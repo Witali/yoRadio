@@ -1,0 +1,20 @@
+--- reference_binding.py
++++ reference_binding02.py
+@@ -50,7 +50,7 @@
+             item = observed(snapshot, row["sha256"])
+             need("bytes" not in row or item["bytes"] == row["bytes"], "historical snapshot size")
+         scopes[name] = dict(qualification_path=qpath, qualification_sha256=qsha, host_path=hpath, host_sha256=hsha,
+-            receipt_path=rpath, receipt_sha256=rsha, original_returncode=1, totals=totals,
++            receipt_path=rpath, receipt_sha256=rsha, original_returncode=1, totals=list(totals),
+             qualification=q, host=host)
+     need(len(contract["model"]["cases"]) == len(mapping["cases"]) == 25, "all25 source cases")
+     rows = []
+@@ -100,6 +100,6 @@
+ 
+ if __name__ == "__main__":
+     value = derive(json.loads((HERE / "contract.json").read_bytes()), json.loads((HERE / "source-map.json").read_bytes()))
+-    with (HERE / "reference-binding.json").open("x", encoding="utf-8", newline="\n") as stream:
++    with (HERE / "reference-binding02.json").open("x", encoding="utf-8", newline="\n") as stream:
+         json.dump(value, stream, indent=2); stream.write("\n")
+-    print(json.dumps(dict(binding=fact(HERE / "reference-binding.json"), cases=len(value["cases"]), new_reference_commands=False)))
++    print(json.dumps(dict(binding=fact(HERE / "reference-binding02.json"), cases=len(value["cases"]), new_reference_commands=False)))

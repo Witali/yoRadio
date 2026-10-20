@@ -1,0 +1,100 @@
+--- paired-numeric01/compare_capture.py
++++ checked-numeric01/compare_capture.py
+@@ -1,4 +1,4 @@
+-"""Measure complete public PCM capture against Xiph; no codec/process execution."""
++"""Measure complete checked-only17 PCM against Xiph; no codec/process execution."""
+ import argparse
+ import hashlib
+ import importlib.util
+@@ -14,9 +14,12 @@
+ HOST = 'eaf3d8033406d5c6844f5dd6e3f42b26195d6e03b3293c27ea03353d6ca0ae29'
+ QUALIFIED = 'd269d71ab02568fcb549c5abf39e4daf8ffcd082b1ede3c259351615768e02b0'
+ HOST_TERMINAL = '799bb892e5b12e0ccc13fc02607aefe49527f51568d0aecfe8a98ac88c492773'
+-RUNNER = 'c78c5265173ebe2c8801d1f6f37ee8ab14811468b40fd5fbcc99a53f8193ff83'
+-PROTOCOL = '7b9912db4d5317376c22d4ab1f65a206941f84f6773b07cf37a522a3bc7f35f8'
++RUNNER = '3aa167fe4b231d2c15b91b1b5c78b24da3410d18eaacc0709d6afe0c33ea902d'
++PROTOCOL = '547655c4fa31a100f29f52b3a142a54442578393b860723b2b1147732578700e'
+ CONTRACT = '847022a7835de03c0f820b3f8e418e7e8b89b6125d2dba8bdf09712d33d3a65a'
++CONTRACT_FILE = '6c95b8d52a7bd5a3ca8e2d1b519f5d0ec3172e7e76e83ade8c1e78d364fdd391'
++DATA_HEADER = 'b4db391fda10e7361f57fe4242574593902042f0e0ef9a48fe24aac144bb153d'
++CALLER = '37eaeb25a272ceadaafe36d6309449d31895b7019523333ed0e4c48226d0d065'
+ COMMANDS = ('sdk-head', 'sdk-clean', 'build', 'setup-macros', 'symbols', 'merge', 'qemu', 'sdk-head-after', 'sdk-clean-after')
+ 
+ 
+@@ -52,9 +55,10 @@
+ 
+ 
+ def complete_capture(report):
+-    need(report.get('result') == 'RAW_CORPUS_PCM_CAPTURED' and report.get('completed') is True and
+-         report.get('target_capture_completed') is True and report.get('vendor_checked_pcm_equal') is True,
+-         'Only a complete original/checked capture is supported; partial/panicking captures are unusable')
++    need(report.get('result') == 'CHECKED_CORPUS_PCM_CAPTURED' and report.get('completed') is True and
++         report.get('target_capture_completed') is True and report.get('checked_decode_completed') is True and
++         report.get('vendor_checked_pcm_equal') is False and report.get('vendor_comparison_available') is False,
++         'Only complete checked-only17 capture is supported; NONPASS/partial captures are unusable')
+     need(all(report.get(key) is False for key in ('passed', 'independent_reference_compared',
+          'numeric_reference_qualified', 'format_corpus_qualified', 'full_G6_qualified',
+          'physical_device', 'production_radio_integration')), 'Capture scope/classification differs')
+@@ -134,7 +138,12 @@
+     inputs.read('target/controller', target_root / 'sources/helpers/run.py', RUNNER)
+     protocol_path = target_root / 'sources/helpers/protocol.py'
+     inputs.read('target/protocol', protocol_path, PROTOCOL)
+-    contract_bytes = inputs.read('target/contract', target_root / 'sources/corpus/contract.json', target['corpus']['contract_file_sha256'])
++    need(target['corpus']['contract_file_sha256'] == CONTRACT_FILE and
++         target['corpus']['data_header_sha256'] == DATA_HEADER and target['corpus']['cases'] == 17 and
++         target['corpus']['packets'] == 238 and target['corpus']['expected_pcm'] == 398080, 'Exact reviewed17 corpus/header facts required')
++    inputs.read('target/caller', target_root / 'sources/project/main/main.c', CALLER)
++    inputs.read('target/data-header', target_root / 'sources/project/main/data.h', DATA_HEADER)
++    contract_bytes = inputs.read('target/contract', target_root / 'sources/corpus/contract.json', CONTRACT_FILE)
+     original_contract = json.loads(contract_bytes)
+     need(original_contract['contract_sha256'] == target['corpus']['contract_sha256'] == CONTRACT, 'Reviewed contract identity')
+     spec = importlib.util.spec_from_file_location('pinned_numeric_capture_protocol', protocol_path)
+@@ -146,15 +155,19 @@
+         need(row['sha256'] == item['sha256'], 'Frozen matrix input binding')
+         relocated.append(dict(path=str((target_root / relative(row['snapshot'])).resolve()), sha256=item['sha256']))
+     contract = protocol.load_contract(relocated)
+-    need(contract['contract_sha256'] == CONTRACT and contract['model'] == original_contract['model'],
+-         'Relocation may change paths only, never source/model bytes')
++    need(contract['contract_sha256'] == CONTRACT and contract['model'] == original_contract['model'] and
++         len(contract['model']['cases']) == 17 and contract['model']['total_packets'] == 238 and
++         contract['model']['total_pcm'] == 398080 and contract['model']['case_mask'] == 131071,
++         'Relocation is path-only; exactly17 cases required, never a partial or25case extension')
+     qemu = target['commands'][6]
+     log = (inputs.read('target/log/qemu.stdout.log', target_root / 'qemu.stdout.log', qemu['stdout_sha256']).decode(errors='replace') + '\n' +
+            inputs.read('target/log/qemu.stderr.log', target_root / 'qemu.stderr.log', qemu['stderr_sha256']).decode(errors='replace'))
+     observed = protocol.validate_log(log, contract, returncode=qemu['exit_status'], timed_out=qemu['timed_out'],
+                                     interrupted=qemu['interrupted'], manifest_hashes=contract['model']['manifest_sha256'])
+     captured = observed.pop('case_pcm')
+-    need(observed == target['observed'] and observed['cases'] == 17 and observed['paired_packets'] == 238 and observed['pcm'] == 398080,
++    need(observed == target['observed'] and observed['cases'] == 17 and observed['decoded_packets'] == 238 and observed['pcm'] == 398080 and
++         observed['protocol_lines'] == 530 and observed['checked_decode_completed'] is True and
++         observed['vendor_checked_pcm_equal'] is False and observed['vendor_comparison_available'] is False,
+          'Complete strict target protocol differs from stored report')
+     need(len(captured) == len(target['observed_pcm']) == 17, 'All seventeen complete PCM captures required')
+     commands = {row['name']: row for row in host['commands']}
+@@ -230,7 +243,14 @@
+             native.append(dict(reference_id=reference_id, comparison=cross))
+         save()
+     need(set((target_root / 'observed-pcm').iterdir()) == persisted_paths and len(native) == 7, 'Exact target/native PCM file accounting')
+-    declared = qualified['xiph_metamorphic_checks']
++    declared = []
++    for mi, item in enumerate(relocated):
++        matrix = json.loads(inputs.read('target/matrix/' + str(mi), item['path'], item['sha256']))
++        for kind, field in (('equal', 'expected_same_decoder_pcm_equal_groups'), ('different', 'expected_same_decoder_pcm_different_pairs')):
++            for group in matrix.get(field, []):
++                declared.append(dict(decoder='libvorbis', kind=kind, cases=group, passed=True))
++    need(len(declared) == 4 and declared == qualified['xiph_metamorphic_checks'],
++         'All actual source-declared17 books relations must match the independent qualification')
+     metamorphic = dict(xiph=relations(xiph_books, declared), target=relations(target_books, declared))
+     need(all(row['expected_relation_observed'] for row in metamorphic['xiph']), 'Previously qualified Xiph relations changed')
+     policy, qualified_pcm = bounded_policy(case_results, metamorphic, args.max_abs_error)
+@@ -258,7 +278,8 @@
+     need(out.is_relative_to(repo / '.build') and out != repo / '.build' and not out.exists() and
+          all(not out.is_relative_to(p) and not p.is_relative_to(out) for p in protected), 'Fresh independent .build output required')
+     out.mkdir(parents=True, exist_ok=False)
+-    result = dict(result='INCOMPLETE', measurement_completed=False, actual_reference_compared=False,
++    result = dict(result='INCOMPLETE', checked_only=True, vendor_comparison_available=False, vendor_checked_pcm_equal=False,
++        measurement_completed=False, actual_reference_compared=False,
+         bounded_corpus_pcm_qualified=False, policy=None, passed=False, numeric_reference_qualified=False,
+         format_conformance_qualified=False, format_corpus_qualified=False, full_G6_qualified=False,
+         physical_device=False, production_radio_integration=False, cases=[])

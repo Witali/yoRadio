@@ -1,0 +1,44 @@
+--- expanded25-prep01/materialize.py
++++ expanded25-prep02/materialize.py
+@@ -96,10 +96,10 @@
+ def render(contract, items):
+     text = ("// Generated complete raw inputs; source materialization only, not target qualification.\n"
+             "#pragma once\n#include \"corpus_case.h\"\n\n"
+-            "#define CORPUS_CASE_COUNT 17U\n"
++            f"#define CORPUS_CASE_COUNT {len(contract['model']['cases'])}U\n"
+             f"#define CORPUS_CONTRACT_SHA256 \"{MODEL_SHA}\"\n"
+             f"#define CORPUS_CONTRACT_FILE_SHA256 \"{CONTRACT_FILE_SHA}\"\n"
+-            "#define CORPUS_EXPECTED_PCM_BYTES 398080U\n\n")
++            f"#define CORPUS_EXPECTED_PCM_BYTES {contract['model']['total_pcm']}U\n\n")
+     rows = []
+     for index, (case, raw) in enumerate(zip(contract["model"]["cases"], items)):
+         names = symbols(index)
+@@ -114,7 +114,8 @@
+ 
+ def recover(text, contract, items):
+     """Read the emitted restricted C grammar; no compiler, generator import or C evaluation."""
+-    for name, expected in (("CORPUS_CASE_COUNT", "17U"), ("CORPUS_EXPECTED_PCM_BYTES", "398080U"),
++    for name, expected in (("CORPUS_CASE_COUNT", f"{len(contract['model']['cases'])}U"),
++                           ("CORPUS_EXPECTED_PCM_BYTES", f"{contract['model']['total_pcm']}U"),
+                            ("CORPUS_CONTRACT_SHA256", json.dumps(MODEL_SHA)),
+                            ("CORPUS_CONTRACT_FILE_SHA256", json.dumps(CONTRACT_FILE_SHA))):
+         found = re.findall(r"^#define " + name + r" (.+)$", text, re.M)
+@@ -134,6 +135,9 @@
+     need(len(table) == 1, "one_descriptor_table")
+     blocks = re.findall(r"    \{\n(.*?)    \},\n?", table[0], re.S)
+     need(len(blocks) == 25, "all_25_descriptors")
++    declared_count = int(re.findall(r"^#define CORPUS_CASE_COUNT ([0-9]+)U$", text, re.M)[0])
++    need(declared_count == len(blocks) == len(items) == len(contract["model"]["cases"]),
++         "declared_capacity_descriptor_model_raw_count")
+     report, seen = [], set()
+     for index, (case, raw, block) in enumerate(zip(contract["model"]["cases"], items, blocks)):
+         names = symbols(index)
+@@ -195,6 +199,8 @@
+         report["header"] = dict(path="data.h", bytes=header.stat().st_size, sha256=sha(header.read_bytes()))
+         report["cases"] = recover(header.read_text(encoding="ascii"), contract, items)
+         controls = [
++            ("declared_case_count17", text.replace("#define CORPUS_CASE_COUNT 25U", "#define CORPUS_CASE_COUNT 17U", 1), "identity_macro:CORPUS_CASE_COUNT"),
++            ("declared_pcm_total17", text.replace("#define CORPUS_EXPECTED_PCM_BYTES 623360U", "#define CORPUS_EXPECTED_PCM_BYTES 398080U", 1), "identity_macro:CORPUS_EXPECTED_PCM_BYTES"),
+             ("raw_identification_byte", text.replace("0x01", "0x02", 1), "raw_array_bytes:identification"),
+             ("first_offset", text.replace("    0U,", "    1U,", 1), "offset_values"),
+             ("descriptor_rate", text.replace(".rate = 192000U", ".rate = 48000U", 1), "ordered_descriptor_fields"),

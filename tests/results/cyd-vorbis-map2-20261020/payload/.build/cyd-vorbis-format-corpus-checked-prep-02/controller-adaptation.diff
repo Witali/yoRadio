@@ -1,0 +1,83 @@
+--- .build/cyd-vorbis-format-corpus-sdk-prep-01/run-cyd-vorbis-format-corpus-qemu.py
++++ .build/cyd-vorbis-format-corpus-checked-prep-01/run-cyd-vorbis-format-corpus-checked-qemu.py
+@@ -1,4 +1,4 @@
+-"""Capture an isolated public raw Vorbis corpus; independent PCM comparison remains separate."""
++"""Capture a checked-only public raw Vorbis corpus; independent PCM comparison remains separate."""
+ import argparse
+ import hashlib
+ import json
+@@ -27,9 +27,11 @@
+     '.build/cyd-vorbis-format-corpus-host-01-command.json':
+         '799bb892e5b12e0ccc13fc02607aefe49527f51568d0aecfe8a98ac88c492773'}
+ CONTRACT_ID = '847022a7835de03c0f820b3f8e418e7e8b89b6125d2dba8bdf09712d33d3a65a'
++CONTRACT_FILE_SHA = '6c95b8d52a7bd5a3ca8e2d1b519f5d0ec3172e7e76e83ade8c1e78d364fdd391'
++DATA_HEADER_SHA = 'b4db391fda10e7361f57fe4242574593902042f0e0ef9a48fe24aac144bb153d'
+ # Filled only with the independent caller owner's final reviewed source bytes.
+-CALLER_SHA = '3ca8f85b8a2a9fad5c196143f4833da5fb9ce13b9b69351900b9eecc7e831f54'
+-PROTOCOL_SHA = '7b9912db4d5317376c22d4ab1f65a206941f84f6773b07cf37a522a3bc7f35f8'
++CALLER_SHA = '37eaeb25a272ceadaafe36d6309449d31895b7019523333ed0e4c48226d0d065'
++PROTOCOL_SHA = '547655c4fa31a100f29f52b3a142a54442578393b860723b2b1147732578700e'
+ CASE_HEADER_SHA = '91a040d89f3bc2b7740fa2f175f36d64cebcd92653cd4c2014149bbb11219be3'
+ RAW_HELPER_SHA = '5731c1022c8f6ecdb6c03d833f9d2208c675b22e20f71ac7327b3941af8822c5'
+ SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+@@ -63,6 +65,8 @@
+     args = parser.parse_args()
+     if not all(re.fullmatch(r'[0-9a-f]{64}',value) for value in (args.contract_sha256,args.data_sha256)):
+         parser.error('Require independently reviewed lowercase contract/data SHA256 values')
++    if args.contract_sha256!=CONTRACT_FILE_SHA or args.data_sha256!=DATA_HEADER_SHA:
++        parser.error('Require the unchanged reviewed17-case contract and materialized data header')
+     if not all((CALLER_SHA,PROTOCOL_SHA,CASE_HEADER_SHA)):
+         parser.error('Source proposal incomplete: independent caller source freeze is required')
+     if sys.platform != 'win32': parser.error('Pinned Windows SDK launcher required')
+@@ -75,7 +79,7 @@
+     taskkill = Path(os.environ['SystemRoot']) / 'System32/taskkill.exe'
+     rom = qemu.parent.parent / 'pc-bios'
+     # The sibling layout permits review from this scratch prep before promotion.
+-    harness = Path(__file__).resolve().parent / 'target/cyd_vorbis_format_corpus_qemu'
++    harness = Path(__file__).resolve().parent / 'target/cyd_vorbis_format_corpus_checked_qemu'
+     contract_path, data_header = args.contract.resolve(), args.data_header.resolve()
+     protected = (candidate,harness,contract_path,data_header,sdk,tools,codec,ps.parent,qemu.parent,rom,
+                  repo/'.build/cyd-vorbis-format-corpus-qualified-01',repo/'.build/cyd-vorbis-format-corpus-host-01')
+@@ -91,7 +95,8 @@
+                 harness/'main/corpus_case.h', Path(__file__).with_name('protocol.py')]
+     if any(not p.is_file() for p in required): parser.error('Missing required pinned source/runtime')
+     out.mkdir(parents=True, exist_ok=False)
+-    report = dict(passed=False, completed=False, target_capture_completed=False, vendor_checked_pcm_equal=False,
++    report = dict(passed=False, completed=False, target_capture_completed=False,checked_decode_completed=False,
++                  vendor_checked_pcm_equal=False,vendor_comparison_available=False,
+                   independent_reference_compared=False,numeric_reference_qualified=False,format_corpus_qualified=False,
+                   full_G6_qualified=False,physical_device=False,production_radio_integration=False,
+                   commands=[],inputs={},tools={},observed_pcm=[])
+@@ -314,8 +319,9 @@
+             returncode=qemu_row['exit_status'],timed_out=qemu_row['timed_out'],interrupted=qemu_row['interrupted'],
+             manifest_hashes=[sha(repo/name) for name,digest in MATRIX_INPUTS])
+         captured = observed.pop('case_pcm')
+-        need(len(captured)==17 and observed['cases']==17 and observed['paired_packets']==238 and observed['pcm']==398080 and
+-             observed['vendor_checked_pcm_equal'] is True and observed['independent_reference_compared'] is False,
++        need(len(captured)==17 and observed['protocol_lines']==530 and observed['cases']==17 and observed['decoded_packets']==238 and observed['pcm']==398080 and
++             observed['checked_decode_completed'] is True and observed['vendor_checked_pcm_equal'] is False and
++             observed['vendor_comparison_available'] is False and observed['independent_reference_compared'] is False,
+              'All17 actual PCM observations required')
+         pcm_directory = out/'observed-pcm'
+         pcm_directory.mkdir()
+@@ -342,15 +348,16 @@
+              set(pcm_directory.iterdir())=={out/row['path'] for row in report['observed_pcm']} and
+              all(sha(out/row['path'])==row['sha256'] and (out/row['path']).stat().st_size==row['bytes']
+                  for row in report['observed_pcm']),'Observed PCM file set changed/incomplete')
+-        report.update(completed=True,target_capture_completed=True,vendor_checked_pcm_equal=True,
+-                      result='RAW_CORPUS_PCM_CAPTURED')
++        report.update(completed=True,target_capture_completed=True,checked_decode_completed=True,
++                      vendor_checked_pcm_equal=False,vendor_comparison_available=False,result='CHECKED_CORPUS_PCM_CAPTURED')
+         save()
+         print(json.dumps({k:report[k] for k in ('result','completed','target_capture_completed',
+-            'vendor_checked_pcm_equal','independent_reference_compared','numeric_reference_qualified',
++            'checked_decode_completed','vendor_checked_pcm_equal','vendor_comparison_available','independent_reference_compared','numeric_reference_qualified',
+             'format_corpus_qualified','observed_pcm')}))
+         return 0
+     except BaseException as exc:
+-        report.update(passed=False,completed=False,target_capture_completed=False,vendor_checked_pcm_equal=False,
++        report.update(passed=False,completed=False,target_capture_completed=False,checked_decode_completed=False,
++                      vendor_checked_pcm_equal=False,vendor_comparison_available=False,
+                       independent_reference_compared=False,numeric_reference_qualified=False,format_corpus_qualified=False,
+                       result='INTERRUPTED' if isinstance(exc,KeyboardInterrupt) else 'NONPASS',error=repr(exc))
+         save()

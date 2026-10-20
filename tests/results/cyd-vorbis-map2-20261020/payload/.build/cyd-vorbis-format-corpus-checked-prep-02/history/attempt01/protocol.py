@@ -1,0 +1,153 @@
+"""Strict checked-only public raw corpus observations. Does not launch or qualify a target."""
+import hashlib
+import json
+from pathlib import Path
+import re
+
+PREFIX = "CYD_VORBIS_CHECKED_CORPUS_"
+CASE_COUNT, PACKETS = 17, 14
+
+
+def need(condition, message):
+    if not condition:
+        raise RuntimeError(message)
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def inspect_case(case, directory, source_index):
+    """Read complete raw inputs; never interpret codec-private state or synthesize."""
+    need(re.fullmatch(r"[a-z0-9_-]{1,96}", case["id"]), "case id")
+    directory = Path(directory).resolve()
+    raw, facts = {}, []
+    for kind in ("identification", "setup", "audio"):
+        path = (directory / case[kind]).resolve()
+        need(path.is_relative_to(directory) and path != directory, "raw path escapes matrix directory")
+        raw[kind] = path.read_bytes()
+        facts.append(dict(path=str(path), bytes=len(raw[kind]), sha256=sha(raw[kind])))
+    info, setup, audio = raw["identification"], raw["setup"], raw["audio"]
+    need(len(info) == 30 and info[:7] == b"\x01vorbis" and len(setup) > 7 and setup[:7] == b"\x05vorbis", "full prefixed headers")
+    rate, channels, short, long = (case[k] for k in ("rate", "channels", "short", "long"))
+    need(all(type(x) is int for x in (rate, channels, short, long)), "typed descriptor values")
+    need(0 < rate <= 0xffffffff and channels == 2, "rate/channels")
+    need(all(64 <= x <= 8192 and not x & (x - 1) for x in (short, long)) and short <= long, "block sizes")
+    need(info[7:11] == bytes(4) and info[11] == channels and int.from_bytes(info[12:16], "little") == rate and info[29] & 1, "identification fields")
+    need(1 << (info[28] & 15) == short and 1 << (info[28] >> 4) == long, "identification block fields")
+    offsets, modes = case["offsets"], case["mode_flags"]
+    need(case["packet_count"] == PACKETS and len(offsets) == PACKETS + 1 and len(modes) == PACKETS, "packet shape")
+    need(all(type(x) is int for x in offsets + modes) and offsets[0] == 0 and offsets[-1] == len(audio), "offset types/endpoints")
+    sizes = [b - a for a, b in zip(offsets, offsets[1:])]
+    need(all(0 < x <= 512 for x in sizes) and all(x in (0, 1) for x in modes), "complete packet sizes/modes")
+    for i, (offset, mode) in enumerate(zip(offsets, modes)):
+        first = audio[offset]
+        need(first & 3 == mode << 1, "raw packet mode")
+        if mode:
+            need(i > 0 and i + 1 < PACKETS and (first >> 2) & 1 == modes[i - 1] and (first >> 3) & 1 == modes[i + 1], "long neighbor flags")
+    blocks = [long if mode else short for mode in modes]
+    frames = [0] + [(a + b) // 4 for a, b in zip(blocks, blocks[1:])]
+    pcm = [n * channels * 2 for n in frames]
+    need(max(pcm) <= 16384 and sum(pcm) == case["expected_s16le_bytes"] and sum(frames) == case["expected_raw_samples"], "overlap totals")
+    declared = case.get("expected_packet_samples", case.get("expected_packet_frames"))
+    need(declared == frames, "declared frame counts")
+    transitions = [4] + [a * 2 + b for a, b in zip(modes, modes[1:])]
+    need(set(transitions[1:]) == {0, 1, 2, 3}, "all four transitions")
+    return dict(id=case["id"], source_index=source_index, rate=rate, channels=channels,
+                short=short, long=long, offsets=offsets, modes=modes, sizes=sizes,
+                frames=frames, pcm=pcm, total_pcm=sum(pcm), transitions=transitions,
+                raw_sha256={k: sha(v) for k, v in raw.items()}), facts
+
+
+def load_contract(manifest_inputs):
+    """Inputs are explicit {path, sha256} pairs; caller supplies independently pinned SHAs."""
+    need(len(manifest_inputs) == 2, "two source matrices required")
+    cases, facts, pins = [], [], []
+    for source_index, source in enumerate(manifest_inputs):
+        path = Path(source["path"]).resolve()
+        data = path.read_bytes()
+        need(type(source["sha256"]) is str and sha(data) == source["sha256"], "source manifest SHA")
+        pins.append(dict(path=str(path), sha256=source["sha256"]))
+        facts.append(dict(path=str(path), bytes=len(data), sha256=sha(data)))
+        matrix = json.loads(data)
+        for case in matrix["cases"]:
+            item, raw_facts = inspect_case(case, path.parent, source_index)
+            cases.append(item); facts.extend(raw_facts)
+    need(len(cases) == CASE_COUNT and len({c["id"] for c in cases}) == CASE_COUNT, "all 17 distinct named cases")
+    model = dict(schema="public-vorbis-corpus-contract-v1", manifest_sha256=[p["sha256"] for p in pins],
+                 cases=cases, total_packets=CASE_COUNT * PACKETS,
+                 total_pcm=sum(c["total_pcm"] for c in cases), case_mask=(1 << CASE_COUNT) - 1)
+    identity = sha(json.dumps(model, sort_keys=True, separators=(",", ":")).encode())
+    return dict(contract_sha256=identity, manifest_inputs=pins, model=model, source_facts=facts)
+
+
+def validate_log(log, contract, *, returncode, timed_out, interrupted, manifest_hashes):
+    """Actual process/controller facts are mandatory. Returns observations, not qualification."""
+    need(type(returncode) is int and returncode == 0 and timed_out is False and interrupted is False,
+         "process incomplete/nonzero/timed out/interrupted")
+    need(isinstance(manifest_hashes, (list, tuple)) and list(manifest_hashes) == contract["model"]["manifest_sha256"],
+         "controller manifest hash facts")
+    need(load_contract(contract["manifest_inputs"]) == contract, "contract/source stability")
+    need(not re.search(r"Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP|Task watchdog got triggered|Interrupt wdt timeout|Stack canary watchpoint|stack overflow|TimeoutExpired|timed out", log, re.I), "target failure/panic/timeout")
+    lines = log.splitlines()
+    need(not any(("VORBIS_CORPUS_" in line or "VORBIS_CHECKED_CORPUS_" in line) and not line.startswith(PREFIX) for line in lines), "foreign/malformed corpus prefix")
+    events = [line[len(PREFIX):] for line in lines if line.startswith(PREFIX)]
+    position = 0
+    def take(event, expected, variables=(), strings=()):
+        nonlocal position
+        need(position < len(events), "missing protocol event")
+        tokens = events[position].split(" "); position += 1
+        need(tokens[0] == event and all(token.count("=") == 1 for token in tokens[1:]), "event syntax/order")
+        fields = {}
+        for token in tokens[1:]:
+            key, value = token.split("=")
+            need(key and (value or key in strings) and key not in fields, "duplicate/empty field")
+            fields[key] = value
+        need(set(fields) == set(expected) | set(variables) | set(strings), "missing/extra event fields")
+        for key, value in expected.items():
+            need(fields[key] == str(value), f"{event} {key}: actual {fields[key]!r}, expected {value!r}")
+        parsed = {}
+        for key in variables:
+            need(re.fullmatch(r"0|[1-9][0-9]*", fields[key]), "noncanonical unsigned count")
+            parsed[key] = int(fields[key])
+        for key in strings:
+            parsed[key] = fields[key]
+        return parsed
+    model = contract["model"]
+    take("BEGIN", dict(contract=contract["contract_sha256"], cases=17, packets=238, coordinator=0))
+    take("WORKER", dict(core=1, priority=3, configured_stack=16384))
+    captured = []
+    for index, case in enumerate(model["cases"]):
+        take("OPEN", dict(case=index, id=case["id"], checked_rc=0, checked_handle=1, core=1))
+        nl = nr = 0
+        case_pcm, packet_offsets = bytearray(), [0]
+        for packet, (size, pcm, frames, transition) in enumerate(zip(case["sizes"], case["pcm"], case["frames"], case["transitions"])):
+            result = take("PACKET", dict(case=index, packet=packet, size=size, checked_rc=0,
+                checked_consumed=size, expected_pcm=pcm, checked_pcm=pcm, checked_rate=case["rate"],
+                checked_channels=2, checked_bits=16, checked_canary=1, transition=transition, core=1), ("nz_l", "nz_r"))
+            need(all((count == 0 if not packet else 1 <= count <= frames) for count in result.values()),
+                 "nonzero each output channel/transition or primer counts")
+            emitted = take("PCM_HEX", dict(case=index, packet=packet, bytes=pcm, core=1), strings=("hex",))["hex"]
+            need(len(emitted) == 2 * pcm and re.fullmatch(r"(?:[0-9a-f]{2})*", emitted) is not None,
+                 "PCM hex length/alphabet")
+            packet_pcm = bytes.fromhex(emitted)
+            observed = {"nz_l": sum(packet_pcm[i:i + 2] != b"\0\0" for i in range(0, len(packet_pcm), 4)),
+                        "nz_r": sum(packet_pcm[i:i + 2] != b"\0\0" for i in range(2, len(packet_pcm), 4))}
+            need(observed == result, "PCM bytes/nonzero observations disagree")
+            case_pcm.extend(packet_pcm); packet_offsets.append(len(case_pcm))
+            nl += result["nz_l"]; nr += result["nz_r"]
+        take("CLOSE", dict(case=index, checked_rc=0, core=1))
+        take("CASE", dict(case=index, id=case["id"], packets=14, pcm=case["total_pcm"], nz_l=nl, nz_r=nr,
+                          transitions_mask=15, core=1))
+        captured.append(dict(case=index, id=case["id"], pcm=bytes(case_pcm), sha256=sha(case_pcm),
+                             packet_offsets=packet_offsets))
+    take("COMPLETE", dict(cases=17, packets=238, pcm=model["total_pcm"], cases_mask=131071, core=1))
+    need(position == len(events) == 530, "extra/missing/duplicate protocol")
+    need(load_contract(contract["manifest_inputs"]) == contract, "source changed during validation")
+    return dict(protocol_lines=position, cases=17, decoded_packets=238, pcm=model["total_pcm"],
+                case_mask=131071, checked_decode_completed=True, vendor_checked_pcm_equal=False,
+                vendor_comparison_available=False, independent_reference_compared=False,
+                manifest_sha256=list(manifest_hashes),
+                contract_sha256=contract["contract_sha256"], observed_returncode=returncode,
+                observed_timed_out=timed_out, observed_interrupted=interrupted,
+                case_pcm=captured)

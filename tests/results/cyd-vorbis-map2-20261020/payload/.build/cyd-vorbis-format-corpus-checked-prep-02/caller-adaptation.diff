@@ -1,0 +1,131 @@
+--- .build/cyd-vorbis-format-corpus-sdk-prep-01/target/cyd_vorbis_format_corpus_qemu/main/main.c
++++ .build/cyd-vorbis-format-corpus-checked-prep-01/target/cyd_vorbis_format_corpus_checked_qemu/main/main.c
+@@ -13,27 +13,22 @@
+ #ifdef LIMIT_TO_64kHz
+ #error This corpus requires the normal unrestricted format profile
+ #endif
+-_Static_assert(CORPUS_CASE_COUNT == 17, "This corpus has exactly 17 named cases");
++_Static_assert(CORPUS_CASE_COUNT >= 1 && CORPUS_CASE_COUNT <= 31, "Bounded named corpus cases");
+ 
+-extern esp_audio_err_t __real_esp_vorbis_dec_open(void *, uint32_t, void **);
+-extern esp_audio_err_t __real_esp_vorbis_dec_decode(void *, esp_audio_dec_in_raw_t *,
+-    esp_audio_dec_out_frame_t *, esp_audio_dec_info_t *);
+-
+-#define P "CYD_VORBIS_CORPUS_"
++#define P "CYD_VORBIS_CHECKED_CORPUS_"
+ #define PACKETS 14U
+ #define PCM_CAPACITY 16384U
+ #define INPUT_CAPACITY 512U
+ typedef struct { uint8_t before[16], data[PCM_CAPACITY], after[16]; } guarded_pcm_t;
+-static guarded_pcm_t vendor_pcm, checked_pcm;
+-static uint8_t vendor_input[INPUT_CAPACITY], checked_input[INPUT_CAPACITY];
++static guarded_pcm_t checked_pcm;
++static uint8_t checked_input[INPUT_CAPACITY];
+ static char pcm_hex[2U * PCM_CAPACITY + 1U]; // Test-only capture; worker stack is unchanged.
+-static void *vendor, *checked;
++static void *checked;
+ static unsigned current_case, current_packet;
+ 
+ static void stop(const char *reason) {
+     if (reason) printf(P "FAILURE case=%u packet=%u reason=%s core=%d\n",
+                        current_case, current_packet, reason, xPortGetCoreID());
+-    if (vendor) { esp_vorbis_dec_close(vendor); vendor = NULL; }
+     if (checked) { esp_vorbis_dec_close(checked); checked = NULL; }
+     fflush(stdout);
+     esp_restart();
+@@ -108,50 +103,39 @@
+ static uint32_t run_case(const corpus_case_t *c, unsigned index) {
+     current_case = index; current_packet = 0;
+     descriptor(c);
+-    need(!vendor && !checked, "fresh_handles");
+-    esp_vorbis_dec_cfg_t vc = config(c), cc = config(c);
+-    int vr = __real_esp_vorbis_dec_open(&vc, sizeof(vc), &vendor);
++    need(!checked, "fresh_checked_handle");
++    esp_vorbis_dec_cfg_t cc = config(c);
+     int cr = esp_vorbis_dec_open(&cc, sizeof(cc), &checked);
+-    bool distinct = vendor && checked && vendor != checked;
+-    printf(P "OPEN case=%u id=%s vendor_rc=%d checked_rc=%d vendor_handle=%u checked_handle=%u distinct=%u core=%d\n",
+-        index, c->id, vr, cr, vendor != NULL, checked != NULL, distinct, xPortGetCoreID());
+-    need(vr == ESP_AUDIO_ERR_OK && cr == ESP_AUDIO_ERR_OK && distinct, "public_open_distinct_handles");
+-    esp_audio_dec_info_t vi = {0}, ci = {0}; // Retained once for each opened handle, including primer.
++    printf(P "OPEN case=%u id=%s checked_rc=%d checked_handle=%u core=%d\n",
++        index, c->id, cr, checked != NULL, xPortGetCoreID());
++    need(cr == ESP_AUDIO_ERR_OK && checked, "checked_public_open");
++    esp_audio_dec_info_t ci = {0}; // Persistent public metadata for this handle, including primer.
+     uint32_t total = 0, nz_left = 0, nz_right = 0;
+     unsigned transition_mask = 0;
+     for (unsigned packet = 0; packet < PACKETS; ++packet) {
+         current_packet = packet;
+         uint32_t size = c->offsets[packet + 1] - c->offsets[packet], expected = expected_pcm(c, packet);
+-        memcpy(vendor_input, c->audio + c->offsets[packet], size);
+         memcpy(checked_input, c->audio + c->offsets[packet], size);
+-        esp_audio_dec_in_raw_t a = {.buffer=vendor_input, .len=size}, b = {.buffer=checked_input, .len=size};
+-        esp_audio_dec_out_frame_t ao = {.buffer=vendor_pcm.data, .len=sizeof(vendor_pcm.data)};
++        esp_audio_dec_in_raw_t b = {.buffer=checked_input, .len=size};
+         esp_audio_dec_out_frame_t bo = {.buffer=checked_pcm.data, .len=sizeof(checked_pcm.data)};
+-        arm(&vendor_pcm, 0xa7);
+-        vr = __real_esp_vorbis_dec_decode(vendor, &a, &ao, &vi); // Vendor first for EVERY packet.
+-        bool vg = guards(&vendor_pcm);
+         arm(&checked_pcm, 0xc9);
+         cr = esp_vorbis_dec_decode(checked, &b, &bo, &ci);
+-        bool cg = guards(&checked_pcm), bounded = ao.decoded_size <= PCM_CAPACITY && bo.decoded_size <= PCM_CAPACITY;
+-        bool equal = bounded && ao.decoded_size == bo.decoded_size && !memcmp(vendor_pcm.data, checked_pcm.data, bo.decoded_size);
++        bool cg = guards(&checked_pcm), bounded = bo.decoded_size <= PCM_CAPACITY;
+         uint32_t nl = 0, nr = 0;
+         if (bounded && !(bo.decoded_size % 4U)) nonzero(checked_pcm.data, bo.decoded_size, &nl, &nr);
+         unsigned transition = packet ? c->modes[packet - 1] * 2U + c->modes[packet] : 4U;
+         int core = xPortGetCoreID();
+-        printf(P "PAIR case=%u packet=%u size=%" PRIu32 " vendor_rc=%d checked_rc=%d vendor_consumed=%" PRIu32
+-            " checked_consumed=%" PRIu32 " expected_pcm=%" PRIu32 " vendor_pcm=%" PRIu32 " checked_pcm=%" PRIu32
+-            " vendor_rate=%" PRIu32 " checked_rate=%" PRIu32 " vendor_channels=%u checked_channels=%u vendor_bits=%u checked_bits=%u"
+-            " equal=%u vendor_canary=%u checked_canary=%u vendor_first=1 transition=%u nz_l=%" PRIu32 " nz_r=%" PRIu32 " core=%d\n",
+-            index, packet, size, vr, cr, a.consumed, b.consumed, expected, ao.decoded_size, bo.decoded_size,
+-            vi.sample_rate, ci.sample_rate, (unsigned)vi.channel, (unsigned)ci.channel,
+-            (unsigned)vi.bits_per_sample, (unsigned)ci.bits_per_sample, equal, vg, cg, transition, nl, nr, core);
+-        need(core == 1 && vr == ESP_AUDIO_ERR_OK && cr == ESP_AUDIO_ERR_OK && a.consumed == size && b.consumed == size,
+-             "pair_result_full_consumption_core");
+-        need(bounded && ao.decoded_size == expected && bo.decoded_size == expected && equal && vg && cg,
+-             "pair_exact_pcm_size_and_canaries");
+-        need(vi.sample_rate == c->rate && ci.sample_rate == c->rate && vi.channel == 2 && ci.channel == 2 &&
+-             vi.bits_per_sample == 16 && ci.bits_per_sample == 16, "pair_retained_public_metadata");
+-        need(!packet ? !nl && !nr : nl && nr, "pair_nonzero_each_channel_transition");
++        printf(P "PACKET case=%u packet=%u size=%" PRIu32 " checked_rc=%d checked_consumed=%" PRIu32
++            " expected_pcm=%" PRIu32 " checked_pcm=%" PRIu32 " checked_rate=%" PRIu32
++            " checked_channels=%u checked_bits=%u checked_canary=%u transition=%u nz_l=%" PRIu32 " nz_r=%" PRIu32 " core=%d\n",
++            index, packet, size, cr, b.consumed, expected, bo.decoded_size, ci.sample_rate,
++            (unsigned)ci.channel, (unsigned)ci.bits_per_sample, cg, transition, nl, nr, core);
++        need(core == 1 && cr == ESP_AUDIO_ERR_OK && b.consumed == size,
++             "checked_result_full_consumption_core");
++        need(bounded && bo.decoded_size == expected && cg, "checked_pcm_size_and_canaries");
++        need(ci.sample_rate == c->rate && ci.channel == 2 && ci.bits_per_sample == 16,
++             "checked_retained_public_metadata");
++        need(!packet ? !nl && !nr : nl && nr, "checked_nonzero_each_channel_transition");
+         static const char digits[] = "0123456789abcdef";
+         for (uint32_t i = 0; i < bo.decoded_size; ++i) {
+             pcm_hex[2U * i] = digits[checked_pcm.data[i] >> 4];
+@@ -164,11 +148,11 @@
+         if (packet) transition_mask |= 1U << transition;
+         vTaskDelay(1);
+     }
+-    void *vh = vendor, *ch = checked; vendor = checked = NULL;
+-    vr = esp_vorbis_dec_close(vh); cr = esp_vorbis_dec_close(ch);
+-    printf(P "CLOSE case=%u vendor_rc=%d checked_rc=%d core=%d\n", index, vr, cr, xPortGetCoreID());
+-    need(vr == ESP_AUDIO_ERR_OK && cr == ESP_AUDIO_ERR_OK && total == c->expected_pcm_bytes && transition_mask == 15,
+-         "public_close_and_case_total");
++    void *ch = checked; checked = NULL;
++    cr = esp_vorbis_dec_close(ch);
++    printf(P "CLOSE case=%u checked_rc=%d core=%d\n", index, cr, xPortGetCoreID());
++    need(cr == ESP_AUDIO_ERR_OK && total == c->expected_pcm_bytes && transition_mask == 15,
++         "checked_public_close_and_case_total");
+     printf(P "CASE case=%u id=%s packets=%u pcm=%" PRIu32 " nz_l=%" PRIu32 " nz_r=%" PRIu32 " transitions_mask=%u core=%d\n",
+         index, c->id, PACKETS, total, nz_left, nz_right, transition_mask, xPortGetCoreID());
+     return total;
+@@ -180,7 +164,7 @@
+     need(core == 1 && priority == 3, "worker_core_priority");
+     uint64_t total = 0; uint32_t mask = 0;
+     for (unsigned i = 0; i < CORPUS_CASE_COUNT; ++i) { total += run_case(corpus_cases + i, i); mask |= 1U << i; }
+-    need(total == CORPUS_EXPECTED_PCM_BYTES && mask == 131071U, "complete_corpus_total");
++    need(total == CORPUS_EXPECTED_PCM_BYTES && mask == ((UINT32_C(1) << CORPUS_CASE_COUNT) - 1U), "complete_corpus_total");
+     printf(P "COMPLETE cases=%u packets=%u pcm=%" PRIu64 " cases_mask=%" PRIu32 " core=%d\n",
+         CORPUS_CASE_COUNT, CORPUS_CASE_COUNT * PACKETS, total, mask, xPortGetCoreID());
+     stop(NULL);

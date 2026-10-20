@@ -1,0 +1,13 @@
+--- archive-prep02/pack.py
++++ archive-prep03/pack.py
+@@ -146,8 +146,8 @@
+     for rel in plan['extras']:
+         add(repo / rel)
+         if rel.endswith('.json') and 'argv' in load(repo / rel): receipt(rel)
+-    for name in ('pack.py', 'verify.py', 'README.md', 'plan.template.json', 'source_ast_check.py',
+-                 'source-ast.stdout.log', 'source-ast.stderr.log', 'source-ast-command.json', 'readiness.json'):
++    for name in ('pack.py', 'verify.py', 'README.md', 'plan.template.json', 'pack-revision02.diff',
++                 'verify-revision02.diff', 'pack-revision03.diff', 'source-relation.json', 'readiness.json'):
+         add(Path(__file__).with_name(name), stored=name)
+     add(plan_path, stored='selection.json')
+     attributes = b'* -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol,-space-before-tab\n'

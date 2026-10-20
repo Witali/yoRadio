@@ -1,0 +1,245 @@
+{
+  "schema": "map2-saved-input-readback-v1",
+  "completed": true,
+  "construction_only": true,
+  "cases": 8,
+  "raw_packets": 112,
+  "raw_files": 32,
+  "carriers": 8,
+  "manifest_files_checked": 43,
+  "expected_pcm_bytes_per_case": 28160,
+  "expected_total_pcm_bytes": 225280,
+  "exact_negative_controls": [
+    {
+      "name": "map2_unused_original_rows_omitted",
+      "rejected": true,
+      "exact_reason": "vector_book_fields"
+    },
+    {
+      "name": "map2_used_count_reads_original_prefix",
+      "rejected": true,
+      "exact_reason": "expected_spectral_equality"
+    },
+    {
+      "name": "single_entry_length2_rejected",
+      "rejected": true,
+      "exact_reason": "finite corpus requires a complete codeword tree"
+    },
+    {
+      "name": "other_underpopulated_tree_rejected",
+      "rejected": true,
+      "exact_reason": "finite corpus requires a complete codeword tree"
+    },
+    {
+      "name": "single_entry_zero_bit_consumption",
+      "rejected": true,
+      "exact_reason": "truncated construction"
+    },
+    {
+      "name": "twin_rows_must_be_vector_identical",
+      "rejected": true,
+      "exact_reason": "expected_spectral_equality"
+    },
+    {
+      "name": "audio_selected_entry_changed",
+      "rejected": true,
+      "exact_reason": "actual_selected_entries"
+    },
+    {
+      "name": "carrier_crc_changed",
+      "rejected": true,
+      "exact_reason": "CRC mismatch"
+    }
+  ],
+  "cases_observed": [
+    {
+      "id": "sparse_explicit_d16_seq0",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 104,
+        "audio": 84,
+        "comment": 58,
+        "ogg": 752
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 8,
+        "2": 7,
+        "5": 7,
+        "3": 6
+      },
+      "all_original_multiplicands": 96
+    },
+    {
+      "id": "dense_active_d16_seq0",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 94,
+        "audio": 84,
+        "comment": 58,
+        "ogg": 742
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 8,
+        "1": 7,
+        "3": 7,
+        "2": 6
+      },
+      "all_original_multiplicands": 64
+    },
+    {
+      "id": "sparse_explicit_d16_seq1",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 104,
+        "audio": 84,
+        "comment": 58,
+        "ogg": 752
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 8,
+        "2": 7,
+        "5": 7,
+        "3": 6
+      },
+      "all_original_multiplicands": 96
+    },
+    {
+      "id": "dense_active_d16_seq1",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 94,
+        "audio": 84,
+        "comment": 58,
+        "ogg": 742
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 8,
+        "1": 7,
+        "3": 7,
+        "2": 6
+      },
+      "all_original_multiplicands": 64
+    },
+    {
+      "id": "single_explicit_d2_seq0",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 78,
+        "audio": 98,
+        "comment": 58,
+        "ogg": 740
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 224
+      },
+      "all_original_multiplicands": 2
+    },
+    {
+      "id": "dense_twin_d2_seq0",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 79,
+        "audio": 98,
+        "comment": 58,
+        "ogg": 741
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 112,
+        "1": 112
+      },
+      "all_original_multiplicands": 4
+    },
+    {
+      "id": "single_explicit_d2_seq1",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 78,
+        "audio": 98,
+        "comment": 58,
+        "ogg": 740
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 224
+      },
+      "all_original_multiplicands": 2
+    },
+    {
+      "id": "dense_twin_d2_seq1",
+      "raw_sizes": {
+        "identification": 30,
+        "setup": 79,
+        "audio": 98,
+        "comment": 58,
+        "ogg": 741
+      },
+      "expected_pcm_bytes": 28160,
+      "active_entry_usage": {
+        "0": 112,
+        "1": 112
+      },
+      "all_original_multiplicands": 4
+    }
+  ],
+  "expected_pair_groups": [
+    [
+      "sparse_explicit_d16_seq0",
+      "dense_active_d16_seq0"
+    ],
+    [
+      "sparse_explicit_d16_seq1",
+      "dense_active_d16_seq1"
+    ],
+    [
+      "single_explicit_d2_seq0",
+      "dense_twin_d2_seq0"
+    ],
+    [
+      "single_explicit_d2_seq1",
+      "dense_twin_d2_seq1"
+    ]
+  ],
+  "actual_saved_audio_equal_for_all_four_pairs": true,
+  "actual_saved_integer_spectrum_equal_for_all_four_pairs": true,
+  "actual_PCM_equality_observed": false,
+  "single_consumed_bit_counts": {
+    "0": 224,
+    "1": 224
+  },
+  "previous_zero_only_manifest": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\generated01\\manifest.json",
+    "bytes": 8641,
+    "sha256": "1a0d67d8693901d17ae529299c50f3640f4d4aeddd65b2eeda9597a82487e1a6"
+  },
+  "previous_zero_only_inputs_and_files_unchanged": true,
+  "inputs": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\generate02.py",
+      "bytes": 18147,
+      "sha256": "842577227a4418bfffa7c354e0a162350d9d926887a43b1ef2b3bb25db0184fc"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\README02.md",
+      "bytes": 6159,
+      "sha256": "e86cb379c176f91ac1743d0e5a1bf492f04ac00c783f588b095c3c96e9270982"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_format_corpus\\generate_books.py",
+      "bytes": 21108,
+      "sha256": "de9b09de59a0825feda741c0343c6d60821ddad1258ce7df5ae342c68e268fc1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_block_matrix\\generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    }
+  ],
+  "source_or_campaign_mutations": false,
+  "actual_codec_SDK_compiler_QEMU_reference_Git_privatebinary_device_executed": false
+}

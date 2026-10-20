@@ -1,0 +1,27 @@
+--- archive-prep01/pack.py
++++ archive-prep02/pack.py
+@@ -105,11 +105,22 @@
+         report = load(root / 'report.json')
+         for field in ('build_outputs', 'variant_sources'):
+             selected += [root / norm(rel) for rel in report.get(field, {})]
++        expected_products = set()
+         desc = root / 'build/project_description.json'
+         if desc.is_file():
+-            selected += [root / 'build' / load(desc)[key] for key in ('app_elf', 'app_bin')]
++            expected_products.update(root / 'build' / load(desc)[key] for key in ('app_elf', 'app_bin'))
+         recipe = root / 'build/flasher_args.json'
+-        if recipe.is_file(): selected += [root / 'build' / rel for rel in load(recipe)['flash_files'].values()]
++        if recipe.is_file(): expected_products.update(root / 'build' / rel for rel in load(recipe)['flash_files'].values())
++        for path in sorted(expected_products):
++            if path.is_file():
++                selected.append(path)
++            else:
++                need(kind == 'history' and report.get('completed') is False and
++                     any(c['name'] == 'build' and c['exit_status'] != 0 for c in report['commands']) and
++                     not any(c['name'] == 'qemu' for c in report['commands']) and path.suffix in ('.bin', '.elf'),
++                     'Expected build product missing outside failed compilation history: ' + str(path))
++                manifest.setdefault('unbuilt_history_artifacts', {})[path.relative_to(repo).as_posix()] = dict(
++                    role=role, reason='SDK compilation failed before this declared product existed; no QEMU ran')
+         for path in sorted(set(selected)): add(path)
+         aliases = manifest['aliases'][role] = {}
+         for original, row in report.get('inputs', {}).items():

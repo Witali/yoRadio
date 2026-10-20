@@ -1,0 +1,40 @@
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('repository','target','target-terminal','output'):
+        parser.add_argument('--' + name,type=Path,required=True)
+    parser.add_argument('--target-report-sha256',required=True)
+    parser.add_argument('--max-abs-error',type=int,choices=(2,),default=None)
+    parser.add_argument('--alignment-max-lag',type=int,choices=range(65),default=8)
+    args = parser.parse_args()
+    need(re.fullmatch('[0-9a-f]{64}',args.target_report_sha256),'Explicit reviewed target report SHA256 required')
+    repo,out = args.repository.resolve(),args.output.resolve()
+    build_root = (repo/'.build').resolve()
+    protected = (args.target.resolve(),Path(__file__).resolve().parent,
+        *[(repo/scope['host_path']).parent.resolve() for scope in SCOPE_PINS],
+        *[(repo/scope['qualification_path']).parent.resolve() for scope in SCOPE_PINS])
+    need(build_root.parent == repo and out.is_relative_to(build_root) and out != build_root and not out.exists() and
+         all(not out.is_relative_to(p) and not p.is_relative_to(out) for p in protected),'Fresh independent .build output required')
+    out.mkdir(parents=True,exist_ok=False)
+    result = dict(result='INCOMPLETE',checked_only=True,vendor_comparison_available=False,vendor_checked_pcm_equal=False,
+        measurement_completed=False,actual_reference_compared=False,bounded_corpus_pcm_qualified=False,policy=None,
+        passed=False,numeric_reference_qualified=False,format_conformance_qualified=False,format_corpus_qualified=False,
+        full_G6_qualified=False,physical_device=False,production_radio_integration=False,cases=[])
+    def save():
+        temp = out/'report.json.tmp'
+        temp.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n',encoding='utf-8')
+        temp.replace(out/'report.json')
+    save()
+    try:
+        code = run(args,result,save)
+    except BaseException as error:
+        result.update(result='INTERRUPTED' if isinstance(error,KeyboardInterrupt) else 'INPUT_OR_MEASUREMENT_REJECTED',
+            measurement_completed=False,actual_reference_compared=False,bounded_corpus_pcm_qualified=False,
+            error_type=type(error).__name__,error=str(error))
+        save()
+        return 130 if isinstance(error,KeyboardInterrupt) else 1
+    print(json.dumps({k:result[k] for k in ('result','measurement_completed','bounded_corpus_pcm_qualified','policy','declared_subgroup_books16')}))
+    return code
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

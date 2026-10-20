@@ -1,0 +1,23 @@
+--- fixed/vorbis_repair/setup.c
++++ mapped-single-v1/vorbis_repair/setup.c
+@@ -120,19 +120,7 @@
+   if (n<1)
+     return 1;
+ 
+-  if(b->used_entries==1){
+-    /* Errata 20150226: dense or sparse single-entry books sink one bit.
+-       Both bit values select the original entry's mapped leaf. */
+-    if(table_words<2)return 1;
+-    for(i=0;i<n;i++){
+-      if(l[i]){
+-        if(l[i]!=1)return 1;
+-        r[0]=r[1]=decpack(i,0,quantvals,b,opb,maptype)|0x80000000;
+-      }else if(maptype==2 && b->dec_type==1){
+-        for(j=0;j<b->dim;j++)tremor_oggpack_read(opb,b->q_bits);
+-      }
+-    }
+-  }else if(n<2){
++  if(n<2){
+     r[0]=0x80000000;
+   }else{
+     memset(marker,0,sizeof(marker));

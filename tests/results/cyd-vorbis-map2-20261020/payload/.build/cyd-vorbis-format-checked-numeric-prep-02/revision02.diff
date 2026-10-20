@@ -1,0 +1,11 @@
+--- checked-numeric-prep-01/compare_capture.py
++++ checked-numeric-prep-02/compare_capture.py
+@@ -82,7 +82,7 @@
+     text = data.decode('utf-8').replace('\r\n', '\n')
+     need(re.search(r'^#tb 0: 1/' + str(rate) + '$', text, re.M) and
+          re.search(r'^#sample_rate 0: ' + str(rate) + '$', text, re.M) and
+-         '#codec_id 0: pcm_s16le' in text and '#channel_layout_name 0: 2 channels' in text,
++         '#codec_id 0: pcm_s16le' in text and re.search(r'^#channel_layout_name 0: (?:2 channels|stereo)$', text, re.M),
+          'Reference framemd5 metadata mismatch')
+     rows = [line for line in text.splitlines() if line and not line.startswith('#')]
+     need(len(rows) == len(frames) - 1 and frames[0] == 0, 'Exact thirteen nonprimer reference frames required')

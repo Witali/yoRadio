@@ -1,0 +1,20 @@
+--- .build/cyd-vorbis-uint32-rate-sdk-prep-01/target/cyd_vorbis_uint32_rate_qemu/sdk-build.ps1
++++ .build/cyd-vorbis-format-corpus-sdk-prep-01/target/cyd_vorbis_format_corpus_qemu/sdk-build.ps1
+@@ -2,8 +2,7 @@
+       [Parameter(Mandatory)][string]$Repository,
+       [Parameter(Mandatory)][string]$SdkDirectory,
+       [Parameter(Mandatory)][string]$ToolsDirectory,
+-      [Parameter(Mandatory)][string]$CodecDirectory,
+-      [Parameter(Mandatory)][ValidateSet("baseline","acceptance","limited")][string]$RateMode)
++      [Parameter(Mandatory)][string]$CodecDirectory)
+ $ErrorActionPreference = 'Stop'
+ $Campaign = [IO.Path]::GetFullPath($Campaign)
+ $draftRoot = Join-Path ([IO.Path]::GetFullPath($Repository)) '.build'
+@@ -32,7 +31,6 @@
+ $argsForIdf = @((Join-Path $env:IDF_PATH 'tools/idf.py'), '-C', (Join-Path $Campaign 'sources/project'),
+  '-B', (Join-Path $Campaign 'build'), '--no-ccache', '-D', 'IDF_TARGET=esp32',
+  '-D', "SDKCONFIG=$Campaign/sdkconfig", '-D', "SDKCONFIG_DEFAULTS=$Campaign/sources/project/sdkconfig.defaults",
+- '-D', "RATE_MODE=$RateMode",
+  '-D', 'CMAKE_JOB_POOLS=compile=2;link=1', '-D', 'CMAKE_JOB_POOL_COMPILE=compile', '-D', 'CMAKE_JOB_POOL_LINK=link', 'build')
+ $toolPaths = @(Get-ChildItem Env: | Where-Object { $_.Name -imatch '^path$' -and $_.Value.Contains('tools\ninja') } | Select-Object -ExpandProperty Value)
+ if ($toolPaths.Count -ne 1) { throw 'Activated toolchain PATH missing' }

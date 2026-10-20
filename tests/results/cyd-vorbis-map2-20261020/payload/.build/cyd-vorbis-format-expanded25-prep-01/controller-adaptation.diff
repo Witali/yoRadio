@@ -1,0 +1,180 @@
+--- C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-format-corpus-checked-prep-02\run-cyd-vorbis-format-corpus-checked-qemu.py
++++ run-cyd-vorbis-format-expanded25-qemu.py
+@@ -11,29 +11,27 @@
+ import sys
+ from windows_compile_command import macro_command, check_macro_inputs
+ from protocol import load_contract, validate_log
++from reference_binding import verify as verify_source_binding
+ 
+ ARCHIVES = {'libesp_audio_codec.a': '92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58',
+             'libesp_audio_simple_dec.a': 'ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6'}
+ MATRIX_INPUTS = (
+-    ('.build/cyd-vorbis-books-prep-01/generated01/matrix.json',
+-     '38e38f1f5ada7cd84a6ea91c5b46e0680ee62a7f511c9a72bfa7b6d7eb64cd2e'),
++    ('.build/cyd-vorbis-format-expanded25-prep-01/inputs/books16/matrix.json',
++     '16b087d4462f2ef481cb479f3730dc24f17bf195be83812d68819831799c7239'),
+     ('.build/cyd-vorbis-floor0-prep-01/generated01/matrix.json',
+      'aa1231b8813ac193767c85a2ef339a2da36af52f2af157a16cda9f3d2d438f07'))
+-REFERENCE_PROOFS = {
+-    '.build/cyd-vorbis-format-corpus-qualified-01/qualification.json':
+-        'd269d71ab02568fcb549c5abf39e4daf8ffcd082b1ede3c259351615768e02b0',
+-    '.build/cyd-vorbis-format-corpus-host-01/report.json':
+-        'eaf3d8033406d5c6844f5dd6e3f42b26195d6e03b3293c27ea03353d6ca0ae29',
+-    '.build/cyd-vorbis-format-corpus-host-01-command.json':
+-        '799bb892e5b12e0ccc13fc02607aefe49527f51568d0aecfe8a98ac88c492773'}
+-CONTRACT_ID = '847022a7835de03c0f820b3f8e418e7e8b89b6125d2dba8bdf09712d33d3a65a'
+-CONTRACT_FILE_SHA = '6c95b8d52a7bd5a3ca8e2d1b519f5d0ec3172e7e76e83ade8c1e78d364fdd391'
+-DATA_HEADER_SHA = 'b4db391fda10e7361f57fe4242574593902042f0e0ef9a48fe24aac144bb153d'
++REFERENCE_PROOFS = {'.build/cyd-vorbis-format-corpus-qualified-01/qualification.json': 'd269d71ab02568fcb549c5abf39e4daf8ffcd082b1ede3c259351615768e02b0', '.build/cyd-vorbis-format-corpus-host-01/report.json': 'eaf3d8033406d5c6844f5dd6e3f42b26195d6e03b3293c27ea03353d6ca0ae29', '.build/cyd-vorbis-format-corpus-host-01-command.json': '799bb892e5b12e0ccc13fc02607aefe49527f51568d0aecfe8a98ac88c492773', '.build/cyd-vorbis-map2-regression-qualified-01/qualification.json': 'bb78d2478d6e2a191202098443f5d224cda37fe7c44b33052de005ce10662bc4', '.build/cyd-vorbis-map2-regression-host-01/report.json': '5701c50e49118123e059c2a48a152f1fdd2f9def3bffb84053759b51c9a8df88', '.build/cyd-vorbis-map2-regression-host-01-command.json': '829899ce49f473962c2abc838fb9a1c6a6be14cf1ec007e66c464f7cff09bc2f'}
++CONTRACT_ID = '660ac01523d3336ccb103f1443e51b870edf1a3d3f50321c5666969b1da634cc'
++CONTRACT_FILE_SHA = '717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d'
++DATA_HEADER_SHA = '4cba27844a6a9018c103e06ac8e505590ae0549ef2dfe6238ebd933b4dfb9757'
+ # Filled only with the independent caller owner's final reviewed source bytes.
+ CALLER_SHA = '37eaeb25a272ceadaafe36d6309449d31895b7019523333ed0e4c48226d0d065'
+ PROTOCOL_SHA = '547655c4fa31a100f29f52b3a142a54442578393b860723b2b1147732578700e'
+ CASE_HEADER_SHA = '91a040d89f3bc2b7740fa2f175f36d64cebcd92653cd4c2014149bbb11219be3'
+ RAW_HELPER_SHA = '5731c1022c8f6ecdb6c03d833f9d2208c675b22e20f71ac7327b3941af8822c5'
++SOURCE_MAP_SHA = '63f0eccf40044fabcc8d2b31c0a2094859258856e4948fe53a57cf8a9358301a'
++REFERENCE_BINDING_SHA = '802d0fe193991cfc40d388ad27594d8d0b632112f223cb6dee68226c07585f2c'
++REFERENCE_HELPER_SHA = '87b71b038aa4a12c4073bd3b9afa4760330a4af542385636bf9b2fd4c0c49fda'
+ SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+ MODULES = ('vorbis_repair/setup.c', 'vorbis_repair/output.c',
+            'vorbis_repair/COPYING', 'vorbis_repair_abi.h', 'compat/vorbis_repair/enable.cmake')
+@@ -66,7 +64,7 @@
+     if not all(re.fullmatch(r'[0-9a-f]{64}',value) for value in (args.contract_sha256,args.data_sha256)):
+         parser.error('Require independently reviewed lowercase contract/data SHA256 values')
+     if args.contract_sha256!=CONTRACT_FILE_SHA or args.data_sha256!=DATA_HEADER_SHA:
+-        parser.error('Require the unchanged reviewed17-case contract and materialized data header')
++        parser.error('Require the unchanged reviewed25-case contract and materialized data header')
+     if not all((CALLER_SHA,PROTOCOL_SHA,CASE_HEADER_SHA)):
+         parser.error('Source proposal incomplete: independent caller source freeze is required')
+     if sys.platform != 'win32': parser.error('Pinned Windows SDK launcher required')
+@@ -79,10 +77,14 @@
+     taskkill = Path(os.environ['SystemRoot']) / 'System32/taskkill.exe'
+     rom = qemu.parent.parent / 'pc-bios'
+     # The sibling layout permits review from this scratch prep before promotion.
+-    harness = Path(__file__).resolve().parent / 'target/cyd_vorbis_format_corpus_checked_qemu'
++    harness = Path(__file__).resolve().parent / 'target/cyd_vorbis_format_expanded25_qemu'
++    source_map_path = Path(__file__).with_name('source-map.json')
++    binding_path = Path(__file__).with_name('reference-binding.json')
++    binding_helper = Path(__file__).with_name('reference_binding.py')
+     contract_path, data_header = args.contract.resolve(), args.data_header.resolve()
+-    protected = (candidate,harness,contract_path,data_header,sdk,tools,codec,ps.parent,qemu.parent,rom,
+-                 repo/'.build/cyd-vorbis-format-corpus-qualified-01',repo/'.build/cyd-vorbis-format-corpus-host-01')
++    protected = (candidate,harness,contract_path,data_header,source_map_path,binding_path,binding_helper,sdk,tools,codec,ps.parent,qemu.parent,rom,
++                 repo/'.build/cyd-vorbis-format-corpus-qualified-01',repo/'.build/cyd-vorbis-format-corpus-host-01',
++                 repo/'.build/cyd-vorbis-map2-regression-qualified-01',repo/'.build/cyd-vorbis-map2-regression-host-01')
+     if (not all(path.is_relative_to(repo) for path in (candidate,contract_path,data_header))
+         or not out.is_relative_to(repo / '.build') or out == repo / '.build'
+         or out.exists() or any((p / 'report.json').is_file() for p in out.parents if p != repo)
+@@ -91,7 +93,7 @@
+     required = [py, ps, qemu, git, taskkill, rom/'esp32-v3-rom.bin', rom/'esp32-v3-rom-app.bin',
+                 sdk/'export.ps1', sdk/'tools/idf.py', *[candidate/x for x in MODULES],
+                 *[codec/'lib/esp32'/x for x in ARCHIVES], contract_path, data_header,
+-                *[repo/name for name in REFERENCE_PROOFS], harness/'main/main.c',
++                *[repo/name for name in REFERENCE_PROOFS], source_map_path, binding_path, binding_helper, harness/'main/main.c',
+                 harness/'main/corpus_case.h', Path(__file__).with_name('protocol.py')]
+     if any(not p.is_file() for p in required): parser.error('Missing required pinned source/runtime')
+     out.mkdir(parents=True, exist_ok=False)
+@@ -166,11 +168,11 @@
+         contract = json.loads((out/'sources/corpus/contract.json').read_text())
+         expected_manifests = [dict(path=str((repo/name).resolve()),sha256=digest) for name,digest in MATRIX_INPUTS]
+         need(contract['manifest_inputs']==expected_manifests and load_contract(expected_manifests)==contract,
+-             'Contract differs from the exact two qualified source matrices/raw packets')
++             'Contract differs from exact merged books16 plus original floor9 source matrices/raw packets')
+         model = contract['model']
+-        need(contract['contract_sha256']==CONTRACT_ID and len(model['cases'])==17 and
+-             model['total_packets']==238 and model['total_pcm']==398080 and model['case_mask']==131071,
+-             'All17 corpus contract shape/identity required')
++        need(contract['contract_sha256']==CONTRACT_ID and len(model['cases'])==25 and
++             model['total_packets']==350 and model['total_pcm']==623360 and model['case_mask']==33554431,
++             'All25 corpus contract shape/identity required')
+         for fact in contract['source_facts']:
+             path = Path(fact['path']).resolve()
+             need(path.is_relative_to(repo) and sha(path)==fact['sha256'] and path.stat().st_size==fact['bytes'],
+@@ -197,33 +199,27 @@
+              sha(out/'sources/project/main/corpus_case.h')==CASE_HEADER_SHA and
+              sha(out/'sources/helpers/protocol.py')==PROTOCOL_SHA and
+              sha(out/'sources/project/raw-enable.cmake')==RAW_HELPER_SHA,'Wrong reviewed caller/protocol/raw helper')
+-        qualified = json.loads((repo/'.build/cyd-vorbis-format-corpus-qualified-01/qualification.json').read_text())
+-        host = json.loads((repo/'.build/cyd-vorbis-format-corpus-host-01/report.json').read_text())
+-        receipt = json.loads((repo/'.build/cyd-vorbis-format-corpus-host-01-command.json').read_text())
+-        need(qualified['completed'] is True and qualified['reference_corpus_qualified'] is True and
+-             qualified['original_dual_reference_passed'] is False and
+-             tuple(qualified[k] for k in ('xiph_cases','native_compared','native_lookup2_refusals',
+-                 'paired_raw_packets','expected_pcm_bytes'))==(17,7,10,238,398080),'Exact completed host qualification required')
+-        need(qualified['original_report_sha256']==REFERENCE_PROOFS['.build/cyd-vorbis-format-corpus-host-01/report.json'] and
+-             qualified['original_outer_receipt_sha256']==REFERENCE_PROOFS['.build/cyd-vorbis-format-corpus-host-01-command.json'],
+-             'Qualification/original reference linkage')
+-        need(receipt['status']=='TERMINAL' and type(receipt['returncode']) is int and receipt['returncode']==1 and
+-             host['completed'] is True and host['xiph_reference_qualified'] is True and
+-             host['dual_reference_qualified'] is False and len(host['cases'])==17 and len(host['failures'])==10,
+-             'Preserve actual terminal original dual-reference NONPASS')
+-        need(len(qualified['cases'])==17,'All17 host qualification rows required')
+-        for case,raw,reference in zip(model['cases'],host['cases'],qualified['cases']):
+-            reference_id = f"{case['source_index']}-{case['id']}"
+-            need(raw['id']==reference['id']==reference_id and reference['xiph_qualified'] is True and
+-                 raw['source_matrix_sha256']==model['manifest_sha256'][case['source_index']] and
+-                 reference['pcm_bytes']==case['total_pcm'] and reference['frames']==case['frames'][1:] and
+-                 all(reference['transition_nonzero_bytes'].values()),'Actual host/corpus case binding')
+-            for kind in ('identification','setup','audio'):
+-                path = str((Path(raw['source_matrix']).parent/raw['input'][kind]).resolve())
+-                need(host['inputs'][path]['sha256']==case['raw_sha256'][kind],'Qualified raw payload differs')
++        need(sha(source_map_path)==SOURCE_MAP_SHA and sha(binding_path)==REFERENCE_BINDING_SHA and
++             sha(binding_helper)==REFERENCE_HELPER_SHA,'Expanded25 source binding/helper pins')
++        freeze(source_map_path,Path('corpus/source-map.json'))
++        freeze(binding_path,Path('reference/reference-binding.json'))
++        freeze(binding_helper,Path('helpers/reference_binding.py'))
++        mapping = json.loads(source_map_path.read_bytes())
++        binding = json.loads(binding_path.read_bytes())
++        verify_source_binding(contract,mapping,binding)
++        need(len(binding['cases'])==25 and binding['new_reference_commands_executed'] is False and
++             binding['aggregate_reference_campaign_exists'] is False and binding['dual_reference_passed'] is False,
++             'Exact coherent25 source bindings required; historical dual NONPASS remains')
++        for item in binding['proof_facts']:
++            path = Path(item['path'])
++            need(path.is_relative_to(repo) and sha(path)==item['sha256'] and path.stat().st_size==item['bytes'],
++                 'Actual original/copied raw or frozen historical reference fact differs')
++            freeze(path,Path('reference-facts')/path.relative_to(repo))
+         report['corpus'] = dict(contract_sha256=CONTRACT_ID,contract_file_sha256=args.contract_sha256,
+-            data_header_sha256=args.data_sha256,manifest_sha256=model['manifest_sha256'],cases=17,packets=238,
+-            expected_pcm=398080,xiph_reference_cases=17,native_compared=7,native_lookup2_refusals=10)
++            data_header_sha256=args.data_sha256,manifest_sha256=model['manifest_sha256'],cases=25,packets=350,
++            expected_pcm=623360,source_map_sha256=SOURCE_MAP_SHA,reference_binding_sha256=REFERENCE_BINDING_SHA,
++            source_reference_scopes=binding['source_scopes'],new_reference_commands_executed=False,
++            aggregate_reference_campaign_exists=False,dual_reference_passed=False)
+         shutil.copytree(out/'sources/candidate',out/'variant')
+         shutil.copyfile(out/'sources/project/raw-enable.cmake',out/'variant/compat/vorbis_repair/enable.cmake')
+         report['variant_sources'] = {str(p.relative_to(out)):sha(p) for p in (out/'variant').rglob('*') if p.is_file()}
+@@ -319,10 +315,10 @@
+             returncode=qemu_row['exit_status'],timed_out=qemu_row['timed_out'],interrupted=qemu_row['interrupted'],
+             manifest_hashes=[sha(repo/name) for name,digest in MATRIX_INPUTS])
+         captured = observed.pop('case_pcm')
+-        need(len(captured)==17 and observed['protocol_lines']==530 and observed['cases']==17 and observed['decoded_packets']==238 and observed['pcm']==398080 and
++        need(len(captured)==25 and observed['protocol_lines']==778 and observed['cases']==25 and observed['decoded_packets']==350 and observed['pcm']==623360 and
+              observed['checked_decode_completed'] is True and observed['vendor_checked_pcm_equal'] is False and
+              observed['vendor_comparison_available'] is False and observed['independent_reference_compared'] is False,
+-             'All17 actual PCM observations required')
++             'All25 actual PCM observations required')
+         pcm_directory = out/'observed-pcm'
+         pcm_directory.mkdir()
+         report['observed'] = observed
+@@ -337,14 +333,16 @@
+             with path.open('xb') as stream: stream.write(pcm)
+             need(path.read_bytes()==pcm,'PCM persistence changed bytes')
+             report['observed_pcm'].append(dict(case=index,id=case['id'],path=str(path.relative_to(out)),
+-                source_index=case['source_index'],reference_id=f"{case['source_index']}-{case['id']}",
++                source_index=case['source_index'],reference_id=binding['cases'][index]['original_reference_id'],
++                reference_scope=binding['cases'][index]['original_group'],
++                reference_qualification_sha256=binding['cases'][index]['qualification_sha256'],
+                 bytes=len(pcm),sha256=sha(path),packet_offsets=offsets))
+             save()  # Only metadata enters JSON. Raw public output remains in separate files.
+         need(execute('sdk-head-after',[git,'-C',sdk,'rev-parse','HEAD']).strip() == SDK_HEAD,'SDK identity changed')
+         need(not execute('sdk-clean-after',[git,'-C',sdk,'status','--porcelain','--untracked-files=no']).strip(),'SDK changed')
+         current()
+         need(all(sha(out/path) == value for path,value in report['build_outputs'].items()),'Build/execution bytes changed')
+-        need(len(report['observed_pcm'])==17 and sum(row['bytes'] for row in report['observed_pcm'])==398080 and
++        need(len(report['observed_pcm'])==25 and sum(row['bytes'] for row in report['observed_pcm'])==623360 and
+              set(pcm_directory.iterdir())=={out/row['path'] for row in report['observed_pcm']} and
+              all(sha(out/row['path'])==row['sha256'] and (out/row['path']).stat().st_size==row['bytes']
+                  for row in report['observed_pcm']),'Observed PCM file set changed/incomplete')

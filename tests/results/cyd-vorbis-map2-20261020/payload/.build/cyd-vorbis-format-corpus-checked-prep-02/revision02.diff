@@ -1,0 +1,11 @@
+--- checked-prep01/controller.py
++++ checked-prep02/controller.py
+@@ -289,7 +289,7 @@
+         for name in ('CONFIG_IDF_TARGET_ESP32','CONFIG_YORADIO_VORBIS_REPAIR'):
+             need(re.search(r'^#define '+name+r' 1$',macros,re.M),'Expected setup compile context '+name)
+         symbols = execute('symbols',[nm,'-n','-S',elf])
+-        for symbol in ('__wrap_esp_vorbis_dec_open','__wrap_esp_vorbis_dec_decode','esp_vorbis_dec_open','esp_vorbis_dec_decode'):
++        for symbol in ('__wrap_esp_vorbis_dec_open','__wrap_esp_vorbis_dec_decode','esp_vorbis_dec_decode'):
+             need(re.search(r'\b'+symbol+'$',symbols,re.M),'Missing symbol '+symbol)
+         recipe = json.loads((build/'flasher_args.json').read_text())
+         settings = recipe.get('flash_settings',{})

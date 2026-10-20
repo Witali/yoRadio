@@ -1,0 +1,219 @@
+{
+  "schema": "vorbis-format-corpus-target-source-readiness-v1",
+  "status": "READY_FOR_ROOT_SOURCE_REVIEW",
+  "C_compiled": false,
+  "SDK_or_QEMU_or_codec_executed": false,
+  "actual_data_h_supplied": false,
+  "canonical_or_historical_campaign_mutated": false,
+  "contract_sha256": "847022a7835de03c0f820b3f8e418e7e8b89b6125d2dba8bdf09712d33d3a65a",
+  "model": {
+    "core_worker": 1,
+    "protocol_events": 530,
+    "generic_case_mask": 131071,
+    "configured_stack": 16384,
+    "core_coordinator": 0,
+    "paired_packets": 238,
+    "cases": 17,
+    "test_static_hex_buffer": 32769,
+    "priority": 3,
+    "pcm_bytes": 398080
+  },
+  "pure_checks": {
+    "input_identities": 66,
+    "named_negative_controls": 77,
+    "synthetic_only": true,
+    "inputs_stable": true,
+    "session": 96226,
+    "terminal_chunk": "adcf0e",
+    "tests": 8,
+    "terminal_returncode": 0
+  },
+  "API": {
+    "PCM_result": "case_pcm: [{case,id,pcm:bytes,sha256,packet_offsets}]",
+    "constructor": "load_contract([{path,sha256}, {path,sha256}])",
+    "reference_comparison": "Not performed by protocol; root must save actual bytes and independently compare with Xiph reference under its own policy.",
+    "validator": "validate_log(log, contract, *, returncode, timed_out, interrupted, manifest_hashes)"
+  },
+  "pending": [
+    "Root review and actual raw-array/data.h freeze tied to contract/source payload identities.",
+    "Actual public-header/compile/link/source/ELF closure and SDK/QEMU campaign.",
+    "Actual captured target PCM comparison with Xiph WAV, measured errors and explicitly owned acceptance policy."
+  ],
+  "files": [
+    {
+      "path": "contract.json",
+      "bytes": 47333,
+      "sha256": "6c95b8d52a7bd5a3ca8e2d1b519f5d0ec3172e7e76e83ade8c1e78d364fdd391"
+    },
+    {
+      "path": "corpus_case.h",
+      "bytes": 476,
+      "sha256": "91a040d89f3bc2b7740fa2f175f36d64cebcd92653cd4c2014149bbb11219be3"
+    },
+    {
+      "path": "data.h.template",
+      "bytes": 605,
+      "sha256": "5fcda40718f55fbb62e50ef4ca648a00ab4be685dc86b1dd5fa9b4b82fcd1728"
+    },
+    {
+      "path": "host-check01.command.json",
+      "bytes": 1374,
+      "sha256": "fc4b8533cd9f95725fb71f334721f3b927928ff006c88400b86418d88fb6984c"
+    },
+    {
+      "path": "host-check01.inputs-after.json",
+      "bytes": 17364,
+      "sha256": "ea10fe121a82d1c1a13bb6c92c21f981949459ad793524cd0295163a310fa0bd"
+    },
+    {
+      "path": "host-check01.inputs-before.json",
+      "bytes": 17364,
+      "sha256": "ea10fe121a82d1c1a13bb6c92c21f981949459ad793524cd0295163a310fa0bd"
+    },
+    {
+      "path": "host-check01.stderr",
+      "bytes": 1016,
+      "sha256": "07cb45be252e38f4c0e5c77917cd779fb58c77e718127f94b51f6e1fb2ca6535"
+    },
+    {
+      "path": "host-check01.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "host-check01/id-length/audio.bin",
+      "bytes": 145,
+      "sha256": "96f055b7aca8a33d30885d73f1187b977491b5df020960888e2a625945ff964d"
+    },
+    {
+      "path": "host-check01/id-length/identification.bin",
+      "bytes": 29,
+      "sha256": "dd02b1d2188025c70b91fc94d0f2ecd5abf6fa2f8fce67608a7d2859f4489d97"
+    },
+    {
+      "path": "host-check01/id-length/setup.bin",
+      "bytes": 78,
+      "sha256": "39a886f1274867b5fe3098fd874baf5cc36890684ca5e64fa5143cced507d535"
+    },
+    {
+      "path": "host-check01/id-prefix/audio.bin",
+      "bytes": 145,
+      "sha256": "96f055b7aca8a33d30885d73f1187b977491b5df020960888e2a625945ff964d"
+    },
+    {
+      "path": "host-check01/id-prefix/identification.bin",
+      "bytes": 30,
+      "sha256": "95e603fa1d042c238431ea28246e6431a1e057d5c48d9a5e4f7099c0a834b42c"
+    },
+    {
+      "path": "host-check01/id-prefix/setup.bin",
+      "bytes": 78,
+      "sha256": "39a886f1274867b5fe3098fd874baf5cc36890684ca5e64fa5143cced507d535"
+    },
+    {
+      "path": "host-check01/mode/audio.bin",
+      "bytes": 145,
+      "sha256": "e96b1935e21d40eeb8038be0d42ea4845289fab116e26f2a744b927afa456020"
+    },
+    {
+      "path": "host-check01/mode/identification.bin",
+      "bytes": 30,
+      "sha256": "450371ae7aa22622d743ffc9a58c986aa44e369149dc35ea8bd25f4167dfe43d"
+    },
+    {
+      "path": "host-check01/mode/setup.bin",
+      "bytes": 78,
+      "sha256": "39a886f1274867b5fe3098fd874baf5cc36890684ca5e64fa5143cced507d535"
+    },
+    {
+      "path": "host-check01/offsets/audio.bin",
+      "bytes": 145,
+      "sha256": "96f055b7aca8a33d30885d73f1187b977491b5df020960888e2a625945ff964d"
+    },
+    {
+      "path": "host-check01/offsets/identification.bin",
+      "bytes": 30,
+      "sha256": "450371ae7aa22622d743ffc9a58c986aa44e369149dc35ea8bd25f4167dfe43d"
+    },
+    {
+      "path": "host-check01/offsets/setup.bin",
+      "bytes": 78,
+      "sha256": "39a886f1274867b5fe3098fd874baf5cc36890684ca5e64fa5143cced507d535"
+    },
+    {
+      "path": "host-check01/raw-path/audio.bin",
+      "bytes": 145,
+      "sha256": "96f055b7aca8a33d30885d73f1187b977491b5df020960888e2a625945ff964d"
+    },
+    {
+      "path": "host-check01/raw-path/identification.bin",
+      "bytes": 30,
+      "sha256": "450371ae7aa22622d743ffc9a58c986aa44e369149dc35ea8bd25f4167dfe43d"
+    },
+    {
+      "path": "host-check01/raw-path/setup.bin",
+      "bytes": 78,
+      "sha256": "39a886f1274867b5fe3098fd874baf5cc36890684ca5e64fa5143cced507d535"
+    },
+    {
+      "path": "host-check01/report.json",
+      "bytes": 2302,
+      "sha256": "8aa26e17a8ae13dfa5247be6789d16dd16185b5e711ea3f05ecb45778bacf186"
+    },
+    {
+      "path": "host-check01/setup-prefix/audio.bin",
+      "bytes": 145,
+      "sha256": "96f055b7aca8a33d30885d73f1187b977491b5df020960888e2a625945ff964d"
+    },
+    {
+      "path": "host-check01/setup-prefix/identification.bin",
+      "bytes": 30,
+      "sha256": "450371ae7aa22622d743ffc9a58c986aa44e369149dc35ea8bd25f4167dfe43d"
+    },
+    {
+      "path": "host-check01/setup-prefix/setup.bin",
+      "bytes": 78,
+      "sha256": "953e9e0d4f1f10357889fc55d2fd4a00beca03827c0f8fb640308e7ff6bd4019"
+    },
+    {
+      "path": "host-check01/total/audio.bin",
+      "bytes": 145,
+      "sha256": "96f055b7aca8a33d30885d73f1187b977491b5df020960888e2a625945ff964d"
+    },
+    {
+      "path": "host-check01/total/identification.bin",
+      "bytes": 30,
+      "sha256": "450371ae7aa22622d743ffc9a58c986aa44e369149dc35ea8bd25f4167dfe43d"
+    },
+    {
+      "path": "host-check01/total/setup.bin",
+      "bytes": 78,
+      "sha256": "39a886f1274867b5fe3098fd874baf5cc36890684ca5e64fa5143cced507d535"
+    },
+    {
+      "path": "inputs.json",
+      "bytes": 16353,
+      "sha256": "ebbc714dc7aa26e0a7b1d55dc576927aa48eec254b3e458297777798cb9d6fde"
+    },
+    {
+      "path": "main.c",
+      "bytes": 11457,
+      "sha256": "3ca8f85b8a2a9fad5c196143f4833da5fb9ce13b9b69351900b9eecc7e831f54"
+    },
+    {
+      "path": "protocol.py",
+      "bytes": 10239,
+      "sha256": "7b9912db4d5317376c22d4ab1f65a206941f84f6773b07cf37a522a3bc7f35f8"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5492,
+      "sha256": "d9795d43b3c7d6165df15f3a43567cb4f566efa1d0d251c5d8216a6d1c73e7d6"
+    },
+    {
+      "path": "test_protocol.py",
+      "bytes": 12333,
+      "sha256": "0406ccbdc617b0a4d1e7977af06b05c758e9a3e47a224dd9876ec36054228afa"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-map2-archive-prep-01\pack.py", line 160, in <module>
+    pack(args.repository, args.output, args.plan)
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-map2-archive-prep-01\pack.py", line 131, in pack
+    for index, item in enumerate(plan['history']): collect('history-' + str(index), item, 'history')
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-map2-archive-prep-01\pack.py", line 113, in collect
+    for path in sorted(set(selected)): add(path)
+                                       ^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-map2-archive-prep-01\pack.py", line 43, in add
+    need(path.is_relative_to(repo) and path.is_file(), 'Missing/outside repository input: ' + str(path))
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-map2-archive-prep-01\pack.py", line 15, in need
+    if not ok: raise RuntimeError(message)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Missing/outside repository input: C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-format-expanded25-capture-01\build\cyd_vorbis_format_corpus_checked.bin

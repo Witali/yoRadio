@@ -1,0 +1,16 @@
+--- archive-prep01/verify.py
++++ archive-prep02/verify.py
+@@ -80,6 +80,13 @@
+     def record(role, relative='report.json'): return obj(data(role, relative))
+     def identity(role, relative): return files[key(role, relative)]['raw_sha256']
+     reports = {role: record(role) for role in manifest['roles']}
++    for name, item in manifest.get('unbuilt_history_artifacts', {}).items():
++        role = item['role']
++        report = reports[role]
++        need(manifest['roles'][role]['kind'] == 'history' and name.startswith(key(role, 'build/')) and
++             name.endswith(('.bin', '.elf')) and name not in files and report.get('completed') is False and
++             any(c['name'] == 'build' and c['exit_status'] != 0 for c in report['commands']) and
++             not any(c['name'] == 'qemu' for c in report['commands']), 'Invalid absent failed-build artifact')
+ 
+     def receipt_check(value, code, role, report_hash=None):
+         if isinstance(value, dict):

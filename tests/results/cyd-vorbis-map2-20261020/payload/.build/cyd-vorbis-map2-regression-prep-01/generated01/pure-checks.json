@@ -1,0 +1,102 @@
+{
+  "schema": "map2-pure-construction-checks-v1",
+  "completed": true,
+  "cases": 8,
+  "packets": 112,
+  "expected_pcm_bytes_per_case": 28160,
+  "expected_total_pcm_bytes": 225280,
+  "source_inputs_before": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\generate.py",
+      "bytes": 17357,
+      "sha256": "9cc39c2045747eca22276c03206983b71161d7d27e520ebe68564cdf4f02be1c"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\README.md",
+      "bytes": 5490,
+      "sha256": "5d6ee1ed76045d14695c5561825d78022b80f246b952ad3a9003c9ccbee047f9"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_format_corpus\\generate_books.py",
+      "bytes": 21108,
+      "sha256": "de9b09de59a0825feda741c0343c6d60821ddad1258ce7df5ae342c68e268fc1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_block_matrix\\generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    }
+  ],
+  "source_inputs_after": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\generate.py",
+      "bytes": 17357,
+      "sha256": "9cc39c2045747eca22276c03206983b71161d7d27e520ebe68564cdf4f02be1c"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\README.md",
+      "bytes": 5490,
+      "sha256": "5d6ee1ed76045d14695c5561825d78022b80f246b952ad3a9003c9ccbee047f9"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_format_corpus\\generate_books.py",
+      "bytes": 21108,
+      "sha256": "de9b09de59a0825feda741c0343c6d60821ddad1258ce7df5ae342c68e268fc1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_block_matrix\\generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    }
+  ],
+  "full_setup_and_packet_field_scan": true,
+  "single_entry_exact_length1_code0_one_bit": true,
+  "other_underpopulation_rejected": true,
+  "all_active_original_entries_selected": true,
+  "all_original_map2_rows_retained": true,
+  "all_four_expected_spectral_pair_equalities": true,
+  "exact_negative_controls": [
+    {
+      "name": "map2_unused_original_rows_omitted",
+      "rejected": true,
+      "exact_reason": "vector_book_fields"
+    },
+    {
+      "name": "map2_used_count_reads_original_prefix",
+      "rejected": true,
+      "exact_reason": "expected_spectral_equality"
+    },
+    {
+      "name": "single_entry_length2_rejected",
+      "rejected": true,
+      "exact_reason": "finite corpus requires a complete codeword tree"
+    },
+    {
+      "name": "other_underpopulated_tree_rejected",
+      "rejected": true,
+      "exact_reason": "finite corpus requires a complete codeword tree"
+    },
+    {
+      "name": "single_entry_zero_bit_consumption",
+      "rejected": true,
+      "exact_reason": "truncated construction"
+    },
+    {
+      "name": "twin_rows_must_be_vector_identical",
+      "rejected": true,
+      "exact_reason": "expected_spectral_equality"
+    },
+    {
+      "name": "audio_selected_entry_changed",
+      "rejected": true,
+      "exact_reason": "actual_selected_entries"
+    },
+    {
+      "name": "carrier_crc_changed",
+      "rejected": true,
+      "exact_reason": "CRC mismatch"
+    }
+  ],
+  "no_helper_copies_or_global_function_rebinding": true,
+  "actual_codec_SDK_compiler_QEMU_reference_Git_device_executed": false
+}

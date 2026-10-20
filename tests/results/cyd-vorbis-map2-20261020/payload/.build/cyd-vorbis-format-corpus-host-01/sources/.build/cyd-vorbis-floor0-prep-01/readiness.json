@@ -1,0 +1,81 @@
+{
+  "schema": "vorbis-floor0-source-readiness-v1",
+  "status": "READY_FOR_INDEPENDENT_REFERENCES",
+  "pure_generation_terminal": {
+    "returncode": 0,
+    "chunk": "c23019"
+  },
+  "raw_payloads_verified": 57,
+  "cases": 9,
+  "audio_packets": 126,
+  "raw_header_packets": 27,
+  "maximum_expected_pcm_bytes": 4096.0,
+  "public_decode_output_capacity": 16384,
+  "runtime_inputs_stable": true,
+  "codec_sdk_compiler_qemu_git_executed": false,
+  "validity_qualified": false,
+  "actual_nonzero_pcm_observed": false,
+  "public_assertions": [
+    "Open opaque raw handle with complete identification/setup and matching48000Hz stereo config; no private-state inspection.",
+    "Retain metadata object across14 packets; verify48000Hz,2channels,16bit from primer onward.",
+    "Complete-packet consumption; packet0 outputs0; later output bytes exactly4*((previous_N+current_N)/4), within16384-byte canary buffer.",
+    "Successful public close; independent host decode must show actual nonzero PCM in each channel and exact matrix frame totals."
+  ],
+  "files": [
+    {
+      "path": "generate.py",
+      "bytes": 14111,
+      "sha256": "3955a1fd3c0ef6a9287ea11e9e5f3ad0cec3d6e02dad9a2730cd2a95deae464e"
+    },
+    {
+      "path": "minimal_support.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": "inputs.json",
+      "bytes": 1685,
+      "sha256": "a6ccdba239b5906d19a402ffc8be39649569b45b1b7c1dec230e0b0ee1b06f39"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4938,
+      "sha256": "f66643c247d87f505591018dd054ccf6c95b9df67520fc4a07739154e6508127"
+    },
+    {
+      "path": "generation01.json",
+      "bytes": 4550,
+      "sha256": "b0b131f2ca0911bea54ff0f2ca20c21476f10626fdbff3aecb92f18617d0bc9e"
+    },
+    {
+      "path": "generation01.stdout",
+      "bytes": 261,
+      "sha256": "e42c073d1b808183dab09073385c4186e5fae1352d9e3f279051bcfa43f49cd6"
+    },
+    {
+      "path": "generation01.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "generated01/manifest.json",
+      "bytes": 10336,
+      "sha256": "50df061c0b50a5e329a4d803c6ac00b63980b4cbcdd2172bbc1babc24c6dabc4"
+    },
+    {
+      "path": "generated01/matrix.json",
+      "bytes": 19544,
+      "sha256": "aa1231b8813ac193767c85a2ef339a2da36af52f2af157a16cda9f3d2d438f07"
+    },
+    {
+      "path": "generated01/construction-fields.json",
+      "bytes": 236819,
+      "sha256": "8cf4833ef1815efc36bac26c620821d633aa8451df9894f23b7eeb6d3b2fff14"
+    },
+    {
+      "path": "generated01/pure-checks.json",
+      "bytes": 685,
+      "sha256": "6a1282bc2c4941d38961d53ab4657fbeab5f3b350976b81f45d7a12ab2ac70cd"
+    }
+  ]
+}

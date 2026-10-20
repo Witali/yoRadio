@@ -1,0 +1,90 @@
+--- .build/cyd-vorbis-format-corpus-sdk-prep-01/protocol.py
++++ .build/cyd-vorbis-format-corpus-checked-prep-01/protocol.py
+@@ -1,11 +1,11 @@
+-"""Strict public raw corpus observations. Does not launch or qualify a target."""
++"""Strict checked-only public raw corpus observations. Does not launch or qualify a target."""
+ import hashlib
+ import json
+ from pathlib import Path
+ import re
+ 
+-PREFIX = "CYD_VORBIS_CORPUS_"
+-CASE_COUNT, PACKETS = 17, 14
++PREFIX = "CYD_VORBIS_CHECKED_CORPUS_"
++MAX_CASES, PACKETS = 31, 14
+ 
+ 
+ def need(condition, message):
+@@ -73,10 +73,10 @@
+         for case in matrix["cases"]:
+             item, raw_facts = inspect_case(case, path.parent, source_index)
+             cases.append(item); facts.extend(raw_facts)
+-    need(len(cases) == CASE_COUNT and len({c["id"] for c in cases}) == CASE_COUNT, "all 17 distinct named cases")
++    need(1 <= len(cases) <= MAX_CASES and len({c["id"] for c in cases}) == len(cases), "bounded distinct named cases")
+     model = dict(schema="public-vorbis-corpus-contract-v1", manifest_sha256=[p["sha256"] for p in pins],
+-                 cases=cases, total_packets=CASE_COUNT * PACKETS,
+-                 total_pcm=sum(c["total_pcm"] for c in cases), case_mask=(1 << CASE_COUNT) - 1)
++                 cases=cases, total_packets=len(cases) * PACKETS,
++                 total_pcm=sum(c["total_pcm"] for c in cases), case_mask=(1 << len(cases)) - 1)
+     identity = sha(json.dumps(model, sort_keys=True, separators=(",", ":")).encode())
+     return dict(contract_sha256=identity, manifest_inputs=pins, model=model, source_facts=facts)
+ 
+@@ -90,7 +90,7 @@
+     need(load_contract(contract["manifest_inputs"]) == contract, "contract/source stability")
+     need(not re.search(r"Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP|Task watchdog got triggered|Interrupt wdt timeout|Stack canary watchpoint|stack overflow|TimeoutExpired|timed out", log, re.I), "target failure/panic/timeout")
+     lines = log.splitlines()
+-    need(not any("VORBIS_CORPUS_" in line and not line.startswith(PREFIX) for line in lines), "foreign/malformed corpus prefix")
++    need(not any(("VORBIS_CORPUS_" in line or "VORBIS_CHECKED_CORPUS_" in line) and not line.startswith(PREFIX) for line in lines), "foreign/malformed corpus prefix")
+     events = [line[len(PREFIX):] for line in lines if line.startswith(PREFIX)]
+     position = 0
+     def take(event, expected, variables=(), strings=()):
+@@ -114,20 +114,18 @@
+             parsed[key] = fields[key]
+         return parsed
+     model = contract["model"]
+-    take("BEGIN", dict(contract=contract["contract_sha256"], cases=17, packets=238, coordinator=0))
++    count = len(model["cases"])
++    take("BEGIN", dict(contract=contract["contract_sha256"], cases=count, packets=model["total_packets"], coordinator=0))
+     take("WORKER", dict(core=1, priority=3, configured_stack=16384))
+     captured = []
+     for index, case in enumerate(model["cases"]):
+-        take("OPEN", dict(case=index, id=case["id"], vendor_rc=0, checked_rc=0,
+-                          vendor_handle=1, checked_handle=1, distinct=1, core=1))
++        take("OPEN", dict(case=index, id=case["id"], checked_rc=0, checked_handle=1, core=1))
+         nl = nr = 0
+         case_pcm, packet_offsets = bytearray(), [0]
+         for packet, (size, pcm, frames, transition) in enumerate(zip(case["sizes"], case["pcm"], case["frames"], case["transitions"])):
+-            result = take("PAIR", dict(case=index, packet=packet, size=size, vendor_rc=0, checked_rc=0,
+-                vendor_consumed=size, checked_consumed=size, expected_pcm=pcm, vendor_pcm=pcm, checked_pcm=pcm,
+-                vendor_rate=case["rate"], checked_rate=case["rate"], vendor_channels=2, checked_channels=2,
+-                vendor_bits=16, checked_bits=16, equal=1, vendor_canary=1, checked_canary=1,
+-                vendor_first=1, transition=transition, core=1), ("nz_l", "nz_r"))
++            result = take("PACKET", dict(case=index, packet=packet, size=size, checked_rc=0,
++                checked_consumed=size, expected_pcm=pcm, checked_pcm=pcm, checked_rate=case["rate"],
++                checked_channels=2, checked_bits=16, checked_canary=1, transition=transition, core=1), ("nz_l", "nz_r"))
+             need(all((count == 0 if not packet else 1 <= count <= frames) for count in result.values()),
+                  "nonzero each output channel/transition or primer counts")
+             emitted = take("PCM_HEX", dict(case=index, packet=packet, bytes=pcm, core=1), strings=("hex",))["hex"]
+@@ -139,16 +137,17 @@
+             need(observed == result, "PCM bytes/nonzero observations disagree")
+             case_pcm.extend(packet_pcm); packet_offsets.append(len(case_pcm))
+             nl += result["nz_l"]; nr += result["nz_r"]
+-        take("CLOSE", dict(case=index, vendor_rc=0, checked_rc=0, core=1))
++        take("CLOSE", dict(case=index, checked_rc=0, core=1))
+         take("CASE", dict(case=index, id=case["id"], packets=14, pcm=case["total_pcm"], nz_l=nl, nz_r=nr,
+                           transitions_mask=15, core=1))
+         captured.append(dict(case=index, id=case["id"], pcm=bytes(case_pcm), sha256=sha(case_pcm),
+                              packet_offsets=packet_offsets))
+-    take("COMPLETE", dict(cases=17, packets=238, pcm=model["total_pcm"], cases_mask=131071, core=1))
+-    need(position == len(events) == 530, "extra/missing/duplicate protocol")
++    take("COMPLETE", dict(cases=count, packets=model["total_packets"], pcm=model["total_pcm"], cases_mask=model["case_mask"], core=1))
++    need(position == len(events) == 3 + count * (2 * PACKETS + 3), "extra/missing/duplicate protocol")
+     need(load_contract(contract["manifest_inputs"]) == contract, "source changed during validation")
+-    return dict(protocol_lines=position, cases=17, paired_packets=238, pcm=model["total_pcm"],
+-                case_mask=131071, vendor_checked_pcm_equal=True, independent_reference_compared=False,
++    return dict(protocol_lines=position, cases=count, decoded_packets=model["total_packets"], pcm=model["total_pcm"],
++                case_mask=model["case_mask"], checked_decode_completed=True, vendor_checked_pcm_equal=False,
++                vendor_comparison_available=False, independent_reference_compared=False,
+                 manifest_sha256=list(manifest_hashes),
+                 contract_sha256=contract["contract_sha256"], observed_returncode=returncode,
+                 observed_timed_out=timed_out, observed_interrupted=interrupted,

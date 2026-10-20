@@ -121,7 +121,20 @@ allocation и численные настройки C3 являются канд
   books/floor0/residue0 случаев и ещё 29 mono/stereo/mapping и map2-регрессий;
   [новые 149 файлов](../tests/results/vorbis-more-generators-20261020/README.md)
   совпадают с исходными побайтно. Их target PCM и независимое численное сравнение
-  ещё не квалифицированы. Полное G6 открыто.
+  ещё не квалифицированы целиком. [Setup checkpoint](../tests/results/cyd-vorbis-map2-20261020/CHECKPOINT.md)
+  исправляет чтение всех исходных lookup2 строк и mapped-single-entry leaves.
+  Полный корпус25 проходит raw open/decode/close:350 пакетов/623360 PCM байт.
+  Исходные книги8, single/twin случаи4 и контрольные floor1/residue0 случаи3
+  отличаются от Xiph не более чем на1 PCM16 LSB. Широкие D16 lookup2 случаи4
+  пока дают max65535 и нарушают sparse/dense PCM равенство; причина не установлена.
+  Все шесть floor0 случаев также нарушают заранее выбранный проектный предел2:
+  максимумы even6:40664/1649/40664; odd5:65535 во всех трёх парах блоков.
+  Полный численный результат и подгруппа books16 остаются NONPASS.
+  Следом проверить публикацию наших book/floor0 полей отдельным unit-тестом,
+  публичные decode_map/кривую Tremor и эквивалентное представление LSP с
+  ненулевым минимумом; подтверждённой причины широкого/floor0 PCM пока нет.
+  Остальные gaps: sparse-single/map1-single, wide9–16-bit и C3/RV32 проверка
+  новой setup правки. Полное G6 открыто; bridge в radio не подключён.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
   Затем полный Clang, три backend exports и физическая приёмка.
@@ -792,3 +805,30 @@ Stream остаётся на core0, decode/output на core1 с прежними
   14 construction rejection controls проходят. Это воспроизводимые fixtures,
   новый target/PCM результат этим не заявляется. Manifest SHA256:
   `c66cefeb56522cdb0b4b466c9823ca02c85d9c9772ed8679aa8944f611cf95ba`.
+- 2026-10-20, CYD-C3-14 G6: [lookup2/single-entry setup checkpoint](../tests/results/cyd-vorbis-map2-20261020/CHECKPOINT.md)
+  читает все исходные multiplicand строки, сохраняет только активные wide строки
+  в порядке used-entry и публикует исходный mapped leaf одиночной книги для
+  обоих однобитовых значений. ABI, synthesis/MDCT/PCM backend не менялись.
+  Actual SDK6.0.2/Xtensa/core1 open/decode/close проходит17 и25 случаев:
+  соответственно238/398080 и350/623360 пакетов/PCM байт. Все9 owned commands
+  каждой кампании завершены с exit0. Три независимых возврата прежней ветки
+  воспроизводят точный open отказ: packed case6 после84 пакетов, wide case8
+  после112 и singleton case12 после168; полные предшествующие protocol/PCM
+  префиксы равны fixed capture, panic нет. Самим control campaigns сохранён NONPASS.
+  Численное сравнение25 завершено на всех случаях: исходные книги8, single/twin4
+  и floor1 controls3 имеют max1; wideD16×4 и floor0×6 не проходят предел2.
+  Полный25 и подгруппа books16 остаются NONPASS, допуск не повышался.
+  Обе исходные независимые host dual-reference кампании также сохранены как
+  NONPASS с отдельными Xiph-qualified результатами. Исходный vendor open panic,
+  неиспользуемый symbol gate, ошибка C capacity17 для25 descriptors и ошибка
+  framemd5 layout проверки сохранены отдельно от последующих реальных прогонов.
+  Дальнейшая работа: unit-тест публикации наших book/floor0 полей, публичный
+  Tremor decode_map/кривая и эквивалентные LSP представления; затем C3/RV32,
+  оставшиеся single/wide-width cases и остальные G1–G8. В radio bridge пока не
+  подключён, физическая приёмка не выполнялась.
+  Архив4183 файлов/22126714 байт сохраняет4221 исходную identity запись,
+  включая41 hash-only omission целевых бинарников. Manifest SHA256:
+  `c3e1fa16adb85d25f90339a9d4c74b6c0cbc9feac3d4097624bbe1d6553bd11c`.
+  [Автономная проверка](../tests/results/cyd-vorbis-map2-verification-20261020/README.md)
+  конечного canonical каталога из другого cwd завершена с exit0; она подтверждает
+  целостность свидетельств, сохраняя полный численный NONPASS.

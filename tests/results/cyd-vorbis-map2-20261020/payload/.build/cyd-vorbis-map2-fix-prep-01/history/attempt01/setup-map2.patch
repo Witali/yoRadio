@@ -1,0 +1,138 @@
+--- a/idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c
++++ b/idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c
+@@ -120,7 +120,19 @@
+   if (n<1)
+     return 1;
+ 
+-  if(n<2){
++  if(b->used_entries==1){
++    /* Errata 20150226: dense or sparse single-entry books sink one bit.
++       Both bit values select the original entry's mapped leaf. */
++    if(table_words<2)return 1;
++    for(i=0;i<n;i++){
++      if(l[i]){
++        if(l[i]!=1)return 1;
++        r[0]=r[1]=decpack(i,0,quantvals,b,opb,maptype)|0x80000000;
++      }else if(maptype==2 && b->dec_type==1){
++        for(j=0;j<b->dim;j++)tremor_oggpack_read(opb,b->q_bits);
++      }
++    }
++  }else if(n<2){
+     r[0]=0x80000000;
+   }else{
+     memset(marker,0,sizeof(marker));
+@@ -177,6 +189,9 @@
+             marker[j]=marker[j-1]<<1;
+           }else
+             break;
++      }else if(b->used_entries>0 && maptype==2 && b->dec_type==1){
++        /* Lookup 2 carries a full row even for an unused codeword. */
++        for(j=0;j<b->dim;j++)tremor_oggpack_read(opb,b->q_bits);
+       }
+     }
+   }
+@@ -552,17 +567,27 @@
+       s->dec_leafw=_determine_leaf_words(s->dec_nodeb,_ilog(s->used_entries-1)/8+1);
+       if(_make_decode_table(s,lengthlist,quantvals,opb,maptype))goto _errout;
+ 
+-      /* get the vals & pack them */
++      /* Read all original rows; retain only active rows in decpack order. */
++      if(s->dim > INT_MAX/((s->q_bits+7)/8))goto _eofout;
+       s->q_pack=(s->q_bits+7)/8*s->dim;
+-      s->q_val=repair_alloc(s->q_pack*s->used_entries);
++      s->q_val=repair_calloc((size_t)s->used_entries,(size_t)s->q_pack);
+       if(!s->q_val) goto _eofout;
+ 
+-      if(s->q_bits<=8){
+-        for(i=0;i<s->used_entries*s->dim;i++)
+-          ((unsigned char *)(s->q_val))[i]=tremor_oggpack_read(opb,s->q_bits);
+-      }else{
+-        for(i=0;i<s->used_entries*s->dim;i++)
+-          ((ogg_uint16_t *)(s->q_val))[i]=tremor_oggpack_read(opb,s->q_bits);
++      {
++        size_t used=0;
++        for(i=0;i<s->entries;i++){
++          for(j=0;j<s->dim;j++){
++            long value=tremor_oggpack_read(opb,s->q_bits);
++            if(lengthlist[i]){
++              size_t offset=used*(size_t)s->dim+(size_t)j;
++              if(s->q_bits<=8)
++                ((unsigned char *)s->q_val)[offset]=value;
++              else
++                ((ogg_uint16_t *)s->q_val)[offset]=value;
++            }
++          }
++          if(lengthlist[i])used++;
++        }
+       }
+     }
+     break;
+--- a/idf/esp32c3-oled-native/main/vorbis_repair/setup.c
++++ b/idf/esp32c3-oled-native/main/vorbis_repair/setup.c
+@@ -120,7 +120,19 @@
+   if (n<1)
+     return 1;
+ 
+-  if(n<2){
++  if(b->used_entries==1){
++    /* Errata 20150226: dense or sparse single-entry books sink one bit.
++       Both bit values select the original entry's mapped leaf. */
++    if(table_words<2)return 1;
++    for(i=0;i<n;i++){
++      if(l[i]){
++        if(l[i]!=1)return 1;
++        r[0]=r[1]=decpack(i,0,quantvals,b,opb,maptype)|0x80000000;
++      }else if(maptype==2 && b->dec_type==1){
++        for(j=0;j<b->dim;j++)tremor_oggpack_read(opb,b->q_bits);
++      }
++    }
++  }else if(n<2){
+     r[0]=0x80000000;
+   }else{
+     memset(marker,0,sizeof(marker));
+@@ -177,6 +189,9 @@
+ 	    marker[j]=marker[j-1]<<1;
+ 	  }else
+ 	    break;
++      }else if(b->used_entries>0 && maptype==2 && b->dec_type==1){
++        /* Lookup 2 carries a full row even for an unused codeword. */
++        for(j=0;j<b->dim;j++)tremor_oggpack_read(opb,b->q_bits);
+       }
+     }
+   }
+@@ -552,17 +567,27 @@
+       s->dec_leafw=_determine_leaf_words(s->dec_nodeb,_ilog(s->used_entries-1)/8+1);
+       if(_make_decode_table(s,lengthlist,quantvals,opb,maptype))goto _errout;
+ 
+-      /* get the vals & pack them */
++      /* Read all original rows; retain only active rows in decpack order. */
++      if(s->dim > INT_MAX/((s->q_bits+7)/8))goto _eofout;
+       s->q_pack=(s->q_bits+7)/8*s->dim;
+-      s->q_val=repair_alloc(s->q_pack*s->used_entries);
++      s->q_val=repair_calloc((size_t)s->used_entries,(size_t)s->q_pack);
+       if(!s->q_val) goto _eofout;
+ 
+-      if(s->q_bits<=8){
+-	for(i=0;i<s->used_entries*s->dim;i++)
+-	  ((unsigned char *)(s->q_val))[i]=tremor_oggpack_read(opb,s->q_bits);
+-      }else{
+-	for(i=0;i<s->used_entries*s->dim;i++)
+-	  ((ogg_uint16_t *)(s->q_val))[i]=tremor_oggpack_read(opb,s->q_bits);
++      {
++        size_t used=0;
++        for(i=0;i<s->entries;i++){
++          for(j=0;j<s->dim;j++){
++            long value=tremor_oggpack_read(opb,s->q_bits);
++            if(lengthlist[i]){
++              size_t offset=used*(size_t)s->dim+(size_t)j;
++              if(s->q_bits<=8)
++                ((unsigned char *)s->q_val)[offset]=value;
++              else
++                ((ogg_uint16_t *)s->q_val)[offset]=value;
++            }
++          }
++          if(lengthlist[i])used++;
++        }
+       }
+     }
+     break;

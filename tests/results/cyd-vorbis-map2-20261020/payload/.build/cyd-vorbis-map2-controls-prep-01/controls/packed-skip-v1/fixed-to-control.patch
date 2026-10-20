@@ -1,0 +1,12 @@
+--- fixed/vorbis_repair/setup.c
++++ packed-skip-v1/vorbis_repair/setup.c
+@@ -189,9 +189,6 @@
+             marker[j]=marker[j-1]<<1;
+           }else
+             break;
+-      }else if(b->used_entries>0 && maptype==2 && b->dec_type==1){
+-        /* Lookup 2 carries a full row even for an unused codeword. */
+-        for(j=0;j<b->dim;j++)tremor_oggpack_read(opb,b->q_bits);
+       }
+     }
+   }
