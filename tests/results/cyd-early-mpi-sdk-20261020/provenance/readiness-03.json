@@ -1,0 +1,106 @@
+{
+  "passed": true,
+  "scope": "Packager preparation, existing first-two evidence only; no archive or SDK command",
+  "scripts_sha256": {
+    "build_archive.py": "98fca414242a2d3ac49fe48a1333956d273c3bfcde353932919aee757815bac5",
+    "verify.py": "8e61c4fe996c72ce1389e14406ff4afa535995253da2edfede5478db93534588",
+    "README.template.md": "5b53a0e8a22fbb643a396461702a292de698334c00680286fd15aad28c8e665d",
+    "HOST.template.md": "eef61cdcb9d9793d9dc25c5a5a686eefa1586203496883327d815af3b1f80ee9",
+    "PLAN.md": "c3b69b58fee1ac1935f05c5f10b5a8a360aae7cf743b96549124bbf226730841",
+    "check-prep.py": "c33ad94c55de8f5945dff0e835d039dd232db90162e48a18d230cefbc4ac2883"
+  },
+  "checks": [
+    "Python AST",
+    "CLI help without collection/archive",
+    "All selected canonical paths and explicit working/raw HEAD text representations",
+    "Complete clean source snapshot and exact prior report",
+    "Extensionless LFS object omission",
+    "12 exact text controls in independent packager/verifier guards",
+    "Existing two ELF metadata/call decoding and separate warning classes"
+  ],
+  "exact_text_guard_cases": [
+    {
+      "name": "same-lf",
+      "expected_accept": true,
+      "passed": true
+    },
+    {
+      "name": "lf-to-crlf",
+      "expected_accept": true,
+      "passed": true
+    },
+    {
+      "name": "crlf-to-lf",
+      "expected_accept": true,
+      "passed": true
+    },
+    {
+      "name": "same-crlf",
+      "expected_accept": true,
+      "passed": true
+    },
+    {
+      "name": "mixed-working",
+      "expected_accept": false,
+      "passed": true
+    },
+    {
+      "name": "mixed-blob",
+      "expected_accept": false,
+      "passed": true
+    },
+    {
+      "name": "same-mixed-rejected",
+      "expected_accept": false,
+      "passed": true
+    },
+    {
+      "name": "lone-cr",
+      "expected_accept": false,
+      "passed": true
+    },
+    {
+      "name": "changed-byte",
+      "expected_accept": false,
+      "passed": true
+    },
+    {
+      "name": "lost-final-lf",
+      "expected_accept": false,
+      "passed": true
+    },
+    {
+      "name": "nul",
+      "expected_accept": false,
+      "passed": true
+    },
+    {
+      "name": "invalid-utf8",
+      "expected_accept": false,
+      "passed": true
+    }
+  ],
+  "profile_facts": {
+    "esp32-cyd2usb-native-early-mpi-pdm": {
+      "elf_sha256": "4af1e90ff1f06809a688024c77479f8115a745221292c84b8351bb1f7ed1815c",
+      "actual_app_main_calls": 29,
+      "cmake_categories": [
+        "component-include-dependency",
+        "object-path-length"
+      ]
+    },
+    "esp32-cyd2usb-native-early-mpi-disabled-pdm": {
+      "elf_sha256": "852800727cc09689186de5b8254e0a64e0a71a809234c93b4e5ba0f575947b53",
+      "actual_app_main_calls": 28,
+      "cmake_categories": [
+        "component-include-dependency",
+        "object-path-length"
+      ]
+    }
+  },
+  "archive_written": false,
+  "sdk_build_or_test_executed": false,
+  "final_five_report_pending": true,
+  "root_must_authorize_archive": true,
+  "scripts_current": true
+}

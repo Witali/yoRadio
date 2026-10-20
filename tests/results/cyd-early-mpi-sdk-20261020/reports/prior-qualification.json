@@ -1,0 +1,626 @@
+{
+  "passed": true,
+  "scope": "INTERMEDIATE vendor PDM MPI on/off only; reclaim remains on; all-backend and physical qualification open",
+  "physical_tested": false,
+  "source_commit": "1190aebce400375c382a5ad54211e2400f98161d",
+  "marker_sha256": "d0b8632d82f03fae323e0ed631700261c7d7c34488ff9bdae4d1701d5ba00ab7",
+  "images": [
+    {
+      "variant": "esp32-cyd2usb-native-early-mpi-pdm",
+      "enabled": true,
+      "elf_machine": 94,
+      "app_bytes": 1544560,
+      "ota_free_bytes": 224912,
+      "app_sha256": "bd4cbad0aa49269390b6255d70c38a9f987e33f258e386e20b743f349a17afe2",
+      "elf_sha256": "4af1e90ff1f06809a688024c77479f8115a745221292c84b8351bb1f7ed1815c",
+      "manifest_sha256": "2e5299b9dd7ea28e7c57c88ae83a5a3505cac2549243e53bbc6bcd09bcb44a14",
+      "baseline_config_delta": {
+        "YORADIO_TLS_EARLY_MPI_LOCK": {
+          "previous": null,
+          "current": true
+        }
+      },
+      "sdk_allocator_pointer_routes": {
+        "mbedtls_calloc_func": {
+          "address": 1073417268,
+          "value": 1074719472,
+          "expected": "__wrap_esp_mbedtls_mem_calloc"
+        },
+        "mbedtls_free_func": {
+          "address": 1073417264,
+          "value": 1075014092,
+          "expected": "esp_mbedtls_mem_free"
+        }
+      },
+      "mpi_compile_rows": [
+        {
+          "directory": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build",
+          "command": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe -DESP_PLATFORM -DESP_PSA_ITS_AVAILABLE -DIDF_VER=\\\"v6.0.2\\\" -DMBEDTLS_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DMBEDTLS_MAJOR_VERSION=4 -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -DTF_PSA_CRYPTO_USER_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DYORADIO_ESP_IDF_NATIVE=1 -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -D__STDC_WANT_LIB_EXT1__=0 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/config -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/platform_include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/esp_additions/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/ldo/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/debug_probe/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/etm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/power_supply/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/modem/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/. -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/tlsf -IC:/Work/yoRadio/.idf/v6.0.2/components/log/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/register -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/platform_port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/include/private -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_stdio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/deprecated_include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_usb/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include/apps -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/freertos/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/arch -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/sys -IC:/Work/yoRadio/.idf/v6.0.2/components/efuse/include -IC:/Work/yoRadio/.idf/v6.0.2/components/efuse/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/interface -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_spi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_pm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpspi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpspi/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_dac/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_event/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_client/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_server/include -IC:/Work/yoRadio/.idf/v6.0.2/components/http_parser -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_lcd/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_lcd/interface -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_i2c/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2c/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2c/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_parlio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_parlio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_lcd/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_netif/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_timer/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/include/local -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/wifi_apps/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/wifi_apps/nan_app/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_phy/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_phy/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_ringbuf/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/core -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/extras -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/esp_crt_bundle/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/psa_driver/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include -IC:/Work/yoRadio/.idf/v6.0.2/components/nvs_flash/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_partition/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_blockdev/include -IC:/Work/yoRadio/.idf/v6.0.2/components/spiffs/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/audio_level_led -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_ledc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ledc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ledc/esp32/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_audio_normalizer -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_audio_settings -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_web_transport/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls/esp-tls-crypto -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_ota/include -IC:/Work/yoRadio/.idf/v6.0.2/components/app_update/include -IC:/Work/yoRadio/.idf/v6.0.2/components/bootloader_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/bootloader_support/bootloader_flash/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_app_format/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_bootloader_format/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_time/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_wifi_store/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_network_power/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_legacy_codecs -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/aac_decoder -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/mp3_decoder -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/minimp3 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_codec_support -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_flac -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/flac_decoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/decoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/decoder/impl -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/encoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/encoder/impl -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/simple_dec @\"C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/toolchain/cflags\" -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -O2 -fmacro-prefix-map=C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native=. -fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.0.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu23 -Wno-old-style-declaration -fzero-init-padding-bits=all -fno-malloc-dce -o esp-idf\\main\\CMakeFiles\\__idf_main.dir\\native_tls_early_mpi.c.obj -c C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c",
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c",
+          "output": "esp-idf\\main\\CMakeFiles\\__idf_main.dir\\native_tls_early_mpi.c.obj"
+        }
+      ],
+      "reclaim_compile_rows": [
+        {
+          "directory": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build",
+          "command": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe -DESP_PLATFORM -DESP_PSA_ITS_AVAILABLE -DIDF_VER=\\\"v6.0.2\\\" -DMBEDTLS_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DMBEDTLS_MAJOR_VERSION=4 -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -DTF_PSA_CRYPTO_USER_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DYORADIO_ESP_IDF_NATIVE=1 -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -D__STDC_WANT_LIB_EXT1__=0 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/config -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/platform_include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/esp_additions/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/ldo/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/debug_probe/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/etm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/power_supply/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/modem/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/. -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/tlsf -IC:/Work/yoRadio/.idf/v6.0.2/components/log/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/register -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/platform_port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/include/private -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_stdio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/deprecated_include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_usb/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include/apps -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/freertos/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/arch -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/sys -IC:/Work/yoRadio/.idf/v6.0.2/components/efuse/include -IC:/Work/yoRadio/.idf/v6.0.2/components/efuse/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/interface -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_spi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_pm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpspi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpspi/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_dac/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_event/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_client/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_server/include -IC:/Work/yoRadio/.idf/v6.0.2/components/http_parser -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_lcd/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_lcd/interface -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_i2c/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2c/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2c/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_parlio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_parlio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_lcd/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_netif/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_timer/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/include/local -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/wifi_apps/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/wifi_apps/nan_app/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_phy/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_phy/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_ringbuf/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/core -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/extras -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/esp_crt_bundle/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/psa_driver/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include -IC:/Work/yoRadio/.idf/v6.0.2/components/nvs_flash/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_partition/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_blockdev/include -IC:/Work/yoRadio/.idf/v6.0.2/components/spiffs/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/audio_level_led -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_ledc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ledc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ledc/esp32/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_audio_normalizer -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_audio_settings -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_web_transport/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls/esp-tls-crypto -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_ota/include -IC:/Work/yoRadio/.idf/v6.0.2/components/app_update/include -IC:/Work/yoRadio/.idf/v6.0.2/components/bootloader_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/bootloader_support/bootloader_flash/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_app_format/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_bootloader_format/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_time/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_wifi_store/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_network_power/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_legacy_codecs -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/aac_decoder -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/mp3_decoder -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/minimp3 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_codec_support -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_flac -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/flac_decoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/decoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/decoder/impl -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/encoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/encoder/impl -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/simple_dec @\"C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/toolchain/cflags\" -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -O2 -fmacro-prefix-map=C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native=. -fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.0.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu23 -Wno-old-style-declaration -fzero-init-padding-bits=all -fno-malloc-dce -o esp-idf\\main\\CMakeFiles\\__idf_main.dir\\native_input_reclaim.c.obj -c C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c",
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c",
+          "output": "esp-idf\\main\\CMakeFiles\\__idf_main.dir\\native_input_reclaim.c.obj"
+        }
+      ],
+      "http_overlay_compile_row": {
+        "directory": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build",
+        "command": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe -DESP_PLATFORM -DESP_PSA_ITS_AVAILABLE -DIDF_VER=\\\"v6.0.2\\\" -DMBEDTLS_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DMBEDTLS_MAJOR_VERSION=4 -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -DTF_PSA_CRYPTO_USER_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -D__STDC_WANT_LIB_EXT1__=0 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/config -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_client/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_client/lib/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/platform_include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/esp_additions/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/ldo/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/debug_probe/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/etm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/power_supply/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/modem/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/. -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/tlsf -IC:/Work/yoRadio/.idf/v6.0.2/components/log/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/register -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/platform_port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/include/private -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_stdio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/deprecated_include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_usb/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include/apps -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/freertos/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/arch -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/sys -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_event/include -IC:/Work/yoRadio/.idf/v6.0.2/components/tcp_transport/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls/esp-tls-crypto -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/core -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/extras -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/esp_crt_bundle/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/psa_driver/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_timer/include -IC:/Work/yoRadio/.idf/v6.0.2/components/http_parser @\"C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/on/build/toolchain/cflags\" -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -O2 -fmacro-prefix-map=C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native=. -fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.0.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu23 -Wno-old-style-declaration -fzero-init-padding-bits=all -fno-malloc-dce -o esp-idf\\esp_http_client\\CMakeFiles\\__idf_esp_http_client.dir\\__\\__\\native-http-request-buffer\\esp_http_client.c.obj -c C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\native-http-request-buffer\\esp_http_client.c",
+        "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\native-http-request-buffer\\esp_http_client.c",
+        "output": "esp-idf\\esp_http_client\\CMakeFiles\\__idf_esp_http_client.dir\\__\\__\\native-http-request-buffer\\esp_http_client.c.obj"
+      },
+      "actual_app_main_calls": [
+        {
+          "pc": 1074645867,
+          "target": 1074719676,
+          "kind": "direct",
+          "symbols": [
+            "native_tls_early_mpi_prepare"
+          ]
+        },
+        {
+          "pc": 1074645870,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645885,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074645888,
+          "target": 1074673528,
+          "kind": "direct",
+          "symbols": [
+            "native_health_start"
+          ]
+        },
+        {
+          "pc": 1074645894,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645909,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074645915,
+          "target": 1074671812,
+          "kind": "direct",
+          "symbols": [
+            "native_state_init"
+          ]
+        },
+        {
+          "pc": 1074645918,
+          "target": 1074625160,
+          "kind": "direct",
+          "symbols": [
+            "nvs_flash_init"
+          ]
+        },
+        {
+          "pc": 1074645925,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645934,
+          "target": 1075020632,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074645951,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074645954,
+          "target": 1074750692,
+          "kind": "direct",
+          "symbols": [
+            "native_audio_settings_init"
+          ]
+        },
+        {
+          "pc": 1074645972,
+          "target": 1074319064,
+          "kind": "direct",
+          "symbols": [
+            "_esp_error_check_failed"
+          ]
+        },
+        {
+          "pc": 1074645975,
+          "target": 1074683056,
+          "kind": "direct",
+          "symbols": [
+            "network_settings_init"
+          ]
+        },
+        {
+          "pc": 1074645982,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645991,
+          "target": 1075020632,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074646008,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074646032,
+          "target": 1074732136,
+          "kind": "direct",
+          "symbols": [
+            "esp_vfs_spiffs_register"
+          ]
+        },
+        {
+          "pc": 1074646039,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074646048,
+          "target": 1075020632,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074646065,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074646071,
+          "target": 1074667480,
+          "kind": "direct",
+          "symbols": [
+            "cyd_display_init"
+          ]
+        },
+        {
+          "pc": 1074646088,
+          "target": 1074319064,
+          "kind": "direct",
+          "symbols": [
+            "_esp_error_check_failed"
+          ]
+        },
+        {
+          "pc": 1074646091,
+          "target": 1074684224,
+          "kind": "direct",
+          "symbols": [
+            "time_service_start"
+          ]
+        },
+        {
+          "pc": 1074646099,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074646109,
+          "target": 1075020632,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074646127,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074646150,
+          "target": 1075605740,
+          "kind": "indirect",
+          "literal": 1074594308,
+          "symbols": [
+            "xTaskCreatePinnedToCore"
+          ]
+        },
+        {
+          "pc": 1074646173,
+          "target": 1075605740,
+          "kind": "indirect",
+          "literal": 1074594308,
+          "symbols": [
+            "xTaskCreatePinnedToCore"
+          ]
+        }
+      ],
+      "symbol_logs": {
+        "app-main.log": "d5feb7ef067e356130b5a19712b3480a95e775f85a99a5d14f7466467fe8075e",
+        "mpi-body.log": "d4f5ac5afddcf55360924e76f035540c620bca8c4674518e6b6226b3ce14e8c0",
+        "nm.log": "9bf5e892cc9da2430de0bfa8a2308912cbd12b393b323b6924c0fe9602f8fc24"
+      },
+      "sdk_environment_warnings": []
+    },
+    {
+      "variant": "esp32-cyd2usb-native-early-mpi-disabled-pdm",
+      "enabled": false,
+      "elf_machine": 94,
+      "app_bytes": 1544544,
+      "ota_free_bytes": 224928,
+      "app_sha256": "7c4499277c0948c1ad8c0781c452f7bfdaed7095041f50338837c9a31c7c47e9",
+      "elf_sha256": "852800727cc09689186de5b8254e0a64e0a71a809234c93b4e5ba0f575947b53",
+      "manifest_sha256": "5d1292efaab85701573be50d318db09418529d647bcaea8a434d6af1732239f6",
+      "baseline_config_delta": {
+        "YORADIO_TLS_EARLY_MPI_LOCK": {
+          "previous": null,
+          "current": false
+        }
+      },
+      "sdk_allocator_pointer_routes": {
+        "mbedtls_calloc_func": {
+          "address": 1073417268,
+          "value": 1074719464,
+          "expected": "__wrap_esp_mbedtls_mem_calloc"
+        },
+        "mbedtls_free_func": {
+          "address": 1073417264,
+          "value": 1075014028,
+          "expected": "esp_mbedtls_mem_free"
+        }
+      },
+      "mpi_compile_rows": [],
+      "reclaim_compile_rows": [
+        {
+          "directory": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build",
+          "command": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe -DESP_PLATFORM -DESP_PSA_ITS_AVAILABLE -DIDF_VER=\\\"v6.0.2\\\" -DMBEDTLS_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DMBEDTLS_MAJOR_VERSION=4 -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -DTF_PSA_CRYPTO_USER_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DYORADIO_ESP_IDF_NATIVE=1 -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -D__STDC_WANT_LIB_EXT1__=0 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build/config -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/platform_include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/esp_additions/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/ldo/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/debug_probe/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/etm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/power_supply/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/modem/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/. -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/tlsf -IC:/Work/yoRadio/.idf/v6.0.2/components/log/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/register -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/platform_port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/include/private -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_stdio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/deprecated_include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_usb/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include/apps -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/freertos/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/arch -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/sys -IC:/Work/yoRadio/.idf/v6.0.2/components/efuse/include -IC:/Work/yoRadio/.idf/v6.0.2/components/efuse/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/interface -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_adc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_spi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_pm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpspi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpspi/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_dac/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_event/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_client/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_server/include -IC:/Work/yoRadio/.idf/v6.0.2/components/http_parser -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_lcd/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_lcd/interface -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_i2c/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2c/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2c/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_parlio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_parlio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_lcd/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_netif/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_timer/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/include/local -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/wifi_apps/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_wifi/wifi_apps/nan_app/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_phy/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_phy/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_ringbuf/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/core -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/extras -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/esp_crt_bundle/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/psa_driver/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include -IC:/Work/yoRadio/.idf/v6.0.2/components/nvs_flash/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_partition/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_blockdev/include -IC:/Work/yoRadio/.idf/v6.0.2/components/spiffs/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/audio_level_led -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_driver_ledc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ledc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ledc/esp32/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_audio_normalizer -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_audio_settings -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_web_transport/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls/esp-tls-crypto -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_ota/include -IC:/Work/yoRadio/.idf/v6.0.2/components/app_update/include -IC:/Work/yoRadio/.idf/v6.0.2/components/bootloader_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/bootloader_support/bootloader_flash/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_app_format/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_bootloader_format/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_time/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_wifi_store/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_network_power/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_legacy_codecs -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/aac_decoder -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/mp3_decoder -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/minimp3 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_codec_support -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_flac -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/src/audioI2S/flac_decoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/decoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/decoder/impl -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/encoder -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/encoder/impl -IC:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec/include/simple_dec @\"C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build/toolchain/cflags\" -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -O2 -fmacro-prefix-map=C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native=. -fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.0.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu23 -Wno-old-style-declaration -fzero-init-padding-bits=all -fno-malloc-dce -o esp-idf\\main\\CMakeFiles\\__idf_main.dir\\native_input_reclaim.c.obj -c C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c",
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c",
+          "output": "esp-idf\\main\\CMakeFiles\\__idf_main.dir\\native_input_reclaim.c.obj"
+        }
+      ],
+      "http_overlay_compile_row": {
+        "directory": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build",
+        "command": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe -DESP_PLATFORM -DESP_PSA_ITS_AVAILABLE -DIDF_VER=\\\"v6.0.2\\\" -DMBEDTLS_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -DMBEDTLS_MAJOR_VERSION=4 -DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE -DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ -DTF_PSA_CRYPTO_USER_CONFIG_FILE=\\\"mbedtls/esp_config.h\\\" -D_GLIBCXX_HAVE_POSIX_SEMAPHORE -D_GLIBCXX_USE_POSIX_SEMAPHORE -D_GNU_SOURCE -D_POSIX_READER_WRITER_LOCKS -D__STDC_WANT_LIB_EXT1__=0 -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build/config -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_client/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_http_client/lib/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/platform_include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/config/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos -IC:/Work/yoRadio/.idf/v6.0.2/components/freertos/esp_additions/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/ldo/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/debug_probe/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/etm/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/power_supply/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/modem/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/. -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/port/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/include -IC:/Work/yoRadio/.idf/v6.0.2/components/heap/tlsf -IC:/Work/yoRadio/.idf/v6.0.2/components/log/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/soc/esp32/register -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/platform_port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/hal/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32/include/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_rom/esp32 -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/soc -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/include/private -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_stdio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/include -IC:/Work/yoRadio/.idf/v6.0.2/components/xtensa/deprecated_include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_gpio/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_usb/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_pmu/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_ana_conv/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_dma/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_i2s/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/include/apps -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/freertos/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/arch -IC:/Work/yoRadio/.idf/v6.0.2/components/lwip/port/esp32xx/include/sys -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_event/include -IC:/Work/yoRadio/.idf/v6.0.2/components/tcp_transport/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls -IC:/Work/yoRadio/.idf/v6.0.2/components/esp-tls/esp-tls-crypto -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/core -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/extras -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/esp_crt_bundle/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/psa_driver/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/esp32/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_hal_security/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include -IC:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m -IC:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include -IC:/Work/yoRadio/.idf/v6.0.2/components/esp_timer/include -IC:/Work/yoRadio/.idf/v6.0.2/components/http_parser @\"C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-production-prep-01/campaign-02/off/build/toolchain/cflags\" -fdiagnostics-color=always -ffunction-sections -fdata-sections -Wall -Werror -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations -Wextra -Wno-error=extra -Wno-unused-parameter -Wno-sign-compare -Wno-enum-conversion -gdwarf-4 -ggdb -O2 -fmacro-prefix-map=C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native=. -fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.0.2=/IDF -fstrict-volatile-bitfields -fno-jump-tables -fno-tree-switch-conversion -std=gnu23 -Wno-old-style-declaration -fzero-init-padding-bits=all -fno-malloc-dce -o esp-idf\\esp_http_client\\CMakeFiles\\__idf_esp_http_client.dir\\__\\__\\native-http-request-buffer\\esp_http_client.c.obj -c C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\native-http-request-buffer\\esp_http_client.c",
+        "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\native-http-request-buffer\\esp_http_client.c",
+        "output": "esp-idf\\esp_http_client\\CMakeFiles\\__idf_esp_http_client.dir\\__\\__\\native-http-request-buffer\\esp_http_client.c.obj"
+      },
+      "actual_app_main_calls": [
+        {
+          "pc": 1074645863,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645878,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074645881,
+          "target": 1074673520,
+          "kind": "direct",
+          "symbols": [
+            "native_health_start"
+          ]
+        },
+        {
+          "pc": 1074645886,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645901,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074645907,
+          "target": 1074671804,
+          "kind": "direct",
+          "symbols": [
+            "native_state_init"
+          ]
+        },
+        {
+          "pc": 1074645910,
+          "target": 1074625156,
+          "kind": "direct",
+          "symbols": [
+            "nvs_flash_init"
+          ]
+        },
+        {
+          "pc": 1074645917,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645926,
+          "target": 1075020568,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074645943,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074645946,
+          "target": 1074750672,
+          "kind": "direct",
+          "symbols": [
+            "native_audio_settings_init"
+          ]
+        },
+        {
+          "pc": 1074645964,
+          "target": 1074319064,
+          "kind": "direct",
+          "symbols": [
+            "_esp_error_check_failed"
+          ]
+        },
+        {
+          "pc": 1074645967,
+          "target": 1074683048,
+          "kind": "direct",
+          "symbols": [
+            "network_settings_init"
+          ]
+        },
+        {
+          "pc": 1074645974,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074645983,
+          "target": 1075020568,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074646000,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074646024,
+          "target": 1074732116,
+          "kind": "direct",
+          "symbols": [
+            "esp_vfs_spiffs_register"
+          ]
+        },
+        {
+          "pc": 1074646031,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074646040,
+          "target": 1075020568,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074646057,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074646063,
+          "target": 1074667472,
+          "kind": "direct",
+          "symbols": [
+            "cyd_display_init"
+          ]
+        },
+        {
+          "pc": 1074646080,
+          "target": 1074319064,
+          "kind": "direct",
+          "symbols": [
+            "_esp_error_check_failed"
+          ]
+        },
+        {
+          "pc": 1074646083,
+          "target": 1074684216,
+          "kind": "direct",
+          "symbols": [
+            "time_service_start"
+          ]
+        },
+        {
+          "pc": 1074646091,
+          "target": 1074331524,
+          "kind": "direct",
+          "symbols": [
+            "esp_log_timestamp"
+          ]
+        },
+        {
+          "pc": 1074646101,
+          "target": 1075020568,
+          "kind": "direct",
+          "symbols": [
+            "esp_err_to_name"
+          ]
+        },
+        {
+          "pc": 1074646119,
+          "target": 1074331336,
+          "kind": "direct",
+          "symbols": [
+            "esp_log"
+          ]
+        },
+        {
+          "pc": 1074646142,
+          "target": 1075605716,
+          "kind": "indirect",
+          "literal": 1074594308,
+          "symbols": [
+            "xTaskCreatePinnedToCore"
+          ]
+        },
+        {
+          "pc": 1074646165,
+          "target": 1075605716,
+          "kind": "indirect",
+          "literal": 1074594308,
+          "symbols": [
+            "xTaskCreatePinnedToCore"
+          ]
+        }
+      ],
+      "symbol_logs": {
+        "app-main.log": "d33107b06c2bd34b0c1bf9a50d98498ee02aa862d9cec3d858133306edbe4c45",
+        "nm.log": "0e822ed26a94a4b069364f5643e090ee12688fd53e0423b77fecfb4532950a8c"
+      },
+      "sdk_environment_warnings": []
+    }
+  ],
+  "between_config_delta": {
+    "YORADIO_TLS_EARLY_MPI_LOCK": {
+      "on": true,
+      "off": false
+    }
+  },
+  "head_after": "1190aebce400375c382a5ad54211e2400f98161d",
+  "all_bound_inputs_current": true,
+  "qualification_inputs_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\run\\report.json": "59b22ce639e7788201c1ae5209599e5434d6631fa46c698e8c24af64a7e9f06f",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\run\\on\\stdout.log": "4753f12b08a50a840198e85580cfbf6a9c28df73eb593f2fff5d9c3abc6737c1",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\run\\on\\stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\run\\off\\stdout.log": "0b3e328bf224fe78807d4a5111face21bf77556de6c8563d1aba4e09bca6005b",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\run\\off\\stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\yoradio_cyd2usb_native.elf": "4af1e90ff1f06809a688024c77479f8115a745221292c84b8351bb1f7ed1815c",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\yoradio_cyd2usb_native.bin": "bd4cbad0aa49269390b6255d70c38a9f987e33f258e386e20b743f349a17afe2",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\compile_commands.json": "ad6ce62c2224b7f0da256368d0b6a76f72914960f6750ec07a731673091da612",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\build.ninja": "26cc12dc7b290caf5348510f881afef1f8666eda44b9d1438524b115fbe16ea6",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\project_description.json": "13fe3fd19270e5201117b6126cedcc34b2e1bf4596628ff44a435da87cbd4065",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\config\\sdkconfig.json": "e9fdc12c44cdb4f23c97c8d3d6498121d25274675d5a9c092cede0a242b33737",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\on\\build\\sdkconfig": "bd16efb4774336c5b8056ebd38c016a0c2cf4c5bf60a4e9d3d1964816173daea",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\app.bin": "bd4cbad0aa49269390b6255d70c38a9f987e33f258e386e20b743f349a17afe2",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\build-1.log": "b969508145ada2c1c8e1c53234d03ef1b8f00f4bc0e25b7a70f99c4c6897cd43",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\build-2.log": "f4808a857ce4c24a3fb5e656e7778d37871ac18078509c73621038120631f1e0",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\flasher_args.json": "3eafedc8c08642cdf6e5fce5814aabec9e7cd8dcbdf1aa7cfdaa68f9fef69f36",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\manifest.json": "2e5299b9dd7ea28e7c57c88ae83a5a3505cac2549243e53bbc6bcd09bcb44a14",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\partition-table.bin": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\project_description.json": "13fe3fd19270e5201117b6126cedcc34b2e1bf4596628ff44a435da87cbd4065",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\sdkconfig": "bd16efb4774336c5b8056ebd38c016a0c2cf4c5bf60a4e9d3d1964816173daea",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-pdm\\sdkconfig.json": "e9fdc12c44cdb4f23c97c8d3d6498121d25274675d5a9c092cede0a242b33737",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\yoradio_cyd2usb_native.elf": "852800727cc09689186de5b8254e0a64e0a71a809234c93b4e5ba0f575947b53",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\yoradio_cyd2usb_native.bin": "7c4499277c0948c1ad8c0781c452f7bfdaed7095041f50338837c9a31c7c47e9",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\compile_commands.json": "7bb969ed5946f4aff6641f0c333e70208a7d5e06aa5eb8fbcab0135f153348c1",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\build.ninja": "7bb4b3394a43b8c221ad3e055865bab6b26bfabc9eaffa436f55579fff1cbacf",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\project_description.json": "3efe8933258edd1ec3cca5ae543fe2a236b13f78bb0e894b0736884fbb43a73f",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\config\\sdkconfig.json": "af7ef85d8ad0208a2051d19745424593e4aa912ddf632989bf0ddfa444fd5217",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-production-prep-01\\campaign-02\\off\\build\\sdkconfig": "e307e4ba03abe011cdebbbc47fe0c66d634cf5620905066705da760b344a4dab",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\app.bin": "7c4499277c0948c1ad8c0781c452f7bfdaed7095041f50338837c9a31c7c47e9",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\build-1.log": "65e683bf7534f35c8ba0c032ca7965eacc8896e506ae492be144a0b309ec24b6",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\build-2.log": "0d2295804494c723b734beb4ba92c6c191597a28808138dc8c3b9c19d5815522",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\flasher_args.json": "3eafedc8c08642cdf6e5fce5814aabec9e7cd8dcbdf1aa7cfdaa68f9fef69f36",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\manifest.json": "5d1292efaab85701573be50d318db09418529d647bcaea8a434d6af1732239f6",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\partition-table.bin": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\project_description.json": "3efe8933258edd1ec3cca5ae543fe2a236b13f78bb0e894b0736884fbb43a73f",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\sdkconfig": "e307e4ba03abe011cdebbbc47fe0c66d634cf5620905066705da760b344a4dab",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-early-mpi-disabled-pdm\\sdkconfig.json": "af7ef85d8ad0208a2051d19745424593e4aa912ddf632989bf0ddfa444fd5217"
+  },
+  "all_backend_qualification": false,
+  "physical_qualification": false
+}

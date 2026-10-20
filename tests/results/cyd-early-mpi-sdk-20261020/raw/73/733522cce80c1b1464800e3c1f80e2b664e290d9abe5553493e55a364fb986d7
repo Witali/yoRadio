@@ -1,0 +1,42 @@
+"""Read-only final binding review; writes only this new readiness report."""
+from types import SimpleNamespace
+from pathlib import Path
+import json
+import contract as c
+
+out = c.HERE / 'prepared-review.json'
+c.require(not out.exists(), 'Keep immutable readiness evidence')
+args = SimpleNamespace(campaign=c.HERE / 'campaign-01', marker_sha256='3886135a74d1ea51a34744a443288e31cda82f4bf55cdc2535de41891ff66b0b')
+marker, root, _, rows = c.check(args)
+terminal = c.load(c.HERE / 'prepare-attempt-01/terminal.json')
+c.require(terminal['exit_status'] == 0 and terminal['sdk_build_executed'] is False, 'Prepare terminal rejected')
+before = c.load(c.HERE / 'prepare-attempt-01/scripts-before.json')
+c.require(terminal['scripts_after'] == before and all(c.sha(c.HERE / name) == digest for name, digest in before.items()), 'Prepare source bytes changed')
+selfcheck = c.load(c.HERE / 'selfcheck-02/report.json')
+c.require(selfcheck['passed'] is True and all(c.sha(path) == value for path, value in selfcheck['scripts_sha256'].items()), 'Final pure selfcheck inputs changed')
+c.require(c.sha(args.campaign / 'frozen/previous-pdm/qualification-report.json') == c.PREVIOUS_QUALIFICATION_SHA, 'Frozen prior report copy mismatch')
+inventory = {}
+for name, group in marker['previous_gate']['warning_inventory'].items():
+    records = []
+    for item in group['cmake']:
+        category = 'object-path-length' if 'CMAKE_OBJECT_PATH_MAX' in item['block'] else 'component-include-dependency' if 'component_validation.cmake' in item['block'] else 'other-cmake'
+        records.append(dict(item, category=category))
+    inventory[name] = {'cmake': records, 'sdk_environment': group['sdk_environment']}
+report = {'passed': True, 'stage': 'PREPARED_ONLY_ROOT_OWNS_SDK_RUN', 'source_commit': marker['source_commit'],
+          'source_content_sha256': marker['source_content_sha256'], 'head_after': c.git(root, 'rev-parse', 'HEAD').decode().strip(),
+          'campaign': str(args.campaign), 'marker_sha256': args.marker_sha256,
+          'all_marker_bound_inputs_current': True, 'frozen_payloads': len(marker['frozen_inputs_sha256']),
+          'scripts_sha256': marker['scripts_sha256'], 'prior_qualification_sha256': c.PREVIOUS_QUALIFICATION_SHA,
+          'prior_qualified_inputs': len(marker['previous_gate']['qualification_inputs_sha256']),
+          'prepare_terminal': str(c.HERE / 'prepare-attempt-01/terminal.json'), 'prepare_terminal_sha256': c.sha(c.HERE / 'prepare-attempt-01/terminal.json'),
+          'pure_selfcheck_report_sha256': c.sha(c.HERE / 'selfcheck-02/report.json'), 'pure_selfcheck_cases': len(selfcheck['cases']),
+          'profiles': [{'variant': row['variant'], 'backend': row['backend'], 'custom_flac': row['custom_flac'],
+                        'matching_baseline': row['baseline'], 'build_directory': row['build_directory'],
+                        'build_directory_characters': len(row['build_directory']), 'initial_seed_sha256': row['initial_seed_sha256'],
+                        'baseline_sdkconfig_sha256': row['baseline_sdkconfig_sha256']} for row in rows],
+          'prior_warning_classification': inventory, 'agent_executed_sdk_build_or_export': False,
+          'remaining_gates': ['Root-run five actual SDK builds/exports', 'Root qualify full seven-image vendor/custom x three backend plus disabled-PDM matrix',
+                              'Physical board behavior', 'Actual radio pre-app mutex observation', 'Measured benefit'],
+          'original_pdm_scripts_changed': False, 'tracked_source_sdk_git_changes_by_agent': False}
+c.write(out, report)
+print(json.dumps({'passed': True, 'report': str(out), 'sha256': c.sha(out), 'frozen_payloads': len(marker['frozen_inputs_sha256'])}, indent=2))

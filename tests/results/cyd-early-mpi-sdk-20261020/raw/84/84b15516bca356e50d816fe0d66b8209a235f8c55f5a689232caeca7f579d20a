@@ -1,0 +1,67 @@
+# Remaining five early-MPI application profiles — prepare only
+
+These ignored tools extend the immutable two-PDM gate. Preparing them does not
+build or export firmware. Root owns later run and qualification after review.
+No source, SDK, config, Git metadata, original PDM script or original campaign is
+modified. The exact committed source checkpoint is
+`1190aebce400375c382a5ad54211e2400f98161d`.
+
+The five enabled variants are `esp32-cyd2usb-native-early-mpi-` followed by
+`continuous`, `legacy`, `custom-flac-pdm`, `custom-flac-continuous` and
+`custom-flac-legacy`. Each starts from its matching committed
+`esp32-cyd2usb-native-tls-input-reclaim-` baseline. Only the MPI option may change
+from absent to the boolean true. Reclaim, HTTP TX release, selected backend and
+vendor/custom codec selection are preserved. Any additional option is rejected.
+
+Scripts and frozen campaign metadata stay under this prep folder. Actual build
+paths are the exact short fresh repository paths
+`.build/em-sdk-01/{vc,vl,cp,cc,cl}/build`, respectively. Existing build roots,
+development outputs and campaign/run/qualification receipts are rejected.
+Failure evidence is retained. Neither resume nor overwrite is provided.
+
+Using installed bootstrap Python with `-B -X utf8` and installed PowerShell7:
+
+```text
+python -B -X utf8 .build/cyd-early-mpi-backend-prep-01/prepare.py --expected-head 1190aebce400375c382a5ad54211e2400f98161d --powershell <PWSH7_EXE>
+python -B -X utf8 .build/cyd-early-mpi-backend-prep-01/run.py --marker-sha256 <PRINTED_MARKER_SHA256>
+python -B -X utf8 .build/cyd-early-mpi-backend-prep-01/qualify.py --marker-sha256 <SAME_MARKER_SHA256>
+```
+
+`--repository`, `--dependency-root` and `--campaign` may be explicit. Campaigns
+must be fresh descendants of this folder. Preparation freezes the existing
+exporter's complete clean source snapshot and HEAD before/after, all five
+complete committed baseline exports, task/board equivalence to each baseline,
+initial seeds, four required MPI README/HOST plus reclaim/HTTP README evidence,
+scripts/tools, SDK6 commit/source and the clean SDK5 legacy driver inputs.
+Runtime scripts require the immutable marker SHA and recheck bindings before
+and after each export and qualification. The original PDM marker
+`d0b8632d82f03fae323e0ed631700261c7d7c34488ff9bdae4d1701d5ba00ab7`, scripts,
+seeds and frozen payloads are checked read-only; its live build is not touched.
+Its exact completed qualification report
+`7c2007b1a33a3dfedde6be0ee13e09b463403d6ffdd9d6506fbe1edbbb29a1f4`
+and all actual qualified payload/log hashes are also bound during preparation.
+The report is copied into the new immutable campaign. Existing CMake object-path
+warning blocks are inventoried separately from compiler and environment warnings.
+
+Only each baseline's manifest-bound `app.bin` and `partition-table.bin` may use
+Git LFS. Their exact standard pointer, manifest OID, hydrated SHA/size and
+already-present local LFS object SHA/size are verified. The pointer is frozen.
+All other baseline/evidence bytes must equal raw Git HEAD blobs. No LFS fetch,
+custom-storage guessing, downloads, AllowDirty or Setup override is provided.
+
+The later qualifier checks actual Xtensa ELF94, image checksum, OTA capacities,
+receipt and seed bindings, exact baseline config delta, canonical whole MPI
+module compile and first actual `app_main` call, one ordinary public MPI
+acquire/release pair, allocator/free/reclaim pointer and link ownership,
+canonical HTTP overlay, metrics DRAM and PDM callback IRAM only for the PDM
+profile. The production Vorbis bridge must remain unconnected. The five fresh
+images are combined with the successfully qualified original enabled/disabled
+vendor PDM pair only after all of that pair's report, image and ELF evidence
+hashes remain current. A passing combined report requires all six enabled
+vendor/custom × three-backend combinations plus the disabled PDM control.
+
+This remains a linked-image gate. Physical behavior, actual radio pre-app mutex
+state and benefit measurements remain open. No RAM, fragmentation or speed
+improvement is claimed. Deferred codec extensions and AAC investigation are
+excluded. The small pure contract/preflight self-check does not qualify an SDK
+application or execute MPI, crypto or network operations.

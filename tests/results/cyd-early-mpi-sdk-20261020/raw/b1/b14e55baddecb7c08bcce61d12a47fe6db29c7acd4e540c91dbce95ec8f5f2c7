@@ -1,0 +1,87 @@
+"""Pure synthetic contract/parser checks; no prepare/build/export/SDK calls."""
+import copy
+import hashlib
+import json
+from pathlib import Path
+import struct
+import contract as gate
+
+checks = []
+
+
+def ok(name, condition):
+    assert condition, name
+    checks.append(name)
+
+
+def rejects(name, action):
+    try:
+        action()
+    except (RuntimeError, StopIteration, struct.error):
+        checks.append(name)
+    else:
+        raise AssertionError(name)
+
+
+root = Path('C:/synthetic-repository').resolve()
+campaign = root / '.build/synthetic-campaign'
+profiles = [{'name': name, 'variant': variant, 'enabled': enabled, 'backend': 'pdm',
+             'baseline': str(root / gate.BASELINE), 'build_directory': str(campaign / name / 'build'),
+             'sdkconfig': str(campaign / name / 'build/sdkconfig'),
+             'output_directory': str(root / 'firmware/development' / variant)}
+            for name, (variant, enabled) in gate.EXPECTED.items()]
+gate.profile_contract(root, campaign, profiles)
+ok('exact-two-valid-profiles', True)
+rejects('one-profile-rejected', lambda: gate.profile_contract(root, campaign, profiles[:1]))
+rejects('duplicate-name-rejected', lambda: gate.profile_contract(root, campaign, [profiles[0], profiles[0]]))
+for field, replacement in [('enabled', 1), ('baseline', str(root / 'other-baseline')),
+                           ('backend', 'continuous'), ('sdkconfig', str(root / 'sdkconfig')),
+                           ('build_directory', str(root / 'build')), ('output_directory', str(root / 'firmware/release/other'))]:
+    mutated = copy.deepcopy(profiles)
+    mutated[0][field] = replacement
+    rejects('profile-' + field + '-rejected', lambda rows=mutated: gate.profile_contract(root, campaign, rows))
+before = {'existing_bool': True, 'capacity': 16384}
+after = {**before, gate.MPI: True}
+ok('exact-new-mpi-bool', gate.config_delta(before, after) == {gate.MPI: {'previous': None, 'current': True}})
+ok('bool-versus-int-not-coalesced', 'existing_bool' in gate.config_delta(before, {**before, 'existing_bool': 1}))
+ok('extra-false-option-visible', 'unexpected' in gate.config_delta(before, {**after, 'unexpected': False}))
+ok('missing-false-option-visible', 'existing' in gate.config_delta({'existing': False}, {}))
+
+# A synthetic ELF32 PT_LOAD containing two literal words; no target binary or
+# private SDK state is created/read. Test both actual parser instruction forms.
+raw = bytearray(0x240)
+struct.pack_into('<I', raw, 28, 52)
+struct.pack_into('<HH', raw, 42, 32, 1)
+struct.pack_into('<8I', raw, 52, 1, 0x200, 0x1000, 0x1000, 64, 64, 4, 4)
+struct.pack_into('<II', raw, 0x200, 0x400d0100, 0x400d0200)
+syms = {'first': {'address': 0x400d0100}, 'second': {'address': 0x400d0200}}
+trace = gate.call_trace('400d1000: 000000 l32r a8, 1000 <literal>\n400d1003: 000000 callx8 a8\n400d1006: 000000 call8 400d0200 <second>\n', raw, syms)
+ok('longcall-and-direct-ordered', [row['target'] for row in trace] == [0x400d0100, 0x400d0200])
+trace = gate.call_trace('400d1000: 000000 l32r a8, 1000 <literal>\n400d1003: 000000 mov.n a8, a2\n400d1006: 000000 callx8 a8\n', raw, syms)
+ok('clobbered-longcall-stays-unknown', trace[0]['target'] is None)
+trace = gate.call_trace('400d1000: 000000 callx8 a8\n400d1003: 000000 call8 400d0200 <second>\n', raw, syms)
+ok('unknown-first-call-not-dropped', len(trace) == 2 and trace[0]['target'] is None)
+
+data = bytearray(24)
+data[0], data[1], data[23] = 0xe9, 1, 1
+payload = bytes(range(1, 33))
+data += struct.pack('<II', 0x3ffb0000, len(payload)) + payload
+checksum = 0xef
+for byte in payload:
+    checksum ^= byte
+end = ((len(data) + 16) // 16) * 16 - 1
+data += bytes(end - len(data)) + bytes([checksum])
+data += hashlib.sha256(data).digest()
+gate.validate_image(data)
+ok('synthetic-image-valid', True)
+bad = bytearray(data)
+bad[end] ^= 1
+rejects('image-checksum-rejected', lambda: gate.validate_image(bad))
+bad_footer = bytearray(data)
+bad_footer[-1] ^= 1
+rejects('image-footer-rejected', lambda: gate.validate_image(bad_footer))
+output = gate.HERE / 'selfcheck-report.json'
+assert not output.exists()
+output.write_bytes((json.dumps({'passed': True, 'checks': checks,
+                               'scope': __doc__, 'build_export_sdk_device_executed': False}, indent=2) + '\n').encode())
+print(json.dumps({'passed': True, 'checks': len(checks), 'report_sha256': gate.sha(output)}, indent=2))

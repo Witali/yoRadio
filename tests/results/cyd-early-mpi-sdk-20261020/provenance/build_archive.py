@@ -1,0 +1,468 @@
+"""Prepare or seal selected seven-app MPI evidence. Never build or deploy.
+
+No archive byte is written until both exact authoritative qualifications pass,
+all selected inputs are collected/revalidated and --write-reviewed-archive is
+explicit. Default mode writes a plan only inside this ignored prep directory.
+"""
+import argparse
+import gzip
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import struct
+import subprocess
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+ARCHIVE = ROOT / 'tests/results/cyd-early-mpi-sdk-20261020'
+HEAD = '1190aebce400375c382a5ad54211e2400f98161d'
+PRIOR = ROOT / '.build/cyd-early-mpi-production-prep-01/campaign-02'
+BACKENDS = ROOT / '.build/cyd-early-mpi-backend-prep-01/campaign-01'
+PRIOR_MARKER = 'd0b8632d82f03fae323e0ed631700261c7d7c34488ff9bdae4d1701d5ba00ab7'
+BACKEND_MARKER = '3886135a74d1ea51a34744a443288e31cda82f4bf55cdc2535de41891ff66b0b'
+PRIOR_REPORT = '7c2007b1a33a3dfedde6be0ee13e09b463403d6ffdd9d6506fbe1edbbb29a1f4'
+PREFIX = 'esp32-cyd2usb-native-early-mpi-'
+MPI = 'YORADIO_TLS_EARLY_MPI_LOCK'
+SPECS = {'pdm': ('pdm', False, True), 'disabled-pdm': ('pdm', False, False),
+         'continuous': ('continuous', False, True), 'legacy': ('legacy', False, True),
+         'custom-flac-pdm': ('pdm', True, True), 'custom-flac-continuous': ('continuous', True, True),
+         'custom-flac-legacy': ('legacy', True, True)}
+CANONICAL = ('idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c',
+             'idf/esp32-cyd2usb-native/main/native_tls_early_mpi.h',
+             'idf/esp32-cyd2usb-native/main/compat/early_mpi/enable.cmake',
+             'idf/esp32-cyd2usb-native/main/app_main.c',
+             'idf/esp32-cyd2usb-native/main/CMakeLists.txt',
+             'idf/esp32-cyd2usb-native/main/Kconfig.projbuild',
+             'idf/esp32-cyd2usb-native/main/board_config.h',
+             'idf/esp32-cyd2usb-native/main/audio_service.c',
+             'idf/esp32-cyd2usb-native/main/network_runtime.c',
+             'idf/esp32-cyd2usb-native/main/native_input_reclaim.c',
+             'idf/esp32-cyd2usb-native/main/native_input_reclaim.h',
+             'idf/esp32-cyd2usb-native/main/native_audio_output.c',
+             'idf/esp32-cyd2usb-native/main/native_output_metrics.c',
+             'idf/esp32-cyd2usb-native/main/http_request_buffer.h',
+             'idf/esp32-cyd2usb-native/main/compat/http_request_buffer/enable.cmake',
+             'idf/components/native_stream/adaptive_input.c',
+             'idf/components/native_stream/include/adaptive_input.h',
+             'idf/components/native_ota/CMakeLists.txt',
+             'idf/esp32-cyd2usb-native/build-production.ps1',
+             'tools/export_cyd_production.py', 'tools/patch_cyd_http_request_buffer.py')
+
+
+def require(value, message):
+    if not value:
+        raise RuntimeError(message)
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def hashfile(path):
+    result = hashlib.sha256()
+    with Path(path).open('rb') as source:
+        for block in iter(lambda: source.read(1024 * 1024), b''):
+            result.update(block)
+    return result.hexdigest()
+
+
+def encode(value):
+    return (json.dumps(value, indent=2, ensure_ascii=False) + '\n').encode('utf-8')
+
+
+def load(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def environment():
+    env = os.environ.copy()
+    env.update(PYTHONDONTWRITEBYTECODE='1', PYTHONNOUSERSITE='1', GIT_OPTIONAL_LOCKS='0', IDF_COMPONENT_MANAGER='0')
+    count = int(env.get('GIT_CONFIG_COUNT', '0'))
+    env['GIT_CONFIG_KEY_' + str(count)] = 'core.longpaths'
+    env['GIT_CONFIG_VALUE_' + str(count)] = 'true'
+    env['GIT_CONFIG_COUNT'] = str(count + 1)
+    return env
+
+
+def git(*args):
+    return subprocess.check_output(['git', '-c', 'core.longpaths=true', '-C', str(ROOT), *args], env=environment())
+
+
+def source_snapshot():
+    # The unmodified exporter calls Git through its own subprocess helper.
+    # Preserve the same process-local longpaths/optional-lock environment used
+    # by the frozen gates, including when this function is imported for review.
+    os.environ.update(environment())
+    spec = importlib.util.spec_from_file_location('mpi_sdk_archive_exporter', ROOT / 'tools/export_cyd_production.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.source_snapshot(ROOT)
+
+
+def sdk_state(dependency_root):
+    result = {}
+    for name, expected in (('v6.0.2', '7101770dc6db2667b3c477cc31365dd1acd6db4e'), ('v5.5.4', '735507283d5b2f9fb363a1901172dbd9e847945d')):
+        path = Path(dependency_root) / name
+        command = ['git', '-c', 'core.longpaths=true', '-C', str(path)]
+        commit = subprocess.check_output([*command, 'rev-parse', 'HEAD'], env=environment()).decode().strip()
+        status = subprocess.check_output([*command, 'status', '--porcelain', '--untracked-files=no'], env=environment())
+        require(commit == expected and not status.strip(), 'Installed SDK commit/clean state changed: ' + name)
+        result[name] = {'commit': commit, 'tracked_clean': True}
+    return result
+
+
+def binary(path, prefix):
+    return prefix.startswith((b'\x7fELF', b'MZ', b'!<arch>\n')) or path.suffix.lower() in ('.bin', '.elf', '.obj', '.o', '.a', '.exe', '.dll', '.pyc', '.zip')
+
+
+def exact_text_relation(blob, working):
+    """Only uniform LF/CRLF conversion of selected canonical UTF-8 text."""
+    def style(raw):
+        raw.decode('utf-8')
+        require(b'\0' not in raw, 'Canonical text contains NUL')
+        require(b'\r' not in raw.replace(b'\r\n', b''), 'Canonical text contains lone CR')
+        if b'\r\n' in raw:
+            require(raw.count(b'\n') == raw.count(b'\r\n'), 'Canonical text has mixed LF/CRLF')
+            return 'CRLF'
+        return 'LF'
+    blob_style, working_style = style(blob), style(working)
+    normalized = blob.replace(b'\r\n', b'\n')
+    reconstructed = normalized.replace(b'\n', b'\r\n') if working_style == 'CRLF' else normalized
+    require(reconstructed == working, 'Canonical text differs beyond exact uniform newline conversion')
+    return {'relationship': 'byte-equal' if blob == working else blob_style + '-blob-to-' + working_style + '-working',
+            'git_blob_line_endings': blob_style, 'working_line_endings': working_style}
+
+
+class Collector:
+    def __init__(self):
+        self.entries = []
+        self.keys = {}
+        self.payloads = {}
+        self.files = {}
+        self.observed = {}
+        self.bindings = []
+
+    def add(self, path, role, expected=None, original=None, preferred=None, force_omit=False):
+        path = Path(path).resolve()
+        size, sha = path.stat().st_size, hashfile(path)
+        require(expected is None or sha == expected, 'Input hash changed: ' + str(path))
+        self.observed[str(path)] = {'bytes': size, 'sha256': sha}
+        key = (str(original or path), sha)
+        if key in self.keys:
+            row = self.entries[self.keys[key]]
+            if role not in row['roles']:
+                row['roles'].append(role)
+            if str(path) not in row['observed_from']:
+                row['observed_from'].append(str(path))
+            return row
+        row = {'id': len(self.entries), 'original_path': key[0], 'sha256': sha, 'bytes': size,
+               'roles': [role], 'observed_from': [str(path)]}
+        with path.open('rb') as source:
+            prefix = source.read(16)
+        if force_omit or binary(path, prefix):
+            row.update(disposition='omitted', reason='Selected firmware/ELF/object/archive/ROM/tool executable bytes omitted; identity only, no duplicate binary in evidence archive')
+        else:
+            if sha not in self.payloads:
+                raw = path.read_bytes()
+                require(len(raw) == size and digest(raw) == sha, 'Text input changed while reading')
+                compressed = preferred is None and (path.suffix.lower() == '.log' or size >= 131072)
+                stored = preferred or 'raw/' + sha[:2] + '/' + sha + ('.gz' if compressed else '')
+                data = gzip.compress(raw, compresslevel=9, mtime=0) if compressed else raw
+                self.files[stored] = data
+                self.payloads[sha] = {'stored_path': stored, 'encoding': 'gzip' if compressed else 'raw',
+                                      'stored_bytes': len(data), 'stored_sha256': digest(data)}
+            row.update(disposition='stored', **self.payloads[sha])
+        self.keys[key] = row['id']
+        self.entries.append(row)
+        return row
+
+    def bind(self, container, tokens, target):
+        self.bindings.append({'container_id': container['id'], 'hash_tokens': tokens, 'target_id': target['id']})
+
+    def add_git_blob(self, name, raw):
+        identity = 'git-head:' + HEAD + ':' + name
+        sha = digest(raw)
+        key = (identity, sha)
+        if key in self.keys:
+            return self.entries[self.keys[key]]
+        require(not binary(Path(name), raw[:16]) and b'\0' not in raw, 'Only selected canonical text Git blobs may be stored')
+        if sha not in self.payloads:
+            stored = 'raw/' + sha[:2] + '/' + sha
+            self.files[stored] = raw
+            self.payloads[sha] = {'stored_path': stored, 'encoding': 'raw', 'stored_bytes': len(raw), 'stored_sha256': sha}
+        row = {'id': len(self.entries), 'original_path': identity, 'sha256': sha, 'bytes': len(raw),
+               'roles': ['raw HEAD Git blob of selected canonical text'], 'observed_from': ['git show ' + HEAD + ':' + name],
+               'disposition': 'stored', **self.payloads[sha]}
+        self.keys[key] = row['id']
+        self.entries.append(row)
+        return row
+
+    def check(self):
+        require(all(Path(path).stat().st_size == row['bytes'] and hashfile(path) == row['sha256'] for path, row in self.observed.items()), 'Selected input changed during packaging')
+
+
+def warning_inventory(folder, receipt):
+    cmake, compiler, environment_warnings = [], [], []
+    for entry in receipt['build_logs']:
+        path = folder / entry['file']
+        lines = path.read_text(errors='replace').splitlines()
+        for index, line in enumerate(lines):
+            if line.startswith('CMake Warning'):
+                end = index + 1
+                while end < len(lines) and (not lines[end].strip() or lines[end][0].isspace() or lines[end].startswith('Call Stack ')):
+                    end += 1
+                block = '\n'.join(lines[index:end]).rstrip()
+                category = 'object-path-length' if 'CMAKE_OBJECT_PATH_MAX' in block else 'component-include-dependency' if 'component_validation.cmake' in block and 'native_ota' in block and 'native_stream' in block else 'other-cmake'
+                cmake.append({'path': str(path), 'line': index + 1, 'category': category, 'block': block, 'log_sha256': hashfile(path)})
+            if re.search(r'\bwarning:', line):
+                target = environment_warnings if line.startswith('warning:  Failed to clean temp activation directory with file ') and '[WinError 2]' in line else compiler
+                target.append({'path': str(path), 'line': index + 1, 'message': line, 'log_sha256': hashfile(path)})
+    require(all(row['category'] != 'other-cmake' for row in cmake), 'Unexpected CMake warning needs explicit review')
+    return {'cmake': cmake, 'compiler': compiler, 'sdk_environment': environment_warnings}
+
+
+def elf_metadata(path, image, logs):
+    raw = path.read_bytes()
+    require(raw[:6] == b'\x7fELF\x01\x01' and struct.unpack_from('<H', raw, 18)[0] == 94, 'Not actual Xtensa ELF')
+    phoff = struct.unpack_from('<I', raw, 28)[0]
+    phsize, phcount = struct.unpack_from('<HH', raw, 42)
+    programs = [struct.unpack_from('<8I', raw, phoff + index * phsize) for index in range(phcount)]
+    addresses = {row['address'] for row in image['sdk_allocator_pointer_routes'].values()}
+    for log in logs:
+        addresses.update(int(value, 16) for value in re.findall(r'\bl32r\s+a\d+,\s*([0-9a-f]+)', log.read_text(errors='replace')))
+    words = {}
+    for address in sorted(addresses):
+        segment = next((row for row in programs if row[0] == 1 and row[2] <= address <= row[2] + row[4] - 4), None)
+        require(segment is not None, 'Literal/pointer not backed by ELF file bytes')
+        offset = segment[1] + address - segment[2]
+        words[str(address)] = {'file_offset': offset, 'raw_hex': raw[offset:offset + 4].hex(), 'value': struct.unpack_from('<I', raw, offset)[0]}
+    return {'source_path': str(path), 'bytes': len(raw), 'sha256': digest(raw), 'elf_class': 1, 'data_encoding': 1, 'machine': 94,
+            'entry': struct.unpack_from('<I', raw, 24)[0], 'program_headers': [list(row) for row in programs],
+            'data_words': words, 'scope': 'Derived metadata/nonexecuting data words only; original ELF intentionally omitted, full linked behavior established by immutable qualifier'}
+
+
+def collect(args):
+    require(git('rev-parse', 'HEAD').decode().strip() == HEAD, 'Expected committed source HEAD changed')
+    require(not ARCHIVE.exists(), 'New evidence archive must not exist')
+    markers = [load(PRIOR / 'marker.json'), load(BACKENDS / 'marker.json')]
+    require(hashfile(PRIOR / 'marker.json') == PRIOR_MARKER and hashfile(BACKENDS / 'marker.json') == BACKEND_MARKER, 'Exact two markers required')
+    require(hashfile(PRIOR / 'qualification/report.json') == PRIOR_REPORT, 'Exact prior two-app report required')
+    require(hashfile(BACKENDS / 'qualification/report.json') == args.backend_report_sha256, 'Root-authorized five-app report hash required')
+    require(markers[0]['source_snapshot'] == markers[1]['source_snapshot'] == source_snapshot(), 'Complete clean exporter snapshot changed')
+    require(markers[0]['source_commit'] == HEAD and markers[0]['source_snapshot']['dirty'] is False and markers[0]['source_snapshot']['source_dirty'] is False and not markers[0]['source_snapshot']['untracked'], 'Clean committed source required')
+    reports = [load(PRIOR / 'qualification/report.json'), load(BACKENDS / 'qualification/report.json')]
+    require(all(row['passed'] is True and row['all_bound_inputs_current'] is True and row['source_commit'] == row['head_after'] == HEAD and row['physical_qualification'] is False for row in reports), 'Authoritative terminal qualifications required')
+    require(reports[1]['all_backend_qualification'] is True and len(reports[1]['full_seven_matrix']) == 7, 'Full seven-app qualification required')
+    require(reports[1]['previous_pdm_qualification']['qualification_sha256'] == PRIOR_REPORT, 'Exact composed prior report required')
+    require(markers[1]['previous_gate']['qualification_sha256'] == PRIOR_REPORT, 'Prior report was not bound at prepare')
+    sdk_before = sdk_state(markers[0]['dependency_root'])
+    c = Collector()
+    qentries = [c.add(PRIOR / 'qualification/report.json', 'authoritative two-PDM terminal qualification', PRIOR_REPORT, preferred='reports/prior-qualification.json'),
+                c.add(BACKENDS / 'qualification/report.json', 'authoritative five-app/full-seven terminal qualification', args.backend_report_sha256, preferred='reports/backend-qualification.json')]
+    profiles, images, warnings, elf_facts = [], {}, {}, {}
+    for folder, marker, report, qentry, marker_sha in zip((PRIOR, BACKENDS), markers, reports, qentries, (PRIOR_MARKER, BACKEND_MARKER)):
+        ment = c.add(folder / 'marker.json', 'immutable pre-build marker', marker_sha)
+        pent = c.add(folder / 'profiles.json', 'exact prepared profiles', marker['profiles_sha256'])
+        c.bind(ment, ['profiles_sha256'], pent)
+        for key in ('scripts_sha256', 'tools_sha256', 'sdk_source_sha256', 'global_configs_sha256', 'evidence'):
+            for original, sha in marker[key].items():
+                c.bind(ment, [key, original], c.add(original, 'pre-build ' + key, sha))
+        if 'legacy_sdk' in marker:
+            for original, sha in marker['legacy_sdk']['source_sha256'].items():
+                c.bind(ment, ['legacy_sdk', 'source_sha256', original], c.add(original, 'legacy SDK source pin', sha))
+        for relative, sha in marker['frozen_inputs_sha256'].items():
+            c.bind(ment, ['frozen_inputs_sha256', relative], c.add(folder / relative, 'pre-build frozen payload', sha))
+        baseline_maps = marker.get('baselines')
+        if baseline_maps is None:
+            baseline_maps = {'pdm': {'raw_sha256': marker['baseline_raw_sha256'], 'commit_bindings': marker['baseline_commit_bindings']}}
+        for name, baseline_record in baseline_maps.items():
+            base = ROOT / 'firmware/development' / ('esp32-cyd2usb-native-tls-input-reclaim-' + name)
+            for filename, sha in baseline_record['raw_sha256'].items():
+                tokens = ['baseline_raw_sha256', filename] if folder == PRIOR else ['baselines', name, 'raw_sha256', filename]
+                c.bind(ment, tokens, c.add(base / filename, 'committed pre-MPI baseline identity/text', sha))
+            for filename in ('app.bin', 'partition-table.bin'):
+                binding = baseline_record['commit_bindings'][filename]
+                tokens = ['baseline_commit_bindings', filename, 'local_object_sha256'] if folder == PRIOR else ['baselines', name, 'commit_bindings', filename, 'local_object_sha256']
+                c.bind(ment, tokens, c.add(binding['local_object'], 'existing local manifest-bound LFS object; identity only', binding['local_object_sha256'], force_omit=True))
+        for original, sha in report['qualification_inputs_sha256'].items():
+            c.bind(qentry, ['qualification_inputs_sha256', original], c.add(original, 'actual qualification input', sha))
+        for path in sorted((folder / 'run').rglob('*')):
+            if path.is_file():
+                c.add(path, 'actual wrapper command/invocation/stdout/stderr/terminal')
+        terminal = load(folder / 'run/report.json')
+        require(terminal['passed'] is True and terminal['exports_complete'] is True and all(row['exit_status'] == 0 for row in terminal['profiles']), 'Every real exporter process must exit zero')
+        for path in sorted((folder / 'qualification').rglob('*')):
+            if path.is_file():
+                c.add(path, 'actual ELF static qualification/log')
+        for profile in load(folder / 'profiles.json'):
+            variant = profile['variant']
+            name = variant.removeprefix(PREFIX)
+            require(name in SPECS and variant not in images, 'Exact unique seven profile identity')
+            backend, custom, enabled = SPECS[name]
+            require(profile['backend'] == backend and profile['enabled'] is enabled, 'Prepared backend/on-off identity')
+            image_index, image = next((i, value) for i, value in enumerate(report['images']) if value['variant'] == variant)
+            images[variant] = image
+            output = Path(profile['output_directory'])
+            receipt = load(output / 'manifest.json')
+            rent = c.add(output / 'manifest.json', 'successful production export receipt', image['manifest_sha256'])
+            c.bind(qentry, ['images', image_index, 'manifest_sha256'], rent)
+            kent = c.add(output / 'sdkconfig.json', 'actual exported config', receipt['sdkconfig_json_sha256'])
+            bent = c.add(Path(profile['baseline']) / 'sdkconfig.json', 'matching committed pre-MPI baseline config')
+            btext = c.add(Path(profile['baseline']) / 'sdkconfig', 'matching committed baseline raw seed', profile['baseline_sdkconfig_sha256'])
+            sent = c.add(profile['frozen_seed'], 'immutable initial seed', profile['initial_seed_sha256'])
+            for filename, field in (('app.bin', 'app_sha256'), ('sdkconfig', 'sdkconfig_sha256'), ('sdkconfig.json', 'sdkconfig_json_sha256'), ('partition-table.bin', 'partition_table_sha256'), ('flasher_args.json', 'flasher_args_sha256'), ('project_description.json', 'project_description_sha256')):
+                c.bind(rent, [field], c.add(output / filename, 'production export payload/identity', receipt[field]))
+            for index, item in enumerate(receipt['build_logs']):
+                c.bind(rent, ['build_logs', index, 'sha256'], c.add(output / item['file'], 'raw production compiler/CMake log', item['sha256']))
+            build = Path(profile['build_directory'])
+            description = load(build / 'project_description.json')
+            elf = build / description['app_elf']
+            eent = c.add(elf, 'actual ELF identity only', image['elf_sha256'])
+            c.bind(qentry, ['images', image_index, 'elf_sha256'], eent)
+            logbase = folder / 'qualification' / profile['name']
+            logs = []
+            for filename, sha in image['symbol_logs'].items():
+                log = logbase / filename
+                c.bind(qentry, ['images', image_index, 'symbol_logs', filename], c.add(log, 'actual nm/disassembly proof', sha))
+                logs.append(log)
+            elf_facts[variant] = elf_metadata(elf, image, logs)
+            for extra in (build / 'CMakeCache.txt', build / 'config/sdkconfig.h', *sorted((build / 'toolchain').glob('*'))):
+                if extra.is_file():
+                    c.add(extra, 'actual compiler flags/generated config metadata')
+            c.add(image['http_overlay_compile_row']['file'], 'actual canonical SDK HTTP overlay source')
+            warnings[variant] = warning_inventory(output, receipt)
+            compiler = warnings[variant]['compiler']
+            if backend == 'legacy':
+                names = [re.search(r"periph_rtc_apll_(freq_set|acquire|release)' is deprecated", row['message']) for row in compiler]
+                require(not compiler or len(compiler) == 3 and all(names) and {row[1] for row in names} == {'freq_set', 'acquire', 'release'}, 'Exact known legacy warning set')
+            else:
+                require(not compiler, 'Unexpected compiler warning')
+            profiles.append({'variant': variant, 'backend': backend, 'custom_flac': custom, 'enabled': enabled,
+                             'build_directory': str(build), 'output_directory': str(output),
+                             'marker_id': ment['id'], 'receipt_id': rent['id'], 'config_id': kent['id'],
+                             'baseline_config_id': bent['id'], 'baseline_text_id': btext['id'], 'initial_seed_id': sent['id'],
+                             'qualification_id': qentry['id'], 'image_index': image_index, 'elf_id': eent['id'],
+                             'log_ids': {path.name: c.add(path, 'actual ELF log')['id'] for path in logs}})
+    require(set(images) == {PREFIX + name for name in SPECS} and len(profiles) == 7, 'Exact full seven image set')
+    canonical = {}
+    for name in CANONICAL:
+        working = (ROOT / name).read_bytes()
+        blob = git('show', 'HEAD:' + name)
+        relation = exact_text_relation(blob, working)
+        canonical[name] = {'working_id': c.add(ROOT / name, 'actual compiler-working canonical MPI/startup/allocator/board/source')['id'],
+                           'git_head_blob_id': c.add_git_blob(name, blob)['id'],
+                           'git_blob_oid': hashlib.sha1(b'blob ' + str(len(blob)).encode() + b'\0' + blob).hexdigest(), **relation}
+    histories = [('cyd-early-mpi-production-prep-01', ('failed-prepare-01', 'prepare-attempt-02'),
+                  ('prepared-review.json', 'readiness.json', 'selfcheck-report.json', 'selfcheck.py')),
+                 ('cyd-early-mpi-backend-prep-01', ('history', 'prepare-attempt-01', 'selfcheck-01', 'selfcheck-02'),
+                  ('prepared-review.json', 'derive.py', 'prepare-capture.py', 'review-prepared.py', 'selfcheck.py'))]
+    for directory, subdirs, files in histories:
+        base = ROOT / '.build' / directory
+        for name in files:
+            c.add(base / name, 'preparation history; earlier readiness/selfchecks are historical, not canonical run')
+        for name in subdirs:
+            for path in sorted((base / name).rglob('*')):
+                if path.is_file():
+                    c.add(path, 'honest preparation failure/success history; no reconstructed stderr')
+    failed = load(ROOT / '.build/cyd-early-mpi-production-prep-01/failed-prepare-01/report.json')
+    require(failed['passed'] is False and failed['build_or_export_executed'] is False and failed['raw_stderr_file_retained'] is False, 'Historical LFS prepare failure semantics')
+    fail_folder = ROOT / '.build/cyd-early-mpi-production-prep-01/failed-prepare-01'
+    fail_entry = c.add(fail_folder / 'report.json', 'historical expected raw LFS comparison failure')
+    for filename, sha in failed['input_sha256'].items():
+        c.bind(fail_entry, ['input_sha256', filename], c.add(fail_folder / filename, 'exact failed-prepare historical source', sha))
+    for name in ('build_archive.py', 'verify.py', 'README.template.md', 'HOST.template.md', 'PLAN.md', 'check-prep.py', 'readiness-03.json'):
+        c.add(HERE / name, 'archive packaging source/template provenance', preferred='provenance/' + name)
+    for path in sorted((HERE / 'history').rglob('*')):
+        if path.is_file():
+            c.add(path, 'historical packager-prep raw-Git text guard rejection; no SDK/archive run')
+    c.check()
+    require(source_snapshot() == markers[0]['source_snapshot'] and git('rev-parse', 'HEAD').decode().strip() == HEAD and sdk_state(markers[0]['dependency_root']) == sdk_before, 'Complete source or installed SDK changed during packaging')
+    index = {'source_commit': HEAD, 'complete_source_snapshot': markers[0]['source_snapshot'],
+             'prior_marker_sha256': PRIOR_MARKER, 'backend_marker_sha256': BACKEND_MARKER,
+             'prior_qualification_sha256': PRIOR_REPORT, 'backend_qualification_sha256': args.backend_report_sha256,
+             'primary_report_ids': {'prior': qentries[0]['id'], 'backends': qentries[1]['id']},
+             'historical_failed_lfs_prepare_id': fail_entry['id'],
+             'profiles': profiles, 'canonical_sources': canonical,
+             'status': {'seven_linked_applications_qualified': True, 'default_enabled': False,
+                        'physical_qualified': False, 'radio_pre_app_mutex_observed': False, 'benefit_measured': False},
+             'scope': 'Selected marker/qualification closure, compiler/build metadata, canonical source and preparation history; unreferenced replaceable working objects/libraries/ROM/tool-temporary files are not archived or inventoried',
+             'binary_policy': 'Every selected binary identity is explicitly omitted. Flashable applications stay only under firmware/development and Git LFS; original ELFs/objects/tools are not duplicated.'}
+    c.files['index.json'] = encode(index)
+    c.files['path-map.json'] = encode({'entries': c.entries, 'identity_key': 'original path + sha256; historical versions may coexist'})
+    c.files['bindings.json'] = encode({'bindings': c.bindings})
+    c.files['warnings.json'] = encode(warnings)
+    c.files['elf-metadata.json'] = encode(elf_facts)
+    c.files['current-verification.json'] = encode({'all_selected_read_inputs_unchanged_after': True, 'selected_read_inputs': c.observed,
+                                                 'complete_source_snapshot_after': markers[0]['source_snapshot'], 'installed_sdk_before_after': sdk_before})
+    substitutions = {'@@BACKEND_REPORT_SHA@@': args.backend_report_sha256, '@@PROFILE_COUNT@@': str(len(profiles))}
+    for source, target in (('README.template.md', 'README.md'), ('HOST.template.md', 'HOST.md')):
+        text = (HERE / source).read_text(encoding='utf-8')
+        for before, after in substitutions.items():
+            text = text.replace(before, after)
+        require('@@' not in text, 'Unresolved archive template token')
+        c.files[target] = text.encode('utf-8')
+    c.files['verify.py'] = (HERE / 'verify.py').read_bytes()
+    c.files['.gitattributes'] = b'* -text\n** -text\n'
+    c.files['SDK.json'] = encode({'source_commit': HEAD, 'sdk_commit': '7101770dc6db2667b3c477cc31365dd1acd6db4e',
+                                 'legacy_driver_commit': '735507283d5b2f9fb363a1901172dbd9e847945d',
+                                 'images': [images[PREFIX + name] for name in SPECS], 'warning_inventory': warnings,
+                                 'all_seven': True, 'physical_tested': False, 'benefit_claimed': False})
+    return c, index
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--backend-report-sha256', required=True)
+    p.add_argument('--attempt', default='attempt-01')
+    p.add_argument('--write-reviewed-archive', action='store_true')
+    args = p.parse_args()
+    require(re.fullmatch('[0-9a-f]{64}', args.backend_report_sha256), 'Explicit exact backend qualification SHA required')
+    require(re.fullmatch('attempt-[0-9]{2}', args.attempt), 'Fresh ignored attempt name required')
+    attempt = HERE / args.attempt
+    require(not attempt.exists(), 'Preserve failed or completed packaging attempt')
+    attempt.mkdir()
+    report = {'passed': False, 'archive_written': False, 'sdk_build_export_or_test_commands_executed': False,
+              'backend_report_sha256': args.backend_report_sha256}
+    try:
+        c, index = collect(args)
+        report.update(plan_files=len(c.files), mapped_versions=len(c.entries), hash_bindings=len(c.bindings),
+                      omitted_versions=sum(row['disposition'] == 'omitted' for row in c.entries),
+                      selected_input_count=len(c.observed), exact_profiles=[row['variant'] for row in index['profiles']])
+        if args.write_reviewed_archive:
+            require(not ARCHIVE.exists() and ARCHIVE.resolve() == ARCHIVE, 'Fresh exact excluded archive path required')
+            ARCHIVE.mkdir(parents=True, exist_ok=False)
+            for name, raw in sorted(c.files.items()):
+                target = ARCHIVE / name
+                require(target.resolve().is_relative_to(ARCHIVE), 'Archive target escapes')
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+            manifest = {'files': [{'path': name, 'bytes': len(raw), 'sha256': digest(raw)} for name, raw in sorted(c.files.items())]}
+            (ARCHIVE / 'manifest.json').write_bytes(encode(manifest))
+            done = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(ARCHIVE / 'verify.py')], env=environment(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60)
+            (attempt / 'offline-verifier.log').write_bytes(done.stdout)
+            require(done.returncode == 0, 'Offline archive verifier rejected the archive; retain nonpass output')
+            c.check()
+            require(source_snapshot() == index['complete_source_snapshot'] and git('rev-parse', 'HEAD').decode().strip() == HEAD, 'Complete source changed after archive sealing')
+            report.update(archive_written=True, archive=str(ARCHIVE), manifest_sha256=hashfile(ARCHIVE / 'manifest.json'),
+                          readme_sha256=hashfile(ARCHIVE / 'README.md'), verifier_exit_status=done.returncode)
+        else:
+            (attempt / 'planned-files.json').write_bytes(encode({'files': [{'path': name, 'bytes': len(raw), 'sha256': digest(raw)} for name, raw in sorted(c.files.items())]}))
+        report['passed'] = True
+    except BaseException as error:
+        if isinstance(error, subprocess.TimeoutExpired):
+            (attempt / 'timeout.log').write_bytes(error.output or b'')
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        (attempt / 'report.json').write_bytes(encode(report))
+        raise
+    (attempt / 'report.json').write_bytes(encode(report))
+    print(json.dumps(report, indent=2))
+
+
+if __name__ == '__main__':
+    os.environ.update(environment())
+    main()

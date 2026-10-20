@@ -1,0 +1,38 @@
+[CmdletBinding(PositionalBinding = $false)]
+param([Parameter(Mandatory)][string]$Invocation)
+$ErrorActionPreference = 'Stop'
+if ($PSVersionTable.PSVersion.Major -lt 7) { throw 'PowerShell7 is required' }
+$metadata = Get-Content -LiteralPath $Invocation -Raw | ConvertFrom-Json
+$backends = @{
+    'esp32-cyd2usb-native-early-mpi-continuous' = 'continuous'
+    'esp32-cyd2usb-native-early-mpi-legacy' = 'legacy'
+    'esp32-cyd2usb-native-early-mpi-custom-flac-pdm' = 'pdm'
+    'esp32-cyd2usb-native-early-mpi-custom-flac-continuous' = 'continuous'
+    'esp32-cyd2usb-native-early-mpi-custom-flac-legacy' = 'legacy'
+}
+if ($metadata.schema -cne 'early-mpi-backend-export-v1' -or
+    $metadata.variant -cnotin @($backends.Keys) -or
+    $metadata.backend -cne $backends[[string]$metadata.variant] -or
+    @($metadata.evidence).Count -ne 4 -or
+    @($metadata.evidence | Sort-Object -Unique).Count -ne 4) { throw 'Unexpected five-backend invocation' }
+$expectedEvidence = @(
+    'tests/results/cyd-early-mpi-20261020/README.md',
+    'tests/results/cyd-early-mpi-20261020/HOST.md',
+    'tests/results/cyd-input-reclaim-20261020/README.md',
+    'tests/results/cyd-http-request-buffer-20261020/README.md'
+) | ForEach-Object { [IO.Path]::GetFullPath((Join-Path ([string]$metadata.repository) $_)) }
+$actualEvidence = @($metadata.evidence | ForEach-Object { [IO.Path]::GetFullPath([string]$_) })
+if (@(Compare-Object $expectedEvidence $actualEvidence -CaseSensitive).Count -ne 0) {
+    throw 'Unexpected four evidence bindings'
+}
+$parameters = @{
+    DependencyRoot = [string]$metadata.dependency_root
+    AudioBackend = [string]$metadata.backend
+    BuildDirectory = [string]$metadata.build_directory
+    Sdkconfig = [string]$metadata.sdkconfig
+    Variant = [string]$metadata.variant
+    FirmwareOutputDirectory = [string]$metadata.output_directory
+    Evidence = [string[]]@($metadata.evidence)
+}
+& (Join-Path ([string]$metadata.repository) 'idf/esp32-cyd2usb-native/build-production.ps1') @parameters
+if ($LASTEXITCODE -ne 0) { throw "Production wrapper failed: $LASTEXITCODE" }

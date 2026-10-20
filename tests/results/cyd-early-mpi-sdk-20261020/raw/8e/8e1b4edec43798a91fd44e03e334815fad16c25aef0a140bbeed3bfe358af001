@@ -1,0 +1,114 @@
+"""Pure Python contract and rejecting PowerShell preflight; never invoke SDK."""
+import ast
+import copy
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+import contract as c
+
+
+def main():
+    out = c.HERE / 'selfcheck-02'
+    c.require(not out.exists(), 'Preserve old selfcheck evidence')
+    out.mkdir()
+    scripts = {str(c.HERE / name): c.sha(c.HERE / name) for name in (*c.SCRIPTS, 'selfcheck.py')}
+    report = {'passed': False, 'scope': 'Pure contract and rejecting PS preflight; no SDK execution', 'cases': [], 'scripts_sha256': scripts}
+    try:
+        for name in ('contract.py', 'prepare.py', 'run.py', 'qualify.py', 'selfcheck.py'):
+            ast.parse((c.HERE / name).read_text(encoding='utf-8'))
+        report['cases'].append({'name': 'python-ast', 'passed': True})
+        root = c.DEFAULT_ROOT.resolve()
+        campaign = c.HERE / 'synthetic-campaign'
+        rows = []
+        for name, spec in c.EXPECTED.items():
+            build = root / '.build/em-sdk-01' / spec['tag'] / 'build'
+            rows.append({'name': name, 'variant': c.PREFIX + name, 'enabled': True,
+                         'backend': spec['backend'], 'custom_flac': spec['custom_flac'],
+                         'baseline': str(root / 'firmware/development' / (c.BASELINE_PREFIX + name)),
+                         'build_directory': str(build), 'sdkconfig': str(build / 'sdkconfig'),
+                         'output_directory': str(root / 'firmware/development' / (c.PREFIX + name))})
+        c.profile_contract(root, campaign, rows)
+        report['cases'].append({'name': 'exact-five-short-path-profiles', 'passed': True})
+
+        def rejected(name, change):
+            mutated = copy.deepcopy(rows)
+            change(mutated)
+            try:
+                c.profile_contract(root, campaign, mutated)
+            except (RuntimeError, KeyError) as error:
+                report['cases'].append({'name': name, 'passed': True, 'error': str(error)})
+            else:
+                raise RuntimeError('Profile negative accepted: ' + name)
+
+        rejected('missing-profile', lambda values: values.pop())
+        rejected('duplicate-profile', lambda values: values.__setitem__(0, copy.deepcopy(values[1])))
+        rejected('unknown-profile', lambda values: values[0].update(name='pdm'))
+        rejected('disabled-profile', lambda values: values[0].update(enabled=False))
+        rejected('integer-enabled', lambda values: values[0].update(enabled=1))
+        rejected('wrong-backend', lambda values: values[0].update(backend='pdm'))
+        rejected('wrong-custom', lambda values: values[0].update(custom_flac=True))
+        rejected('wrong-baseline', lambda values: values[0].update(baseline=values[1]['baseline']))
+        rejected('long-build-root', lambda values: values[0].update(build_directory=str(campaign / 'continuous/build')))
+        rejected('wrong-sdkconfig', lambda values: values[0].update(sdkconfig=values[1]['sdkconfig']))
+        rejected('wrong-output', lambda values: values[0].update(output_directory=values[1]['output_directory']))
+
+        previous = {'unchanged': True, 'value': 3}
+        after = dict(previous, **{c.MPI: True})
+        expected = {c.MPI: {'previous': None, 'current': True}}
+        c.require(c.config_delta(previous, after) == expected, 'Valid exact bool delta rejected')
+        report['cases'].append({'name': 'only-absent-to-true', 'passed': True})
+        for name, mutated in [('wrong-bool', dict(previous, **{c.MPI: False})),
+                              ('bool-as-integer', dict(previous, **{c.MPI: 1})),
+                              ('extra-false-flag', dict(after, YORADIO_VORBIS_REPAIR=False)),
+                              ('changed-baseline', dict(after, value=4)),
+                              ('removed-baseline', {c.MPI: True})]:
+            c.require(not (type(mutated.get(c.MPI)) is bool and mutated.get(c.MPI) is True and c.config_delta(previous, mutated) == expected), 'Scope leak accepted: ' + name)
+            report['cases'].append({'name': name, 'passed': True})
+
+        powershell = Path('C:/Users/rudol/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe')
+        parse_script = out / 'parse.ps1'
+        parse_script.write_text('param([string]$InputSource)\n$errors = $null; $tokens = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($InputSource, [ref]$tokens, [ref]$errors); if ($errors.Count) { $errors | Out-String | Write-Error; exit 1 }\n', encoding='utf-8')
+        done = subprocess.run([str(powershell), '-NoProfile', '-NonInteractive', '-File', str(parse_script), '-InputSource', str(c.HERE / 'export-one.ps1')], env=c.environment(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=20)
+        (out / 'powershell-parse.log').write_bytes(done.stdout)
+        c.require(done.returncode == 0, 'PowerShell syntax parser failed')
+        report['cases'].append({'name': 'powershell-parse', 'passed': True})
+
+        base = {'schema': 'early-mpi-backend-export-v1', 'variant': rows[0]['variant'], 'backend': rows[0]['backend'],
+                'repository': str(root), 'evidence': [str(root / name) for name in c.EVIDENCE]}
+        mutations = [('schema', {'schema': 'early-mpi-pdm-export-v1'}),
+                     ('unknown-variant', {'variant': c.PREFIX + 'pdm'}),
+                     ('wrong-backend', {'backend': 'pdm'}),
+                     ('evidence-count', {'evidence': base['evidence'][:3]}),
+                     ('duplicate-evidence', {'evidence': [base['evidence'][0]] * 4}),
+                     ('foreign-evidence', {'evidence': base['evidence'][:3] + [str(root / 'foreign.md')]}),
+                     ('schema-case', {'schema': 'Early-mpi-backend-export-v1'})]
+        for name, delta in mutations:
+            invocation = out / ('reject-' + name + '.json')
+            c.write(invocation, dict(base, **delta))
+            done = subprocess.run([str(powershell), '-NoProfile', '-NonInteractive', '-File', str(c.HERE / 'export-one.ps1'), '-Invocation', str(invocation)],
+                                  env=c.environment(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=20)
+            (out / ('reject-' + name + '.log')).write_bytes(done.stdout)
+            c.require(done.returncode != 0 and ('Unexpected five-backend invocation' in done.stdout.decode(errors='replace') or 'Unexpected four evidence bindings' in done.stdout.decode(errors='replace')), 'Named rejecting PS guard did not fire: ' + name)
+            report['cases'].append({'name': 'ps-reject-' + name, 'passed': True, 'exit_status': done.returncode})
+
+        for name in ('prepare.py', 'run.py', 'qualify.py'):
+            done = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(c.HERE / name), '--help'], env=c.environment(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=20)
+            (out / (name + '-help.log')).write_bytes(done.stdout)
+            c.require(done.returncode == 0, 'CLI help failed: ' + name)
+            report['cases'].append({'name': name + '-help', 'passed': True})
+        c.require(all(c.sha(path) == expected for path, expected in scripts.items()), 'Script changed during selfcheck')
+        report.update(passed=True, sdk_build_executed=False, scripts_current=True)
+    except BaseException as error:
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        if isinstance(error, subprocess.TimeoutExpired):
+            (out / 'timeout.log').write_bytes(error.output or b'')
+        c.write(out / 'report.json', report)
+        raise
+    c.write(out / 'report.json', report)
+    print(json.dumps({'passed': True, 'cases': len(report['cases']), 'report_sha256': c.sha(out / 'report.json')}, indent=2))
+
+
+if __name__ == '__main__':
+    main()

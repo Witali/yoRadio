@@ -1,0 +1,22 @@
+$Env:IDF_PATH="C:\Work\yoRadio\.idf\v6.0.2"
+$Env:ESP_IDF_VERSION="6.0"
+$Env:IDF_PYTHON_ENV_PATH="C:\Work\yoRadio\.idf\tools-v6.0.2\python_env\idf6.0_py3.12_env"
+$Env:OPENOCD_SCRIPTS="C:\Work\yoRadio\.idf\tools-v6.0.2\tools\openocd-esp32\v0.12.0-esp32-20260424\openocd-esp32\share\openocd\scripts"
+$Env:IDF_CCACHE_ENABLE="1"
+$Env:ESP_ROM_ELF_DIR="C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-rom-elfs\20241011\"
+$Env:PATH="C:\Work\yoRadio\.idf\v6.0.2\components\espcoredump;C:\Work\yoRadio\.idf\v6.0.2\components\partition_table;C:\Work\yoRadio\.idf\v6.0.2\components\app_update;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\xtensa-esp-elf-gdb\17.1_20260402\xtensa-esp-elf-gdb\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\riscv32-esp-elf-gdb\17.1_20260402\riscv32-esp-elf-gdb\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\xtensa-esp-elf\esp-15.2.0_20251204\xtensa-esp-elf\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\riscv32-esp-elf\esp-15.2.0_20251204\riscv32-esp-elf\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp32ulp-elf\2.38_20240113\esp32ulp-elf\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\cmake\4.0.3\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\openocd-esp32\v0.12.0-esp32-20260424\openocd-esp32\bin;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\ninja\1.12.1\;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\idf-exe\1.0.3\;C:\Work\yoRadio\.idf\tools-v6.0.2\tools\ccache\4.12.1\ccache-4.12.1-windows-x86_64;C:\Work\yoRadio\.idf\tools-v6.0.2\python_env\idf6.0_py3.12_env\Scripts;C:\Work\yoRadio\.idf\v6.0.2\tools;$Env:PATH"
+$Env:IDF_DEACTIVATE_FILE_PATH="C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-early-mpi-backend-prep-01\campaign-01\run\custom-flac-legacy\tmpgnv3dfv7idf_7372"
+$Env:IDF_TOOLS_INSTALL_CMD="C:\Work\yoRadio\.idf\v6.0.2\install.ps1"
+$Env:IDF_TOOLS_EXPORT_CMD="C:\Work\yoRadio\.idf\v6.0.2\export.ps1"
+function idf.py { &python "$Env:IDF_PATH\tools\idf.py" $args }
+function global:esptool.py { &python "$Env:IDF_PATH\components\esptool_py\esptool\esptool.py" $args }
+function global:espefuse.py { &python "$Env:IDF_PATH\components\esptool_py\esptool\espefuse.py" $args }
+function global:espsecure.py { &python "$Env:IDF_PATH\components\esptool_py\esptool\espsecure.py" $args }
+function global:otatool.py { &python "$Env:IDF_PATH\components\app_update\otatool.py" $args }
+function global:parttool.py { &python "$Env:IDF_PATH\components\partition_table\parttool.py" $args }
+echo "
+Done! You can now compile ESP-IDF projects.
+Go to the project directory and run:
+
+  idf.py build
+"

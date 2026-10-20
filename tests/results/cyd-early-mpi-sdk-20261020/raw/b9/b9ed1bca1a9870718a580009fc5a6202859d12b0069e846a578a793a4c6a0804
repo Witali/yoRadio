@@ -1,0 +1,93 @@
+"""Validate packager syntax/selected completed evidence, without archive/SDK run."""
+import ast
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+import build_archive as b
+
+out = b.HERE / 'readiness-02.json'
+b.require(not out.exists(), 'Keep immutable prep-readiness metadata')
+files = ('build_archive.py', 'verify.py', 'README.template.md', 'HOST.template.md', 'PLAN.md', 'check-prep.py')
+before = {name: b.hashfile(b.HERE / name) for name in files}
+report = {'passed': False, 'scope': 'Packager preparation, existing first-two evidence only; no archive or SDK command', 'scripts_sha256': before, 'checks': []}
+try:
+    b.require(not b.ARCHIVE.exists(), 'No final archive before root terminal PASS')
+    for name in ('build_archive.py', 'verify.py', 'check-prep.py'):
+        ast.parse((b.HERE / name).read_text(encoding='utf-8'))
+    report['checks'].append('Python AST')
+    done = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(b.HERE / 'build_archive.py'), '--help'], env=b.environment(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=20)
+    b.require(done.returncode == 0 and not b.ARCHIVE.exists(), 'Help cannot create archive')
+    (b.HERE / 'help.log').write_bytes(done.stdout)
+    report['checks'].append('CLI help without collection/archive')
+    for name in b.CANONICAL:
+        b.exact_text_relation(b.git('show', 'HEAD:' + name), (b.ROOT / name).read_bytes())
+    report['checks'].append('All selected canonical paths and explicit working/raw HEAD text representations')
+    b.require(b.hashfile(b.PRIOR / 'qualification/report.json') == b.PRIOR_REPORT, 'Exact existing completed two-PDM report')
+    marker = b.load(b.PRIOR / 'marker.json')
+    b.require(b.source_snapshot() == marker['source_snapshot'], 'Current complete exporter source snapshot')
+    report['checks'].append('Complete clean source snapshot and exact prior report')
+    collector = b.Collector()
+    lfs = marker['baseline_commit_bindings']['app.bin']
+    row = collector.add(lfs['local_object'], 'LFS omission preflight', lfs['local_object_sha256'], force_omit=True)
+    b.require(row['disposition'] == 'omitted' and not collector.files, 'Extensionless local LFS binary must never be copied')
+    report['checks'].append('Extensionless LFS object omission')
+    spec = importlib.util.spec_from_file_location('prepared_offline_verifier', b.HERE / 'verify.py')
+    verifier = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(verifier)
+    text_cases = [('same-lf', b'a\nb\n', b'a\nb\n', True), ('lf-to-crlf', b'a\nb\n', b'a\r\nb\r\n', True),
+                  ('crlf-to-lf', b'a\r\nb\r\n', b'a\nb\n', True), ('same-crlf', b'a\r\nb\r\n', b'a\r\nb\r\n', True),
+                  ('mixed-working', b'a\nb\n', b'a\r\nb\n', False), ('mixed-blob', b'a\r\nb\n', b'a\nb\n', False),
+                  ('same-mixed-rejected', b'a\r\nb\n', b'a\r\nb\n', False), ('lone-cr', b'a\nb\n', b'a\rb\r', False),
+                  ('changed-byte', b'a\nb\n', b'a\r\nc\r\n', False), ('lost-final-lf', b'a\nb\n', b'a\r\nb', False),
+                  ('nul', b'a\0\n', b'a\0\n', False), ('invalid-utf8', b'\xff\n', b'\xff\r\n', False)]
+    text_results = []
+    for name, blob, working, expected in text_cases:
+        values = []
+        for guard in (b.exact_text_relation, verifier.exact_text_relation):
+            try:
+                result = guard(blob, working)
+            except (RuntimeError, ValueError, UnicodeDecodeError):
+                b.require(not expected, 'Exact text guard rejected positive ' + name)
+                values.append(False)
+            else:
+                b.require(expected, 'Exact text guard accepted negative ' + name)
+                values.append(result)
+        b.require(values[0] == values[1], 'Packager/verifier text guard disagreement: ' + name)
+        text_results.append({'name': name, 'expected_accept': expected, 'passed': True})
+    report['checks'].append('12 exact text controls in independent packager/verifier guards')
+    report['exact_text_guard_cases'] = text_results
+    prior = b.load(b.PRIOR / 'qualification/report.json')
+    profile_facts = {}
+    for profile in b.load(b.PRIOR / 'profiles.json'):
+        image = next(row for row in prior['images'] if row['variant'] == profile['variant'])
+        build = Path(profile['build_directory'])
+        description = b.load(build / 'project_description.json')
+        logs = b.PRIOR / 'qualification' / profile['name']
+        metadata = b.elf_metadata(build / description['app_elf'], image, list(logs.glob('*.log')))
+        syms = {}
+        for line in (logs / 'nm.log').read_text().splitlines():
+            fields = line.split()
+            if len(fields) == 4:
+                syms[fields[3]] = {'address': int(fields[0], 16), 'bytes': int(fields[1], 16), 'type': fields[2]}
+        calls = verifier.call_trace((logs / 'app-main.log').read_text(), metadata['data_words'], syms)
+        b.require(calls == image['actual_app_main_calls'], 'Offline trace must equal actual recorded app_main calls')
+        if profile['enabled']:
+            body = verifier.call_trace((logs / 'mpi-body.log').read_text(), metadata['data_words'], syms)
+            b.require(calls[0]['target'] == syms['native_tls_early_mpi_prepare']['address'] and [row['target'] for row in body] == [syms[name]['address'] for name in ('esp_crypto_mpi_lock_acquire', 'esp_crypto_mpi_lock_release')], 'Existing enabled static call proof')
+        folder = Path(profile['output_directory'])
+        inventory = b.warning_inventory(folder, b.load(folder / 'manifest.json'))
+        b.require(not inventory['compiler'] and {row['category'] for row in inventory['cmake']} == {'component-include-dependency', 'object-path-length'}, 'Existing CMake warnings separate from compiler warnings')
+        profile_facts[profile['variant']] = {'elf_sha256': metadata['sha256'], 'actual_app_main_calls': len(calls), 'cmake_categories': [row['category'] for row in inventory['cmake']]}
+    report['checks'].append('Existing two ELF metadata/call decoding and separate warning classes')
+    b.require(all(b.hashfile(b.HERE / name) == sha for name, sha in before.items()) and not b.ARCHIVE.exists(), 'Prep scripts changed/archive created')
+    report.update(passed=True, profile_facts=profile_facts, archive_written=False, sdk_build_or_test_executed=False,
+                  final_five_report_pending=True, root_must_authorize_archive=True, scripts_current=True)
+except BaseException as error:
+    report['error'] = type(error).__name__ + ': ' + str(error)
+    out.write_bytes(b.encode(report))
+    raise
+out.write_bytes(b.encode(report))
+print(json.dumps({'passed': True, 'checks': len(report['checks']), 'readiness_sha256': b.hashfile(out), 'archive_written': False}, indent=2))

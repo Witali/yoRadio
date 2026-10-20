@@ -1,0 +1,254 @@
+"""Derive the NEW five-profile contract; original reviewed PDM files read-only."""
+import ast
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+p = HERE / 'contract.py'
+s = p.read_text()
+
+
+def replace_function(name, text):
+    global s
+    node = next(node for node in ast.parse(s).body if isinstance(node, ast.FunctionDef) and node.name == name)
+    lines = s.splitlines(True)
+    lines[node.lineno - 1:node.end_lineno] = [text.strip() + '\n']
+    s = ''.join(lines)
+
+
+s = s.replace('Fail-closed preparation/qualification for two intermediate PDM exports only.',
+              'Five remaining enabled backend exports, composed with the frozen two-PDM gate.')
+start = s.index("BASELINE = Path(")
+stop = s.index('EVIDENCE = ', start)
+s = s[:start] + '''MPI = 'YORADIO_TLS_EARLY_MPI_LOCK'
+SDK_COMMIT = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+LEGACY_COMMIT = '735507283d5b2f9fb363a1901172dbd9e847945d'
+PREFIX = 'esp32-cyd2usb-native-early-mpi-'
+BASELINE_PREFIX = 'esp32-cyd2usb-native-tls-input-reclaim-'
+EXPECTED = {
+    'continuous': {'backend': 'continuous', 'custom_flac': False, 'tag': 'vc'},
+    'legacy': {'backend': 'legacy', 'custom_flac': False, 'tag': 'vl'},
+    'custom-flac-pdm': {'backend': 'pdm', 'custom_flac': True, 'tag': 'cp'},
+    'custom-flac-continuous': {'backend': 'continuous', 'custom_flac': True, 'tag': 'cc'},
+    'custom-flac-legacy': {'backend': 'legacy', 'custom_flac': True, 'tag': 'cl'},
+}
+PREVIOUS_RELATIVE = Path('.build/cyd-early-mpi-production-prep-01/campaign-02')
+PREVIOUS_MARKER_SHA = 'd0b8632d82f03fae323e0ed631700261c7d7c34488ff9bdae4d1701d5ba00ab7'
+''' + s[stop:]
+s = s.replace('def baseline_binary(root, name, receipt):', 'def baseline_binary(root, baseline_path, name, receipt):')
+s = s.replace('relative = BASELINE / name\n    blob', 'relative = baseline_path / name\n    blob')
+s = s.replace('def baseline(root):\n    folder = root / BASELINE',
+              "def baseline(root, profile_name):\n    spec = EXPECTED[profile_name]\n    BASELINE = Path('firmware/development') / (BASELINE_PREFIX + profile_name)\n    folder = root / BASELINE")
+s = s.replace('baseline_binary(root, name, receipt)', 'baseline_binary(root, BASELINE, name, receipt)')
+s = s.replace("receipt['backend'] == 'pdm' and receipt['variant']", "receipt['backend'] == spec['backend'] and receipt['variant']")
+s = s.replace("require(config.get('YORADIO_NATIVE_AUDIO_OUTPUT_PDM') is True and config.get('YORADIO_FLAC_DECODER_ESPRESSIF') is True and not config.get('YORADIO_FLAC_DECODER_CUSTOM'), 'Baseline must be vendor PDM')",
+'''backend_key = {'pdm': 'YORADIO_NATIVE_AUDIO_OUTPUT_PDM', 'continuous': 'YORADIO_NATIVE_AUDIO_OUTPUT_DAC', 'legacy': 'YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC'}
+    require(config.get(backend_key[spec['backend']]) is True and all(config.get(value) is False for key, value in backend_key.items() if key != spec['backend']), 'Baseline backend mismatch')
+    require(config.get('YORADIO_FLAC_DECODER_CUSTOM') is spec['custom_flac'] and config.get('YORADIO_FLAC_DECODER_ESPRESSIF') is (not spec['custom_flac']), 'Baseline codec selector mismatch')''')
+
+replace_function('profile_contract', '''
+def profile_contract(root, campaign, rows):
+    require(len(rows) == 5 and {row['name'] for row in rows} == set(EXPECTED), 'Exactly five named remaining profiles required')
+    build_root = root / '.build/em-sdk-01'
+    require(build_root.resolve() == build_root, 'Short build root must not redirect')
+    for row in rows:
+        spec = EXPECTED[row['name']]
+        require(type(row['enabled']) is bool and row['enabled'] is True and row['variant'] == PREFIX + row['name'], 'Profile identity mismatch')
+        require(type(row['custom_flac']) is bool and row['custom_flac'] is spec['custom_flac'] and row['backend'] == spec['backend'], 'Backend/codec profile mismatch')
+        require(Path(row['baseline']) == root / 'firmware/development' / (BASELINE_PREFIX + row['name']), 'Matching committed baseline required')
+        require(Path(row['build_directory']) == build_root / spec['tag'] / 'build', 'Exact short build path required')
+        require(Path(row['sdkconfig']) == Path(row['build_directory']) / 'sdkconfig', 'Wrong isolated sdkconfig')
+        require(Path(row['output_directory']) == root / 'firmware/development' / row['variant'], 'Wrong development variant')
+    for key in ('name', 'variant', 'build_directory', 'sdkconfig', 'output_directory'):
+        require(len({str(row[key]).casefold() for row in rows}) == 5, 'Duplicate profile ' + key)
+''')
+
+replace_function('prepare', r'''
+def prepare(args):
+    root = args.repository.resolve()
+    require(re.fullmatch('[0-9a-f]{40}', args.expected_head), 'Explicit full expected HEAD required')
+    dependencies = args.dependency_root or next((base / '.idf' for base in (root, *root.parents) if (base / '.idf/v6.0.2/tools/idf.py').is_file()), None)
+    require(dependencies is not None and args.powershell is not None, 'Specify installed dependency root and PowerShell7')
+    dependencies, powershell = dependencies.resolve(), args.powershell.resolve()
+    require(powershell.is_file() and not args.campaign.exists(), 'Fresh campaign and installed PowerShell7 required')
+    build_root = root / '.build/em-sdk-01'
+    require(not build_root.exists() and build_root.resolve() == build_root, 'Exact short build root must be fresh and not redirected')
+    api = exporter(root)
+    frozen = snapshot(root, api)
+    require(frozen['commit'] == args.expected_head == '1190aebce400375c382a5ad54211e2400f98161d', 'Unexpected frozen checkpoint')
+    for backend in ('pdm', 'continuous', 'legacy'):
+        api.preflight(dependencies, backend)
+    baselines = {name: baseline(root, name) for name in EXPECTED}
+    refs = evidence(root)
+    bindings = {name: task_bindings(root, value[0]['source_commit']) for name, value in baselines.items()}
+    sdk_inputs = sdk(root, dependencies)
+    old_sdk = legacy_sdk(dependencies)
+    previous = previous_gate(root, frozen)
+    global_configs = globals_(root)
+    tools_dir = dependencies / 'tools-v6.0.2/tools'
+    binary = tools_dir / 'xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin'
+    tools = {str(path.resolve()): sha(path) for path in [powershell, Path(sys.executable).resolve(), dependencies / 'python-3.12.10/tools/python.exe', tools_dir / 'cmake/4.0.3/bin/cmake.exe', tools_dir / 'ninja/1.12.1/ninja.exe', *[binary / ('xtensa-esp32-elf-' + name + '.exe') for name in ('gcc', 'nm', 'objdump')]]}
+    scripts = {str((HERE / name).resolve()): sha(HERE / name) for name in SCRIPTS}
+    for name in EXPECTED:
+        require(not (root / 'firmware/development' / (PREFIX + name)).exists(), 'New variant output already exists: ' + name)
+    args.campaign.mkdir(parents=True, exist_ok=False)
+    profiles = []
+    for name, spec in EXPECTED.items():
+        baseline_path = root / 'firmware/development' / (BASELINE_PREFIX + name)
+        initial = (baseline_path / 'sdkconfig').read_bytes()
+        require(not re.search(rb'(?m)^(?:# )?CONFIG_YORADIO_TLS_EARLY_MPI_LOCK(?:=| )', initial), 'Baseline unexpectedly contains MPI config')
+        build = build_root / spec['tag'] / 'build'
+        build.mkdir(parents=True, exist_ok=False)
+        seed = initial + (b'' if initial.endswith(b'\n') else b'\n') + b'CONFIG_YORADIO_TLS_EARLY_MPI_LOCK=y\n'
+        config = build / 'sdkconfig'
+        config.write_bytes(seed)
+        frozen_seed = args.campaign / 'frozen/seeds' / (name + '-sdkconfig')
+        frozen_seed.parent.mkdir(parents=True, exist_ok=True)
+        frozen_seed.write_bytes(seed)
+        profiles.append({'name': name, 'variant': PREFIX + name, 'enabled': True, 'backend': spec['backend'], 'custom_flac': spec['custom_flac'], 'baseline': str(baseline_path), 'build_directory': str(build), 'sdkconfig': str(config), 'output_directory': str(root / 'firmware/development' / (PREFIX + name)), 'initial_seed_sha256': sha(config), 'baseline_sdkconfig_sha256': baselines[name][2]['sdkconfig'], 'frozen_seed': str(frozen_seed)})
+        for relative in baselines[name][2]:
+            target = args.campaign / 'frozen/baselines' / name / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(baseline_path / relative, target)
+        for binary_name in ('app.bin', 'partition-table.bin'):
+            target = args.campaign / 'frozen/baseline-git-pointers' / name / (binary_name + '.lfs')
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(baselines[name][3][binary_name]['git_pointer_ascii'].encode('ascii'))
+    profile_contract(root, args.campaign, profiles)
+    for index, path in enumerate(refs):
+        target = args.campaign / 'frozen/evidence' / str(index) / Path(path).name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+    for path in scripts:
+        target = args.campaign / 'frozen/scripts' / Path(path).name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+    for filename in ('marker.json', 'profiles.json'):
+        target = args.campaign / 'frozen/previous-pdm' / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root / PREVIOUS_RELATIVE / filename, target)
+    write(args.campaign / 'profiles.json', profiles)
+    baseline_records = {name: {'raw_sha256': value[2], 'commit_bindings': value[3], 'source_commit': value[0]['source_commit']} for name, value in baselines.items()}
+    require(snapshot(root, api) == frozen and evidence(root) == refs and sdk(root, dependencies) == sdk_inputs and legacy_sdk(dependencies) == old_sdk and globals_(root) == global_configs and previous_gate(root, frozen) == previous, 'Preparation input changed')
+    for name in EXPECTED:
+        after = baseline(root, name)
+        require(after[2] == baseline_records[name]['raw_sha256'] and after[3] == baseline_records[name]['commit_bindings'], 'Baseline changed during preparation: ' + name)
+    marker = {'source_snapshot': frozen, 'source_commit': frozen['commit'], 'source_content_sha256': frozen['content_sha256'], 'repository': str(root), 'dependency_root': str(dependencies), 'powershell': str(powershell), 'profiles_sha256': sha(args.campaign / 'profiles.json'), 'baselines': baseline_records, 'evidence': refs, 'scripts_sha256': scripts, 'tools_sha256': tools, 'sdk_source_sha256': sdk_inputs, 'legacy_sdk': old_sdk, 'previous_gate': previous, 'short_build_root': str(build_root), 'global_configs_sha256': global_configs, 'unchanged_task_board_bindings': bindings, 'head_before': frozen['commit'], 'head_after_prepare': git(root, 'rev-parse', 'HEAD').decode().strip(), 'scope': 'Five remaining enabled backend exports plus frozen two-PDM control gate: seven complete vendor/custom x three backends and disabled PDM; physical/radio pre-app/benefit stages remain open', 'frozen_inputs_sha256': {path.relative_to(args.campaign).as_posix(): sha(path) for path in (args.campaign / 'frozen').rglob('*') if path.is_file()}}
+    write(args.campaign / 'marker.json', marker)
+    print(json.dumps({'prepared': 5, 'source_commit': frozen['commit'], 'marker_sha256': sha(args.campaign / 'marker.json'), 'campaign': str(args.campaign), 'short_build_root': str(build_root), 'build_or_export_executed': False}, indent=2))
+'''.replace("b'\\n'", "b'\n'").replace("=y\\n'", "=y\n'"))
+
+replace_function('check', '''
+def check(args):
+    campaign = args.campaign
+    require(sha(campaign / 'marker.json') == args.marker_sha256, 'Frozen marker hash changed')
+    marker = load(campaign / 'marker.json')
+    root = Path(marker['repository'])
+    api = exporter(root)
+    require(snapshot(root, api) == marker['source_snapshot'], 'Complete exporter source snapshot/HEAD changed')
+    require(sha(campaign / 'profiles.json') == marker['profiles_sha256'], 'Profile list changed')
+    rows = load(campaign / 'profiles.json')
+    profile_contract(root, campaign, rows)
+    for group in ('scripts_sha256', 'tools_sha256', 'sdk_source_sha256'):
+        require(all(sha(path) == value for path, value in marker[group].items()), 'Frozen ' + group + ' changed')
+    require(all(sha(campaign / path) == value for path, value in marker['frozen_inputs_sha256'].items()), 'Frozen payload changed')
+    require(sdk(root, Path(marker['dependency_root'])) == marker['sdk_source_sha256'] and legacy_sdk(Path(marker['dependency_root'])) == marker['legacy_sdk'], 'SDK source/commit changed')
+    require(globals_(root) == marker['global_configs_sha256'] and evidence(root) == marker['evidence'], 'Global configs/evidence changed')
+    require(previous_gate(root, marker['source_snapshot']) == marker['previous_gate'], 'Original PDM gate marker changed')
+    for row in rows:
+        current = baseline(root, row['name'])
+        expected = marker['baselines'][row['name']]
+        require(current[2] == expected['raw_sha256'] and current[3] == expected['commit_bindings'], 'Committed baseline changed')
+        require(task_bindings(root, expected['source_commit']) == marker['unchanged_task_board_bindings'][row['name']], 'Task/board bindings changed')
+        require(sha(row['frozen_seed']) == row['initial_seed_sha256'], 'Immutable initial seed changed')
+    return marker, root, api, rows
+''')
+s = s.replace("'schema': 'early-mpi-pdm-export-v1'", "'schema': 'early-mpi-backend-export-v1', 'backend': row['backend']")
+s = s.replace("print('Two exports finished;", "print('Five exports finished;")
+s = s.replace("len(terminal['profiles']) == 2", "len(terminal['profiles']) == 5")
+s = s.replace('Exact two terminal exit0 exporter processes required', 'Exact five terminal exit0 exporter processes required')
+s = s.replace("    baseline_receipt, previous, _, _ = baseline(root)\n", '')
+s = s.replace("        for row in rows:\n            check(args)\n            folder = Path(row['output_directory'])", "        for row in rows:\n            check(args)\n            baseline_receipt, previous, _, _ = baseline(root, row['name'])\n            folder = Path(row['output_directory'])")
+s = s.replace("receipt['backend'] == 'pdm'", "receipt['backend'] == row['backend']")
+s = s.replace("Path(marker['dependency_root']), 'pdm', marker['source_snapshot']", "Path(marker['dependency_root']), row['backend'], marker['source_snapshot']")
+s = s.replace("Path(row['sdkconfig']), 'pdm', marker['powershell']", "Path(row['sdkconfig']), row['backend'], marker['powershell']")
+s = s.replace(", 'yoradio_http_client_release_request_buffer', 'esp_flac_dec_register')", ", 'yoradio_http_client_release_request_buffer')")
+s = s.replace("require('custom_flac_decoder_feed' not in syms, 'Vendor profile changed')", "require(('custom_flac_decoder_feed' in syms) is row['custom_flac'] and ('esp_flac_dec_register' in syms) is (not row['custom_flac']), 'Vendor/custom profile changed')")
+old = "            for name in ('pdm_completion_queue_drop', 'native_output_metrics_queue_drop'):\n                require(name in syms and 0x40080000 <= syms[name]['address'] < 0x400a0000, 'PDM callback/metrics hook left IRAM: ' + name)"
+new = "            if row['backend'] == 'pdm':\n                for name in ('pdm_completion_queue_drop', 'native_output_metrics_queue_drop'):\n                    require(name in syms and 0x40080000 <= syms[name]['address'] < 0x400a0000, 'PDM callback/metrics hook left IRAM: ' + name)"
+assert old in s
+s = s.replace(old, new)
+s = s.replace("            require([line for line in warnings if line not in tolerated] == [], 'Unexpected PDM compiler/build warning')", r'''            actual_warnings = [line for line in warnings if line not in tolerated]
+            if row['backend'] == 'legacy':
+                require(len(actual_warnings) in (0, 3) and all(re.search(r"periph_rtc_apll_(?:freq_set|acquire|release)' is deprecated", line) and '/v5.5.4/components/driver/deprecated/i2s_legacy.c:' in line.replace('\\', '/') for line in actual_warnings), 'Unexpected legacy warning')
+            else:
+                require(actual_warnings == [], 'Unexpected compiler/build warning')''')
+s = s.replace("'variant': row['variant'], 'enabled': row['enabled'], 'elf_machine': 94", "'variant': row['variant'], 'backend': row['backend'], 'custom_flac': row['custom_flac'], 'enabled': row['enabled'], 'elf_machine': 94")
+s = s.replace("'sdk_environment_warnings': tolerated", "'sdk_environment_warnings': tolerated, 'compiler_warnings': actual_warnings")
+start = s.index("        require(len(report['images']) == 2")
+stop = s.index('        check(args)', start)
+s = s[:start] + '''        require(len(report['images']) == 5 and {entry['variant'] for entry in report['images']} == {PREFIX + name for name in EXPECTED}, 'Exact five unique qualified images required')
+        previous_report = compose_previous(root, marker, report['images'])
+        qualification_inputs.update(previous_report['qualification_inputs_sha256'])
+''' + s[stop:]
+s = s.replace('passed=True, between_config_delta=between,', "passed=True, full_seven_matrix=previous_report['matrix'], previous_pdm_qualification=previous_report['provenance'],")
+s = s.replace('all_backend_qualification=False', 'all_backend_qualification=True')
+s = s.replace("'images': 2, 'report_sha256'", "'images': 5, 'full_matrix_images': 7, 'report_sha256'")
+
+extra = r'''
+
+
+def legacy_sdk(dependencies):
+    path = dependencies / 'v5.5.4'
+    require(git(path, 'rev-parse', 'HEAD').decode().strip() == LEGACY_COMMIT, 'Wrong legacy driver source commit')
+    require(not git(path, 'status', '--porcelain', '--untracked-files=no').strip(), 'Legacy SDK source is dirty')
+    names = ('components/driver/deprecated/i2s_legacy.c', 'components/hal/esp32/include/hal/i2s_ll.h', 'tools/cmake/version.cmake')
+    return {'commit': LEGACY_COMMIT, 'source_sha256': {str(path / name): sha(path / name) for name in names}}
+
+
+def previous_gate(root, source):
+    folder = root / PREVIOUS_RELATIVE
+    require(sha(folder / 'marker.json') == PREVIOUS_MARKER_SHA, 'Frozen original PDM marker changed')
+    marker = load(folder / 'marker.json')
+    require(marker['source_snapshot'] == source and marker['source_commit'] == source['commit'], 'Both gates must use the same complete source snapshot')
+    require(sha(folder / 'profiles.json') == marker['profiles_sha256'], 'Original PDM profiles changed')
+    profiles = load(folder / 'profiles.json')
+    require(len(profiles) == 2 and {row['variant'] for row in profiles} == {PREFIX + 'pdm', PREFIX + 'disabled-pdm'}, 'Original two PDM profiles required')
+    require(all(row['backend'] == 'pdm' and type(row['enabled']) is bool and row['enabled'] is (row['variant'] == PREFIX + 'pdm') for row in profiles), 'Original PDM control identity')
+    for path, value in marker['scripts_sha256'].items():
+        require(sha(path) == value, 'Original PDM script changed')
+    require(all(sha(folder / path) == value for path, value in marker['frozen_inputs_sha256'].items()), 'Original PDM frozen payload changed')
+    return {'campaign': str(folder), 'marker_sha256': PREVIOUS_MARKER_SHA, 'profiles_sha256': marker['profiles_sha256']}
+
+
+def compose_previous(root, marker, new_images):
+    previous_gate(root, marker['source_snapshot'])
+    folder = root / PREVIOUS_RELATIVE
+    qpath = folder / 'qualification/report.json'
+    original_sha = sha(qpath)
+    value = load(qpath)
+    require(value['passed'] is True and value['all_bound_inputs_current'] is True and value['source_commit'] == marker['source_commit'] and value['marker_sha256'] == PREVIOUS_MARKER_SHA, 'Original PDM qualification not complete/bound')
+    require(len(value['images']) == 2 and {row['variant'] for row in value['images']} == {PREFIX + 'pdm', PREFIX + 'disabled-pdm'}, 'Exact two qualified original images required')
+    inputs = dict(value['qualification_inputs_sha256'])
+    inputs[str(qpath)] = original_sha
+    for path, expected in inputs.items():
+        require(sha(path) == expected, 'Original qualified application payload changed: ' + path)
+    for name in ('on', 'off'):
+        image = next(row for row in value['images'] if row['variant'] == PREFIX + ('pdm' if name == 'on' else 'disabled-pdm'))
+        require(image['enabled'] is (name == 'on'), 'Original PDM enabled/control mismatch')
+        for filename, expected in image['symbol_logs'].items():
+            path = folder / 'qualification' / name / filename
+            require(sha(path) == expected, 'Original ELF proof log changed')
+            inputs[str(path)] = expected
+    matrix = [dict(row, backend='pdm', custom_flac=False) for row in value['images']] + new_images
+    expected = {PREFIX + name for name in ('pdm', 'continuous', 'legacy', 'custom-flac-pdm', 'custom-flac-continuous', 'custom-flac-legacy', 'disabled-pdm')}
+    require(len(matrix) == 7 and len({row['variant'] for row in matrix}) == 7 and {row['variant'] for row in matrix} == expected, 'Complete seven-image matrix required')
+    enabled = [row for row in matrix if row['enabled'] is True]
+    require(len(enabled) == 6 and {(row['backend'], row['custom_flac']) for row in enabled} == {(backend, custom) for backend in ('pdm', 'continuous', 'legacy') for custom in (False, True)}, 'Vendor/custom x all three backends required')
+    require(sha(qpath) == original_sha, 'Original qualification changed during composition')
+    return {'matrix': matrix, 'qualification_inputs_sha256': inputs,
+            'provenance': {'campaign': str(folder), 'marker_sha256': PREVIOUS_MARKER_SHA, 'qualification_sha256': original_sha}}
+'''
+s += extra
+ast.parse(s)
+p.write_bytes(s.encode())
+print('Derived NEW contract without modifying original frozen PDM inputs.')

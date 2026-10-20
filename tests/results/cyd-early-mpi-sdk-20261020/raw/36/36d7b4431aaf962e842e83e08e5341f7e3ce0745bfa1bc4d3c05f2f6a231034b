@@ -1,0 +1,2 @@
+param([string]$InputSource)
+$errors = $null; $tokens = $null; [void][System.Management.Automation.Language.Parser]::ParseFile($InputSource, [ref]$tokens, [ref]$errors); if ($errors.Count) { $errors | Out-String | Write-Error; exit 1 }

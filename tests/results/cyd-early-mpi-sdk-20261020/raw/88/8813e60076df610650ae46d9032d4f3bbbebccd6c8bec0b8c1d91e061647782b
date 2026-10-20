@@ -1,0 +1,19 @@
+[CmdletBinding(PositionalBinding = $false)]
+param([Parameter(Mandatory)][string]$Invocation)
+$ErrorActionPreference = 'Stop'
+if ($PSVersionTable.PSVersion.Major -lt 7) { throw 'PowerShell7 is required' }
+$metadata = Get-Content -LiteralPath $Invocation -Raw | ConvertFrom-Json
+if ($metadata.schema -ne 'early-mpi-pdm-export-v1' -or
+    $metadata.variant -notin @('esp32-cyd2usb-native-early-mpi-pdm', 'esp32-cyd2usb-native-early-mpi-disabled-pdm') -or
+    @($metadata.evidence).Count -ne 4) { throw 'Unexpected intermediate PDM invocation' }
+$parameters = @{
+    DependencyRoot = [string]$metadata.dependency_root
+    AudioBackend = 'pdm'
+    BuildDirectory = [string]$metadata.build_directory
+    Sdkconfig = [string]$metadata.sdkconfig
+    Variant = [string]$metadata.variant
+    FirmwareOutputDirectory = [string]$metadata.output_directory
+    Evidence = [string[]]@($metadata.evidence)
+}
+& (Join-Path ([string]$metadata.repository) 'idf/esp32-cyd2usb-native/build-production.ps1') @parameters
+if ($LASTEXITCODE -ne 0) { throw "Production wrapper failed: $LASTEXITCODE" }

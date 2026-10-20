@@ -1,0 +1,59 @@
+# Intermediate PDM application gate — prepared, not executed
+
+These ignored tools are for root review. No production SDK build/export has
+been executed by preparing them. Do not apply them to another worktree without
+reviewing paths. Run only after all source is clean and committed. The explicit
+40-character expected HEAD and printed marker SHA are approval checkpoints.
+
+Use the installed bootstrap Python with `-B -X utf8` and the installed
+PowerShell 7 executable. From the repository worktree, substitute the actual
+clean commit and PowerShell path:
+
+```text
+python -B -X utf8 .build/cyd-early-mpi-production-prep-01/prepare.py --expected-head <FULL_CLEAN_HEAD> --powershell <PWSH7_EXE>
+python -B -X utf8 .build/cyd-early-mpi-production-prep-01/run.py --marker-sha256 <PRINTED_MARKER_SHA256>
+python -B -X utf8 .build/cyd-early-mpi-production-prep-01/qualify.py --marker-sha256 <SAME_MARKER_SHA256>
+```
+
+`--repository`, `--dependency-root` and `--campaign` can be explicit. Campaigns
+must remain fresh descendants of this prep directory. Outputs are exactly the
+two new development variants `esp32-cyd2usb-native-early-mpi-pdm` and
+`esp32-cyd2usb-native-early-mpi-disabled-pdm`. Existing destinations, build caches
+and run/qualification receipts are rejected. Failed evidence is retained rather
+than silently overwritten or resumed.
+
+Both initial sdkconfigs append only the MPI bool to the same byte-exact
+committed reclaim-PDM baseline. Each final JSON must differ from that baseline
+only by absent MPI becoming true/false; the two final JSONs must differ only by
+that bool. Reclaim and HTTP TX release stay enabled. Any additional option,
+including an unrelated default-off bridge, is scope leakage and fails.
+
+Preparation stores the complete existing exporter source snapshot and verifies
+HEAD before/after, raw baseline/evidence bytes against Git HEAD, source/task/
+board bindings, ignored global config identities, original and prepared seed
+hashes, script/tool/SDK identities and exact two unique profiles. Runtime tools
+require the immutable marker hash and check these bindings before/after each
+export and qualification. The four bound evidence files are MPI README/HOST,
+reclaim README and HTTP README. The existing production wrapper is used without
+AllowDirty/Setup; dependencies must already be installed. No downloads or board
+commands are provided.
+
+The baseline's `app.bin` and `partition-table.bin` are the only LFS exceptions
+to raw Git blob byte equality. For those two manifest-bound payloads, the gate
+parses exactly the standard three-line Git pointer, checks its OID against the
+manifest, checks hydrated bytes/SHA/size and verifies the already-present local
+Git LFS object's SHA/size. Both raw pointer payloads are frozen. No fetch is
+attempted if the object is missing. Every other baseline/evidence file must
+remain raw byte-equal to Git HEAD. Custom LFS storage requires explicit review.
+
+Qualification checks actual Xtensa ELF/image/checksum/OTA, receipt and initial
+seed bindings, canonical module compile on/off and first actual `app_main` call,
+ordinary public MPI acquire/release, unchanged allocator/free/reclaim function
+pointers and link flags, canonical HTTP overlay, PDM callback IRAM/metrics DRAM,
+and task/board equivalence to the reclaim baseline. It is a static linked-image
+gate. It does not execute the application, crypto calculations or networking.
+
+This is an **intermediate vendor PDM gate only**. All three audio backends,
+physical behavior, actual radio pre-app mutex state and benefit measurement
+remain open. No RAM/fragmentation/speed improvement is claimed. Deferred codec
+extensions and AAC investigation are excluded.

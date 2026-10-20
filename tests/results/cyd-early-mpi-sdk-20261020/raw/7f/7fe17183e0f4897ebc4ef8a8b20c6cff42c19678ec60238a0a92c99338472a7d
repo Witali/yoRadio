@@ -1,0 +1,26 @@
+"""Capture one authoritative prepare-only attempt, including nonpass evidence."""
+import json
+from pathlib import Path
+import subprocess
+import sys
+import contract as c
+
+out = c.HERE / 'prepare-attempt-01'
+c.require(not out.exists(), 'Keep existing terminal evidence')
+out.mkdir()
+command = [sys.executable, '-B', '-X', 'utf8', str(c.HERE / 'prepare.py'),
+           '--expected-head', '1190aebce400375c382a5ad54211e2400f98161d',
+           '--powershell', 'C:/Users/rudol/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe']
+c.write(out / 'command.json', command)
+c.write(out / 'scripts-before.json', {name: c.sha(c.HERE / name) for name in (*c.SCRIPTS, 'prepare-capture.py')})
+with (out / 'stdout.log').open('wb') as stdout, (out / 'stderr.log').open('wb') as stderr:
+    done = subprocess.run(command, cwd=c.DEFAULT_ROOT, env=c.environment(), stdout=stdout, stderr=stderr)
+terminal = {'exit_status': done.returncode, 'stdout_sha256': c.sha(out / 'stdout.log'),
+            'stderr_sha256': c.sha(out / 'stderr.log'), 'sdk_build_executed': False,
+            'scripts_after': {name: c.sha(c.HERE / name) for name in (*c.SCRIPTS, 'prepare-capture.py')}}
+c.write(out / 'terminal.json', terminal)
+print((out / 'stdout.log').read_text(encoding='utf-8'))
+if done.returncode:
+    print((out / 'stderr.log').read_text(encoding='utf-8'), file=sys.stderr)
+print(json.dumps(terminal, indent=2))
+sys.exit(done.returncode)

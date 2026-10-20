@@ -1,0 +1,689 @@
+"""Five remaining enabled backend exports, composed with the frozen two-PDM gate."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import struct
+import subprocess
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+DEFAULT_ROOT = HERE.parent.parent
+PROJECT = Path('idf/esp32-cyd2usb-native')
+MPI = 'YORADIO_TLS_EARLY_MPI_LOCK'
+SDK_COMMIT = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+LEGACY_COMMIT = '735507283d5b2f9fb363a1901172dbd9e847945d'
+PREFIX = 'esp32-cyd2usb-native-early-mpi-'
+BASELINE_PREFIX = 'esp32-cyd2usb-native-tls-input-reclaim-'
+EXPECTED = {
+    'continuous': {'backend': 'continuous', 'custom_flac': False, 'tag': 'vc'},
+    'legacy': {'backend': 'legacy', 'custom_flac': False, 'tag': 'vl'},
+    'custom-flac-pdm': {'backend': 'pdm', 'custom_flac': True, 'tag': 'cp'},
+    'custom-flac-continuous': {'backend': 'continuous', 'custom_flac': True, 'tag': 'cc'},
+    'custom-flac-legacy': {'backend': 'legacy', 'custom_flac': True, 'tag': 'cl'},
+}
+PREVIOUS_RELATIVE = Path('.build/cyd-early-mpi-production-prep-01/campaign-02')
+PREVIOUS_MARKER_SHA = 'd0b8632d82f03fae323e0ed631700261c7d7c34488ff9bdae4d1701d5ba00ab7'
+PREVIOUS_QUALIFICATION_SHA = '7c2007b1a33a3dfedde6be0ee13e09b463403d6ffdd9d6506fbe1edbbb29a1f4'
+EVIDENCE = ('tests/results/cyd-early-mpi-20261020/README.md',
+            'tests/results/cyd-early-mpi-20261020/HOST.md',
+            'tests/results/cyd-input-reclaim-20261020/README.md',
+            'tests/results/cyd-http-request-buffer-20261020/README.md')
+SCRIPTS = ('prepare.py', 'run.py', 'qualify.py', 'contract.py', 'export-one.ps1', 'README.md')
+FIELDS = {'app.bin': 'app_sha256', 'sdkconfig': 'sdkconfig_sha256',
+          'sdkconfig.json': 'sdkconfig_json_sha256', 'partition-table.bin': 'partition_table_sha256',
+          'flasher_args.json': 'flasher_args_sha256', 'project_description.json': 'project_description_sha256'}
+
+
+def require(condition, message):
+    if not condition:
+        raise RuntimeError(message)
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def write(path, value):
+    path.write_bytes((json.dumps(value, indent=2) + '\n').encode())
+
+
+def load(path):
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+
+
+def environment():
+    env = os.environ.copy()
+    env.update(PYTHONDONTWRITEBYTECODE='1', PYTHONNOUSERSITE='1', PYTHONUTF8='1',
+               PYTHONIOENCODING='utf-8', GIT_OPTIONAL_LOCKS='0', IDF_COMPONENT_MANAGER='0')
+    count = int(env.get('GIT_CONFIG_COUNT', '0'))
+    env['GIT_CONFIG_KEY_' + str(count)] = 'core.longpaths'
+    env['GIT_CONFIG_VALUE_' + str(count)] = 'true'
+    env['GIT_CONFIG_COUNT'] = str(count + 1)
+    return env
+
+
+def git(root, *args):
+    return subprocess.check_output(['git', '-c', 'core.longpaths=true', '-C', str(root), *args], env=environment())
+
+
+def module(path, name):
+    spec = importlib.util.spec_from_file_location(name, path)
+    value = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(value)
+    return value
+
+
+def exporter(root):
+    # The existing complete exporter snapshot is authoritative, not a hand-picked
+    # source whitelist. Never import a copy with modified exclusions.
+    os.environ.update(environment())
+    return module(root / 'tools/export_cyd_production.py', 'early_mpi_production_exporter')
+
+
+def snapshot(root, api):
+    before = git(root, 'rev-parse', 'HEAD').decode().strip()
+    value = api.source_snapshot(root)
+    after = git(root, 'rev-parse', 'HEAD').decode().strip()
+    require(before == after == value['commit'], 'HEAD changed while freezing the exporter source snapshot')
+    require(value['dirty'] is False and value['source_dirty'] is False and not value['untracked'],
+            'Require a fully clean committed tree, including exporter Git dirty state')
+    return value
+
+
+def globals_(root):
+    return {str(path.resolve()): sha(path) for path in (root / PROJECT).glob('sdkconfig*') if path.is_file()}
+
+
+def sdk(root, dependencies):
+    path = dependencies / 'v6.0.2'
+    require(git(path, 'rev-parse', 'HEAD').decode().strip() == SDK_COMMIT, 'Wrong SDK commit')
+    require(not git(path, 'status', '--porcelain', '--untracked-files=no').strip(), 'SDK tracked state is dirty')
+    required = ('components/esp_security/src/esp_crypto_lock.c', 'components/esp_security/include/esp_crypto_lock.h',
+                'components/esp_libc/src/locks.c', 'components/esp_libc/platform_include/sys/lock.h',
+                'components/esp_http_client/esp_http_client.c', 'components/mbedtls/port/esp_mem.c',
+                'tools/cmake/version.cmake', 'tools/idf.py', 'export.ps1')
+    return {str((path / name).resolve()): sha(path / name) for name in required}
+
+
+def committed(root, relative):
+    path = root / relative
+    raw = path.read_bytes()
+    require(raw == git(root, 'show', 'HEAD:' + Path(relative).as_posix()), 'Raw file differs from Git HEAD: ' + str(relative))
+    return raw
+
+
+def baseline_binary(root, baseline_path, name, receipt):
+    """Only these two manifest-bound binary payloads may use LFS storage."""
+    require(name in ('app.bin', 'partition-table.bin'), 'LFS exception outside the two baseline binaries')
+    relative = baseline_path / name
+    blob = git(root, 'show', 'HEAD:' + relative.as_posix())
+    parsed = re.fullmatch(rb'version https://git-lfs.github.com/spec/v1\noid sha256:([0-9a-f]{64})\nsize (0|[1-9][0-9]*)\n', blob)
+    require(parsed is not None, 'Expected exact standard Git LFS pointer: ' + name)
+    attribute = git(root, 'check-attr', '-z', 'filter', '--', relative.as_posix()).split(b'\0')
+    require(attribute == [os.fsencode(relative.as_posix()), b'filter', b'lfs', b''], 'Expected explicit LFS filter: ' + name)
+    oid, size = parsed[1].decode(), int(parsed[2])
+    require(oid == receipt[FIELDS[name]], 'LFS OID does not match export manifest: ' + name)
+    raw = (root / relative).read_bytes()
+    require(len(raw) == size and hashlib.sha256(raw).hexdigest() == oid, 'Hydrated binary does not match LFS pointer: ' + name)
+    if name == 'app.bin':
+        require(size == receipt['app_bytes'], 'LFS app size differs from manifest')
+    common = Path(git(root, 'rev-parse', '--git-common-dir').decode().strip())
+    common = (common if common.is_absolute() else root / common).resolve()
+    override = subprocess.run(['git', '-C', str(root), 'config', '--get', 'lfs.storage'], env=environment(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    require(override.returncode == 1 and not override.stdout.strip(), 'Custom LFS storage needs an explicit path review')
+    obj = common / 'lfs/objects' / oid[:2] / oid[2:4] / oid
+    require(obj.is_file(), 'Required local LFS object absent; never fetch automatically: ' + str(obj))
+    require(obj.stat().st_size == size and sha(obj) == oid, 'Local LFS object does not match its pointer: ' + name)
+    return raw, {'storage': 'manifest-bound-lfs', 'git_pointer_sha256': hashlib.sha256(blob).hexdigest(),
+                 'git_pointer_ascii': blob.decode('ascii'), 'oid': oid, 'bytes': size,
+                 'local_object': str(obj), 'local_object_sha256': sha(obj)}
+
+
+def baseline(root, profile_name):
+    spec = EXPECTED[profile_name]
+    BASELINE = Path('firmware/development') / (BASELINE_PREFIX + profile_name)
+    folder = root / BASELINE
+    receipt = load(folder / 'manifest.json')
+    files = set(FIELDS) | {'manifest.json'} | {row['file'] for row in receipt['build_logs']}
+    names = {Path(os.fsdecode(path)).relative_to(BASELINE).as_posix()
+             for path in git(root, 'ls-tree', '-r', '--name-only', '-z', 'HEAD', '--', BASELINE.as_posix()).split(b'\0') if path}
+    require(names == files == {path.relative_to(folder).as_posix() for path in folder.rglob('*') if path.is_file()},
+            'Baseline must be exactly the committed complete export file set')
+    hashes, bindings = {}, {}
+    for name in sorted(files):
+        if name in ('app.bin', 'partition-table.bin'):
+            raw, binding = baseline_binary(root, BASELINE, name, receipt)
+        else:
+            raw = committed(root, BASELINE / name)
+            binding = {'storage': 'raw-git-byte-equal', 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
+        hashes[name] = hashlib.sha256(raw).hexdigest()
+        bindings[name] = binding
+    require(receipt['build_check'] == 'PASS' and receipt['source_dirty'] is False and not receipt['source_untracked'], 'Unqualified baseline')
+    require(receipt['target'] == 'esp32' and receipt['backend'] == spec['backend'] and receipt['variant'] == BASELINE.name, 'Wrong baseline profile')
+    for name, field in FIELDS.items():
+        require(hashes[name] == receipt[field], 'Baseline export hash mismatch: ' + name)
+    for row in receipt['build_logs']:
+        require(hashes[row['file']] == row['sha256'], 'Baseline log changed')
+    config = load(folder / 'sdkconfig.json')
+    require(MPI not in config, 'Baseline must predate the new MPI option')
+    require(config.get('YORADIO_TLS_INPUT_RECLAIM') is True and config.get('YORADIO_HTTP_REQUEST_BUFFER_RELEASE') is True, 'Baseline reclaim/HTTP must remain enabled')
+    backend_key = {'pdm': 'YORADIO_NATIVE_AUDIO_OUTPUT_PDM', 'continuous': 'YORADIO_NATIVE_AUDIO_OUTPUT_DAC', 'legacy': 'YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC'}
+    require(config.get(backend_key[spec['backend']]) is True and all(config.get(value) is False for key, value in backend_key.items() if key != spec['backend']), 'Baseline backend mismatch')
+    require(config.get('YORADIO_FLAC_DECODER_CUSTOM') is spec['custom_flac'] and config.get('YORADIO_FLAC_DECODER_ESPRESSIF') is (not spec['custom_flac']), 'Baseline codec selector mismatch')
+    return receipt, config, hashes, bindings
+
+
+def evidence(root):
+    return {str((root / name).resolve()): hashlib.sha256(committed(root, Path(name))).hexdigest() for name in EVIDENCE}
+
+
+def task_bindings(root, old_commit):
+    result = {}
+    for name in ('app_main.c', 'audio_service.c', 'network_runtime.c'):
+        relative = (PROJECT / 'main' / name).as_posix()
+        old = git(root, 'show', old_commit + ':' + relative).decode().replace('\r\n', '\n')
+        new = git(root, 'show', 'HEAD:' + relative).decode().replace('\r\n', '\n')
+        calls = lambda text: re.findall(r'\bxTaskCreatePinnedToCore\([^;]+;', text, re.S)
+        require(calls(old) == calls(new) and calls(new), 'Task calls changed since reclaim-PDM baseline: ' + name)
+        value = {'calls': calls(new), 'live_sha256': sha(root / relative)}
+        if name == 'audio_service.c':
+            table = lambda text: re.search(r'static const pipeline_task_t task_config\[3\] = \{(.*?)\n    \};', text, re.S).group(1)
+            require(table(old) == table(new), 'Three audio owner task profiles changed')
+            value['three_owner_table'] = table(new)
+        result[relative] = value
+    relative = (PROJECT / 'main/board_config.h').as_posix()
+    require(git(root, 'show', old_commit + ':' + relative) == git(root, 'show', 'HEAD:' + relative), 'Board config changed since baseline')
+    result[relative] = {'live_sha256': sha(root / relative), 'git_blob_bytes_unchanged': True}
+    return result
+
+
+def profile_contract(root, campaign, rows):
+    require(len(rows) == 5 and {row['name'] for row in rows} == set(EXPECTED), 'Exactly five named remaining profiles required')
+    build_root = root / '.build/em-sdk-01'
+    require(build_root.resolve() == build_root, 'Short build root must not redirect')
+    for row in rows:
+        spec = EXPECTED[row['name']]
+        require(type(row['enabled']) is bool and row['enabled'] is True and row['variant'] == PREFIX + row['name'], 'Profile identity mismatch')
+        require(type(row['custom_flac']) is bool and row['custom_flac'] is spec['custom_flac'] and row['backend'] == spec['backend'], 'Backend/codec profile mismatch')
+        require(Path(row['baseline']) == root / 'firmware/development' / (BASELINE_PREFIX + row['name']), 'Matching committed baseline required')
+        require(Path(row['build_directory']) == build_root / spec['tag'] / 'build', 'Exact short build path required')
+        require(Path(row['sdkconfig']) == Path(row['build_directory']) / 'sdkconfig', 'Wrong isolated sdkconfig')
+        require(Path(row['output_directory']) == root / 'firmware/development' / row['variant'], 'Wrong development variant')
+    for key in ('name', 'variant', 'build_directory', 'sdkconfig', 'output_directory'):
+        require(len({str(row[key]).casefold() for row in rows}) == 5, 'Duplicate profile ' + key)
+
+
+def parser(phase):
+    p = argparse.ArgumentParser(description=__doc__ + '\nPhase: ' + phase)
+    p.add_argument('--campaign', type=Path, default=HERE / 'campaign-01')
+    if phase == 'prepare':
+        p.add_argument('--repository', type=Path, default=DEFAULT_ROOT)
+        p.add_argument('--dependency-root', type=Path)
+        p.add_argument('--powershell', type=Path, default=shutil.which('pwsh.exe') or shutil.which('pwsh'))
+        p.add_argument('--expected-head', required=True)
+    else:
+        p.add_argument('--marker-sha256', required=True)
+    args = p.parse_args()
+    args.campaign = args.campaign.resolve()
+    require(args.campaign != HERE and args.campaign.is_relative_to(HERE), 'Campaign must be a new descendant of this isolated prep folder')
+    return args
+
+
+def prepare(args):
+    root = args.repository.resolve()
+    require(re.fullmatch('[0-9a-f]{40}', args.expected_head), 'Explicit full expected HEAD required')
+    dependencies = args.dependency_root or next((base / '.idf' for base in (root, *root.parents) if (base / '.idf/v6.0.2/tools/idf.py').is_file()), None)
+    require(dependencies is not None and args.powershell is not None, 'Specify installed dependency root and PowerShell7')
+    dependencies, powershell = dependencies.resolve(), args.powershell.resolve()
+    require(powershell.is_file() and not args.campaign.exists(), 'Fresh campaign and installed PowerShell7 required')
+    build_root = root / '.build/em-sdk-01'
+    require(not build_root.exists() and build_root.resolve() == build_root, 'Exact short build root must be fresh and not redirected')
+    api = exporter(root)
+    frozen = snapshot(root, api)
+    require(frozen['commit'] == args.expected_head == '1190aebce400375c382a5ad54211e2400f98161d', 'Unexpected frozen checkpoint')
+    for backend in ('pdm', 'continuous', 'legacy'):
+        api.preflight(dependencies, backend)
+    baselines = {name: baseline(root, name) for name in EXPECTED}
+    refs = evidence(root)
+    bindings = {name: task_bindings(root, value[0]['source_commit']) for name, value in baselines.items()}
+    sdk_inputs = sdk(root, dependencies)
+    old_sdk = legacy_sdk(dependencies)
+    previous = previous_gate(root, frozen)
+    global_configs = globals_(root)
+    tools_dir = dependencies / 'tools-v6.0.2/tools'
+    binary = tools_dir / 'xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin'
+    tools = {str(path.resolve()): sha(path) for path in [powershell, Path(sys.executable).resolve(), dependencies / 'python-3.12.10/tools/python.exe', tools_dir / 'cmake/4.0.3/bin/cmake.exe', tools_dir / 'ninja/1.12.1/ninja.exe', *[binary / ('xtensa-esp32-elf-' + name + '.exe') for name in ('gcc', 'nm', 'objdump')]]}
+    scripts = {str((HERE / name).resolve()): sha(HERE / name) for name in SCRIPTS}
+    for name in EXPECTED:
+        require(not (root / 'firmware/development' / (PREFIX + name)).exists(), 'New variant output already exists: ' + name)
+    args.campaign.mkdir(parents=True, exist_ok=False)
+    profiles = []
+    for name, spec in EXPECTED.items():
+        baseline_path = root / 'firmware/development' / (BASELINE_PREFIX + name)
+        initial = (baseline_path / 'sdkconfig').read_bytes()
+        require(not re.search(rb'(?m)^(?:# )?CONFIG_YORADIO_TLS_EARLY_MPI_LOCK(?:=| )', initial), 'Baseline unexpectedly contains MPI config')
+        build = build_root / spec['tag'] / 'build'
+        build.mkdir(parents=True, exist_ok=False)
+        seed = initial + (b'' if initial.endswith(b'\n') else b'\n') + b'CONFIG_YORADIO_TLS_EARLY_MPI_LOCK=y\n'
+        config = build / 'sdkconfig'
+        config.write_bytes(seed)
+        frozen_seed = args.campaign / 'frozen/seeds' / (name + '-sdkconfig')
+        frozen_seed.parent.mkdir(parents=True, exist_ok=True)
+        frozen_seed.write_bytes(seed)
+        profiles.append({'name': name, 'variant': PREFIX + name, 'enabled': True, 'backend': spec['backend'], 'custom_flac': spec['custom_flac'], 'baseline': str(baseline_path), 'build_directory': str(build), 'sdkconfig': str(config), 'output_directory': str(root / 'firmware/development' / (PREFIX + name)), 'initial_seed_sha256': sha(config), 'baseline_sdkconfig_sha256': baselines[name][2]['sdkconfig'], 'frozen_seed': str(frozen_seed)})
+        for relative in baselines[name][2]:
+            target = args.campaign / 'frozen/baselines' / name / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(baseline_path / relative, target)
+        for binary_name in ('app.bin', 'partition-table.bin'):
+            target = args.campaign / 'frozen/baseline-git-pointers' / name / (binary_name + '.lfs')
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(baselines[name][3][binary_name]['git_pointer_ascii'].encode('ascii'))
+    profile_contract(root, args.campaign, profiles)
+    for index, path in enumerate(refs):
+        target = args.campaign / 'frozen/evidence' / str(index) / Path(path).name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+    for path in scripts:
+        target = args.campaign / 'frozen/scripts' / Path(path).name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, target)
+    for filename in ('marker.json', 'profiles.json'):
+        target = args.campaign / 'frozen/previous-pdm' / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root / PREVIOUS_RELATIVE / filename, target)
+    shutil.copyfile(root / PREVIOUS_RELATIVE / 'qualification/report.json', args.campaign / 'frozen/previous-pdm/qualification-report.json')
+    write(args.campaign / 'profiles.json', profiles)
+    baseline_records = {name: {'raw_sha256': value[2], 'commit_bindings': value[3], 'source_commit': value[0]['source_commit']} for name, value in baselines.items()}
+    require(snapshot(root, api) == frozen and evidence(root) == refs and sdk(root, dependencies) == sdk_inputs and legacy_sdk(dependencies) == old_sdk and globals_(root) == global_configs and previous_gate(root, frozen) == previous, 'Preparation input changed')
+    for name in EXPECTED:
+        after = baseline(root, name)
+        require(after[2] == baseline_records[name]['raw_sha256'] and after[3] == baseline_records[name]['commit_bindings'], 'Baseline changed during preparation: ' + name)
+    marker = {'source_snapshot': frozen, 'source_commit': frozen['commit'], 'source_content_sha256': frozen['content_sha256'], 'repository': str(root), 'dependency_root': str(dependencies), 'powershell': str(powershell), 'profiles_sha256': sha(args.campaign / 'profiles.json'), 'baselines': baseline_records, 'evidence': refs, 'scripts_sha256': scripts, 'tools_sha256': tools, 'sdk_source_sha256': sdk_inputs, 'legacy_sdk': old_sdk, 'previous_gate': previous, 'short_build_root': str(build_root), 'global_configs_sha256': global_configs, 'unchanged_task_board_bindings': bindings, 'head_before': frozen['commit'], 'head_after_prepare': git(root, 'rev-parse', 'HEAD').decode().strip(), 'scope': 'Five remaining enabled backend exports plus frozen two-PDM control gate: seven complete vendor/custom x three backends and disabled PDM; physical/radio pre-app/benefit stages remain open', 'frozen_inputs_sha256': {path.relative_to(args.campaign).as_posix(): sha(path) for path in (args.campaign / 'frozen').rglob('*') if path.is_file()}}
+    write(args.campaign / 'marker.json', marker)
+    print(json.dumps({'prepared': 5, 'source_commit': frozen['commit'], 'marker_sha256': sha(args.campaign / 'marker.json'), 'campaign': str(args.campaign), 'short_build_root': str(build_root), 'build_or_export_executed': False}, indent=2))
+
+
+def check(args):
+    campaign = args.campaign
+    require(sha(campaign / 'marker.json') == args.marker_sha256, 'Frozen marker hash changed')
+    marker = load(campaign / 'marker.json')
+    root = Path(marker['repository'])
+    api = exporter(root)
+    require(snapshot(root, api) == marker['source_snapshot'], 'Complete exporter source snapshot/HEAD changed')
+    require(sha(campaign / 'profiles.json') == marker['profiles_sha256'], 'Profile list changed')
+    rows = load(campaign / 'profiles.json')
+    profile_contract(root, campaign, rows)
+    for group in ('scripts_sha256', 'tools_sha256', 'sdk_source_sha256'):
+        require(all(sha(path) == value for path, value in marker[group].items()), 'Frozen ' + group + ' changed')
+    require(all(sha(campaign / path) == value for path, value in marker['frozen_inputs_sha256'].items()), 'Frozen payload changed')
+    require(sdk(root, Path(marker['dependency_root'])) == marker['sdk_source_sha256'] and legacy_sdk(Path(marker['dependency_root'])) == marker['legacy_sdk'], 'SDK source/commit changed')
+    require(globals_(root) == marker['global_configs_sha256'] and evidence(root) == marker['evidence'], 'Global configs/evidence changed')
+    require(previous_gate(root, marker['source_snapshot']) == marker['previous_gate'], 'Original PDM gate marker changed')
+    for row in rows:
+        current = baseline(root, row['name'])
+        expected = marker['baselines'][row['name']]
+        require(current[2] == expected['raw_sha256'] and current[3] == expected['commit_bindings'], 'Committed baseline changed')
+        require(task_bindings(root, expected['source_commit']) == marker['unchanged_task_board_bindings'][row['name']], 'Task/board bindings changed')
+        require(sha(row['frozen_seed']) == row['initial_seed_sha256'], 'Immutable initial seed changed')
+    return marker, root, api, rows
+
+
+def run(args):
+    marker, root, api, rows = check(args)
+    attempt = args.campaign / 'run'
+    require(not attempt.exists(), 'Run output exists; preserve it and review failures rather than overwrite evidence')
+    for row in rows:
+        require(sha(row['sdkconfig']) == row['initial_seed_sha256'], 'Prepared initial config changed')
+        require(not Path(row['output_directory']).exists() and not (Path(row['build_directory']) / 'CMakeCache.txt').exists(), 'Fresh output/GCC directory required')
+    attempt.mkdir()
+    state = {'passed': False, 'exports_complete': False, 'full_qualification_pending': True, 'profiles': [],
+             'source_commit': marker['source_commit'], 'marker_sha256': args.marker_sha256}
+    try:
+        for row in rows:
+            check(args)
+            folder = attempt / row['name']
+            folder.mkdir()
+            invocation = {'schema': 'early-mpi-backend-export-v1', 'backend': row['backend'], 'repository': str(root),
+                          'dependency_root': marker['dependency_root'], 'build_directory': row['build_directory'],
+                          'sdkconfig': row['sdkconfig'], 'variant': row['variant'],
+                          'output_directory': row['output_directory'], 'evidence': list(marker['evidence'])}
+            write(folder / 'invocation.json', invocation)
+            # A frozen PS shim creates the string[] inside PowerShell. Native
+            # -File argument binding must not flatten the four evidence paths.
+            command = [marker['powershell'], '-NoLogo', '-NoProfile', '-NonInteractive', '-File',
+                       str(args.campaign / 'frozen/scripts/export-one.ps1'), '-Invocation', str(folder / 'invocation.json')]
+            require(not any(value in command for value in ('-AllowDirty', '--allow-dirty', '-Setup')), 'Forbidden build override')
+            write(folder / 'command.json', command)
+            env = environment()
+            env.update(TEMP=str(folder), TMP=str(folder), IDF_TOOLCHAIN='gcc')
+            # No constructed shell text or visible windows. The existing wrapper
+            # owns its ordinary exporter/build child and saves production images.
+            with (folder / 'stdout.log').open('wb') as stdout, (folder / 'stderr.log').open('wb') as stderr:
+                done = subprocess.run(command, cwd=root, env=env, stdout=stdout, stderr=stderr,
+                                      creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0)
+            state['profiles'].append({'name': row['name'], 'exit_status': done.returncode,
+                                      'stdout_sha256': sha(folder / 'stdout.log'), 'stderr_sha256': sha(folder / 'stderr.log')})
+            write(attempt / 'report.json', state)
+            require(done.returncode == 0, 'Production wrapper failed: ' + row['name'])
+            check(args)
+        state.update(passed=True, exports_complete=True, head_after=git(root, 'rev-parse', 'HEAD').decode().strip())
+        write(attempt / 'report.json', state)
+        print('Five exports finished; run qualify.py with the same campaign and marker hash.')
+    except BaseException as error:
+        state['error'] = type(error).__name__ + ': ' + str(error)
+        write(attempt / 'report.json', state)
+        raise
+
+
+def symbols(text):
+    result = {}
+    for line in text.splitlines():
+        fields = line.split()
+        if len(fields) == 4:
+            result[fields[3]] = {'address': int(fields[0], 16), 'bytes': int(fields[1], 16), 'type': fields[2]}
+    return result
+
+
+def pointer(raw, address):
+    phoff = struct.unpack_from('<I', raw, 28)[0]
+    size, count = struct.unpack_from('<HH', raw, 42)
+    segments = [struct.unpack_from('<8I', raw, phoff + index * size) for index in range(count)]
+    segment = next(row for row in segments if row[0] == 1 and row[2] <= address <= row[2] + row[4] - 4)
+    return struct.unpack_from('<I', raw, segment[1] + address - segment[2])[0]
+
+
+def config_delta(before, after, labels=('previous', 'current')):
+    return {key: {labels[0]: before.get(key), labels[1]: after.get(key)} for key in sorted(set(before) | set(after))
+            if key not in before or key not in after or type(before[key]) is not type(after[key]) or before[key] != after[key]}
+
+
+def call_trace(text, raw, syms):
+    """Decode direct calls and l32r/callx longcalls from the actual ELF bytes.
+
+    Unknown indirect targets stay unknown, never silently disappear. Register
+    knowledge is conservatively discarded on other destinations and on calls.
+    """
+    registers = {}
+    calls = []
+    for line in text.splitlines():
+        match = re.match(r'^\s*([0-9a-f]+):\s+[0-9a-f]+\s+(\S+)\s*(.*)$', line)
+        if not match:
+            continue
+        pc, opcode, operands = match.groups()
+        if opcode == 'l32r':
+            operand = re.match(r'(a\d+),\s*([0-9a-f]+)', operands)
+            if operand:
+                register, literal = operand.groups()
+                registers[register] = (pointer(raw, int(literal, 16)), int(literal, 16))
+        elif re.fullmatch(r'call(?:0|4|8|12)', opcode):
+            target = int(re.match(r'([0-9a-f]+)', operands)[1], 16)
+            calls.append({'pc': int(pc, 16), 'target': target, 'kind': 'direct',
+                          'symbols': [name for name, value in syms.items() if value['address'] == target]})
+            registers.clear()
+        elif re.fullmatch(r'callx(?:0|4|8|12)', opcode):
+            register = operands.split(',')[0].strip()
+            target, literal = registers.get(register, (None, None))
+            calls.append({'pc': int(pc, 16), 'target': target, 'kind': 'indirect', 'literal': literal,
+                          'symbols': [name for name, value in syms.items() if value['address'] == target]})
+            registers.clear()
+        else:
+            register = operands.split(',')[0].strip()
+            registers.pop(register, None)
+    return calls
+
+
+def validate_image(data):
+    require(data[0] == 0xe9 and data[23] == 1 and struct.unpack_from('<H', data, 12)[0] == 0, 'Invalid ESP32 image header')
+    pos, checksum = 24, 0xef
+    for _ in range(data[1]):
+        size = struct.unpack_from('<I', data, pos + 4)[0]
+        pos += 8
+        require(size > 0 and pos + size <= len(data), 'Invalid image segment')
+        for value in data[pos:pos + size]:
+            checksum ^= value
+        pos += size
+    end = ((pos + 16) // 16) * 16 - 1
+    require(len(data) == end + 33 and data[end] == checksum, 'Image checksum/size mismatch')
+    require(hashlib.sha256(data[:end + 1]).digest() == data[end + 1:], 'Image appended digest mismatch')
+
+
+def qualify(args):
+    marker, root, api, rows = check(args)
+    terminal = load(args.campaign / 'run/report.json')
+    require(terminal['passed'] is True and terminal['exports_complete'] is True and
+            terminal['source_commit'] == marker['source_commit'] and terminal['head_after'] == marker['source_commit'],
+            'All five SDK exporter processes must have completed at the frozen HEAD')
+    require(len(terminal['profiles']) == 5 and {entry['name'] for entry in terminal['profiles']} == set(EXPECTED)
+            and all(entry['exit_status'] == 0 for entry in terminal['profiles']), 'Exact five terminal exit0 exporter processes required')
+    qualification_inputs = {str(args.campaign / 'run/report.json'): sha(args.campaign / 'run/report.json')}
+    for entry in terminal['profiles']:
+        for label in ('stdout', 'stderr'):
+            path = args.campaign / 'run' / entry['name'] / (label + '.log')
+            require(sha(path) == entry[label + '_sha256'], 'Terminal exporter log changed')
+            qualification_inputs[str(path)] = sha(path)
+    out = args.campaign / 'qualification'
+    require(not out.exists(), 'Fresh qualification output required')
+    out.mkdir()
+    report = {'passed': False, 'scope': marker['scope'], 'physical_tested': False,
+              'source_commit': marker['source_commit'], 'marker_sha256': args.marker_sha256, 'images': []}
+    configs = {}
+    try:
+        for row in rows:
+            check(args)
+            baseline_receipt, previous, _, _ = baseline(root, row['name'])
+            folder = Path(row['output_directory'])
+            receipt = load(folder / 'manifest.json')
+            require(receipt['source_commit'] == marker['source_commit'] and receipt['source_dirty'] is False and not receipt['source_untracked'], 'Receipt source identity')
+            require(receipt['source_content_sha256'] == marker['source_content_sha256'] and receipt['source_excluded_paths'] == marker['source_snapshot']['excluded_paths'], 'Receipt complete source identity')
+            require(receipt['source_git_dirty'] is False and receipt['source_git_dirty_after_build'] is False, 'Receipt Git dirty state')
+            require(receipt['variant'] == row['variant'] and receipt['backend'] == row['backend'] and receipt['target'] == 'esp32', 'Receipt profile')
+            require(Path(receipt['build_directory']) == Path(row['build_directory']) and receipt['build_check'] == 'PASS' and receipt['physical_tested'] is False, 'Receipt build identity')
+            require(len(receipt['evidence']) == 4 and {entry['path']: entry['sha256'] for entry in receipt['evidence']} == marker['evidence'], 'Exact four frozen evidence bindings')
+            seed = receipt['sdkconfig_seed']
+            require(seed['mode'] == 'existing-isolated-config' and seed['source_sha256'] == row['initial_seed_sha256'] and Path(seed['source_path']) == Path(row['sdkconfig']), 'Actual initial seed SHA/path')
+            require(seed['time_capacity']['changed'] is False and seed['time_capacity']['previous'] == 2, 'Unexpected SNTP seed change')
+            for name, key in FIELDS.items():
+                require(sha(folder / name) == receipt[key], 'Export payload hash: ' + name)
+            for entry in receipt['build_logs']:
+                require(sha(folder / entry['file']) == entry['sha256'], 'Build log changed')
+            build = Path(row['build_directory'])
+            current = api.qualify(root, build, Path(marker['dependency_root']), row['backend'], marker['source_snapshot'], Path(row['sdkconfig']))
+            require(current['details']['elf_sha256'] == receipt['elf_sha256'] and current['details']['app_sha256'] == receipt['app_sha256'], 'Actual linked ELF/app mismatch')
+            require(receipt['build_command'] == api.build_command(root, Path(marker['dependency_root']), build, Path(row['sdkconfig']), row['backend'], marker['powershell']), 'Exporter used unexpected build command')
+            config = load(folder / 'sdkconfig.json')
+            require(type(config.get(MPI)) is bool and config[MPI] is row['enabled'], 'MPI value must be the exact requested bool')
+            delta = config_delta(previous, config)
+            require(delta == {MPI: {'previous': None, 'current': row['enabled']}}, 'Strict baseline-to-export config scope leakage: ' + str(delta))
+            require(config.get('YORADIO_TLS_INPUT_RECLAIM') is True and config.get('YORADIO_HTTP_REQUEST_BUFFER_RELEASE') is True and not config.get('FREERTOS_UNICORE'), 'Reclaim/HTTP/dual-core contract')
+            configs[row['name']] = config
+            image = (folder / 'app.bin').read_bytes()
+            validate_image(image)
+            slots = api.partition_slots((folder / 'partition-table.bin').read_bytes(), 0x400000)
+            require(slots == baseline_receipt['ota_slots'] and min(slot['bytes'] for slot in slots) == 0x1b0000 and all(len(image) <= slot['bytes'] for slot in slots), 'OTA capacity/profile changed')
+            require(receipt['partition_table_sha256'] == baseline_receipt['partition_table_sha256'], 'Partition table changed')
+            desc = load(build / 'project_description.json')
+            elf = build / desc['app_elf']
+            raw = elf.read_bytes()
+            require(raw[:6] == b'\x7fELF\x01\x01' and struct.unpack_from('<H', raw, 18)[0] == 94, 'Not actual Xtensa ELF')
+            actual_inputs = [elf, build / desc['app_bin'], build / 'compile_commands.json', build / 'build.ninja',
+                             build / 'project_description.json', build / 'config/sdkconfig.json', Path(row['sdkconfig']),
+                             *[path for path in folder.rglob('*') if path.is_file()]]
+            for path in actual_inputs:
+                qualification_inputs[str(path)] = sha(path)
+            tools = Path(desc['c_compiler']).parent
+            folder_out = out / row['name']
+            folder_out.mkdir()
+            def tool(label, command):
+                done = subprocess.run(list(map(str, command)), env=environment(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30)
+                (folder_out / (label + '.log')).write_bytes(done.stdout)
+                require(done.returncode == 0, 'Read-only ELF tool failed: ' + label)
+                return done.stdout.decode(errors='replace')
+            syms = symbols(tool('nm', [tools / 'xtensa-esp32-elf-nm.exe', '-S', '--defined-only', elf]))
+            require(('native_tls_early_mpi_prepare' in syms) is row['enabled'], 'MPI symbol on/off mismatch')
+            for name in ('__wrap_esp_mbedtls_mem_calloc', 'native_input_reclaim_bind', 'esp_mbedtls_mem_calloc', 'esp_mbedtls_mem_free', 'mbedtls_calloc_func', 'mbedtls_free_func', 'yoradio_http_client_release_request_buffer'):
+                require(name in syms, 'Required preserved symbol missing: ' + name)
+            require('__wrap_esp_mbedtls_mem_free' not in syms and not any(name.startswith('tls_large_reserve_') for name in syms), 'Allocator/free ownership changed')
+            require(('custom_flac_decoder_feed' in syms) is row['custom_flac'] and ('esp_flac_dec_register' in syms) is (not row['custom_flac']), 'Vendor/custom profile changed')
+            routes = {}
+            for name, expected in [('mbedtls_calloc_func', '__wrap_esp_mbedtls_mem_calloc'), ('mbedtls_free_func', 'esp_mbedtls_mem_free')]:
+                require(syms[name]['bytes'] == 4 and pointer(raw, syms[name]['address']) == syms[expected]['address'], 'Actual SDK allocator pointer pairing changed')
+                routes[name] = {'address': syms[name]['address'], 'value': pointer(raw, syms[name]['address']), 'expected': expected}
+            app_asm = tool('app-main', [tools / 'xtensa-esp32-elf-objdump.exe', '-dwC', '--disassemble=app_main', elf])
+            calls = call_trace(app_asm, raw, syms)
+            require(calls, 'Actual app_main call trace is empty')
+            if row['enabled']:
+                require(calls[0]['target'] == syms['native_tls_early_mpi_prepare']['address'], 'MPI must be the first actual app_main call, before log/health/state/NVS')
+                body = tool('mpi-body', [tools / 'xtensa-esp32-elf-objdump.exe', '-dwC', '--disassemble=native_tls_early_mpi_prepare', elf])
+                body_calls = call_trace(body, raw, syms)
+                require([entry['target'] for entry in body_calls] == [syms[name]['address'] for name in ('esp_crypto_mpi_lock_acquire', 'esp_crypto_mpi_lock_release')], 'MPI must use exactly one ordinary public acquire/release pair')
+            if row['backend'] == 'pdm':
+                for name in ('pdm_completion_queue_drop', 'native_output_metrics_queue_drop'):
+                    require(name in syms and 0x40080000 <= syms[name]['address'] < 0x400a0000, 'PDM callback/metrics hook left IRAM: ' + name)
+            for name, size in [('s_output_metrics', 64), ('s_output_metrics_lock', 8)]:
+                require(name in syms and syms[name]['bytes'] == size and 0x3ff80000 <= syms[name]['address'] < 0x40000000, 'Metrics storage changed: ' + name)
+            compile_rows = load(build / 'compile_commands.json')
+            require(not any(Path(entry['file']).resolve().is_relative_to(root / PROJECT / 'main/vorbis_repair') for entry in compile_rows), 'Unwired production Vorbis bridge leaked into backend gate')
+            mpi_rows = [entry for entry in compile_rows if Path(entry['file']).name == 'native_tls_early_mpi.c']
+            require(len(mpi_rows) == int(row['enabled']), 'Actual MPI whole-TU compile count')
+            for entry in mpi_rows:
+                require(Path(entry['file']).resolve() == root / PROJECT / 'main/native_tls_early_mpi.c' and 'xtensa-esp32-elf-gcc' in entry['command'], 'MPI must compile canonical production source with actual GCC flags')
+            reclaim_rows = [entry for entry in compile_rows if Path(entry['file']).name == 'native_input_reclaim.c']
+            require(len(reclaim_rows) == 1 and Path(reclaim_rows[0]['file']).resolve() == root / PROJECT / 'main/native_input_reclaim.c', 'Reclaim module changed')
+            ninja = (build / 'build.ninja').read_text()
+            require('--wrap=esp_mbedtls_mem_calloc' in ninja and '--undefined=__wrap_esp_mbedtls_mem_calloc' in ninja and '--wrap=esp_mbedtls_mem_free' not in ninja, 'Actual allocator link ownership changed')
+            require('--wrap=esp_vorbis_dec_open' not in ninja, 'Unexpected production Vorbis wrap option')
+            overlay = [entry for entry in compile_rows if 'native-http-request-buffer' in entry['file'] and Path(entry['file']).name == 'esp_http_client.c']
+            require(len(overlay) == 1 and 'xtensa-esp32-elf-gcc' in overlay[0]['command'], 'Expected one actual SDK HTTP overlay TU')
+            patcher = module(root / 'tools/patch_cyd_http_request_buffer.py', 'early_mpi_http_audit_patch')
+            original = Path(marker['dependency_root']) / 'v6.0.2/components/esp_http_client/esp_http_client.c'
+            require(Path(overlay[0]['file']).read_bytes() == patcher.patch(original.read_bytes()), 'HTTP overlay differs from canonical audited patch')
+            warnings = [line for entry in receipt['build_logs'] for line in (folder / entry['file']).read_text(errors='replace').splitlines() if re.search(r'\bwarning:', line)]
+            tolerated = [line for line in warnings if line.startswith('warning:  Failed to clean temp activation directory with file ') and '[WinError 2]' in line]
+            actual_warnings = [line for line in warnings if line not in tolerated]
+            if row['backend'] == 'legacy':
+                require(len(actual_warnings) in (0, 3) and all(re.search(r"periph_rtc_apll_(?:freq_set|acquire|release)' is deprecated", line) and '/v5.5.4/components/driver/deprecated/i2s_legacy.c:' in line.replace('\\', '/') for line in actual_warnings), 'Unexpected legacy warning')
+                if actual_warnings:
+                    require({re.search(r"periph_rtc_apll_(freq_set|acquire|release)' is deprecated", line)[1] for line in actual_warnings} == {'freq_set', 'acquire', 'release'}, 'Legacy warnings must name each known function exactly once')
+            else:
+                require(actual_warnings == [], 'Unexpected compiler/build warning')
+            report['images'].append({'variant': row['variant'], 'backend': row['backend'], 'custom_flac': row['custom_flac'], 'enabled': row['enabled'], 'elf_machine': 94,
+                                     'app_bytes': len(image), 'ota_free_bytes': min(slot['bytes'] for slot in slots) - len(image),
+                                     'app_sha256': sha(folder / 'app.bin'), 'elf_sha256': sha(elf), 'manifest_sha256': sha(folder / 'manifest.json'),
+                                     'baseline_config_delta': delta, 'sdk_allocator_pointer_routes': routes,
+                                     'mpi_compile_rows': mpi_rows, 'reclaim_compile_rows': reclaim_rows, 'http_overlay_compile_row': overlay[0],
+                                     'actual_app_main_calls': calls, 'symbol_logs': {p.name: sha(p) for p in folder_out.glob('*.log')},
+                                     'sdk_environment_warnings': tolerated, 'compiler_warnings': actual_warnings,
+                                     'cmake_warning_inventory': cmake_warnings(folder, receipt)})
+            write(out / 'report.json', report)
+            check(args)
+        require(len(report['images']) == 5 and {entry['variant'] for entry in report['images']} == {PREFIX + name for name in EXPECTED}, 'Exact five unique qualified images required')
+        previous_report = compose_previous(root, marker, report['images'])
+        qualification_inputs.update(previous_report['qualification_inputs_sha256'])
+        check(args)
+        require(all(sha(path) == value for path, value in qualification_inputs.items()), 'Actual qualification payload changed while reading ELF/images/config/logs')
+        report.update(passed=True, full_seven_matrix=previous_report['matrix'], previous_pdm_qualification=previous_report['provenance'], head_after=git(root, 'rev-parse', 'HEAD').decode().strip(),
+                      all_bound_inputs_current=True, qualification_inputs_sha256=qualification_inputs,
+                      all_backend_qualification=True, physical_qualification=False)
+        write(out / 'report.json', report)
+        print(json.dumps({'passed': True, 'images': 5, 'full_matrix_images': 7, 'report_sha256': sha(out / 'report.json'), 'scope': marker['scope']}, indent=2))
+    except BaseException as error:
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        write(out / 'report.json', report)
+        raise
+
+
+
+def legacy_sdk(dependencies):
+    path = dependencies / 'v5.5.4'
+    require(git(path, 'rev-parse', 'HEAD').decode().strip() == LEGACY_COMMIT, 'Wrong legacy driver source commit')
+    require(not git(path, 'status', '--porcelain', '--untracked-files=no').strip(), 'Legacy SDK source is dirty')
+    names = ('components/driver/deprecated/i2s_legacy.c', 'components/hal/esp32/include/hal/i2s_ll.h', 'tools/cmake/version.cmake')
+    return {'commit': LEGACY_COMMIT, 'source_sha256': {str(path / name): sha(path / name) for name in names}}
+
+
+def previous_gate(root, source):
+    folder = root / PREVIOUS_RELATIVE
+    require(sha(folder / 'marker.json') == PREVIOUS_MARKER_SHA, 'Frozen original PDM marker changed')
+    marker = load(folder / 'marker.json')
+    require(marker['source_snapshot'] == source and marker['source_commit'] == source['commit'], 'Both gates must use the same complete source snapshot')
+    require(sha(folder / 'profiles.json') == marker['profiles_sha256'], 'Original PDM profiles changed')
+    profiles = load(folder / 'profiles.json')
+    require(len(profiles) == 2 and {row['variant'] for row in profiles} == {PREFIX + 'pdm', PREFIX + 'disabled-pdm'}, 'Original two PDM profiles required')
+    require(all(row['backend'] == 'pdm' and type(row['enabled']) is bool and row['enabled'] is (row['variant'] == PREFIX + 'pdm') for row in profiles), 'Original PDM control identity')
+    for path, value in marker['scripts_sha256'].items():
+        require(sha(path) == value, 'Original PDM script changed')
+    require(all(sha(folder / path) == value for path, value in marker['frozen_inputs_sha256'].items()), 'Original PDM frozen payload changed')
+    qpath = folder / 'qualification/report.json'
+    require(sha(qpath) == PREVIOUS_QUALIFICATION_SHA, 'Exact completed original PDM qualification changed')
+    qualified = load(qpath)
+    require(qualified['passed'] is True and qualified['all_bound_inputs_current'] is True and qualified['source_commit'] == source['commit'] and qualified['head_after'] == source['commit'] and qualified['marker_sha256'] == PREVIOUS_MARKER_SHA, 'Original PDM qualification incomplete or unbound')
+    require(len(qualified['images']) == 2 and {row['variant'] for row in qualified['images']} == {PREFIX + 'pdm', PREFIX + 'disabled-pdm'}, 'Exact two qualified original PDM images required')
+    inputs = dict(qualified['qualification_inputs_sha256'])
+    inputs[str(qpath)] = PREVIOUS_QUALIFICATION_SHA
+    inventory = {}
+    for profile in profiles:
+        image = next(row for row in qualified['images'] if row['variant'] == profile['variant'])
+        require(type(image['enabled']) is bool and image['enabled'] is profile['enabled'], 'Original qualified on/off identity')
+        for filename, expected in image['symbol_logs'].items():
+            inputs[str(folder / 'qualification' / profile['name'] / filename)] = expected
+        output = Path(profile['output_directory'])
+        receipt = load(output / 'manifest.json')
+        inventory[profile['name']] = {'cmake': cmake_warnings(output, receipt), 'sdk_environment': image['sdk_environment_warnings']}
+    require(all(sha(path) == expected for path, expected in inputs.items()), 'Original qualified input changed before composition')
+    return {'campaign': str(folder), 'marker_sha256': PREVIOUS_MARKER_SHA, 'profiles_sha256': marker['profiles_sha256'],
+            'qualification_sha256': PREVIOUS_QUALIFICATION_SHA, 'qualification_inputs_sha256': inputs,
+            'warning_inventory': inventory}
+
+
+def cmake_warnings(folder, receipt):
+    """Preserve CMake warning blocks separately from compiler diagnostics."""
+    result = []
+    for entry in receipt['build_logs']:
+        path = folder / entry['file']
+        lines = path.read_text(errors='replace').splitlines()
+        for index, line in enumerate(lines):
+            if line.startswith('CMake Warning'):
+                end = index + 1
+                while end < len(lines) and (not lines[end].strip() or lines[end][0].isspace() or lines[end].startswith('Call Stack ')):
+                    end += 1
+                result.append({'path': str(path), 'line': index + 1, 'block': '\n'.join(lines[index:end]).rstrip(), 'log_sha256': sha(path)})
+    return result
+
+
+def compose_previous(root, marker, new_images):
+    bound = previous_gate(root, marker['source_snapshot'])
+    require(bound == marker['previous_gate'], 'Original qualification differs from immutable preparation binding')
+    folder = root / PREVIOUS_RELATIVE
+    qpath = folder / 'qualification/report.json'
+    original_sha = sha(qpath)
+    require(original_sha == PREVIOUS_QUALIFICATION_SHA == marker['previous_gate']['qualification_sha256'], 'Original report is not the exact prepared completed qualification')
+    value = load(qpath)
+    require(value['passed'] is True and value['all_bound_inputs_current'] is True and value['source_commit'] == marker['source_commit'] and value['marker_sha256'] == PREVIOUS_MARKER_SHA, 'Original PDM qualification not complete/bound')
+    require(len(value['images']) == 2 and {row['variant'] for row in value['images']} == {PREFIX + 'pdm', PREFIX + 'disabled-pdm'}, 'Exact two qualified original images required')
+    inputs = dict(value['qualification_inputs_sha256'])
+    inputs[str(qpath)] = original_sha
+    for path, expected in inputs.items():
+        require(sha(path) == expected, 'Original qualified application payload changed: ' + path)
+    for name in ('on', 'off'):
+        image = next(row for row in value['images'] if row['variant'] == PREFIX + ('pdm' if name == 'on' else 'disabled-pdm'))
+        require(image['enabled'] is (name == 'on'), 'Original PDM enabled/control mismatch')
+        for filename, expected in image['symbol_logs'].items():
+            path = folder / 'qualification' / name / filename
+            require(sha(path) == expected, 'Original ELF proof log changed')
+            inputs[str(path)] = expected
+    matrix = [dict(row, backend='pdm', custom_flac=False) for row in value['images']] + new_images
+    expected = {PREFIX + name for name in ('pdm', 'continuous', 'legacy', 'custom-flac-pdm', 'custom-flac-continuous', 'custom-flac-legacy', 'disabled-pdm')}
+    require(len(matrix) == 7 and len({row['variant'] for row in matrix}) == 7 and {row['variant'] for row in matrix} == expected, 'Complete seven-image matrix required')
+    enabled = [row for row in matrix if row['enabled'] is True]
+    require(len(enabled) == 6 and {(row['backend'], row['custom_flac']) for row in enabled} == {(backend, custom) for backend in ('pdm', 'continuous', 'legacy') for custom in (False, True)}, 'Vendor/custom x all three backends required')
+    require(sha(qpath) == original_sha, 'Original qualification changed during composition')
+    return {'matrix': matrix, 'qualification_inputs_sha256': inputs,
+            'provenance': {'campaign': str(folder), 'marker_sha256': PREVIOUS_MARKER_SHA, 'qualification_sha256': original_sha,
+                           'warning_inventory': bound['warning_inventory']}}
