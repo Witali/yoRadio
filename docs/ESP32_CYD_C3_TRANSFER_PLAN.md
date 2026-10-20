@@ -99,6 +99,10 @@ allocation и численные настройки C3 являются канд
   ошибочного тестового отождествления pre-handshake MFL getter и размера RX storage.
   Освобождение HTTP GET TX и lifetime-safe reclaim уже реализованы;
   семь production exports reclaim проверены, физический выигрыш ещё не измерен.
+  [Запуск двух полных PDM образов в QEMU](../tests/results/cyd-production-radio-boot-20261020/README.md)
+  завершился nonpass в SDK SPI flash init до `app_main`: reserve ON/OFF дают
+  одинаковый QIE/QIO отказ. Ранняя MPI и radio startup этим не квалифицированы;
+  исходные образы и конфигурации сохранены, аппаратная приёмка остаётся.
 - **Этап 14, Vorbis/Ogg:** завершить [изолированный ESP32 bridge](CYD_VORBIS_TRANSFER_DESIGN.md)
   и подключить к actual audio task после Ogg EOF/reset, allocation failure/reopen,
   concurrent scopes, полной callback ABI и format/conformance проверок. Raw PCM
@@ -679,3 +683,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Архив SDK/Clang проверен автономно из другого каталога, включая все ссылки
   на firmware; manifest SHA256 —
   `8a120ba9329a190d7baf6f3b813bc61224a391101bcbf170b4c1f6dba96a1db1`.
+
+- 2026-10-20, CYD-C3-13/15: [два actual production PDM boot attempts](../tests/results/cyd-production-radio-boot-20261020/README.md)
+  сохранены как nonpass: reserve ON и OFF, controller exit1 при QEMU exit0
+  после guest panic/reboot. Оба доходят до SDK multicore startup/heap и одинаково
+  падают в `init_flash:654` до `app_main` после QIE readback failure. Вывод о
+  несовместимости модели flash/профиля — обоснованная гипотеза; конкретная
+  неудавшаяся transaction не установлена. Ранняя MPI, дисплей, pipeline, сеть и
+  static RX loan не квалифицированы. Input/tool/source и scratch image hashes
+  сохранены; firmware/SDK/model не менялись, физические операции не выполнялись.
+  Manifest SHA256: `7ecef77c3b660efac39241f1a556271f9dbb60c4d08829efbe52e3048d69d5b9`.

@@ -190,6 +190,17 @@ The slot permanently reserves storage. Physical tests must establish its effect
 on TLS allocation, fragmentation, concurrent traffic and playback before any
 default activation or resource-benefit claim. The option remains default-off.
 
+## Complete production-image boot observation
+
+The [PDM reserve ON/OFF boot pair](../tests/results/cyd-production-radio-boot-20261020/README.md)
+uses the exact saved production components without a rebuild or byte patches.
+Both local QEMU attempts remain nonpassing: SDK flash initialization asserts
+before app_main, after a quad-enable status-register readback failure. Neither
+observes the early-MPI call or static RX use. The identical failure boundary
+supports a flash-model/profile compatibility limitation, with the exact failing
+transaction still unproven. The original images/configurations are preserved;
+radio-boot and physical gates remain open.
+
 ## Remaining work
 
 - Finish radio-boot, network-traffic and physical qualification of the
