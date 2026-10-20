@@ -59,15 +59,30 @@ The earlier [frozen proposal](../tests/results/cyd-http-request-buffer-20261020/
 is retained as historical evidence from before implementation. Its status must
 not be read as the current implementation checkpoint.
 
+## Opt-in early MPI mutex initialization
+
+[The early-MPI module](CYD_EARLY_MPI_DESIGN.md) is now called first at
+`app_main` entry through a default-off option. It acquires/releases the existing
+SDK mutex through the public API, preserving its lifetime and all task profiles.
+Whole canonical startup tests pass with strict ASan/UBSan and the real board
+header. The actual SDK/Xtensa fixture passes its two-core case, both exact
+omission controls and the real-heap void-API OOM gate. Independent review found
+and closed a duplicated board constant in the initial host fixture.
+[The immutable qualification archive](../tests/results/cyd-early-mpi-20261020/README.md)
+retains the canonical reports, inputs, controls and review closure.
+Full production exports, actual radio pre-application observation and physical
+benefit/default activation remain open. The source audit below is historical
+evidence from before this implementation, rather than its current status.
+
 ## Remaining work
 
-- Implement and qualify a CYD-specific TLS/full-record RX reservation and early
-  MPI policy after the [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
+- Implement and qualify a CYD-specific TLS/full-record RX reservation after the
+  [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
   CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity
   formula do not apply. Preserve the SDK full-record capacity expression,
   ordinary allocator/free pairing and input reclaim; verify cleanup, OOM,
-  reconnect and concurrent clients. Early MPI requires actual first-use and
-  public-lock observations; the SDK void API does not offer recoverable OOM.
+  reconnect and concurrent clients. Complete the early-MPI full-application and
+  radio-boot gates; its SDK void API does not offer recoverable OOM.
 - Measure internal/DMA heap, largest blocks, TLS peaks, stack margins and
   scheduler latency on CYD with TFT, network and audio active. Select input
   pool sizes, IRAM placement and stack changes from those results.

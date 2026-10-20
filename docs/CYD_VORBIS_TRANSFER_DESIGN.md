@@ -4,7 +4,40 @@ Stage CYD-C3-14 of the [transfer plan](ESP32_CYD_C3_TRANSFER_PLAN.md) remains
 open. The [read-only Xtensa audit](../tests/results/cyd-vorbis-xtensa-audit-20261020/README.md)
 examines the actual installed Espressif 2.6.2 ESP32 archives, rather than
 assuming that the C3 binary layout carries over. It does not execute a decoder
-or qualify a repair. The previously deferred AAC private-owner work is excluded.
+or qualify a repair. A later isolated implementation checkpoint is described
+below. The previously deferred AAC private-owner work is excluded.
+
+## Isolated implementation checkpoint, 2026-10-20
+
+Commit `cbb69fdad` adds the separate ESP32
+[setup/open bridge](../idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c),
+[Ogg adapter](../idf/esp32-cyd2usb-native/main/vorbis_repair/simple.c),
+[output preflight](../idf/esp32-cyd2usb-native/main/vorbis_repair/output.c),
+[typed ABI assertions](../idf/esp32-cyd2usb-native/main/vorbis_repair_abi.h)
+and [exact-archive build guard](../idf/esp32-cyd2usb-native/main/compat/vorbis_repair/enable.cmake).
+These sources are used by the standalone target project; production radio
+registration, Kconfig and the audio task do not enable them yet.
+
+The [frozen qualification archive](../tests/results/cyd-vorbis-bridge-20261020/README.md)
+records actual SDK6.0.2/Xtensa execution of all three canonical translation
+units, with the coordinator on core0 and decoding on core1. For one fixture,
+535 raw audio packets produce 2,112,000 bytes of per-packet exact PCM against
+the original ESP32 ample-buffer decoder. The 1,602 undersized retries preserve
+input consumption and the observed wrapper/DSP/history state. An independent
+variant bypassing preflight fails the exact `rejected_dsp_unchanged` assertion.
+Twenty-one real CMake configurations pass their expected outcomes: three
+accepted and eighteen rejected. Final normalized-source runs are `raw-02`,
+`raw-control-02` and `config-02`; earlier drafts and pre-normalization runs are
+historical evidence only.
+
+This partially exercises G1/G2/G3/G7. It does not close any whole gate: complete
+callback binding, Ogg EOF/reset, allocation failures and reopen, concurrent
+task-local scopes, broader codebook/format coverage, actual audio-task
+integration, final static analysis/application exports and physical resource
+measurements remain. The stripped vendor objects only partly corroborate
+private layouts; compiler assertions and this fixture do not prove every field's
+vendor semantics. Inherited rate/block-size limits remain unqualified against
+the standard. No memory, speed or full conformance claim follows from this run.
 
 ## Entry points and confirmed problems
 
@@ -44,6 +77,12 @@ allocation counts and performance measurements are not CYD evidence.
 
 ## Required qualification
 
+The format requirements use the primary
+[Vorbis I specification](https://xiph.org/vorbis/doc/Vorbis_I_spec.html) and
+[Ogg RFC 3533](https://www.rfc-editor.org/rfc/rfc3533), consulted 2026-10-20.
+Embedded-profile omissions require an explicit allowance in the specification;
+an inherited vendor or donor limit alone does not establish conformance.
+
 - **G1 — ABI/link:** whole repair translation units on SDK 6.0.2/Xtensa, all
   asserted fields, machine94, both cores, correct operation tables and exact
   negative build guards.
@@ -72,7 +111,8 @@ allocation counts and performance measurements are not CYD evidence.
   actual task stack/CPU and heap/largest-block measurements, HTTP/HTTPS and
   prolonged radio playback on CYD.
 
-All eight gates are unrun by the read-only audit. Existing CYD registration
+The read-only audit did not run these gates; the later isolated checkpoint above
+partially exercises four of them. Existing CYD registration
 rollback, independent PCM ownership and terminal cleanup are reused, with new
 regressions where coverage is missing. AAC compact-owner adaptation remains a
 separate stage-14 work item; the deferred AAC item stays explicitly deferred.

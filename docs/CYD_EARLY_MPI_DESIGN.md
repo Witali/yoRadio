@@ -59,6 +59,11 @@ production module bytes and production Kconfig snapshot. The target report's
 execute the radio application's services. It does not mean that an alternate
 module implementation was tested.
 
+The [qualification archive](../tests/results/cyd-early-mpi-20261020/README.md)
+retains the final canonical reports, exact source snapshots, independent review
+closure and an offline hash verifier. Historical prototype and initial host
+results are labelled separately from current canonical evidence.
+
 Full application exports, actual radio pre-application observation and physical
 CYD memory/boot/audio qualification remain separate gates. The minimal SDK
 fixture does not establish that the full radio firmware has the same
