@@ -1,0 +1,226 @@
+{
+  "scope": "Read-only N5 integration preparation. No production/test/docs/Git edits, builds, flashing or deferred AAC changes. Proposed names below are an integration design, not implemented behavior.",
+  "reviewed_utc": "2026-10-19T14:59:27.105143+00:00",
+  "source_commit": "489c9f81977b3bbfa6beb93c63988bc05b5b5c45",
+  "sources_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_settings.c": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_settings.h": "fc7c79da8fb40872fb36a43c9bfdc32015a2aa4e74b2232a5925e649ff8d24b6",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_runtime.c": "cfa7936e561a6ea3b7a9d297ccd215d2840a15126416650feb2c9fdf3ce777ce",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_runtime.h": "44906b5208143021f3f2f42699545c2e96a3b0c2dceb96e6b8b9ace35433fd72",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_service.c": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_service.h": "ea2b158159975a6bd13963eb461bbb39269f91e9910388d9d8a0916b162e5b2d",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_status.h": "8b4df7ee6080ede9761c0f51b5c098c376439dd148b9e6ea982b53dfb5226bc8",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": "a633513bdf11cbddcfed23eb0f1998cee1599c99f56c4bff886b217e9285e5b3",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_service.c": "bf61146aadc64642b7211eabe4aa266db263efc97d3c6a67e50845d7f3379f21",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_pages.cpp": "e8e69d61134ad9d1fcfba3b213a041210fd4f1cd749d5ebffbdcc141d7a98c04",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_time.c": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_time.h": "589ae0577cfd13f2eac4a72bb7b657f3415704307fe732476c68b6589412b612",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_ota.c": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_upload.c": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_wifi.c": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": "7ada1be1060a3dc3c0d89633e3591850668d37e7c49143375cf27ca600849f80",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\CYD_NETWORK_RUNTIME_TRANSFER_DESIGN.md": "4388437ae62d735eac508bf9344158389c35872bef4263e6e14857b99a6b1658",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_network_runtime\\test.c": "cc324346e652fd9e55254a26dade2e36bcdbded29ac39c5bec85936559d1a7e8",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_network_runtime\\platform.c": "77f610449910d1371ddf9207312805e6d4265f38bd11461566bb3b519df1d1a7",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_network_runtime\\platform.h": "db2285b0e7c9e78db161512b28380f029996f1949571fda9dfc95131791d1802",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\reboot_lease_test.c": "d058ef6ca6a61633f0886fa587c4a6f77332e2f97866c19647afc381917d1f29",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_web_time_test.c": "5c008bf657d81e724aebe38bff66f84cb4add988421b7ecdd78c3add61f01dd2",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_web_start_test.c": "763628cf87d23cca981795d61f7fad0dc8fd149d24cb317a7cf1d409d7a0b340",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js": "9311d14cefbeab86ba7e341b17d50944d327dc9001451737017ca91d83170799",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-network-settings.py": "12020d76df58a729085da8f94f88f6ac9e3c098a37d41641eac6a607f39d2760",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-network-runtime.py": "ed804e82de0c2531d8a245090abd4cdea7f2423717e176203998fafe9b20be55",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-reboot-leases.py": "09c2095eaeef0dd32ad0a2dc3981b334d04324d779edc75610f7a3a849e67ffb",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-web-time.py": "ce52850f87807af30e2d4c509f4612cb8f3ac9bd38b121d78adbda5ee3179cbb",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-web-static.py": "04959b19709f4ddd40e039e23139ef6d2d31e4879dff34a0d6ac54e57f782634",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-native-page.py": "31c9c23e12c22d355098e917b30790aac1dda08d33b5bc6572e25bc73d691fe8",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\network_service.c": "5c0596774a5bb063d3184a559cd0da7b14e6981402d8827412ec4eca4af35e21",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\runtime_settings.c": "5a7d5d6f55169ee810953a317ebcaeba3d68bdaf95b5594ffab96fe79393eba1",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_netif\\include\\esp_netif.h": "4da2860e63457b12a4af7b470af27f9a908f6e98fb357098b9cc0636c937c1f0",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_netif\\lwip\\esp_netif_lwip.c": "c7fb9d080581b4abbc741e089d31e5a67bcb7695aa7e63800778ba263cfa216c"
+  },
+  "existing_contracts": {
+    "settings": "network_settings.c/.h is committed as an unwired precursor. Defaults yoradio/0, hostname24 (1-23 ASCII alnum/internal hyphen), timeout0-30. Missing/malformed NVS => defaults without rewrite; real read/init failure => no snapshot. Canonical 32-byte record and commit-before-publish. Snapshot revision boot-local, starts1, output unchanged on failure.",
+    "startup": "app_main.c:102 initializes NVS without erase before tasks; network_task:76 starts facade, audio, WebUI sequentially. network_service_start:101 creates stopped STA/netif, calls network_runtime_start:142, then esp_wifi_start:145. Runtime construction is the safe initial hostname configuration point before task admission/driver start.",
+    "owner": "network_runtime.c owner_step:389 polls every100ms, drains at most16 notices, serializes configuration/connect/AP transitions. configure_attempt:266 proves SDK NOT_CONNECT before set_config/connect. after:73 saturates absolute int64 deadlines. Link notices increment s_link_version before queue send; overflow sets s_resync. Snapshot masks stale published link state.",
+    "portal": "enable_portal:196 marks ap_enabled only after successful APSTA mode. Portal can remain enabled after online, so ap_enabled alone is never a reboot condition. finish_cycle:211 reaches AP_IDLE and cancels last connect; actual association must still be queried before reboot.",
+    "hostname_sdk": "esp_netif.h:350 says changes after started/connected are reflected only after restart/reconnect; this is DHCP hostname, not an mDNS responder. lwip implementation:1808 frees the old hostname before strdup; allocation failure sets p_netif->hostname to CONFIG_LWIP_LOCAL_HOSTNAME and returns NO_MEM. Current CYD config default is espressif. Never retain old applied-valid status after this failed call.",
+    "reboot": "web_reboot_start:34 preallocates the 2048-byte task during web startup. reserve:65 requires zero lease and ready/no ordinary pending/no other reservation/non-exhausted epoch; success atomically owns s_reserved_epoch. cancel:78 only consumes that exact reservation and wakes the task. commit:91 consumes reservation and creates irreversible ordinary s_pending with earliest deadline, max60000ms. request:48 can create ordinary pending even during a lease; the task defers it until the lease is consumed. abort:108 is startup-only and refuses pending/reserved.",
+    "ota": "web_ota.c:18 reserves at admission before reading/flashing. Failed activation releases audio maintenance then cancels its lease; successful boot selection commits after response attempt and retains maintenance through restart. Wi-Fi settings/import similarly reserve before persistence and commit after successful durable credentials. AP timeout must preserve these durable decisions."
+  },
+  "wiring_order": [
+    {
+      "step": 1,
+      "paths": [
+        "main/CMakeLists.txt",
+        "main/app_main.c"
+      ],
+      "change": "Register network_settings.c and the dedicated small web_network_settings.c. After NVS initialization and before launching network_task, call network_settings_init and log a nonfatal N5 error; never erase/rewrite NVS on failure. Existing native_audio_settings_init remains independently fail-fast; do not claim all NVS failures can boot. Runtime may use local defaults/revision0 on unavailable N5 snapshot; settings HTTP stays unavailable rather than pretending defaults were persisted."
+    },
+    {
+      "step": 2,
+      "paths": [
+        "main/network_runtime.c",
+        "main/network_status.h"
+      ],
+      "change": "Keep one desired settings copy/revision/availability in owner. Initialize from snapshot-or-local-defaults, then checked esp_netif_set_hostname(station, desired.hostname) during runtime construction before launching owner and before facade esp_wifi_start. A hostname failure is reported and invalidates applied hostname; it should not disable AP/ordinary Wi-Fi startup. Never invent hostname applied success."
+    },
+    {
+      "step": 3,
+      "paths": [
+        "main/network_runtime.c"
+      ],
+      "change": "At beginning of owner_step snapshot committed N5 RAM only, no NVS. On a new desired revision copy the coherent whole record. A hostname change while online stays pending; do not disconnect merely for a form save. Before configure_attempt calls esp_wifi_connect, after its checked NOT_CONNECT barrier, apply the newest desired hostname if it differs from known configured value or validity is false. Revalidate latest revision around call; a stale successful setter records what actually reached the netif, leaving newer desired pending. Failure clears applied validity because SDK may have changed to espressif; preserve last_hostname_error. Avoid redundant setter allocation when the same known hostname is already configured. Attempts are bounded by existing connection-cycle attempts; no unbounded immediate apply loop."
+    },
+    {
+      "step": 4,
+      "paths": [
+        "main/network_status.h",
+        "main/network_service.c",
+        "main/network_service.h"
+      ],
+      "change": "Expose bounded desired settings/revision/availability, configured hostname[24], configured revision/valid/error, hostname application pending, AP timeout armed and remaining_ms. Define applied/configured as SDK netif configuration for the next/current attempt, not proof DHCP server accepted it. The new settings GET may combine settings snapshot with bounded runtime snapshot; runtime unavailability need not hide a persisted desired record. Save facade delegates to network_settings_save; it must not reboot or call Wi-Fi. The permanent owner picks changes within its next100ms iteration."
+    },
+    {
+      "step": 5,
+      "paths": [
+        "main/network_runtime.c",
+        "main/web_reboot.c",
+        "main/web_reboot.h"
+      ],
+      "change": "Keep the AP absolute deadline and operation epoch in owner; no esp_timer or new task is needed. Use the reserved immediate owner restart described below, or explicitly implement a guarded cancellable request if the existing asynchronous reboot task must execute it. Do not feed AP expiry to irreversible ordinary request/commit and claim cancellation."
+    },
+    {
+      "step": 6,
+      "paths": [
+        "main/web_network_settings.c",
+        "main/web_network_settings.h",
+        "main/web_service.c",
+        "main/web_pages.cpp"
+      ],
+      "change": "Add bounded strict HTTP handlers, two route entries/capability and capability-gated form, following the existing time settings flow. Keep desired persistence, hostname application and reboot distinct in responses/UI."
+    }
+  ],
+  "ap_deadline": {
+    "storage": "int64_t deadline_us plus bool armed and a local monotonic operation token; use after(now, (int64_t)minutes*60*1000000), with overflow-safe multiplication (minutes<=30). Do not use a relative decrement or reset on every owner poll. Zero means disabled.",
+    "arm": "Start a fresh interval when AP actually becomes enabled while offline, or when an online link is later lost while AP is already enabled. If timeout changes to another nonzero value, cancel old authorization and rearm from the owner observation time. Hostname-only edits keep the existing timeout deadline; config revision still invalidates a stale final authorization. Explicit manual/new connection cycle invalidates old token; a fresh offline AP interval may start from that cycle. This conservative rearm rule must be documented/tested, rather than accidental timer retention.",
+    "cancel": "Online confirmation, timeout0, runtime stop/rollback or AP unavailable cancels deadline and increments/invalidate token. Success/disable/operation change must invalidate any pending timeout authorization. Physical AP remaining enabled after online must not keep a reboot armed.",
+    "block_at_due": "Require started + AP enabled + !online + phase AP_IDLE + !cycle_active + no pending/manual admitted retry + !s_resync + unchanged link version. Query actual STA association: only exact ESP_ERR_WIFI_NOT_CONNECT is positive proof of disconnected state; any other SDK error suppresses reboot. Require netif down and successful IP query with zero address (or an equivalently conservative documented live netif proof). A current association waiting for DHCP is pending link and suppresses reboot even if cached online=false. Recheck version/resync after SDK queries and before final arbitration.",
+    "lease_block": "Do not queue any ordinary AP reboot when web_reboot_reserve fails. Existing OTA/credential lease or ordinary pending wins. To ensure a failed OTA/cancel does not release a stale AP reboot, keep no deferred AP request; conservatively rearm a fresh interval after a failed AP reservation rather than causing immediate restart on lease cancellation. This changes only AP policy, never consumes another owner token or cancels durable ordinary pending.",
+    "clock": "Saturation is explicit; negative/invalid monotonic values suppress admission. OWNER_POLL_MS gives a local polling granularity, not a hard SDK/RF time bound."
+  },
+  "recommended_reboot_extension": {
+    "name": "web_reboot_restart_reserved_now(web_reboot_lease_t *lease)",
+    "reason": "Existing ordinary pending requests are intentionally irreversible for committed credentials/OTA. They cannot also represent a cancellable AP deadline. The smallest path is no AP queue: owner proves eligibility, reserves the existing service, checks current local/config/link/lifecycle token again, then synchronously restarts from the permanent owner task.",
+    "contract": "Reject NULL/stale/zero token without side effects. Under s_deadline_lock verify exact active reservation; keep that reservation active while calling esp_restart outside the critical section. Do not clear it and notify the ordinary reboot task first: keeping it owned prevents both a competing OTA reservation and the ordinary task from independently restarting. Successful restart never returns. If final eligibility fails before this call, owner cancels its own lease. No allocation, timeout callback restart, new task or generic callback framework is required.",
+    "alternative": "If all restarts must remain in reboot_task, add a separate cancellable AP-only token/guard slot, revalidate immediately before restart, and keep it separate from durable ordinary pending. OTA reserve must atomically suppress/cancel the AP slot; a failed guard may clear only that AP slot. Plain commit(lease,0) still has an uncancellable task-dispatch window and is insufficient for a strict late-link cancellation claim.",
+    "boundary": "Final eligibility/arbitration is the application linearization point. SDK Wi-Fi/netif queries and RF state changes are asynchronous; an association/settings command arriving after the last successful check cannot be atomically prevented by any current SDK restart API. Tests should prove events received before the point suppress restart, and describe the later-event boundary honestly. Never call esp_restart while holding a portMUX."
+  },
+  "http": {
+    "route": "GET and POST /api/native/network-settings; distinct from existing read-only /api/native/network. Advertise nativeNetworkSettingsApi with this exact path plus network_hostname_max_bytes:23 and network_ap_timeout_max_minutes:30.",
+    "request": "Reuse web_time.c reply/reject-body, URL decoding and complete-field parser pattern, without extracting a new generic framework. GET: no query or body. POST: no body, exactly hostname and ap_timeout_minutes query keys once each; complete replacement, last accepted writer wins. NETWORK_QUERY_MAX_BYTES=192, char query[193], key[24], value[24]. Worst fully percent-encoded valid keys+values fit156 bytes; current CONFIG_HTTPD_MAX_URI_LEN=512 accommodates path+query.",
+    "strictness": "Reject empty/missing/unknown/duplicate decoded keys (including aliases through percent encoding), missing equals, trailing ampersand, percent truncation/nonhex, decoded NUL/control/DEL, overlong decoded hostname, non-ASCII/dots/edge hyphens, query size mismatch/get error, signs/leading zeroes/space/decimals/exponents and timeout>30. Parse bounded unsigned decimal with checked accumulation; validate final whole network_settings_t before saving. Body rejection must close via native_web_transport_prepare_close and return ESP_FAIL to prevent HTTPD purge of an uncontrolled body.",
+    "response": "JSON+no-store on success and errors; use json_buffer_string for strings and checked capacities. POST success says saved:true, application_pending:true, rebooting:false; it is not a connected/DHCP-applied promise. 400 invalid arguments; 503 uninitialized/revision-exhausted/admission timeout/OOM; 500 persistent storage failure. Failed persistence leaves desired settings/revision and owner timer unchanged. GET should include desired revision/settings and explicit runtime/configured-host validity/pending status. Keep endpoint body at a proven small bound (e.g.768) and test maxima rather than copying unbounded text.",
+    "routes_capacity": "Current registration is20 explicit routes + WebSocket + wildcard=22. Two new explicit handlers require config.max_uri_handlers=24 and23 HTTP handler registrations in existing startup fixture (WebSocket is accounted separately). Register before wildcard and retain checked rollback. capabilities_handler currently body1152: add exact fields, check worst-case actual JSON; increase to1536 only if measured necessary."
+  },
+  "ui": {
+    "fields": "New section/form with hostname text maxlength23, pattern for one ASCII label, autocomplete off; AP timeout type number min0 max30 step1 required with label 0 disables. Explain hostname takes effect at next reconnect and does not create mDNS; saving does not force disconnect/reboot.",
+    "state": "Mirror existing time form: networkSettingsDirty, networkSettingsBusy, networkSettingsAvailable, requestEpoch. Capability-gate exact path; keep unavailable hidden/disabled. Reuse api() URLSearchParams helper and updateUploadControls firmware/upload/awaitingRestart gating. Snapshot polling must not overwrite dirty fields; stale pre-save GET responses must not overwrite new values/status. On save require saved===true, retain edits on failure, then force-refresh status; do not set awaitingRestart from this response. Preserve requestEpoch after both success/failure to reject old reads. Use textContent, no innerHTML.",
+    "polling": "Fetch sequentially at startup and reuse existing3-second pollBusy loop. No new interval or parallel high-frequency requests; preserve two-tab/socket budget. Show desired/configured mismatch and last apply error separately from successful persistence."
+  },
+  "tests_to_add": [
+    {
+      "suite": "tests/run-cyd-network-runtime.py + tests/native/cyd_network_runtime/*",
+      "cases": [
+        "default/settings unavailable startup; checked hostname call before facade wifi_start and before connect after NOT_CONNECT",
+        "online save changes desired only, no disconnect/setter/reboot; next explicit/natural reconnect applies latest desired",
+        "hostname setter SDK OOM resets modeled netif fallback: applied_valid clears, desired persists; stale successful apply records actual old result with new desired still pending",
+        "AP0 never arms; nonzero enable success arms once; AP failure never arms; exact before/at deadline;30-minute and saturated clock",
+        "late online while AP still enabled cancels; loss then fresh offline interval; manual cycle cancels old token; DHCP pending, queue backlog/resync, stale link version and SDK query error suppress expiry",
+        "timeout0/edited nonzero/hostname-only edits and NVS failure preserve specified cancel/rearm behavior; stop/restart old lifetime token cannot restart",
+        "AP expiry while OTA lease held stores no ordinary pending; OTA cancel/failure cannot release a queued AP restart; current lease/new generation wins; one authorized due decision at most"
+      ]
+    },
+    {
+      "suite": "tests/run-reboot-leases.py + tests/native/reboot_lease_test.c",
+      "cases": [
+        "actual new reserved-immediate function with valid/stale/NULL/zero token and no allocations",
+        "AP final reservation vs OTA reserve race: exactly one owner; ordinary pending during AP lease remains deferred until cancellation or immediate authorized restart",
+        "final guard cancellation before restart path consumes only own lease; existing committed credential/OTA ordinary pending remains irreversible",
+        "semantic controls deliberately use ordinary request during lease or consume reservation before final restart; fail named assertions, not timeout/sanitizer crash"
+      ]
+    },
+    {
+      "suite": "new dedicated web network-settings runner patterned on tests/run-cyd-web-time.py",
+      "cases": [
+        "actual complete new handler/parser with actual network_settings.c NVS fixture, response JSON parsed",
+        "2 fields valid boundaries, exhaustive invalid encodings/duplicate/unknown/missing/trailing separators/overflow and body close path",
+        "all NVS failures, admission timeout and snapshot unavailability produce exact statuses and unchanged revision/table; no reboot/set_ps/connect is called by save",
+        "roundtrip desired/configured pending semantics and worst JSON/query capacities; exact semantic mutants catch partial save, permissive parser and false applied claim"
+      ]
+    },
+    {
+      "suite": "tests/run-cyd-web-static.py + tests/native/cyd_web_start_test.c + tests/cyd-native-page.test.js",
+      "cases": [
+        "24 URI capacity,23 HTTP registrations, both new method/handler mappings and failure rollback at every new route",
+        "capability and exact field limits; unsupported/503 disables form without breaking existing time/Wi-Fi/OTA controls",
+        "actual page submit URL/query, hostname+timeout validation, save failure preserves input, save success does not await restart",
+        "dirty input and stale pre-save GET response protection, pending application/error display, upload/firmware gating and sequential polling"
+      ]
+    },
+    {
+      "suite": "production GCC/Clang checks after integration",
+      "cases": [
+        "reconfigure real GCC and isolated Clang databases with new units; compile actual CYD main and full static warning delta when changes warrant",
+        "host sanitizer/scheduler seams do not claim target ABI, lwIP/DHCP payload, RF, flash power loss, boot/reset or strict bounded SDK latency; hardware checks remain a separate authorized gate"
+      ]
+    }
+  ],
+  "not_in_scope": [
+    "C3 hostname/AP timer rewrite",
+    "mDNS responder",
+    "new display/hardware support",
+    "default automatic reboot",
+    "deferred AAC ownership/profile issue",
+    "new generic routing/timer/settings framework"
+  ],
+  "sources_unchanged_after_review": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_settings.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_settings.h": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_runtime.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_runtime.h": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_service.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_service.h": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_status.h": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_service.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_pages.cpp": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_reboot.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_reboot.h": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_time.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_time.h": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_ota.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_upload.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_wifi.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\CYD_NETWORK_RUNTIME_TRANSFER_DESIGN.md": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_network_runtime\\test.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_network_runtime\\platform.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_network_runtime\\platform.h": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\reboot_lease_test.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_web_time_test.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_web_start_test.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-network-settings.py": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-network-runtime.py": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-reboot-leases.py": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-web-time.py": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-web-static.py": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-native-page.py": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\network_service.c": true,
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\runtime_settings.c": true,
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_netif\\include\\esp_netif.h": true,
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_netif\\lwip\\esp_netif_lwip.c": true
+  }
+}

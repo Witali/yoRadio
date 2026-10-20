@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "source_commit": "489c9f81977b3bbfa6beb93c63988bc05b5b5c45",
+  "physical_tested": false,
+  "variant": "esp32-cyd2usb-native-network-power-custom-flac-pdm",
+  "app_bytes": 1501536,
+  "ota_free_bytes": 267936,
+  "sdkconfig_changes": {
+    "YORADIO_FLAC_DECODER_CUSTOM": {
+      "previous": false,
+      "current": true
+    },
+    "YORADIO_FLAC_DECODER_ESPRESSIF": {
+      "previous": true,
+      "current": false
+    }
+  },
+  "linked_selections": [
+    {
+      "selection": "vendor",
+      "elf_sha256": "f286f917d53407b6077938659e4c08f208955b58778aef6f3ed7f28bd1efd294",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe",
+        "--defined-only",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\yoradio_cyd2usb_native.elf"
+      ],
+      "custom_feed_defined": false,
+      "vendor_flac_registration_defined": true
+    },
+    {
+      "selection": "custom",
+      "elf_sha256": "492839d47084a63f6aeb79288a58574d9a741d3a83b695d2510595de5f3171ee",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe",
+        "--defined-only",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-flac-runtime-sdk-custom\\yoradio_cyd2usb_native.elf"
+      ],
+      "custom_feed_defined": true,
+      "vendor_flac_registration_defined": false
+    }
+  ],
+  "manifest_sha256": "939c549ca134ec366edc126fa120e0727fa4a507c6f72bfe1c005634236fa813",
+  "scope": "Actual Xtensa GCC application link/export with custom FLAC, image/config/evidence integrity and selected ELF symbols. Decoder PCM/lifetime uses the independent current host report; QEMU and physical performance remain open."
+}

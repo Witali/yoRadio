@@ -37,8 +37,9 @@ phase и budgets. Pending SDK events маскируют устаревший IP/
 содержит 44 полных owner-loop сценария и четыре semantic controls,
 loader/netif/rollback/API/WS/UI проверки с ASan/UBSan. TSAN недоступен:
 его независимый контроль падает при старте runtime. Xtensa GCC component
-compile проходит; полные production exports, RF, heap/stack и физическая
-SMP/audio приёмка остаются открыты. Таблицы ниже сохраняют исходные точки
+compile проходит; [пять полных production exports](../tests/results/network-power-transfer-20261019/SDK.md)
+сохранены после N4. RF, heap/stack и физическая SMP/audio приёмка остаются
+открыты. Таблицы ниже сохраняют исходные точки
 сравнения до замены runtime; source-level дефекты относятся к historical baseline.
 
 ### N4: generation-aware power реализован
@@ -66,8 +67,10 @@ revisions, attempts/error; это не измерение физического
 воспроизводит обе гонки на старом C3 коде и проверяет shared policy, actual
 C3/CYD audio owners, retry/maintenance, CYD network owner и HTTP/WS. Полный
 clang-tidy: CYD 50/C3 65 units, 0 новых warnings, 0 errors; GCC component
-compiles обеих платформ проходят. Production exports и hardware gates
-учитываются отдельно.
+compiles обеих платформ проходят. [Полные GCC images](../tests/results/network-power-transfer-20261019/SDK.md)
+из чистого `489c9f819`: CYD PDM/continuous/legacy, C3 и optional CYD custom
+FLAC PDM сохранены и проверены по target/OTA/configuration/ELF. Hardware gates
+остаются открыты.
 
 ### N5: только persisted precursor
 

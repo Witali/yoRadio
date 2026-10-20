@@ -1,0 +1,732 @@
+{
+  "passed": true,
+  "source_commit": "489c9f81977b3bbfa6beb93c63988bc05b5b5c45",
+  "physical_tested": false,
+  "images": [
+    {
+      "label": "CYD PDM",
+      "variant": "esp32-cyd2usb-native-network-power-pdm",
+      "app_bytes": 1528016,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 241456,
+      "app_sha256": "457aff8318ea7da759ad2fe738b0de791e3c0864c5586badd4e973586f13efdc",
+      "elf_sha256": "f286f917d53407b6077938659e4c08f208955b58778aef6f3ed7f28bd1efd294",
+      "sdkconfig_changes": {
+        "YORADIO_FLAC_DECODER_CUSTOM": {
+          "previous": null,
+          "current": false
+        },
+        "YORADIO_FLAC_DECODER_ESPRESSIF": {
+          "previous": null,
+          "current": true
+        }
+      },
+      "compiler_warnings": [],
+      "manifest_sha256": "61e1e29d13163fe7e1459dffa1d3c834b76a29bd242af52412147663a49528e6"
+    },
+    {
+      "label": "CYD continuous DAC",
+      "variant": "esp32-cyd2usb-native-network-power-continuous",
+      "app_bytes": 1521808,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 247664,
+      "app_sha256": "37e59e2fec704a67918b14f4722b5ac6b1c64b556d93294bd64adf2728b25b5d",
+      "elf_sha256": "763d22cc5499b5a9fb3663546bc5c6a77adfd3cdd52bd8d7230c0b3b05b6626d",
+      "sdkconfig_changes": {
+        "YORADIO_FLAC_DECODER_CUSTOM": {
+          "previous": null,
+          "current": false
+        },
+        "YORADIO_FLAC_DECODER_ESPRESSIF": {
+          "previous": null,
+          "current": true
+        }
+      },
+      "compiler_warnings": [],
+      "manifest_sha256": "37178a7cd6e0c65375e7bec10ec7e72b67cddb13fcce7b216dac3e0f09c0fd05"
+    },
+    {
+      "label": "CYD legacy DAC",
+      "variant": "esp32-cyd2usb-native-network-power-legacy",
+      "app_bytes": 1527808,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 241664,
+      "app_sha256": "64bfdf534bdce0475c5170e0dec9e24325a681d5af288d2eee06f55a5554e79b",
+      "elf_sha256": "e41b015488222b4cb0b4daf9e7bf0153db86bb601ab85b8cfaa5cb0ac8870fcd",
+      "sdkconfig_changes": {
+        "YORADIO_FLAC_DECODER_CUSTOM": {
+          "previous": null,
+          "current": false
+        },
+        "YORADIO_FLAC_DECODER_ESPRESSIF": {
+          "previous": null,
+          "current": true
+        }
+      },
+      "compiler_warnings": [
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:719:9: warning: 'periph_rtc_apll_freq_set' is deprecated: Please use esp_clk_tree_src_set_freq_hz instead [-Wdeprecated-declarations]",
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:1506:9: warning: 'periph_rtc_apll_acquire' is deprecated: Please use esp_clk_tree_enable_src instead [-Wdeprecated-declarations]",
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:1643:9: warning: 'periph_rtc_apll_release' is deprecated: Please use esp_clk_tree_enable_src instead [-Wdeprecated-declarations]"
+      ],
+      "manifest_sha256": "73ccac03a18f0f20f156c50630c20c09ebca6cf593cc6a3ca208ef79dc43fc0e"
+    },
+    {
+      "label": "C3 stereo PDM",
+      "variant": "esp32c3-oled-native-network-power",
+      "app_bytes": 1539136,
+      "ota_slot_bytes": 1900544,
+      "ota_free_bytes": 361408,
+      "app_sha256": "38b9e29800f92517f6f418853caa99d22be3d8a33c7e5b8777b2058ab5de90bc",
+      "elf_sha256": "e9d3779d7d87279a2db93329007487156557b09da814db7e23e07f20e2350f16",
+      "sdkconfig_changes": {},
+      "compiler_warnings": [],
+      "manifest_sha256": "901f7eb13e604ac619e6afc5f21b1ada76e1031ade00cf92a2caa2647ffa0454"
+    }
+  ],
+  "target_object_symbols": {
+    "cyd": {
+      "ws": [
+        {
+          "name": "s_have_previous",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_running",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_task_alive",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_work_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_playlist_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_server",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_status_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "hex$0",
+          "kind": "r",
+          "bytes": 17
+        },
+        {
+          "name": "s_sockets",
+          "kind": "b",
+          "bytes": 40
+        },
+        {
+          "name": "s_clients",
+          "kind": "b",
+          "bytes": 384
+        },
+        {
+          "name": "s_current",
+          "kind": "b",
+          "bytes": 508
+        },
+        {
+          "name": "s_previous",
+          "kind": "b",
+          "bytes": 508
+        },
+        {
+          "name": "s_status",
+          "kind": "b",
+          "bytes": 5120
+        }
+      ],
+      "tls": [
+        {
+          "name": "s_prepared",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_secure",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_bundle",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_bundle_size",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_sessions",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_config",
+          "kind": "b",
+          "bytes": 64
+        }
+      ],
+      "time": [
+        {
+          "name": "s_available",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_network_ready",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_synchronized",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_applied_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_connection_epoch",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_last_apply_error",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_start_lock",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state_lock",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_task",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_last_sync_epoch",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_last_sync_us",
+          "kind": "b",
+          "bytes": 8
+        }
+      ],
+      "network": [
+        {
+          "name": "s_network_start",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_wifi_save_lock",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_station_netif",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_wifi_paths",
+          "kind": "r",
+          "bytes": 12
+        },
+        {
+          "name": "__FUNCTION__$2",
+          "kind": "r",
+          "bytes": 29
+        },
+        {
+          "name": "__FUNCTION__$0",
+          "kind": "r",
+          "bytes": 33
+        },
+        {
+          "name": "__FUNCTION__$1",
+          "kind": "r",
+          "bytes": 38
+        },
+        {
+          "name": "s_wifi_store",
+          "kind": "b",
+          "bytes": 48
+        }
+      ],
+      "wifi-store": [],
+      "wifi-http": [],
+      "wifi-io": [],
+      "time-backend": [
+        {
+          "name": "s_initialized",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_managed",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_tcpip_ready",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_callback",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_callback_context",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_lock",
+          "kind": "b",
+          "bytes": 4
+        }
+      ],
+      "power": [
+        {
+          "name": "s_driver_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_lock",
+          "kind": "d",
+          "bytes": 8
+        },
+        {
+          "name": "s_next_attempt",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_power",
+          "kind": "b",
+          "bytes": 20
+        }
+      ],
+      "network-runtime": [
+        {
+          "name": "s_exited",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_manual_admitted",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_resync",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_retry",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_stop",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_gate",
+          "kind": "d",
+          "bytes": 4
+        },
+        {
+          "name": "s_lifecycle",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_link_version",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_overflows",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_owner",
+          "kind": "b",
+          "bytes": 760
+        }
+      ]
+    },
+    "c3": {
+      "ws": [
+        {
+          "name": "s_message_poll_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_playlist_changed_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_reboot_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_reboot_ready",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_completed_deliveries",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_current_send_pending",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_fragmented_clients",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_last_ws_clients",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_reboot_at",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_server",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_status_send_pending",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_reboot_next_epoch",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_reboot_reserved_epoch",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_current_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_playlist_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_status_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "hex.0",
+          "kind": "r",
+          "bytes": 17
+        },
+        {
+          "name": "s_broadcast_current",
+          "kind": "b",
+          "bytes": 48
+        },
+        {
+          "name": "s_current_status_key",
+          "kind": "b",
+          "bytes": 428
+        },
+        {
+          "name": "s_previous_status_key",
+          "kind": "b",
+          "bytes": 428
+        },
+        {
+          "name": "s_broadcast_status",
+          "kind": "b",
+          "bytes": 1280
+        },
+        {
+          "name": "s_clients",
+          "kind": "b",
+          "bytes": 3200
+        }
+      ],
+      "tls": [
+        {
+          "name": "s_prepared",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_secure",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_bundle",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_bundle_size",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_sessions",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_config",
+          "kind": "b",
+          "bytes": 68
+        }
+      ],
+      "time": [
+        {
+          "name": "s_apply_pending",
+          "kind": "d",
+          "bytes": 1
+        },
+        {
+          "name": "s_backend_applied",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_network_ready_seen",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_control_lock",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_time_sync_task",
+          "kind": "b",
+          "bytes": 4
+        }
+      ],
+      "network": [
+        {
+          "name": "s_have_credentials",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_stopping_for_sleep",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_ap_netif",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_credential_count",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_credential_index",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_retries",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_softap_reboot_timer",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_station_netif",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_wifi_events",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_wifi_save_lock",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_wifi_paths",
+          "kind": "r",
+          "bytes": 12
+        },
+        {
+          "name": "s_wifi_store",
+          "kind": "b",
+          "bytes": 48
+        },
+        {
+          "name": "s_station_config",
+          "kind": "b",
+          "bytes": 184
+        },
+        {
+          "name": "s_credentials",
+          "kind": "b",
+          "bytes": 920
+        }
+      ],
+      "wifi-store": [],
+      "wifi-http": [],
+      "wifi-io": [],
+      "time-backend": [
+        {
+          "name": "s_initialized",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_managed",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_tcpip_ready",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_callback",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_callback_context",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_lock",
+          "kind": "b",
+          "bytes": 4
+        }
+      ],
+      "power": [
+        {
+          "name": "s_driver_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_next_attempt",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_power",
+          "kind": "b",
+          "bytes": 20
+        }
+      ]
+    }
+  },
+  "cyd_pipeline_affinity": [
+    {
+      "task": "radio_stream",
+      "core": 0,
+      "priority": 3
+    },
+    {
+      "task": "audio_decode",
+      "core": 1,
+      "priority": 5
+    },
+    {
+      "task": "audio_output",
+      "core": 1,
+      "priority": 6
+    }
+  ],
+  "scope": "N4 network/audio power checkpoint: GCC final ELF/image/archive/config integrity and actual target object symbol sizes. No physical OTA/flash, power-loss, heap/stack/timing or audio admission claim."
+}
