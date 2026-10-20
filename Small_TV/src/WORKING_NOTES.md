@@ -81,6 +81,17 @@ host boot остаётся14Oct, terminal footer нет; cause unknown. Report17
 journal179+5pending,3034.24guestsec; не24h pass и не firmware failure. Исходные
 raw files сохраняются отдельно в baseline branch перед любыми новыми запусками.
 
+На20Oct09:29UTC baseline-префиксы сохранены в bf3618f2 (86raw), новый actual
+preflight8cycles/4outages прошёл с32inputs/guard/supervisor/cleanup. До повторного
+запуска frozen581full и32+47+8H10 expectations закоммичены2996eea2/08e3366.
+Новый full output: root/.build/small-tv-functional/jpeg-selector-complete-full-20261020;
+controller29928 created09:22:52.898648Z. НовыйH10: baseline/.build/jpeg-selector-h10-20261020,
+supervisor22184/workload32636/VM32580/guard18268, VMnameSmallTV-131b35021705.
+Exact creations в baseline/Small_TV/qemu/parity/jpeg-selector-baseline-launch-checkpoint-20261020.json
+(c8e56f932), оба launchers in_job=false. Они live на этой отметке, не приняты как
+полный/24h pass. По-прежнему freeze baseline SRC/ELF/resources/SDK/snapshot и
+не добавлять guest QMP/RSP clients. JPEG library меняется только в отдельном tree.
+
 Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
 groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
 24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.

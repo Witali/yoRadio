@@ -3257,3 +3257,11 @@ true. Это только начало нового прогона, не 24 ча
   causeunknown. Canonical analyzer проверил32inputs,179complete journal cycles,
   5pending events и3034.241151guestsec; report178. Никакие stale running flags
   не объявлены pass. Сохранение baseline proofs выполняется в её собственной ветке.
+
+- После сохранения86raw артефактов в baseline bf3618f2 новый supervised preflight
+  завершил8cycles/4outages,32inputs unchanged, workload/guard exit0, cleanup[]
+  (09:25:55UTC20Oct). Full581input freeze2996eea2 и H10prelaunch08e3366 сохранены
+  до старта. Full controller29928 и H10supervisor22184/workload32636/VM32580/
+  guard18268 подтверждены черезОС09:29UTC, launchers outside callerJob. VM
+  SmallTV-131b35021705. Launch/checkpoint c8e56f932 в baseline branch. Старые
+  каталоги19Oct не переименованы; новые20Oct покаrunning, не acceptance.
