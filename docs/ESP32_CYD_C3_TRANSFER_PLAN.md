@@ -84,9 +84,12 @@ allocation и численные настройки C3 являются канд
   и подобрать heap/IRAM/стеки по CYD. MPI уже подключена default-off и прошла
   проверки actual startup/SDK mutex/OOM/двух ядер, а также
   [семь полных application exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md);
-  physical benefit ещё открыт. Кандидат reserve прошёл локальные host/config
-  проверки, но пока не подключён к firmware; изолированная SDK/QEMU матрица
-  выполняется и пока не закрывает полный target gate.
+  physical benefit ещё открыт. Первый кандидат reserve прошёл локальные
+  host/config проверки, но не подключён к firmware: ревью выявило неполный
+  контракт pointer/numeric `user_data`. [Новая привязка конфигураций](CYD_MEMORY_TRANSFER_DESIGN.md)
+  не использует application userdata и прошла изолированные host-проверки;
+  итоговая версия, actual SDK/QEMU и подключение к радио ещё впереди.
+  Первая target-матрица завершилась nonpass; полный target gate остаётся открытым.
   Освобождение HTTP GET TX и lifetime-safe reclaim уже реализованы;
   семь production exports reclaim проверены, физический выигрыш ещё не измерен.
 - **Этап 14, Vorbis/Ogg:** завершить [изолированный ESP32 bridge](CYD_VORBIS_TRANSFER_DESIGN.md)
@@ -579,3 +582,18 @@ Stream остаётся на core0, decode/output на core1 с прежними
   full application/link/image утверждений. Исторические ошибки стенда и
   существующие SDK diagnostics сохранены отдельно; offline и staged-byte
   проверки архива проходят.
+- 2026-10-20, CYD-C3-13: первый TLS RX prototype остаётся неинтегрированным.
+  Independent review подтвердил ограничение публичного getter после numeric
+  userdata setter; новая реализация должна хранить binding отдельно и учитывать
+  actual ESP-TLS config-free-before-ssl-free. Старый SDK/QEMU runner завершён
+  с exit1: шесть принятых вариантов, седьмой control дал named failure и затем
+  panic при создании timekeeping lock внутри controlled restart под OOM;
+  три option-варианта не запускались. Это не полный target PASS. Старые данные
+  сохраняются, корректируется тестовое завершение без ослабления panic oracle.
+- 2026-10-20, CYD-C3-13: replacement registry candidate прошёл семь host-групп,
+  девять exact semantic controls и 14 compile rejections с ASan/UBSan, затем
+  повтор всех семи положительных групп. Проверены pointer/numeric userdata,
+  init/free revocation, config-free-before-ssl-free, повторное использование
+  адреса и переполнение реестра. Host layout/crypto/RTOS остаются явными seams;
+  это не actual SDK/QEMU или radio integration PASS. Следующая самостоятельная
+  ревизия будет хранить integer address identities и требует отдельных проверок.

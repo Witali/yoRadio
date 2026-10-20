@@ -80,6 +80,43 @@ and physical benefit/default activation remain open. The source audit below
 is historical evidence from before this implementation, rather than its
 current status.
 
+## Static RX reserve candidate remains under review
+
+The first isolated candidate retained the complete SDK RX expression and passed
+its canonical ownership, rollback, real-heap and two-core erase/handover case.
+It is not integrated into radio firmware. Independent review found a public-API
+gap: the pinned configuration pointer-userdata getter has an undefined result
+after the numeric-userdata setter. Pointer-cookie tests therefore cannot prove
+isolation for all other configurations. The existing application userdata must
+remain available to its owner, regardless of which public setter it uses.
+
+A replacement uses a bounded, separately synchronized registry
+of explicitly radio-attached configuration identities. Exact configuration
+initialization/free hooks must revoke eligibility without releasing an existing
+RX loan. This separation is necessary because the actual ESP-TLS teardown frees
+its configuration before freeing the SSL context. Registry overflow must fall
+back to ordinary allocation; it must not reject a connection or evict a live
+configuration. Numeric/pointer userdata, early setup failure, cancellation,
+address reuse, full registry and both-core lifetime checks remain required.
+
+The isolated registry candidate passed seven host groups, nine exact semantic
+controls and fourteen invalid-profile compile rejections with ASan/UBSan, followed
+by all seven restored positive groups. These checks exercise selected pinned SDK
+lifetime bodies with explicit host layout/crypto/RTOS/capacity seams; they do not
+qualify the actual Xtensa SDK build, TLS traffic or physical memory benefit. The
+next self-contained revision also replaces retained pointer keys with integer
+address identities. Its final source, target matrix and radio integration still
+need their own qualification.
+
+The original ten-variant campaign ended nonpassing: six variants were accepted,
+the seventh emitted its expected semantic marker and then panicked when its
+controlled restart required a lazy SDK timekeeping lock under exhausted heap.
+The final three option variants were not run. That seventh control is not a
+pass. The corrected fixture must record the failed predicate and release its
+own pressure allocations before reporting/stopping, while retaining strict
+rejection of generic panics. These prototype results do not close the target,
+production integration or physical resource gates.
+
 ## Remaining work
 
 - Implement and qualify a CYD-specific TLS/full-record RX reservation after the
