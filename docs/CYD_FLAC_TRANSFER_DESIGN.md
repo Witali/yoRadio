@@ -210,12 +210,16 @@ claim or default change.
    checks, final image/configuration/source hashes and terminal emulator exit 0.
    Six source depths and four input schedules are covered. This is a synthetic
    decoder owner with an isolated debug profile, not full-radio resource data.
-6. **Actual CYD task target gate open:** run unchanged `audio_service.c` via
-   public startup/play/stop/maintenance APIs with all three real SDK task owners.
-   First cover ordered EOF/PCM identity, Stop/reopen and maintenance/resume;
-   then backpressure/errors, scoped OOM and deliberate target semantic controls.
-   HTTP transport and output hardware need explicitly bounded seams. No test
-   may assign the private phase or ACK instead of executing its actual owner.
+6. **First actual CYD task target checkpoint complete:**
+   [frozen SDK/QEMU evidence](../tests/results/cyd-flac-task-qemu-20261020/README.md)
+   executes unchanged complete `audio_service.c` through public startup/play/
+   stop/maintenance APIs with all three real SDK owners and original profiles.
+   Three cases pass ordered EOF/PCM identity, Stop/reopen and maintenance/resume;
+   five actual decoder and HTTP-client instances are cleaned up. Transport and
+   output hardware are explicit seams, and request-TX release is disabled because
+   that transport does not enter SDK response state. No private phase/ACK writes
+   simulate cleanup. Backpressure/errors, scoped OOM and deliberate target
+   semantic controls remain open, as do production watchdog/resource margins.
 7. **Physical qualification open:** CYD A/B with matched
    configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.
