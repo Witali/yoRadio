@@ -9,9 +9,13 @@ New-Item -ItemType Directory -Force -Path $output | Out-Null
 if (!(Test-Path -LiteralPath $VsDevCmd)) {throw "Pass -VsDevCmd pointing to an installed MSVC development environment."}
 $resources=Join-Path $repo ".build\small-tv-esp32c2\resources"
 if (!$PythonPath) {$PythonPath=Join-Path $repo ".idf\python-3.12.10\tools\python.exe"}
+& $PythonPath (Join-Path $project "tools\audit_correspondence.py")
+if ($LASTEXITCODE) {throw "Factory/native correspondence is missing or stale; review the changed inputs"}
+& $PythonPath (Join-Path $project "tests\correspondence_test.py")
+if ($LASTEXITCODE) {throw "Correspondence omission controls failed"}
 & $PythonPath (Join-Path $project "tools\prepare_resources.py") --output $resources
 if ($LASTEXITCODE) {throw "Resource generation failed"}
-$sources=@("tests/native_test.c","app/settings/settings.c","app/settings/factory_settings.c","app/services/weather_parser.c","app/text/text.c","app/media/assets.c","app/media/photo_upload.c","app/network/dns_packet.c","app/web/server.c","app/web/request_body.c","app/web/settings_api.c","app/web/photo_api.c","third_party/tjpgd/tjpgd.c","third_party/cjson/cJSON.c")
+$sources=@("tests/native_test.c","app/settings/settings.c","app/settings/factory_settings.c","app/services/weather_parser.c","app/text/text.c","app/media/assets.c","app/media/photo_upload.c","app/media/color_convert.c","app/network/dns_packet.c","app/web/server.c","app/web/request_body.c","app/web/settings_api.c","app/web/photo_api.c","third_party/tjpgd/tjpgd.c","third_party/cjson/cJSON.c")
 $arguments=@("/nologo","/std:c11","/W3","/D_CRT_SECURE_NO_WARNINGS","/DCJSON_NESTING_LIMIT=16")
 foreach($include in @("tests/stubs","app/include","third_party/tjpgd","third_party/cjson")) {$arguments+='/I"'+(Join-Path $project $include)+'"'}
 $arguments+='/I"'+$resources+'"'

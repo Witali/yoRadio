@@ -1,0 +1,56 @@
+--- a/src/jdmaster.c
++++ b/src/jdmaster.c
+@@ -10,6 +10,7 @@
+  * Copyright (C) 2009-2011, 2016, 2019, 2022-2024, 2026, D. R. Commander.
+  * Copyright (C) 2013, Linaro Limited.
+  * Copyright (C) 2015, Google, Inc.
++ * Small TV modifications: Copyright (C) 2026 Small TV contributors.
+  * For conditions of distribution and use, see the accompanying README.ijg
+  * file.
+  *
+@@ -513,6 +514,9 @@
+ LOCAL(void)
+ master_selection(j_decompress_ptr cinfo)
+ {
++  /* REQUESTED_CHANGE: bound memory for direct lossless output; IDCT and lossy
++   * color conversion never use this path.  Retain the range table for palette
++   * quantization and buffered-image clients, which can change output passes. */
+   my_master_ptr master = (my_master_ptr)cinfo->master;
+   boolean use_c_buffer;
+   long samplesperrow;
+@@ -544,7 +548,11 @@
+ 
+   /* Initialize dimensions and other stuff */
+   jpeg_calc_output_dimensions(cinfo);
+-  prepare_range_limit_table(cinfo);
++  if (!cinfo->master->lossless || cinfo->quantize_colors ||
++      cinfo->buffered_image)
++    prepare_range_limit_table(cinfo);
++  else
++    cinfo->sample_range_limit = NULL;
+ 
+   /* Width of an output scanline must be representable as JDIMENSION. */
+   samplesperrow = (long)cinfo->output_width *
+--- a/src/jdcoefct.c
++++ b/src/jdcoefct.c
+@@ -7,6 +7,7 @@
+  * Copyright 2009 Pierre Ossman <ossman@cendio.se> for Cendio AB
+  * Copyright (C) 2010, 2015-2016, 2019-2020, 2022-2026, D. R. Commander.
+  * Copyright (C) 2015, 2020, Google, Inc.
++ * Small TV modifications: Copyright (C) 2026 Small TV contributors.
+  * For conditions of distribution and use, see the accompanying README.ijg
+  * file.
+  *
+@@ -897,7 +898,11 @@
+       access_rows = compptr->v_samp_factor;
+ #ifdef BLOCK_SMOOTHING_SUPPORTED
+       /* If block smoothing could be used, need a bigger window */
+-      if (cinfo->progressive_mode)
++      /* REQUESTED_CHANGE: a non-buffered client that disabled smoothing
++       * only needs one iMCU row.  Buffered clients may enable it on a later
++       * output pass, so retain their original five-row access guarantee. */
++      if (cinfo->progressive_mode &&
++          (cinfo->do_block_smoothing || cinfo->buffered_image))
+         access_rows *= 5;
+ #endif
+       coef->whole_image[ci] = (*cinfo->mem->request_virt_barray)

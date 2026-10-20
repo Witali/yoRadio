@@ -46,7 +46,7 @@ def main():
     paths += [archive / name for name in ('app.bin', 'bootloader.bin', 'partition-table.bin',
                                          'assets.bin', 'manifest.json', 'source-manifest.json')]
     paths += [args.qemu_root / 'tools' / name for name in ('small_tv_vm.py', 'small_tv_http_test.py',
-              'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')]
+              'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'small_tv_display.py', 'esp_elf.py')]
     pins = {str(path): sha(path) for path in paths}
     report = {'passed': False, 'all_functionality_verified': False, 'scope': __doc__,
               'app_sha256': sha(archive / 'app.bin'), 'qemu_sha256': sha(executable),

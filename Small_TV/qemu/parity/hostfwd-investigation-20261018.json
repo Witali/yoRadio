@@ -1,0 +1,661 @@
+{
+  "status": "partial_investigation_with_unresolved_timeouts",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T14:02:03.862074+00:00",
+  "scope": "Exact Small TV 0592 real-browser controls and static Windows libslirp listener experiment. Failed loads are preserved; this is not whole firmware, CYD or QEMU acceptance.",
+  "qemu_base": "0860e568d4ccc3f74a0e4a0e46f25b1fb7a0939b",
+  "reproducer_commit": "09dde5148a",
+  "vendor_commit": "dd76415fce457e319d665eb8210d05c5731360ba",
+  "changed_vendor_sources": [
+    "src/socket.c"
+  ],
+  "clean_wrap_fetch_patch_build_verified": true,
+  "clean_wrap_comparison": "Fresh Meson checkout uses LF; the manual socket checkout uses CRLF. Both patched sources match after line-ending normalization.",
+  "peer_port_reproducer_commit": "063bddfd4298e94fb7f925eb61cd13cf4b33b50a",
+  "peer_port_negative_control": {
+    "expected_failed": true,
+    "peer_port": 53092,
+    "guest_lru_eof": true,
+    "response_wall_seconds": 3.0160000000032596,
+    "inputs_unchanged": true,
+    "protected_flash_unchanged": true,
+    "rom_boots": 1
+  },
+  "timewait_trace": {
+    "peer_port": 62291,
+    "old_iss": 4928001,
+    "new_iss": 8000001,
+    "first_synack_delay_guest_seconds": 41.67109704017639,
+    "observation": "Guest ACKs the old sequence while proxy remains SYN_SENT. Later SYNACK is observed; expiry versus memory-pressure TIME_WAIT reclamation is not distinguished."
+  },
+  "browser": {
+    "stock20b": {
+      "passed": false,
+      "loads": 18,
+      "failed_loads": 1,
+      "refused_requests": 1,
+      "failures": [
+        {
+          "round": 5,
+          "mode": "none",
+          "error": null,
+          "controls_match": false,
+          "failed_requests": [
+            {
+              "path": "/get_clock_colors",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            }
+          ]
+        }
+      ],
+      "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+      "qemu_sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e"
+    },
+    "control": {
+      "passed": false,
+      "loads": 60,
+      "failed_loads": 6,
+      "refused_requests": 8,
+      "failures": [
+        {
+          "round": 1,
+          "mode": "close",
+          "error": null,
+          "controls_match": false,
+          "failed_requests": [
+            {
+              "path": "/getclocktype",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            },
+            {
+              "path": "/getsettings",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            },
+            {
+              "path": "/GetTimeModeValue",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "mode": "none",
+          "error": null,
+          "controls_match": false,
+          "failed_requests": [
+            {
+              "path": "/GetTimeModeValue",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "mode": "none",
+          "error": null,
+          "controls_match": false,
+          "failed_requests": [
+            {
+              "path": "/get_clock_colors",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "mode": "close",
+          "error": null,
+          "controls_match": false,
+          "failed_requests": [
+            {
+              "path": "/get_clock_colors",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            }
+          ]
+        },
+        {
+          "round": 6,
+          "mode": "close",
+          "error": null,
+          "controls_match": false,
+          "failed_requests": [
+            {
+              "path": "/GetTimeModeValue",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            }
+          ]
+        },
+        {
+          "round": 7,
+          "mode": "none",
+          "error": null,
+          "controls_match": false,
+          "failed_requests": [
+            {
+              "path": "/GetTimeModeValue",
+              "error": "net::ERR_CONNECTION_REFUSED",
+              "finished": false
+            }
+          ]
+        }
+      ],
+      "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+      "qemu_sha256": "0641009acff87b79ccbd8d00ae2afc4086ee25bcd8169884978f682e26e3f7ee"
+    },
+    "candidate": {
+      "passed": false,
+      "loads": 60,
+      "failed_loads": 2,
+      "refused_requests": 0,
+      "failures": [
+        {
+          "round": 6,
+          "mode": "close",
+          "error": "TimeoutError: page.waitForLoadState: Timeout 30000ms exceeded.\n=========================== logs ===========================\n  \"load\" event fired\n============================================================",
+          "controls_match": null,
+          "failed_requests": []
+        },
+        {
+          "round": 10,
+          "mode": "keep",
+          "error": "TimeoutError: page.goto: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:18085/\", waiting until \"domcontentloaded\"\u001b[22m\n",
+          "controls_match": null,
+          "failed_requests": [
+            {
+              "path": "/",
+              "error": "net::ERR_ABORTED",
+              "finished": false
+            }
+          ]
+        }
+      ],
+      "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+      "qemu_sha256": "2a3f63231b82946a6a948741195838e1d15af4c2da99237be9e77dfda4d8fcd9"
+    },
+    "diag": {
+      "passed": false,
+      "loads": 60,
+      "failed_loads": 1,
+      "refused_requests": 0,
+      "failures": [
+        {
+          "round": 3,
+          "mode": "close",
+          "error": "TimeoutError: page.waitForLoadState: Timeout 30000ms exceeded.\n=========================== logs ===========================\n  \"load\" event fired\n============================================================",
+          "controls_match": null,
+          "failed_requests": []
+        }
+      ],
+      "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+      "qemu_sha256": "bacef2eba1e51e3d884f3b774dcc27ccb6454312ebb33d470c180dec396e4d7b"
+    },
+    "usernet": {
+      "passed": false,
+      "loads": 60,
+      "failed_loads": 1,
+      "refused_requests": 0,
+      "failures": [
+        {
+          "round": 3,
+          "mode": "close",
+          "error": "TimeoutError: apiRequestContext.get: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - \u2192 GET http://127.0.0.1:18085/\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Connection: close\u001b[22m\n",
+          "controls_match": null,
+          "failed_requests": []
+        }
+      ],
+      "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+      "qemu_sha256": "2a3f63231b82946a6a948741195838e1d15af4c2da99237be9e77dfda4d8fcd9"
+    }
+  },
+  "wifi_setup": {
+    "passed": true,
+    "flows": [
+      "discovered",
+      "literal-manual",
+      "manual-entry"
+    ],
+    "ui_checks": 93,
+    "storage_role_checks": 18,
+    "inputs_verified": 25,
+    "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+    "qemu_sha256": "2a3f63231b82946a6a948741195838e1d15af4c2da99237be9e77dfda4d8fcd9"
+  },
+  "packet_tests": {
+    "passed": true,
+    "tests": 12
+  },
+  "flash_write": {
+    "passed": true,
+    "groups": 11,
+    "socs": [
+      "esp32c2",
+      "esp32c3",
+      "esp32"
+    ]
+  },
+  "modular_peripherals_passed": true,
+  "c3_oled_legacy_and_modular_boot_passed": true,
+  "full_cyd_acceptance": false,
+  "cyd_observation": "60 wall-second control had no panic; candidate showed a cache-error panic. Earlier PHY/cache baseline failures remain documented. This comparison does not prove full compatibility or identify a new regression.",
+  "remaining": [
+    "Explain and eliminate the strict browser timeouts.",
+    "Resolve CYD compatibility with an equivalent runtime control.",
+    "Complete exact final-image full regression, runtime acceptance and physical-board requirements."
+  ],
+  "artifacts": [
+    {
+      "file": "hostfwd-investigation-20261018-raw/stock20b-report.json.gz",
+      "original_sha256": "f948a82326de5f9868fcc59ea817454caf2a8211aa1d6acd9b59f069aef4b235",
+      "published_payload_sha256": "c268e0c09387afd9d1f1fb4d345dc810c3510199cd7a69226cd7408d4857f917",
+      "gzip_sha256": "f1b5b56a6157d93c70d4e11278b743ec6176c505ec27d3dc9149d8510a5e65df",
+      "host_account_paths_normalized": true
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/stock20b-browser.json.gz",
+      "original_sha256": "eb42a001718b0392960e02143fa4b3bd05c7a7cf7cac00266fca3e07121cfaa9",
+      "published_payload_sha256": "eb42a001718b0392960e02143fa4b3bd05c7a7cf7cac00266fca3e07121cfaa9",
+      "gzip_sha256": "0bbed88cf5f8b11e29838976b1f7ccd6e5709ce10b5923f78980dfc29813785e",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/stock20b-network.pcap.gz",
+      "original_sha256": "607e87c1cb865e4cec002c8845a7e085e99e218f3b6f96a60a56ce140148e6c1",
+      "published_payload_sha256": "607e87c1cb865e4cec002c8845a7e085e99e218f3b6f96a60a56ce140148e6c1",
+      "gzip_sha256": "014e306cf53a55cc747e85f4dedbec70606211107f79e330290ce709bf70a2c6",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/stock20b-uart.log.gz",
+      "original_sha256": "4155d9eb021f257a59a15f58fba52c2bff1a47679e6ac206b7828d9a8543767d",
+      "published_payload_sha256": "4155d9eb021f257a59a15f58fba52c2bff1a47679e6ac206b7828d9a8543767d",
+      "gzip_sha256": "553dd3576262e1ec001e3583cfe3723095ced3b6a89ba65885d9cc7822eba695",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/control-report.json.gz",
+      "original_sha256": "c31ee4e430929927dec30e54b19cf556a622e4418205e230e70ed9223ab17e34",
+      "published_payload_sha256": "2bcf95ae4bf5e73f29f36b78068e4ee7aae43a76de5bdc4d20147a04eeeb79ea",
+      "gzip_sha256": "dc7c3225db86678b55adbb645b974378b401aabbeeb019d81ecbcb9f45cbc5de",
+      "host_account_paths_normalized": true
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/control-browser.json.gz",
+      "original_sha256": "b976423858e43129b0ebbc361a53b6d10f023f960fe806aab47ec1f3e0de5553",
+      "published_payload_sha256": "b976423858e43129b0ebbc361a53b6d10f023f960fe806aab47ec1f3e0de5553",
+      "gzip_sha256": "7f3568ce4e80abee7e37f6e9c7cbd98200dbb115cdf0d7a0cd1701b21de86ecb",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/control-network.pcap.gz",
+      "original_sha256": "e72d2ea28f8bf35b7241ce842ee824125821228ef59108d22021574008db7d53",
+      "published_payload_sha256": "e72d2ea28f8bf35b7241ce842ee824125821228ef59108d22021574008db7d53",
+      "gzip_sha256": "5c8c3b0393f3dcf774cc22ee9e8543d1740b2e8ffb4698026279273f10157db2",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/control-uart.log.gz",
+      "original_sha256": "ce3e464008c5b0c513389a151259404e1e71de7b466df15b5561e9860e897620",
+      "published_payload_sha256": "ce3e464008c5b0c513389a151259404e1e71de7b466df15b5561e9860e897620",
+      "gzip_sha256": "ff30fd12f06c4adb279b02147bcf7d5da13bec176da74bc96176fe98ec7165aa",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/candidate-report.json.gz",
+      "original_sha256": "7a011d1a4393e774f2034960448571e5f0344ed5bb43ec26de97ce1a94d3af55",
+      "published_payload_sha256": "dc8ccc06928c86129e7cbbef82de20a7e3382ceb4043215d3b3fa196973a4ce0",
+      "gzip_sha256": "e5979903b00b4b828df4896f735709ec5de8635f7812ed7cfa10470fe3689713",
+      "host_account_paths_normalized": true
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/candidate-browser.json.gz",
+      "original_sha256": "8940017080229e180874e35ee6e6065cc48871f01315cb9913497c66c434b58e",
+      "published_payload_sha256": "8940017080229e180874e35ee6e6065cc48871f01315cb9913497c66c434b58e",
+      "gzip_sha256": "e9c84b959c3eaf52771b98cd08a5559d29d1134bc3621b68b7e23537156e072c",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/candidate-network.pcap.gz",
+      "original_sha256": "7dbbb477ff5ed00fc1652dd0020cb877131d1e32aeffd73ede8d3ad400c15aee",
+      "published_payload_sha256": "7dbbb477ff5ed00fc1652dd0020cb877131d1e32aeffd73ede8d3ad400c15aee",
+      "gzip_sha256": "82d1443146e10f009d3a70bdb59835af8e87d72de3e26832e62abd3ce87e9640",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/candidate-uart.log.gz",
+      "original_sha256": "1eac4421b91f9d925359841e07112183a8a6f298d8d86454b9bfe9c65aceddc0",
+      "published_payload_sha256": "1eac4421b91f9d925359841e07112183a8a6f298d8d86454b9bfe9c65aceddc0",
+      "gzip_sha256": "fa472b254943228c84154a6b73f248cb749a4e2a52aa20157ff81c7788a6d9f1",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diag-report.json.gz",
+      "original_sha256": "0df60242f50e08fea33b437e2532e9812174387e57222f54d16d8d8ba2452ff7",
+      "published_payload_sha256": "86e907d243ad8044ef9fe3871752e8dec038c114fcd1abe5c4eb63d9faff63e7",
+      "gzip_sha256": "8cfefc890f2aa53fce91fac40a955572735f25c754a77d10de0236d913c4478f",
+      "host_account_paths_normalized": true
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diag-browser.json.gz",
+      "original_sha256": "a0ff216720343c2c620e92ab8a22ab3db29bcfed34604e4dca6f9ff376fbe743",
+      "published_payload_sha256": "a0ff216720343c2c620e92ab8a22ab3db29bcfed34604e4dca6f9ff376fbe743",
+      "gzip_sha256": "2280a7a132fc665e624aa1e20291e60c338669ae9235122609e25037e04fe080",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diag-network.pcap.gz",
+      "original_sha256": "eadf1522762f86bdd57b78840742b4f173460b4537a667515fe896489777eacf",
+      "published_payload_sha256": "eadf1522762f86bdd57b78840742b4f173460b4537a667515fe896489777eacf",
+      "gzip_sha256": "4522229fd042d29511129f2d56e3ca29e4e17c1407110091496a51637f2f7e56",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diag-uart.log.gz",
+      "original_sha256": "b80fc94613d5c5e1a33dd6a47f24644ba86046deb2ee53120adb765def94e742",
+      "published_payload_sha256": "b80fc94613d5c5e1a33dd6a47f24644ba86046deb2ee53120adb765def94e742",
+      "gzip_sha256": "c2f25c03bb20dd1c15c9a3cd7671166aaddb68417802aaa2cd0823f1c089bf6c",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diag-qemu.log.gz",
+      "original_sha256": "f49c105d6475fe42380072a7b03ce2ab2f182a320b8599cc8c5b88d8cbe4c00e",
+      "published_payload_sha256": "f49c105d6475fe42380072a7b03ce2ab2f182a320b8599cc8c5b88d8cbe4c00e",
+      "gzip_sha256": "cd82c61d34350af710bd95cda27f3fba80f667622ff11071fc00528a9f2c2951",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diag-host-tcp-observations.json.gz",
+      "original_sha256": "84a69a7a1403b32b3dec98443efa29b4a26249c68d44fac4584233e12c32fc1f",
+      "published_payload_sha256": "84a69a7a1403b32b3dec98443efa29b4a26249c68d44fac4584233e12c32fc1f",
+      "gzip_sha256": "e5894a72deea52c45c69976756ff645c07fac1c93256aced18621800f6f74e8e",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/usernet-report.json.gz",
+      "original_sha256": "0f47519e2899b4815bfbfa58d8a654cc8e3eb5da6587ad9f626d85d0459a4365",
+      "published_payload_sha256": "2ad0a6d0d5d826c54b7c7cb08e6c6010534079a3164cf5ba0da0accaf3b41e03",
+      "gzip_sha256": "699bc2ba28f1333495db634f91142e98efd3ddba3da9817e8bb44d772f4004cf",
+      "host_account_paths_normalized": true
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/usernet-browser.json.gz",
+      "original_sha256": "bf0d11ece262762c1417fc4985128e2cd00ac38b61e550bcc9355501606b07f0",
+      "published_payload_sha256": "bf0d11ece262762c1417fc4985128e2cd00ac38b61e550bcc9355501606b07f0",
+      "gzip_sha256": "46c7423c191ba58f5b6afffc8c4348b0a9c9f382abb519cc28328fdaeeb187c6",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/usernet-network.pcap.gz",
+      "original_sha256": "11c1138d4ba744a52c1bb660c5f0cb8f4f408dea85f76b1e80061b2f9fee9951",
+      "published_payload_sha256": "11c1138d4ba744a52c1bb660c5f0cb8f4f408dea85f76b1e80061b2f9fee9951",
+      "gzip_sha256": "3b2dfe9186d3eacdfc9cd2c2df5530b5e67e85a8a20a84e1a0068194b0127c10",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/usernet-uart.log.gz",
+      "original_sha256": "a5fce72b04d87724d9668676e9d3562e2f90f13d4cbf6921d3441c39ff26f7b2",
+      "published_payload_sha256": "a5fce72b04d87724d9668676e9d3562e2f90f13d4cbf6921d3441c39ff26f7b2",
+      "gzip_sha256": "5da234ff3258e16f1c80c8a3e1055f340070ee8e5a0b3651e962ee278afd018f",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/usernet-qemu.log.gz",
+      "original_sha256": "5fa7ab740f10e8a89802f1e34c088224f8f3521c59c3af33f877790caf0985b3",
+      "published_payload_sha256": "5fa7ab740f10e8a89802f1e34c088224f8f3521c59c3af33f877790caf0985b3",
+      "gzip_sha256": "0d32919286d07a3da4eeb8362e7e46b3196e8d79d62946864a843df5abb33a07",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/usernet-host-tcp-observations.json.gz",
+      "original_sha256": "887588a84446fe6a4e1e21710a87bbe60525fe041ea0725f639889a2a93c090f",
+      "published_payload_sha256": "887588a84446fe6a4e1e21710a87bbe60525fe041ea0725f639889a2a93c090f",
+      "gzip_sha256": "707b7486f83fb2f93261826a4d9cde12586e0e6dc2390c3eec10ca3c913b85b1",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/peer-port-report.json.gz",
+      "original_sha256": "893526e10a6152eaa9e904832e39e5dc400c075f109b89352eaac3e6cf94ca90",
+      "published_payload_sha256": "893526e10a6152eaa9e904832e39e5dc400c075f109b89352eaac3e6cf94ca90",
+      "gzip_sha256": "7d46f52096813a706756defb8ff515453b93da4a117edef86dd93e314a68c10a",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/peer-port-network.pcap.gz",
+      "original_sha256": "37f3a9f5036d86609534ba074c200253883debe31d34230b2b857c00d5fc2797",
+      "published_payload_sha256": "37f3a9f5036d86609534ba074c200253883debe31d34230b2b857c00d5fc2797",
+      "gzip_sha256": "86d56b891fd855a5012b770fa308009c8866813f666fb4cc6959478060cc6f6d",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/peer-port-uart.log.gz",
+      "original_sha256": "b62df950adba0d781c7c5ddcb9b1f69a5338732c23535873e35498a7d2dce597",
+      "published_payload_sha256": "b62df950adba0d781c7c5ddcb9b1f69a5338732c23535873e35498a7d2dce597",
+      "gzip_sha256": "aef3ec8179368b03fab608858f163c71cb42c30a75fa725b80c938eb29a83f73",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/peer-port-test.py.gz",
+      "original_sha256": "ed375455e1694d8c0287dd590c94fa4f6974521d4329635c23ec400aead2c677",
+      "published_payload_sha256": "ed375455e1694d8c0287dd590c94fa4f6974521d4329635c23ec400aead2c677",
+      "gzip_sha256": "1c53a736bdbae5d43bbfe2e809337e89a977f38b00a974432b7849fe0736f6cd",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/investigation-notes.md.gz",
+      "original_sha256": "4450876e2a29fab666b3ee8b8552a8c0d584224e1bae2a41c2a1ddfe95237378",
+      "published_payload_sha256": "4450876e2a29fab666b3ee8b8552a8c0d584224e1bae2a41c2a1ddfe95237378",
+      "gzip_sha256": "60ba5affa4345cc3d595335d6d3a4b3e5b80cbc8d9454fbdea9a0da856292dfd",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/timewait-extract.json.gz",
+      "original_sha256": "e6a0c24de1cc6420340e31f7eb016edd4684369195067da6a2a83bad83767aa5",
+      "published_payload_sha256": "e6a0c24de1cc6420340e31f7eb016edd4684369195067da6a2a83bad83767aa5",
+      "gzip_sha256": "b77dd3b9bca13e05046226e4e39401353abad716ef7655d3e31bf7469fa9090c",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/wifi-report.json.gz",
+      "original_sha256": "b8bb870f706eb6df865bde32be38e696efa2966a51f3075e7ba99b8e7df694ff",
+      "published_payload_sha256": "0a7f89193038d8d9cf116e4daf92047893df55fa527aa57eb0c0d2d769ef21eb",
+      "gzip_sha256": "ddc47d9953be550bdd39ab55a5368a618793f395af20c036c26da0d375f7b0bd",
+      "host_account_paths_normalized": true
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/discovered-setup-uart.log.gz.gz",
+      "original_sha256": "06505b411a46abd134e2cba035b0220abf77abcbe243abd247afc95fc7ea52b0",
+      "published_payload_sha256": "06505b411a46abd134e2cba035b0220abf77abcbe243abd247afc95fc7ea52b0",
+      "gzip_sha256": "6e1303fa502a84642dc90caa1834f0f42f322b0578f0f9da5061811cec428c81",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/discovered-cold-uart.log.gz.gz",
+      "original_sha256": "661e4bf7f0511da07191ed897e12661381e2a462aba0d7ab5c7a141f749b6167",
+      "published_payload_sha256": "661e4bf7f0511da07191ed897e12661381e2a462aba0d7ab5c7a141f749b6167",
+      "gzip_sha256": "b5865b2b461cada85f6f026e67dbb482de29e6959e4856e57df01c18c93b5464",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/literal-manual-setup-uart.log.gz.gz",
+      "original_sha256": "4268f4893951a6f1da7b059fe69c05140d6a3ba140bb44be1ce729aacdbc44ca",
+      "published_payload_sha256": "4268f4893951a6f1da7b059fe69c05140d6a3ba140bb44be1ce729aacdbc44ca",
+      "gzip_sha256": "75a052ab5b0fb055d1ef4c978551661b50247b50435bd45a8f649dd2b8513f18",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/literal-manual-cold-uart.log.gz.gz",
+      "original_sha256": "262ab0da09feddd1d94ce62ff39c55489817a14daca48a77fcf77df33d09f3cd",
+      "published_payload_sha256": "262ab0da09feddd1d94ce62ff39c55489817a14daca48a77fcf77df33d09f3cd",
+      "gzip_sha256": "2794d8e4e9d551aa28399e20c2868febc657876cc663608a3390c8b2bf4fbe8f",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/manual-entry-setup-uart.log.gz.gz",
+      "original_sha256": "c758f145586c57e5363ce68cbbfdb9b4706be817575cd0c843a9d4bf654cc7e2",
+      "published_payload_sha256": "c758f145586c57e5363ce68cbbfdb9b4706be817575cd0c843a9d4bf654cc7e2",
+      "gzip_sha256": "aa0a3639ccaec18cb4ad48368bfc623c9e5bd449d35063cf87634d18864cf77e",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/manual-entry-cold-uart.log.gz.gz",
+      "original_sha256": "161588560b60465ab02468fe2856173ffffd18679010d004d9be3b19fd0b9d85",
+      "published_payload_sha256": "161588560b60465ab02468fe2856173ffffd18679010d004d9be3b19fd0b9d85",
+      "gzip_sha256": "0284c517e7f6808b845b974ef5de3642746996b17f8e08211a9d59959cb3c013",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-wifi-services-20261018.json.gz",
+      "original_sha256": "8be65d7c745217a3c4aa870a3302dbc16b2709b81c322ef4865cf2239366d59e",
+      "published_payload_sha256": "8be65d7c745217a3c4aa870a3302dbc16b2709b81c322ef4865cf2239366d59e",
+      "gzip_sha256": "fc94062b9a2ce683aa05cf2f2c4b9ae3d880e5f9c8b5fc63dbf370451099e85e",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-flash-write-20261018.json.gz",
+      "original_sha256": "5370350fc5c41a66da8a759b143fd6d997882ac4f68095e71274a51ebf36d85e",
+      "published_payload_sha256": "5370350fc5c41a66da8a759b143fd6d997882ac4f68095e71274a51ebf36d85e",
+      "gzip_sha256": "8647bf547afdaf5d388f46bfa45e52241f673ddd9a1a17eaa9bb16f9e10192c3",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-modules-20261018-modular-report.json.gz",
+      "original_sha256": "c54b97d562fdd29a314cc94756a055db6e0bdaf2561131f680af185a0322b1aa",
+      "published_payload_sha256": "c54b97d562fdd29a314cc94756a055db6e0bdaf2561131f680af185a0322b1aa",
+      "gzip_sha256": "3e8a76ef14bed15bdef9f01d080844ae8df22c4342ca342c4c0c1f5012becf75",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-legacy-20261018-report.json.gz",
+      "original_sha256": "fc0d8562b482943fd6426ddceac0b246f4870b8a01efe93340ffeb8a2f307191",
+      "published_payload_sha256": "fc0d8562b482943fd6426ddceac0b246f4870b8a01efe93340ffeb8a2f307191",
+      "gzip_sha256": "38b25e3bef62b7235f374ae5f1cccfec47744f5df5a0f5801feac23822beebae",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-tools-unit-20261018.log.gz",
+      "original_sha256": "d086a85efb69e6fe088d219b7ad6369517d63752d5715e340818126229ddeceb",
+      "published_payload_sha256": "d086a85efb69e6fe088d219b7ad6369517d63752d5715e340818126229ddeceb",
+      "gzip_sha256": "88462044a68e2f0fa9f8d1500e6b86cae71e5dede03dd9460de09c2aae7eb577",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-wrap-repro-20261018.log.gz",
+      "original_sha256": "735d7643275e2a01e5dedae8275d76ac7fd5be7c79be00846015a2f8f3f852c0",
+      "published_payload_sha256": "735d7643275e2a01e5dedae8275d76ac7fd5be7c79be00846015a2f8f3f852c0",
+      "gzip_sha256": "d89031835423c6f4b3da60568e09fade54a10f365165bbad1ceb44f96263588e",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/qemu-hostfwd-control-build-v2-20261018.log.gz",
+      "original_sha256": "8614ea9cd5674df8b1d0b858c94816aa402b64cdb0298f914dcd00d93e16778e",
+      "published_payload_sha256": "8614ea9cd5674df8b1d0b858c94816aa402b64cdb0298f914dcd00d93e16778e",
+      "gzip_sha256": "d87bbfc49c2e69590242577cf21633de185c6daa71f52a82d8be818e9f3dace8",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/qemu-hostfwd-candidate-build-20261018.log.gz",
+      "original_sha256": "995a95c9906d0334b10102a3a55ec3dcd0b0381b6ea2e66ea3f826404bfebc76",
+      "published_payload_sha256": "995a95c9906d0334b10102a3a55ec3dcd0b0381b6ea2e66ea3f826404bfebc76",
+      "gzip_sha256": "c27aca4ac33fcd0f6a6ad66e81db4a6d57ac6399ba9ca981283ca9bc85216d49",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-control-socket-20261018.asm.gz",
+      "original_sha256": "e311c6144ae14c3c07632016d6cdee165a86fcb96b83542adfbf81e2b71790b9",
+      "published_payload_sha256": "e311c6144ae14c3c07632016d6cdee165a86fcb96b83542adfbf81e2b71790b9",
+      "gzip_sha256": "8a87218b0b872138cdd29311c25a5562e4c3874f15b83e98f4451fa4b929ac56",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/hostfwd-candidate-socket-20261018.asm.gz",
+      "original_sha256": "edaa76aa814ce2c5e103fd7d5dcca695d65d6ddd81366be5bd407e9fb75175fa",
+      "published_payload_sha256": "edaa76aa814ce2c5e103fd7d5dcca695d65d6ddd81366be5bd407e9fb75175fa",
+      "gzip_sha256": "8539fbab0eb929fff58c56685d8f2a0d4af07156a0b136ddc402e1464cc47fba",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/cyd_control-uart.log.gz",
+      "original_sha256": "1b3c915e20365741d0cf88490c191af3d9fb3d6babb0af19ee04f47d6bcbbd90",
+      "published_payload_sha256": "1b3c915e20365741d0cf88490c191af3d9fb3d6babb0af19ee04f47d6bcbbd90",
+      "gzip_sha256": "12b99e888f03d2d2644fb3aa5bfb60ca0d5b978d88d0b0b67158bf79339c3d45",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/cyd_candidate-uart.log.gz",
+      "original_sha256": "97404305f6091bb92c0597d8e7b2a375f465fc7522686cab8142b50650a95638",
+      "published_payload_sha256": "97404305f6091bb92c0597d8e7b2a375f465fc7522686cab8142b50650a95638",
+      "gzip_sha256": "7f8ce13094f4667305ed2895b13ff89fc7762076b99d9b0830f84b359d85a4e6",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/c3_oled-uart.log.gz",
+      "original_sha256": "feaf931faac157b8cc725abe45cfedb82848a5b099c3c931a44cd1c4cd5e60f0",
+      "published_payload_sha256": "feaf931faac157b8cc725abe45cfedb82848a5b099c3c931a44cd1c4cd5e60f0",
+      "gzip_sha256": "7c55f012233b0f0b189ad135e1d41c3feb1f82417cc165a2af54ae2c8a29b6ae",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/c3_modular-uart.log.gz",
+      "original_sha256": "feaf931faac157b8cc725abe45cfedb82848a5b099c3c931a44cd1c4cd5e60f0",
+      "published_payload_sha256": "feaf931faac157b8cc725abe45cfedb82848a5b099c3c931a44cd1c4cd5e60f0",
+      "gzip_sha256": "7c55f012233b0f0b189ad135e1d41c3feb1f82417cc165a2af54ae2c8a29b6ae",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/slirp-win32.wrap.gz",
+      "original_sha256": "01b1aacbebef4aded66d43aacbd838d5889a2662270ad4990e0fc3da57a01d84",
+      "published_payload_sha256": "01b1aacbebef4aded66d43aacbd838d5889a2662270ad4990e0fc3da57a01d84",
+      "gzip_sha256": "7c5e102b80457ef4b63120001088049a7dbf3fbfe6c1a102eeb1f5625a44f340",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/slirp-win32-listen.diff.gz",
+      "original_sha256": "004a43d4353036f4fbf71fde60b94068db4a6f5cf80532aba1d635d87f0bf32a",
+      "published_payload_sha256": "004a43d4353036f4fbf71fde60b94068db4a6f5cf80532aba1d635d87f0bf32a",
+      "gzip_sha256": "d2d8bd6e3a6285fa3902b22899bf3f38e6a089023f2185d786bfcd8e3bc30802",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/slirp-win32-subproject.diff.gz",
+      "original_sha256": "9e54dfdffccbbc1d6ba124095f3f743f301c25d5abce02b12e3a01ee34a0e450",
+      "published_payload_sha256": "9e54dfdffccbbc1d6ba124095f3f743f301c25d5abce02b12e3a01ee34a0e450",
+      "gzip_sha256": "52e8d148a2a8685d3a2fc5984a1c0f3a1cd9b0ec6288613ed7998e27e136c871",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/build-inputs.json.gz",
+      "original_sha256": "dbed11a6ca90fe1b4ea3cb8fbf6f12441fd21b17787a11cb22f70613db4fa8ba",
+      "published_payload_sha256": "dbed11a6ca90fe1b4ea3cb8fbf6f12441fd21b17787a11cb22f70613db4fa8ba",
+      "gzip_sha256": "b2b547a632eecb2c6df5cb4d45551df7b64b23038f23fccdfc887331ac3664d0",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diagnostic.diff.gz",
+      "original_sha256": "14de53572a2b0a646336ee0fee7b87fc0b251181fd6360c21212fad6e5d15d86",
+      "published_payload_sha256": "14de53572a2b0a646336ee0fee7b87fc0b251181fd6360c21212fad6e5d15d86",
+      "gzip_sha256": "de4d72fda02de8e22297e66bcc40764b842b907096df70953f9533adab15287a",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/diagnostic-inputs.json.gz",
+      "original_sha256": "9a65cb884e2e041adb7f9277b9290c60423eefcc5bdab41732e5753b0c597d3c",
+      "published_payload_sha256": "9a65cb884e2e041adb7f9277b9290c60423eefcc5bdab41732e5753b0c597d3c",
+      "gzip_sha256": "57bfbcab1cce80e4136effe2792967d6e608c8de82cfcef810b5ffeb4d57b09e",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "hostfwd-investigation-20261018-raw/browser-usernet-observer.py.gz",
+      "original_sha256": "cf7fc1bef247d18361de266b5552703056cee3da9431c9db5c7934a5ca88afb7",
+      "published_payload_sha256": "cf7fc1bef247d18361de266b5552703056cee3da9431c9db5c7934a5ca88afb7",
+      "gzip_sha256": "9845b2680870cc44182fc4fdf1c05f0542be7336c97682b3b6f01864c643c1b2",
+      "host_account_paths_normalized": false
+    }
+  ]
+}

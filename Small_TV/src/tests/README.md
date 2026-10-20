@@ -1,5 +1,150 @@
 # Функциональные тесты Small TV ESP32-C2
 
+## Полнота переноса
+
+[Двусторонняя карта](../reference/BIDIRECTIONAL_AUDIT.md) учитывает каждый
+экспортированный factory entry и каждую прикладную C-функцию. Проверка
+`correspondence_test.py` отвергает пропущенные/неизвестные цели и устаревшие входы.
+Она проверяет инвентаризацию, не семантическую эквивалентность; найденные
+непроверенные переходы перечислены в документе.
+
+`http_captive.inc` проверяет неизвестные маршруты отдельно: локальный/отсутствующий
+Host, порт, чужое/AP-похожее имя и STA. `captive_qemu.py` исполняет factory AP,
+native AP и native STA в отдельных ВМ без LCD/debugger, с настоящими HTTP
+ответами. Для `--qemu-root` нужен pinned snapshot с `frozen-inputs.json`;
+остальные аргументы — `--dependency-root` и новый `--output`.
+[54F4 scoped proof](../../qemu/parity/captive-portal-validation-20261020.json)
+не заменяет полный suite/24h новой версии.
+
+## Цвета и подготовка нового JPEG
+
+Pure color module имеет отдельные host/RV32 проверки grayscale/RGB/CMYK2–16бит
+и буквальное выполнение заводских RGB helpers. C8FD прошла native regression,
+отдельные cold LCD и network-without-LCD gates; новая JPEG library ещё не
+подключена. См. [COLOR_CONVERSION.md](COLOR_CONVERSION.md).
+
+Host libjpeg allocation/I/O faults и recovery после abort проверяются отдельно:
+1227инъекций,36truncated recoveries и12format transitions. См.
+[JPEG_FAULT_RECOVERY.md](JPEG_FAULT_RECOVERY.md). Эти результаты не заменяют
+NOR/HTTP/LCD или полный/суточный прогон будущей firmware.
+
+Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
+для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write
+не выполняется. Это capacity/ownership plan, не готовый NOR backend.
+
+## JPEG Huffman selectors
+
+Отдельный `jpeg_selector_oracle.py` проверяет136valid/32invalid входа с
+независимыми DC/AC destinations каждого компонента. HTTP upload проверяется
+своим этапом `photo_qemu.py`. Это проверки формата/хранения, их результаты
+не подменяют network или display readiness. См. [JPEG_SELECTORS.md](JPEG_SELECTORS.md).
+
+## Сеть без дисплея
+
+`network_without_display_qemu.py` запускает обе прошивки в ВМ без LCD. Свежий
+SNTP и HTTP проверяются до/после reset без framebuffer/готовности дисплея.
+Реальный F1/D64 прогон прошёл; boot и display/not_run отражаются отдельно.
+См. [NETWORK_WITHOUT_DISPLAY.md](NETWORK_WITHOUT_DISPLAY.md).
+
+## Холодные старты и полный кадр
+
+Независимый `display_cold_boot_qemu.py` повторяет20cold process starts на factory
+и native, сравнивая весь LCD с фактическим заводским setup frame. Boot и display
+имеют свои результаты; сеть не проверяется и host HTTP forwarding отключён.
+См. [DISPLAY_COLD_BOOT.md](DISPLAY_COLD_BOOT.md): происхождение эталона,
+12отрицательных/положительных unit controls, запуск и аппаратные ограничения.
+
+## Desktop/mobile настройки и холодное сохранение
+
+`browser_controls_qemu.py` проверяет реальные страницы Clock/Advanced/Photos,
+все значения тем/GIF/дат, переключатели, цвета, яркость, ночное расписание и
+параметры фото на1280×900 и390×844. После reload DOM сверяется с API, затем
+полный набор — с raw flash и новым процессом ВМ. Результат F1/D64:
+281 UI +5 storage/source checks; сетевые и дисплейные результаты остаются
+отдельными. Запуск, точный объём и ограничения — [BROWSER_CONTROLS.md](BROWSER_CONTROLS.md).
+
+## Первоначальная настройка Wi-Fi в настоящем браузере
+
+`browser_wifi_qemu.py` запускает `browser_wifi_flow.mjs` в установленном Chrome
+с viewport390×844. Аргументы те же, что у photo gate ниже: абсолютные пути
+`--qemu-root`, `--dependency-root`, `--node`, `--playwright-modules`,
+`--browser-executable` и новый `--output`. Каждый сценарий имеет собственные
+raw flash и профиль; доступ браузера ограничен двумя loopback адресами этой ВМ.
+
+Проверяются реальный `/scan`, знаковый RSSI, обычный SSID и сеть с буквальным
+именем `manual`, ручной ввод после пустого сканирования, Cancel/пустой prompt,
+отказ при коротком пароле и успешная настройка открытой синтетической сети.
+Недопустимый ввод не должен менять raw record, режим AP или число ROM boot.
+При успехе JavaScript должен перейти в `about:blank`, станция получить DHCP,
+синхронизировать SDK UTC через UDP и загрузить переключатели из `/getsettings`.
+Затем новый процесс ВМ проверяет сохранённые credentials и режим STA.
+
+После программного restart сравнение времени использует SDK HRT offset,
+correction и systimer из matching ELF (`ntp_reply_observation`), а не сумму
+RTC base и времени жизни QEMU. У каждого процесса сохраняются ROM boot count,
+read-only SDK observations и UART. Исполняемый код, media banks и все flash
+области вне NVS/raw settings должны остаться прежними. WPA handshake,
+физический RF/captive portal, desktop UI и весь H03 этим gate не закрываются.
+Это самостоятельный тест: он не добавляется задним числом в live frozen full.
+Текущий F1/ELF91E2/D64 также прошёл93browser и18storage/role checks,
+26inputs неизменны. Три пары процессов ВМ завершены; сырые отчёты, UART,
+снимки браузера и точные исходники сохранены в
+[browser-wifi-f1-validation-20261018.json](../../qemu/parity/browser-wifi-f1-validation-20261018.json).
+В каждом preflight есть ровно две ожидаемые записи console об HTTP400 при
+отказе короткого пароля; других console errors и JavaScript exceptions нет.
+Это сетевой/browser/storage результат, не проверка изображения на LCD.
+
+Исторический BC68/20B прошёл93browser и18storage/role checks,25inputs неизменны:
+[browser-wifi-validation-20261018.json](../../qemu/parity/browser-wifi-validation-20261018.json).
+В отчёте сохранены также два неуспешных запуска при разработке наблюдателя;
+они не переименованы в успешные. Все шесть тестовых ВМ завершены.
+
+## Настоящий браузер и фото в QEMU
+
+`browser_photo_qemu.py` управляет отдельной writable ВМ и двумя холодными
+процессами Chrome через `browser_photo_flow.mjs`. Передавайте абсолютные пути
+`--qemu-root`, `--dependency-root`, `--node`, `--playwright-modules` (каталог
+node_modules с установленным Playwright), `--browser-executable` и новый
+`--output`. Используются только существующие локальные зависимости и
+синтетические цветные/шумовые изображения с фиктивными EXIF/APP/COM tags.
+
+Проверяются реальные mouse pointer events уменьшения/растягивания рамки,
+ползунки и выбранные RGB pixels, JPEG240×240 без metadata, Cancel/Escape,
+390×844 viewport, настоящие12multipart chunks и два cold process readback.
+QMP подтверждает raw backing; HTTP-байты совпадают с photo banks. Защищённые
+flash intervals и slots1–3 остаются прежними. Для каждого процесса сохраняется
+отдельный UART с одним ROM boot; все inputs проверяются после выполнения.
+
+Текущий F1/ELF91E2/D64 прошёл23browser и6storage/source checks,27inputs
+неизменны. Оба процесса ВМ завершены; сырые JPEG с синтетическими metadata,
+результаты Canvas, снимки desktop/mobile и UART сохранены в
+[browser-photo-f1-validation-20261018.json](../../qemu/parity/browser-photo-f1-validation-20261018.json).
+Исторический результат BC68/20B:
+[browser-photo-validation-20261018.json](../../qemu/parity/browser-photo-validation-20261018.json).
+Это отдельная browser/Canvas/storage проверка: физический touchscreen, RF,
+полные LCD frames и H10 требуют своей evidence. Уже идущий frozen full suite
+этот новый standalone gate задним числом не получает.
+
+`raw_flash_observer_test.py` содержит5проверок чтения raw настроек: erased/partial
+ASCII остаётся pending, точный максимальный key читается полностью, неверный key
+не проходит, native dirty flag должен быть нулём до и после чтения файла. Внешний
+wait_for сохраняет прежний timeout: постоянная ошибка записи продолжает падать.
+Флаг взят из единственного1-byte symbol dirty в текущем ELF; его адрес и ELF hash
+записаны в regional report. Factory использует прежнюю проверку точного raw key,
+поскольку эквивалентный factory completion flag не доказан. Это обязательный
+unit gate suite/publisher/verifier. Scoped real proof:
+`../../qemu/parity/flash-persistence-observer-validation-20261018.json`.
+
+`ap_services_qemu.py` сравнивает factory/native AP setup после6настоящих HTTP
+настроек: полные RGB кадры, cache, AP/STA/time state и task set. Native snapshots
+привязаны к ELF и ROM heap counters; в AP отсутствуют time_sync/weather_http.
+`ap_services_contract.py` общий для suite/publisher/verifier и содержит18
+отрицательных проверок evidence. Результат BC68/B44 сохранён в
+`../../qemu/parity/ap-services-validation-20261018.json`; full и H10 для BC68
+ещё не принимались. Platform cases setup_services/empty_station_setup_services
+проверяют actual initialized AP role, включая mode1 без SSID; неизменный final
+harness падает на прежних двух service modules.
+
 Набор проверяет восстановленную прошивку и сохраняет результаты для конкретного
 SHA-256 приложения и исходников. Он включает все имеющиеся функции устройства:
 экраны, часы, сетевую настройку, погоду, подсветку, фотографии и веб-интерфейс.
@@ -194,6 +339,15 @@ Pillow нужен только для воспроизведения закре�
 невозможных таблиц с рабочим entropy: DC depth 1 и AC depths 1…16. Ошибки
 должны отклоняться до начала декомпрессии; буквальный factory acceptance
 записывается отдельно. [Huffman-проверки](../../qemu/parity/huffman-checks.md).
+
+`jpeg_dht_oracle.py` добавляет128случаев: четыре valid controls и124invalid
+unused branches (reserved AC symbols, DC boundaries и all-one words на разных
+глубинах). Malformed DHT должен отклоняться до entropy даже при корректном DC0/EOB.
+Полный panel guard и discard validation проверяются независимо. Этот child gate
+обязателен внутри `machine_jpeg_inputs`; общий `jpeg_dht_contract.py` проверяет
+доказательства в runner/publisher/verifier, включая семь rejection controls.
+`photo_qemu.py` дополнительно требует400/absent для трёх reserved-table JPEG
+через настоящую загрузку. [Спецификация, before/after и область проверки](../../qemu/parity/jpeg-dht-checks-20261018.md).
 
 Группа `machine_timezones` исполняет настоящий код преобразования времени и libc:
 36,404 сравнения для 109 исходных ключей стран, все записанные переходы ±1 секунду,
@@ -435,6 +589,32 @@ python Small_TV/src/tests/startup_qemu.py --dependency-root C:/Work/yoRadio `
 событий/регистров/RAM; code/media остаются прежними. Общий contract23negative
 controls используется suite/publisher/verifier. Это проверка QEMU, не физического RF.
 
+`netif_roles_qemu.py` входит в `qemu_suite.py` и проверяет реальные списки
+ESP-NETIF: ровно `WIFI_STA_DEF` в станции и `WIFI_AP_DEF` в setup, в том числе
+после HTTP `/scan`. Сначала заводской SDK создаёт синтетические credentials
+`yoRadio-QEMU` при настоящем подключении. Его NVS используется в обеих setup
+фикстурах; остальные байты станции сохраняются, затем меняется только raw mode.
+В native драйвере используется RAM storage, поэтому собственные дубли SSID в
+SDK NVS не требуются. Парсер ESP-IDF5.5.4 из `--dependency-root/.idf/v5.5.4`
+подтверждает namespace/SSID/AP-info и CRC; пользовательский NVS не используется.
+
+Заводские адреса связаны с SHA полного dump и assembly в
+`src/reference/assembly/netif-20261018`; native символы/смещения берутся из
+DWARF ELF, связанного с `app.bin`. `netif_observer.py` ограничивает чтение
+RAM/DROM, обнаруживает циклы, плохие указатели/ключи и лишние интерфейсы.
+Семь offline tests и17 evidence rejection controls обязательны в suite/publisher.
+Самостоятельный запуск из репозитория с нужным SDK/ELF:
+
+```powershell
+python -X utf8 Small_TV/src/tests/netif_roles_qemu.py `
+  --qemu-root C:/Work/QEMU-ESP32 --dependency-root C:/Work/yoRadio `
+  --output .build/netif-roles-new
+```
+
+Проверено на B44: четыре реальных потока прошли; прежний app6324 тем же
+наблюдателем отвергнут за AP+STA в станции. Это ограниченная role/scan проверка,
+не полная приёмка и не длительный memory trend.
+
 В интегрированном [исправлении offline clock](../../qemu/parity/offline-clock-checks.md)
 устранены остановка активной темы и подмена IP при потере Wi-Fi.
 `clock_offline_dst_*` и `clock_offline_photo` проходят с production C и SDK
@@ -487,6 +667,8 @@ API-ключи и фото с личными метаданными в отчё�
 только последние 32 снимка `report.json`:
 
 Для длительного Windows-прогона используйте `tools/runtime_supervisor.ps1`.
+Ошибки host-записи и очистка процессов проверяются отдельно:
+[RUNTIME_SUPERVISION.md](RUNTIME_SUPERVISION.md).
 Он держит точные Process handles workload и UART guard; исчезновение любого
 дочернего процесса не становится успешным тестом. При ошибке закрывается только
 VM из собственного session.json. Состояние и stdout/stderr сохраняются отдельно
@@ -494,11 +676,9 @@ VM из собственного session.json. Состояние и stdout/stde
 Для фонового запуска:
 
 ```powershell
-Start-Process -FilePath (Get-Command pwsh).Source -WindowStyle Hidden -PassThru `
-  -ArgumentList @('-NoProfile', '-File',
-    'C:/Work/yoRadio/Small_TV/src/tools/runtime_supervisor.ps1',
-    '-YoradioRoot', 'C:/Work/yoRadio', '-QemuRoot', 'C:/Work/QEMU-ESP32',
-    '-OutputDirectory', 'C:/Work/yoRadio/.build/small-tv-parity/new-runtime-24h')
+& Small_TV/src/tools/start_runtime.ps1 `
+  -YoradioRoot C:/Work/yoRadio -QemuRoot C:/Work/QEMU-ESP32 `
+  -OutputDirectory C:/Work/yoRadio/.build/small-tv-parity/new-runtime-24h
 ```
 
 Выберите новый каталог. По умолчанию — 86 400 гостевых секунд, интервал 15 с,
@@ -508,6 +688,24 @@ Start-Process -FilePath (Get-Command pwsh).Source -WindowStyle Hidden -PassThru 
 и command line через системный process audit. Проверка выживания через границу
 assistant turn остаётся отдельным наблюдением. Terminal supervisor pass также
 не заменяет полный journal/trend audit и не подтверждает аппаратную приёмку.
+
+`start_runtime.ps1` запускает скрытый supervisor через службу Windows с
+`CREATE_BREAKAWAY_FROM_JOB` и проверяет через ядро, что процесс находится вне
+Job родительского инструмента. Аргументы передаются без shell. Запись
+`<run>-launch.json` сохраняет PID, реальное время создания, команду и хеши
+launcher/supervisor. Имя резервируется до запуска: повторный вызов не создаёт
+вторую VM и не перезаписывает старые данные. Этот способ переживает выход
+родителя; выключение Windows и явная остановка процесса всё равно прервут тест.
+Наличие записи запуска не доказывает, что тест продолжает работать.
+
+Реальная проверка процесса, точности argv, завершения после выхода родителя,
+ошибок запуска и сохранности уже зарезервированного имени:
+
+```powershell
+python Small_TV/src/tests/runtime_process_test.py `
+  --output .build/runtime-process-new --yoradio-root C:/Work/yoRadio `
+  --qemu-root C:/Work/QEMU-ESP32 --dependency-root C:/Work/yoRadio
+```
 
 ```powershell
 python Small_TV/src/tools/analyze_runtime.py `
@@ -559,3 +757,11 @@ location/key без сохранения URL или содержимого. H10 
 подменой ESP-IDF API. Гонки задач, DST библиотек, успешная Internet-погода и работа
 JavaScript в браузере также остаются отдельными проверками. OTA, звук и SD-карта
 не входят в функционал этой восстановленной прошивки и здесь не добавляются.
+
+## Независимые проверки после reset
+
+Проверки загрузки, сети и дисплея разделены; см. [RESET_SUBSYSTEMS.md](RESET_SUBSYSTEMS.md).
+
+## JPEG header acceptance
+
+[133 header cases and real upload checks](JPEG_HEADER_VALIDATION.md) complement the existing public JPEG/DHT gates.

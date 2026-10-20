@@ -22,6 +22,12 @@ from http_body_contract import validate_http_body, validate_http_body_guards
 from concurrency_contract import validate_concurrency, validate_concurrency_guards
 from boot_state_contract import validate_boot_state, validate_boot_rejections
 from wifi_fallback_contract import validate_wifi_fallback, validate_wifi_fallback_guards
+from netif_roles_contract import validate_netif_roles, rejection_checks as netif_role_rejections
+from ap_services_contract import validate_ap_services, rejection_checks as ap_service_rejections
+from jpeg_dht_contract import validate_dht, validate_photo_dht, rejection_checks as dht_rejections
+from jpeg_header_contract import validate_headers, rejection_checks as header_rejections
+from jpeg_header_http_contract import validate_photo_headers
+from jpeg_selector_contract import validate_selector_evidence, validate_photo_selectors
 
 
 def read(path):
@@ -76,6 +82,28 @@ def main():
         'native_elf_sha256':hashlib.sha256((BUILD/'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
         'test_sha256':hashlib.sha256((ROOT/'tests/wifi_fallback_qemu.py').read_bytes()).hexdigest()})
     validate_wifi_fallback_guards(wifi_wait)
+    # New role gates share the suite/publisher's validators; a green outer
+    # report must not authorize missing task, cache, scan or complete LCD data.
+    role_expected = {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
+        'qemu_sha256': groups['qemu']['qemu_sha256'],
+        'native_elf_sha256': hashlib.sha256((BUILD / 'small_tv_reconstructed.elf').read_bytes()).hexdigest()}
+    netif_roles = groups['qemu']['netif_roles_http']
+    netif_expected = {**role_expected, 'test_sha256': {
+        name: hashlib.sha256((ROOT / 'tests' / name).read_bytes()).hexdigest()
+        for name in ('netif_roles_qemu.py', 'netif_observer.py', 'wifi_fallback_qemu.py')}}
+    validate_netif_roles(netif_roles, netif_expected)
+    require(netif_roles['contract_checks'] == netif_role_rejections(netif_roles, netif_expected) and
+            groups['qemu']['netif_observer_unit'] == {'passed': True, 'tests': 7}, 'Missing netif evidence guards')
+    require(groups['qemu']['raw_flash_observer_unit'] == {'passed': True, 'tests': 5},
+            'Missing raw erase/program persistence observer controls')
+    ap_services = groups['qemu']['ap_services_http']
+    ap_expected = {**role_expected, 'test_sha256': hashlib.sha256((ROOT / 'tests/ap_services_qemu.py').read_bytes()).hexdigest()}
+    validate_ap_services(ap_services, ap_expected)
+    require(ap_services['contract_checks'] == ap_service_rejections(ap_services, ap_expected), 'Missing AP service guards')
+    for gate in (netif_roles, ap_services):
+        for filename, expected in gate['inputs_sha256'].items():
+            require(hashlib.sha256(Path(filename).read_bytes()).hexdigest() == expected,
+                    'Role input changed after execution: ' + Path(filename).name)
     body_http = groups['qemu']['body_http']
     validate_http_body(body_http, {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
         'qemu_sha256': groups['qemu']['qemu_sha256'],
@@ -108,6 +136,18 @@ def main():
             all(row['passed'] for row in huffman['valid'] + huffman['invalid']) and
             not any(row['decoder_started'] for row in huffman['invalid']),
             'Huffman gate omitted depth/boundary cases or accepted an impossible tree')
+    validate_dht(jpeg_inputs['dht'], {key: jpeg_inputs[key] for key in
+        ('app_sha256', 'source_sha256', 'native_elf_sha256', 'factory_elf_sha256')})
+    dht_guards = jpeg_inputs['dht_rejection_checks']
+    require(len(dht_guards) == 7 and all(row['passed'] for row in dht_guards) and
+            dht_guards == dht_rejections(jpeg_inputs['dht']), 'JPEG DHT evidence rejection controls did not pass')
+    validate_headers(jpeg_inputs['headers'], {key: jpeg_inputs[key] for key in
+        ('app_sha256', 'source_sha256', 'native_elf_sha256', 'factory_elf_sha256')})
+    header_guards = jpeg_inputs['header_rejection_checks']
+    require(len(header_guards) == 7 and all(row['passed'] for row in header_guards) and
+            header_guards == header_rejections(jpeg_inputs['headers']), 'JPEG header evidence rejection controls did not pass')
+    validate_selector_evidence(jpeg_inputs['selectors'], {key: jpeg_inputs[key] for key in
+        ('app_sha256', 'source_sha256', 'native_elf_sha256', 'factory_elf_sha256')}, jpeg_inputs['selector_rejection_checks'])
     for item in jpeg_inputs['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Additional JPEG fixture/adapter changed: ' + item['file'])
@@ -175,19 +215,23 @@ def main():
     for item in frames['test_inputs']:
         require(hashlib.sha256((REPO/item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Photo frame input changed since execution: '+item['file'])
-    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
+    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'reserved_dht_rejected', 'busy_and_retry_policy',
                     'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
                     'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
                     'immediate_finish_cut_bounded', 'immediate_finish_new_vm', 'immediate_finish_persisted',
                     'interrupted_slot_unpublished', 'interrupted_start_cut_bounded', 'immediate_finish_no_panic',
                     'interrupted_boot_new_vm', 'interrupted_photo_hidden', 'new_upload_after_interruption',
-                    'interrupted_boot_no_panic'}
+                    'interrupted_boot_no_panic', 'header_fields_rejected', 'custom_component_ids_published',
+                    'selector_uploads_valid', 'selector_missing_rejected'}
     require(photo['profile_sha256'] == groups['qemu']['profile_sha256'] and
             set(photo['checks']) == photo_checks and all(photo['checks'].values()) and
             photo['invalid']['finish_status'] == 400 and photo['invalid']['metadata'] == {'exists': False, 'size': 0} and
             all(0 <= photo[key] < .5 for key in
                 ('finish_response_to_stop_guest_seconds', 'start_response_to_stop_guest_seconds')),
             'Real photo upload/download/cold-boot checks omitted stages or accepted invalid data')
+    validate_photo_dht(photo)
+    validate_photo_headers(photo)
+    validate_photo_selectors(photo)
     require(0 <= startup['ready_wait_guest_seconds'] <= .5 and startup['different_colors'] >= 2,
             'Ready startup clock was delayed or blank')
     require(held_weather['during']['request_state'] & held_weather['compiled_running_mask'] and

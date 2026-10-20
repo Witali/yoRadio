@@ -220,11 +220,54 @@ static esp_err_t advanced_page(httpd_req_t *req)
 
 static esp_err_t captive_redirect(httpd_req_t *req, httpd_err_code_t error)
 {
-    /* Redirect unknown setup-network paths to the captive configuration page. */
+    /* Handle unknown paths using the factory captive-portal Host contract.
+     * FIXED_RECONSTRUCTION: 0x4200d4be serves root for the AP Host (or a missing
+     * header) and redirects foreign names to the absolute AP address. A relative
+     * redirect retains the probe hostname and loses this factory behavior.
+     * FIXED_FACTORY: match the complete authority, not the factory substring;
+     * AP-looking foreign names must still redirect. In STA mode retain the
+     * local redirect: the setup AP address is not an active service there. */
 
     (void)error;
+    const char *location = "/";
+    if (network_ap_active())
+    {
+        const char ap[] = "192.168.43.1";
+        char host[128];
+        /* The factory falls back to its AP Host when the header cannot be read. */
+        bool local = true;
+        if (httpd_req_get_hdr_value_str(req, "Host", host, sizeof(host)) == ESP_OK)
+        {
+            local = !strcmp(host, ap);
+            if (!local && !strncmp(host, ap, sizeof(ap) - 1) && host[sizeof(ap) - 1] == ':')
+            {
+                const char *suffix = host + sizeof(ap);
+                unsigned port = 0;
+                bool valid = *suffix != 0;
+                for (; valid && *suffix; ++suffix)
+                {
+                    unsigned digit = (unsigned char)*suffix - '0';
+                    if (digit > 9 || port > (65535u - digit) / 10u)
+                        valid = false;
+                    else
+                        port = port * 10 + digit;
+                }
+                local = valid && port != 0;
+            }
+        }
+        if (local)
+        {
+            /* Reuse root selection without replacing the SDK's original URI. */
+            void *context = req->user_ctx;
+            req->user_ctx = (void *)"/";
+            esp_err_t result = page(req);
+            req->user_ctx = context;
+            return result;
+        }
+        location = "http://192.168.43.1/";
+    }
     httpd_resp_set_status(req, "302 Found");
-    httpd_resp_set_hdr(req, "Location", "/");
+    httpd_resp_set_hdr(req, "Location", location);
     return httpd_resp_send(req, "", 0);
 }
 

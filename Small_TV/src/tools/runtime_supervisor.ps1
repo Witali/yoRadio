@@ -15,6 +15,10 @@ param(
     [ValidateRange(0,100000)][int]$OutageEvery = 60
 )
 $ErrorActionPreference = 'Stop'
+$cleanupModule = Join-Path $PSScriptRoot 'runtime_cleanup.psm1'
+Import-Module $cleanupModule -Force
+$stateModule = Join-Path $PSScriptRoot 'runtime_state_io.psm1'
+Import-Module $stateModule -Force
 $YoradioRoot = [IO.Path]::GetFullPath($YoradioRoot)
 $QemuRoot = [IO.Path]::GetFullPath($QemuRoot)
 $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
@@ -27,18 +31,16 @@ New-Item -ItemType Directory -Path $control | Out-Null
 $python = Join-Path $DependencyRoot '.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe'
 $driver = Join-Path $YoradioRoot 'Small_TV/src/tests/runtime_qemu.py'
 $guardSource = Join-Path $PSScriptRoot 'runtime_run_guard.py'
-$sources = @($PSCommandPath, $driver, $guardSource, (Join-Path $QemuRoot 'tools/small_tv_vm.py'))
+$sources = @($PSCommandPath, $cleanupModule, $stateModule, $driver, $guardSource, (Join-Path $QemuRoot 'tools/small_tv_vm.py'))
 $state = [ordered]@{schema_version=1; status='starting'; passed=$false; all_functionality_verified=$false;
     supervisor_pid=$PID; supervisor_started_utc=[DateTime]::UtcNow.ToString('o');
     run_directory=$OutputDirectory; scope='Child process supervision only; not a 24-hour or memory-trend acceptance.';
-    sources_sha256=@{}}
+    sources_sha256=@{}; cleanup_errors=[Collections.Generic.List[object]]::new(); deferred_state_writes=0}
 foreach ($source in $sources) {$state.sources_sha256[$source]=(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLower()}
 
-function Save-State {
-    # Replace a single status file atomically so a reader never sees half a JSON.
-    $temporary = Join-Path $control 'supervisor.json.tmp'
-    [IO.File]::WriteAllText($temporary, ($state | ConvertTo-Json -Depth 12) + "`n", [Text.UTF8Encoding]::new($false))
-    Move-Item -LiteralPath $temporary -Destination (Join-Path $control 'supervisor.json') -Force
+function Save-State([switch]$Final) {
+    # FIXED_TEST: state-file sharing conflicts and final writes have distinct rules.
+    Write-SmallTvRuntimeState $state $control -Final:$Final
 }
 function Read-Report([string]$Path) {
     # A producer may be rewriting its report; wait for a later complete read.
@@ -52,19 +54,14 @@ function Start-Child([string[]]$Arguments, [string]$Name) {
     $start.WorkingDirectory=$YoradioRoot
     $start.RedirectStandardOutput=$true
     $start.RedirectStandardError=$true
-    foreach ($argument in $Arguments) {[void]$start.ArgumentList.Add($argument)}
+    $start.StandardOutputEncoding=[Text.UTF8Encoding]::new($false)
+    $start.StandardErrorEncoding=[Text.UTF8Encoding]::new($false)
+    foreach ($argument in @('-X','utf8','-B')+$Arguments) {[void]$start.ArgumentList.Add($argument)}
     $process = [Diagnostics.Process]::new()
     $process.StartInfo=$start
     [void]$process.Start()
     return @{process=$process; stdout=$process.StandardOutput.ReadToEndAsync();
              stderr=$process.StandardError.ReadToEndAsync(); name=$Name}
-}
-function Save-ChildLogs($Child) {
-    # Drain both pipes asynchronously during execution and persist after exit.
-    if ($null -ne $Child -and $Child.process.HasExited) {
-        [IO.File]::WriteAllText((Join-Path $control ($Child.name+'.stdout.log')), $Child.stdout.GetAwaiter().GetResult())
-        [IO.File]::WriteAllText((Join-Path $control ($Child.name+'.stderr.log')), $Child.stderr.GetAwaiter().GetResult())
-    }
 }
 $workload = $guard = $null
 try {
@@ -114,18 +111,27 @@ try {
     $state.status='failed'
     $state.error=$_.Exception.Message
 } finally {
-    # Process objects hold the exact children; never kill a reused PID by name.
+    # FIXED_TEST: finish all process cleanup before best-effort log writes.
+    # One inaccessible/full output sink must not leave later children alive.
     foreach ($child in @($workload,$guard)) {
-        if ($null -ne $child -and !$child.process.HasExited) {$child.process.Kill(); [void]$child.process.WaitForExit(5000)}
-        Save-ChildLogs $child
+        Stop-SmallTvRuntimeChild $child $state
     }
-    if (!$state.passed -and (Test-Path -LiteralPath (Join-Path $OutputDirectory 'vm/session.json'))) {
-        # The helper verifies its session identity before stopping only this VM.
-        & $python (Join-Path $QemuRoot 'tools/small_tv_vm.py') stop --state (Join-Path $OutputDirectory 'vm') *> (Join-Path $control 'vm-cleanup.log')
-        $state.vm_cleanup_exit_code=$LASTEXITCODE
+    try {
+        if (!$state.passed -and (Test-Path -LiteralPath (Join-Path $OutputDirectory 'vm/session.json'))) {
+            Invoke-SmallTvRuntimeVmCleanup $python (Join-Path $QemuRoot 'tools/small_tv_vm.py') `
+                (Join-Path $OutputDirectory 'vm') $control $state
+        }
+    } catch {
+        Set-SmallTvRuntimeCleanupFailure $state 'locate owned VM session' $_.Exception.Message
+    }
+    foreach ($child in @($workload,$guard)) {
+        Save-SmallTvRuntimeChildLogs $child $control $state
     }
     $state.finished_utc=[DateTime]::UtcNow.ToString('o')
-    Save-State
+    try {Save-State -Final} catch {
+        Set-SmallTvRuntimeCleanupFailure $state 'save final supervisor state' $_.Exception.Message
+        Write-SmallTvRuntimeFallback $state
+    }
 }
 if (!$state.passed) {exit 1}
 exit 0

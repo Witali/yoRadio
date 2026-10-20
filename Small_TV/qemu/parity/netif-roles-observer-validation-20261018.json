@@ -1,0 +1,214 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Four real factory/native STA and retained-SDK-NVS setup flows, including actual APSTA HTTP scans. New production app26C6 and unchanged QEMU B44. Not a complete suite run, H10, physical RF or arbitrary NVS acceptance.",
+  "app_sha256": "26c6ca74940dbfa5f27b67a308515a2901bcdab2968e2a45954055b59cbe1234",
+  "native_elf_sha256": "fe9be9577dd82294b86710e61e25f5d1f54f92d4bf78dce8b3d578e9fc34adc9",
+  "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+  "source_sha256": "d62847d868de1b6cc806fbc8f0ff6426405a55200d3f7d0578d9db508bbce734",
+  "test_sha256": {
+    "netif_roles_qemu.py": "31e35812a0e868021e405b7ad7171d64920adf3bfd80c559c0fed4c377b59ad6",
+    "netif_observer.py": "d5f7f1775adedb45c1fd4633d17ccf386075752a9d6b25a3a52f671232981c3e",
+    "wifi_fallback_qemu.py": "bf9b95462fd7ba0153fee4b3785148494a258d4469e929b17e7cb2242d9d1007"
+  },
+  "native_layout": {
+    "head": 1070283180,
+    "head_first": 0,
+    "node_size": 8,
+    "node_netif": 0,
+    "node_next": 4,
+    "if_key": 92,
+    "elf_sha256": "fe9be9577dd82294b86710e61e25f5d1f54f92d4bf78dce8b3d578e9fc34adc9",
+    "settings": {
+      "address": 1070265616,
+      "fields": {
+        "version": 0,
+        "ssid": 4,
+        "password": 37,
+        "city": 102,
+        "country": 167,
+        "ntp": 187,
+        "weather_key": 252,
+        "day_level": 318,
+        "night_level": 320,
+        "colors": 322,
+        "theme": 328,
+        "animation": 329,
+        "date_format": 330,
+        "night_start": 331,
+        "night_stop": 332,
+        "photo_seconds": 333,
+        "fahrenheit": 334,
+        "hour12": 335,
+        "miles": 336,
+        "browser_time": 337,
+        "night_mode": 338,
+        "click_count": 339,
+        "photo_mask": 340,
+        "wifi_mode": 341,
+        "photo_size": 344
+      }
+    }
+  },
+  "native_driver_storage": "RAM; synthetic factory driver NVS supplied explicitly to setup fixture",
+  "observer_unit": {
+    "passed": true,
+    "tests": 7
+  },
+  "contract_checks": [
+    {
+      "name": "failed",
+      "passed": true
+    },
+    {
+      "name": "changed-inputs",
+      "passed": true
+    },
+    {
+      "name": "wrong-app",
+      "passed": true
+    },
+    {
+      "name": "wrong-elf",
+      "passed": true
+    },
+    {
+      "name": "wrong-qemu",
+      "passed": true
+    },
+    {
+      "name": "missing-factory",
+      "passed": true
+    },
+    {
+      "name": "empty-netifs",
+      "passed": true
+    },
+    {
+      "name": "extra-station",
+      "passed": true
+    },
+    {
+      "name": "changed-code",
+      "passed": true
+    },
+    {
+      "name": "missing-http",
+      "passed": true
+    },
+    {
+      "name": "lost-nvs",
+      "passed": true
+    },
+    {
+      "name": "bad-nvs-crc",
+      "passed": true
+    },
+    {
+      "name": "scan-failed",
+      "passed": true
+    },
+    {
+      "name": "scan-extra-station",
+      "passed": true
+    },
+    {
+      "name": "factory-got-ip",
+      "passed": true
+    },
+    {
+      "name": "factory-unobserved",
+      "passed": true
+    },
+    {
+      "name": "scan-reset",
+      "passed": true
+    }
+  ],
+  "flows": {
+    "original-station": {
+      "passed": true,
+      "netifs": [
+        {
+          "key": "WIFI_STA_DEF",
+          "object": "0x3fcc791c"
+        }
+      ]
+    },
+    "original-setup": {
+      "passed": true,
+      "netifs": [
+        {
+          "key": "WIFI_AP_DEF",
+          "object": "0x3fcd0b40"
+        }
+      ],
+      "netifs_after_scan": [
+        {
+          "key": "WIFI_AP_DEF",
+          "object": "0x3fcd0b40"
+        }
+      ]
+    },
+    "reconstructed-station": {
+      "passed": true,
+      "netifs": [
+        {
+          "key": "WIFI_STA_DEF",
+          "object": "0x3fcdede4"
+        }
+      ]
+    },
+    "reconstructed-setup": {
+      "passed": true,
+      "netifs": [
+        {
+          "key": "WIFI_AP_DEF",
+          "object": "0x3fcdef4c"
+        }
+      ],
+      "netifs_after_scan": [
+        {
+          "key": "WIFI_AP_DEF",
+          "object": "0x3fcdef4c"
+        }
+      ]
+    }
+  },
+  "negative_control": {
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+    "expected_failed": true,
+    "error": "Unexpected interfaces for selected role: ['WIFI_AP_DEF', 'WIFI_STA_DEF']",
+    "same_test_observer_and_qemu_bytes": true,
+    "immutable_code_media_and_clean_uart": true
+  },
+  "inputs_verified": {
+    "positive": 27,
+    "negative": 27
+  },
+  "integration": {
+    "qemu_suite": "Required new gate; existing frozen full runs do not include it",
+    "publisher": "Requires exact images, sources, role/scan/NVS evidence and all17 rejections",
+    "source_sha256": {
+      "netif_roles_contract.py": "36a6a8cb42da2a8903aad11574e81d68a2c65492728b75ddaf5f4355b2c1ecb2",
+      "netif_observer_test.py": "62e5a912ddaa958d29a126876ef13ceb62708472c51039ed99470618829baeb0",
+      "qemu_suite.py": "2d9367462db1f999a2b84b85c17fffab11fafdc6543ed3f14d66e8dda03fb1f6",
+      "publish-report.py": "ace833530598f7acb0896c50b3aee9261492567c343bbc688dbfd669e7ee47be"
+    }
+  },
+  "raw": [
+    {
+      "file": "netif-roles-observer-positive-20261018.json.gz",
+      "source": "C:\\Work\\yoRadio\\.build\\netif-roles-observer-v3-20261018\\report.json",
+      "sha256": "5fa320b6ee2614833e3306e52fe9ce567c371cb1cf91cf96e6b9dd77a21a52ce",
+      "gzip_sha256": "0f710a50857c982f20a303f8b55567741244003f8e6eb249c6ef7e843a65d7e7"
+    },
+    {
+      "file": "netif-roles-observer-negative-20261018.json.gz",
+      "source": "C:\\Work\\yoRadio\\.build\\netif-roles-observer-old-control-20261018\\report.json",
+      "sha256": "db9cc66bf0ff14ffec3a363faa3877107656bec372d98433f326cf927f6e84ab",
+      "gzip_sha256": "8c558336e74a314dc996e91eb9db63d03dcc01e63f66fff4cfdad994f35e6777"
+    }
+  ]
+}

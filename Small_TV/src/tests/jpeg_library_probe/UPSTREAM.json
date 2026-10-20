@@ -1,0 +1,39 @@
+{
+  "library": "libjpeg-turbo",
+  "version": "3.2.0",
+  "commit": "c85e6b905bf237038faa936dab160ebfc5da0344",
+  "source": "https://github.com/libjpeg-turbo/libjpeg-turbo/tree/3.2.0",
+  "release": "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/tag/3.2.0",
+  "source_archive_sha256": "a778d84dcc6174be769da284877cf8ee56f99376b587e3c3cf5e9bac4ef90b07",
+  "patch": "libjpeg-turbo-3.2.0-bounded.patch",
+  "patch_sha256": "431c9cf3c83be38a1ad661bc6986dc182e22d3fb3f6c1d339e3346a82e6a0024",
+  "license_files": {
+    "licenses/LICENSE.md": "ba6bceebcba0fdd35488477c2cca8c4632ce82c74dbfbc87d886ce6fc4433579",
+    "licenses/README.ijg": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6"
+  },
+  "modifications": [
+    "Skip unused lossless range table for non-quantized non-buffered output.",
+    "Keep one iMCU window when progressive smoothing is explicitly disabled by a non-buffered client.",
+    "Optional exact 12-bit range/color lookup tables in read-only storage, replacing 110592 bytes of dynamic tables.",
+    "Optional compact IMAGE pool reserves: 4096 bytes initially and 1024 bytes per additional chunk, preserving object sizes/alignment."
+  ],
+  "integration_status": "Host qualification and RV32 link measurement; not linked into production firmware.",
+  "explicitly_unsupported_upstream": [
+    "Hierarchical JPEG",
+    "DNL marker",
+    "Nonintegral subsampling ratios",
+    "Lossless arithmetic JPEG",
+    "12-bit arithmetic JPEG"
+  ],
+  "deferred_formats": [
+    "JPEG-LS",
+    "JPEG 2000",
+    "JPEG XL",
+    "WebP"
+  ],
+  "flash_tables_patch": "libjpeg-turbo-3.2.0-flash-tables.patch",
+  "flash_tables_patch_sha256": "1fdf910f05bfbbf6fb1862ef12f9a431b3e63208ee87e24322ce6fd08b58f88f",
+  "flash_tables_generator": "generate_flash_tables.py",
+  "compact_pools_patch": "libjpeg-turbo-3.2.0-compact-pools.patch",
+  "compact_pools_patch_sha256": "735247281197a0df260545468d154fb18a1f6a505f69d0ec6e9ac7aa37efb981"
+}

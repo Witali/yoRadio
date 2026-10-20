@@ -1,0 +1,633 @@
+{
+  "status": "full_failed_h10_running",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T15:41:38.546830+00:00",
+  "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+  "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+  "full": {
+    "controller": {
+      "status": "terminal_failed",
+      "started_utc": "2026-10-18T15:28:52.2640322Z",
+      "pid": 33440,
+      "error": "One or more functional groups failed. See report.json and per-group logs.",
+      "ended_utc": "2026-10-18T15:34:43.4453102Z",
+      "exit_code": 1
+    },
+    "passed": false,
+    "groups": [
+      {
+        "name": "report_aggregation",
+        "status": "passed"
+      },
+      {
+        "name": "native",
+        "status": "passed"
+      },
+      {
+        "name": "platform",
+        "status": "passed"
+      },
+      {
+        "name": "frontend",
+        "status": "passed"
+      },
+      {
+        "name": "integrity",
+        "status": "passed"
+      },
+      {
+        "name": "timezone_sources",
+        "status": "passed"
+      },
+      {
+        "name": "machine",
+        "status": "passed"
+      },
+      {
+        "name": "machine_control",
+        "status": "passed"
+      },
+      {
+        "name": "machine_classic",
+        "status": "passed"
+      },
+      {
+        "name": "machine_weather",
+        "status": "passed"
+      },
+      {
+        "name": "machine_calendar",
+        "status": "passed"
+      },
+      {
+        "name": "machine_jpeg",
+        "status": "passed"
+      },
+      {
+        "name": "machine_jpeg_inputs",
+        "status": "passed"
+      },
+      {
+        "name": "machine_timezones",
+        "status": "passed"
+      },
+      {
+        "name": "machine_time_state",
+        "status": "passed"
+      },
+      {
+        "name": "machine_text",
+        "status": "passed"
+      },
+      {
+        "name": "machine_network",
+        "status": "passed"
+      },
+      {
+        "name": "qemu_profile",
+        "status": "passed"
+      },
+      {
+        "name": "qemu",
+        "status": "failed"
+      },
+      {
+        "name": "hardware_browser_soak",
+        "status": "not_run"
+      }
+    ],
+    "failed_native_checks": {
+      "reset_reboots": false
+    },
+    "observation": "Both ROM banners and station/SNTP recovery were observed; the sole post-reset capture contains zero nonzero RGB bytes. Root cause under investigation; no failed record replaced.",
+    "inputs": {
+      "count": 553,
+      "mismatches": []
+    }
+  },
+  "h10": {
+    "status": "running",
+    "completed_cycles_observed": 27,
+    "observed_at_utc": "2026-10-18T15:41:37.7885597Z",
+    "process_identities": [
+      {
+        "ProcessId": 13800,
+        "ParentProcessId": 26768,
+        "created_utc": "2026-10-18T15:30:49.8342280Z",
+        "ExecutablePath": "%USERPROFILE%\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "CommandLine": "\"%USERPROFILE%\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\""
+      },
+      {
+        "ProcessId": 31224,
+        "ParentProcessId": 13800,
+        "created_utc": "2026-10-18T15:30:50.2104210Z",
+        "ExecutablePath": "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+        "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\Small_TV\\src\\tests\\runtime_qemu.py --yoradio C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision --dependency-root C:\\Work\\yoRadio --qemu-root C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018 --output C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018 --interval-seconds 15 --outage-every 60 --outage-seconds 1 --duration-seconds 86400"
+      },
+      {
+        "ProcessId": 19212,
+        "ParentProcessId": 4648,
+        "created_utc": "2026-10-18T15:30:54.3405010Z",
+        "ExecutablePath": "C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018\\bin\\qemu-system-riscv32.exe",
+        "CommandLine": "C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018\\bin\\qemu-system-riscv32.exe -M esp32c2,default-peripherals=off -name SmallTV-beea78179836 -L C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\\vm -drive file=C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\\vm\\flash.bin,if=mtd,format=raw -display none -serial file:C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\\vm\\uart.log -monitor none -icount shift=3,align=off,sleep=on -qmp tcp:127.0.0.1:58582,server=on,wait=off -device {\\\"driver\\\":\\\"esp-spi-module\\\",\\\"id\\\":\\\"lcd\\\",\\\"bus\\\":\\\"/spi2/spi\\\",\\\"gpio\\\":\\\"/machine/gpio\\\",\\\"spi-host\\\":2,\\\"cs\\\":0,\\\"model\\\":\\\"st7789\\\",\\\"sck\\\":4,\\\"mosi\\\":6,\\\"miso\\\":-1,\\\"cs-gpio\\\":-1,\\\"dc-gpio\\\":5,\\\"reset-gpio\\\":1,\\\"backlight-gpio\\\":18,\\\"backlight-active-low\\\":true,\\\"properties\\\":\\\"{\\\\\\\"visible-width\\\\\\\":240,\\\\\\\"controls\\\\\\\":false,\\\\\\\"panel-inverted\\\\\\\":true}\\\"} -global esp32c3-wifi.clock-services=on -global esp32c3-wifi.ntp-hosts=ntp1.aliyun.com;cn.pool.ntp.org;pool.ntp.org -global esp32c3-wifi.station-ssid=yoRadio-QEMU -nic user,model=esp32c3-wifi,restrict=on,hostfwd=tcp:127.0.0.1:18080-10.0.2.15:80,guestfwd=tcp:10.0.2.100:80-tcp:127.0.0.1:58574 -global esp32c3-wifi.service-hosts=api.openweathermap.org -snapshot -gdb tcp:127.0.0.1:58575 -S"
+      },
+      {
+        "ProcessId": 27200,
+        "ParentProcessId": 13800,
+        "created_utc": "2026-10-18T15:31:22.5524240Z",
+        "ExecutablePath": "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+        "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\Small_TV\\src\\tools\\runtime_run_guard.py --run C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018 --qemu-tools C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018\\tools"
+      }
+    ],
+    "guard": {
+      "scope": "Independent UART boot/panic guard; not a memory trend or 24-hour pass.",
+      "status": "running",
+      "passed": false,
+      "polls": 124,
+      "vm_name": "SmallTV-beea78179836",
+      "source_file": "vm/uart.log",
+      "last_observation": {
+        "passed": true,
+        "bytes": 333,
+        "rom_boots": 1,
+        "errors": []
+      }
+    },
+    "frozen_registries": {
+      "runtime_inputs_sha256": {
+        "count": 31,
+        "mismatches": []
+      },
+      "snapshot_inputs_sha256": {
+        "count": 41,
+        "mismatches": []
+      },
+      "supervisor_sources_sha256": {
+        "count": 6,
+        "mismatches": []
+      }
+    },
+    "qmp_rsp_clients_added": 0,
+    "accepted": false
+  },
+  "evidence": [
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-aggregation-date-input.json.gz",
+      "sha256": "8bbfeba126bdacee90839d917bbf4ceb65494460f81ef794274c3a76fade9344",
+      "original_sha256": "08d62c9a0d8619252b755701b83b37b87868e937c1da9bc98e4e19d6a78a0b1d",
+      "original_bytes": 239
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-aggregation-date-roundtrip.json.gz",
+      "sha256": "364a827eabfdec6efed95cc654c4623b498ed4f331df203b3be5243fa64ed415",
+      "original_sha256": "0bccf45f87380907018223418450bd684e758f84f262bc1e826a3a063a06ed52",
+      "original_bytes": 330
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-calendar.json.gz",
+      "sha256": "9fefa5f77cbe13bade8586797b8283e2e4f46871705f17574ab59284f7db98ba",
+      "original_sha256": "ff61a146490fd1e6cc5c9bb8cd55c33ec106f4d14f0ad01e3f3552150e36a089",
+      "original_bytes": 95201
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-classic.json.gz",
+      "sha256": "66dc178f8822beb4cb172f4530141a5c26b40f852353cbcce210ad5960ebbf3c",
+      "original_sha256": "6afb96ae326e86ceeb9a700c06d8411713a1f9ca56a07d40104cb6aae0b3e328",
+      "original_bytes": 889635
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-control.json.gz",
+      "sha256": "dd5752418fa67a22857edb59e6b7092ba735468fb4f2ff1958d95c9626171700",
+      "original_sha256": "d9e9095b0361c0608b2b95b303e5d9d467ee2336c9e501de3365a84e9cfeb125",
+      "original_bytes": 17869
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-controller-exit.json.gz",
+      "sha256": "291bfa9435d803a909afefd06e69bf983bfa6c8742f533442b9d1dd172fdaf71",
+      "original_sha256": "2e8d4a1566c0db201edb99e0bc2fbf7866876489bc641a8cadc6067e526be747",
+      "original_bytes": 259
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-controller.log.gz",
+      "sha256": "73b368c15d68ab051e805a0a8f0018fcddec6d797b0f7ee1e4ecc4fc312c145d",
+      "original_sha256": "b95784f0486472a5c3f332b4a6cb26201e8426d826d3e7366a77bcf4a6ed5db2",
+      "original_bytes": 610
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-frontend.json.gz",
+      "sha256": "f7da65bf4e802973a7bf2d45ea956e0a1aa434c208803403dc0917eebb87b94d",
+      "original_sha256": "f687b1caf567af7216b97296479fde34e6cac8b9deb22e1d3466fc4ed08f9ff6",
+      "original_bytes": 7170
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-frontend.log.gz",
+      "sha256": "4c5f6fb4f72668884ffd1b35f8d5869f89e87a235faf50e5e37626041f3a4729",
+      "original_sha256": "80741ada3385b112b2362612cfa183946064ef67d48ccdc5fe72f4286a834fe1",
+      "original_bytes": 109
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-integrity.json.gz",
+      "sha256": "2cf9cdc62527142a4c27b64771017acba91ac0e5ed942ef478a8d8d761dc0239",
+      "original_sha256": "e9b2b8d33c54abb7517c7b70a88d02c417c2c726666aa2deb8116d11566c2e2c",
+      "original_bytes": 341
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-integrity.log.gz",
+      "sha256": "9f463764e81b775dad308396be13cfc9791b318e36246e4bc54dfca17c11989d",
+      "original_sha256": "c83db3147c91677cda967757686e936b5067f284d551bfe7a01945a76b9ddea9",
+      "original_bytes": 665
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-jpeg-inputs-dht-935d1dfd3df1.json.gz",
+      "sha256": "7669681c9def6f3a4af86f395cbcbda2394b509890144e2b04216fb49fab2ec0",
+      "original_sha256": "5ac1f8e143de539c0f68515fd3519115158245a8b23b9a43998c3ab6ab62a399",
+      "original_bytes": 88693
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-jpeg-inputs.json.gz",
+      "sha256": "e63ccb93da2e97691e63c924bd41271e07feb03afdb642552689c62cd49dbcb6",
+      "original_sha256": "bd269527ecb7176cb351f1107c3a92a5b8d5f9fa597ad020efdd636057dd2594",
+      "original_bytes": 118049
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-jpeg.json.gz",
+      "sha256": "c9f1994e9b9f3f0cfdd95e11435a53b591425d622066e757017f39557c1d93dc",
+      "original_sha256": "ecb79abdeceac25cf3f07a1360327a41ffd9e0b20ac99f48ee39ca1a8ac934a1",
+      "original_bytes": 40401
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine__report.json.gz",
+      "sha256": "3d910fd355a947b9287aeb341f1f9be59dc5016ae9d0ea20b636aeb1a406a5ed",
+      "original_sha256": "ed3a33756df9ba36d79e1999c688bdae9222cc97a20b55b74e57587f646e8f35",
+      "original_bytes": 382702
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine.log.gz",
+      "sha256": "5bfc329815153c0451ee53a97ddc3079e1f237080fbc8e0fc8b1303d653ae376",
+      "original_sha256": "dc9a10258f1fecffc682fb7710e46600cd5ecb692d4f739bb588c47825ea73cd",
+      "original_bytes": 6014
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_calendar.log.gz",
+      "sha256": "a2a4cd0fb787adb407d270b7c8ae14d5c173854569d2e69d5b4d001841c40463",
+      "original_sha256": "abd94fa71fb5f4c724524846c6c973997bf89b80dd3b0215c52c4300896c047b",
+      "original_bytes": 39
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_classic.log.gz",
+      "sha256": "93a8fc05cbe8189738263c7794e96e692831f0dfe4529aaacac4a51e19903486",
+      "original_sha256": "a4c6b3e7221705b80a9a4d53576b8eb85ed6d2f030cb206f3f32abdbacf801b6",
+      "original_bytes": 78
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_jpeg.log.gz",
+      "sha256": "7c872de250c8d2be76949bfcc687c8910acb4761981b07d0ec86b05ed06e89db",
+      "original_sha256": "4936b68e5ebdf1c70899620970298493e2362864e1012263d8bd38fd5af502f5",
+      "original_bytes": 6134
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_jpeg_inputs.log.gz",
+      "sha256": "ae927516303d79108749f55bc858defa779f3e31b2059c43db2e5f70511fcc9c",
+      "original_sha256": "3200120432d37ed5a36ae8f3f49b9a3ed3f481a19f8a5e736d481338e5ead983",
+      "original_bytes": 5500
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_network.log.gz",
+      "sha256": "85b8bf68b80c16dd6b8bba5ca23ccfb00e19c1a551d236cab311e02347f54229",
+      "original_sha256": "5aac5eac9c97d14711a179c94715e9a0a57f7c5a30012e7f8f5eda7047ae617f",
+      "original_bytes": 72
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_text.log.gz",
+      "sha256": "b7ce65246a7b3277e16b8eb4389b6a898e72be11aaed21b67aeb4b510f331e7e",
+      "original_sha256": "afcd5c5fdbdd7fd4a3c403ab59c044ffcfe72f65938aaa0c2fbeaf2f8c052788",
+      "original_bytes": 81
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_time_state.log.gz",
+      "sha256": "05e0b039182ed1c551834f7c35fcc9fd738e114ebaad60c06e913970a41450b4",
+      "original_sha256": "3c2779a6f0ae5aa255bd5a524e8855861be6188e89e52ba63a246e41613973ea",
+      "original_bytes": 67
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_timezones.log.gz",
+      "sha256": "d8e26d901a255d04d303fe5aab2200996a4d25ae4cf06caf3277f854ec1578bd",
+      "original_sha256": "e39aa6325c3c57ea8ce2d7a943ee1e8c1d54625822948b7640fa5c25635f39a2",
+      "original_bytes": 3919
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-machine_weather.log.gz",
+      "sha256": "a52f16fde7e89cfa4df9116c0b61cba0a7112e5abd2af965f4d9b88aad667e45",
+      "original_sha256": "9f20d8de737380b5c67644006b498b9965735b38769e85b0930735a8e004d17f",
+      "original_bytes": 46
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-native.log.gz",
+      "sha256": "177d89aa2b210f70199e96e34b6627688b14f3f4559c409b10f9c1e0bb1055bf",
+      "original_sha256": "05cfb6b13fb1de46e7fd22a732894196f1db475e37adc1e461ade42f87b5dd53",
+      "original_bytes": 1139
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-network.json.gz",
+      "sha256": "4968dfe650dce432b1f00fa8b85c463d466ee90fa5a031681261773bdd493c3d",
+      "original_sha256": "e504e133a672651225bc4bd895e25c46fa725f15ce208aa43271cd18c907b92a",
+      "original_bytes": 7313
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-platform.log.gz",
+      "sha256": "8c27ea4d1eb1766898db8ca7daea6212606e06e18bbca292821440560c0947cb",
+      "original_sha256": "89046381c725094e9df29140929565bafcd730a16b0d2181ee571f7df09754ba",
+      "original_bytes": 4251
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-observer-unit.json.gz",
+      "sha256": "cea77c3b9f92a0d8404b3ae8a27c2c08f83479e51c8f729a82201c1067366dcc",
+      "original_sha256": "fa17c09b611cf17ba0573e3e90067cdd621acd78b1761827ddbd4b4b358b619e",
+      "original_bytes": 346
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__after-reset.ppm.gz",
+      "sha256": "446cb574efb8fba5a35ca91e0262ab1c730b082c3d31f83b3130536c3dfa4dd5",
+      "original_sha256": "a7dfc9c0eb0976cc29914e5f624a350fcd3ba00963209ee1ac20a2d6fd99faed",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__frame-0.png.gz",
+      "sha256": "eef937b49fc608c6b9e33a75b46f2989d0cfc813237884aa4fc39f00ae5d5434",
+      "original_sha256": "ac6e803f51c476296062eee9a6f9b2e92183738e8dab5c4cdc38bfc76e9b3792",
+      "original_bytes": 6127
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__frame-0.ppm.gz",
+      "sha256": "2e25aa8bdd1cd87463586f83b85324d7a979edaf1022792dd9cb4caf0cc7583a",
+      "original_sha256": "c060d30f497e8c72780752fc0f9c2ed62516727f48a7457060481253dfe962bc",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__frame-1.png.gz",
+      "sha256": "1f28755546e935df094878e3827905d23a3141d2fe6b6abd7e9a161077933606",
+      "original_sha256": "ab738618b26d3db893e87171bdc7859436f70163d41e6f014dcfb22b1e8aa69a",
+      "original_bytes": 6307
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__frame-1.ppm.gz",
+      "sha256": "5e58974e3076ac0d94c08a00d9fb1349adc35b2b4abc21bc864e89b01794e901",
+      "original_sha256": "bce70a7824c244729be9457e42272cd48089d0b76319fe7b061b821162f16550",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__frame-2.png.gz",
+      "sha256": "5763d80d90399d4096df7efef17bee9af40a7e1f45970e803962256e4b3ecb73",
+      "original_sha256": "6b355008c13d858abd51b125fc820598be1c82fbf785404507a723bb86f95f4e",
+      "original_bytes": 6263
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__frame-2.ppm.gz",
+      "sha256": "ad8796080bdd8303df271b5bbdcef77c515fd5f4da37d8267f56f9c2650e0f4b",
+      "original_sha256": "fffb4b745d2df112e431efa3b1b2fbcdb1f71b36e99d3292ab66ea4438987c4f",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__prepared.json.gz",
+      "sha256": "1dcf5ddcd33f35125f51699733e2991223503950b93de7e03867c144af52d435",
+      "original_sha256": "ab06c942d416a69836179c3c391f2750f1205454031e4970468be954d9c1ab7e",
+      "original_bytes": 2065
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__qemu.log.gz",
+      "sha256": "3816ddc68bd61d53b6b7462012eb759b4b214c642f1ae6239f61fd69533135ec",
+      "original_sha256": "a2f4f0799ef9a9b8d19c4719b1b49b868590292718a7ef33df9dc184941f89db",
+      "original_bytes": 335
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__registers.txt.gz",
+      "sha256": "1d7f25abf514f3d89841c2d52c13015c42083c0aaf4bebd05b6efde8d1e4cb0f",
+      "original_sha256": "306065f9ae49aef28f700989014a647cfc4469580539bd8053376c217fce15bb",
+      "original_bytes": 2092
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__reset.ppm.gz",
+      "sha256": "9a8c2493fc72f538af0a8d8723d4c59185d97189134512de497a104d293a4165",
+      "original_sha256": "1c9647599609f484387d350da404471cb44fa2b7a7f3a182f431c58e35509699",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__session.json.gz",
+      "sha256": "472dbc197d7c3e41aac0bb5661f09e1350818806df8236590dd9eb01603cbef2",
+      "original_sha256": "d6eedc9abed41ef222072541a2d3d0e0bc37891f215c8c0b84ffe608d94b0c0c",
+      "original_bytes": 1855
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__test-report.json.gz",
+      "sha256": "b2ca8e0924ef59725f2e0be1467a7d9d52d5e2da8965f691a4ed970427b85d99",
+      "original_sha256": "e636883f32ca4212d0bed5486698cbc601ffe37b0a174a1a3e423bb6ee89ca0a",
+      "original_bytes": 6409
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__original__uart.log.gz",
+      "sha256": "6d3d8fe61135fa910c2b8fa5d884187ba3fc97e2c0939449deb00cf16776e855",
+      "original_sha256": "d059c1ee94a69d7546c6605edda48cc18bc6af31b8795a01b782e04eb92297db",
+      "original_bytes": 6291
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__after-reset.ppm.gz",
+      "sha256": "9a8c2493fc72f538af0a8d8723d4c59185d97189134512de497a104d293a4165",
+      "original_sha256": "1c9647599609f484387d350da404471cb44fa2b7a7f3a182f431c58e35509699",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__frame-0.png.gz",
+      "sha256": "fc3ce6b72644fc401d6e86b9eb5ab2896d480608eb43ee7728b5595e1e4e8d06",
+      "original_sha256": "ac68b71e54a62430e2f97c088a8f92e6e344080329758f826d5a91544ad1f705",
+      "original_bytes": 6258
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__frame-0.ppm.gz",
+      "sha256": "9bd812a9f4da76dcb17e7e95e4366f32459a42f354a73441d3bf8939c558428b",
+      "original_sha256": "4c24d0f1ec9262f9454d7ae885403e0f0ce9768ac8e68954abd2251a71bff840",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__frame-1.png.gz",
+      "sha256": "25fce60a6acabec0b1c4de657e29f02ddde4b6838e4f07671a0832e30b579042",
+      "original_sha256": "269ffc12927564356943fc88b92545d1ce7e82e48f40ea34fd3df518a3a0af45",
+      "original_bytes": 6302
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__frame-1.ppm.gz",
+      "sha256": "0df212f9c1e7dc5ad5a1cc337ad622e9abd07d25582f6e3d3b21e6931eeb23b4",
+      "original_sha256": "a4575a60432bdd6b53c9ab38f8f0c13e13c06d926f6289505f1c90aac04a7c61",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__frame-2.png.gz",
+      "sha256": "f1696c46c3c83cfa7f9660089663535a0749031a30242491cd2d99b111a57c60",
+      "original_sha256": "ccaa8709d49536b1a24d5b741de5cf064438cc97fb1a5daa3099757afe791207",
+      "original_bytes": 6240
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__frame-2.ppm.gz",
+      "sha256": "56203c09bba186a2a77b1939d2672ece4d3fefe0f84caf2290dc5e85ac92934a",
+      "original_sha256": "91d06f9febd45e285846042f60b73e67394eb670dd63c89d6ab59c55e42d0871",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__prepared.json.gz",
+      "sha256": "a3f36d57843f6cf2063ceed009aa439fe12f824d58ea1763c9561a7dc42363b7",
+      "original_sha256": "a9ca4391883de758fa27ff92d19feb1cb70190adb17655b7147a8382225e88b4",
+      "original_bytes": 2863
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__qemu.log.gz",
+      "sha256": "0fc62ec686f38c4e4d22b70e1174a53d4c6e0754dbf2bed825365bf11213b10f",
+      "original_sha256": "8ad7c3433f588cc0b11d60731eeb0394a8bdd4c4242ccfacd50c8f97807ea211",
+      "original_bytes": 335
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__registers.txt.gz",
+      "sha256": "cdc3d8e23c5994c3440fddb3a3373f2f818f2d1f884ee4f9393a08bf9aee2bff",
+      "original_sha256": "a440589772655c6a9a597f8b7d4252d6bb652ffcd6b4e1e1e524e72b1f46ee70",
+      "original_bytes": 2092
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__reset.ppm.gz",
+      "sha256": "9a8c2493fc72f538af0a8d8723d4c59185d97189134512de497a104d293a4165",
+      "original_sha256": "1c9647599609f484387d350da404471cb44fa2b7a7f3a182f431c58e35509699",
+      "original_bytes": 172815
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__session.json.gz",
+      "sha256": "71910bbe7f4343020945f23afa61c221d615ac2677d73a493958cca74ed66f91",
+      "original_sha256": "aed41d98fb9f046eb978d1683605889f34eff6e02a8ac87abb36510da1821e06",
+      "original_bytes": 1860
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__test-report.json.gz",
+      "sha256": "18167e067caf294ae6b163b552064c231e91b66e7fca61b48513b91a5b5c9ccd",
+      "original_sha256": "32e762af69a607e064c15f14d9ba002dfba71e920860efd75051cf08e38fe0b9",
+      "original_bytes": 9259
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__boot-reset__reconstructed__uart.log.gz",
+      "sha256": "e520a80efbfbf85ae22e96c3502b7dedf14f840c4bdc6ddd37adbce6c70de2a2",
+      "original_sha256": "29affb5bb0ed00fa241bad1ec8b12407359dd0ba231a01f2a71cf19ba748fe20",
+      "original_bytes": 2151
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu__report.json.gz",
+      "sha256": "7586be1991d11067f8ac245b04ffb1cb1ee0386f0d4e08d5245468bf982daab9",
+      "original_sha256": "95d4563f35c7cf9bc5520c1c0caf0cca7cdaeda8384072e7000f00e1cdbada3b",
+      "original_bytes": 20542
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu-profile.json.gz",
+      "sha256": "f11910d17e319ebeb720a39490736772b7de0f82afabaf7a69fd92aea998c2be",
+      "original_sha256": "8d4ca71a581941d3807e3d6ff180ee8118137d27ef0ae645bab7264357ed73c9",
+      "original_bytes": 1060
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu.log.gz",
+      "sha256": "2bf7718c0a1bbc44d13c647274aa6f3f64a2f701c8ee384cc02230294e63328f",
+      "original_sha256": "ad508c3c8a03a5c1c350b1d2c3154e89962f111588f7072dbe928c7adf72697b",
+      "original_bytes": 3005
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-qemu_profile.log.gz",
+      "sha256": "fdffffb69e9f55f3e65541c8bce796c5e4ce04bddaf8fced1df697176f05d491",
+      "original_sha256": "91a77910e059cecff6ed1fd8798cf2867753f92c950d478df8af2d0d3c72dde1",
+      "original_bytes": 791
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-report-aggregation.json.gz",
+      "sha256": "9d3dad2ff5f57db0aab9baefeca01117b42ae73325fc87cd487c30211efe86ec",
+      "original_sha256": "e0027e24f125ece9f16541dc90160961654384e5d5486e68e335041b12106788",
+      "original_bytes": 422
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-report.json.gz",
+      "sha256": "a9e16d269e1e702f54a1984c45c1d740123ae43cc35ba6bd10e75c8a98e7ce26",
+      "original_sha256": "b134e476f2ed0f16d54174dab9e44f99712bb93a744b44f499558599740b33cf",
+      "original_bytes": 2547913
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-report_aggregation.log.gz",
+      "sha256": "de935f93a28c144d1a65bef4f2e03101fc0376d177d4acf9bfc3bf9e6e80ad76",
+      "original_sha256": "42363689ddabfa2d844a8055c55fa7ca4b63420ecd4178c8e899c7548c7a76ec",
+      "original_bytes": 34
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-text.json.gz",
+      "sha256": "12133d56b92218be4eb2dc555766c22a18755f69767df0504ff560474f5a9993",
+      "original_sha256": "41778044a5752cadf4986d9405803671d886f5155c7a8745c7135ee141328bb6",
+      "original_bytes": 194962
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-time-state.json.gz",
+      "sha256": "14ffa5ea4acf15f68b4a65bb77e751c84837e55f77bcd3ed45793e24592696bd",
+      "original_sha256": "f8e705eb2fae09ff1679de4aaee0889c00af5cca6c7cb808814a7c5d6116654e",
+      "original_bytes": 4480
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-timezone-sources.json.gz",
+      "sha256": "5fa909673a0e473b37616bb8728bd5ddfb1f1aec9c50b24ce979e87edb466593",
+      "original_sha256": "ac732fe5c270d36a3aa53cdbccdd1d7a9723a2591b85b5d1a81b51bd2e72bd2d",
+      "original_bytes": 18750
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-timezone_sources.log.gz",
+      "sha256": "4c3a4d50273e1a22a9500464ebdace240da31c67559d6f62ab4cc5229374b535",
+      "original_sha256": "c6042a4efc54f404e1fa5a193749af424fdad7b0e9aa305c08395118657abdc9",
+      "original_bytes": 1663
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-timezones.json.gz",
+      "sha256": "421c4272d10f5c604792c31dade9054c9250ecd32fee1496458481de895eae98",
+      "original_sha256": "76b73e3696904f05e8a66dc73b0c037e28ff4c0eb4f7c593066491b1113c5879",
+      "original_bytes": 28976
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/full-weather-render.json.gz",
+      "sha256": "44b409c3e72721aea17e35ab59d80124a599de49db043af375fb7372c0482d22",
+      "original_sha256": "461d36cb1819666e823942d6c76de7448cd25c553841817e6b804f2095969a9f",
+      "original_bytes": 72448
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/h10-report.json.gz",
+      "sha256": "a4804eb8310eea83a43ff8fc3de79632b77144925429e88136fe049c22fced04",
+      "original_sha256": "f39ca90b35efab64bc507b63601753a67ea04fa0d13b16c76a92231b1dd87d97",
+      "original_bytes": 83770
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/h10-events.jsonl.gz",
+      "sha256": "d9c4918ea51ac5407c4b83ed1756093d5265b2366df328009e0285fa7cccadc2",
+      "original_sha256": "00d1c1a476cc1645d1e8457c5126632e8a86c77c457c599a15a87fe7de889573",
+      "original_bytes": 59130
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/h10-uptime-guard.json.gz",
+      "sha256": "1e95df87b8dcfee99ecce5baf6cfe5c9e96cce31e9f111852c0c443ac3d248cd",
+      "original_sha256": "7924d7516736f755f6d4d1cda9a9d123a97dcddc71d715be075bd74dc11f22e4",
+      "original_bytes": 333
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/h10-vm__uart.log.gz",
+      "sha256": "d852f6c255101dcedc0b3cba5843107f1de19033c77f0d68210d14e0909362be",
+      "original_sha256": "4130d76c69635c3c9f362ef54517492559618805b619d2fff119fd9fa6838a20",
+      "original_bytes": 333
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/h10-vm__session.json.gz",
+      "sha256": "54828d25d41358826447a164bf4cc9a93cc506a933e361370f7680c1169f9a20",
+      "original_sha256": "cf65a6aeb8df1e97ecc78dd16fb95256c9aca61705e0bd82cea958969e0c59fc",
+      "original_bytes": 2186
+    },
+    {
+      "file": "hostfwd-final-checkpoint-20261018-raw/h10-supervisor.json.gz",
+      "sha256": "cbd14f5e4b43b5ab93b3349e21483bedcb432d10e082bd7c874cee3990b1db91",
+      "original_sha256": "07318b7fde4d39d95fd629221c2572d776b89f771b8455303fe1e6db601b7878",
+      "original_bytes": 1783
+    }
+  ],
+  "next_actions": "Investigate reset display capture in a separate unfrozen source tree; continue the unchanged H10. CYD acceptance remains open.",
+  "scope": "A failed full run plus a live process-verified checkpoint; neither is full parity, H10 completion, CYD, or physical acceptance."
+}

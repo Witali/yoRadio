@@ -1,0 +1,215 @@
+{
+  "status": "desktop_mobile_controls_and_cold_persistence_passed",
+  "passed": true,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:51:36.698829+00:00",
+  "test_commit": "346d97fc38f1a4cdddab2b2ff8466f8dc50bfe6e",
+  "app_sha256": "f1ada8b4da4338df3248ffb26a39a79e36bf5cf0e365eb2972b75c8721f7ea7b",
+  "native_elf_sha256": "91e26eb2583ea61fda24f81ef9f7fdfbe2ad5ecf35b476b17dee680d29b5089d",
+  "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+  "source_sha256": "f849f5bfcda51f28e5ffd68b4a7240ab20aa645e8b01581cee25ea6aed684eeb",
+  "browser_version": "155.0.8059.80",
+  "ui_checks": 281,
+  "storage_source_checks": 5,
+  "ui_post_requests": 96,
+  "cold_post_requests": 0,
+  "observed_input_count": 25,
+  "source_hashes": {
+    "Small_TV/src/tests/browser_controls_qemu.py": {
+      "worktree_sha256": "30771f7f49b758541a4a6ff7a0cdbfb96335b2fd58cab8c1247872ace7cb4e20",
+      "git_lf_sha256": "30771f7f49b758541a4a6ff7a0cdbfb96335b2fd58cab8c1247872ace7cb4e20"
+    },
+    "Small_TV/src/tests/browser_controls_flow.mjs": {
+      "worktree_sha256": "ddfd4e7c585482004ba4df220c7d6597341a1f16ab731d4d21a839d5d6c63027",
+      "git_lf_sha256": "ddfd4e7c585482004ba4df220c7d6597341a1f16ab731d4d21a839d5d6c63027"
+    }
+  },
+  "ui_checks_by_stage": {
+    "mutate": 236,
+    "cold": 45
+  },
+  "vm_processes": {
+    "mutate": {
+      "pid": 14256,
+      "name": "SmallTV-d3fbc38893c3",
+      "rom_boots": 1
+    },
+    "cold": {
+      "pid": 20488,
+      "name": "SmallTV-f11029200f40",
+      "rom_boots": 1
+    }
+  },
+  "os_cleanup": {
+    "status": "owned_vm_processes_absent",
+    "captured_utc": "2026-10-18T16:51:35.2248819Z",
+    "tested_pids": [
+      14256,
+      20488
+    ],
+    "all_absent": true,
+    "all_functionality_verified": false,
+    "scope": "OS process check after both terminal successful browser stages; no QMP/RSP connection."
+  },
+  "independent_flash": {
+    "passed": true,
+    "protected_intervals": [
+      {
+        "start": 0,
+        "end": 36864,
+        "sha256": "6719c13ac8f129ee59574246a97b7660e42d531b86dc2232a851217f1b22dfb0"
+      },
+      {
+        "start": 61440,
+        "end": 4091904,
+        "sha256": "952867f80bbea1cf8504fba99a5b6ed252e9b96e95c65721356b85a7ee1419d8"
+      },
+      {
+        "start": 4096000,
+        "end": 4194304,
+        "sha256": "1bffa7ef9c11319de313a60f5ae2cbcc486e5e40ebb3e25f31b550ca8aa916b0"
+      }
+    ],
+    "raw_public_settings_match": true,
+    "raw_record_sha256": "e78a70e34ef8e9daa7788e44c1dd2ae0a66503b2fa934b78a9b8d0418a9bbab2",
+    "scope": "Offline independent fresh preparation and protected byte comparison; no new VM, QMP or RSP client."
+  },
+  "evidence": [
+    {
+      "file": "browser-controls-validation-20261018-raw/report.json.gz",
+      "source_file_sha256": "4a1345c7bb60146e7059e70c277a5b67f844d375c19fba8fe98888ad67dd1256",
+      "payload_sha256": "4a1345c7bb60146e7059e70c277a5b67f844d375c19fba8fe98888ad67dd1256",
+      "stored_sha256": "9cbf5ca6dd56fbd841155c2be3a1a812344c99234057bfe46222e5450d2f2d36",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/browser-controls-mutate.json.gz",
+      "source_file_sha256": "7c233fd0fbba69aa0527c3f7374efdfdc076651cfe1140c7f01e379323c702eb",
+      "payload_sha256": "7c233fd0fbba69aa0527c3f7374efdfdc076651cfe1140c7f01e379323c702eb",
+      "stored_sha256": "8f0e3dac212afb4ad1af7f51edd823f0c95c9845d843507cb71d5f494023f4b7",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/browser-controls-cold.json.gz",
+      "source_file_sha256": "b84362207caea0274f2bba9a4b8e442c36d23626d7b544ba4f73151ad2478e0a",
+      "payload_sha256": "b84362207caea0274f2bba9a4b8e442c36d23626d7b544ba4f73151ad2478e0a",
+      "stored_sha256": "cc877288b963d7a41be511865839f5869faaadd9e539bd3c3289bc312178cc7f",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/expected-controls.json.gz",
+      "source_file_sha256": "97628b2e000d0c793e0339d61258629afa7db8a80c74d10acd1972589fcfc2ab",
+      "payload_sha256": "97628b2e000d0c793e0339d61258629afa7db8a80c74d10acd1972589fcfc2ab",
+      "stored_sha256": "475a11e60daf5577058de702efae4d7067db1010494105ce467a633d3eb9ee51",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/node-controls-mutate.log.gz",
+      "source_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/node-controls-cold.log.gz",
+      "source_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/independent-flash-check.json.gz",
+      "source_file_sha256": "4e03ec6a2e03629a7eb5a58bbc1ea3b57c52561c20dcdcc2af36c4a008b5d522",
+      "payload_sha256": "4e03ec6a2e03629a7eb5a58bbc1ea3b57c52561c20dcdcc2af36c4a008b5d522",
+      "stored_sha256": "c62d434fbdc7aa9b7740c9cfe0fd41d35abedcdd9c04e4993c19f553bb32a7ff",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/uart-mutate.log.gz",
+      "source_file_sha256": "26319d06787bc996bee8f6eb2417db321ef4f9cc23d1362633207dab6dbf4380",
+      "payload_sha256": "10b46bd9bd988ae6e65f1e6a0319f36c5ee1a495afe3a9205160f7b26eed70fc",
+      "stored_sha256": "26319d06787bc996bee8f6eb2417db321ef4f9cc23d1362633207dab6dbf4380",
+      "source_was_gzip": true
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/uart-cold.log.gz",
+      "source_file_sha256": "e4a816ae85ba82c3aeccfd77e2fb9afed6b66f66ea3c80d9c7333999b083a250",
+      "payload_sha256": "0ca5352dac577d3446a305efc4ffae39e6dc2369f60ed00a942ac9fa2fa53f12",
+      "stored_sha256": "e4a816ae85ba82c3aeccfd77e2fb9afed6b66f66ea3c80d9c7333999b083a250",
+      "source_was_gzip": true
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/browser_controls_qemu.py.gz",
+      "source_file_sha256": "30771f7f49b758541a4a6ff7a0cdbfb96335b2fd58cab8c1247872ace7cb4e20",
+      "payload_sha256": "30771f7f49b758541a4a6ff7a0cdbfb96335b2fd58cab8c1247872ace7cb4e20",
+      "stored_sha256": "646f2379df33e31364c54707234e3405f808ea5ee8e7a7dff4ffaa69a951c684",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/browser_controls_flow.mjs.gz",
+      "source_file_sha256": "ddfd4e7c585482004ba4df220c7d6597341a1f16ab731d4d21a839d5d6c63027",
+      "payload_sha256": "ddfd4e7c585482004ba4df220c7d6597341a1f16ab731d4d21a839d5d6c63027",
+      "stored_sha256": "1785de7fad2268e39a7d2e65b6f544a64db49bd7dd75ec845579107ae8e5afeb",
+      "source_was_gzip": false
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/save_browser_controls_evidence.py.gz",
+      "source_file_sha256": "b86dedc5c987f367e6085430148c3a2f0f1f44a51cd05c6bb4861992efb7f7b4",
+      "payload_sha256": "b86dedc5c987f367e6085430148c3a2f0f1f44a51cd05c6bb4861992efb7f7b4",
+      "stored_sha256": "2cd33cea3d9bc840d795c6029388d93c7fded6fbcf452ee4c36b6ebced38a96b",
+      "source_was_gzip": false
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "browser-controls-validation-20261018-raw/cold-advanced-1280.png",
+      "sha256": "0c01e136e741f8e48e87ed97a91e4c265d6386f63605834a1399548852e43002"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/cold-advanced-390.png",
+      "sha256": "cb4896e3df5cf40b6648031244698b890e83daa7eb761d9a92e99c02819b003a"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/cold-photo-1280.png",
+      "sha256": "2f7dc9cb255b1469b6f1758c29b5141900021842876c5864c3ba0e6d9741e9d6"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/cold-photo-390.png",
+      "sha256": "03aaa203017368b3c91c5d2bef2d4f43e9de8e54cbdbe1a3df969f1aaf9826dc"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/cold-settings-1280.png",
+      "sha256": "6cd318855c880cd8aea5ec03c41a71f8661e22130b888abbbc0454d8828d83c7"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/cold-settings-390.png",
+      "sha256": "8030e7f799382ff6b79f96baf70a8d4cf08356ea3dc4b97273bee9d0195477b3"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/mutate-advanced-1280.png",
+      "sha256": "0c01e136e741f8e48e87ed97a91e4c265d6386f63605834a1399548852e43002"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/mutate-advanced-390.png",
+      "sha256": "cb4896e3df5cf40b6648031244698b890e83daa7eb761d9a92e99c02819b003a"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/mutate-photo-1280.png",
+      "sha256": "2f7dc9cb255b1469b6f1758c29b5141900021842876c5864c3ba0e6d9741e9d6"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/mutate-photo-390.png",
+      "sha256": "03aaa203017368b3c91c5d2bef2d4f43e9de8e54cbdbe1a3df969f1aaf9826dc"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/mutate-settings-1280.png",
+      "sha256": "9897f7925eb1a6c8a22e004c1238a329bd7af20d48af88e9afa44758de7ff3c5"
+    },
+    {
+      "file": "browser-controls-validation-20261018-raw/mutate-settings-390.png",
+      "sha256": "50e476bb650278a084343dae11ccd5391440b25f96247e14db4e74bd7a0cec48"
+    }
+  ],
+  "production_changed": false,
+  "scope": "Standalone real Chrome desktop/mobile H03/H04 controls gate on exact F1/D64. No LCD/PWM, RF/WPA/captive portal, Internet weather, crop/upload, power interruption mid-write, software restart, full-suite or H10 acceptance is claimed."
+}

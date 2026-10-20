@@ -52,9 +52,14 @@ static void test_http_pages(void)
     }
     get("/advanced");
     CHECK(strstr(request.response, "/advancedset") != NULL);
+    get("/");
+    size_t root_length = request.response_length;
+    const unsigned char *root_page = connected ? web_settings : web_setup;
     prepare("/generate_204", "", 0, NULL);
     dispatch(HTTP_GET);
-    CHECK(request.status == 302 && !strcmp(request.location, "/") && request.response_length == 0);
+    /* FIXED_TEST: factory 0x4200d4be serves root for the default AP Host. */
+    CHECK(request.status == 200 && request.location[0] == 0);
+    CHECK(request.response_length == root_length && !memcmp(request.response, root_page, root_length));
     connected = false;
     get("/scan");
     CHECK(strstr(request.response, "native test") && strstr(request.response, "-42"));

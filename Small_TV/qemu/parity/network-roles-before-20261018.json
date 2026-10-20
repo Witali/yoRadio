@@ -1,0 +1,17 @@
+{
+  "status": "expected_failure_before_fix",
+  "passed": false,
+  "scope": "Host platform role invariant rejects previous C initialization before the resource change.",
+  "source_commit": "9c8a6747b2e448bdde3c0ff068d2f6b8df835369",
+  "source_file": "Small_TV/src/app/network/wifi.c",
+  "source_git_blob_sha256": "6cd64e914af476041916a4bd2111c2c1d1593e78c46f0476bffa3babb54b575f",
+  "test_sha256": "e2f202e116493cedf9d27dae7061a63bd544e0f329be9928aad740d07888e52e",
+  "case": "wifi_setup",
+  "exit_code": 1,
+  "rejected_invariant": "station_netifs_created == 0 && ap_netifs_created == 1",
+  "raw_log": {
+    "file": "network-roles-before-20261018.log.gz",
+    "uncompressed_sha256": "81e44218ed93006beba1c8420b43c8396d0e23ada5238a5659d952584e971058"
+  },
+  "limitation": "The before host executable was replaced by the successful after build; its bytes are not retained. Actual firmware before/after images and runtime identities are retained separately."
+}

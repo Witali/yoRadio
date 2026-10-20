@@ -1,0 +1,36 @@
+{
+  "status": "intent_before_stop",
+  "captured_utc": "2026-10-18T12:30:21.341213+00:00",
+  "all_functionality_verified": false,
+  "reason": "Supersede old app26C6/B44 observation with current appBC68/20B after successful exact candidate preflight.",
+  "old_run": "C:/Work/yoRadio/.worktree/small-tv-h10-netif-roles/.build/netif-roles-detached-24h-20261018",
+  "old_prefix": {
+    "cycles": 212,
+    "guest_seconds": 3492.5186400000002,
+    "input_count": 31
+  },
+  "old_identities": [
+    {
+      "ProcessId": 21928,
+      "CreationDate": "2026-10-18T13:14:24.867145+02:00",
+      "CommandLine": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\runtime-qemu-b44-frozen-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\netif-roles-detached-24h-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\""
+    },
+    {
+      "ProcessId": 20664,
+      "CreationDate": "2026-10-18T13:14:25.260008+02:00",
+      "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\Small_TV\\src\\tests\\runtime_qemu.py --yoradio C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles --dependency-root C:\\Work\\yoRadio --qemu-root C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\runtime-qemu-b44-frozen-20261018 --output C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\netif-roles-detached-24h-20261018 --interval-seconds 15 --outage-every 60 --outage-seconds 1 --duration-seconds 86400"
+    },
+    {
+      "ProcessId": 7412,
+      "CreationDate": "2026-10-18T13:14:28.687373+02:00",
+      "CommandLine": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\runtime-qemu-b44-frozen-20261018\\bin\\qemu-system-riscv32.exe -M esp32c2,default-peripherals=off -name SmallTV-6ee0ab85101d -L C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\netif-roles-detached-24h-20261018\\vm -drive file=C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\netif-roles-detached-24h-20261018\\vm\\flash.bin,if=mtd,format=raw -display none -serial file:C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\netif-roles-detached-24h-20261018\\vm\\uart.log -monitor none -icount shift=3,align=off,sleep=on -qmp tcp:127.0.0.1:58574,server=on,wait=off -device {\\\"driver\\\":\\\"esp-spi-module\\\",\\\"id\\\":\\\"lcd\\\",\\\"bus\\\":\\\"/spi2/spi\\\",\\\"gpio\\\":\\\"/machine/gpio\\\",\\\"spi-host\\\":2,\\\"cs\\\":0,\\\"model\\\":\\\"st7789\\\",\\\"sck\\\":4,\\\"mosi\\\":6,\\\"miso\\\":-1,\\\"cs-gpio\\\":-1,\\\"dc-gpio\\\":5,\\\"reset-gpio\\\":1,\\\"backlight-gpio\\\":18,\\\"backlight-active-low\\\":true,\\\"properties\\\":\\\"{\\\\\\\"visible-width\\\\\\\":240,\\\\\\\"controls\\\\\\\":false,\\\\\\\"panel-inverted\\\\\\\":true}\\\"} -global esp32c3-wifi.clock-services=on -global esp32c3-wifi.ntp-hosts=ntp1.aliyun.com;cn.pool.ntp.org;pool.ntp.org -global esp32c3-wifi.station-ssid=yoRadio-QEMU -nic user,model=esp32c3-wifi,restrict=on,hostfwd=tcp:127.0.0.1:18080-10.0.2.15:80,guestfwd=tcp:10.0.2.100:80-tcp:127.0.0.1:58572 -global esp32c3-wifi.service-hosts=api.openweathermap.org -snapshot -gdb tcp:127.0.0.1:58573 -S"
+    },
+    {
+      "ProcessId": 35272,
+      "CreationDate": "2026-10-18T13:14:57.777167+02:00",
+      "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\Small_TV\\src\\tools\\runtime_run_guard.py --run C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\netif-roles-detached-24h-20261018 --qemu-tools C:\\Work\\yoRadio\\.worktree\\small-tv-h10-netif-roles\\.build\\runtime-qemu-b44-frozen-20261018\\tools"
+    }
+  ],
+  "replacement_preflight": "ap-services-h10-preflight-20261018.json",
+  "policy": "Stop only the exact old workload with a retained process handle; preserve the original terminal failure/guard/UART and audit the prefix as incomplete. Supervisor cleans its own guest/guard. Never claim H10 success for the replaced run."
+}

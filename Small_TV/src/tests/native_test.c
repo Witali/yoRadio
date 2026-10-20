@@ -31,7 +31,7 @@ static int64_t clock_us;
 static unsigned rendered_pixels,registered_routes,restart_requests,weather_requests;
 static unsigned nvs_commits;
 static unsigned route_success[48],route_errors[48];
-static bool connected;
+static bool connected, setup_ap = true;
 static uint16_t scan_count=1;
 static esp_err_t scan_result=ESP_OK,write_result=ESP_OK;
 static esp_err_t (*not_found)(httpd_req_t *,httpd_err_code_t);
@@ -76,7 +76,7 @@ void display_fill(int x,int y,int width,int height,uint16_t color)
     assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240 && color==0);
 }
 bool network_connected(void) {return connected;}
-bool network_ap_active(void) {return true;}
+bool network_ap_active(void) {return setup_ap;}
 void network_restart_later(void) {++restart_requests;}
 void weather_request_update(void) {++weather_requests;}
 esp_err_t network_scan(wifi_ap_record_t *records,uint16_t *count)
@@ -589,6 +589,7 @@ static void test_advanced_page(void)
 }
 
 #include "http_contracts.inc"
+#include "http_captive.inc"
 
 int main(int argc,char **argv)
 {
@@ -596,7 +597,7 @@ int main(int argc,char **argv)
     CHECK(argc==2 || argc==3);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_advanced_page();test_uploads();test_multipart();test_dns();
+    test_settings();test_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_advanced_page();test_uploads();test_multipart();test_dns();test_http_captive();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
     if(argc==3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);

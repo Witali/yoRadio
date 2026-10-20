@@ -1,0 +1,871 @@
+{
+  "schema_version": 1,
+  "status": "scoped_color_firmware_validation_passed",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-20T10:25:03.133170+00:00",
+  "base_commit": "f1e00daeb",
+  "scope": "Color module/factory code/pixel and RV32 contracts, native regression, independent display and network gates. No new JPEG codec integration, full/24h/physical acceptance.",
+  "app_sha256": "c8fdc949757d3caf6f433d67c1b682d7f14a0a556d413bd30a9e4874fc787e6d",
+  "elf_sha256": "368ab7b56c9bf502a085a900565f05ff771598932a9e7ebb2e561789d1c5de93",
+  "source_sha256": "e34bebeb82b22f277848a2931efd847bde97761ab2f6c71c6459356d8eaada6c",
+  "source_inputs": 61,
+  "sources_sha256": {
+    "Small_TV/src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
+    "Small_TV/src/app/display/backlight.c": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03",
+    "Small_TV/src/app/display/clock_ui.c": "3d1ff2524cef46ab59cf1dd913d292871cb484a0c4b38980139c3ebed1462663",
+    "Small_TV/src/app/display/factory_animation.c": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09",
+    "Small_TV/src/app/display/factory_fonts.c": "a0e98417e6464d0825f8361dfce1d97cc826da8a77f0a7c44aa0b25cc20ff231",
+    "Small_TV/src/app/display/factory_photo.c": "1a12f6e63dafe015570d1312138729785cee33449c0f5e9b24af29fb779764af",
+    "Small_TV/src/app/display/factory_timer.c": "563706d717d3429544bfc8a2cafa5f028b3fd76403cd078b05323338274641fe",
+    "Small_TV/src/app/display/st7789.c": "e3194452d0b8ccaa4cbdb3b51fa229d94c92f11f2eaab80f3a127ffaf49ce17f",
+    "Small_TV/src/app/display/ui_renderer.c": "2da92adadef583678d8c06666107cde45c1e1545635eae34766fdbf042a35ed3",
+    "Small_TV/src/app/media/assets.c": "21a3553ad69f31c3ac3ae2fb1d38d7c02b6a2a3fda99db4108a2051953ac9c41",
+    "Small_TV/src/app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
+    "Small_TV/src/app/media/photo_upload.c": "e234368f41edabca3d92d14f6eaa37a7caec3a0de3b7dbcb35f32ea0a8475f04",
+    "Small_TV/src/app/network/dns.c": "a4bee538e60a4bca3aba5a7b00233c17a9c08ff39779aefde9965e3a17234025",
+    "Small_TV/src/app/network/dns_packet.c": "cb807af1329c04c534d61296138529f71e0ac5b2b2c3cf5eeb225ac763d6feb1",
+    "Small_TV/src/app/network/wifi.c": "54d1de158d20e1f41826ca902a14ee3c9e36dc8da540ab852665a91f696908ec",
+    "Small_TV/src/app/services/time_sync.c": "b44582771c144f62bec9181ac71a25a83cf8b1d0bbad3e3b1d8f3315f55e9c5c",
+    "Small_TV/src/app/services/timezones.c": "b7ff1ad5ce79358fa6f7967cb7dce05819636c67a74928165c2dc821ee6c7069",
+    "Small_TV/src/app/services/weather.c": "5f8cf49943d713bffc886707b64b15634dcb4749d483e222b34dd89d7f7b57e7",
+    "Small_TV/src/app/services/weather_parser.c": "af09595b9843d4d559526d39db7afd84cd45b6497408b3a7d23c2f61e8ced6e5",
+    "Small_TV/src/app/settings/factory_settings.c": "81ad9a3cef18df97d9c345abe1106c5c62ecd4e3c60ebba677200f612d7faa9b",
+    "Small_TV/src/app/settings/settings.c": "f51739b6b0e81434362d7105303fad91589191b43219f0fee44c6fefa2fa93cd",
+    "Small_TV/src/app/text/text.c": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa",
+    "Small_TV/src/app/web/photo_api.c": "f5935dfe63bd1679855791c58f92e023b36bfba61e6dba995b7259e25eee0400",
+    "Small_TV/src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
+    "Small_TV/src/app/web/server.c": "8cb1a4ede2558c05abe825c1046b205b0d039a0ecad13bfed6962c91812e56b4",
+    "Small_TV/src/app/web/settings_api.c": "2c1b9db64dd8f8ae66883e35a106c8f731d6505691ba006ec4327a3a99ddbb0a",
+    "Small_TV/src/app/include/board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+    "Small_TV/src/app/include/color_convert.h": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6",
+    "Small_TV/src/app/include/display.h": "3f38992b7da73f45e3a11e1e567a075c8e1cfc3cc4f3553783e2e92e13e38b09",
+    "Small_TV/src/app/include/dns_packet.h": "d03a8d292118201158ce35ba3915b2b23f2641863f28af20fbed53fbe8227107",
+    "Small_TV/src/app/include/factory_animation.h": "326c35c61c56dfa38f8a861091eb9ca45a5056a1a12c51eea079a356c913daa3",
+    "Small_TV/src/app/include/factory_photo.h": "9ee99645bdddb1a05769eb22e181d84e727aa1c4eb52a6ee6fc263313bec341a",
+    "Small_TV/src/app/include/factory_settings.h": "81743a6d77d761902589b6c073b351efbce072744aea7ca0dc5d04b3f3473dda",
+    "Small_TV/src/app/include/factory_timer.h": "dbed083df5fb927ef764042d496dcd36bfb1113f05fe2fb40cea98f788a69e2d",
+    "Small_TV/src/app/include/factory_ui.h": "28d4e15bb91fbf79adbb6d4b60c357a0d44ee8cc9228c9299b14e5aeef314321",
+    "Small_TV/src/app/include/media.h": "d75d4172760d302ba31a914947bcdbf21f3eee73ae73ec661f371f78be8ad995",
+    "Small_TV/src/app/include/network.h": "fc88fdbbb10f4dec709f480cbd260371c7816923f5a0b9c757652e5aed5d708f",
+    "Small_TV/src/app/include/services.h": "6490660af9c5cd11519c173a17982def5a33e0c7a5c9de32c3e7218f5faab193",
+    "Small_TV/src/app/include/settings.h": "6ca9118c064394037033f441055b467ba0e2143df651ab03a1c5c9176798c916",
+    "Small_TV/src/app/include/text.h": "150044cb34ad45edbd4d3d267d7c066aafaf3b6e2635e6e2a93ec88775b3a3ef",
+    "Small_TV/src/app/include/timezones.h": "b0f6bc81cea6a32a60a48a9746ff999922b0c7af1f137d2cbe34d2e436e859f8",
+    "Small_TV/src/app/include/web.h": "fb5d64e86859718aa5f1ee0f0519d9194c33c0df8d831b30ff4e252e4cd89a23",
+    "Small_TV/src/app/media/media_internal.h": "a18fc231725ee9297d539ed239085b88f661c7349632f17b56556996946a2a32",
+    "Small_TV/src/app/services/country_timezones.h": "d3098a16a798f3831d1321f1c8c7754c9528a38aa5523d9c2b92f65d30f11b8b",
+    "Small_TV/src/third_party/cjson/cJSON.c": "298581a04a36c0165da4b0aade235c23088cb2faa58651d720ea2f3706ed0b0d",
+    "Small_TV/src/third_party/tjpgd/tjpgd.c": "c397f6332f507bf5e2e098055acb2c406957611de45bf45000a8525dacdb31ba",
+    "Small_TV/src/third_party/cjson/cJSON.h": "25b0145150d500498e4d209cec69c18c42cf818bffcc54690be3b895a2a16dee",
+    "Small_TV/src/third_party/tjpgd/tjpgd.h": "4c7115c84f1c7042e9ee459d1a731fb6fcdd89fdc8686e95afa9c59074a69557",
+    "Small_TV/src/third_party/tjpgd/tjpgdcnf.h": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760",
+    "Small_TV/src/CMakeLists.txt": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8",
+    "Small_TV/src/app/CMakeLists.txt": "0cd3e28a5d426ef3d6d05443658e64e3f77fd8b827ce7e856402cf49aaf4406a",
+    "Small_TV/src/sdkconfig.defaults": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
+    "Small_TV/src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
+    "Small_TV/src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
+    "Small_TV/src/tests/color_convert/bridge.c": "ef37bd9c53a297454442b0de48bd6a7c50821ab06c7ad263f17fdc3d877ba006",
+    "Small_TV/src/tests/color_convert/build.py": "1c665eacea587dca28341b27d7f39fbbd8dfd0a58a4fcba64d4322a826369a5d",
+    "Small_TV/src/tests/color_convert/CMakeLists.txt": "306e768be287c4e907701d1f3dad47e89aa728d32177d3ab15d7d10932b2bc3a",
+    "Small_TV/src/tests/color_convert_contract.py": "d546ca65a349450dfcfb40a2888608b1749603384fc5c65095e051cdfa58c981",
+    "Small_TV/src/tests/run.ps1": "39c172d5b072f5f1388ee5f67d85ff0daaa02f902c9f6b94167215f9920f5234",
+    "Small_TV/src/tests/native_test.c": "c3081ae78ca637645d5971206ed57b95cba1bad71d2d346a5c237bcc1aeb9406",
+    "Small_TV/src/tests/machine_oracle.py": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2",
+    "Small_TV/src/tests/display_cold_boot_qemu.py": "2556759ee712c1092abd7d606a6cdb6dfd1c2f9655333eb21b492eaf5918f074",
+    "Small_TV/src/tests/display_boot_observer.py": "309d15d8b2e38087788264711a8e30d65fa52d1f6a9a9abbf825767c57c394ec",
+    "Small_TV/src/tests/network_without_display_qemu.py": "c54d5092dd0029ca76eeca40321264049bf74260a4b4caea41a9f891627c883a",
+    "Small_TV/src/tests/qemu_storage.py": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d",
+    "Small_TV/src/tests/stubs/esp_attr.h": "eeb17565d81d387240a34f855611453654e19d747bd5a19c81765840ad0a331c",
+    "Small_TV/src/tests/stubs/esp_crt_bundle.h": "b3adf106d95b8934f690943f2921308b90be5b766c4c8ba250c792de56400201",
+    "Small_TV/src/tests/stubs/esp_err.h": "ff324f4c58f3e452d1044ddcafec4650debfcdc15a874203f1db0bc47cb6f030",
+    "Small_TV/src/tests/stubs/esp_event.h": "320a206756661470135eca864cb42c5881653aaf9a23002461b246039dd0e8bb",
+    "Small_TV/src/tests/stubs/esp_flash.h": "ae113fca498474504de520266ae0c4ea5566b662b198076d7671e42c2b5563d0",
+    "Small_TV/src/tests/stubs/esp_http_client.h": "f6f9e755cd9bcf4843c490bfae493bf15b9e2118c3ec623eb74a307926e32ef5",
+    "Small_TV/src/tests/stubs/esp_http_server.h": "612be2480cebfaafa1a70429dcf0fa9b96a1462b883fedd5c03b9702a8b89541",
+    "Small_TV/src/tests/stubs/esp_netif.h": "f4f9c0e2b6244653544dd0fe1e927848a8636cab6dc0c43e66e24748d6f8beae",
+    "Small_TV/src/tests/stubs/esp_netif_sntp.h": "ffff057b6df9d5c1aa546c583141ad8bc8d773b45949e9fc74c5dd68d66f07a4",
+    "Small_TV/src/tests/stubs/esp_partition.h": "ccc2bbc1bed4688f32d2087416cf6a6c7f5a5c55f59f20da97142f66ac2158cd",
+    "Small_TV/src/tests/stubs/esp_system.h": "2236f53f34f441564332e95ae002a00b7d4b773759293241b0ca1276dcfc1dbe",
+    "Small_TV/src/tests/stubs/esp_timer.h": "82a7c14acf5d1cdcbea1b23bab880c69562da88013adc34ff5f2ae2115fb08d1",
+    "Small_TV/src/tests/stubs/esp_wifi.h": "ac167813c9d550c3aef904b0ee426d6e292df6fad85894c648f7501dc4d92d4b",
+    "Small_TV/src/tests/stubs/nvs.h": "5f6b13a4f8f655556c0e1b23be778eb064dc6a00c199cf349663088b40511e9a",
+    "Small_TV/src/tests/stubs/time_adapter.h": "14aa359e1ce977a8bc520a67c0d3d6ed6bb8fd5c61960fedb2fbc7f5f79b8559",
+    "Small_TV/src/tests/stubs/driver/gpio.h": "cb03cea98c5d32fb07c0cfbdc7926af161a94c3fd65c153ac48830754bbfe465",
+    "Small_TV/src/tests/stubs/driver/gptimer.h": "d137cf8197b1edca31e7beea249a3c939d7d653316feb4a59c24efaf8e8bcf0e",
+    "Small_TV/src/tests/stubs/driver/ledc.h": "28742a7d5ec88c4e2a86f186a127ff8ec4464aebb0c2ef215003de6e174aa3d9",
+    "Small_TV/src/tests/stubs/driver/spi_master.h": "69435ae97362f945e681ba755ac824d1093430f025873c18bee0fc6e18fd44fd",
+    "Small_TV/src/tests/stubs/freertos/FreeRTOS.h": "0e8480e3c8d57cd5b1bccb7bc0d7766c502bde4bdb3beae786747591a80413b7",
+    "Small_TV/src/tests/stubs/freertos/semphr.h": "0793f354d1c08d741fb54fa5a6f7af8cf09ebe8d0a72c91242e1f7af2bd0ff9e",
+    "Small_TV/src/tests/stubs/freertos/task.h": "8c2f1876858dce1348c4125744812dd979ccd902b5d367dc2c1686c1fc045152",
+    "Small_TV/src/tests/stubs/lwip/sockets.h": "476b174e9d84c11a532614ee12e7146edc3b2e8b9d9cc6daab11ee19366a8a4a"
+  },
+  "counts": {
+    "factory_expand": 65536,
+    "factory_pack": 3304,
+    "host_rows": 61,
+    "samples": 549676,
+    "rv32_rows": 141,
+    "host_rejections": 65,
+    "rv32_rejections": 68,
+    "jpeg_images": 66,
+    "pillow_images": 18,
+    "native_checks": 5531,
+    "cold_display_processes": 4,
+    "display_frozen_inputs": 62,
+    "network_frozen_inputs": 59
+  },
+  "converter_rv32": {
+    "code_bytes": 540,
+    "readonly_bytes": 4,
+    "writable_bytes": 0,
+    "frame_bytes": 96,
+    "heap_allocation": false
+  },
+  "production": {
+    "app_bytes": 1170032,
+    "partition_bytes": 1536000,
+    "remaining_bytes": 365968,
+    "decoder": "Existing TJpgd; new libjpeg not linked; row API unreferenced and removed by section GC"
+  },
+  "baseline_checkpoint": {
+    "captured_utc": "2026-10-20T10:23:31.6982611Z",
+    "scope": "Read-only OS identity/file checkpoint. No QMP/RSP clients added to B50D full/H10.",
+    "baseline_processes": [
+      {
+        "role": "full",
+        "pid": 29928,
+        "expected_utc": "2026-10-20T09:22:52.8986480Z",
+        "observed_utc": "2026-10-20T09:22:52.8986480Z",
+        "identity_matches": true
+      },
+      {
+        "role": "h10_supervisor",
+        "pid": 22184,
+        "expected_utc": "2026-10-20T09:27:35.2066230Z",
+        "observed_utc": "2026-10-20T09:27:35.2066230Z",
+        "identity_matches": true
+      },
+      {
+        "role": "h10_workload",
+        "pid": 32636,
+        "expected_utc": "2026-10-20T09:27:35.6846960Z",
+        "observed_utc": "2026-10-20T09:27:35.6846960Z",
+        "identity_matches": true
+      },
+      {
+        "role": "h10_vm",
+        "pid": 32580,
+        "expected_utc": "2026-10-20T09:27:41.5109650Z",
+        "observed_utc": "2026-10-20T09:27:41.5109650Z",
+        "identity_matches": true
+      },
+      {
+        "role": "h10_guard",
+        "pid": 18268,
+        "expected_utc": "2026-10-20T09:28:10.4140440Z",
+        "observed_utc": "2026-10-20T09:28:10.4140440Z",
+        "identity_matches": true
+      }
+    ],
+    "h10_status": "running",
+    "h10_cycles": 149,
+    "h10_observed_utc": "2026-10-20T10:23:31.1548406Z",
+    "h10_cleanup_errors": [],
+    "full_terminal_present": false,
+    "scoped_vm_orphans": []
+  },
+  "diagnostics": "First sandbox LCD QMP startup timeout retained as failed; subsequent distinct outside-sandbox run passed. Timeout cause unproven. Pillow deprecation warnings retained.",
+  "artifacts": [
+    {
+      "file": "color-conversion-validation-20261020-raw/color-report.json.gz",
+      "sha256": "23a1c50b447092034fcf3c1d14a8cef9433e709049f87b0bf17568f0de8e8cc8",
+      "raw_sha256": "9c6089e9b76a95705a4188878472491c609e5e8d360cd99a8bdbea94405b9ab8",
+      "raw_bytes": 79059
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/build-report.json.gz",
+      "sha256": "f2b539deb329050cc764173f2fe6bd9afe5697570bb080d37814b08480cdf506",
+      "raw_sha256": "6e7efc10064d8ea4fc3364bd07a69c2714748b191e59254bca4ce46c9e8ddad1",
+      "raw_bytes": 2326
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display-report.json.gz",
+      "sha256": "e8bb025636742416e892d7d67c3ebfb2a4be72bc5fb4148a0cb9b66629a4228d",
+      "raw_sha256": "798226b172780f5662402cc9440a4ff174e576c64d44815e45a42779ba397297",
+      "raw_bytes": 72957
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/network-report.json.gz",
+      "sha256": "2d2623cca6e2d1d084b3053c24f1e5129938299892e904bc16bf898c9125e785",
+      "raw_sha256": "56d7939a295bb56a78953df0ded293b697f4798c38f34960d5b3d0fd0141f604",
+      "raw_bytes": 86848
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/failed-display-report.json.gz",
+      "sha256": "f8a6da9088ef46ed1a2990bf0f3134610b7c4c46d75e0d9a8aaa4cd81391f045",
+      "raw_sha256": "836d091800d2895374379b1578482bd316c57434f5a397ac13d28e22cbee2a17",
+      "raw_bytes": 14152
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/native-report.json.gz",
+      "sha256": "6884cca0e7121e8d34ce4269b2064ab0cad5d3414779a8de4d82cbf0110105cd",
+      "raw_sha256": "68275013c5cbb7e3340adac5885493292dd80e72f566131def5e4f80b6e06998",
+      "raw_bytes": 2792
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/baseline-and-cleanup-checkpoint.json.gz",
+      "sha256": "756256fb262d40823e0ba8c6cf6672766b3b3f593342d054b5e742aa767563ea",
+      "raw_sha256": "8e1d53ee76a2c36205b2f8fecc3f28ac047e3fb64ff59a5c249424db549a86d9",
+      "raw_bytes": 1412
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/production.elf.gz",
+      "sha256": "ee86fcdac49c158d0df8b3e5c57d696d395f1c68852b1c205e03c666e86d41ba",
+      "raw_sha256": "368ab7b56c9bf502a085a900565f05ff771598932a9e7ebb2e561789d1c5de93",
+      "raw_bytes": 11229180
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/native_test.exe.gz",
+      "sha256": "dcda82aff9d9b62036e312a3e08f63f3788ea0c74cac64ce2e6477e517b5810e",
+      "raw_sha256": "e74b3be622c56ce77c39ca87ad6f1293b51d5e593f9f38641691c0db6fe3c239",
+      "raw_bytes": 496640
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/color.elf.gz",
+      "sha256": "421b73e12867ff8e2b1cc55171f0f5387f53dc99243fa1c3cb1657ca9059130f",
+      "raw_sha256": "14a07ee0022b01f6066c3e548d0a44b6be9454e052ff69aa18bb1905e3560f5b",
+      "raw_bytes": 9748
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/color.o.gz",
+      "sha256": "9331a075eb6f9efd241f1c00c68071feb7b82836fca21f2a33a9feb40a365d09",
+      "raw_sha256": "8619536bcae007fe957cfeac8bdde07c7d669c895d23e42213ed8ba66c7a212e",
+      "raw_bytes": 2972
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/color.su.gz",
+      "sha256": "d5edebe263eaa1b0ce6f18136e4def8232706b7a739c4ebb3e6af1ed01ddc3d0",
+      "raw_sha256": "c18fb695e682b6960b267d1e548d0b137049a797ba4c0f220e1a30b5a56a20e1",
+      "raw_bytes": 371
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/rv32-compile.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/rv32-link.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/rv32-sections.txt.gz",
+      "sha256": "d134b99eb03abca932f1268d26ce1cf30477a920f8c976c68d49c47a3b645572",
+      "raw_sha256": "433be93e3d4bf9e7f2ab2299dd94557286acde3db404765608ebcc8ab30329f3",
+      "raw_bytes": 327
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/rv32-symbols.txt.gz",
+      "sha256": "a5f88942014bb11918bd3e12d4c05bd452d87f392fcca2d8a75884c0d60501e1",
+      "raw_sha256": "9f3bcd4cfbf8ea154ff53fb23d0f1f317eadaa8a4bf6f5317194fad4904634b8",
+      "raw_bytes": 285
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/rv32-compiler.txt.gz",
+      "sha256": "88ca7709bb41e04101b777ed445c073b4f2ab71753201016ed70ec282107b725",
+      "raw_sha256": "ee884ee696eac54e7a43de3cd7518be21d17e526990c95046246fdba4b453b8b",
+      "raw_bytes": 273
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/host-configure.log.gz",
+      "sha256": "1795424ada7da343bbb280faad5bf81dbfd9df512247e7d232ef10c2fced25e8",
+      "raw_sha256": "d8a1f047f111b3e5a1bcbed5dcea4d7cbdca923595234680a41332123e94d361",
+      "raw_bytes": 528
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/host-build.log.gz",
+      "sha256": "d871197ac480b712b6a87161bde15e437101316b1af711f3a6a4c0862e39a866",
+      "raw_sha256": "ae5bde6fafd1f14851b8b506ee94e7d7ffdbeb1a11f0a6a331caa17ffb5c6826",
+      "raw_bytes": 3831
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/color_contract.dll.gz",
+      "sha256": "020deb3c9b07a55d38c7fa18365782c1d471fe9a8eab1d8e23ec4baa034bfd9c",
+      "raw_sha256": "7eb4b635da5c3ecaa09b98fdc39ba27cc2a9fbec89eab7b577dc438931880148",
+      "raw_bytes": 10752
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/generated-web_pages.c.gz",
+      "sha256": "a5ac7849306aa8ec1e4b6807f8ee9d17f00a2d801d908f4c8e63493cf4cf9437",
+      "raw_sha256": "e2212afcba7d25b2b70e8ce1136a875a74db6b0ead51107f33022e67bd0cd265",
+      "raw_bytes": 295217
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/generated-font6x12.h.gz",
+      "sha256": "d38df77d8d982a27630254734eff1677f86a418cf641b92285f507239701e9f5",
+      "raw_sha256": "ddc7b0004c76cdccef22de21b7183f1bb537765afd1a4b1e8f12c7aebab1fb5e",
+      "raw_bytes": 5600
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/generated-unicode_bitmaps.h.gz",
+      "sha256": "44011c12ba8b3abe2521d80c78beff947bd534a6c319b901d3a7f6cdb7d5cac6",
+      "raw_sha256": "ec25007920f18729c51dac7305df5048f1f8afbe03cbeac40424f483f90ac6d4",
+      "raw_bytes": 249229
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/generated-factory_bitmaps.c.gz",
+      "sha256": "1d6d5305bc329fe0ff8989062b2ea1f5118e967c21dfe5ed3119889491fcffda",
+      "raw_sha256": "7898c5f7490e525048e45b2ac1724425e55eb7e438ce7f7c9015ef7460cdbb42",
+      "raw_bytes": 100307
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/generated-factory_bitmaps.h.gz",
+      "sha256": "4e6cc2db72b69c813354bae3bc48ff3650d6c8aeb33d59236a5e136ec331ee5c",
+      "raw_sha256": "26faf234604a389f78385828e095832525ef93ab15cad0c96f9a4d42b21236c3",
+      "raw_bytes": 395
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/generated-asset_defaults.h.gz",
+      "sha256": "e8611821b06aa4f64848084d19f0609397a7bd16899ce7fd2bd09fb337b3b726",
+      "raw_sha256": "af9db1feb8360b8a216f1414c8df31873641d8bc454aaf9bb44bdf8cdf4019e5",
+      "raw_bytes": 74
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/generated-timezone_data.h.gz",
+      "sha256": "4e57c9e76173df2a76df01f6ab5ac1ff07bd878b574deffde941908fd224e8dc",
+      "raw_sha256": "11e9f9f0b13b182852e4045abd90e20d20f0f823b35c841da18475c840947d01",
+      "raw_bytes": 180171
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-qualified-build-20261020.log.gz",
+      "sha256": "829c051b90879e10a6502d2542bc830151ff47dab89936ac6abbe38cde213309",
+      "raw_sha256": "6e9d420dfcf4afe7bc6e84e6372f5e311193214cd740439d2de28a3fe60aee6e",
+      "raw_bytes": 63
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-contract-20261020.log.gz",
+      "sha256": "4fc16dddce524cc5e6010648e23ba2bc3fc68afa12e165b6a63e17349694eb0e",
+      "raw_sha256": "349f39028bdb7b9d4d04836c1cae2c8172c57b6596cc88be0329ce2b0cf388f8",
+      "raw_bytes": 846
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-contract-v2-20261020.log.gz",
+      "sha256": "b89ca54271a7925988f4e07b1935592b2878eed18b2b52816906a0a59d11dbe2",
+      "raw_sha256": "dae0e908bcda66b2cb56ebd7f9170741f6d9410ab855f19f682231343452e9d3",
+      "raw_bytes": 913
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-firmware-build-20261020.log.gz",
+      "sha256": "b093fe0f110fdc0155ba47a73799bc42cb061287afbc257aa639491ce952bbfe",
+      "raw_sha256": "7c6bedff67e4193395d0c5e5acbbcc0c361841a5a5a9e5b74968cfd28f1bc691",
+      "raw_bytes": 146455
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-native-final-20261020.log.gz",
+      "sha256": "41a25e1435187f64a625bb4b6503f1980057d3d9bcecfcb0e6a673e3fed4f16e",
+      "raw_sha256": "2b60a448a68686267baf48c54f1ad61db615f68ac5f32718d78ceead3288c10b",
+      "raw_bytes": 1266
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-cold-display-20261020.log.gz",
+      "sha256": "306842a084014971262744f468eef738274d788c5e88a11896e94b98c8ce8ca5",
+      "raw_sha256": "3cdcb63e9ceff19a45abdd189ace18a860aed786a823e64d1ba849845490c15a",
+      "raw_bytes": 941
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-cold-display-v2-20261020.log.gz",
+      "sha256": "d3ba1b4c4e27f90769870ea1b0148f0d6111a8ea732d5ecd5dd7f6e63ff0eef9",
+      "raw_sha256": "7d7c3900baebcf8ca187bbdb4c9fa86873c179a7fcad7bca5ff9abe46fbb4381",
+      "raw_bytes": 206
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/small-tv-color-network-only-20261020.log.gz",
+      "sha256": "e0191fce3bcc4ac6991cc9f99824821e894d1b7e6bbe7359491c54f4c2750083",
+      "raw_sha256": "24324022584635baed91e763503021587c93356b532b2616e74994a069614a69",
+      "raw_bytes": 77
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__original__qemu.log.gz",
+      "sha256": "ed91586bb19803f4a8bf1c9147fdd4f1c1b0ccb2f055c0450e7afaa6b619bd37",
+      "raw_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "raw_bytes": 25
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__original__uart.log.gz",
+      "sha256": "f682e64e0d9d0de5b518531ae2693f90f22e900f55bfecbcc2b0ac4bd3bb609f",
+      "raw_sha256": "0f3e570c626d721cd05dd478af5105af9a6df473c0a1aa3154aa13ba0f421fa9",
+      "raw_bytes": 1612
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__reconstructed__qemu.log.gz",
+      "sha256": "ed91586bb19803f4a8bf1c9147fdd4f1c1b0ccb2f055c0450e7afaa6b619bd37",
+      "raw_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "raw_bytes": 25
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__reconstructed__uart.log.gz",
+      "sha256": "aa6e9bdc91da00e805ec91b1d0ecfc200551207e1c89ccb12a9341549121daef",
+      "raw_sha256": "90071a8da12c626227f013f6824eda9c40f696392ead783b5f8e8c772efbea18",
+      "raw_bytes": 319
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__original__cycle-01__uart.log.gz.gz",
+      "sha256": "ad546473d300b6c083dd1674dbb8ed31ef58ca672103959ba8ef94973236e8a9",
+      "raw_sha256": "3a06959b18f3b586538798551b3417c958ffda79c28f3f84d76c3fd5bfa884ff",
+      "raw_bytes": 814
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__original__cycle-02__uart.log.gz.gz",
+      "sha256": "d4c033a2fb41353e7c20fd6a99f0b4c1095ec7d90bec35edcc40fd23c047e506",
+      "raw_sha256": "f682e64e0d9d0de5b518531ae2693f90f22e900f55bfecbcc2b0ac4bd3bb609f",
+      "raw_bytes": 766
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__reconstructed__cycle-01__uart.log.gz.gz",
+      "sha256": "83e850989f99cd33fc4221feccfcfa7f1e7270236d9c23800ccd35dadcb0b982",
+      "raw_sha256": "eb541ee58098fa092e8270ad4a8aec870e989803e25e43fa89b775d165a1e5a4",
+      "raw_bytes": 306
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__reconstructed__cycle-02__uart.log.gz.gz",
+      "sha256": "9ceba2da85ebdc92e3e604e1e3a2431b518c32002de28b06d0a664efb5a6ac66",
+      "raw_sha256": "aa6e9bdc91da00e805ec91b1d0ecfc200551207e1c89ccb12a9341549121daef",
+      "raw_bytes": 254
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__original__cycle-01__display.ppm.gz.gz",
+      "sha256": "08907f4294a073b2a2bd1ad579aa2c8a78d1bcfa071d8c1a0aeee313ed85340b",
+      "raw_sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "raw_bytes": 2207
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__original__cycle-02__display.ppm.gz.gz",
+      "sha256": "08907f4294a073b2a2bd1ad579aa2c8a78d1bcfa071d8c1a0aeee313ed85340b",
+      "raw_sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "raw_bytes": 2207
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__reconstructed__cycle-01__display.ppm.gz.gz",
+      "sha256": "08907f4294a073b2a2bd1ad579aa2c8a78d1bcfa071d8c1a0aeee313ed85340b",
+      "raw_sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "raw_bytes": 2207
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__reconstructed__cycle-02__display.ppm.gz.gz",
+      "sha256": "08907f4294a073b2a2bd1ad579aa2c8a78d1bcfa071d8c1a0aeee313ed85340b",
+      "raw_sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "raw_bytes": 2207
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__original__session.json.gz",
+      "sha256": "e559f1b0d68e9d72fe5767cd2d4a6ee8ddc23df12609ded4c96261a8f527d8b5",
+      "raw_sha256": "c3d2e905b6c0843c199a6b221b67e84f58573625a9af406598fbadc997de2d69",
+      "raw_bytes": 1593
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/display__reconstructed__session.json.gz",
+      "sha256": "5df9c53459325f8a6e437d4f279de165b94805204d743a5a8dc5e7cfa511a362",
+      "raw_sha256": "bffdbdd104fb14c56c43d194914994d6c68d6771d3267dbd400364a2a0aebfd7",
+      "raw_bytes": 1598
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/network__original__qemu.log.gz",
+      "sha256": "e9b4f306587f868a6feb7a23452e3723bc87ff47e29573ca84627077b82fb901",
+      "raw_sha256": "bfebacd3ae66da245ac7f1c47e4b3fb5763e96a2d8147f45841a12b51632b91f",
+      "raw_bytes": 335
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/network__original__uart.log.gz",
+      "sha256": "6500090ffa7dfdea783c6d6bb541f5b5360354f3844d74f30a3e56e160b5e987",
+      "raw_sha256": "85a76739e94f311e13b6d46762b286791e4f1a2da4dd3c4568e518997351700b",
+      "raw_bytes": 4217
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/network__reconstructed__qemu.log.gz",
+      "sha256": "3934bd797025ce632957e16fdbe302737a6012edba404d7af8e062ae86dbfea9",
+      "raw_sha256": "62b16ff5fbc8c7e496a52e08e43313ec2b28d8b95bac514a5b490a3eb778b781",
+      "raw_bytes": 335
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/network__reconstructed__uart.log.gz",
+      "sha256": "15477cd3e307ab54f1d3368682adbe127dc1921a7edef8969d787fed77116b92",
+      "raw_sha256": "1274efa245a4626e7dec68e00793f46e06ac46c0614226780f25bef37b051837",
+      "raw_bytes": 1243
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/network__original__session.json.gz",
+      "sha256": "b5c444e9c965fc682601b14f1ba6e9bb551a6b677a56addf2a958567b738a503",
+      "raw_sha256": "b32ec057473733d9175a5212eaa29fe17478bfee51d0129beddf54f1c46c896c",
+      "raw_bytes": 1484
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/network__reconstructed__session.json.gz",
+      "sha256": "25a63656b39be2be530e7bfd7330cf4f248544200fc5ef462a3421426bade952",
+      "raw_sha256": "391136cce6b69e6271d7f68e7b924bf6bef26bc7dd7ad5082d9f10b35d38215f",
+      "raw_bytes": 1489
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/failed-display__original__qemu.log.gz",
+      "sha256": "ed91586bb19803f4a8bf1c9147fdd4f1c1b0ccb2f055c0450e7afaa6b619bd37",
+      "raw_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "raw_bytes": 25
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/failed-display__original__uart.log.gz",
+      "sha256": "3a06959b18f3b586538798551b3417c958ffda79c28f3f84d76c3fd5bfa884ff",
+      "raw_sha256": "93584399ae2da341ab6ded5437a5e37514d001213fb529b50e0e92d85891bd81",
+      "raw_bytes": 1710
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/failed-display__original__session.json.gz",
+      "sha256": "e8a09ecce874c8b622289612d6f62ff455d11b67b7f74a65ce70dcaaa23848d3",
+      "raw_sha256": "ba1d8a529badfd68fa8833790db06c1e821b2b5c6b8830b6bed661f4a60baeca",
+      "raw_bytes": 1592
+    },
+    {
+      "file": "color-conversion-validation-20261020-raw/fixtures.tar.gz",
+      "sha256": "e40bad5c66e16d6c7f35c1495bc62a946564f556e62dcae816a9418a0f36f1ab",
+      "entries": [
+        {
+          "file": "independent/grayscale.jpg",
+          "sha256": "1b80ccdb6063226b0c22e7ef83bf4728a5df5146ca33635316a7ff69459b134b",
+          "bytes": 31385
+        },
+        {
+          "file": "independent/odd-grayscale.jpg",
+          "sha256": "9e22eed5ef8095c9a2a4e59f1a7638d08b19589976401359c345e3420e1cd098",
+          "bytes": 603
+        },
+        {
+          "file": "independent/odd-rgb.jpg",
+          "sha256": "afd3bfb9a5f902b4d6ea53ba97285bcd4016900eccf6b8a8e08b3c740b8063ba",
+          "bytes": 10598
+        },
+        {
+          "file": "independent/pillow-CMYK-p0-s0.jpg",
+          "sha256": "75b7a24eef7ab1e9a1c5ba53aaf6925a190ebcbff484d3fa982361066ad1ac9d",
+          "bytes": 105171
+        },
+        {
+          "file": "independent/pillow-CMYK-p1-s0.jpg",
+          "sha256": "f51f14c397628426b9ad7a752ee1803fa70846d7e69d41636728b269d1278308",
+          "bytes": 97029
+        },
+        {
+          "file": "independent/pillow-L-p0-s0.jpg",
+          "sha256": "a4f9f9b03d584894a0f942b851cd68bcd7bf524a61317bbc02b54ecc73d060c6",
+          "bytes": 29720
+        },
+        {
+          "file": "independent/pillow-L-p1-s0.jpg",
+          "sha256": "4c8c926dd46dd053599d8378f562afbd40498da454140818703d13c9263e82b9",
+          "bytes": 27060
+        },
+        {
+          "file": "independent/pillow-RGB-p0-s0.jpg",
+          "sha256": "22174bc0e80280659c67d3a008466c71db05099e87b56d4190eaad49737df053",
+          "bytes": 76488
+        },
+        {
+          "file": "independent/pillow-RGB-p0-s1.jpg",
+          "sha256": "fd21fe475b842a502a295fffa4dbd0b92d04fb37518783db7cba09357ff03a58",
+          "bytes": 52581
+        },
+        {
+          "file": "independent/pillow-RGB-p0-s2.jpg",
+          "sha256": "fa116d95df30d2dc4b8f50d7373f6b373f2f745c062dfa24e77ebf2a8795af05",
+          "bytes": 40077
+        },
+        {
+          "file": "independent/pillow-RGB-p1-s0.jpg",
+          "sha256": "10b7321410b9e012b890b1b0b85275810543145175c54132514e3f95f38c65f8",
+          "bytes": 72821
+        },
+        {
+          "file": "independent/pillow-RGB-p1-s1.jpg",
+          "sha256": "7fbc56c8da272e54a728ec8d5319573fb4ea4c35bfc07539714e7b5ed89ea543",
+          "bytes": 49223
+        },
+        {
+          "file": "independent/pillow-RGB-p1-s2.jpg",
+          "sha256": "0b08f292e7f291a7ee897a510fddf780c9eacaced7ac31d7bad1cfcf1f523a38",
+          "bytes": 37235
+        },
+        {
+          "file": "independent/rgb-420-restart.jpg",
+          "sha256": "c8ce32fed8ea72404e89590e7185ce5546e51f85e15a61b3f6bf1172c390d919",
+          "bytes": 38972
+        },
+        {
+          "file": "independent/rgb-420.jpg",
+          "sha256": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+          "bytes": 38488
+        },
+        {
+          "file": "independent/rgb-422.jpg",
+          "sha256": "646fcde983c483fe47c36875fea061855310cb10da3d12f3a6d51c30965a965d",
+          "bytes": 50234
+        },
+        {
+          "file": "independent/rgb-444-restart.jpg",
+          "sha256": "2b8f08c8398e7450cf475e574838e5ca1e3cdb87f7a469de58641e7afda403a1",
+          "bytes": 75198
+        },
+        {
+          "file": "independent/rgb-444.jpg",
+          "sha256": "68ebb2b96a446262ea2e9d65980146c07776c23b8d54dd9517ba6c2a6c5ea7df",
+          "bytes": 74509
+        },
+        {
+          "file": "rich12/rich-baseline420-q100-239x237.jpg",
+          "sha256": "c6c85953ac5b05675aad98289baac05883995ee4e63b2062a1cebca2a843359c",
+          "bytes": 26352
+        },
+        {
+          "file": "rich12/rich-baseline420-q100-240x240.jpg",
+          "sha256": "fa6d7067d79618949a55a751a6e2270a53e81141f411589df2f32ea8cc16894c",
+          "bytes": 26065
+        },
+        {
+          "file": "rich12/rich-baseline420-q83-239x237.jpg",
+          "sha256": "bc9fb2ae3a7dc7dfa495025eabe6135c91ea169256363c047a338543a99350cd",
+          "bytes": 17149
+        },
+        {
+          "file": "rich12/rich-baseline420-q83-240x240.jpg",
+          "sha256": "32e05a759fe988bce3015e10229d8097d706bf759b75ac746ea04a1aa0d5be2b",
+          "bytes": 16989
+        },
+        {
+          "file": "rich12/rich-baseline422-q100-239x237.jpg",
+          "sha256": "59f6c9c5d877284dab87a96899c0e2f1461b5c9cc2710bc6f6fc7704db6be796",
+          "bytes": 30090
+        },
+        {
+          "file": "rich12/rich-baseline422-q100-240x240.jpg",
+          "sha256": "57862f0e30ea1cef14c1295c3969f572261e08b16fdd36c475dd31e26287a91c",
+          "bytes": 29806
+        },
+        {
+          "file": "rich12/rich-baseline422-q83-239x237.jpg",
+          "sha256": "381d65779a6ded1660eae82386d68d8ebeaa28b2433c77d8ae191e3409ab7b1a",
+          "bytes": 19618
+        },
+        {
+          "file": "rich12/rich-baseline422-q83-240x240.jpg",
+          "sha256": "d1e3fbdb47add54530e140f2ff00664f093f4cecec861ea123785edf4fb64095",
+          "bytes": 19483
+        },
+        {
+          "file": "rich12/rich-baseline444-q100-239x237.jpg",
+          "sha256": "2fd6623f26ca31aa7b72ee6ef9de10bc36d0b444422fc95c70cc9fcbbefb5bac",
+          "bytes": 36086
+        },
+        {
+          "file": "rich12/rich-baseline444-q100-240x240.jpg",
+          "sha256": "2c854f742b772b144a01b91b57694100d2c1afb132a5db2d597d6e1fd11263ce",
+          "bytes": 35833
+        },
+        {
+          "file": "rich12/rich-baseline444-q83-239x237.jpg",
+          "sha256": "41385251fc99e600a20228ef71208ca067f6b33cd2687b71bb92a05c24791a37",
+          "bytes": 23644
+        },
+        {
+          "file": "rich12/rich-baseline444-q83-240x240.jpg",
+          "sha256": "9c2c94ed2878078a0fec3db285d4c3780c43d0e7ae1faf0820522e9ec3a13a0e",
+          "bytes": 23487
+        },
+        {
+          "file": "rich12/rich-cmyk-baseline-q100-239x237.jpg",
+          "sha256": "fe8b0f321747cc6428ee41f23561427527d5a942939f233d235f7b9bd7111f94",
+          "bytes": 68190
+        },
+        {
+          "file": "rich12/rich-cmyk-baseline-q100-240x240.jpg",
+          "sha256": "a94ee27115b37ef20be073c2212de4f6e9ece3b912082bf1b618f5ee5dc2b46d",
+          "bytes": 67047
+        },
+        {
+          "file": "rich12/rich-cmyk-baseline-q83-239x237.jpg",
+          "sha256": "4f08c4d758e86e15955d35b1eb30c75f870f666e9f466e613db8a6f1083bb02b",
+          "bytes": 47138
+        },
+        {
+          "file": "rich12/rich-cmyk-baseline-q83-240x240.jpg",
+          "sha256": "ced7abb80c401904a157a6885a84098c532ad895b9acc5a4758776622dccdb87",
+          "bytes": 46657
+        },
+        {
+          "file": "rich12/rich-cmyk-progressive-q100-239x237.jpg",
+          "sha256": "6c441620badce4d7102a40348d41bf7e6e16752815bae24ff2c8468a41230f2e",
+          "bytes": 68607
+        },
+        {
+          "file": "rich12/rich-cmyk-progressive-q100-240x240.jpg",
+          "sha256": "f44c0b551cf959df5e9d124f36b5110d39f47dcd2db9e79907bc2798da836e39",
+          "bytes": 67634
+        },
+        {
+          "file": "rich12/rich-cmyk-progressive-q83-239x237.jpg",
+          "sha256": "47b32b5d7afcafbd98bd0d706fcc1dfb5e96945c936109a70a9d94344b4151be",
+          "bytes": 45191
+        },
+        {
+          "file": "rich12/rich-cmyk-progressive-q83-240x240.jpg",
+          "sha256": "fe55a1ad4030093b5fa1c00a2c96a2d7bb022f6eb464b1d4d18eda9599fccd7c",
+          "bytes": 44402
+        },
+        {
+          "file": "rich12/rich-gray-baseline-q100-239x237.jpg",
+          "sha256": "3f75bb13a86acc392a6036e448eb96d99106f4549b8f5f6c3955f4552ed17442",
+          "bytes": 17128
+        },
+        {
+          "file": "rich12/rich-gray-baseline-q100-240x240.jpg",
+          "sha256": "479943a96378c82717e8c16e0c5a2881d0bfc5c2b627b79d0ec766aaf0895e40",
+          "bytes": 16874
+        },
+        {
+          "file": "rich12/rich-gray-baseline-q83-239x237.jpg",
+          "sha256": "5c274e2c517f49a150dbb52042681161d0d39b4d597ad115d778c174abb097a5",
+          "bytes": 11887
+        },
+        {
+          "file": "rich12/rich-gray-baseline-q83-240x240.jpg",
+          "sha256": "8cd7830a8a15c932db0e160123b44af2e45a3a8e4018d69fdabfcccb76126908",
+          "bytes": 11784
+        },
+        {
+          "file": "rich12/rich-gray-progressive-q100-239x237.jpg",
+          "sha256": "04ee2b93a08c3199b4ff53f42821246312d250a3d6e694846a22fa297a552b7d",
+          "bytes": 17192
+        },
+        {
+          "file": "rich12/rich-gray-progressive-q100-240x240.jpg",
+          "sha256": "5517320a367a50af855541d1f7eefe76ed47d65fd09674ae1e60defb62571117",
+          "bytes": 16975
+        },
+        {
+          "file": "rich12/rich-gray-progressive-q83-239x237.jpg",
+          "sha256": "861988451ed78659aaba3cdcf43a2a0579d8d1604e5014918cb45c9e0eab3d4c",
+          "bytes": 11368
+        },
+        {
+          "file": "rich12/rich-gray-progressive-q83-240x240.jpg",
+          "sha256": "dabef31a0d4d5bd32ff5c42f8de0dae24832cb5955ae00e7218928a466595adf",
+          "bytes": 11183
+        },
+        {
+          "file": "rich12/rich-progressive420-q100-239x237.jpg",
+          "sha256": "bdfa6723d2c0e97c6023525418b210524940a58f266178a7fb72591e759cbc59",
+          "bytes": 26250
+        },
+        {
+          "file": "rich12/rich-progressive420-q100-240x240.jpg",
+          "sha256": "3c8a2f40fe54dfdb8736763bd90b4f59c4ca1c76cb03835df8c3a5711b9fb3c8",
+          "bytes": 26009
+        },
+        {
+          "file": "rich12/rich-progressive420-q83-239x237.jpg",
+          "sha256": "559592f2d15d7dd103322bf56ff6e719519596260ec7b4273cfd401a3fa3628b",
+          "bytes": 16421
+        },
+        {
+          "file": "rich12/rich-progressive420-q83-240x240.jpg",
+          "sha256": "df1890d2945fe1ff8fe99e9fa101532fcb1d269050edd5c05053f7d387bd851e",
+          "bytes": 16184
+        },
+        {
+          "file": "rich12/rich-progressive422-q100-239x237.jpg",
+          "sha256": "8d4c9cd4d7629967a86198ac7ae069bc98ae1d703f83f1ed36198a2542410965",
+          "bytes": 29857
+        },
+        {
+          "file": "rich12/rich-progressive422-q100-240x240.jpg",
+          "sha256": "11c9e782c87c6f5e10d4046a8da87d7a14f5999e65280b8f00348beb13a3d44c",
+          "bytes": 29634
+        },
+        {
+          "file": "rich12/rich-progressive422-q83-239x237.jpg",
+          "sha256": "7c9ae6d844c360c29d85208893dfce6e8da23257fa48a9cefa667f7043e4f431",
+          "bytes": 18710
+        },
+        {
+          "file": "rich12/rich-progressive422-q83-240x240.jpg",
+          "sha256": "bdf84c60532eea0dee16108dda65c29b3e96ddd915d43da5b925978eef86ea80",
+          "bytes": 18508
+        },
+        {
+          "file": "rich12/rich-progressive444-q100-239x237.jpg",
+          "sha256": "edd992573ea99f85544608ead13cf253d7d76849f96103f7434671a9e35167fd",
+          "bytes": 35579
+        },
+        {
+          "file": "rich12/rich-progressive444-q100-240x240.jpg",
+          "sha256": "476c96016380a0f0f85996bef8ffb6ea8afe65ea5796718f996254404d4e56a1",
+          "bytes": 35353
+        },
+        {
+          "file": "rich12/rich-progressive444-q83-239x237.jpg",
+          "sha256": "858caea8720b8b61e99bc99b6732cee6710c850c0f353f38e8ff7346a55717e3",
+          "bytes": 22489
+        },
+        {
+          "file": "rich12/rich-progressive444-q83-240x240.jpg",
+          "sha256": "4d31e7cdcc32a8518a00c282982c13a4cace6acba8a0472ff2feb04f89c31f38",
+          "bytes": 22277
+        },
+        {
+          "file": "rich12/rich-ycck-baseline-q100-239x237.jpg",
+          "sha256": "59c23339327a83b3765a7773f4c1301277c450e2909e275d6d5dae8b2566c063",
+          "bytes": 43535
+        },
+        {
+          "file": "rich12/rich-ycck-baseline-q100-240x240.jpg",
+          "sha256": "ab71ef74e366a9a7d537c72d75f4680010c72748b8e13d16658f5abf64c39e55",
+          "bytes": 43066
+        },
+        {
+          "file": "rich12/rich-ycck-baseline-q83-239x237.jpg",
+          "sha256": "0c0ad3aff8c59d42b62f090fcd94bc6646c443cb7526ff257f012712da04fafd",
+          "bytes": 29093
+        },
+        {
+          "file": "rich12/rich-ycck-baseline-q83-240x240.jpg",
+          "sha256": "3d6a4f00fe8a3f01b50ed68890f8ed3892aa75e3191075e7da37d7807160af70",
+          "bytes": 28778
+        },
+        {
+          "file": "rich12/rich-ycck-progressive-q100-239x237.jpg",
+          "sha256": "678a6cdd80349ccfd2b0861315299640ff4a5f3cac748f6456ea998e7eb2443f",
+          "bytes": 43627
+        },
+        {
+          "file": "rich12/rich-ycck-progressive-q100-240x240.jpg",
+          "sha256": "ecbd1ddd3548ff319aa3704d6224f6a28d1a22cf1009d5f3c4a431b11c4253fb",
+          "bytes": 43172
+        },
+        {
+          "file": "rich12/rich-ycck-progressive-q83-239x237.jpg",
+          "sha256": "75d61a84764725855bedb0301a7002307fe671ad98e4135b63cd1a2143d99b11",
+          "bytes": 27840
+        },
+        {
+          "file": "rich12/rich-ycck-progressive-q83-240x240.jpg",
+          "sha256": "a51167c31529b0e70d9c0449933450e743651f5b3d189a6ba80fb2e6430e8864",
+          "bytes": 27445
+        }
+      ]
+    }
+  ],
+  "required_remaining": [
+    "NOR backing and wear policy",
+    "codec adapter and privacy/upload integration",
+    "total heap/stack and actual libjpeg production link",
+    "new HTTP/LCD/full/soak",
+    "physical acceptance"
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Scoped AP services optimization and STA controls; no full regression or H10 acceptance.",
+  "identities": {
+    "app_sha256": "bc68d3460332878b26226a41b74b0cae16376fbf6f41c7d8a98198af5514c393",
+    "native_elf_sha256": "4fde010e5bf09466e6822687199313bd47221f99681db57964a8654b0b9fc2b8",
+    "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+    "source_sha256": "5586ef6103e4c2647c09ed342d0adadb166509991e024b7edca3dda60108bc25",
+    "test_sha256": "5b9cb78c1992bf63c54c5da6127511c3e94d070add75fbb05710bb730d13c484"
+  },
+  "source_manifest_sha256": "2937453230518c892b5ac0b94bfb892cc2dee3d7a3d800a6a787692931c53400",
+  "source_aggregate_sha256": "5586ef6103e4c2647c09ed342d0adadb166509991e024b7edca3dda60108bc25",
+  "source_files_verified": 59,
+  "production_changed": [
+    "app/services/time_sync.c",
+    "app/services/weather.c",
+    "app/include/services.h"
+  ],
+  "assembly_reference": "application_main_at_42008e56.asm: 0x42009032..0x42009052 AP setup branch",
+  "host": {
+    "platform_cases": 50,
+    "platform_checks": 1182393,
+    "native_checks": 5531,
+    "artifact_tests": 6
+  },
+  "negative_control": {
+    "expected_failed": true,
+    "scope": "Run the final role tests against the two unchanged pre-fix service modules.",
+    "source_commit": "53a3db108ce113572ebefec566f8dfb3174f6952",
+    "old_service_sources_sha256": {
+      "Small_TV/src/app/services/weather.c": "28e22b32bcfeab96c716126ac042a64c72b27c337366889cf185aa8161a7e66b",
+      "Small_TV/src/app/services/time_sync.c": "7acd830a2456d73f7372aef5611855c4f88ab4c91f7bdec1d83bd94b55f1d830"
+    },
+    "final_test_sha256": "0de6c490d3eb9c440448d81f0a48de03d97b381504186f36c7a43c01897ea333",
+    "executable_sha256": "6ce805613d98d3eab4996c170942755e2c3432f410a2b784360e558acb358fe3",
+    "cases": [
+      {
+        "name": "setup_services",
+        "exit_code": 1,
+        "expected_failed": true,
+        "failure": "task_count == 0"
+      },
+      {
+        "name": "empty_station_setup_services",
+        "exit_code": 1,
+        "expected_failed": true,
+        "failure": "task_count == 0"
+      }
+    ]
+  },
+  "ap_evidence_controls": [
+    {
+      "name": "failed",
+      "passed": true
+    },
+    {
+      "name": "changed-inputs",
+      "passed": true
+    },
+    {
+      "name": "wrong-app",
+      "passed": true
+    },
+    {
+      "name": "wrong-elf",
+      "passed": true
+    },
+    {
+      "name": "wrong-qemu",
+      "passed": true
+    },
+    {
+      "name": "missing-factory",
+      "passed": true
+    },
+    {
+      "name": "missing-http",
+      "passed": true
+    },
+    {
+      "name": "changed-code",
+      "passed": true
+    },
+    {
+      "name": "reset",
+      "passed": true
+    },
+    {
+      "name": "different-frame",
+      "passed": true
+    },
+    {
+      "name": "early-frame",
+      "passed": true
+    },
+    {
+      "name": "weather-worker",
+      "passed": true
+    },
+    {
+      "name": "time-worker",
+      "passed": true
+    },
+    {
+      "name": "pending-request",
+      "passed": true
+    },
+    {
+      "name": "changed-cache",
+      "passed": true
+    },
+    {
+      "name": "ap-got-ip",
+      "passed": true
+    },
+    {
+      "name": "false-time-sync",
+      "passed": true
+    },
+    {
+      "name": "missing-rom-check",
+      "passed": true
+    }
+  ],
+  "ap_ready": {
+    "before_app": "26c6ca74940dbfa5f27b67a308515a2901bcdab2968e2a45954055b59cbe1234",
+    "before_free": 86604,
+    "before_tasks": 11,
+    "after_free": 98112,
+    "after_tasks": 9,
+    "gain_bytes": 11508,
+    "comparison_limit": "Ready snapshots only: later HTTP workloads differ; no matched-phase median claim."
+  },
+  "representative_frame_sha256": "acc588ab852b81d9e034b64eb489c0f6a8057a3bf49477046c17071e414fffcd",
+  "raw": [
+    {
+      "file": "ap-services-ap-report-20261018.json.gz",
+      "sha256": "e50dd303d1bbe57d0b6e43c11bd4839b341487a1fa0a30f75a62f7c69d84adf8",
+      "uncompressed_sha256": "dfe80eea65c5992c0ce7400ade0f521b6b5fd769e28cb165ad1afe89843fc888"
+    },
+    {
+      "file": "ap-services-negative-20261018.json.gz",
+      "sha256": "33322b0cdd5ac8679098279a62c2bd0f80c914e141fae13fb8ff77ba2acc573d",
+      "uncompressed_sha256": "4ed596446ae695624b84fed6c5ca6955861ab78948c8b17e45d95a3f143c901b"
+    },
+    {
+      "file": "ap-services-platform-20261018.json.gz",
+      "sha256": "7edd62c8774683cda812c7ef93c5cde07659563915fbe2b81f48daabc9b701e2",
+      "uncompressed_sha256": "7e65fa029e656e1435185e8933f1d1a6f877ca98cafb6cc685dc37c414b66fdd"
+    },
+    {
+      "file": "ap-services-native-20261018.json.gz",
+      "sha256": "6884cca0e7121e8d34ce4269b2064ab0cad5d3414779a8de4d82cbf0110105cd",
+      "uncompressed_sha256": "68275013c5cbb7e3340adac5885493292dd80e72f566131def5e4f80b6e06998"
+    },
+    {
+      "file": "ap-services-artifact-20261018.json.gz",
+      "sha256": "0ae00a43e849a18eeccb51cd43d2ba746762a5f7897ef29d65981cc9314486ec",
+      "uncompressed_sha256": "0e98d55b3ba99a44cc3780b1920a48c459043055f2e81d5d12e105e9233bb5ce"
+    },
+    {
+      "file": "ap-services-setup-20261018.json.gz",
+      "sha256": "f16a71937856f4fdf177a61d2e2592b4e7c1e8d8b9a99f8df1522b6ce56ec73f",
+      "uncompressed_sha256": "c3ce9392c2e328836a9efc5e2274fb7d9cd9d7f655e55d29bb6e56f1fb7ed395"
+    },
+    {
+      "file": "ap-services-station-runtime-20261018.json.gz",
+      "sha256": "c02dad01c57f8672c96255493d72becc463223366e693a98f1421450a9cf5aa7",
+      "uncompressed_sha256": "9c0fed384802890d92a4164abd2a1608a3a741a0d363153a2c14c32fa15ae00f"
+    },
+    {
+      "file": "ap-services-station-events-20261018.jsonl.gz",
+      "sha256": "722677b3d41fa7a8e96cd6a7160033cc332c38a93da3632b00ea9f8d07ba0976",
+      "uncompressed_sha256": "bc0f8df31b7838becabf031592c514e6d59bca526d1cb365e6a28a9bc3d7c35d"
+    }
+  ]
+}

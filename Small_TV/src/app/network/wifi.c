@@ -55,12 +55,12 @@ static void wifi_event(void *context, esp_event_base_t base, int32_t id, void *d
 
 static esp_err_t start_access_point(void)
 {
-    /* Keep the setup AP and an idle station interface so the setup page can scan networks. */
+    /* Enable the setup AP and the driver's idle STA role for network scans. */
 
     if (atomic_load(&ap_active))
         return ESP_OK;
-    /* ESP-IDF cannot scan in WIFI_MODE_AP. STA_START does not connect while
-     * station_configured is false; the station exists only for explicit scans. */
+    /* Scanning needs WIFI_MODE_APSTA, not a separate STA TCP/IP netif.
+     * STA_START does not connect while station_configured is false. */
     esp_err_t result = esp_wifi_set_mode(WIFI_MODE_APSTA);
     if (result == ESP_OK)
         atomic_store(&ap_active, true);
@@ -92,15 +92,12 @@ static void fallback_task(void *unused)
     }
 }
 
-esp_err_t network_init(void)
+static esp_err_t configure_access_point_netif(void)
 {
-    /* Configure station/AP interfaces, factory address, DHCP and Wi-Fi event handlers. */
+    /* Create the setup netif and advertise its factory address through DHCP/DNS. */
 
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    station_netif = esp_netif_create_default_wifi_sta();
     ap_netif = esp_netif_create_default_wifi_ap();
-    if (!station_netif || !ap_netif)
+    if (!ap_netif)
         return ESP_ERR_NO_MEM;
     esp_netif_ip_info_t ip = {0};
     esp_netif_set_ip4_addr(&ip.ip, 192, 168, 43, 1);
@@ -115,14 +112,39 @@ esp_err_t network_init(void)
     ESP_ERROR_CHECK(esp_netif_dhcps_option(ap_netif, ESP_NETIF_OP_SET, ESP_NETIF_DOMAIN_NAME_SERVER,
                                            &offer_dns, sizeof(offer_dns)));
     ESP_ERROR_CHECK(esp_netif_dhcps_start(ap_netif));
+    return ESP_OK;
+}
+
+esp_err_t network_init(void)
+{
+    /* Configure the selected role and its workers.
+     * FIXED_RECONSTRUCTION: factory 0x4200ca30 creates only WIFI_STA_DEF;
+     * 0x4200ce9e/0x4200d06e create only WIFI_AP_DEF. The APSTA scan path
+     * does not need a STA netif. Allocate no inactive DHCP/DNS interface or
+     * supervisor stack for the other role. */
+
+    tv_settings_t s;
+    settings_snapshot(&s);
+    station_configured = s.wifi_mode == 1 && s.ssid[0];
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    if (station_configured)
+    {
+        station_netif = esp_netif_create_default_wifi_sta();
+        if (!station_netif)
+            return ESP_ERR_NO_MEM;
+    }
+    else
+    {
+        esp_err_t result = configure_access_point_netif();
+        if (result != ESP_OK)
+            return result;
+    }
     wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&config));
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event, NULL));
-    tv_settings_t s;
-    settings_snapshot(&s);
-    station_configured = s.wifi_mode == 1 && s.ssid[0];
     wifi_config_t station = {0};
     memcpy(station.sta.ssid, s.ssid, strlen(s.ssid));
     memcpy(station.sta.password, s.password, strlen(s.password));
@@ -132,17 +154,23 @@ esp_err_t network_init(void)
                                .channel = 1,
                                .max_connection = 3,
                                .authmode = WIFI_AUTH_OPEN}};
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap));
     if (station_configured)
-        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &station));
-    if (station_configured)
+    {
         ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &station));
+    }
     else
+    {
         ESP_ERROR_CHECK(start_access_point());
+        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap));
+    }
     ESP_ERROR_CHECK(esp_wifi_start());
     atomic_store(&ap_active, !station_configured);
-    dns_start();
+    if (!station_configured)
+    {
+        dns_start();
+        return ESP_OK;
+    }
     return xTaskCreate(fallback_task, "wifi_fallback", 2048, NULL, 2, NULL) == pdPASS
                ? ESP_OK
                : ESP_ERR_NO_MEM;

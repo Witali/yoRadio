@@ -87,7 +87,7 @@ def main():
         'components/freertos/FreeRTOS-Kernel/tasks.c',
         'components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos/portmacro.h')]
     files += [args.qemu_root / 'tools' / name for name in
-              ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')]
+              ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'small_tv_display.py', 'esp_elf.py')]
     executable = args.qemu_root / 'bin/qemu-system-riscv32.exe'
     files.append(executable)
     inputs = {str(path.resolve()): digest(path) for path in files}

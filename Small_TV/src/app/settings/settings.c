@@ -34,23 +34,6 @@ _Static_assert(sizeof(tv_settings_v1_t) == 344 && offsetof(tv_settings_v1_t, wif
 _Static_assert(sizeof(tv_settings_t) == 364 && offsetof(tv_settings_t, photo_size) == 344,
                "Unexpected version 2 settings ABI");
 
-uint16_t rgb565_from_rgb888(uint32_t rgb)
-{
-    /* Convert an RGB888 color to the panel RGB565 representation. */
-
-    return ((rgb >> 8) & 0xf800) | ((rgb >> 5) & 0x07e0) | ((rgb >> 3) & 0x001f);
-}
-
-uint32_t rgb888_from_rgb565(uint16_t rgb)
-{
-    /* Expand RGB565 components for the original web color API (0x42008a34/0x42008a6a). */
-
-    unsigned r = (rgb >> 11) & 31, g = (rgb >> 5) & 63, b = rgb & 31;
-    /* The original shift/OR sequence repeats high bits, giving white 0xffffff
-     * rather than the darker 0xf8fcf8 produced by zero-filling low bits. */
-    return (((r << 3) | (r >> 2)) << 16) | (((g << 2) | (g >> 4)) << 8) | (b << 3) | (b >> 2);
-}
-
 bool settings_country_valid(const char country[TV_COUNTRY_BYTES])
 {
     /* Bound a country/region key and keep it safe as an unescaped URI component.

@@ -1,0 +1,474 @@
+{
+  "status": "complete_snapshot_setup_and_wifi_preflight_passed",
+  "passed": true,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:06:12.906814+00:00",
+  "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+  "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+  "snapshot_data_correction": "Copied the four unchanged board JSON profiles into a new selected snapshot. full557 and its original snapshot remain unchanged; all code/executable/ELF/archive bytes match.",
+  "setup_preparation": {
+    "passed": true,
+    "snapshot_files": 46,
+    "sources_unchanged": true,
+    "default_profile_sha256": "757a21953cb2078a8d28f10af43932f58c72af908282fdce1ac5d4df400554b8",
+    "canonical_profile_matches": true,
+    "variants": {
+      "original": {
+        "passed": true,
+        "prepared_flash_sha256": "b3d7f5173e29db553e290f6dc8fe021e48703f5c2fb7cf7a027fa90065b35a70",
+        "sources": {
+          "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+        }
+      },
+      "reconstructed": {
+        "passed": true,
+        "prepared_flash_sha256": "1739dcfaba9570bc0c94c14a8056816deef8dec31cd1edb94cc3f0861953b249",
+        "sources": {
+          "images": [
+            {
+              "bytes": 16928,
+              "offset": "0x0",
+              "sha256": "359de03d75edff65b377cccc4a121af79745e25ebfeea2b2280ae598acd537f4",
+              "file": "bootloader.bin"
+            },
+            {
+              "bytes": 3072,
+              "offset": "0x8000",
+              "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+              "file": "partition-table.bin"
+            },
+            {
+              "bytes": 1169936,
+              "offset": "0x10000",
+              "sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+              "file": "app.bin"
+            },
+            {
+              "bytes": 1994752,
+              "offset": "0x200000",
+              "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+              "file": "assets.bin"
+            }
+          ],
+          "source_sha256": "d338a294e3f95f911d1526b8cdf5986691f4e77fcc14d4765c0a3b938848a404"
+        }
+      }
+    },
+    "scope": "Actual original and reconstructed setup preparation without starting a VM; not a guest network acceptance."
+  },
+  "flows": {
+    "original": {
+      "passed": true,
+      "checks": {
+        "held_station_mode": true,
+        "no_premature_restart": true,
+        "no_ip_before_release": true,
+        "recovered_station": true,
+        "saved_station_mode": true,
+        "same_boot_after_release": true,
+        "no_panic": true,
+        "station_http": true
+      }
+    },
+    "reconstructed": {
+      "passed": true,
+      "checks": {
+        "held_station_mode": true,
+        "no_premature_restart": true,
+        "no_ip_before_release": true,
+        "recovered_station": true,
+        "saved_station_mode": true,
+        "same_boot_after_release": true,
+        "no_panic": true,
+        "station_http": true
+      }
+    }
+  },
+  "failure_flows": {
+    "original": {
+      "passed": true,
+      "checks": {
+        "setup_saved": true,
+        "restart_once": true,
+        "external_ap_offline": true,
+        "setup_http": true,
+        "no_station_after_restore": true,
+        "setup_active": true,
+        "no_panic": true
+      }
+    },
+    "reconstructed": {
+      "passed": true,
+      "checks": {
+        "setup_saved": true,
+        "restart_once": true,
+        "external_ap_offline": true,
+        "setup_http": true,
+        "no_station_after_restore": true,
+        "setup_active": true,
+        "no_panic": true
+      }
+    }
+  },
+  "consumer_rejections": [
+    {
+      "name": "failed",
+      "passed": true
+    },
+    {
+      "name": "changed-inputs",
+      "passed": true
+    },
+    {
+      "name": "wrong-app",
+      "passed": true
+    },
+    {
+      "name": "wrong-elf",
+      "passed": true
+    },
+    {
+      "name": "wrong-qemu",
+      "passed": true
+    },
+    {
+      "name": "wrong-test",
+      "passed": true
+    },
+    {
+      "name": "missing-factory",
+      "passed": true
+    },
+    {
+      "name": "wrong-source",
+      "passed": true
+    },
+    {
+      "name": "early-setup",
+      "passed": true
+    },
+    {
+      "name": "early-reset",
+      "passed": true
+    },
+    {
+      "name": "early-ip",
+      "passed": true
+    },
+    {
+      "name": "short-delay",
+      "passed": true
+    },
+    {
+      "name": "filter-off",
+      "passed": true
+    },
+    {
+      "name": "filter-flushed",
+      "passed": true
+    },
+    {
+      "name": "no-recovery",
+      "passed": true
+    },
+    {
+      "name": "no-http",
+      "passed": true
+    },
+    {
+      "name": "panic",
+      "passed": true
+    },
+    {
+      "name": "changed-media",
+      "passed": true
+    },
+    {
+      "name": "missing-failure-case",
+      "passed": true
+    },
+    {
+      "name": "ap-not-offline",
+      "passed": true
+    },
+    {
+      "name": "failure-not-saved",
+      "passed": true
+    },
+    {
+      "name": "restart-loop",
+      "passed": true
+    },
+    {
+      "name": "missing-setup-http",
+      "passed": true
+    },
+    {
+      "name": "early-factory-ap",
+      "passed": true
+    },
+    {
+      "name": "factory-apsta-got-ip",
+      "passed": true
+    },
+    {
+      "name": "factory-apsta-unobserved",
+      "passed": true
+    }
+  ],
+  "evidence": [
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-original__prepared.json.gz",
+      "sha256": "8d4ebdaeb7d686b9e3243fbe637f4daf24abd3d5fdb02d175264e50612c8972b",
+      "original_sha256": "1b14d6ba2afdb618fcb49f49a62838a0604732c3f43cec2469b8a6878a70f63d",
+      "bytes": 2065
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-original__qemu.log.gz",
+      "sha256": "ed91586bb19803f4a8bf1c9147fdd4f1c1b0ccb2f055c0450e7afaa6b619bd37",
+      "original_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "bytes": 25
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-original__report.json.gz",
+      "sha256": "067eea4eda5b9a50e6a4bb5adb5b13eeaad098672cbe4b542886157007b30034",
+      "original_sha256": "73696d081f60666e62d5368fcd2176ba5d3da26a129f17b09d8cf89515bda0bc",
+      "bytes": 10300
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-original__session.json.gz",
+      "sha256": "7d938d48adf33646ab1048149dbc9f4abeac7ec41065784a369f58677459d395",
+      "original_sha256": "ad88eb4886df25d85c4d4a1d387daeab87090d24fd4686899226cb4adf2b923f",
+      "bytes": 2096
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-original__setup.png.gz",
+      "sha256": "142cfe30c48436de1ac15bc7f4d69f267c8d993d3b62b6d812f649a922678761",
+      "original_sha256": "dde46fa3b30277e46c229b4215e00b1d03a27b3d8f8530b69a1a8daa8afe7fe3",
+      "bytes": 2514
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-original__setup.ppm.gz",
+      "sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "original_sha256": "20526d0072aa9096a5400e7e724d207ed60b081a249afba25878835dbf71b22e",
+      "bytes": 172815
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-original__uart.log.gz",
+      "sha256": "0fa92e8379864c82ae32aadf869f5bce9dce825304103d9ef353e72d2f8fc642",
+      "original_sha256": "76255519c43bec3ae4c2fa45bd4a3449a511300649ce6c58fa7c1433852bb83b",
+      "bytes": 3461
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-reconstructed__prepared.json.gz",
+      "sha256": "3a04c5a935d98f8adf6a11194d9a45a32572c20a15c8d9052d6e52d1ac6e21ed",
+      "original_sha256": "7f875a52d4c2ac1201c2b281ac4b2c7e7e4114af9ec59abade0f58f29d563956",
+      "bytes": 2863
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-reconstructed__qemu.log.gz",
+      "sha256": "ed91586bb19803f4a8bf1c9147fdd4f1c1b0ccb2f055c0450e7afaa6b619bd37",
+      "original_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "bytes": 25
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-reconstructed__report.json.gz",
+      "sha256": "3506bfe5a74942c30e331fc36d15e6c21a7f3986b801124810be673d5dc79421",
+      "original_sha256": "84d07226aa0616157f74d13ac7f2f63f03b4b273192e4cdefb31aeb5338d4d6d",
+      "bytes": 10941
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-reconstructed__session.json.gz",
+      "sha256": "ce249461a41c8ff872b7dd482881457dcbc18c720d2b9cde4f07f1b1f518e1be",
+      "original_sha256": "84712303b599f4d42dd315f293e90c70cc52863c2ae8a9cb96cce385151780ac",
+      "bytes": 2100
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-reconstructed__setup.png.gz",
+      "sha256": "142cfe30c48436de1ac15bc7f4d69f267c8d993d3b62b6d812f649a922678761",
+      "original_sha256": "dde46fa3b30277e46c229b4215e00b1d03a27b3d8f8530b69a1a8daa8afe7fe3",
+      "bytes": 2514
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-reconstructed__setup.ppm.gz",
+      "sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "original_sha256": "20526d0072aa9096a5400e7e724d207ed60b081a249afba25878835dbf71b22e",
+      "bytes": 172815
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-missing-reconstructed__uart.log.gz",
+      "sha256": "e74cb421743ab455e03f233348013e1167d0e67dfeea9e7fe3532895d9b281db",
+      "original_sha256": "cef8164bf9678af9ab15f3e72e755732ae22816df61c0d895e25b80aa4a6726a",
+      "bytes": 660
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__after-release.png.gz",
+      "sha256": "b8d34d81acffe1b82f51db714fd11419562dfdc5266fa3ff821f479f5430f4e9",
+      "original_sha256": "f62a295859bf626dee9be3dd853873a1ee13a36c591af2bbab4381c8629c7fda",
+      "bytes": 248
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__after-release.ppm.gz",
+      "sha256": "9a8c2493fc72f538af0a8d8723d4c59185d97189134512de497a104d293a4165",
+      "original_sha256": "1c9647599609f484387d350da404471cb44fa2b7a7f3a182f431c58e35509699",
+      "bytes": 172815
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__before-release.png.gz",
+      "sha256": "24ac8d1833fe1e2500e136f8830fc25350f1b610f3e20939c8b776285732ecdf",
+      "original_sha256": "fe282a5482654339c86212400f99dec8bb59432f28279226d57bc792550e9727",
+      "bytes": 1042
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__before-release.ppm.gz",
+      "sha256": "81f02558984b9d3ca46876a8dae12d81e72c9aff2b0356c6aab02c61372f7b54",
+      "original_sha256": "1139f9cc6a1212302eeac0c2bfff290cc0bd1407807344f14353af96b7419b2f",
+      "bytes": 172815
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__prepared.json.gz",
+      "sha256": "8d4ebdaeb7d686b9e3243fbe637f4daf24abd3d5fdb02d175264e50612c8972b",
+      "original_sha256": "1b14d6ba2afdb618fcb49f49a62838a0604732c3f43cec2469b8a6878a70f63d",
+      "bytes": 2065
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__qemu.log.gz",
+      "sha256": "ed91586bb19803f4a8bf1c9147fdd4f1c1b0ccb2f055c0450e7afaa6b619bd37",
+      "original_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "bytes": 25
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__report.json.gz",
+      "sha256": "e65573d32518cc4a5d40da62a748bb96476934dea4a56791025039b26281bd8b",
+      "original_sha256": "c77b6ef116886c38eaab41ecb910133106f7ecac4bdaea756011027b9c2d286b",
+      "bytes": 18604
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__session.json.gz",
+      "sha256": "22656591d0ada18552dac730b379831ed0b7740e4a6a76466d73b854aadbf9a3",
+      "original_sha256": "c2472eb52940d38301cd3a24c6f763dbc86a400bc5042d316b0d392f5fbab3b8",
+      "bytes": 2096
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-original__uart.log.gz",
+      "sha256": "e6860ffa05ca76b7b55ee2a45e7653a7ec2ad7c65caff9c4723e7535671fe7ae",
+      "original_sha256": "005a73ed179f5fce9f3aec04ddfc4ac68537cebb1ca34a2e3e5887d197b0a16b",
+      "bytes": 1985
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__after-release.png.gz",
+      "sha256": "8226376f5b482be2f8cf58b24e02fe535a2930ed850b11dca7a11ee78bebf225",
+      "original_sha256": "67777cc7f48bd2e2298072a8233179bd1e3cfc74757074108cdef77d8e338486",
+      "bytes": 6192
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__after-release.ppm.gz",
+      "sha256": "522056dc60b0a28fd31098a68fe4e494c50f82cc26af83e6f958039fd8d9bbc6",
+      "original_sha256": "35dc49e59d31054616679fe250304c106c2479e7e922cad9bae484bf1ebc2abe",
+      "bytes": 172815
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__before-release.png.gz",
+      "sha256": "a52c4c62392cdced2f9ea56065ac4e5cf30d722858996a70d806251ca7d4c955",
+      "original_sha256": "ecdff12c552576c007379bb7335341c4cc7fdef6a18807bcac78e4661eb1506f",
+      "bytes": 1038
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__before-release.ppm.gz",
+      "sha256": "7ccb4230de2c7f40de690dfc08ddf39f566027b9aabfabbf22ee4b35ac720b7a",
+      "original_sha256": "045dfd577c0663c98ba67a7d6d609fbb44e842b04dbf72ab63a293c070fe700e",
+      "bytes": 172815
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__prepared.json.gz",
+      "sha256": "3a04c5a935d98f8adf6a11194d9a45a32572c20a15c8d9052d6e52d1ac6e21ed",
+      "original_sha256": "7f875a52d4c2ac1201c2b281ac4b2c7e7e4114af9ec59abade0f58f29d563956",
+      "bytes": 2863
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__qemu.log.gz",
+      "sha256": "ed91586bb19803f4a8bf1c9147fdd4f1c1b0ccb2f055c0450e7afaa6b619bd37",
+      "original_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "bytes": 25
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__report.json.gz",
+      "sha256": "56733899d0d6340212849da9799843b9149e940ad547467fa7423ac294b5f673",
+      "original_sha256": "24e8a2c24d6d7a19e321888deb0e75e860db3a2abf29fa6b6d53cd1238f9c066",
+      "bytes": 19862
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__session.json.gz",
+      "sha256": "3ce1f1b8b4501cf189785037e6ca5f7d0f847212c87da66954f62b49305a333f",
+      "original_sha256": "3dc46ea34024a570ba8dede38f67426fa163dc8c0591b058778c09727d970680",
+      "bytes": 2101
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-reconstructed__uart.log.gz",
+      "sha256": "7f35106d8bef6d199a5e0316611daa43e06d063d1f95a33e7cbe3b53ba3dd786",
+      "original_sha256": "6dce48c9e0a11c3774003afff2addc085bc52039a27f7a5834d47e2575894972",
+      "bytes": 560
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/wifi-report.json.gz",
+      "sha256": "d4d5bb04d8f6c444901272c8bf725783158a23813e2e92e87908760393d076ad",
+      "original_sha256": "7ab18b62d62c13a80112757bf9b51c6a6469d41d87801f27601221b4b64fc06b",
+      "bytes": 74725
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/complete-snapshot-wifi-fallback-consumer-20261018.json.gz",
+      "sha256": "e1e491fb51261b2c4dc30516eb7e722ef814d577ce0b14f581a0d689de70847f",
+      "original_sha256": "7e2aaea8f200746f526dd225d9bf27eddd8cfd036c5fd16761b5aa6903f768c8",
+      "bytes": 1580
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/prepare_complete_qemu_snapshot.py.gz",
+      "sha256": "c824b2df213c621a015bfc54dcb6681f23b37c87c87616983c0407b9a797282d",
+      "original_sha256": "5d297e884e8937a6ec28b36a6763f9ffa610aa6449cfd1645d66ef60fd6c45eb",
+      "bytes": 3086
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/freeze_reset_display_complete_full.py.gz",
+      "sha256": "fa2720f9444da3de097a3f89724359d2603cd9d1662f8d97c4edf826c149d1aa",
+      "original_sha256": "9ca449268b2a0dcec0c714eb41e085fbbc853b2a23c7c909524864aff71f8219",
+      "bytes": 3947
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/setup-prepare-report.json.gz",
+      "sha256": "0ba2efdac9496895ce3cf687fc281e1c4b0a844759588444c5f49c4a1b58081f",
+      "original_sha256": "5e9ebc78c6941a3e288cd0800c757dbf0604cb46fba5a261fb99819af222a3ee",
+      "bytes": 1762
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/runtime-frozen-inputs.json.gz",
+      "sha256": "8086cf131c5b7e95639d958d50a8de36dc21d1e11e1041f67d0d5e68d47e81a9",
+      "original_sha256": "be176712060ca82a03a9025c0aed8a7b2d5092600716aeedfb97892673b9f6a5",
+      "bytes": 7135
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/profile-c3-oled.json.gz",
+      "sha256": "66757284bc833c2c86ad207e205c23f28d3bcee3d82252a25100c680edd07a53",
+      "original_sha256": "041447f4e958ef30d2a5e57aef38ac3a55b410751cec323def91fee3457cb37b",
+      "bytes": 455
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/profile-esp32-dual-spi.json.gz",
+      "sha256": "a3e747ca092fc36dc956561fdd1946c51f5fb14af8501ac232cb5a94cd540f89",
+      "original_sha256": "5b957f0732dd58dced19977a885a9ecba089b8da74521aa7e8642dd8938e5257",
+      "bytes": 597
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/profile-small-tv-c2-sd.json.gz",
+      "sha256": "39ae04cc85516e218fc2d7d34913af9088c2b2b1806bc35693ae034ea0d1df90",
+      "original_sha256": "bb93fd1b5fc735bb4d6faa0522b6781db4f6b8aef962025c476ae45e2b4a665c",
+      "bytes": 947
+    },
+    {
+      "file": "complete-snapshot-preflight-20261018-raw/profile-small-tv-c2.json.gz",
+      "sha256": "de7f80385534c71d5291fa6285bfd24f23b43be37515c2f4f7f5f5df3d348853",
+      "original_sha256": "757a21953cb2078a8d28f10af43932f58c72af908282fdce1ac5d4df400554b8",
+      "bytes": 695
+    }
+  ],
+  "scope": "Actual setup preparation and delayed-DHCP/unavailable-AP flows on both immutable applications. Not a complete full-suite, H10, CYD or physical acceptance."
+}

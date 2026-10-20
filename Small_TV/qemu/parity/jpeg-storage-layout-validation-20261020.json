@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "read_only_capacity_ownership_passed",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-20T10:39:14.907382+00:00",
+  "base_commit": "3f65fd6fd",
+  "scope": "Native sanitized image read-only capacity/ownership and CLI output guards. No flash writes, NOR/power-loss/wear or full JPEG bound acceptance.",
+  "layout_id": "4508149b7701de9fbd945b6f9fe7145b5f2dbe93de9760e56fe2437f51ad9ca6",
+  "image_sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+  "source_hashes": {
+    "Small_TV/src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
+    "Small_TV/src/tests/jpeg_storage_layout_contract.py": "57c1a048e540d12368ecf2deed94eb49ce64cbd5d25b071939c4b6238c8c78f7",
+    "Small_TV/src/app/include/board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+    "Small_TV/src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e"
+  },
+  "counts": {
+    "available_sectors": 262,
+    "allocated_sectors": 260,
+    "spare_sectors": 2,
+    "unsafe_rejections": 30,
+    "positive_controls": 4
+  },
+  "allocation": {
+    "backing_bytes": 460800,
+    "backing_sectors": 113,
+    "cache_count": 5,
+    "frame_bytes": 115200,
+    "cache_sectors": 145,
+    "metadata_sectors": 2
+  },
+  "production_unchanged": true,
+  "flash_writes": false,
+  "diagnostics": "Initial positive fixture crossed a photo-slot boundary in memory; the payload guard rejected it. Fixed one-byte control passed; the failed log is retained. No image was modified.",
+  "artifacts": [
+    {
+      "file": "jpeg-storage-layout-validation-20261020-raw/plan.json.gz",
+      "sha256": "d3834ed53a2a58052f65d43bfaf0131d309dc3ae4ec1c9d700437782961088f6",
+      "raw_sha256": "6f4588e448ea293b19ea680ae249d2ec73117f270575d8c3e913b0ec3b97d5e7",
+      "raw_bytes": 5331
+    },
+    {
+      "file": "jpeg-storage-layout-validation-20261020-raw/report.json.gz",
+      "sha256": "c7fd4e5bd82d4cce4603a21d914142a58867cb6fe0fb4c0ccf33881ece2ff4bd",
+      "raw_sha256": "39728e4322a001566bee13e359c621b5b228bf6fd2492de0966555d1a9bbc3de",
+      "raw_bytes": 5000
+    },
+    {
+      "file": "jpeg-storage-layout-validation-20261020-raw/assets-manifest.json.gz",
+      "sha256": "e6b9d6fd2a96fef67ab956ea3d042de685e12463c37927b228d1f45f411afe59",
+      "raw_sha256": "9f034fa7d5793c24da9a5399c68d93f921d6716b923fb6193a7a54a1ec7a6e0b",
+      "raw_bytes": 4782
+    },
+    {
+      "file": "jpeg-storage-layout-validation-20261020-raw/board.h.gz",
+      "sha256": "2bf36668a05a2f577d3f07f06b1daee1babd9fb45953f56ddf28895f89db113b",
+      "raw_sha256": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+      "raw_bytes": 527
+    },
+    {
+      "file": "jpeg-storage-layout-validation-20261020-raw/partitions.csv.gz",
+      "sha256": "c5122dc78ae7581965712db47e786ccb117c0a42be64599e52ce6f56058554eb",
+      "raw_sha256": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
+      "raw_bytes": 194
+    },
+    {
+      "file": "jpeg-storage-layout-validation-20261020-raw/initial-failed-control.log.gz",
+      "sha256": "1f16de3d61b1a22685cb334ce1e8507df3c3b7df51238f1863028f7176c012ab",
+      "raw_sha256": "e7cb12a5a207bc81de296d979832fa945288afb13f32988a184f1befccd8e10a",
+      "raw_bytes": 626
+    },
+    {
+      "file": "jpeg-storage-layout-validation-20261020-raw/contract.log.gz",
+      "sha256": "1900581f2a54e9d9db1bbec672b182854fac24ede1ef2f64e8e60e98196b41ce",
+      "raw_sha256": "c252b48295ad0c81e4799af6ba42858f5f63ccd9cc234ad48b2609c2fbaf034b",
+      "raw_bytes": 82
+    }
+  ],
+  "required_remaining": [
+    "NOR sector read/modify/erase/program and fault tests",
+    "atomic cache publication and cold recovery",
+    "measure erase counts and avoid periodic decode writes",
+    "invalidate cache on source/codec/layout changes",
+    "expanded subsampling backing bound",
+    "production link/total heap/stack and HTTP/LCD/full/soak"
+  ]
+}

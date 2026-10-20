@@ -35,14 +35,27 @@ def observe(qmp,folder,variant,settings,application):
             mode=int.from_bytes(read_bytes(qmp,0x3fcb7b9c+352,4),'little')
             station_state=read_bytes(qmp,0x3fcc3a74,1)[0]
             connected=station_state==2
-            active_ap=mode!=1 and boots>=2
+            # The restart/mode write precedes Wi-Fi initialization. Factory
+            # d1c4 writes 5 only after esp_wifi_start, DHCP inspection and scan;
+            # HTTP is checked separately through a real associated AP client.
+            active_ap=mode==2 and station_state==5
+            # The APSTA handler latches GOT_IP in its event group, without
+            # changing state byte 5 to 2. Read that positive event separately;
+            # it does not establish live connectivity after a later disconnect.
+            apsta_got_ip=None
+            if active_ap:
+                group=int.from_bytes(read_bytes(qmp,0x3fcc3a7c,4),'little')
+                if 0x3fcb0000<=group<=0x3fce0000-4:
+                    apsta_got_ip=bool(int.from_bytes(read_bytes(qmp,group,4),'little')&1)
         else:
             mode=read_bytes(qmp,settings['address']+settings['fields']['wifi_mode'],1)[0]
             state=vm.application_state(qmp,application)
             connected,active_ap=state['connected'],state['ap_active']
             station_state=None
+            apsta_got_ip=None
         return {'guest_seconds':seconds,'rom_boots':boots,'mode_ram':mode,'mode_raw':raw_mode,
-                'connected':connected,'ap_active':active_ap,'factory_station_state':station_state}
+                'connected':connected,'ap_active':active_ap,'factory_station_state':station_state,
+                'factory_apsta_got_ip_event':apsta_got_ip}
     finally:qmp.execute('cont')
 
 
@@ -156,13 +169,15 @@ def exercise_unavailable(options,folder,variant,settings,application):
             result['external_ap_was_offline']=not qmp.execute('qom-get',path='/machine/wifi',property='station-ap-online')
             qmp.execute('qom-set',path='/machine/wifi',property='station-ap-online',value=True)
             wait_http(session['web_urls']['setup'],expected=b'/configure')
-            setup=observe(qmp,folder,variant,settings,application)
-            result['observations'].append(setup)
+            setup=wait_observation(qmp,folder,variant,settings,application,
+                lambda row:row['ap_active'],result['observations'],90)
             result['after_restore']=setup
             result['checks']={'setup_saved':failed['mode_raw']==2 and failed['mode_ram']==2,
                 'restart_once':failed['rom_boots']==2 and setup['rom_boots']==2,
                 'external_ap_offline':result['external_ap_was_offline'],'setup_http':True,
-                'no_station_after_restore':not setup['connected'],'setup_active':setup['ap_active'],
+                'no_station_after_restore':not setup['connected'] and
+                    (variant!='original' or setup['factory_apsta_got_ip_event'] is False),
+                'setup_active':setup['ap_active'],
                 'no_panic':clean_uart(folder)}
             vm.capture_png(qmp,folder/'setup.png')
             result['passed']=all(result['checks'].values())
@@ -201,7 +216,7 @@ def main():
         ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf']}
     pins.update({str(args.qemu_root/'tools'/name):digest(args.qemu_root/'tools'/name) for name in
         ['small_tv_vm.py','small_tv_http_test.py','small_tv_network.py','small_tv_web.py',
-         'esp_elf.py','esp_board.py','esp_services.py']})
+         'small_tv_display.py', 'esp_elf.py','esp_board.py','esp_services.py']})
     archive=ROOT/'firmware/development/small-tv-esp32c2-reconstructed'
     pins.update({str(archive/name):digest(archive/name) for name in
         ['app.bin','bootloader.bin','partition-table.bin','assets.bin','manifest.json','source-manifest.json']})

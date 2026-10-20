@@ -1,0 +1,103 @@
+{
+  "status": "partial_browser_checkpoint",
+  "passed": false,
+  "all_functionality_verified": false,
+  "saved_utc": "2026-10-18T13:14:03.686990+00:00",
+  "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+  "native_elf_sha256": "aea10675caa2cb7c6f817eb4d517998e4b1023a2fa845e0d66badbfbc2dba6c6",
+  "source_sha256": "d338a294e3f95f911d1526b8cdf5986691f4e77fcc14d4765c0a3b938848a404",
+  "qemu_sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e",
+  "photo": {
+    "passed": true,
+    "browser_checks": 23,
+    "storage_checks": 6,
+    "inputs_verified": 26,
+    "stages": {
+      "upload": {
+        "vm_name": "SmallTV-97fb1413fbb8",
+        "pid": 1672,
+        "direct_raw_backing": true,
+        "rom_boots": 1
+      },
+      "cold": {
+        "vm_name": "SmallTV-106243a9acb8",
+        "pid": 6784,
+        "direct_raw_backing": true,
+        "rom_boots": 1
+      }
+    }
+  },
+  "wifi": {
+    "passed": false,
+    "failed_scenario": "literal-manual",
+    "failed_stage": "cold",
+    "failed_endpoint": "/GetTimeModeValue",
+    "observed_console": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+      },
+      {
+        "type": "error",
+        "text": "Error fetching current time mode: TypeError: Failed to fetch\n    at HTMLDocument.<anonymous> (http://127.0.0.1:18083/:620:9)"
+      }
+    ],
+    "discovered_flow_passed": true,
+    "manual_entry_flow_executed": false,
+    "inputs_rechecked": 25,
+    "root_cause": "Unresolved. An actual browser GET was refused despite other settings loading. HTTP server max_open_sockets=6 and the probe APIRequestContext keeps its own connection; connection pressure is a hypothesis, not a proven cause or a firmware-vs-harness attribution."
+  },
+  "raw": [
+    {
+      "file": "jpeg-dht-browser-photo-report-20261018.gz",
+      "sha256": "b6e747c60dd8b7b87669640f063c2a3edaddee0d55d985128a6336a9d13fb498",
+      "uncompressed_sha256": "c6dbd5052fd7513ba90dd376e9cb61a3be58ea3c65a4adf6245800a1c5a4a64e"
+    },
+    {
+      "file": "jpeg-dht-browser-photo-upload-20261018.gz",
+      "sha256": "48ae5ece149995214dc5bd7c6e2b185096ffd18d7037e4f64e4e0cd7ef398e8d",
+      "uncompressed_sha256": "25081619a32d7d0699a136007f07a79029254cdb21bd0bdf5f4bb1939216f0e4"
+    },
+    {
+      "file": "jpeg-dht-browser-photo-cold-20261018.gz",
+      "sha256": "11faacd2290037080fcee48a6ec19ad564c5bf9767d470ffb29953c50633c6fb",
+      "uncompressed_sha256": "77a7bcf8cbb38e8f3d92678f7bc4c030d377cdc820e5ab1c6213397308f794ad"
+    },
+    {
+      "file": "jpeg-dht-browser-wifi-failed-report-20261018.gz",
+      "sha256": "1afa88260f4800f5bc97f7ee219e7809f8acfe75f40e6d98325c978384304431",
+      "uncompressed_sha256": "6dc7f35f187623b7e612318f5e12f01d54227950d151ccc5b6a160dee3720a02"
+    },
+    {
+      "file": "jpeg-dht-browser-wifi-failed-cold-20261018.gz",
+      "sha256": "bfe25e067e68bccc658654da33511926a8d1f638d628ed6c7f83f6dc8276b63a",
+      "uncompressed_sha256": "c0fa3427e891fa17b69ef26785b13df558f8f70b1fdce7bfcc6463a32483fa9e"
+    },
+    {
+      "file": "jpeg-dht-browser-wifi-last-uart-20261018.gz",
+      "sha256": "5c23d3299cdadfbb7ccb9a3bf43e87fe2ceefa24ffba30bd5daf2f250b442b9a",
+      "uncompressed_sha256": "6d5e934844d93f1dcac83039785604136cbdd7abb40fd0053999aa8d7f495cbf"
+    },
+    {
+      "file": "jpeg-dht-browser-photo-uart-upload-20261018.log.gz",
+      "sha256": "8115800da70a8b6f3f58f7065f222ec614f1a1ffdc2ccb980614ec6ba6854e4d"
+    },
+    {
+      "file": "jpeg-dht-browser-photo-uart-cold-20261018.log.gz",
+      "sha256": "b3afdd4004ad47742fc75c001a8947e663c0f94327c37e7c30b5de95270ea9e3"
+    },
+    {
+      "file": "jpeg-dht-browser-landscape-crop-20261018.png",
+      "sha256": "3a28e1863d8fddf10417b4790be3cbf534a8e6455f285b99c284443888388fa7"
+    },
+    {
+      "file": "jpeg-dht-browser-portrait-crop-20261018.png",
+      "sha256": "7e0e398998cc82c85de687cca5b4cbf7f26a00a4dde754096982e38a3b95e8e3"
+    },
+    {
+      "file": "jpeg-dht-browser-wifi-failed-cold-20261018.png",
+      "sha256": "5cb8dbae3f1823523348db42ff214beab1ae77d01264feec2ae8a7e8a2c02ae9"
+    }
+  ],
+  "scope": "Exact0592 browser photo success and preserved failed Wi-Fi browser run. No blanket browser/H03, full regression, H10 or hardware acceptance."
+}

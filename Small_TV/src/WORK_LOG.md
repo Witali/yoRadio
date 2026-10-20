@@ -2552,3 +2552,836 @@ gzip и JSONL читаются. Полного суточного результ
 не меняется до завершения; опубликованный исторический отчёт не заменяется
 промежуточными результатами. Следующий H10 требует отдельного нового каталога
 и проверки способа запуска, который переживёт завершение родительского сеанса.
+
+### 2026-10-18 — независимый запуск длительного теста Windows
+
+В отдельной выборочной рабочей копии добавлены start_runtime.ps1 и модуль
+runtime_process.psm1. Новый supervisor создаётся скрыто через CIM с
+CREATE_BREAKAWAY_FROM_JOB; IsProcessInJob проверяется по реальному handle.
+Команда не исполняется shell; правило Windows argv сохраняет кавычки,
+завершающие backslash, пустые строки и Unicode. Запись запуска резервируется
+до создания процесса, дубликаты не начинают вторую VM и не трогают прежние
+данные. PID/время создания/команда и хеши launcher сохраняются отдельно.
+При ошибке очистка разрешена только после проверки принадлежности процесса.
+
+runtime_process_test.py выполнил восемь реальных интеграционных проверок,
+включая выход родительского процесса до завершения ребёнка, независимую
+проверку Job через kernel32, точный argv и ошибки Windows Create. Первое
+выполнение выявило отказ привязки пустой строки argv; добавлен AllowEmptyString,
+последующие проверки прошли. Отдельный восьмицикловый QEMU preflight через
+новый launcher завершился: supervisor/workload/guard exit 0, sources unchanged.
+Модуль после него дополнен защитой от PID reuse и повторно прошёл host-проверки.
+Это не доказывает причину прежней остановки H10 или завершение 24 часов.
+
+Итоговый модуль также проверен отдельным четырёхцикловым preflight: 17.171712
+гостевой секунды, 32 HTTP, два отключения AP, 31 проверенный входной файл;
+supervisor/workload/guard завершились с кодом 0, исходники не изменились.
+Аудитор вернул completed_scope_requires_review, как ожидается для короткого
+прогона. Отчёт и исходные журналы сохранены в runtime-launch-validation-20261018.json
+и трёх gzip. Производственная прошивка, исходники и установленный QEMU не менялись.
+
+### 2026-10-18 — сохранён неуспешный полный прогон 6324
+
+Session 92602 завершился с кодом 1 в 09:51:51 UTC. Все 18 host/machine/profile
+групп прошли. QEMU boot/reset/SNTP обеих прошивок и delayed-DHCP original/native
+прошли, но missing-original не дождался setup HTTP на localhost:18080. Последнее
+наблюдение: 15.499082 гостевой секунды, mode RAM/raw=2, AP active, connected=false,
+два ROM boot; исполняемые области не изменились. Проблема возникла в заводском
+образе до native missing-AP и позднейших групп. Причина пока не установлена,
+ожидание не ослабляется и ошибка не приписывается нашей прошивке без анализа.
+Все 195 frozen identities повторно совпали. Scoped JSON и четыре исходных
+отчёта в gzip сохранены отдельным checkpoint; прежняя успешная публикация
+остаётся исторической и не выдаётся за проверку текущего образа.
+
+### 2026-10-18 — чистка завершённых worktree по запросу пользователя
+
+Применён навык git-repo-cleanup и его Git reference. Проверены все 22 yoRadio
+worktree и обе копии QEMU: index/diff, ignored/untracked файлы, Git-операции,
+скрытые flags, submodule/nested Git, reflog, публикация и процессы. Origin HEAD
+обоих проектов подтверждён как main; refs получены без prune. Копии ESP8266/C3
+с незавершённой работой и SDK оставлены, все семь исходных staged diff сохранены.
+
+Удалены 12 завершённых worktree Small_TV обычным worktree remove после повторной
+проверки каждого пути, inventory, refs и отсутствия активных процессов. Полный
+логический размер файлов этих копий — 25 889 466 492 байта. Все ignored файлы,
+включая ELF/map, VM-журналы и сборки, сохранены в 12 проверенных архивах общим
+размером 932 262 015 байт в `.build/worktree-retention/20261018`. Уникальный
+прежний amended-коммит observer закреплён в recovery ref и incremental bundle.
+Ветки не удалялись. Root, H10 Wi-Fi и новая runtime-launch копия сохранены.
+
+В QEMU удалена одна завершённая дополнительная копия на том же 2a593f8d,
+что опубликованный main. Ignored файлы сохранены в проверенном архиве,
+обе вложенные зависимости — дополнительно в Git bundle. До удаления исследован
+orphan из reflog: 158b65e28a отличается от принятого amend только двумя QOM
+путями README. Он закреплён recovery ref и проверенным incremental bundle;
+избыточный созданный полный bundle заменён компактным. Зарегистрированные ROM
+submodule были неинициализированными. Установленные RISC-V/Xtensa executable
+после чистки совпали по SHA-256; код QEMU не менялся, rebuild не требовался.
+Точный local exclude скрывает только приватный retention-каталог.
+
+Новые runtime launcher изменения сохраняются в codex/small-tv-runtime-launch;
+рекомендуется интеграция инструментов после review, но очистка не объявляет
+успешной полную функциональную или аппаратную приёмку прошивки.
+
+### 2026-10-18 — новый H10 через независимый launcher после чистки
+
+В 10:06:56 UTC start_runtime.ps1 запустил новый 86400-guest-second run в
+сохранённом `.worktree/small-tv-h10-wifi`. Используется прежний точный 6324
+образ, ELF 9E2C, source 53D3 и frozen QEMU A74. Interval=15, outage cadence=60.
+Запись старта связывает 31 неизменный входной файл, реальные CIM identities
+17788/23672/28632/35664, команды и хеши supervisor/guard/launcher. Все процессы
+повторно сверены; supervisor действительно вне Windows Job, как проверил
+launcher. Начальный независимый file-only аудит pending, start_record_matches
+true. Это только начало нового прогона, не 24 часа, не доказанный memory trend
+и не проверка выживания через следующий turn. Старые прерванные каталоги не
+возобновлялись и их длительность этому образцу не добавляется.
+
+## 18 октября 2026 — APSTA early restoration
+
+- После завершённой очистки репозиториев продолжено расследование terminal full
+  regression. Четыре контроля отделили ранний возврат внешнего AP от раннего HTTP:
+  два early-restore запуска не ответили за 91 s, два late-restore ответили за 2.30/4.55 s.
+- Инструкции 0x4200d1a0..d1c4 и AP handler 0x4200c6e2 сохранены. Factory state 5
+  означает конец AP init, не подключение клиента. Старое ap_active до init было
+  неверной эвристикой. AP handler пытается STA connect; GOT_IP не пишет state 2.
+- Отдельный probe проверил STA HTTP и event group: ответа нет, bits=0. Успешная
+  STA в сбойном запуске не установлена. Исполняемые/media области неизменны.
+- Новый QTest воспроизвёл конфликт общих peer state и MAC на C2/C3 в обоих порядках
+  подключения: четыре отрицательных subcase. Отчёты сохранены с raw SHA/gzip.
+  QEMU fix ещё не принят; новый scoped passing gate и полный regression впереди.
+- В 10:22 UTC проверены PID/creation/command всех четырёх процессов H10: совпали.
+  Префикс дошёл до 44 циклов / 765.066695 guest s. Это не суточная приёмка.
+
+- Исправление QEMU завершено и сохранено как aab05d5de6: независимые AP/STA peer
+  state в отдельном модуле, общий radio/DMA, разделение входящих IP/ARP и очереди
+  при отключении внешнего AP. После коммита сборка повторена: executable B44D1A05
+  побайтово прежний и marker соответствует aab05d5de6.
+- Пять QTest / 10 C2/C3 subcase проходят. Те же test/harness SHA дают 10 ошибок
+  на прежнем A74. Прошли 12 прежних сетевых тестов, модульные LCD/SD/SPI/I2C
+  и неизменённые CYD/C3 OLED boot проверки на окончательном B44.
+- Обе настоящие прошивки прошли delayed-DHCP и missing-AP при раннем возврате
+  сети: четыре потока. Observer ждёт state 5 после HTTP и читает отдельный
+  APSTA GOT_IP event; в factory missing-AP checkpoint он false. Все 26 мутаций
+  недостоверного evidence отклонены. App6324/source53D3 не менялись.
+- Scoped evidence сохранён в apsta-validation-20261018.json и семи raw gzip;
+  exact build bytes и Git blob hashes QEMU записаны отдельно из-за Windows EOL.
+  Это не полный regression, не DEBUG-off приёмка и не суточный результат.
+
+- 10:41:21 UTC: полный host/machine/QEMU regression начат на app6324 / ELF9E2C /
+  QEMU B44 из aab05d5de6. Controller PID2448 запущен проверенным detached helper;
+  реальное kernel job membership=false. В 10:42 UTC его creation/command совпали.
+  121 test + 152 дополнительных файла заморожены и после старта совпали (273).
+  Набор идёт без Skip; суточной/общей приёмки этим стартом не объявлять.
+- Для изолированной рабочей копии создан ignored SDK junction .idf на основной
+  SDK и скопированы oracle dependencies. При очистке не обходить junction.
+- В 10:42 UTC повторно совпали четыре личности H10 и 31 input hash. Префикс
+  103 цикла / 1737.66437 гостевой секунды, 832 HTTP и одно отключение внешнего AP.
+  H10 использует frozen A74, а новый full regression — B44; области не смешивать.
+
+- Продолжено исследование APSTA без изменения 273 frozen full inputs. По цепочке
+  SDK get_handle_from_ifkey найден список 0x3fcc3c0c; getter 0x42036f98 читает
+  if_key по +92. Два настоящих factory boot дали ровно STA_DEF в station и
+  AP_DEF в setup, обе страницы HTTP200; code/media/UART guards прошли.
+- Setup VM использует сохранённые реальным SDK синтетические credentials.
+  Официальный NVS parser v5.5.4 подтвердил nvs.net80211/sta.ssid и sta.apinfo
+  с верными CRC. GOT_IP event=false при отсутствии STA netif: это не потеря SSID.
+  Исходные APSTA connect-вызовы сами по себе не доказывают рабочий STA IP путь.
+- Characterization report и raw gzip сохранены отдельно от passing full gate.
+  Scratch netif probe нужно перенести в reusable test после terminal full run.
+  Кандидат оптимизации — лишние native netif/DNS в другом режиме; пока код и
+  производственный app не менялись, затраты памяти и wire behavior не измерены.
+
+## 18 октября 2026 — network role allocation, в работе
+
+- Создана отдельная sparse worktree codex/small-tv-netif-roles от9c8a6747, чтобы
+  сохранить 273 frozen входа текущего full run в другой копии.
+- Изменён только network/wifi.c и его platform coverage: по одному netif на
+  выбранную роль, AP-only DHCP/DNS и STA-only retry task. APSTA scan остаётся.
+- Negative control прежнего C упал на лишнем STA netif в setup. Исправленный C
+  прошёл 48 cases /1 182 327 checks. SDK/QEMU behavior и RAM gain ещё не измерены.
+- Production compile session58887 запущен с общим pinned SDK; это не flash.
+  После завершения проверить development archive перед реальными VM проверками.
+
+- Compile session58887 завершён exit0; app26C6 / ELFFE9B / sourceD628 сохранены
+  в development archive ветки. Размер1 169 872 bytes /366 128 свободно; DEBUG off.
+  Ни success SDK/QEMU, ни RAM gain одним размером/компиляцией не заявляются.
+- Запущены actual setup/AP scan/reboot->STA (17901), четыре Wi-Fi policy cases
+  (53919) и отдельный memory baseline8cycles old6324 на B44 (20063). Старый H10
+  остаётся на A74; его prefix не используется вместо before/after memory control.
+
+- Actual setup scan/configure/reboot->STA/cold relaunch/reset новой26C6 прошёл
+  (21 check). Четыре Wi-Fi DHCP/failure потока factory/native и26 evidence guards
+  прошли с неизменными образами и исходными input SHA.
+- Честный runtime before/after на B44: по8циклов /64HTTP /4outage /69events.
+  Оба pass; task set отличается только отсутствием captive_dns в STA (12->11).
+  Ready free heap87876->92036; медианный gain9samples4160bytes. Это короткий
+  STA workload, не суточная приёмка и не измерение AP. Исходные отчёты сохранены.
+- Проверены59 production inputs: изменён только network/wifi.c; sdkconfig один.
+  Bootloader checksum/SHA валидны, исполняемый образ идентичен кроме SDK даты
+  компиляции и integrity bytes. Поэтому смена bootloader hash не скрыта как
+  «тот же binary». Scoped proof network-roles-validation-20261018.json +5gzip.
+
+- 11:07:17 UTC полный app26C6 run запущен independently через проверенный CIM
+  launcher, PID28968, job=false. После запуска все273inputSHA и личность совпали.
+  Полный SDK/machine/QEMU набор без Skip; start не является passing report.
+- В11:07:50 UTC прежний full app6324 PID2448 жив, все273inputs прежние. H10
+  app6324/A74:4process identities и31input совпали;180cycles/3005.344746guest s,
+  1445HTTP/3outage. Новой26C6 H10 ещё нет; области приёмки явно разделены.
+
+- Frozen H10 copy app26C6/ELFFE9B/B44 создана atf0375b14. Detached4cycle preflight
+  завершился pass, workload/guard exit0,32HTTP/2outage/31unchangedinputs.
+- До любых stop действий записан replacement intent старого app6324/A74 H10.
+  В11:13 UTC совпали4process identities и31input;196cycles/3267.751527guest s,
+  1573HTTP/3outage. Это неполный prefix; замена нужна для нового firmware/model.
+  Следом требуется revalidate worker handle, supervisor cleanup и сохранение raw.
+
+- В11:13:48 UTC после committed intent и CIM revalidation остановлен прежний
+  workload23672. Supervisor выполнил cleanup exit0; raw failed/-1 outcome
+  сохранён. Независимый file-only audit подтвердил200полных циклов,
+  3292.590422guest s/1605HTTP/3outage,31inputs, одинROMboot безpanic.
+  Manifest network-roles-runtime-superseded-20261018.json +7rawgzip; неH10 pass.
+- Новая frozen26C6/FE9B/B44 H10 запущена11:14:24UTC, supervisor21928 внеJob,
+  workload20664/guard35272/VM7412. После запуска все4CIM identities совпали,
+  31runtime+11frozenQEMU hashes проверены; file-only diagnostic/start binding pass.
+  Start proof network-roles-runtime-start-20261018.json +2rawsnapshots. Никакой
+  24h/полной приёмки пока нет. Оба full controller2448/28968 также живы.
+
+## 18 октября 2026 — повторяемая проверка SDK netif
+
+- В отдельной codex/small-tv-netif-observer отfe592a8b создан read-only observer:
+  factory addresses связаны с dump5321; native layout читается из совпадающего
+  ELF/DWARF. Ограничены pointer/key reads, list size; ошибки не подменяются пустым
+  успешным результатом. Production C и build26C6 не менялись.
+- Первый probe отверг NVS blob_index, второй ошибочно требовал SDK FLASH SSID
+  и от native WIFI_STORAGE_RAM. Неуспешные отчёты сохранены. Уточнена фикстура:
+  factory STA сам записывает public driver NVS, обе setup VM получают эту
+  проверенную NVS partition; далее меняется только raw mode=2. Код/RAM не патчатся.
+- Финальный v3 прошёл четыре потока: factory/native STA и setup, HTTP страницы,
+  retained SSID+AP-info CRC, APSTA `/scan`, netif до/после, неизменные code/media,
+  clean UART. Прежняя native6324 с теми же observer bytes/B44 упала на двух
+  интерфейсах в STA, что подтверждает обнаружение исправляемого расхождения.
+- 7offline observer tests и17evidence mutations pass. Новый gate обязателен
+  в suite/publisher;27inputs runtime reports совпали. Старые frozen full runs
+  остаются в прежнем объёме, никакой полный pass новой test revision не заявлен.
+
+- Завершено дополнительное AP before/after измерение: одинаковые4scan+4HTTP,
+  9heap/task snapshots каждого app6324/26C6 на одном B44. Оба pass,24input SHA
+  каждого неизменны, по36ROM counter crosschecks, одинROMboot безpanic.
+  Задач12->11 (только wifi_fallback); ready free83928->86604, gain2676bytes.
+  Медиана парных фаз2672, range2332..4596: transient HTTP buffers оставлены
+  видимыми, не маскируются. Raw reports/UART и one-off probe сохранены gzip
+  с network-roles-ap-memory-20261018.json; это не H10/latency/leak acceptance.
+- Замечены time_sync и weather_http tasks также в AP. Следующий шаг — сравнить
+  service lifecycle и factory AP branch/HTTP/cache/time semantics, затем решать,
+  можно ли избежать allocation. Production пока не менялся. Frozen full/H10
+  не перезапускались и не получают новый netif gate задним числом.
+
+### 2026-10-18 — station-only service allocation и сохранение результата full
+
+- По factory AP branch0x42009032..0x42009052 разделены cache initialization
+  и workers. AP не выделяет time_sync/weather_http, STA с ожидающим DHCP
+  продолжает их создавать. Production delta — ровно3из59inputs; appBC68,
+  ELF4FDE, source5586, app1169904bytes, запас366096. Build успешно архивирован.
+- Platform50cases/1182393checks, native5531 и artifact6 pass. Исправлены три
+  старых fixture, которые неправомерно посылали station GOT_IP в AP режиме.
+  Оба новых AP tests с финальным harness падают на старых service modules.
+- Real factory/native AP6HTTP settings routes, ≥30/45guest seconds, реальные
+  tasks/cache/ROM counters и четыре полных RGB кадра прошли. Ready AP gain11508
+  bytes, tasks11→9; later-workload median не заявляется. Настройка AP→STA и
+  STA8cycles/64HTTP/4outages/9weather generations прошли на B44.
+- Сохранены ap-services-validation-20261018.json и8raw gzip; full BC68/H10
+  пока не запускались. Различие bootloader raw bytes не объявлялось изменением
+  алгоритма или доказанной нормализованной идентичностью кода.
+- Старый full26C6/B44: terminal_failed/exit1 в regional raw ASCII observer на
+  erased0xff. Повторно проверены273frozen inputs; исходный failure сохранён
+  в network-roles-full-failure-20261018.json и6gzip. Причина flash моделирования
+  рассматривается отдельно; отказ не превращён в успешный результат.
+
+### 2026-10-18 — raw observer между erase и программированием
+
+- Проверка на byte0xff больше не падает в decode: erased/partial data pending,
+  неизменный bounded timeout сохраняет отказ при постоянной порче. Native dirty
+  symbol1byte из matching ELF должен быть0до/после host read. Проверка factory
+  completion flag не выдумывалась; factory читает точный сохранённый key.
+- 5unit controls pass и добавлены как mandatory suite/publisher/verifier gate.
+  На scoped QEMU9DA прошли15+15regionalkeys, maxcity64/country19, invalidinputs,
+  raw immutable media, холодный boot и SDK NVS v1 migration/v2 fallback.
+- Окончательный QEMU20B с дополнительным исправлением C2dummy/QE прошёл настройку
+  Wi-Fi16factory/21native checks и station isolation. Разделение бинарников и
+  ограничения evidence сохранены в flash-persistence-observer-validation-20261018.json
+  с2rawgzip. Эти результаты не заменяют полный прогон или H10 текущего BC68.
+
+### 2026-10-18 — итог flash audit и ограничение CYD
+
+- QEMU0860e568d4, final binaries20B/1845:11NOR groups на3SoC,17rows/476checks
+  старой read-mode/capacity matrix и modular peripherals pass. Тот же final
+  harness на прежних бинарниках даёт24failures/2errors (отсутствующая timing
+  property). Исходники, положительные/отрицательные reports и scope сохранены
+  в QEMU docs/validation/flash-write-validation-20261018.json +15gzip.
+- Short CYD25s сначала pass, однако более длинные60s выявили esp_phy_enable
+  assertion phy_init.c:332. Сопоставимый same-toolchain control со старым NOR
+  blob воспроизводит тот же assertion. Старый installed control падает на QIE.
+  Это не полная CYD acceptance; console pixels/no-panic25s недостаточны.
+  C3 OLED и modular OLED checks pass. Firmware archives не менялись.
+
+### 2026-10-18 — завершился исторический frozen full6324
+
+- Старый full app6324/source53D3/B44 terminal_passed12:10:15UTC:19passed groups,
+  hardware_browser_soak not_run. Все273frozen inputs повторно проверены; proof
+  apsta-full-completed-20261018.json +4rawgzip. Успех не перенесён на26C6/BC68
+  или новый flash QEMU; новые gates в этот старый прогон задним числом не входят.
+- H10 app26C6/B44 не прерывался, file-only diagnostic status pending,
+  h10_checks_passed=false. Чужие/длительные ВМ не останавливались; одноразовые
+  ВМ flash audit завершены. Полного acceptance для текущего appBC68 ещё нет.
+
+### 2026-10-18 — текущий full и замена H10 на BC68/20B
+
+- Full запущен отдельно в codex/small-tv-flash-full, controller10836 вне Job;
+ 533inputs frozen, startce6a1254. После host/machine групп перешёл в QEMU.
+- Новый guarded preflight8cycles/64HTTP/4outages/9weather generations pass,
+ 36ROM counter checks,31+11input hashes совпали, workload/guardexit0.
+ Raw proof ap-services-h10-preflight-20261018.json +6gzip.
+- До остановки старого workload записан и отправлен intent2f9f81e3. Проверен
+ retained handle старогоPID20664, creation time/полный command line; завершён
+ только этот workload12:30:54UTC. Старый supervisor сохранил failed/-1 и
+ очистил собственнуюVM/guard (cleanup0). Аудирован prefix214cycles/31inputs;
+ исходные report/events/UART/guard/supervisor/stop/analysis сохранены7gzip.
+- Новый H10 BC68/20B запущен12:30:54UTC: supervisor23548/workload5036/
+ guard22392/VM18128. CIM подтверждает все4идентичности и отсутствие4oldPID.
+ Start record хранит31runtime и11frozenQEMU inputs; это start/pending, не H10 pass.
+
+### 2026-10-18 — воспроизводимый browser/Canvas/raw photo gate
+
+- Browser Use и Node REPL не инициализировались (kernel assets os error3).
+  Реальная проверка выполнена установленным Chrome155/Playwright через CLI
+  на собственной disposable BC68/20B ВМ с raw backing, без внешней сети.
+- Оба Chrome/VM процесса подтвердили точный generated photo HTML.23browser
+  checks и6storage checks pass: pointer shrink/grow, выбранные blue/yellow RGB,
+  240×240baselineJPEG безAPP/COM, source synthetic metadata, Cancel/Escape,
+  mobileviewport390×844,47773bytes noise/12chunks, cold exact JPEG readback.
+- QMP подтвердил writable raw backing, slots1–3 и executable/static flash
+  области неизменны. По одному ROMboot на каждый новый VM identity, panic нет;
+ 26inputs совпали, console warnings/errors=[]; Chrome/VM закрыты.
+- Созданы browser_photo_qemu.py и browser_photo_flow.mjs; final proof
+  browser-photo-validation-20261018.json +5rawgzip+2PNG. Первый development
+  run также pass; final добавляет source tags и explicit ROM/VM identities.
+  Production не менялся, frozen full533 и active H10 не редактировались.
+
+### 2026-10-18 — совместимость start record с file-only analyzer
+
+- Первая проверка нового start record получила evidence_rejected: отсутствовал
+  top-level guard metadata, хотя его исходный SHA уже был в supervisor snapshot.
+  Добавлены guard/source_file+source_sha256 и canonical duration field86400.
+  Формат исходного ee896b31 сохранён в Git; добавлена явная reconciliation note.
+  Ни workload, ни его31runtime/11QEMU inputs не менялись и не перезапускались.
+
+### 2026-10-18 — настоящий браузер initial Wi-Fi setup на BC68/20B
+
+- В собственной ветке codex/small-tv-browser-wifi добавлены browser_wifi_qemu.py
+  и browser_wifi_flow.mjs. Установленные Chrome155/Playwright через CLI, только
+ 390×844 и два loopback origin каждой disposable VM; внешняя сеть запрещена.
+- Три реальных scan/configure flow: обычная сеть, SSID `manual`, manual entry
+  после отключения external AP. Знаковый RSSI и различение служебного option
+  проверены браузером. Cancel/empty не отправляют POST. Короткий пароль400
+  не меняет444raw bytes, AP role или ROM boot count. Положительные fetch и
+  загрузка настроек не дают console/page errors; negative preflight содержит
+  ровно две ожидаемые console errors для400 и error alert.
+- Каждая настройка прошла программный restart→STA DHCP→UDP SNTP; actual SDK UTC
+  с matching ELF HRT/correction отличается от wire expected менее27ms. Новый
+  cold process сохраняет credentials/STA и вновь синхронизируется. По2ROM boot
+  для setup flow и по1для cold. Все защищённые code/media intervals неизменны.
+- Итог93browser+18storage/role checks pass;25inputs неизменны. Все6VM PID
+  отсутствуют по CIM, Chrome закрыт. Proof browser-wifi-validation-20261018.json,
+ 13rawgzip (включая cleanup и оба failed development runs) и2actual PNG.
+- Первый harness ошибочно ожидал photo loading overlay в settings; второй
+  использовал приблизительный RTC+lifetime UTC с неверной нижней границей.
+  Финальный тест проверяет реальные переключатели/API и SDK timer components.
+  Оба первоначальных failed report и точные исходники сохранены, не заменены pass.
+- Cherry-pick H10 metadata c0fc3cb3 завершён какb1bba736; конфликт только двух
+  добавленных разделов WORK_LOG разрешён сохранением обоих. Production/archive
+  не менялись, live full533 повторно совпали. Controller10836 и все4H10PID живы;
+  file-only prefix58cycles/31inputs, одинROM boot безpanic, пока pending.
+  Полный прогон прошёл photo_controls/reinit/settings; terminal result ещё нет.
+
+### 2026-10-18 — резервированные JPEG DHT branches, factory correction
+
+- Непокрытый edge case найден после чтения существующего41-case JPEG gate.
+  T.81 AnnexC/F.1.2.2.1/TableF.2 запрещают all-one Huffman words и AC size>10
+  либо zero-size кромеEOB/ZRL. Фактический factory0x42011100/0x42011208 и старый
+  C принимают121неиспользуемую malformed ветвь, поскольку entropy использует
+  только DC0/EOB. Три запрещённыхDC controls уже отклонялись, четыре valid pass.
+- Добавлены jpeg_dht_oracle.py (128cases) и общий jpeg_dht_contract.py.
+  Полный panel guard и discard validation; native должен отказать до jd_decomp.
+  Все шесть test/helper SHA и128fixture SHA before/after совпали. Original dump,
+  ELF и CPU instructions не патчились; synthetic bytes подаются наSDK read boundary.
+- В tjpgd.c/create_huffman_tbl поменяны две проверки, FIXED_FACTORY comment
+  объясняет стандарт. Native before0x4201320c bltu заменён candidate0x4201320a
+  bgeu;0x420132aa добавляет AC size/EOB/ZRL. Три точных disassembly сохранены.
+- Успешная SDK6.1 build архивирована:0592b510/ELFaea10675/sourceD338a294,
+ 1169936bytes (+32), free366064, DEBUGoff.59production inputs, delta только1file.
+  Bootloader359de03d после новой сборки не объявляется алгоритмическим изменением.
+- Candidate:128DHT + прежние41inputs,107public JPEG/35errors/7placements,
+ 5531host C и6artifact checks pass. Семь evidence rejection controls pass;
+  новый child gate обязателен в machine_jpeg_inputs, обоих publication tools.
+- HTTP before/after выполнен с одним exact harness/QEMU20B. Все три362-byte
+  reserved-table upload раньше200/exists, теперь400/absent. Candidate22checks
+  pass, including valid files/retries/download/несколько холодных запусков и
+  восстановление после interrupted replacement. В before false только новый
+  reserved_dht_rejected; raw failure не переписан. JPEG proof +12gzip сохранены.
+- Root/active full533 и H10BC68 не редактировались/не останавливались, все пять
+  process identities перепроверены. Полное соответствие0592, его full/H10 и
+  физическая приёмка ещё не доказаны. Следующий шаг — изолированный полный прогон.
+
+## 2026-10-18 — восстановлена надёжность Windows-супервизора H10
+
+- Работа выполнена в новой `codex/small-tv-runtime-supervision` от `cf131575`.
+  Исторические деревья, 539 входов полного прогона и 31+11 входов прерванного
+  H10 не редактировались. Полный 0592/20B завершён: 19 групп, публикация и шесть
+  проверок артефактов приняты. H10 BC68/20B после 336 циклов остаётся непринятым;
+  сопутствующий ENOSPC не объявляется доказанной причиной исчезновения хоста.
+- Установлен дефект finally: ошибка WriteAllText первого child log прерывала
+  очистку guard/VM. Очистка вынесена в `runtime_cleanup.psm1`: все свои children
+  останавливаются через удерживаемые handles, helper своей VM выполняется до
+  открытия его лога, stdout/stderr сохраняются независимо. Потеря диагностики
+  сохраняет failed state; если диск недоступен, JSON footer передаётся в stderr.
+- Атомарное состояние вынесено в `runtime_state_io.psm1`. Windows rename иногда
+  возвращает ACCESS_DENIED при читателе без FILE_SHARE_DELETE. Немутационная
+  DELETE-access probe отличает sharing conflict от реального запрета; heartbeat
+  откладывается до существующего следующего такта, без добавления пауз. Финальная
+  ошибка, read-only и ошибки самого WriteAllText не откладываются и не дают pass.
+  Python children запускаются с UTF-8/-B; fallback JSON экранирует не-ASCII.
+- Окончательный `runtime_supervisor_test.py`: десять реальных OS/process/file
+  сценариев pass, источники неизменны, canary сохранён. Старый 8c91874b… source
+  проходит только normal/footer/guard: семь случаев отклонены; в четырёх
+  зафиксированы оставшиеся VM и/или guard до очистки самим тестом. Тестовые
+  stdout-файлы заменили ожидание pipe EOF, чтобы измерять настоящий Process exit.
+- Реальная пара app0592/ELF aea10675/QEMU d64f3013: окончательный обычный
+  preflight завершил четыре цикла, два outage, HTTP/photo/weather и память;
+  supervisor/workload/guard успешны, источники неизменны. Отдельный окончательный
+  fault test испортил только host paths после готовности guard: supervisor
+  корректно вернул 1, workload/guard/VM закрыты, VM helper exit 0, structured
+  failed footer сохранён, дополнительная очистка тестом не понадобилась.
+- Предварительные провалы стенда (локальная cp1252 при чтении UTF-8 state и
+  ожидание pipe EOF) сохранены отдельно и не являются подтверждением работы.
+  Тесты не заполняют диск; directory/read-only fault не объявляется точным
+  воспроизведением ENOSPC. См. tests/RUNTIME_SUPERVISION.md и новый proof в
+  Small_TV/qemu/parity. Полный новый H10, полный набор на новом QEMU и CYD
+  PHY/cache расследование остаются обязательными следующими шагами.
+
+## 2026-10-18 — независимые проверки сети и дисплея после reset
+
+- Старый полный 0592/D64 завершился с failed QEMU: 18 других групп pass,
+  network/DHCP/SNTP после reset pass, два ROM-баннера, но единственный
+  after-reset кадр полностью чёрный. Все 553 frozen inputs совпали.
+  Сырой failure и live H10 checkpoint сохранены коммитом bc9aff58.
+- В отдельной ВМ с прежним неизменным helper воспроизведён partial frame
+  624 -> 11629 RGB-байтов за 0.034633 гостевой секунды. Это гонка host capture
+  с очисткой/отрисовкой, а не доказанный отказ SNTP или перезагрузки.
+- По требованию пользователя результаты разделены на boot/network/display/
+  source_integrity. Дисплей вынесен в small_tv_display.py, наблюдает только
+  240x240 PPM и bounded clocks. Сеть использует прежний SDK/NTP observer.
+  Network timeout не пропускает display; display error не стирает network.
+  Метки FIXED_TEST объясняют исправление; production app/ELF/source не менялись.
+- Пройдены независимые 9 panel +3 isolation, прежние 19 ELF/SNTP,
+  8 consumer tests и 38 реальных report rejection controls. Отдельный native
+  прогон original + три reconstructed завершён успешно на неизменном D64;
+  это короткая проверка, а не полный suite или H10 acceptance.
+- Новая ветка codex/small-tv-reset-display создана от bc9aff58. Live H10
+  остаётся в small-tv-runtime-supervision с прежним frozen helper; новых
+  QMP/RSP клиентов к нему нет. Полный новый прогон и CYD ещё не приняты.
+
+## 2026-10-18 — строгие JPEG DRI/SOS/DQT headers и component IDs
+
+- В новой sparse рабочей копии codex/small-tv-jpeg-headers подтверждены ошибки
+  factory header parser. 22 начальных RV32 пробы показали 15 принятых
+  повреждённых вариантов. Расширенный неизменный before/after harness: 133
+  случая, 14 корректных, 119 повреждённых; app0592 принимает 115 повреждённых.
+- T.81 Annex B задаёт DRI/SOS lengths, baseline scan fields, component identity
+  и ненулевые quantizers. create_qt_tbl/jd_prepare получили FIXED_FACTORY
+  comments с исходными адресами. Добавлен component_id[3] в хвост JDEC;
+  DWARF реальных ELF подтвердил прежние offsets, RV32 size 120 ->124.
+  IDCT/цвет/вывод не переписаны; изменены только два production source files.
+- Успешная production сборка сохранена в firmware/development: app F1ADA8B4,
+  ELF91E26EB2, source F849F5BF, DEBUG off/WARN. App1170032 bytes (+96),
+  свободно365968 в app partition. Автоматическая прошивка платы не запускалась.
+- Новый native gate: все 119 malformed reject до jd_decomp без рисования,
+  все14 valid совпадают с factory по всему panel, включая arbitrary IDs0/17/255.
+  Семь consumer rejection controls pass. Прежний JPEG inputs gate (41 +128DHT),
+  новый133, public107 +35errors +7placements, host5531 и artifact6 pass.
+- Один и тот же photo HTTP harness на том же D64: before0592 принимает пять
+  из шести новых invalid header inputs (короткий DRI уже получает400),
+  afterF1 возвращает400/absent для всех шести; custom RGB IDs
+ 0/17/255, byte-exact download, retries, cold boot и interrupted replacement pass.
+  В before false только header_fields_rejected; failed evidence сохраняется.
+- Gate включён в jpeg_inputs_oracle и оба publication consumers. Metadata
+  UPSTREAM.json и CORRECTION_MARKERS обновлены. Это targeted acceptance,
+  а не полный прогон новойF1, H10, CYD или физическая приёмка.
+- Исторический полный561 app0592/D64 и H10 остаются живы в своих frozen
+  деревьях; новыеQMP/RSP к H10 не добавлялись. После адресной валидации
+  требуется отдельный полный набор и длительный workload на точной новой паре.
+
+## 2026-10-18 — desktop/mobile настройки и холодное сохранение F1
+
+- В отдельной sparse рабочей копии `codex/small-tv-browser-controls-verify`
+  добавлены browser_controls_qemu.py и browser_controls_flow.mjs. Production C,
+  HTML/JS устройства и archived firmware не менялись: F1/ELF91E2/sourceF849/D64.
+  Собственный Chrome155.0.8059.80 получает настоящие страницы и API из отдельной
+  writable QEMU; внешние browser origins запрещены, все данные синтетические.
+- Пройден281UI check (236mutate/45cold),96настоящих UI POST и5storage/source
+  checks. Обе ширины1280×900/390×844, все4темы/5GIF/3даты, три флага,0/100/37%
+  day brightness,3RGB565 colors, night on/off/start18/23/stop12/5/brightness2/99,
+  фото interval3/60 и masks0/1/17/31. Город с trim и ключ проверены в raw ABI;
+  NTP со спецсимволами пережил submit/reload, после restore сохранён pool.ntp.org.
+- После настоящих reload DOM совпадает с отдельными GET API. Cold stage работает
+  в новом процессе ВМ/Chrome и не отправляет POST; все настройки сохраняются.
+  Dirty flag настоящего matching ELF проверяется до и после raw read, чтобы не
+  останавливать ВМ посреди записи. За пределами NVS/raw sector flash, включая
+  photo banks, побайтно прежняя. Все25наблюдаемых inputs совпали. По одному ROM
+  boot на каждый процесс, panic/console warnings/errors/page exceptions нет.
+- Снимки desktop и mobile просмотрены: поля читаемы, горизонтального выхода нет.
+  Новый тест описан в tests/BROWSER_CONTROLS.md; это отдельная частьH03/H04,
+  не замена network/SNTP, display pixels/PWM, crop/upload, physical или H10 gates.
+  В frozen full566/H10 F1 новый harness задним числом не добавляется.
+- Новый H10 F1 работает в small-tv-jpeg-headers. Прежний0592 H10 намеренно
+  остановлен после committed prefix/intent;182complete journal cycles и16pending
+  events сохранены, last periodic report181 не переписан. Полные0592/full561 и
+  F1/full566 продолжаются независимо; все их inputs сохраняются неизменными.
+
+## 2026-10-18 — независимые cold LCD и network-without-LCD gates
+
+- Новый display_boot_observer.py сравнивает весь RGB с реальным factory setup
+  frame, не использует HTTP/SDK role flags/UART для готовности изображения.
+  12unit cases отвергают black/white/wrong-color/partial/stale/truncated кадры,
+  stalled clock и readiness на deadline; source hashes включены в unit report.
+- Эталон из actual immutable factory5321/D64 AP services subtest, visually checked,
+  RGB SHAACC588AB; compressed PPM2207bytes и provenance сохранены в fixtures/display.
+  Весь parent full этим не принимался. Preliminary1+1cold VM pass, затем тот же
+  harness выполнил20+20процессов: все40boot/display/source results pass,62inputs
+  неизменны. Network явно not_run; host HTTP forwarding отключён.
+- Network_without_display_qemu.py создаёт собственный профиль devices=[] с той
+  же сетью и не меняет обычный профиль. Обе неизменённые прошивки прошли настоящий
+  GET и новый SNTP до/после reset при полном отсутствии LCD. QOM подтверждает
+  отсутствие устройства; screenshots/PNG/PPM отсутствуют. NTP1→2,4HTTP200,
+  SDK UTC/wire maxdelta0.191694s; native connected/DHCP10.0.2.15/time_synced и
+  AP false получены из matching ELF. По2ROM boot, no panic,59inputs совпали.
+- Boot/display/network/source integrity остаются отдельными результатами.
+  Это новые самостоятельные software gates частиH01/H02, не physical power,
+  RF/WPA/PWM, доступность Internet, all-theme LCD или24h/H10 acceptance.
+  Production/firmware и входы live full/H10 не менялись; новые тесты не внесены
+  задним числом в frozen run. Сценарии и ограничения описаны отдельными MD.
+
+## 2026-10-18 — повторные F1 browser photo и первоначальная настройка сети
+
+- На той же F1/ELF91E2/D64 завершены два самостоятельных browser gates.
+  Photo:23UI+6storage/source checks,27inputs неизменны; desktop/mobile crop,
+  resize240×240, удаление синтетических metadata через Canvas,12multipart chunks,
+  byte-exact HTTP/raw readback и новый cold process. Оба снимка кадрирования
+  просмотрены; console errors/JavaScript exceptions отсутствуют.
+- Wi-Fi:93UI+18role/storage checks,26inputs неизменны; discovered/literal-manual/
+  manual-entry сценарии, отказ короткого пароля без изменения raw/AP/boot,
+  настоящий DHCP/SNTP и cold persistence. В preflight каждой ветки сохранены
+  ровно две ожидаемые console errors об HTTP400; исключений и прочих ошибок нет.
+  Первоначальная слишком строгая archival-проверка ожидала пустой console и
+  остановилась; после проверки фактических отрицательных сценариев правило
+  исправлено на точное сопоставление этих двух записей. Гостевые тесты не менялись.
+- Все восемь точных VM identities отсутствуют: один PID занят другим процессом,
+  который не останавливался. OS cleanup proof,22photo и45Wi-Fi gzip artifacts
+  сохранены отдельно; hashes оригинальных/распакованных/архивных bytes проверены.
+  Full flash images в публикацию не включены, прежние BC68 proofs не заменены.
+- Результаты проверяют browser/network/storage и не подтверждают LCD pixels,
+  физический RF/WPA/PWM, полный набор или24h/H10. Production/source archive и
+  все frozen full/H10 inputs остались прежними; новых клиентов к H10 нет.
+
+## 2026-10-18 — JPEG DC/AC selectors по каждому компоненту
+
+- В новой sparse рабочей копии `codex/small-tv-jpeg-selectors` от409f4333
+  подтверждена ошибка factory иF1. Factory SOS0x42011eae..0x42011efa разрешает
+  лишь00/11, mcu_load0x42011a9a выводит table ID из component class через snez.
+  T.81 B.2.3/Table B.3 задают независимые DC/AC selectors0/1; mixed/shared/swapped
+  таблицы допустимы. Восстановленный C повторял заводскую ошибку.
+- Новый неизменный before/after RV32 harness:136valid и32invalid. Все136valid
+  fixtures независимо декодированы Pillow12.3.0, каждый RGB pixel128/128/128;
+  три отдельных240×240upload fixtures также проверены Pillow. Before F1 прошла
+  только34/168:4valid и30invalid; два отсутствующих table1 доходили до entropy
+  и очистки LCD. After B50D проходит168/168, validation не рисует, все guards
+  вне8×8 сохранены;8negative evidence controls отвергаются.
+- В jd_prepare/mcu_load стоят FIXED_FACTORY comments с адресами и спецификацией.
+  Packed selectors занимают3tail bytes JDEC,124→128bytes по actual DWARF,
+  offset123 использует бывший padding; все прежние member offsets сохранены.
+  Native mcu_load встроен в jd_decomp: сохранён настоящий before/after листинг;
+  пустая попытка standalone objdump отмечена как отсутствие symbol.
+- Production сборка B50D15A1/ELF85FCCF00/sourceFC337C9B сохранена в development.
+  App1170048bytes (+16), free365952, DEBUGoff/WARN. Из59compiled inputs изменены
+  только tjpgd.c/.h; IDCT/color/output прежние. После уточнения комментария
+  source manifest обновлён повторной incremental сборкой до запуска final gates;
+  первоначальный manifest сохранён отдельно, stale archive не принимался.
+- Прежние107public JPEG/35errors/7placements,41additional inputs/128DHT/133headers,
+  host5531 и6artifact checks pass. Selector child обязателен в parent JPEG inputs,
+  publisher и verifier. В строгом photo schema этих двух consumers также учтены
+  прежние header_fields_rejected/custom_component_ids_published: старый список
+  требовал22ключа, хотя header gate уже выдавал24. Теперь требуются26 с selectors.
+- Один HTTP harness/helpers/D64: F1 отвергает три допустимых selector JPEG400,
+  B50D публикует их200 с точным скачиванием и отвергает оба missing tables400.
+  Все26after checks, cold/immediate-finish/interrupted persistence pass;
+  пять отрицательных мутаций HTTP evidence отвергаются. Before позднее получил
+  отдельный cold-stage start_upload timeout с WSAEventSelect warning QEMU:
+  failure сохранён, причинная связь с JPEG не заявляется.
+- Proof jpeg-selector-correction-20261018.json +42raw gzip, exact synthetic fixture
+  bytes, исходники и logs сохранены. Все собственные HTTP ВМ завершены по OS
+  run paths/identities. Старые F1 full/H10 пять exact identities живы17:59:39UTC;
+  их inputs не менялись, новыхQMP/RSP кH10 нет. Новый полныйB50D и24h/H10
+  ещё обязательны; physical RF/LCD/PWM, CYD и общая приёмка не объявляются pass.
+
+## 2026-10-19 — terminal F1 full и прерванный H10 перед B50D
+
+- Full F1 завершён18октября18:10:03UTC сexit0:19automatic groups pass,
+  hardware_browser_soak not_run. Все566входов повторно совпали. Выполнен
+  неизменённый publisher той же F1: он отвергает24успешных photo checks по
+  старому требованию22. Сохранены failure/exit1, runtime success отдельно;
+  эта ошибка schema уже исправлена в56010f00, новой публикации F1 не заявляем.
+- H10 остановился без terminal footer: supervisor/VM исходные PID отсутствуют,
+  workload/guard PID переиспользованы чужими процессами. По точным creation
+  timestamps подтверждено отсутствие всех четырёх original identities;
+  чужие процессы не остановлены, новыхQMP/RSP клиентов не создавалось.
+- File-only analyzer проверил32inputs и canonical start record:640complete
+  journal cycles,4pending events,10855.929945guest seconds; periodic report639.
+  Start matches, но24h/terminal guard/steady windows не подтверждены. Отсутствие
+  trend flags при insufficient data не означает отсутствия утечки. Причина
+  прерывания неизвестна; stale running JSON сохранены как были.
+- Сохранены72raw gzip, full/subreports/UART/QEMU logs, событийный journal,
+  original freezes/launch/supervisor/guard и отдельные analysis/OS proof.
+  Предыдущий goal turn дал новые доказательства, определяющие следующий шаг:
+  запускать exact последнюю B50D сборку, а не считать старые прогоны её приёмкой.
+
+## 2026-10-19 — область новой JPEG библиотеки и план следующих форматов
+
+- Пользователь уточнил: сейчас требуется наиболее полная подходящая свободная
+  библиотека для обычных `.jpg/.jpeg`, включая progressive/CMYK/разрядности.
+  Исследуются поддерживаемые режимы, лицензия и реальные flash/RAM/stack limits
+  C2. Выбор готовой библиотеки не объявляется автоматическим покрытием T.81.
+- JPEG-LS, JPEG2000, JPEGXL и WebP по прямому запросу сохранены как отложенный
+  план улучшений в WORKING_NOTES. Для каждого нужны version/license review,
+  измерения ресурсов, codec module, independent fixtures/reference pixels,
+  privacy/error handling, HTTP/storage и отдельный display test. WebP alpha и
+  animation имеют отдельные критерии. В текущую реализацию они не добавляются.
+
+## 2026-10-19 — квалификация памяти новой JPEG библиотеки
+
+- В отдельной ветке `codex/small-tv-jpeg-library` от7f26262e подготовлен
+  воспроизводимый host-стенд для libjpeg-turbo3.2.0/c85e6b90. Upstream tree
+  остаётся неизменным; build.py экспортирует точный commit и применяет отдельный
+  patch к копии. Сохранены исходные LICENSE.md/README.ijg, SHA и происхождение.
+- Найдены две устранимые затраты: range-limit table не используется в прямом
+  lossless без quantization/buffered mode; progressive резервирует пять iMCU
+  строк даже при явно отключённом smoothing. Патч оставляет прежний путь для
+  quantized/buffered клиентов. В test allocator используются минимальные
+  virtual windows и hard cap фактических allocations; 5% headroom сам по себе
+  проблему пяти строк не исправил.
+- Итоговый MSVC/Release стенд использует общий static CRT `/MT` для probe и
+  library, поскольку между ними передаются FILE pointers. Сборка не запускает
+  upstream regression. Сохранены и не объявляются успехом промежуточные ошибки:
+  PDB/compiler configuration, недопустимый restart13 для lossless row31 и
+  недостаточный Pillow encoder MAXBLOCK. Исправлены Release try-compile,
+  MCU-row restart62 и host encoder buffer1MiB соответственно.
+- Итоговые25resource cases,924lossless cases (2–16bits,7predictors,point
+  transforms),16truncated inputs,4optional controls и18budget cases прошли.
+  Все successful bytes совпали с upstream; lossless — также с независимой
+  integer sample formula. Ещё18non-flat baseline/progressive RGB/L/CMYK JPEG
+  совпали по каждому byte с Pillow12.3.0/libjpeg-turbo3.1.4.1. Cleanup проверен
+  и на четырёх budget failures после открытия1/3backing files.
+- RGB16 lossless pool755907→29980bytes; color progressive8 укладывается в64KiB
+  pools с host backing. Worst CMYK capacity460800bytes, logical writes2764800,
+  поэтому обычная перезапись tempfile не моделирует NOR erase/wear. 12-bit
+  lossy176345/347927bytes ещё требует адаптации. Общий RAM/stack/RV32 flash,
+  RGB565/factory pixel parity, NOR backend, I/O faults/reuse и production
+  HTTP/display/full/H10 остаются открытыми; текущая прошивка не заменена.
+- Proof `jpeg-library-host-qualification-20261019.json`:13raw artifacts и
+  983fixtures, build/source/executable hashes и полные результаты. Production
+  B50D/85FC, его ресурсы и frozen full/H10 inputs не менялись. На14:33UTC
+  исходные full controller38780 и H10 supervisor22868/workload29172/VM30196/
+  guard40272 подтверждены через ОС; H10 на67циклах, acceptance ещё нет.
+
+## 2026-10-19 — размер и стек JPEG-кандидата на настоящем RV32 toolchain
+
+- Добавлен отдельный link-only стенд `rv32_footprint.py`/`footprint.c`.
+  Экспортируется точный libjpeg-turbo3.2.0/c85e6b90 и bounded patch из b7bfb69c,
+  SDK/production/frozen baseline не меняются. Compiler GCC15.2.0_20251204,
+  RV32IMC/ilp32/soft-float/esp-base/Os, picolibc headers, SIMDoff.
+- После static build и relocatable section GC:144626bytes executable sections,
+  9680allocated read-only,0data/0bss. Независимый binutils size подтверждает
+  сумму154306. Оставлены8/12/16 scanline APIs, arithmetic, progressive и lossless
+  roots, header/start/finish/error paths; jpeg_CreateCompress отсутствует.
+  Список unresolved libc/libgcc symbols сохранён без fake stubs. Это не
+  production firmware size/heap acceptance и не bootable binary.
+- Исправлена атрибуция `.su`: статические одноимённые функции сопоставляются
+  по паре object/function в retained linker map. Quantizer12 fill_inverse_cmap
+  имеет24928byte frame; jpeg_make_d_derived_tbl1376, IDCT16×16 656. Палитровый
+  вывод не нужен RGB565 adapter, но compile profile/call chain/runtime stack
+  пока не проверены; большой linked frame не объявляется реальным переполнением.
+- Подтверждены источники расхода12-bit lossy RAM: range-limit45056bytes,
+  YCC conversion tables65536bytes +pool overhead. Следующий вариант — точные
+  immutable flash lookup tables либо эквивалентные вычисления; оценка должна
+  учитывать полный firmware link и не исключать12-bit из пользовательской задачи.
+- Исходный запуск GCC внутри sandbox получил DLL relocation error; установленный
+  toolchain нормально работает вне этого ограничения. Повторение измерения
+  оправдано уточнением stack attribution и добавлением независимой size-сверки;
+  оба результата/логи сохраняются. Production/frozen full/H10 не перезапускались.
+  На14:49UTC H10 supervisor сообщает112циклов без cleanup errors; это всё ещё
+  running, не24h pass. Полный regression продолжает HTTP-сценарии.
+
+## 2026-10-20 — 12-bit JPEG tables в read-only storage и завершение host-проверки
+
+- Возобновлены изменения после прерывания с855e55507; они сохранены. Добавлены
+  deterministic flash-table generator и отдельные patches:45056range +65536
+  color bytes в static const, IMAGE spare chunks4096/1024 вместо16000/5000.
+  Объекты/alignment/lifetimes/IDCT/color arithmetic не меняются. Реальный private
+  table dump из pinned upstream C подтвердил все38912значения побайтово.
+- Исправлен build helper: mixed patch внутри sparse worktree пропускал new
+  headers; Git discovery теперь останавливается у parent export, enclosing repo
+  отвергается и оба headers обязательны. Неудачные сборки не считаются pass.
+- Прежний reserve оставлял richYCCK12progressive без памяти при cap64KiB;
+  compact pools устранили это. Все48rich images и12truncated cases проходят;
+  максимальный pool64869bytes, cleanup pool/backing завершён. Ещё25resource,
+  924lossless,16negative,4optional,18budget и18independent Pillow cases прошли.
+- Найдено излишне сильное требование теста: optional unlimited smoothingTRUE
+  progressive420 может получить больше small-pool headers. Exact output сохранён,
+  но205325 против204180bytes (+1145). Эта разница записана в raw metrics;
+  FIXED_TEST ограничивает такой control behavior/cleanup, реальные hard cap cases
+  остаются строгими. Два lossless quantization controls отвергнуты обеими libs.
+- RV32 full decoder144394text+120272read-only=264666bytes; пять tables имеют
+  r/R symbols и размер110592bytes, data/bss0. Это не firmware fit: adapter,
+  libc/libgcc/final link, общий heap/task/interrupt stack и NOR scratch ещё нужны.
+  Документированы scope/оставшиеся cases в tests/JPEG_FLASH_TABLES.md.
+- Отдельно проверены прежние B50D full/H10:20Oct все5original identities
+  отсутствуют, host не перезагружался с14Oct. Terminal full/H10 evidence нет,
+  causeunknown. Canonical analyzer проверил32inputs,179complete journal cycles,
+  5pending events и3034.241151guestsec; report178. Никакие stale running flags
+  не объявлены pass. Сохранение baseline proofs выполняется в её собственной ветке.
+
+- После сохранения86raw артефактов в baseline bf3618f2 новый supervised preflight
+  завершил8cycles/4outages,32inputs unchanged, workload/guard exit0, cleanup[]
+  (09:25:55UTC20Oct). Full581input freeze2996eea2 и H10prelaunch08e3366 сохранены
+  до старта. Full controller29928 и H10supervisor22184/workload32636/VM32580/
+  guard18268 подтверждены черезОС09:29UTC, launchers outside callerJob. VM
+  SmallTV-131b35021705. Launch/checkpoint c8e56f932 в baseline branch. Старые
+  каталоги19Oct не переименованы; новые20Oct покаrunning, не acceptance.
+
+## 2026-10-20 — JPEG allocation/I/O failures и reuse после fatal error
+
+- Добавлены отдельные host modules probe_faults и probe_reuse. В7точках считаются
+  настоящие вызовы: allocation, temporary open/read/write/seek, input и output.
+  Short transfers действительно выполняют частичную операцию до fatal error.
+  Heap session сохраняет cleanup state через longjmp. После create failure —
+  destroy/recreate, после остальных errors —abort и повторное использование
+  того же объекта, как требует pinned upstream API.
+- Прошли1227инъекций:346allocation,22open,169read,169write,317seek,40input,
+  164output; ещё36truncated recoveries и12format transitions. Recovery pixels
+  exact upstream.63разовых allocation failures восстановлены pool manager;
+  не требовать ошибку там, где allocator retry штатно успешен.36create failures
+  требуют нового объекта. После abort backing closed; final pool0, cap64KiB.
+  Peak61421/session4096 — отдельные host measurement, не общий heap C2.
+- На новых точных upstream/candidate builds повторены25resource/924lossless/
+  16negative/4optional/18budget и48rich12-bit/12truncated/38912table entries:
+  проходят. Прежние binary proofs не переименовываются. Начальная сборка
+  закончилась до последнего изменения runner C; для acceptance созданы новые
+  v2directories с текущими hashes. Новый gate и raw evidence сохранены отдельно.
+- Production app B50D, frozen ELF/resources/SDK/full/H10 не менялись. На10:05UTC
+  H10 supervisor сообщает100cycles, cleanup[]; terminal acceptance ещё нет.
+  NOR backing/износ, RGB565, final app link и hardware gates остаются открытыми.
+
+## 2026-10-20 — отдельный модуль цветов и RGB5652–16-bit qualification
+
+- RGB888↔RGB565 helpers перенесены из settings.c в app/media/color_convert.c,
+  общий header подключён через settings.h без изменения callers. Pure row API
+  gray/RGB/CMYK2…16бит использует caller buffers, явную CMYK polarity, native
+  samples и display-owned SPI byte order. Проверяются range/size/address wrap/
+  overlap до output writes; нет heap/float/I/O. Gray и8-bit path сокращают работу,
+  black component читается один раз наpixel. CMYK generic, не ICC transform.
+- Literal factory helpers сверены по manifest bytes:65536expand/3304pack,
+  без LCD/format adapters.61host rows/549676samples и141actual RV32 rows exact;
+  65host+68RV32negative cases не меняют buffers, включая32-bit address wrap.
+  66realJPEG,18independent Pillow RGB565 cases pass. RV32 standalone540code+
+  4read-only bytes, frame96, no unresolved stubs. Row API ещё не вызывается app.
+- Полная DEBUGoff сборка C8FD1170032bytes, app partition1536000; ELF368AB7B5,
+  sourceE34BEBEB. Saved development app/bootloader/manifest. СтарыйTJpgd остаётся,
+  новая libjpeg не включена.5531native checks повторены на окончательных sources.
+- Scoped display gate2factory+2native cold processes: full setup pixels exact,
+  62inputs unchanged, network not_run. Отдельный network withoutLCD gate:
+  original/native HTTP и freshSNTP до/послеreset,59inputs unchanged, display
+  not_run. Все свои scoped ВМ закрыты. Первый sandbox display запуск получил
+  QMP startup timeout; original PID9856 отсутствует, failed report сохранён.
+  Retry вне sandbox —новый directory и pass. Причина timeout не установлена.
+- Proof color-conversion-validation-20261020.json сохраняет reports/raw frames,
+  synthetic fixtures и matchingELF. Full/H10 B50D в другом tree не изменены;
+  C8FD не объявляется full/24h/physical accepted. Следующие работы: codec adapter,
+  NOR temporary backing иwear policy, общий heap/stack, privacy/HTTP/LCD/full/soak.
+- Read-only OS checkpoint10:23:31UTC подтверждает все5original B50D full/H10
+  process identities; H10running149cycles/cleanup[], full безterminal footer.
+  Собственных scoped display/network ВМ больше нет. Это checkpoint, не24h pass.
+
+## 2026-10-20 — read-only JPEG scratch/cache layout на4MiB
+
+- Проверены настоящие lengths пяти native animation containers и полные
+  protected upload/weather/status slots. Свободные erase-aligned области:
+  121сектор между app/assets,112в animation tails и29после icon banks. Всего262.
+  Measured backing113+metadata2+пять RGB565 caches145=260, spare2сектора8KiB.
+  Это позволяет проектировать decoding при upload/invalidation, без повторных
+  scratch writes накаждом slideshow pass. Runtime такого cache ещё не написан.
+- Добавлен отдельный read-only planner и contract: manifest/payload hashes,
+  partition ownership, header/frame bounds, FF tails после установления ownership,
+  sparse nonoverlapping allocation. Все1024сектора распределены protected/free.
+ 30unsafe cases/4controls pass, images unchanged. Удлинение animation0на2сектора
+  пересчитывается ивлезает,3сектора —refusal. CLI не заменяет output и не создаёт
+  его при unsafe layout. Первый positive padding test сам пересёк границуphoto;
+  payload guard отказал корректно, FIXED_TEST делает mutation однобайтной.
+- Plan4508149b...51ad9ca6 и raw reports/logs сохранены. Допуск460800относится
+  к measured matrix, не всемуT.81. Нужны NOR backend/RMW/fault/cold recovery,
+  atomic metadata, source/codec/layout keys, immutable resource guards и физические
+  erase counts. C8FD source/firmware, shared SDK и frozen B50D не менялись.
+
+
+## 2026-10-20 — двусторонняя сверка переноса
+
+Просмотрены все16 reference modules и26 app C modules. Явная карта
+reference/correspondence.json:176 factory (120app/56SDK),168native app,
+13TJpgd+116cJSON,11assembly-only codec entries.198direct factory callees
+вне выбранного экспорта перечислены, а не объявлены автоматически перенесёнными.
+Найдены HTTP-404 (Host/root/absolute redirect), CITY-REINIT (updateCity снимает
+factory theme-init latch), HTTP lifetime multi-peer test gap, RESET/DC pulls
+и устаревшая coarse navigation. Подробности reference/BIDIRECTIONAL_AUDIT.md.
+Checker+10tests проверяют пропуски в обоих направлениях/опечатки/stale inputs,
+не доказывают semantic equivalence. В native run добавлен обязательный gate.
+Firmware C8FD пока не менялась. Frozen B50D full завершился exit0 в10:56UTC;
+H10 всё ещё running, никаких новых QMP/RSP к нему не подключали.
+
+
+## 2026-10-20 — terminal B50D full suite
+
+Полный regression B50D/ELF85FCCF/sourceFC337C завершён:19automatic groups
+passed, hardware_browser_soak not_run, controller exit0/terminal_passed
+2026-10-20T10:56:30.2074153Z. Исходный report4.5MB иfooter сохранены без
+изменения байтов (gzip) вqemu/parity/raw/b50d-full-20261020; certificate
+qemu/parity/b50d-full-terminal-20261020.json. Это результат B50D, неC8FD/54F4
+и не24h H10. Frozen tree/snapshot не редактировались. H10 supervisor11:56UTC
+всё ещё running,396cycles,cleanup_errors[]; наблюдение только через его файлы.
+
+
+## 2026-10-20 — исправлен найденный HTTP-404
+
+Factory0x4200d4be: AP Host/нетHost ->root200, foreignHost ->absoluteAP302.
+Наш unconditional relative redirect исправлен; factory substring bug с именем
+192.168.43.1.example.invalid подтверждён в реальной factory VM и исправлен.
+STA сохраняет local redirect, поскольку setup AP там не активна. Два старых
+теста закрепляли неверное поведение, исправлены с FIXED_TEST. Новый тест
+до изменения кода падает; после —5608native checks и10audit controls pass.
+Новый network-only captive_qemu.py:factoryAP/nativeAP/nativeSTA,15HTTP cases,
+59inputs unchanged, noLCD/noRSP, all3owned VMs stopped. Proof+before/failure/
+after logs+matchingELF: qemu/parity/captive-portal-validation-20261020.json.
+Production archive:app54f441af...,1170240bytes/free365760; ELF83ed2a7a...,
+source9c16c56a...; DEBUGoff, oldTJpgd, libjpeg notlinked. Physical board,
+full suite и24h новой54F4 не запускались. B50D full/H10 ей не приписывать.
+Карта refreshed только для повторно просмотренного server.c; source-only
+coverage не превращается вsemantic proof. Далее CITY-REINIT, AP multi-peer
+HTTP lifetime и RESET/DC pulls; остальные оговорки вBIDIRECTIONAL_AUDIT.md.
+
+Archive integrity:6tests pass; image checksums/partition MD5/current compiled sources/media/34routes/original dump unchanged. Report preserved with captive proof.

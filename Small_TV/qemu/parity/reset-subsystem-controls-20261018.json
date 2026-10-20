@@ -1,0 +1,85 @@
+{
+  "status": "independent_subsystem_controls_passed",
+  "passed": true,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T15:53:48.398607+00:00",
+  "implementation_commit": "3563b1adc7bd4626fe49f6bd6abade78fad0ae56",
+  "qemu_evidence_commit": "9654883868",
+  "qemu_evidence": {
+    "url": "https://github.com/Witali/QEMU-ESP32/blob/9654883868/tests/results/reset-display-20261018/summary.json",
+    "git_lf_sha256": "9a38044ce5397035b9729c0edbbaaa245890bee51191f6f84279ceb2cc89de30",
+    "raw_files": 126
+  },
+  "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+  "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+  "native_trials": [
+    {
+      "number": 0,
+      "firmware": "original",
+      "passed": true,
+      "subsystem_verdicts": {
+        "boot": true,
+        "display": true,
+        "network": true,
+        "source_integrity": true
+      },
+      "display_polls": 1
+    },
+    {
+      "number": 1,
+      "firmware": "reconstructed",
+      "passed": true,
+      "subsystem_verdicts": {
+        "boot": true,
+        "display": true,
+        "network": true,
+        "source_integrity": true
+      },
+      "display_polls": 1
+    },
+    {
+      "number": 2,
+      "firmware": "reconstructed",
+      "passed": true,
+      "subsystem_verdicts": {
+        "boot": true,
+        "display": true,
+        "network": true,
+        "source_integrity": true
+      },
+      "display_polls": 1
+    },
+    {
+      "number": 3,
+      "firmware": "reconstructed",
+      "passed": true,
+      "subsystem_verdicts": {
+        "boot": true,
+        "display": true,
+        "network": true,
+        "source_integrity": true
+      },
+      "display_polls": 1
+    }
+  ],
+  "network_outage_control": {
+    "passed": true,
+    "subsystem_verdicts": {
+      "boot": true,
+      "display": true,
+      "network": false,
+      "source_integrity": true
+    },
+    "explanation": "The actual virtual AP was disabled immediately after reset through its public QOM property. The guest code/RAM and all observers were unchanged. The firmware test correctly failed the network while independently passing boot/display."
+  },
+  "unit_results": {
+    "network_elf": 19,
+    "display": 9,
+    "isolation": 3,
+    "report_consumers": 8,
+    "full_consumer_rejections": 38
+  },
+  "failed_old_full": "hostfwd-final-checkpoint-20261018.json",
+  "new_full_start": "reset-display-full-start-20261018.json",
+  "scope": "Independent boot/network/display smoke checks and exact native controls; new full557 is running, H10 and CYD remain open."
+}

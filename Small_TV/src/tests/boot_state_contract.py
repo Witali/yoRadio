@@ -1,6 +1,7 @@
 """Require linked-ELF guest readiness instead of optional UART INFO messages."""
 import copy
 import math
+import re
 
 SIZES = {'connected': 1, 'ap_active': 1, 'last_station_address': 4, 'time_synced': 1,
          's_microseconds_offset': 8, 's_correction_us': 8}
@@ -9,6 +10,7 @@ CHECKS = ('application_runtime_ready', 'rom_and_bootloader', 'wifi_associated',
           'reset_reboots', 'no_panic_or_watchdog', 'no_panic_after_reset',
           'lcd_has_content', 'animation_updates', 'ntp_reply_sent', 'guest_clock_set_by_sntp',
           'clock_recovered_after_reset', 'source_flash_unchanged', 'source_artifacts_unchanged')
+CHECKS += ('display_ready_after_reset', 'network_recovered_after_reset')
 REJECTIONS = ('missing_units', 'failed_units', 'omitted_units', 'wrong_unit_source',
               'wrong_converter', 'wrong_vm_helper', 'wrong_elf', 'missing_observation',
               'disconnected', 'reset_not_synced', 'reset_wrong_dhcp', 'station_is_ap',
@@ -17,12 +19,67 @@ REJECTIONS = ('missing_units', 'failed_units', 'omitted_units', 'wrong_unit_sour
               'coarse_ntp_only', 'missing_ntp', 'wrong_ntp_base', 'wrong_ntp_expectation',
               'reset_missing_ntp', 'reset_wrong_ntp_base', 'reset_old_ntp_reply',
               'wrong_sdk_clock_layout', 'wrong_clock_object_size', 'wrong_sdk_offset')
+REJECTIONS += ('missing_display_unit', 'wrong_display_helper', 'missing_display_observation',
+               'blank_reset_display', 'late_reset_display', 'wrong_final_frame',
+               'missing_display_check', 'mixed_subsystem_decision', 'no_new_rom_boot')
 
 
 def require(value, message):
     """Keep rejection active with Python optimization enabled."""
     if not value:
         raise ValueError(message)
+
+
+def validate_reset_display(boot):
+    """Require bounded panel evidence, independently of DHCP/SNTP and ROM banners."""
+    observation = boot.get('reset_display_observation', {})
+    require(observation.get('passed') is True and
+            observation.get('method') == 'bounded_post_reset_framebuffer', 'Missing reset panel observation')
+    require(type(observation.get('nonzero_bytes')) is int and
+            1000 < observation['nonzero_bytes'] <= 240 * 240 * 3, 'Reset panel is blank/incomplete')
+    samples = observation.get('samples', [])
+    require(type(observation.get('polls')) is int and observation['polls'] == len(samples) > 0,
+            'Missing reset panel samples')
+    for key, maximum in (('host', 30), ('guest', 5)):
+        elapsed, deadline = observation.get(key + '_seconds'), observation.get(key + '_timeout')
+        require(type(elapsed) in (int, float) and type(deadline) in (int, float) and
+                math.isfinite(elapsed) and math.isfinite(deadline) and
+                0 <= elapsed < deadline <= maximum, 'Late reset display: ' + key)
+    require(re.fullmatch('[0-9a-f]{64}', observation.get('frame_sha256', '')) is not None,
+            'Missing reset frame identity')
+    for key in ('host_seconds', 'guest_seconds', 'nonzero_bytes', 'frame_sha256'):
+        require(samples[-1].get(key) == observation[key], 'Final reset frame mismatch')
+    groups = boot.get('checks_by_subsystem', {})
+    display = groups.get('display', {})
+    require(display.get('passed') is True and
+            display.get('checks', {}).get('display_ready_after_reset') is True,
+            'Missing independent display decision')
+    require(not any(key in display['checks'] for key in
+                    ('station_dhcp', 'wifi_associated', 'sntp_notification_received', 'network_recovered_after_reset')),
+            'Network flags entered display acceptance')
+    return True
+
+
+def validate_reset_network(boot):
+    """Consume network readiness without accepting display pixels as network proof."""
+    network = boot.get('checks_by_subsystem', {}).get('network', {})
+    require(network.get('passed') is True and
+            network.get('checks', {}).get('network_recovered_after_reset') is True,
+            'Missing independent network decision')
+    require(not any(key in network['checks'] for key in
+                    ('lcd_240x240', 'lcd_has_content', 'animation_updates', 'display_ready_after_reset')),
+            'Display pixels entered network acceptance')
+    return True
+
+
+def validate_reset_boot(boot):
+    """Consume the new ROM boot count independently of network and panel state."""
+    rom = boot.get('boot_observation', {})
+    require(type(rom.get('rom_boots_before_reset')) is int and
+            type(rom.get('rom_boots_after_reset')) is int and
+            rom['rom_boots_after_reset'] > rom['rom_boots_before_reset'] >= 1,
+            'Reset did not produce a new ROM boot')
+    return True
 
 
 def validate_ntp_observation(boot, name):
@@ -60,6 +117,18 @@ def validate_boot_state(qemu, expected):
             unit.get('converter_sha256') == helpers.get('esp_elf.py') and
             unit.get('vm_helper_sha256') == helpers.get('small_tv_vm.py'), 'Boot observer source mismatch')
     boot = qemu['boot_reset']['reconstructed']
+    display_unit = qemu.get('display_observer_unit', {})
+    require(display_unit.get('passed') is True and display_unit.get('display_tests', 0) >= 9 and
+            display_unit.get('isolation_tests', 0) >= 3 and
+            display_unit.get('source_sha256') == qemu.get('display_observer_test_sha256') and
+            display_unit.get('display_helper_sha256') == helpers.get('small_tv_display.py') and
+            display_unit.get('vm_helper_sha256') == helpers.get('small_tv_vm.py'),
+            'Missing independent display/isolation unit controls')
+    validate_reset_display(boot)
+    validate_reset_display(qemu['boot_reset']['original'])
+    for row in qemu['boot_reset'].values():
+        validate_reset_network(row)
+        validate_reset_boot(row)
     require(boot.get('passed') is True and boot['qemu_sha256'] == qemu['qemu_sha256'] and
             boot['firmware'] == 'reconstructed', 'Boot used a different VM or did not pass')
     image = next(row for row in boot['prepared']['sources']['images'] if row['file'] == 'app.bin')
@@ -129,6 +198,15 @@ def rejection_checks(qemu, expected):
         'wrong_sdk_clock_layout': (base + ('clock_layout',), {}),
         'wrong_clock_object_size': (observation + ('layout', 'symbols', 's_correction_us', 'size'), 4),
         'wrong_sdk_offset': (base + ('ntp_observation', 'system_correction_us'), 0),
+        'missing_display_unit': (('display_observer_unit',), {}),
+        'wrong_display_helper': (('display_observer_unit', 'display_helper_sha256'), 'bad'),
+        'missing_display_observation': (base + ('reset_display_observation',), {}),
+        'blank_reset_display': (base + ('reset_display_observation', 'nonzero_bytes'), 0),
+        'late_reset_display': (base + ('reset_display_observation', 'guest_seconds'), 5),
+        'wrong_final_frame': (base + ('reset_display_observation', 'frame_sha256'), '0' * 64),
+        'missing_display_check': (base + ('checks', 'display_ready_after_reset'), False),
+        'mixed_subsystem_decision': (base + ('checks_by_subsystem', 'network', 'checks', 'display_ready_after_reset'), True),
+        'no_new_rom_boot': (base + ('boot_observation', 'rom_boots_after_reset'), 1),
     }
     require(set(mutations) == set(REJECTIONS), 'Boot rejection controls changed unexpectedly')
     passed = {}

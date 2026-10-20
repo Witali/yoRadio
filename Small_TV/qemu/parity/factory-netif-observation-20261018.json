@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "status": "observed_factory_roles",
+  "scope": "Two immutable factory boots with real HTTP: STA and setup AP with retained synthetic SDK credentials. Read-only SDK netif SLIST observation, no injected calls or RAM/register writes.",
+  "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+  "factory_full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+  "factory_netif_list_address": "0x3fcc3c0c",
+  "if_key_field_offset": 92,
+  "instruction_chain": [
+    "0x42036770",
+    "0x420352ee",
+    "0x42034e32",
+    "0x42036f98"
+  ],
+  "cases": {
+    "station": {
+      "ready": {
+        "guest_seconds": 3.290693,
+        "rom_boots": 1,
+        "mode_ram": 1,
+        "mode_raw": 1,
+        "connected": true,
+        "ap_active": false,
+        "factory_station_state": 2,
+        "factory_apsta_got_ip_event": null
+      },
+      "netifs": [
+        {
+          "key": "WIFI_STA_DEF",
+          "object": "0x3fcc791c"
+        }
+      ],
+      "http_status": 200,
+      "expected_page": true,
+      "expected_netif_only": true,
+      "code_media_unchanged": true,
+      "uart_clean": true
+    },
+    "setup_with_driver_credentials": {
+      "ready": {
+        "guest_seconds": 5.760062,
+        "rom_boots": 1,
+        "mode_ram": 2,
+        "mode_raw": 2,
+        "connected": false,
+        "ap_active": true,
+        "factory_station_state": 5,
+        "factory_apsta_got_ip_event": false
+      },
+      "netifs": [
+        {
+          "key": "WIFI_AP_DEF",
+          "object": "0x3fcd0bc8"
+        }
+      ],
+      "http_status": 200,
+      "expected_page": true,
+      "expected_netif_only": true,
+      "code_media_unchanged": true,
+      "uart_clean": true
+    }
+  },
+  "retained_driver_credentials": {
+    "nvs_sha256": "0a703ef5b66c725c01f1d9718a97eff2b7a80c2a6e113daf92645477b87b53d6",
+    "matches": [
+      {
+        "namespace": "nvs.net80211",
+        "key": "sta.ssid",
+        "type": "blob_data",
+        "header_crc_matches": true,
+        "data_crc_matches": true,
+        "contains_expected_synthetic_ssid": true
+      },
+      {
+        "namespace": "nvs.net80211",
+        "key": "sta.apinfo",
+        "type": "blob_data",
+        "header_crc_matches": true,
+        "data_crc_matches": true,
+        "contains_expected_synthetic_ssid": true
+      }
+    ],
+    "source": "public synthetic missing-AP VM only; no owner NVS read"
+  },
+  "synthetic_fixture_flash_sha256": "28cc3540cbb5bd2624ea881440fc6b21b6f2194bafcd7dbb313a010d9bb58dcc",
+  "probe_source_sha256": "e7972ceddc64276e6a0049583fd144ff3e8d0000569bd5cb66f2da4e0c984fcd",
+  "sdk_primary_source_sha256": {
+    "components/esp_netif/esp_netif_objects.c": "905c581872c1fb91bb256d55a715cecf2dd453858bc9ce338a32a90cadab3197",
+    "components/esp_wifi/src/wifi_default.c": "76b056c2034829ce249f6de39f43b6a3b17aa527f040ab5acea7dba45e9b7269",
+    "components/esp_wifi/include/esp_wifi.h": "44fb3de85791876cd32ee60036b3b2272d25f89eb907eba6c3d44286de908217",
+    "components/nvs_flash/nvs_partition_tool/nvs_parser.py": "5ddcdc83615194f5539ac88628b2bb9f67a7a34360a514dfa5c6562663ccd1e4"
+  },
+  "raw_report": {
+    "file": "factory-netif-observation-20261018-raw.json.gz",
+    "uncompressed_sha256": "53f8cde1e558b4bcb3baf879133c85dc34e955033172bb74b6421d832036299a"
+  },
+  "limitations": [
+    "Characterization only; not a complete Small TV parity gate or a native allocation comparison.",
+    "The current scratch probe is under ignored .build; promote it to a reusable test after the frozen full regression ends.",
+    "Factory APSTA still calls esp_wifi_connect. No STA netif exists in this initialization path, so this does not establish a usable STA IP/DHCP feature.",
+    "No claim about real RF association, power use or SDK internals beyond the observed API objects."
+  ]
+}

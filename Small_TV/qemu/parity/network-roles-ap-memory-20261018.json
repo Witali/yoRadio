@@ -1,0 +1,156 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Matched native AP setup workloads: four real HTTP scans and four setup-page requests, nine read-only heap/task snapshots at vTaskDelay, exact ROM counter crosschecks. Short resource measurement, not H10, leak-freedom, latency, physical RF or complete factory parity.",
+  "before": {
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+    "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+    "rom_counter_checks": 36,
+    "uart_independent": {
+      "passed": true,
+      "bytes": 536,
+      "rom_boots": 1,
+      "errors": []
+    }
+  },
+  "after": {
+    "app_sha256": "26c6ca74940dbfa5f27b67a308515a2901bcdab2968e2a45954055b59cbe1234",
+    "native_elf_sha256": "fe9be9577dd82294b86710e61e25f5d1f54f92d4bf78dce8b3d578e9fc34adc9",
+    "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+    "rom_counter_checks": 36,
+    "uart_independent": {
+      "passed": true,
+      "bytes": 536,
+      "rom_boots": 1,
+      "errors": []
+    }
+  },
+  "inputs_verified": {
+    "before": 24,
+    "after": 24
+  },
+  "task_count_before": 12,
+  "task_count_after": 11,
+  "removed_task": "wifi_fallback",
+  "ready_gain_bytes": 2676,
+  "median_paired_phase_gain_bytes": 2672,
+  "difference_of_median_free_bytes": 2660,
+  "phase_gain_range_bytes": [
+    2332,
+    4596
+  ],
+  "phase_observations": [
+    {
+      "label": "ready",
+      "before_free_bytes": 83928,
+      "after_free_bytes": 86604,
+      "gain_bytes": 2676,
+      "before_guest_seconds": 30.053843,
+      "after_guest_seconds": 30.045383
+    },
+    {
+      "label": "scan-0",
+      "before_free_bytes": 83804,
+      "after_free_bytes": 86460,
+      "gain_bytes": 2656,
+      "before_guest_seconds": 33.155477,
+      "after_guest_seconds": 33.145202
+    },
+    {
+      "label": "http-0",
+      "before_free_bytes": 83804,
+      "after_free_bytes": 86464,
+      "gain_bytes": 2660,
+      "before_guest_seconds": 33.454533,
+      "after_guest_seconds": 33.444034
+    },
+    {
+      "label": "scan-1",
+      "before_free_bytes": 83804,
+      "after_free_bytes": 86476,
+      "gain_bytes": 2672,
+      "before_guest_seconds": 36.554659,
+      "after_guest_seconds": 36.544082
+    },
+    {
+      "label": "http-1",
+      "before_free_bytes": 81868,
+      "after_free_bytes": 86464,
+      "gain_bytes": 4596,
+      "before_guest_seconds": 36.75381,
+      "after_guest_seconds": 36.844204
+    },
+    {
+      "label": "scan-2",
+      "before_free_bytes": 83804,
+      "after_free_bytes": 86464,
+      "gain_bytes": 2660,
+      "before_guest_seconds": 39.854309,
+      "after_guest_seconds": 39.94435
+    },
+    {
+      "label": "http-2",
+      "before_free_bytes": 81868,
+      "after_free_bytes": 86464,
+      "gain_bytes": 4596,
+      "before_guest_seconds": 40.065444,
+      "after_guest_seconds": 40.244405
+    },
+    {
+      "label": "scan-3",
+      "before_free_bytes": 83476,
+      "after_free_bytes": 86464,
+      "gain_bytes": 2988,
+      "before_guest_seconds": 43.154318,
+      "after_guest_seconds": 43.350172
+    },
+    {
+      "label": "http-3",
+      "before_free_bytes": 83804,
+      "after_free_bytes": 86136,
+      "gain_bytes": 2332,
+      "before_guest_seconds": 43.453879,
+      "after_guest_seconds": 43.637748
+    }
+  ],
+  "limitations": [
+    "The HTTP server may retain response buffers briefly after the host has received a response; paired phases are not identical allocator instruction states.",
+    "UART guard excludes panic/restart errors; expected RF-calibration and startup client-close warnings remain in the raw log.",
+    "The archived one-off probe uses this workspace SDK/QEMU/test paths; no reusable firmware behavior gate is claimed for it."
+  ],
+  "raw": [
+    {
+      "file": "network-roles-ap-memory-before-20261018.json.gz",
+      "source": "C:\\Work\\yoRadio\\.build\\netif-roles-ap-memory-before-20261018\\report.json",
+      "sha256": "2172262a95d7fbce90732e47484e6fc0861d3a0b675b9c89a1c73313f081d1cb",
+      "gzip_sha256": "fcb0011f526fdddb5e2e961da70b43698ff842e8fd7a73535b56f6de8e4a1019"
+    },
+    {
+      "file": "network-roles-ap-memory-after-20261018.json.gz",
+      "source": "C:\\Work\\yoRadio\\.build\\netif-roles-ap-memory-after-20261018\\report.json",
+      "sha256": "48627d3f829ecfa60d043cab843bcfbc001db14350a8d88bb6e3850cd652a12c",
+      "gzip_sha256": "3e6d30f2453946dae81bd1b6fc54874abecc65492391f1accc30986c5d7963eb"
+    }
+  ],
+  "uart_captures": [
+    {
+      "file": "network-roles-ap-memory-before-20261018.uart.gz",
+      "source": "C:\\Work\\yoRadio\\.build\\netif-roles-ap-memory-before-20261018\\vm\\uart.log",
+      "sha256": "b049d1556271dfe2d0ec89dfbdd9591f6bbf62399337067ef7aa242553193b47",
+      "gzip_sha256": "75d5f475e1047980b559f17a4b1535a69050796627f3a5f8b2a0a9ce4d0cc607"
+    },
+    {
+      "file": "network-roles-ap-memory-after-20261018.uart.gz",
+      "source": "C:\\Work\\yoRadio\\.build\\netif-roles-ap-memory-after-20261018\\vm\\uart.log",
+      "sha256": "83250257de393165b03d18bab059eb82bc51596c3fa33927c713ccace9f1223d",
+      "gzip_sha256": "3a646dd67943286531ad248f01ce27c8fb982203acf7d4892c1fbafbc2dbcfab"
+    }
+  ],
+  "probe": {
+    "file": "network-roles-ap-memory-probe-20261018.py.gz",
+    "source": "C:\\Work\\yoRadio\\.build\\probe_small_tv_ap_memory_20261018.py",
+    "sha256": "2d171e5fd16788de42100439757655d84c776bfaf14f2d7321122e85a02fff31",
+    "gzip_sha256": "f355a8ce5cb34229a8a4b07f87aaa11b93342b6d12d7a6e1d5bdf506f9732754"
+  }
+}

@@ -1,0 +1,376 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "saved_utc": "2026-10-18T12:53:21.211714+00:00",
+  "tested_utc": "2026-10-18T12:50:41.286546+00:00",
+  "scope": "Real Chrome390x844, guest scan/configure, open synthetic AP, invalid password, manual/cancel/SSID collision, AP->STA, UDP SNTP and cold persistence. No WPA handshake, physical RF, desktop coverage or factory browser parity claim.",
+  "app_sha256": "bc68d3460332878b26226a41b74b0cae16376fbf6f41c7d8a98198af5514c393",
+  "native_elf_sha256": "4fde010e5bf09466e6822687199313bd47221f99681db57964a8654b0b9fc2b8",
+  "source_sha256": "5586ef6103e4c2647c09ed342d0adadb166509991e024b7edca3dda60108bc25",
+  "qemu_sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e",
+  "browser_version": "155.0.8059.80",
+  "browser_checks": 93,
+  "storage_checks": 18,
+  "input_count": 25,
+  "stages": {
+    "discovered": {
+      "stages": {
+        "setup": {
+          "name": "SmallTV-96cf8b39cc30",
+          "pid": 32952,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          },
+          "role": {
+            "connected": true,
+            "ap_active": false,
+            "station_address": "192.168.43.15",
+            "time_synced": true
+          },
+          "ntp_reply": {
+            "count": 1,
+            "unix_seconds": 1792324800,
+            "virtual_us": 14383345
+          },
+          "sdk_clock": {
+            "method": "model_response_timestamp",
+            "response_count": 1,
+            "server_epoch": 1792324800,
+            "sent_virtual_us": 14383345,
+            "boot_time_us": 1792324784538743,
+            "virtual_us": 15233340,
+            "systimer_ticks": 158409047,
+            "rtc_hrt_offset_us": 11376521,
+            "system_correction_us": -10314400,
+            "since_boot_us": 16293760,
+            "actual_utc_seconds": 1792324800.832503,
+            "expected_utc_seconds": 1792324800.849995,
+            "difference_seconds": -0.017491817474365234
+          },
+          "legacy_clock_estimate": 1792324799.775755,
+          "rom_boots": 2
+        },
+        "cold": {
+          "name": "SmallTV-ae4708f1c6df",
+          "pid": 12164,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          },
+          "role": {
+            "connected": true,
+            "ap_active": false,
+            "station_address": "192.168.43.15",
+            "time_synced": true
+          },
+          "ntp_reply": {
+            "count": 1,
+            "unix_seconds": 1792324800,
+            "virtual_us": 3005703
+          },
+          "sdk_clock": {
+            "method": "model_response_timestamp",
+            "response_count": 1,
+            "server_epoch": 1792324800,
+            "sent_virtual_us": 3005703,
+            "boot_time_us": 1792324796961350,
+            "virtual_us": 5703620,
+            "systimer_ticks": 59314224,
+            "rtc_hrt_offset_us": 69376,
+            "system_correction_us": -62895,
+            "since_boot_us": 5709771,
+            "actual_utc_seconds": 1792324802.671121,
+            "expected_utc_seconds": 1792324802.697917,
+            "difference_seconds": -0.02679610252380371
+          },
+          "legacy_clock_estimate": 1792324802.674969,
+          "rom_boots": 1
+        }
+      },
+      "checks": {
+        "invalid_preserves_raw_role_and_boot": true,
+        "setup_raw_credentials_and_mode": true,
+        "setup_actual_station_dhcp_sntp": true,
+        "cold_raw_credentials_and_mode": true,
+        "cold_actual_station_dhcp_sntp": true,
+        "protected_flash_unchanged": true
+      },
+      "browser_checks": 31
+    },
+    "literal-manual": {
+      "stages": {
+        "setup": {
+          "name": "SmallTV-2ca55574a1b6",
+          "pid": 10956,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          },
+          "role": {
+            "connected": true,
+            "ap_active": false,
+            "station_address": "192.168.43.15",
+            "time_synced": true
+          },
+          "ntp_reply": {
+            "count": 1,
+            "unix_seconds": 1792324800,
+            "virtual_us": 17284628
+          },
+          "sdk_clock": {
+            "method": "model_response_timestamp",
+            "response_count": 1,
+            "server_epoch": 1792324800,
+            "sent_virtual_us": 17284628,
+            "boot_time_us": 1792324781638146,
+            "virtual_us": 17368333,
+            "systimer_ticks": 180624435,
+            "rtc_hrt_offset_us": 11322984,
+            "system_correction_us": -10265869,
+            "since_boot_us": 18424849,
+            "actual_utc_seconds": 1792324800.062995,
+            "expected_utc_seconds": 1792324800.083705,
+            "difference_seconds": -0.020709991455078125
+          },
+          "legacy_clock_estimate": 1792324799.0075269,
+          "rom_boots": 2
+        },
+        "cold": {
+          "name": "SmallTV-b257f0f5bc9c",
+          "pid": 33476,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          },
+          "role": {
+            "connected": true,
+            "ap_active": false,
+            "station_address": "192.168.43.15",
+            "time_synced": true
+          },
+          "ntp_reply": {
+            "count": 1,
+            "unix_seconds": 1792324800,
+            "virtual_us": 6570456
+          },
+          "sdk_clock": {
+            "method": "model_response_timestamp",
+            "response_count": 1,
+            "server_epoch": 1792324800,
+            "sent_virtual_us": 6570456,
+            "boot_time_us": 1792324793398678,
+            "virtual_us": 6637370,
+            "systimer_ticks": 69007988,
+            "rtc_hrt_offset_us": 69414,
+            "system_correction_us": -62930,
+            "since_boot_us": 6641867,
+            "actual_utc_seconds": 1792324800.040545,
+            "expected_utc_seconds": 1792324800.066914,
+            "difference_seconds": -0.026369094848632812
+          },
+          "legacy_clock_estimate": 1792324800.0376492,
+          "rom_boots": 1
+        }
+      },
+      "checks": {
+        "invalid_preserves_raw_role_and_boot": true,
+        "setup_raw_credentials_and_mode": true,
+        "setup_actual_station_dhcp_sntp": true,
+        "cold_raw_credentials_and_mode": true,
+        "cold_actual_station_dhcp_sntp": true,
+        "protected_flash_unchanged": true
+      },
+      "browser_checks": 31
+    },
+    "manual-entry": {
+      "stages": {
+        "setup": {
+          "name": "SmallTV-b87844da5397",
+          "pid": 31208,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          },
+          "role": {
+            "connected": true,
+            "ap_active": false,
+            "station_address": "192.168.43.15",
+            "time_synced": true
+          },
+          "ntp_reply": {
+            "count": 1,
+            "unix_seconds": 1792324800,
+            "virtual_us": 13259622
+          },
+          "sdk_clock": {
+            "method": "model_response_timestamp",
+            "response_count": 1,
+            "server_epoch": 1792324800,
+            "sent_virtual_us": 13259622,
+            "boot_time_us": 1792324785658483,
+            "virtual_us": 15012753,
+            "systimer_ticks": 156126458,
+            "rtc_hrt_offset_us": 11399035,
+            "system_correction_us": -10334821,
+            "since_boot_us": 16076373,
+            "actual_utc_seconds": 1792324801.734856,
+            "expected_utc_seconds": 1792324801.753131,
+            "difference_seconds": -0.018275022506713867
+          },
+          "legacy_clock_estimate": 1792324800.677382,
+          "rom_boots": 2
+        },
+        "cold": {
+          "name": "SmallTV-51b98d979ef3",
+          "pid": 18968,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          },
+          "role": {
+            "connected": true,
+            "ap_active": false,
+            "station_address": "192.168.43.15",
+            "time_synced": true
+          },
+          "ntp_reply": {
+            "count": 1,
+            "unix_seconds": 1792324800,
+            "virtual_us": 3592270
+          },
+          "sdk_clock": {
+            "method": "model_response_timestamp",
+            "response_count": 1,
+            "server_epoch": 1792324800,
+            "sent_virtual_us": 3592270,
+            "boot_time_us": 1792324796381774,
+            "virtual_us": 5836484,
+            "systimer_ticks": 60696083,
+            "rtc_hrt_offset_us": 69428,
+            "system_correction_us": -62941,
+            "since_boot_us": 5842648,
+            "actual_utc_seconds": 1792324802.224422,
+            "expected_utc_seconds": 1792324802.244214,
+            "difference_seconds": -0.01979207992553711
+          },
+          "legacy_clock_estimate": 1792324802.2294428,
+          "rom_boots": 1
+        }
+      },
+      "checks": {
+        "invalid_preserves_raw_role_and_boot": true,
+        "setup_raw_credentials_and_mode": true,
+        "setup_actual_station_dhcp_sntp": true,
+        "cold_raw_credentials_and_mode": true,
+        "cold_actual_station_dhcp_sntp": true,
+        "protected_flash_unchanged": true
+      },
+      "browser_checks": 31
+    }
+  },
+  "cleanup": {
+    "checked_utc": "2026-10-18T12:53:20.1726207Z",
+    "pids_checked": [
+      32952,
+      12164,
+      10956,
+      33476,
+      31208,
+      18968
+    ],
+    "remaining": [],
+    "all_six_vm_pids_absent": true
+  },
+  "raw": [
+    {
+      "file": "browser-wifi-report-20261018.json.gz",
+      "sha256": "23c17eeec1bf169adf3a5707e10b2361366b530c27570710598a22dd8592d417",
+      "uncompressed_sha256": "1e066090df8c77f15b74a91bc07ee3bc0693f9b1237412307015a1f1ffa5d117",
+      "kind": "terminal_positive_report"
+    },
+    {
+      "file": "browser-wifi-cleanup-20261018.json.gz",
+      "sha256": "af72007113c9f72d568f73678939afc7bf08939368d00da6900d3029621c33b4",
+      "uncompressed_sha256": "0a1299c5aaceb1db90f467dbb75010944ddafdb2e3f3ee0960fde909bfea9949",
+      "kind": "authoritative_process_cleanup"
+    },
+    {
+      "file": "browser-wifi-discovered-uart-setup-20261018.log.gz",
+      "sha256": "d1b67c079ae77e5c12853e3d0ca5ee15680c6b99035a6afc67b6f291988a302e",
+      "kind": "guest_uart"
+    },
+    {
+      "file": "browser-wifi-discovered-uart-cold-20261018.log.gz",
+      "sha256": "6f98a8a67809823681716cf14e10a3f42f76a6edf399ab407c504ca3f2a6867f",
+      "kind": "guest_uart"
+    },
+    {
+      "file": "browser-wifi-discovered-20261018.json.gz",
+      "sha256": "63d1f21422c239f5babe85cbdb43969d5fa62b869604115db61c466f71089aac",
+      "uncompressed_sha256": "4b76d196b6fed6994411272dc32906100660131699f6f034b773d90813da73df",
+      "kind": "positive_browser_stages_and_profile"
+    },
+    {
+      "file": "browser-wifi-literal-manual-uart-setup-20261018.log.gz",
+      "sha256": "dca3e474febd2e1f2edcce73b8c2a7f0c91e27736a2948256c1ddb769e9289ea",
+      "kind": "guest_uart"
+    },
+    {
+      "file": "browser-wifi-literal-manual-uart-cold-20261018.log.gz",
+      "sha256": "5858e238c445bb2796b5b05c415b0af31da87225e40065a05a6eb366f571205f",
+      "kind": "guest_uart"
+    },
+    {
+      "file": "browser-wifi-literal-manual-20261018.json.gz",
+      "sha256": "535664b2f69bc9621a11591c54be622c2b298f128d3b4d2f9977ac019a655498",
+      "uncompressed_sha256": "3195e15d8e3bad33da2d4c9461fc1863fd2838ff35869383f930ab044673d2c9",
+      "kind": "positive_browser_stages_and_profile"
+    },
+    {
+      "file": "browser-wifi-manual-entry-uart-setup-20261018.log.gz",
+      "sha256": "9ba45dcc4bd6933a5b21f6c52475274a685bc79fdbfb326d49313b8b7211d852",
+      "kind": "guest_uart"
+    },
+    {
+      "file": "browser-wifi-manual-entry-uart-cold-20261018.log.gz",
+      "sha256": "4a0b3ec5cf0f2f3ef3f1fca13db62a9a8b0c2cb864e1fe360fd013f789cf9db9",
+      "kind": "guest_uart"
+    },
+    {
+      "file": "browser-wifi-manual-entry-20261018.json.gz",
+      "sha256": "3b2b97180e115c4d10ea1b64c656a07f8e9bc053adfa436a03217c24a5c02529",
+      "uncompressed_sha256": "35a09a6d402a0eafa0e1e7b40268c3fc2fb36e74548487dedd8ac44e7b122778",
+      "kind": "positive_browser_stages_and_profile"
+    },
+    {
+      "file": "browser-wifi-harness-selector-failure-20261018.json.gz",
+      "sha256": "439c06993d65582c724006efa2da1142b04aebbfa49adeb553f54f8dbbeea439",
+      "uncompressed_sha256": "9d91e9efcbd7900ab07eb01ded2e5da407e3506aa2b10fb04e577dc833e6d881",
+      "kind": "preserved_failed_harness_run"
+    },
+    {
+      "file": "browser-wifi-harness-clock-failure-20261018.json.gz",
+      "sha256": "08033fb734d89fa72ced4743b37aefb9eb1beebf8857fecfa038febb8a8e196a",
+      "uncompressed_sha256": "d9dea43bb401f25dd8fae1c51b54cab37138b2b33ccfe5cd7aa5ee20f9a8b2c0",
+      "kind": "preserved_failed_harness_run"
+    },
+    {
+      "file": "browser-wifi-manual-setup-20261018.png",
+      "sha256": "3defa1f970f1d39ad7beda4e07a46669b8d15dc385396c4f1cdcf4559b085779",
+      "kind": "actual_mobile_viewport_screenshot"
+    },
+    {
+      "file": "browser-wifi-station-cold-20261018.png",
+      "sha256": "e9945658c01e59cc8d27ec9f1fe610fdce5f174dc2a0dffc5a179762d2678029",
+      "kind": "actual_mobile_viewport_screenshot"
+    }
+  ],
+  "limitations": [
+    "390x844 Chrome viewport is not an actual phone or physical RF/WPA handshake test.",
+    "Native initial setup only; factory scan/short-password/zero-result bugs are not reproduced as desired behavior.",
+    "Two failed development runs are preserved: a nonexistent photo loading selector was copied to the settings-page observer; a later naive RTC-plus-lifetime estimate fell below its hard epoch lower bound. The final gate reads SDK timer origin/correction and compares UTC with the packet timestamp.",
+    "Expected HTTP400 and its error alert produce exactly two captured console errors in each negative preflight. Positive configure/cold stages have no console warnings/errors or JavaScript exceptions.",
+    "This separate gate does not change the 533 inputs of the already running full suite, and does not constitute full H03/H10 or hardware acceptance."
+  ]
+}

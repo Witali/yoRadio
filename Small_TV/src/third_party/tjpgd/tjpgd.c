@@ -234,6 +234,9 @@ static JRESULT create_qt_tbl (  /* 0:OK, !0:Failed */
     size_t ndata            /* Size of input data */
 )
 {
+    /* Load supported 8-bit dequantizers in raster order.
+     * FIXED_FACTORY: 0x4201107c..0x4201109a accepts zero quantizers, forbidden
+     * by T.81 Table B.4. Reject them before entropy decoding or LCD output. */
     unsigned int i, zi;
     uint8_t d;
     int32_t *pb;
@@ -255,6 +258,9 @@ static JRESULT create_qt_tbl (  /* 0:OK, !0:Failed */
         }
         jd->qttbl[i] = pb;                      /* Register the table */
         for (i = 0; i < 64; i++) {              /* Load the table */
+            if (!*data) {
+                return JDR_FMT1;
+            }
             zi = Zig[i];                        /* Zigzag-order to raster-order conversion */
             pb[zi] = (int32_t)((uint32_t) * data++ * Ipsf[zi]); /* Apply scale factor of Arai algorithm to the de-quantizers */
         }
@@ -279,7 +285,10 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
     /* Build canonical DC/AC tables from code-length counts and symbols.
      * FIXED_FACTORY: 0x42011100 accepts oversubscribed prefix trees. Count
      * available prefixes before constructing codewords, so unused impossible
-     * branches cannot pass validation merely because entropy avoids them. */
+     * branches cannot pass validation merely because entropy avoids them.
+     * FIXED_FACTORY: also reserve the all-one word (T.81 Annex C) and reject
+     * baseline AC symbols outside sizes 1..10 and the EOB/ZRL exceptions
+     * (F.1.2.2.1/Table F.2), including symbols never used by the entropy. */
     unsigned int i, j, b, cls, num;
     size_t np;
     uint8_t d, *pb, *pd;
@@ -308,7 +317,7 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
              * prefixes at length 16. Incomplete trees remain supported. */
             available_codes <<= 1;
             b = pb[i] = *data++;
-            if (b > available_codes) {
+            if (b >= available_codes) {
                 return JDR_FMT1;
             }
             available_codes -= b;
@@ -339,7 +348,8 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
         jd->huffdata[num][cls] = pd;
         for (i = 0; i < np; i++) {          /* Load decoded data corresponds to each code word */
             d = *data++;
-            if (!cls && d > 11) {
+            if ((!cls && d > 11) ||
+                (cls && ((d & 15) > 10 || (!(d & 15) && d != 0 && d != 0xF0)))) {
                 return JDR_FMT1;
             }
             pd[i] = d;
@@ -860,7 +870,10 @@ static JRESULT mcu_load (
             for (i = 0; i < 64; bp[i++] = 128) ;
 
         } else {                            /* Load Y/C blocks from input stream */
-            id = cmp ? 1 : 0;                       /* Huffman table ID of this component */
+            /* FIXED_FACTORY: SOS chooses DC and AC independently per component
+             * (T.81 B.2.3/Table B.3). Factory 0x42011a9a uses component class;
+             * retain each selector so shared/swapped tables decode correctly. */
+            id = jd->huffman_selector[cmp] >> 4;     /* Selected DC table */
 
             /* Extract a DC element from input stream */
             d = huffext(jd, id, 0);                 /* Extract a huffman coded data (bit length) */
@@ -886,6 +899,7 @@ static JRESULT mcu_load (
 
             /* Extract following 63 AC elements from input stream */
             memset(&tmp[1], 0, 63 * sizeof (int32_t));  /* Initialize all AC elements */
+            id = jd->huffman_selector[cmp] & 15;    /* Selected AC table can differ from DC */
             z = 1;      /* Top of the AC elements (in zigzag-order) */
             do {
                 d = huffext(jd, id, 1);             /* Extract a huffman coded value (zero runs and bit length) */
@@ -1141,7 +1155,11 @@ JRESULT jd_prepare (
     /* Read baseline headers and construct the decoder's tables and MCU state.
      * FIXED_FACTORY: 0x42011d5a..0x42011d8a ignores SOF sample precision and
      * component payload length. Require the supported 8-bit frame and its
-     * complete component list before reading or accepting those fields. */
+     * complete component list before reading or accepting those fields.
+     * FIXED_FACTORY: the DRI path at 0x42011da2 and SOS at 0x42011e7a read
+     * incomplete headers and ignore extra bytes, scan parameters and component
+     * selectors. Validate T.81 B.2.2/B.2.3/B.2.4.4 before accessing each field;
+     * retain arbitrary, distinct component IDs instead of assuming 1/2/3. */
     uint8_t *seg, b;
     uint16_t marker;
     unsigned int n, i, ofs;
@@ -1229,6 +1247,12 @@ JRESULT jd_prepare (
 
             /* Check each image component */
             for (i = 0; i < jd->ncomp; i++) {
+                jd->component_id[i] = seg[6 + 3 * i];
+                for (n = 0; n < i; n++) {
+                    if (jd->component_id[n] == jd->component_id[i]) {
+                        return JDR_FMT1;    /* Err: duplicate frame component */
+                    }
+                }
                 b = seg[7 + 3 * i];                         /* Get sampling factor */
                 if (i == 0) {   /* Y component */
                     if (b != 0x11 && b != 0x22 && b != 0x21) {  /* Check sampling factor */
@@ -1248,8 +1272,8 @@ JRESULT jd_prepare (
             break;
 
         case 0xDD:  /* DRI - Define Restart Interval */
-            if (len > JD_SZBUF) {
-                return JDR_MEM2;
+            if (len != 2) {
+                return JDR_FMT1;    /* Exactly one 16-bit restart interval */
             }
             if (jd->infunc(jd, seg, len) != len) {
                 return JDR_INP;    /* Load segment data */
@@ -1290,6 +1314,9 @@ JRESULT jd_prepare (
             if (len > JD_SZBUF) {
                 return JDR_MEM2;
             }
+            if (len != 4 + 2 * jd->ncomp) {
+                return JDR_FMT1;    /* Ns, selectors, Ss, Se and Ah/Al */
+            }
             if (jd->infunc(jd, seg, len) != len) {
                 return JDR_INP;    /* Load segment data */
             }
@@ -1300,19 +1327,28 @@ JRESULT jd_prepare (
             if (seg[0] != jd->ncomp) {
                 return JDR_FMT3;    /* Err: Wrong color components */
             }
+            if (seg[len - 3] != 0 || seg[len - 2] != 63 || seg[len - 1] != 0) {
+                return JDR_FMT3;    /* Baseline sequential DCT scan parameters */
+            }
 
             /* Check if all tables corresponding to each components have been loaded */
             for (i = 0; i < jd->ncomp; i++) {
-                b = seg[2 + 2 * i]; /* Get huffman table ID */
-                if (b != 0x00 && b != 0x11) {
-                    return JDR_FMT3;    /* Err: Different table number for DC/AC element */
+                if (seg[1 + 2 * i] != jd->component_id[i]) {
+                    return JDR_FMT1;    /* Scan must select frame components in order */
                 }
-                n = i ? 1 : 0;                          /* Component class */
-                if (!jd->huffbits[n][0] || !jd->huffbits[n][1]) {   /* Check huffman table for this component */
+                /* FIXED_FACTORY: factory 0x42011eae..0x42011efa accepts only
+                 * 00/11 and checks tables by component class. Baseline permits
+                 * both destinations 0/1 independently; require the actual pair. */
+                b = seg[2 + 2 * i]; /* Packed DC/AC Huffman destinations */
+                if ((b >> 4) > 1 || (b & 15) > 1) {
+                    return JDR_FMT3;    /* Err: Unsupported baseline table destination */
+                }
+                jd->huffman_selector[i] = b;
+                if (!jd->huffbits[b >> 4][0] || !jd->huffbits[b & 15][1]) {
 #if JD_DEFAULT_HUFFMAN
                     jd_load_default_huffman(jd); // Always returns OK
 #else
-                    return JDR_FMT1;                    /* Err: Nnot loaded */
+                    return JDR_FMT1;                    /* Err: Selected Huffman table not loaded */
 #endif
                 }
                 if (!jd->qttbl[jd->qtid[i]]) {          /* Check dequantizer table for this component */

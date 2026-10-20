@@ -1,0 +1,179 @@
+{
+  "status": "started_not_completed",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T12:32:45.563631+00:00",
+  "scope": "Current exact BC68/20B detached H10 start; requires terminal guard/supervisor, complete 86400 guest seconds and full journal analysis.",
+  "run_directory": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018",
+  "app_sha256": "bc68d3460332878b26226a41b74b0cae16376fbf6f41c7d8a98198af5514c393",
+  "native_elf_sha256": "4fde010e5bf09466e6822687199313bd47221f99681db57964a8654b0b9fc2b8",
+  "qemu_sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e",
+  "interval_seconds": 15,
+  "outage_every": 60,
+  "launch": {
+    "schema_version": 1,
+    "status": "started_not_completed",
+    "all_functionality_verified": false,
+    "captured_utc": "2026-10-18T12:30:54.2852532Z",
+    "run_directory": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018",
+    "scope": "Detached process launch only; not workload completion or H10 acceptance.",
+    "sources_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\start_runtime.ps1": "a068694b799790ebfe6b8699017f34f4b210f698d947d4d75b15487fb4e4f9c8",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\runtime_supervisor.ps1": "8c91874bee1797c5ff8b317d9b7d430b403fd64cda56050fdd9ebb40f276a500",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\runtime_process.psm1": "833944db87ee1abf401c564b07503bbc06e38e11911f99aeeedae8cc3743a8d2"
+    },
+    "process": {
+      "pid": 23548,
+      "created_utc": "2026-10-18T12:30:54.3422450Z",
+      "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\"",
+      "parent_pid": 35144,
+      "working_directory": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services",
+      "in_job": false,
+      "create_flags": "CREATE_BREAKAWAY_FROM_JOB",
+      "launcher_pid": 17360
+    }
+  },
+  "supervisor_at_capture": {
+    "schema_version": 1,
+    "status": "running",
+    "passed": false,
+    "all_functionality_verified": false,
+    "supervisor_pid": 23548,
+    "supervisor_started_utc": "2026-10-18T12:30:54.6721611Z",
+    "run_directory": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018",
+    "scope": "Child process supervision only; not a 24-hour or memory-trend acceptance.",
+    "sources_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\runtime_run_guard.py": "df024edc6653e2dd4bdc4b92bc57c33994d866cb350d3588f51af90a4a59cbd9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\runtime_supervisor.ps1": "8c91874bee1797c5ff8b317d9b7d430b403fd64cda56050fdd9ebb40f276a500",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\runtime_qemu.py": "cf5bab160df9360b3b8a48df9030110be2d796d875b57d5fb6e1ddf5b7c677c0",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae"
+    },
+    "workload_pid": 5036,
+    "workload_started_utc": "2026-10-18T12:30:54.7152380Z",
+    "observed_at_utc": "2026-10-18T12:32:44.4495628Z",
+    "guard_pid": 22392,
+    "completed_cycles_observed": 2
+  },
+  "inputs_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\runtime_qemu.py": "cf5bab160df9360b3b8a48df9030110be2d796d875b57d5fb6e1ddf5b7c677c0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\runtime_memory.py": "6354f9a322124d5d8d4af691dfed68fca130335951b09815a3b18a3ffa1b58ff",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\runtime_heap_rom.py": "fcc120a6b92260a9ee2f6e9eb6055acb3ca7c37f82f242f7ca0e9e31fd1163a1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\runtime_state.py": "3bad4e096e505d096f356d35e49ca5dec1830a423e4ecf661b9197ce9ebf33a6",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\runtime_weather.py": "bb3461e542b30afd9579860bc06adc68af457fc938017d256bd50a247f68ec1f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "4fde010e5bf09466e6822687199313bd47221f99681db57964a8654b0b9fc2b8",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "bc68d3460332878b26226a41b74b0cae16376fbf6f41c7d8a98198af5514c393",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-rom-elfs\\20260528\\esp32c2_rev200_rom.elf": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\qemu\\parity\\compare.py": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\fixtures\\jpeg\\rgb-420.jpg": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\gdb_observer.py": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\weather_qemu.py": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\time_qemu.py": "65dc11c59bb41b29d9222671ffdb82738d121e7223f4ab2bc884ea564905e856",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "64955c6fcea6ae833ce136753d6be280d8530b713f439d052ec6e38cd13ebfde",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "2937453230518c892b5ac0b94bfb892cc2dee3d7a3d800a6a787692931c53400",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\heap\\heap_private.h": "502fa2f57dc2b7bf044ea4129694c4e97669321525e82bcd7e2435b626407f0c",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\heap\\multi_heap.c": "e9a61ae252353ba9095bb97a922db49c164111a3c1afb97f0a967996d0b15045",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\heap\\heap_caps.c": "16ba43d4868f4eaff39ae83e2ede6bfe6cb33cfd57e23fab64a3e658d4bb5610",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\freertos\\FreeRTOS-Kernel\\tasks.c": "8e02bca581de35d3ea446752e84f5d71ff90ef818d3b3a7a03865dfc95f3c7b6",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\freertos\\FreeRTOS-Kernel\\portable\\riscv\\include\\freertos\\portmacro.h": "d781637967d016af1d69f05c686130e83505fdbcc9fcb3f80c68816bce22abf1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools\\esp_elf.py": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\bin\\qemu-system-riscv32.exe": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e"
+  },
+  "kernel_process_identities_at_capture": [
+    {
+      "ProcessId": 23548,
+      "CreationDate": "2026-10-18T14:30:54.342245+02:00",
+      "Name": "pwsh.exe",
+      "CommandLine": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\""
+    },
+    {
+      "ProcessId": 5036,
+      "CreationDate": "2026-10-18T14:30:54.715238+02:00",
+      "Name": "python.exe",
+      "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tests\\runtime_qemu.py --yoradio C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services --dependency-root C:\\Work\\yoRadio --qemu-root C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018 --output C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018 --interval-seconds 15 --outage-every 60 --outage-seconds 1 --duration-seconds 86400"
+    },
+    {
+      "ProcessId": 18128,
+      "CreationDate": "2026-10-18T14:30:57.7213+02:00",
+      "Name": "qemu-system-riscv32.exe",
+      "CommandLine": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\bin\\qemu-system-riscv32.exe -M esp32c2,default-peripherals=off -name SmallTV-f65d8d848a9a -L C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018\\vm -drive file=C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018\\vm\\flash.bin,if=mtd,format=raw -display none -serial file:C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018\\vm\\uart.log -monitor none -icount shift=3,align=off,sleep=on -qmp tcp:127.0.0.1:64547,server=on,wait=off -device {\\\"driver\\\":\\\"esp-spi-module\\\",\\\"id\\\":\\\"lcd\\\",\\\"bus\\\":\\\"/spi2/spi\\\",\\\"gpio\\\":\\\"/machine/gpio\\\",\\\"spi-host\\\":2,\\\"cs\\\":0,\\\"model\\\":\\\"st7789\\\",\\\"sck\\\":4,\\\"mosi\\\":6,\\\"miso\\\":-1,\\\"cs-gpio\\\":-1,\\\"dc-gpio\\\":5,\\\"reset-gpio\\\":1,\\\"backlight-gpio\\\":18,\\\"backlight-active-low\\\":true,\\\"properties\\\":\\\"{\\\\\\\"visible-width\\\\\\\":240,\\\\\\\"controls\\\\\\\":false,\\\\\\\"panel-inverted\\\\\\\":true}\\\"} -global esp32c3-wifi.clock-services=on -global esp32c3-wifi.ntp-hosts=ntp1.aliyun.com;cn.pool.ntp.org;pool.ntp.org -global esp32c3-wifi.station-ssid=yoRadio-QEMU -nic user,model=esp32c3-wifi,restrict=on,hostfwd=tcp:127.0.0.1:18080-10.0.2.15:80,guestfwd=tcp:10.0.2.100:80-tcp:127.0.0.1:64545 -global esp32c3-wifi.service-hosts=api.openweathermap.org -snapshot -gdb tcp:127.0.0.1:64546 -S"
+    },
+    {
+      "ProcessId": 22392,
+      "CreationDate": "2026-10-18T14:31:25.543498+02:00",
+      "Name": "python.exe",
+      "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\Small_TV\\src\\tools\\runtime_run_guard.py --run C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\ap-services-flash-24h-20261018 --qemu-tools C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services\\.build\\runtime-qemu-20b-frozen-20261018\\tools"
+    }
+  ],
+  "old_pids_absent_at_capture": true,
+  "frozen_qemu_inputs": {
+    "status": "frozen_before_workload",
+    "source_root": "C:\\Work\\QEMU-ESP32\\.worktree\\flash-write-audit",
+    "source_commit": "0860e568d4ccc3f74a0e4a0e46f25b1fb7a0939b",
+    "files": [
+      {
+        "file": "bin/qemu-system-riscv32.exe",
+        "sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e"
+      },
+      {
+        "file": "bin/.qemu-esp32c3-commit",
+        "sha256": "2883ad957f3b439004b4f553956c7905e087260d5f5c252d67e142e8be0dd266"
+      },
+      {
+        "file": "configs/boards/small-tv-c2.json",
+        "sha256": "757a21953cb2078a8d28f10af43932f58c72af908282fdce1ac5d4df400554b8"
+      },
+      {
+        "file": "tools/esp_board.py",
+        "sha256": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752"
+      },
+      {
+        "file": "tools/esp_elf.py",
+        "sha256": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f"
+      },
+      {
+        "file": "tools/esp_services.py",
+        "sha256": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+      },
+      {
+        "file": "tools/small_tv_http_test.py",
+        "sha256": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94"
+      },
+      {
+        "file": "tools/small_tv_network.py",
+        "sha256": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0"
+      },
+      {
+        "file": "tools/small_tv_vm.py",
+        "sha256": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae"
+      },
+      {
+        "file": "tools/small_tv_web.py",
+        "sha256": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2"
+      },
+      {
+        "file": "bin/.qemu-esp32c3-debug-logging",
+        "sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+        "provenance": "CONFIG_ESP_DEBUG is defined in source build config-host.h; candidate lacks a separate debug marker"
+      }
+    ],
+    "scope": "Independent exact helper/executable snapshot for a new BC68 H10; not a workload result."
+  },
+  "preflight_file": "ap-services-h10-preflight-20261018.json",
+  "superseded_file": "ap-services-h10-superseded-20261018.json",
+  "repository_root": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-ap-services",
+  "duration_requested_guest_seconds": 86400,
+  "guard": {
+    "source_file": "Small_TV/src/tools/runtime_run_guard.py",
+    "source_sha256": "df024edc6653e2dd4bdc4b92bc57c33994d866cb350d3588f51af90a4a59cbd9"
+  },
+  "schema_reconciled_utc": "2026-10-18T12:43:04.657869+00:00",
+  "schema_reconciliation_note": "Add analyzer-required guard and canonical duration fields from the original captured supervisor hashes. Original ee896b31 start data remains in Git; workload was not restarted or edited."
+}

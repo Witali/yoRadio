@@ -1,0 +1,211 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Actual Chrome desktop/mobile-viewport crop/Canvas/privacy/upload and new-process guest cold persistence on BC68/20B. No physical touch/RF, full LCD frame or H10 acceptance.",
+  "app_sha256": "bc68d3460332878b26226a41b74b0cae16376fbf6f41c7d8a98198af5514c393",
+  "native_elf_sha256": "4fde010e5bf09466e6822687199313bd47221f99681db57964a8654b0b9fc2b8",
+  "source_sha256": "5586ef6103e4c2647c09ed342d0adadb166509991e024b7edca3dda60108bc25",
+  "qemu_sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e",
+  "browser_version": "155.0.8059.80",
+  "browser_checks": 23,
+  "storage_checks": 6,
+  "input_count": 26,
+  "served_photo_html_sha256": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+  "stages": {
+    "upload": {
+      "vm_name": "SmallTV-b0e6c54ab1a4",
+      "pid": 31828,
+      "direct_raw_backing": true,
+      "rom_boots": 1
+    },
+    "cold": {
+      "vm_name": "SmallTV-299398939e3b",
+      "pid": 22148,
+      "direct_raw_backing": true,
+      "rom_boots": 1
+    }
+  },
+  "checks": {
+    "upload_raw_photos_match": true,
+    "cold_raw_photos_match": true,
+    "protected_flash_unchanged": true,
+    "slots_1_to_3_unchanged": true,
+    "source_inputs_unchanged": true,
+    "cold_boot_exact_photos": true
+  },
+  "upload_checks": [
+    {
+      "name": "actual-guest-html",
+      "passed": true
+    },
+    {
+      "name": "five-decoded-previews",
+      "passed": true
+    },
+    {
+      "name": "landscape-input-carries-private-metadata",
+      "passed": true
+    },
+    {
+      "name": "portrait-input-carries-private-metadata",
+      "passed": true
+    },
+    {
+      "name": "noise-input-carries-private-metadata",
+      "passed": true
+    },
+    {
+      "name": "no-upload-before-crop-confirm",
+      "passed": true
+    },
+    {
+      "name": "cancel-preserves-flash-photo",
+      "passed": true
+    },
+    {
+      "name": "corner-drag-shrinks-frame",
+      "passed": true,
+      "first": 1,
+      "smaller": 1.15
+    },
+    {
+      "name": "corner-drag-grows-frame",
+      "passed": true,
+      "smaller": 1.15,
+      "larger": 1.1
+    },
+    {
+      "name": "landscape-blue-size-and-metadata",
+      "passed": true,
+      "metadata": [],
+      "height": 240,
+      "width": 240,
+      "bytes": 607,
+      "sha256": "89f80beaf8f53e7459e4ada4fa8931821cc286e2a7f945aa1e2d8f7f0af24782"
+    },
+    {
+      "name": "landscape-blue-selected-pixels",
+      "passed": true,
+      "mean": [
+        0,
+        0,
+        254
+      ]
+    },
+    {
+      "name": "mobile-dialog-fits-width",
+      "passed": true,
+      "bounds": {
+        "x": 19,
+        "y": 73.5,
+        "width": 352,
+        "height": 697
+      }
+    },
+    {
+      "name": "portrait-yellow-size-and-metadata",
+      "passed": true,
+      "metadata": [],
+      "height": 240,
+      "width": 240,
+      "bytes": 607,
+      "sha256": "d3f4077b2ea68dd8e313ac6dd75598a0bca0467023174399782ccdad08a1808c"
+    },
+    {
+      "name": "portrait-yellow-selected-pixels",
+      "passed": true,
+      "mean": [
+        255,
+        255,
+        0
+      ]
+    },
+    {
+      "name": "escape-preserves-flash-photo",
+      "passed": true
+    },
+    {
+      "name": "noise-multipart-size-and-metadata",
+      "passed": true,
+      "metadata": [],
+      "height": 240,
+      "width": 240,
+      "bytes": 47773,
+      "sha256": "97746b78059483ed7284b932a2cebaa5cba4882a2ef3c876a6ce0447e6306a67"
+    },
+    {
+      "name": "actual-multiple-browser-multipart-chunks",
+      "passed": true,
+      "bytes": 47773,
+      "chunkCount": 12
+    },
+    {
+      "name": "no-page-script-errors",
+      "passed": true,
+      "errors": []
+    }
+  ],
+  "cold_checks": [
+    {
+      "name": "actual-guest-html",
+      "passed": true
+    },
+    {
+      "name": "five-decoded-previews",
+      "passed": true
+    },
+    {
+      "name": "cold-slot4-exact",
+      "passed": true,
+      "sha256": "97746b78059483ed7284b932a2cebaa5cba4882a2ef3c876a6ce0447e6306a67"
+    },
+    {
+      "name": "cold-slot5-exact",
+      "passed": true,
+      "sha256": "d3f4077b2ea68dd8e313ac6dd75598a0bca0467023174399782ccdad08a1808c"
+    },
+    {
+      "name": "no-page-script-errors",
+      "passed": true,
+      "errors": []
+    }
+  ],
+  "raw": [
+    {
+      "file": "browser-photo-report-20261018.json.gz",
+      "sha256": "8dc4ae17d5baf57ab428b4aaa7ddc5f252cd9f0933b818b451faed1d11cadd4b",
+      "uncompressed_sha256": "70398ebb64f2cb5f73632b9ee208492e4423c197dbedf55d27c43e697828cae7"
+    },
+    {
+      "file": "browser-photo-upload-20261018.json.gz",
+      "sha256": "48ae5ece149995214dc5bd7c6e2b185096ffd18d7037e4f64e4e0cd7ef398e8d",
+      "uncompressed_sha256": "25081619a32d7d0699a136007f07a79029254cdb21bd0bdf5f4bb1939216f0e4"
+    },
+    {
+      "file": "browser-photo-cold-20261018.json.gz",
+      "sha256": "11faacd2290037080fcee48a6ec19ad564c5bf9767d470ffb29953c50633c6fb",
+      "uncompressed_sha256": "77a7bcf8cbb38e8f3d92678f7bc4c030d377cdc820e5ab1c6213397308f794ad"
+    },
+    {
+      "file": "browser-photo-uart-upload-20261018.log.gz",
+      "sha256": "d558cc88c233d2b4d32af7b63e855a4b40fbacf5fba163dd1874090c4de8f02a"
+    },
+    {
+      "file": "browser-photo-uart-cold-20261018.log.gz",
+      "sha256": "f5b5124eca5ffaa881c4c622054bcacd6fb1ee4cb5ad879b7c09b4ba76c7d09c"
+    },
+    {
+      "file": "browser-photo-landscape-crop-20261018.png",
+      "sha256": "3a28e1863d8fddf10417b4790be3cbf534a8e6455f285b99c284443888388fa7"
+    },
+    {
+      "file": "browser-photo-portrait-mobile-crop-20261018.png",
+      "sha256": "7e0e398998cc82c85de687cca5b4cbf7f26a00a4dde754096982e38a3b95e8e3"
+    }
+  ],
+  "limitations": [
+    "Chrome 155 with a 390x844 viewport is not an actual phone or touchscreen.",
+    "This standalone browser gate was added after the separately frozen full suite started; it does not alter that run or its inputs.",
+    "The first development run passed, then final instrumentation added explicit source-tag and per-stage ROM/VM checks; this record binds only the final run."
+  ]
+}

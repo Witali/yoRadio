@@ -13,6 +13,35 @@
 | `REQUESTED_CHANGE` | Добавлено поведение по явному запросу пользователя | Проверка отсутствия приватных метаданных в загружаемой фотографии |
 | `FIXED_TEST` | Исправлена проверка или наблюдение; поведение приложения не меняется | Ожидание календаря ограничено отдельно гостевым и хостовым временем, чтобы незавершённая загрузка медленной ВМ не считалась неправильной датой |
 
+Host-квалификация новой JPEG-библиотеки также использует эти метки:
+`REQUESTED_CHANGE` в отдельном upstream patch обозначает запрошенную оптимизацию
+памяти, `FIXED_TEST` в `jpeg_library_probe/probe_memory.c` — корректное ограничение
+виртуальных окон стенда. Эти метки не утверждают ошибку заводской программы и не
+означают, что библиотека уже включена в production firmware.
+
+В квалификации 12-bit flash tables `REQUESTED_CHANGE` также отмечает перенос
+неизменяемых таблиц и уменьшение spare IMAGE pool chunks. `FIXED_TEST` в
+`qualify.main` сохраняет pixel/cleanup checks optional unlimited modes, но
+не требует монотонного снижения памяти: измеренный прирост1145bytes при smoothing
+остаётся в отчёте. Hard memory cap рабочих cases не ослаблен. См.
+[JPEG_FLASH_TABLES.md](tests/JPEG_FLASH_TABLES.md).
+
+`REQUESTED_CHANGE` в host `probe_reuse.c`/`fault_contract.py` отмечает отдельно
+запрошенные проверки отказов и восстановления JPEG. После fatal error используются
+только abort/destroy, затем проверяются recovery pixels и cleanup. Это тестовый
+стенд; production source/output/NOR failures остаются отдельной работой.
+
+`REQUESTED_CHANGE` в `color_convert_row_rgb565` обозначает расширение grayscale/
+RGB/CMYK row conversion до2–16бит. Два прежних RGB888↔RGB565 helper только
+перенесены в этот модуль и не получают метку исправления: их результаты сохранены
+и сверены с original RV32 code. Новый row API ещё не используется media decoder.
+
+Read-only `jpeg_storage_layout.make_plan` использует `REQUESTED_CHANGE` для
+запрошенной оптимизации будущего JPEG storage. `FIXED_TEST` в его contract
+поясняет однобайтный owned-padding control: прежняя5-byte mutation пересекала
+границу photo slot, и payload-hash guard правильно её отвергал. Ни одна версия
+этого теста не записывала изменённый image на диск или устройство.
+
 ## Как ставить метку
 
 Метка находится в первом комментарии внутри исправленной функции, рядом с
@@ -63,18 +92,20 @@
 | `fetch_weather` | Отклонение ответа с ошибочным HTTP-статусом вместо публикации его JSON как погоды |
 | `timezone_utc_offset`, `time_sync_task`, `factory_local_time` | Явные переходы IANA вместо неявных американских DST-правил; обновление смещения при переходе и безопасная обработка ошибки календаря |
 | `jpeg_decode_unlocked` | Восстановление byte-clipped IDCT оригинала; очистка только области изображения после ошибки декодирования JPEG, без изменения экрана при проверке и ошибке подготовки |
-| `create_qt_tbl`, `jd_prepare` | Некорректный DQT ID не маскируется до 0…3; SOF0 проверяет 8-битную точность и длину component payload. Подтверждённые factory acceptance bugs исправлены, IDCT/цвет не менялись |
+| `jd_prepare`, `mcu_load` | `FIXED_FACTORY`: независимые DC/AC Huffman selectors из SOS для каждого компонента; ранний отказ при отсутствии выбранной таблицы, shared/swapped destinations0/1 разрешены по T.81 |
+| `create_qt_tbl`, `jd_prepare` | Некорректный DQT ID не маскируется до 0…3; SOF0 проверяет 8-битную точность, длину component payload и уникальность произвольных ID. DQT отклоняет нулевые коэффициенты; DRI/SOS требуют точную длину, baseline-параметры и соответствие компонент SOF/SOS. Подтверждённые factory acceptance bugs исправлены, IDCT/цвет не менялись |
 | `create_huffman_tbl` | Переполненные prefix trees отклоняются до декомпрессии, даже если entropy не использует невозможные ветви. 32-битный счётчик сохраняет поддержку разреженных 16-битных таблиц |
 | `photo_upload_active_unlocked`, `photo_upload_start`, `photo_upload_chunk`, `photo_upload_finish`, `photo_headers_safe` | Завершённость, границы и порядок загрузки, тайм-аут и требования к приватности фотографии |
 | `web_body` в `app/web/request_body.c` | Исправлена 24–28-секундная блокировка других клиентов неполным телом: общий срок чтения, ограничение каждого receive оставшимся временем и прекращение read перед SDK cleanup |
 | `uploadImageInChunks` в `local_site/photo_upload.js` | Запрошенное удаление программной паузы после успешной синхронной flash write и после последней неудачной попытки; порядок блоков и backoff между повторами сохранены |
 | `date_capture` в `tests/time_qemu.py` | Раздельные пределы гостевого и хостового ожидания; точное сравнение всех пикселей даты сохранено, остановившаяся ВМ по-прежнему отклоняется |
 | `exercise` в `tests/photo_frames_qemu.py` | Ночной сценарий сохраняет начальные кадры и при необходимости продолжает полные fade-циклы до настоящей SNTP-синхронизации, максимум шесть; пиксели, PWM и порядок фото проверяются во всех циклах |
+| `Save-State`, очистка в `tools/runtime_supervisor.ps1`, функции `runtime_cleanup.psm1` и `runtime_state_io.psm1` | `FIXED_TEST`: ошибка записи лога не прерывает остановку остальных детей и своей ВМ; sharing conflict откладывает только heartbeat, финальная ошибка не становится pass |
 
 Найти все отметки из корня репозитория:
 
 ```powershell
-rg -n 'FIXED_FACTORY|FIXED_RECONSTRUCTION|FIXED_TEST|REQUESTED_CHANGE' Small_TV/src/app Small_TV/src/third_party/tjpgd Small_TV/src/tests
+rg -n 'FIXED_FACTORY|FIXED_RECONSTRUCTION|FIXED_TEST|REQUESTED_CHANGE' Small_TV/src/app Small_TV/src/third_party/tjpgd Small_TV/src/tests Small_TV/src/tools
 ```
 
 Метка не заменяет тест. Исправления оригинала сохраняются в отчётах как намеренные

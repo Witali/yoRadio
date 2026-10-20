@@ -1,0 +1,556 @@
+{
+  "status": "terminal_failed_missing_snapshot_profile",
+  "passed": false,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:02:12.763798+00:00",
+  "controller": {
+    "status": "terminal_failed",
+    "started_utc": "2026-10-18T15:52:10.1159407Z",
+    "pid": 18940,
+    "error": "One or more functional groups failed. See report.json and per-group logs.",
+    "ended_utc": "2026-10-18T15:59:22.9097208Z",
+    "exit_code": 1
+  },
+  "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+  "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+  "input_count": 557,
+  "inputs_unchanged": true,
+  "groups": [
+    {
+      "name": "report_aggregation",
+      "status": "passed"
+    },
+    {
+      "name": "native",
+      "status": "passed"
+    },
+    {
+      "name": "platform",
+      "status": "passed"
+    },
+    {
+      "name": "frontend",
+      "status": "passed"
+    },
+    {
+      "name": "integrity",
+      "status": "passed"
+    },
+    {
+      "name": "timezone_sources",
+      "status": "passed"
+    },
+    {
+      "name": "machine",
+      "status": "passed"
+    },
+    {
+      "name": "machine_control",
+      "status": "passed"
+    },
+    {
+      "name": "machine_classic",
+      "status": "passed"
+    },
+    {
+      "name": "machine_weather",
+      "status": "passed"
+    },
+    {
+      "name": "machine_calendar",
+      "status": "passed"
+    },
+    {
+      "name": "machine_jpeg",
+      "status": "passed"
+    },
+    {
+      "name": "machine_jpeg_inputs",
+      "status": "passed"
+    },
+    {
+      "name": "machine_timezones",
+      "status": "passed"
+    },
+    {
+      "name": "machine_time_state",
+      "status": "passed"
+    },
+    {
+      "name": "machine_text",
+      "status": "passed"
+    },
+    {
+      "name": "machine_network",
+      "status": "passed"
+    },
+    {
+      "name": "qemu_profile",
+      "status": "passed"
+    },
+    {
+      "name": "qemu",
+      "status": "failed"
+    },
+    {
+      "name": "hardware_browser_soak",
+      "status": "not_run"
+    }
+  ],
+  "reset_verdicts": {
+    "original": {
+      "boot": true,
+      "display": true,
+      "network": true,
+      "source_integrity": true
+    },
+    "reconstructed": {
+      "boot": true,
+      "display": true,
+      "network": true,
+      "source_integrity": true
+    }
+  },
+  "failure": {
+    "error": "[Errno 2] No such file or directory: 'C:\\\\Work\\\\yoRadio\\\\.worktree\\\\small-tv-reset-display\\\\.build\\\\reset-display-qemu-frozen-20261018\\\\configs\\\\boards\\\\small-tv-c2.json'",
+    "phase": "Setup image preparation before the first Wi-Fi fallback VM starts",
+    "guest_flows_started": 0,
+    "classification": "Selected snapshot omitted runtime board JSON data; not evidence of a guest Wi-Fi regression."
+  },
+  "evidence": [
+    {
+      "file": "reset-display-full-terminal-20261018-raw/aggregation-date-input.json.gz",
+      "sha256": "8bbfeba126bdacee90839d917bbf4ceb65494460f81ef794274c3a76fade9344",
+      "original_sha256": "08d62c9a0d8619252b755701b83b37b87868e937c1da9bc98e4e19d6a78a0b1d",
+      "bytes": 239
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/aggregation-date-roundtrip.json.gz",
+      "sha256": "364a827eabfdec6efed95cc654c4623b498ed4f331df203b3be5243fa64ed415",
+      "original_sha256": "0bccf45f87380907018223418450bd684e758f84f262bc1e826a3a063a06ed52",
+      "bytes": 330
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/calendar.json.gz",
+      "sha256": "9fefa5f77cbe13bade8586797b8283e2e4f46871705f17574ab59284f7db98ba",
+      "original_sha256": "ff61a146490fd1e6cc5c9bb8cd55c33ec106f4d14f0ad01e3f3552150e36a089",
+      "bytes": 95201
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/classic.json.gz",
+      "sha256": "66dc178f8822beb4cb172f4530141a5c26b40f852353cbcce210ad5960ebbf3c",
+      "original_sha256": "6afb96ae326e86ceeb9a700c06d8411713a1f9ca56a07d40104cb6aae0b3e328",
+      "bytes": 889635
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/control.json.gz",
+      "sha256": "dd5752418fa67a22857edb59e6b7092ba735468fb4f2ff1958d95c9626171700",
+      "original_sha256": "d9e9095b0361c0608b2b95b303e5d9d467ee2336c9e501de3365a84e9cfeb125",
+      "bytes": 17869
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/controller-exit.json.gz",
+      "sha256": "dd8f515817cf4475da808ae3ff72bbc49da7c99865d30f95ffd03a2549fc49f4",
+      "original_sha256": "50cc7d159b72f7982de2c3b1adb76167a65bb4e1836d57e1d70e7e55caef8970",
+      "bytes": 259
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/controller.log.gz",
+      "sha256": "a67ba5a76c0f76b52f66bbb23a83ba54a6aba3fad699747b9fce1301ef042610",
+      "original_sha256": "849af4409f79a577982b853ea83f9908978394809b49525211ce30c9812ee7d3",
+      "bytes": 610
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/frontend.json.gz",
+      "sha256": "f7da65bf4e802973a7bf2d45ea956e0a1aa434c208803403dc0917eebb87b94d",
+      "original_sha256": "f687b1caf567af7216b97296479fde34e6cac8b9deb22e1d3466fc4ed08f9ff6",
+      "bytes": 7170
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/frontend.log.gz",
+      "sha256": "4c5f6fb4f72668884ffd1b35f8d5869f89e87a235faf50e5e37626041f3a4729",
+      "original_sha256": "80741ada3385b112b2362612cfa183946064ef67d48ccdc5fe72f4286a834fe1",
+      "bytes": 109
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/integrity.json.gz",
+      "sha256": "2cf9cdc62527142a4c27b64771017acba91ac0e5ed942ef478a8d8d761dc0239",
+      "original_sha256": "e9b2b8d33c54abb7517c7b70a88d02c417c2c726666aa2deb8116d11566c2e2c",
+      "bytes": 341
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/integrity.log.gz",
+      "sha256": "54c84026b72c08cc7a17913bb3a74dfc08ee14ba6e2734422ae97cce56b0e5ff",
+      "original_sha256": "6b5460d4929e448dca2826e95c2922e28b23d3e4e26acb9956930f8c65feff19",
+      "bytes": 665
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/jpeg-inputs-dht-48d5b4feaaa1.json.gz",
+      "sha256": "033aa8a2afa8a25f0e393b9e6c790d268cb758531df5107a71a88cf20c04abd5",
+      "original_sha256": "65a2f5ec45ad2048ed65aa5062858871867c8479729837737099a1914dfeee7b",
+      "bytes": 88615
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/jpeg-inputs.json.gz",
+      "sha256": "f9ae492c41d630b4d2a6cd6f55d95e0ba88b1ed906bbf0cb56474f5639129304",
+      "original_sha256": "0afc52e9605dc57d0e5492739ff53249bfca62aaba2e89079757d65963a951be",
+      "bytes": 117971
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/jpeg.json.gz",
+      "sha256": "c9f1994e9b9f3f0cfdd95e11435a53b591425d622066e757017f39557c1d93dc",
+      "original_sha256": "ecb79abdeceac25cf3f07a1360327a41ffd9e0b20ac99f48ee39ca1a8ac934a1",
+      "bytes": 40401
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine__report.json.gz",
+      "sha256": "3d910fd355a947b9287aeb341f1f9be59dc5016ae9d0ea20b636aeb1a406a5ed",
+      "original_sha256": "ed3a33756df9ba36d79e1999c688bdae9222cc97a20b55b74e57587f646e8f35",
+      "bytes": 382702
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine.log.gz",
+      "sha256": "5fc65aec971ce0b07558399fe88e2b64bd770ac95abc40ee553e8eab6738ca0c",
+      "original_sha256": "d46e18f7ed740317400a27b8a44e9ad144e3ccd3a55d9d264c76e21e5fcc9ffb",
+      "bytes": 6008
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_calendar.log.gz",
+      "sha256": "a2a4cd0fb787adb407d270b7c8ae14d5c173854569d2e69d5b4d001841c40463",
+      "original_sha256": "abd94fa71fb5f4c724524846c6c973997bf89b80dd3b0215c52c4300896c047b",
+      "bytes": 39
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_classic.log.gz",
+      "sha256": "93a8fc05cbe8189738263c7794e96e692831f0dfe4529aaacac4a51e19903486",
+      "original_sha256": "a4c6b3e7221705b80a9a4d53576b8eb85ed6d2f030cb206f3f32abdbacf801b6",
+      "bytes": 78
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_jpeg.log.gz",
+      "sha256": "7c872de250c8d2be76949bfcc687c8910acb4761981b07d0ec86b05ed06e89db",
+      "original_sha256": "4936b68e5ebdf1c70899620970298493e2362864e1012263d8bd38fd5af502f5",
+      "bytes": 6134
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_jpeg_inputs.log.gz",
+      "sha256": "ae927516303d79108749f55bc858defa779f3e31b2059c43db2e5f70511fcc9c",
+      "original_sha256": "3200120432d37ed5a36ae8f3f49b9a3ed3f481a19f8a5e736d481338e5ead983",
+      "bytes": 5500
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_network.log.gz",
+      "sha256": "85b8bf68b80c16dd6b8bba5ca23ccfb00e19c1a551d236cab311e02347f54229",
+      "original_sha256": "5aac5eac9c97d14711a179c94715e9a0a57f7c5a30012e7f8f5eda7047ae617f",
+      "bytes": 72
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_text.log.gz",
+      "sha256": "b7ce65246a7b3277e16b8eb4389b6a898e72be11aaed21b67aeb4b510f331e7e",
+      "original_sha256": "afcd5c5fdbdd7fd4a3c403ab59c044ffcfe72f65938aaa0c2fbeaf2f8c052788",
+      "bytes": 81
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_time_state.log.gz",
+      "sha256": "05e0b039182ed1c551834f7c35fcc9fd738e114ebaad60c06e913970a41450b4",
+      "original_sha256": "3c2779a6f0ae5aa255bd5a524e8855861be6188e89e52ba63a246e41613973ea",
+      "bytes": 67
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_timezones.log.gz",
+      "sha256": "d8e26d901a255d04d303fe5aab2200996a4d25ae4cf06caf3277f854ec1578bd",
+      "original_sha256": "e39aa6325c3c57ea8ce2d7a943ee1e8c1d54625822948b7640fa5c25635f39a2",
+      "bytes": 3919
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/machine_weather.log.gz",
+      "sha256": "a52f16fde7e89cfa4df9116c0b61cba0a7112e5abd2af965f4d9b88aad667e45",
+      "original_sha256": "9f20d8de737380b5c67644006b498b9965735b38769e85b0930735a8e004d17f",
+      "bytes": 46
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/native.log.gz",
+      "sha256": "7c6f7bff8d2dda0fe9f62e70588bddd148e291c1e60b028772832b45498e2c00",
+      "original_sha256": "7361004cf3295d35be549affa18b2177da9a897cbda41887d30bac93bee1aa71",
+      "bytes": 1109
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/network.json.gz",
+      "sha256": "4968dfe650dce432b1f00fa8b85c463d466ee90fa5a031681261773bdd493c3d",
+      "original_sha256": "e504e133a672651225bc4bd895e25c46fa725f15ce208aa43271cd18c907b92a",
+      "bytes": 7313
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/platform.log.gz",
+      "sha256": "1c657be1ed8aa46ff05047862b5f0dbf72b7b5c0a3248d02fed8a1ef2d21dde6",
+      "original_sha256": "c2932c4aab7ee17ceeb13a1ab4cc518ef3a241a5199517f850c85dfcb8d9077d",
+      "bytes": 4185
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-observer-unit.json.gz",
+      "sha256": "9d4f48c6434b7f1a9fcdb696e41acdce775202a1e0822cbda88802cbfa73330c",
+      "original_sha256": "8a95bb0b5b5beda6e2a35b76103c01af658f5ddb5f3e6ef1706176e4800aeeb0",
+      "bytes": 346
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__after-reset.ppm.gz",
+      "sha256": "301b921a1ac61325bb715a3b0612eb1a3e6866afdb6d3ab1505c08d570190d7d",
+      "original_sha256": "11a0f9468ae9a294f7695c98ac8a595bc3397825426810f11fc984658f36631e",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__frame-0.png.gz",
+      "sha256": "4d55e8a07b5bde6183673a84374c5f4dabf655e6721f1fb7a6567db9dcf9626e",
+      "original_sha256": "102089e271c5de09be495ab43f50f00280bc5b781520d5968ba45c28915cea56",
+      "bytes": 6204
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__frame-0.ppm.gz",
+      "sha256": "c80aa2d19c2acf1afccbbd166eccbaafbe4578d2ca77bec88e7b9db14295ebe8",
+      "original_sha256": "ad54d71795cc0e1a221f0b650c13f768ad7051bf1d50d0b3afe6d9e6df8923ea",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__frame-1.png.gz",
+      "sha256": "685e873c2ac7f8440060cef55a0135d283fa6d5af7a1df76c3c68cc1bcbea20f",
+      "original_sha256": "cfd0693c3133c04e7ff4460f2dee8bd51630cb15b0b579385cf524fc2af6ea4f",
+      "bytes": 6254
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__frame-1.ppm.gz",
+      "sha256": "93913427af7545acb283ebcae2779436cf4a5ba43dcc49e376797bd331e67934",
+      "original_sha256": "29e7d5f640f623500dd7a840a5aba94f62d4dde9efc3ad66321c3e0f3c50f4ff",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__frame-2.png.gz",
+      "sha256": "7757cadffcf7799dfd6e230b47c2dfa1227f3c24e425bbf4a87280854be07667",
+      "original_sha256": "b1d11f83060a689daeb5e8a76650b0f09b62d07e3a6bfa270de7dce60cb133dd",
+      "bytes": 6232
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__frame-2.ppm.gz",
+      "sha256": "8e69824e7058d4aed89bbf41f76348cd74938944917169d31c2a2609d0f0136f",
+      "original_sha256": "f9ee739de532fefe92674f80cba621053d6d0b0da2f61879685f8c0d079f6067",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__prepared.json.gz",
+      "sha256": "1dcf5ddcd33f35125f51699733e2991223503950b93de7e03867c144af52d435",
+      "original_sha256": "ab06c942d416a69836179c3c391f2750f1205454031e4970468be954d9c1ab7e",
+      "bytes": 2065
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__qemu.log.gz",
+      "sha256": "27202a75f91705eb429bd98ba8dd5de664b7ee18fd14ce7a9335cd8e5b6447e1",
+      "original_sha256": "3b3ef9477ee1bba157a5ee832b7ccc4abb6ebc3718e650c1dd8dfcbbff9265fc",
+      "bytes": 335
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__registers.txt.gz",
+      "sha256": "1d7f25abf514f3d89841c2d52c13015c42083c0aaf4bebd05b6efde8d1e4cb0f",
+      "original_sha256": "306065f9ae49aef28f700989014a647cfc4469580539bd8053376c217fce15bb",
+      "bytes": 2092
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__reset.ppm.gz",
+      "sha256": "9a8c2493fc72f538af0a8d8723d4c59185d97189134512de497a104d293a4165",
+      "original_sha256": "1c9647599609f484387d350da404471cb44fa2b7a7f3a182f431c58e35509699",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__session.json.gz",
+      "sha256": "5db167144a30954991983ba6e0429efb63a9b4ca5c597da77755a8c21a369189",
+      "original_sha256": "f5d307058915154f8490f5e918bf73790b4be22137aed0bc047d484b4e139fba",
+      "bytes": 1845
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__test-report.json.gz",
+      "sha256": "0b3d48fb36866a612dcd5489c170aba036e6f3e489ae95d82c029a0228e1e4dd",
+      "original_sha256": "81ecb32fb5b41a9b9fdabc9849a6398c771163de8e61e9a30a4bbcb1c1a36a1e",
+      "bytes": 9703
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__original__uart.log.gz",
+      "sha256": "cba3999ac07d94c36fdbaefd07872e44bc4e3dbee831bf9ad42104f808e66ad6",
+      "original_sha256": "6f59aec8136a964f22d73947acc9cb736fbdb7134a14dbe04215729d0b0fe04e",
+      "bytes": 6291
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__after-reset.ppm.gz",
+      "sha256": "dc28fda6fc67d3f0203ddb1b8897b729ff80a9393afa8965ad68bc331ff42a62",
+      "original_sha256": "ea4c56f9f75a6b36002ce5340e230f9728c0f47b6295985cb13bf8ea2e692315",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__frame-0.png.gz",
+      "sha256": "a95e601f56fda491dda59df5d42ba257649517e734fc95f457bc61595c2763b1",
+      "original_sha256": "59ce4ce0dbe44560af301d15ff5e66febc0aafcaff484a248cd715860a2bb883",
+      "bytes": 6250
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__frame-0.ppm.gz",
+      "sha256": "7a4e25833465bbc56ca69b1b8c0a521d132939d14d376b9121e619566b1a7dd8",
+      "original_sha256": "e59d41713ff50699a3cf0f5316eed9ad5449f0184a56e9032115f2b2fdcdf1bf",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__frame-1.png.gz",
+      "sha256": "59a5fa56ca9d8c16563d602e1d449d49081306b43e0c430b786c98d15a8504c7",
+      "original_sha256": "b0b99d01c7948a6d9a9ccf8491a776e51067e4e7bcfc4573582b2f594939c38e",
+      "bytes": 6358
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__frame-1.ppm.gz",
+      "sha256": "a22f776c34600b4580324dd4999afde12177be6a16434e1b10d78226278d9f77",
+      "original_sha256": "a2a45ec9396bfd26c402c172ae1e055d61258785bdcc873fb5a18e302e2fb1bb",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__frame-2.png.gz",
+      "sha256": "22fa40b3fbd7079b98f069cfc9229054dfde0f6e7152525a51dfce9dae541fcf",
+      "original_sha256": "493c3b3f071ad92b8459b66d0a85f428e69e4df150eb88a5ba2debbbc30d1f64",
+      "bytes": 6295
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__frame-2.ppm.gz",
+      "sha256": "f9400469ad151c9341df58cc0c667545fd3141e41596b4a70402a3fdc0204da1",
+      "original_sha256": "246b1d11c2590f0ba82d42ee7f0ea27b5097c64140680a6daff2921ff593bac1",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__prepared.json.gz",
+      "sha256": "a3f36d57843f6cf2063ceed009aa439fe12f824d58ea1763c9561a7dc42363b7",
+      "original_sha256": "a9ca4391883de758fa27ff92d19feb1cb70190adb17655b7147a8382225e88b4",
+      "bytes": 2863
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__qemu.log.gz",
+      "sha256": "dce3d77be6d4629169cd4163ba4aa2653b0fa3ca2c278aceb2e81a1baeb3778f",
+      "original_sha256": "d64edcc7d3f9a7770358a2bfff2c94d3b49d03c2c8e53e68c49f88894c2950a7",
+      "bytes": 335
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__registers.txt.gz",
+      "sha256": "2e5e31994e9f2efe671e28fba7a5b5fe53b40bffa81b0e816ef2bde51a3860f4",
+      "original_sha256": "7e3f382132db72daa96687ceba0281fb969fb22ae7cdaf295ac22c1759b98231",
+      "bytes": 2092
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__reset.ppm.gz",
+      "sha256": "9a8c2493fc72f538af0a8d8723d4c59185d97189134512de497a104d293a4165",
+      "original_sha256": "1c9647599609f484387d350da404471cb44fa2b7a7f3a182f431c58e35509699",
+      "bytes": 172815
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__session.json.gz",
+      "sha256": "9b64ac27de68442c8ec6c98a90f5f2c5400399abdac4f51ba7fbc0a3a93960ca",
+      "original_sha256": "22ca885b22fae2a1a6e0d4c14ec12bd92871e59a4d59fcfaa7c36d85d940ea07",
+      "bytes": 1850
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__test-report.json.gz",
+      "sha256": "ab053070e5ff3f88fd50b050a32f93111bc73254738cbade969887fe69e8afd0",
+      "original_sha256": "88c9384dd0de8384e069a05f818b49f28f33cd2caa483e6cb8d1337311b13824",
+      "bytes": 12948
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__boot-reset__reconstructed__uart.log.gz",
+      "sha256": "bea9a4d7b562fb192abef77729345f02d14df3994d5d001fed884177804d81a4",
+      "original_sha256": "38689504b98ee9db58a36cd58aa41eaf23c85551a1e6e9d1bacf9a8a2d534224",
+      "bytes": 2151
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__display-observer-unit.json.gz",
+      "sha256": "eee6ad59d6ef0925cc01796588680f95fc6d17ff74921b18bdaae20d15defa22",
+      "original_sha256": "345e21b05a507b3e13c0189e49ceddbba51655f507adc591e0ee8f9d6d5101d5",
+      "bytes": 399
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__report.json.gz",
+      "sha256": "b67b6c6331f7251f5c0a8e983ca3da612e51529c2065326e6c89e0cc0dd83df9",
+      "original_sha256": "b807044acfe919e3b1b3c64282ce82e433829858796cfb2d5830c7c5f6edb47f",
+      "bytes": 36380
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu__wifi_fallback-observer__report.json.gz",
+      "sha256": "a46d7bcbbaf96d319c7a6f1bd6928750291a08a3bc296f7dcb3edf41d94d71f1",
+      "original_sha256": "ae286f45f42e544cf987c60782bf9bdd80c520611f0c988bfcff2e79ae5489ff",
+      "bytes": 5569
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu-profile.json.gz",
+      "sha256": "f11910d17e319ebeb720a39490736772b7de0f82afabaf7a69fd92aea998c2be",
+      "original_sha256": "8d4ca71a581941d3807e3d6ff180ee8118137d27ef0ae645bab7264357ed73c9",
+      "bytes": 1060
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu.log.gz",
+      "sha256": "cc41061a0499e0c5fc7c74ecf81647151777190190ef78f951c876dda13697e4",
+      "original_sha256": "fe7f57c1abed7e18611d9e2b5d21a0f90a7798264b203ef98e6258969f2a0e10",
+      "bytes": 7209
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/qemu_profile.log.gz",
+      "sha256": "34a9fd81987bd89a1b20fcbcbe2376d4e068a0322821607148e3c2b5f549b28f",
+      "original_sha256": "0ca9fb040cc7591ec662840d8b90e8967b208529fd1fe69362947c3c07cea269",
+      "bytes": 791
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/report-aggregation.json.gz",
+      "sha256": "1b019f8313aacd283eb54aea765b5496f0610ec775a0e09d350721d63b5f81eb",
+      "original_sha256": "644f62b2f68c1222b32fde4b8b59f5a47c182348d08edc636d643ca4c2ec0617",
+      "bytes": 422
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/report.json.gz",
+      "sha256": "f17aab120b9444d29030a9a2f28fb3b176b7c6711c41970c863da5f7ad149247",
+      "original_sha256": "aafb76c705d1aa2d374607f57e1b07f1bb2bf943df026890dd4200e577fc7677",
+      "bytes": 2548000
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/report_aggregation.log.gz",
+      "sha256": "de935f93a28c144d1a65bef4f2e03101fc0376d177d4acf9bfc3bf9e6e80ad76",
+      "original_sha256": "42363689ddabfa2d844a8055c55fa7ca4b63420ecd4178c8e899c7548c7a76ec",
+      "bytes": 34
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/text.json.gz",
+      "sha256": "12133d56b92218be4eb2dc555766c22a18755f69767df0504ff560474f5a9993",
+      "original_sha256": "41778044a5752cadf4986d9405803671d886f5155c7a8745c7135ee141328bb6",
+      "bytes": 194962
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/time-state.json.gz",
+      "sha256": "14ffa5ea4acf15f68b4a65bb77e751c84837e55f77bcd3ed45793e24592696bd",
+      "original_sha256": "f8e705eb2fae09ff1679de4aaee0889c00af5cca6c7cb808814a7c5d6116654e",
+      "bytes": 4480
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/timezone-sources.json.gz",
+      "sha256": "5fa909673a0e473b37616bb8728bd5ddfb1f1aec9c50b24ce979e87edb466593",
+      "original_sha256": "ac732fe5c270d36a3aa53cdbccdd1d7a9723a2591b85b5d1a81b51bd2e72bd2d",
+      "bytes": 18750
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/timezone_sources.log.gz",
+      "sha256": "62b35496a355a2349e74de56472a82020bf0ada6c7b14944e6bbcd857c73a046",
+      "original_sha256": "850c3f3ac427d248aeb608c12fd893f93cf3fa3e45fa1fe0222dacd3426470df",
+      "bytes": 1663
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/timezones.json.gz",
+      "sha256": "421c4272d10f5c604792c31dade9054c9250ecd32fee1496458481de895eae98",
+      "original_sha256": "76b73e3696904f05e8a66dc73b0c037e28ff4c0eb4f7c593066491b1113c5879",
+      "bytes": 28976
+    },
+    {
+      "file": "reset-display-full-terminal-20261018-raw/weather-render.json.gz",
+      "sha256": "44b409c3e72721aea17e35ab59d80124a599de49db043af375fb7372c0482d22",
+      "original_sha256": "461d36cb1819666e823942d6c76de7448cd25c553841817e6b804f2095969a9f",
+      "bytes": 72448
+    }
+  ],
+  "correction": "Prepare a new snapshot with the existing board JSON data, preflight both setup images, then run the Wi-Fi gate separately before a new full run. Preserve full557 and its snapshot byte-for-byte.",
+  "scope": "18 required groups and independent boot/network/display checks passed, but the complete suite failed. Not full parity, H10, CYD or physical acceptance."
+}

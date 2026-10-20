@@ -78,10 +78,19 @@ static void test_http_uri_targets(void)
     rejected_setting("/setgifvalue?probe=1", "{\"gif\":5}");
     const char *unknown[] = {"/getclocktype/", "/getclocktypeX", "/GETCLOCKTYPE",
                             "/getclocktype%3Fprobe=1", "/missing?path=/getclocktype"};
+    get("/");
+    size_t root_length = request.response_length;
+    char *root_page = malloc(root_length);
+    CHECK(root_page != NULL);
+    memcpy(root_page, request.response, root_length);
     for (unsigned i = 0; i < sizeof(unknown) / sizeof(unknown[0]); ++i)
     {
         prepare(unknown[i], "", 0, NULL);
         dispatch(HTTP_GET);
-        CHECK(request.status == 302 && !strcmp(request.location, "/"));
+        /* FIXED_TEST: the factory AP Host returns root for an unknown path.
+         * This must still bypass the near-miss settings endpoint itself. */
+        CHECK(request.status == 200 && !request.location[0]);
+        CHECK(request.response_length == root_length && !memcmp(request.response, root_page, root_length));
     }
+    free(root_page);
 }

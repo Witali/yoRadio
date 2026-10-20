@@ -1,0 +1,638 @@
+{
+  "schema_version": 1,
+  "status": "rv32_cross_compile_passed",
+  "all_functionality_verified": false,
+  "scope": "Link-only RV32IMC soft-float decoder measurement. Includes default JPEG errors and memory manager. Excludes final app/link relaxation, libc/libgcc, flash storage adapter, heap, complete call-chain/SDK stack and all runtime acceptance.",
+  "base_commit": "b7bfb69c95bcca451a0c7f9d3a02288b4cbe5386",
+  "sources_sha256": {
+    "Small_TV/src/tests/jpeg_library_probe/rv32_footprint.py": "c3de7a1a9c927f7cffffe7da7fc89e1f410804f75d9ba213e286ad72eaaf6210",
+    "Small_TV/src/tests/jpeg_library_probe/footprint.c": "4898524c359f0dadfcc230a52e024c474fb0bb2cb6abe7283d174c9c179d8192",
+    "Small_TV/src/tests/jpeg_library_probe/build.py": "aaa03a7867e49aaf658508f8ac06ca249cdb971c2350094c6372560a9dea096f",
+    "Small_TV/src/tests/jpeg_library_probe/libjpeg-turbo-3.2.0-bounded.patch": "431c9cf3c83be38a1ad661bc6986dc182e22d3fb3f6c1d339e3346a82e6a0024",
+    "Small_TV/src/tests/jpeg_library_probe/UPSTREAM.json": "7bb559980d4338f029bf6379ff3b45b0549bf7deab7c4a078a70922ba614a390"
+  },
+  "upstream_commit": "c85e6b905bf237038faa936dab160ebfc5da0344",
+  "code_bytes": 144626,
+  "readonly_bytes": 9680,
+  "initialized_writable_bytes": 0,
+  "zero_initialized_bytes": 0,
+  "roots_verified": [
+    "jpeg_read_header",
+    "jpeg_start_decompress",
+    "jpeg_read_scanlines",
+    "jpeg12_read_scanlines",
+    "jpeg16_read_scanlines",
+    "jinit_arith_decoder",
+    "jinit_phuff_decoder",
+    "jinit_lhuff_decoder"
+  ],
+  "raw_artifacts": [
+    {
+      "file": "jpeg-library-rv32-20261019-raw/report.json.gz",
+      "sha256": "044b0bb1216f9a8929c136bc09fc31a997d4cf18c4ecf5dec0052b2f37b9acd1",
+      "raw_sha256": "d02992a690149d500f9c4498339eb2ef08c13b2c9ed96e20c7b548248702aadb",
+      "raw_bytes": 45844
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/decoder-retained.o.gz",
+      "sha256": "6b354f73565b2eb40bd0c28e266147921d7061323e099fcdc54d27df90ca7f7f",
+      "raw_sha256": "f9233dcf47ca11c1c037fed664eab1b772467ba14c191928eb296980d94585b1",
+      "raw_bytes": 363996
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/decoder.map.gz",
+      "sha256": "cb203820392f22f28d1410edc90bcea2ce9f7349fe44a95d0f4d43f0752a3772",
+      "raw_sha256": "08296420b0876e5b70ffac5685a96216259813fc757d4c5536d25ccd74697506",
+      "raw_bytes": 209538
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/elf-architecture.txt.gz",
+      "sha256": "585634414f4b0b086336e3186d5c90ce88a809750a597e9b7c9769c1aed43ae1",
+      "raw_sha256": "578291fea6761412cf460ace3d93c2637b15b7c10eab788ad37bc9fe4a2b6513",
+      "raw_bytes": 1177
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/sections.txt.gz",
+      "sha256": "5f24a5065b65eccd04a2d2f36003f396d9a4efeb5925b9e908519013cbc3ed6f",
+      "raw_sha256": "7a1d1250a26bb70f3d0787f42552622221de3500543be0d6cb127f579da7462f",
+      "raw_bytes": 16378
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/size-summary.txt.gz",
+      "sha256": "c040cc11b750970a285c58a9f0b96dbac53d15e6d27948484c0e39db8d308cc2",
+      "raw_sha256": "c3698b2ceda3909438671d411a2ff64dd07303b839126e26e7e6f81bf900ca76",
+      "raw_bytes": 197
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/symbols.txt.gz",
+      "sha256": "cbc3fe7decc43c7f58dbb3c91d17da9ccdb67aebc6b049ca756393c8f5f87cfd",
+      "raw_sha256": "a4710d9c0cb096076fc7d95ca0fc64cae7bd9e4ccac4d8ab26751bcbdcbf5a63",
+      "raw_bytes": 16012
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/unresolved.txt.gz",
+      "sha256": "96d81b78cc30990ceb198f25fd089a40d743e76021b7fcdfb619b595963f50a7",
+      "raw_sha256": "f492f4db43af77f5fc4d254d6c389f0899dce0f86cc49345c3d0f617af4cd9fb",
+      "raw_bytes": 427
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/compiler.txt.gz",
+      "sha256": "88ca7709bb41e04101b777ed445c073b4f2ab71753201016ed70ec282107b725",
+      "raw_sha256": "ee884ee696eac54e7a43de3cd7518be21d17e526990c95046246fdba4b453b8b",
+      "raw_bytes": 273
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/rv32-toolchain.cmake.gz",
+      "sha256": "27605699b7761362ad710a86c40f9f2eebe343a9468f18e6fab87d34c3696b3d",
+      "raw_sha256": "81c07c9ca19b46e04d6482e861518eccfc8e0ec7b527c4ccad748648eba6df41",
+      "raw_bytes": 926
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/build.log.gz",
+      "sha256": "02d93f52ca04151204061d5f625462dce4111b29fe6f9635d09b07bcec1001f3",
+      "raw_sha256": "a28491f5b20e6c9c4a2de8dc09dcc1359c743127c1e2de743f0287fe0da2a836",
+      "raw_bytes": 11143
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/initial-report.json.gz",
+      "sha256": "1d37c87d552a4ccfc01898ed36742cde54d4d16a58422e6168b5505c6cf73be5",
+      "raw_sha256": "dac5d33cd6f6f2a9b7fe8d37cdadbd3646b200cea92825856b05583c7f55e294",
+      "raw_bytes": 45058
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/initial-build.log.gz",
+      "sha256": "80f921afb1c992c80065890a271524fa150999501de8bd177a291ae99fba7906",
+      "raw_sha256": "84f21c811b5e6ed288f1932c4dc5c512eafade290e36d5c7ad276c27024b75d0",
+      "raw_bytes": 11140
+    },
+    {
+      "file": "jpeg-library-rv32-20261019-raw/stack-usage.tar.gz",
+      "sha256": "455b818d215384f7fc683bb597514b2341be9b4dce19bfb49592d571b49b33e4",
+      "entries": [
+        {
+          "file": "footprint.su",
+          "sha256": "6d74e02a218334d8ff24b6ec3d3166008941d5868ec6d84ba569df94c7ac3d13",
+          "bytes": 134
+        },
+        {
+          "file": "library/CMakeFiles/4.0.3/CompilerIdC/a-CMakeCCompilerId.su",
+          "sha256": "e2bb8347cbae6261a327faf51457aed61dfab007facca06fef121edbe501226c",
+          "bytes": 40
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jaricom.c.su",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcapimin.c.su",
+          "sha256": "419f83d834dfa7e92ed72dc1669505605a83083c43533ddf7c1eb83c3e316c09",
+          "bytes": 1307
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcarith.c.su",
+          "sha256": "bd7fa9dd32be63d2a6dba5740b9dc9f2bc4763a2b8c5abfa59625e6ef8f5bb9d",
+          "bytes": 1547
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jchuff.c.su",
+          "sha256": "ea1ec1f42afcc44914b6c625beb63b7411816de8932d3b8104ba0e4cfcc16ebe",
+          "bytes": 1564
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcicc.c.su",
+          "sha256": "256281d508e2f4802026e546e873c5d9cf1cc735623a4da0a8e10399b10d537c",
+          "bytes": 145
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcinit.c.su",
+          "sha256": "b0c348860fa3393df000700df9edfff9ef6b66b19c2c0feab4c11a01c186ec5a",
+          "bytes": 145
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jclhuff.c.su",
+          "sha256": "d19a5d2338ae0c98062d71981730fc5480c0808f2dfa0f8604084c8d6180643c",
+          "bytes": 1133
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcmarker.c.su",
+          "sha256": "617910757536e37e9e966af0318f5111f040a55e23afb17ec8e05ca2d530911e",
+          "bytes": 1973
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcmaster.c.su",
+          "sha256": "da60d32a0fb15a5add070319985d469d67addd227f5629985b360d23ae5ce9e2",
+          "bytes": 1010
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcomapi.c.su",
+          "sha256": "b2356bfbb4d6e96102b2a60488fb5ad7fda1020bae7bb0134dff91243d824ea5",
+          "bytes": 567
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcparam.c.su",
+          "sha256": "4f863193a263827ad1f5f75212e7180b2c854ea5ec6a09e1a67ecaa9dd03e70a",
+          "bytes": 1590
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jcphuff.c.su",
+          "sha256": "46f14549a5efa1e7a6fc1dc3a3139f112c22d97db982fdb184cbf7f358e05a83",
+          "bytes": 2299
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jctrans.c.su",
+          "sha256": "273efa1873a32936b363acf7394b5e61420096f3212372ab1da6dc1d41266ac3",
+          "bytes": 867
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdapimin.c.su",
+          "sha256": "ac0a769652495b3a44435ce980f8b519cb87d89430415aefc236c74959e1ec71",
+          "bytes": 1176
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdarith.c.su",
+          "sha256": "058b14425a8688de172ffb928afa4770e576d9cf260c019d81906759c7d711b7",
+          "bytes": 1411
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdatadst.c.su",
+          "sha256": "bb442a54435999a208bcb94cfdf25cb8c31e4e83227eecdb7210d0cd33198d38",
+          "bytes": 1154
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdatasrc.c.su",
+          "sha256": "390c0b6fd9d40975a254a9bc4fc06f0df03ffdf3963a89b5ce476fcd72f9967f",
+          "bytes": 1127
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdhuff.c.su",
+          "sha256": "c3115a89510da3ad3fb6897303bf1bacf026de43744e0ea61cbdb99f3cf85931",
+          "bytes": 1002
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdicc.c.su",
+          "sha256": "a70c67d7982f33eb7b3d335273e7415f1d12e776e74904f6f039cb0b6e4f5a2e",
+          "bytes": 281
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdinput.c.su",
+          "sha256": "3b40aaea3950e79b4d408c3378f3f96c72e4eb5443255bae705c9f265f01c721",
+          "bytes": 721
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdlhuff.c.su",
+          "sha256": "c0771b4212e19782db0c2ebbad82dd657e6b9a91dcc57af2b36432749df1d4f9",
+          "bytes": 572
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdmarker.c.su",
+          "sha256": "77e390ad1f164e9ee67b998d7bf69359ba979c5c5f786ffe0e15d3d39630384f",
+          "bytes": 2136
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdmaster.c.su",
+          "sha256": "4281b6c9cfcc61297261f1654d390b563db6f52fcc8f297a65044ab8abdfad72",
+          "bytes": 887
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdphuff.c.su",
+          "sha256": "b74956f8c2408e65db82f0b83b9919595a24c76638a991b8f3092a45d4b66157",
+          "bytes": 1020
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jdtrans.c.su",
+          "sha256": "4bb2614c6a0c8fd863266162dff10ba86da1ddd7db327d25fb29982144224125",
+          "bytes": 147
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jerror.c.su",
+          "sha256": "8c5222f4225c90855684778f7f23ceb74f94cbf3dca0a53eb0f4ab655dc0fc65",
+          "bytes": 827
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jfdctflt.c.su",
+          "sha256": "7ea29b2dae45ff146ea8d5f37dff7129a43a0b61f4c97936a7074d3a0cfb7fe9",
+          "bytes": 141
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jmemmgr.c.su",
+          "sha256": "88346e9b59574c0d6540f3642969d01cc2c6a2c9e5554a2efc672b983c98ffc1",
+          "bytes": 2107
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jmemnobs.c.su",
+          "sha256": "7050d8b4d1639e92a6ce8bc7d5774a3b9fca1834ecdc3374e6295299b6f4f30b",
+          "bytes": 1127
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/jpeg_nbits.c.su",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcapistd-12.c.su",
+          "sha256": "de22abe3a675a722ec4023f1407a5dbeff67d9be7614f3be725bbaa12979d29a",
+          "bytes": 296
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcapistd-16.c.su",
+          "sha256": "e33a27264832c850780e562dd37a01aa561f63bff0d17e71bb9937f41757dedd",
+          "bytes": 148
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcapistd-8.c.su",
+          "sha256": "369cb632389e0ff830164c27a2e8b77eecd39b51a91ec0916e0ce114ea70cae3",
+          "bytes": 437
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jccoefct-12.c.su",
+          "sha256": "ede0a068060d6035c77f20adc8a830ef1c92468834978d899ca7e8df501b4b07",
+          "bytes": 861
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jccoefct-8.c.su",
+          "sha256": "7fcef26a37fe55763c2b9c66b7d88e017d719ae0b97cc164ad719c12e52cd1e4",
+          "bytes": 859
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jccolor-12.c.su",
+          "sha256": "3ba098df875a780e7e8ac2582686fadb7ef56d52ad0beaf610d9d968c109bd36",
+          "bytes": 3877
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jccolor-16.c.su",
+          "sha256": "4142115e2100d4968a677e802915a0067ab792cbf805a6ccd8ddf0abbe427c96",
+          "bytes": 3864
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jccolor-8.c.su",
+          "sha256": "0a918d028875dc83cffb8d8550016aa60f54bc1b62fb34aced318e5860b672da",
+          "bytes": 3871
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcdctmgr-12.c.su",
+          "sha256": "7f5c57dd47d3c5a53824d76059a89372c0a0b14760f1cdeb34d76076cacc2e09",
+          "bytes": 1123
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcdctmgr-8.c.su",
+          "sha256": "32ca9c929b36209cc990d245888b134b3bfad44405a5c145a7f1a8b77d2d79dc",
+          "bytes": 1279
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcdiffct-12.c.su",
+          "sha256": "0800c4f030452a248fdbd5ac19b539e32f29b7aa4bca9fdad4c9765e71a302bb",
+          "bytes": 861
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcdiffct-16.c.su",
+          "sha256": "6ee42346a0f2f42f98121a804fbd6e9a42197134a7b27f3e0fc1a8fea66579a3",
+          "bytes": 861
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcdiffct-8.c.su",
+          "sha256": "1d6209bc1390bcab9bc8a7d594cb7ff293a6a0d7441bac169de555784fcd6e16",
+          "bytes": 859
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jclossls-12.c.su",
+          "sha256": "2fc4c41e96ff0515d740051d80e61579e4d920d53527ee5e05abac911307b99e",
+          "bytes": 1861
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jclossls-16.c.su",
+          "sha256": "e12d93a9016af7d532668ff47ea5e10063529458da582a6b93d816c56a24bab5",
+          "bytes": 1861
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jclossls-8.c.su",
+          "sha256": "eae945825009be9a9d0e645fedc9262a7ea7f1b475f3923bf5f75ea7fca3c005",
+          "bytes": 1859
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcmainct-12.c.su",
+          "sha256": "da13c88d2a23f2520f62beea9480514b787fe1dd7699b17f197cf128d3f28334",
+          "bytes": 443
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcmainct-16.c.su",
+          "sha256": "b3e59b7934f24db871851812663f40803f908c3c2afc1674fdbf446ce9ed34a5",
+          "bytes": 443
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcmainct-8.c.su",
+          "sha256": "2d8715b4c41b8eade04b05f4544a2d829ce2e980d31eb3fb27ca36cb883fe8ac",
+          "bytes": 441
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcprepct-12.c.su",
+          "sha256": "b73a869292a5ed8719882d6c58ea05fc176d71ddeff926733988b9a075f700dd",
+          "bytes": 727
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcprepct-16.c.su",
+          "sha256": "86b956d98955295457758012e39d67403d967c622d2d9028bb7441a957d9706b",
+          "bytes": 727
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcprepct-8.c.su",
+          "sha256": "a1c491e33f62fd9c9184ed35ba33b00afdf242b2372ab91b59de9c57919b9cfb",
+          "bytes": 725
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcsample-12.c.su",
+          "sha256": "159ae30c61f11be3f901196243586dc788dd8384739625a95d18ce30625907e5",
+          "bytes": 1449
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcsample-16.c.su",
+          "sha256": "43868de1e5dbfad2792177fcc97d0debdca4b1d48c9440fd1850fc02ff17c16a",
+          "bytes": 1449
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jcsample-8.c.su",
+          "sha256": "dec163fc58b1e3998cb67616922f0f8f557fd1ae2de5ab09db32824055d2e41f",
+          "bytes": 1448
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdapistd-12.c.su",
+          "sha256": "a3f917aa0fa7e001b5d9aa6b9a9dae3b796c9b20e49ede14f534eac3700f9787",
+          "bytes": 1175
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdapistd-16.c.su",
+          "sha256": "56519fa784c4f606fff4ef5531c46f138e7353e36c54155eec1384c3f9015e22",
+          "bytes": 148
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdapistd-8.c.su",
+          "sha256": "e3ceca66cd2fe65ff0f531011874c6908100a046a55ebadacf42a857957a9100",
+          "bytes": 1747
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdcoefct-12.c.su",
+          "sha256": "eaedac9b2630bfe3d36c154ba68d950f671683116bb4b7cedcceb784f695e6c3",
+          "bytes": 1294
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdcoefct-8.c.su",
+          "sha256": "33ec79feb0fcddd949ab8810f1367ea042be0d8bc45e6a1cf69ba188856477e1",
+          "bytes": 1292
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdcolor-12.c.su",
+          "sha256": "90e594d9972361b66dba5bb743c55614fc8c13c13757740fa5ddab758d6ae4a7",
+          "bytes": 4898
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdcolor-16.c.su",
+          "sha256": "3be30544754547675aa791610d6abf32db4e8b82782fbdb8e221cfb788fbe666",
+          "bytes": 4886
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdcolor-8.c.su",
+          "sha256": "32082c2a3ddb5c468c7cb6da182270248cd5b69f0fb2389fe84e2f7dc7885bf0",
+          "bytes": 4894
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jddctmgr-12.c.su",
+          "sha256": "7842384af915ffd693932837a6442af18b1e66ba207ff5f29792eb169f03859c",
+          "bytes": 283
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jddctmgr-8.c.su",
+          "sha256": "b2e7b73a48bab395891cf41368d421c245c9b3553accc6b4c804e3ac52acda8e",
+          "bytes": 281
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jddiffct-12.c.su",
+          "sha256": "a57346e775383d4688a5136d4519a4f9b8ded4f7da2bc30776a1ede538ed7c6b",
+          "bytes": 1139
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jddiffct-16.c.su",
+          "sha256": "917b86bbc8328836343473e7e80128e56ef1049bd2b3e1bcafafcd21559464af",
+          "bytes": 1139
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jddiffct-8.c.su",
+          "sha256": "9bee18ec25f643918a15d9b855053b37d3a1c7f14e6d463cde4039639f6fd9f3",
+          "bytes": 1137
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdlossls-12.c.su",
+          "sha256": "659c7b7292485d0ebb30b4ef14014615cefe3fd1ae73785fe8fa37aead039b21",
+          "bytes": 1736
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdlossls-16.c.su",
+          "sha256": "59b919ceab0c0dfe38454e4302926d2aa61e9632a951b34b347eff1ef9076e4d",
+          "bytes": 1736
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdlossls-8.c.su",
+          "sha256": "f2301ea4f6d5273d28fedb57ce8943a123bf1ff9e9be24bed952a97a7536adc7",
+          "bytes": 1734
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdmainct-12.c.su",
+          "sha256": "bd6881290c6cc8f8a286635e71fe1cd0e6e8750d9941732444eac79cc66da9dd",
+          "bytes": 746
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdmainct-16.c.su",
+          "sha256": "0daa8aa1fb05ff5b264d2f7f197b0f2ab760accfb76d08833f18bca58185e28a",
+          "bytes": 746
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdmainct-8.c.su",
+          "sha256": "0aa06b6664d08fa9c73af01f5e305bf4fe9dd8ad5bd6d36e516d2a9e713e5396",
+          "bytes": 744
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdmerge-12.c.su",
+          "sha256": "3c314a095160b340528f8cf05b299d10d9dcab00b5683099f4916bff7f76fe93",
+          "bytes": 3327
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdmerge-8.c.su",
+          "sha256": "142233ad9cca8c259a832b52e7014f6bdc63ec19c1741b22bb14ae32979efba6",
+          "bytes": 3325
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdpostct-12.c.su",
+          "sha256": "4b1485218fe2999dfd47bf972514ac63abb48ad52208153e0dd5105a1925ffd1",
+          "bytes": 731
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdpostct-16.c.su",
+          "sha256": "818f77de4208502b23bc541f9e3f9713b37cfc7e5f751b1e0764fcbd19c9e7e8",
+          "bytes": 294
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdpostct-8.c.su",
+          "sha256": "9d3669251d8cb23fd991294a0f7f101290026d35a873b99511ab83733f062a87",
+          "bytes": 729
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdsample-12.c.su",
+          "sha256": "bccd35d8a78c00eec848221a71b0a7036efac18a0e47e3785fb42818bbf02117",
+          "bytes": 1563
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdsample-16.c.su",
+          "sha256": "7b6e1ee3bfe006ed70cfe0c330ad6b65ea5a131563948eeae60ad67f157c356e",
+          "bytes": 1563
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jdsample-8.c.su",
+          "sha256": "29e1a4eda1d08c5d51c7c95fcd053b5e77856e4e44ac31a38e26d8bf44161dc9",
+          "bytes": 1561
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jfdctfst-12.c.su",
+          "sha256": "4e12c001efd4724f5f56ac9dd83c0b0a1998c005fb68e11aebc7443f6a5bd91d",
+          "bytes": 144
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jfdctfst-8.c.su",
+          "sha256": "77ae8db38016139624498760456e9f91e98b79bdd128c844bc2ce5752f08cae4",
+          "bytes": 142
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jfdctint-12.c.su",
+          "sha256": "289d91eef8d37dfd43175ef41edd7f5a195f95fd91bc987d4f579252a14b4827",
+          "bytes": 144
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jfdctint-8.c.su",
+          "sha256": "dd2f9bd06cf7072c687e8a0f5e703adaa7619430f220b61ff85b4aae10d4a154",
+          "bytes": 142
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctflt-12.c.su",
+          "sha256": "facfd353c7e6df397a0728e4f420dbcb354e345aa01e68cf01d5ccff069cc0e4",
+          "bytes": 144
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctflt-8.c.su",
+          "sha256": "dc39b15d18bdcea8c56ebba35f24bfb996c9424d460f2ddb65293cc7c5f70a47",
+          "bytes": 142
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctfst-12.c.su",
+          "sha256": "9ef877ec89cb9a4677ff1c51dd9638a6d2909aa50a8fb3ef9bfd4116bc29e6f6",
+          "bytes": 145
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctfst-8.c.su",
+          "sha256": "beadac3a8499fe4067cb7415270f491041e002ec3c0cc5c1752cf0860c6e2d4c",
+          "bytes": 143
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctint-12.c.su",
+          "sha256": "8f028ad4e9759dae94e8a2b70474e89b1fe1ddfaeb0d2ca8806a96f9352045cd",
+          "bytes": 1881
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctint-8.c.su",
+          "sha256": "6b728c0088aa58f364f30921a326fd4eb7852cd6e51a18a394e07ea739aa33aa",
+          "bytes": 1855
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctred-12.c.su",
+          "sha256": "696a85de4cf2b62edea0ba06fcf10bde05667c0c56bddc54c93e2cef832297ae",
+          "bytes": 426
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jidctred-8.c.su",
+          "sha256": "bc37f6e6067e4cc22eaefc26d445e408f2af3d549bee56ad76ffaeb952852c41",
+          "bytes": 420
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jquant1-12.c.su",
+          "sha256": "04876762c5dd396e1d518e8256bc43d6bf818287b33a1d42ead33c285dc5ab77",
+          "bytes": 1584
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jquant1-8.c.su",
+          "sha256": "66ee4f576104b08d109fbf10d3f52eb89207a77759bf106ae1bedb4132e3aa37",
+          "bytes": 1582
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jquant2-12.c.su",
+          "sha256": "e6589964ed192121cb5ef04f4dac4442f3ab0351a5fcd3652e21b9b6dfd7c4c4",
+          "bytes": 1568
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jquant2-8.c.su",
+          "sha256": "3f663240857820632909bf1abdd2b34b4fec139053b12b9a737fa0faccaad973",
+          "bytes": 1565
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jutils-12.c.su",
+          "sha256": "a553b44d4f717aac01d872914b35e80e5938a56b676fa102ea4393652e419f57",
+          "bytes": 144
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jutils-16.c.su",
+          "sha256": "1e757c2569011108c261c9182e894d3772cbc11a1f52e492c1caf1f85726a20b",
+          "bytes": 144
+        },
+        {
+          "file": "library/CMakeFiles/jpeg-static.dir/src/wrapper/jutils-8.c.su",
+          "sha256": "c82c605af310a6578f4f14fabcbbfca7ce3cd9b2298b3ddad90e8ccf3eebd0b7",
+          "bytes": 682
+        }
+      ]
+    }
+  ],
+  "stack_usage_files": 103,
+  "required_remaining": [
+    "12-bit lossy RAM adaptation",
+    "bounded NOR-aware backing store",
+    "RGB565/factory-pixel adapter",
+    "final production link and actual heap/stack/call-chain measurements",
+    "device/QEMU runtime acceptance"
+  ]
+}

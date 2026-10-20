@@ -66,6 +66,9 @@ def validate_wifi_fallback(report,expected):
                         and row['connected'] is False,'Failed station did not persist setup and restart once')
             require(setup['ap_active'] is True and setup['guest_seconds']>=failed['guest_seconds'],
                     'Setup did not become active after restart')
+            if variant=='original':
+                require(setup['factory_station_state']==5 and setup['factory_apsta_got_ip_event'] is False,
+                        'Factory setup observation omitted completed AP init or a latched GOT_IP event')
             require(failed in flow['observations'] and setup in flow['observations'],
                     'Missing SDK failure/setup transitions')
             require(all(row['rom_boots']<=2 for row in flow['observations']),'Setup restart loop observed')
@@ -98,7 +101,10 @@ def rejection_checks(report,expected):
         ('ap-not-offline',('failure_flows','original','external_ap_was_offline'),False),
         ('failure-not-saved',('failure_flows','reconstructed','after_restore','mode_raw'),1),
         ('restart-loop',('failure_flows','reconstructed','after_restore','rom_boots'),3),
-        ('missing-setup-http',('failure_flows','reconstructed','checks','setup_http'),False)]
+        ('missing-setup-http',('failure_flows','reconstructed','checks','setup_http'),False),
+        ('early-factory-ap',('failure_flows','original','after_restore','factory_station_state'),0),
+        ('factory-apsta-got-ip',('failure_flows','original','after_restore','factory_apsta_got_ip_event'),True),
+        ('factory-apsta-unobserved',('failure_flows','original','after_restore','factory_apsta_got_ip_event'),None)]
     checks=[]
     for name,path,value in mutations:
         changed=deepcopy(report)
@@ -116,7 +122,8 @@ def validate_wifi_fallback_guards(report):
     names={'failed','changed-inputs','wrong-app','wrong-elf','wrong-qemu','wrong-test',
            'missing-factory','wrong-source','early-setup','early-reset','early-ip','short-delay',
            'filter-off','filter-flushed','no-recovery','no-http','panic','changed-media',
-           'missing-failure-case','ap-not-offline','failure-not-saved','restart-loop','missing-setup-http'}
+           'missing-failure-case','ap-not-offline','failure-not-saved','restart-loop','missing-setup-http',
+           'early-factory-ap','factory-apsta-got-ip','factory-apsta-unobserved'}
     checks=report.get('contract_checks',[])
     require(len(checks)==len(names) and {row['name'] for row in checks}==names
             and all(row['passed'] is True for row in checks),'Missing Wi-Fi waiting rejection checks')
