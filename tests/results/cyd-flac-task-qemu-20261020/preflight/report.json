@@ -1,0 +1,286 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "valid-default-discovery",
+      "expected_status": 0,
+      "actual_status": 0,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-flac-task-promoted-01"
+      ],
+      "log_sha256": "1a2871f271adde8bb65a8de70a6ba00d3c1cc139ee7c2f209b63bffd25542bbf"
+    },
+    {
+      "name": "valid-custom-python-and-pwsh",
+      "expected_status": 0,
+      "actual_status": 0,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-flac-task-promoted-custom-01",
+        "--idf-python",
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "--powershell",
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe"
+      ],
+      "log_sha256": "0d309e392fb9888b784c1ac48d264afac3b1bfa9df42f1bf443cbcf2e0fb96e9"
+    },
+    {
+      "name": "existing-campaign",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-flac-task-qemu-01"
+      ],
+      "log_sha256": "67b73cdcd5bc1663201d316bd4f403d27d9f8373bdff9ce7610fd3c5d51a7f3a"
+    },
+    {
+      "name": "nested-campaign",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-flac-task-qemu-01\\new-child"
+      ],
+      "log_sha256": "e69d20eb92a5feaa1b03d6b5a7ef969bcc9d67df51509ea1da0b7e6aa2ffbf93"
+    },
+    {
+      "name": "source-tree",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\new-qemu-output"
+      ],
+      "log_sha256": "f657122454a9df7fbe6079fb325caa16e7d9c8f2a7b254919861cc64d282f625"
+    },
+    {
+      "name": "sdk-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2\\new-qemu-output"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "tools-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\new-qemu-output"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "vendor-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\new-qemu-output"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "sdk-python-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\new-qemu-output"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "custom-python-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\new-qemu-output",
+        "--idf-python",
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "custom-pwsh-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\new-qemu-output",
+        "--powershell",
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "ffmpeg-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\new-qemu-output"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "qemu-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\QEMU-ESP32\\bin\\new-qemu-output"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "rom-parent",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\QEMU-ESP32\\pc-bios\\new-qemu-output"
+      ],
+      "log_sha256": "e0cb04c60f8a8de7f4adcedf17748561d2d45a17882508e299609523ce50fe72"
+    },
+    {
+      "name": "other-repository-source",
+      "expected_status": 2,
+      "actual_status": 2,
+      "output_state_unchanged": true,
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-task-qemu.py",
+        "--qemu",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\tests\\new-qemu-output"
+      ],
+      "log_sha256": "7f3e782978528d2d909bca5dc6aa0ca6b5f80bf3b5faaf5d9dfb9c1448cea4b3"
+    }
+  ],
+  "build_or_qemu_started": false,
+  "python_ast": true,
+  "runner_sha256": "b18992b4b0e13fa347b9f26fbf59b03d39801175394e0ff8e194d9bbf63fa56e"
+}
