@@ -47,8 +47,10 @@ The [implementation and contracts](CYD_INPUT_RECLAIM_DESIGN.md) now provide
 allocation-pressure reclaim of IDLE adaptive-input slots with post-READY
 publication, SMP pin/retirement and an immutable retry budget. The option stays
 default off. Host/service, actual startup and CMake guards pass; full opt-in
-Clang adds no warnings. Actual SDK/QEMU controls and production application
-exports remain in progress, followed by physical qualification.
+Clang adds no warnings. The actual SDK/QEMU gate passes five cases and four
+exact semantic controls, including real allocator NULL/recovery and dual-core
+retirement/refill. Production application exports remain in progress, followed
+by physical qualification.
 
 The earlier [frozen proposal](../tests/results/cyd-http-request-buffer-20261020/plan/idle-input-reclaim/README.md)
 is retained as historical evidence from before implementation. Its status must
@@ -56,8 +58,8 @@ not be read as the current implementation checkpoint.
 
 ## Remaining work
 
-- Finish target semantic controls and production application qualification for
-  opt-in reclaim. The donor bind-before-allocation order was not copied across
+- Finish production application qualification for opt-in reclaim. The donor
+  bind-before-allocation order was not copied across
   CYD startup rollback; runtime pool teardown is not introduced.
 - Audit and qualify any dynamic TLS/full-record RX reservation or early MPI
   allocation policy against the pinned CYD SDK. Preserve complete TLS record

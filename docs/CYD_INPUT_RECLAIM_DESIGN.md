@@ -66,19 +66,24 @@ early-expansion and incompatible allocator profiles. Exact semantic controls
 must fail the intended assertions; sanitizer crashes and timeouts are not
 successful detections.
 
-The separate ESP32 QEMU gate must use actual SDK heaps, FreeRTOS cores and the
-public `mbedtls_calloc` route, observe a real NULL before recovery, preserve
-nonidle bytes/floor/control, retain health failure callbacks, and exercise
-retirement and bounded retries under producer refill. Synthetic allocator
-failure alone cannot establish this target gate.
+The separate [ESP32 QEMU gate](../tests/results/cyd-input-reclaim-qemu-20261020/README.md)
+passes five cases and four exact semantic controls with actual SDK heaps,
+FreeRTOS cores and the public `mbedtls_calloc` route. It observes a real NULL
+before recovery, preserves nonidle bytes/floor/control and health failure
+callbacks, and exercises retirement and bounded retries under producer refill.
+It also checks zero/overflow delegation and an actual timer ISR. Heap fillers
+are synthetic pressure stimuli; allocator NULL/success results are real.
+All five ELF allocator/free pointer initializers and 246 frozen source inputs
+were checked independently. This is not a full TLS handshake or radio workload.
 
 Full opt-in Clang passes; actual production application links remain necessary.
 Physical HTTP/HTTPS, radio/WebUI/OTA contention, largest blocks, stack margins
 and prolonged audio tests remain distinct. No requested-byte count, static
 map delta or emulator result is a claim of measured CYD heap savings.
 
-The current host checkpoint passes 21 service/queue cases and 17 exact semantic
-controls, 12 startup configurations with four publication controls, and eight
-actual CMake helper configurations. The full opt-in Clang run covers 54 units,
-with 86 baseline warnings and no errors; the new service has no diagnostics.
-Actual SDK OOM/QEMU and production application qualification remain separate.
+The [host checkpoint](../tests/results/cyd-input-reclaim-20261020/README.md)
+passes 21 service/queue cases and 17 exact semantic controls, 12 startup
+configurations with four publication controls, and eight actual CMake helper
+configurations. The full opt-in Clang run covers 54 units, with 86 baseline
+warnings and no errors; the new service has no diagnostics. Production
+application exports remain the next separate gate.
