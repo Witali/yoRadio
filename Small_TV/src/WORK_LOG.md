@@ -3228,3 +3228,32 @@ true. Это только начало нового прогона, не 24 ча
   оба результата/логи сохраняются. Production/frozen full/H10 не перезапускались.
   На14:49UTC H10 supervisor сообщает112циклов без cleanup errors; это всё ещё
   running, не24h pass. Полный regression продолжает HTTP-сценарии.
+
+## 2026-10-20 — 12-bit JPEG tables в read-only storage и завершение host-проверки
+
+- Возобновлены изменения после прерывания с855e55507; они сохранены. Добавлены
+  deterministic flash-table generator и отдельные patches:45056range +65536
+  color bytes в static const, IMAGE spare chunks4096/1024 вместо16000/5000.
+  Объекты/alignment/lifetimes/IDCT/color arithmetic не меняются. Реальный private
+  table dump из pinned upstream C подтвердил все38912значения побайтово.
+- Исправлен build helper: mixed patch внутри sparse worktree пропускал new
+  headers; Git discovery теперь останавливается у parent export, enclosing repo
+  отвергается и оба headers обязательны. Неудачные сборки не считаются pass.
+- Прежний reserve оставлял richYCCK12progressive без памяти при cap64KiB;
+  compact pools устранили это. Все48rich images и12truncated cases проходят;
+  максимальный pool64869bytes, cleanup pool/backing завершён. Ещё25resource,
+  924lossless,16negative,4optional,18budget и18independent Pillow cases прошли.
+- Найдено излишне сильное требование теста: optional unlimited smoothingTRUE
+  progressive420 может получить больше small-pool headers. Exact output сохранён,
+  но205325 против204180bytes (+1145). Эта разница записана в raw metrics;
+  FIXED_TEST ограничивает такой control behavior/cleanup, реальные hard cap cases
+  остаются строгими. Два lossless quantization controls отвергнуты обеими libs.
+- RV32 full decoder144394text+120272read-only=264666bytes; пять tables имеют
+  r/R symbols и размер110592bytes, data/bss0. Это не firmware fit: adapter,
+  libc/libgcc/final link, общий heap/task/interrupt stack и NOR scratch ещё нужны.
+  Документированы scope/оставшиеся cases в tests/JPEG_FLASH_TABLES.md.
+- Отдельно проверены прежние B50D full/H10:20Oct все5original identities
+  отсутствуют, host не перезагружался с14Oct. Terminal full/H10 evidence нет,
+  causeunknown. Canonical analyzer проверил32inputs,179complete journal cycles,
+  5pending events и3034.241151guestsec; report178. Никакие stale running flags
+  не объявлены pass. Сохранение baseline proofs выполняется в её собственной ветке.

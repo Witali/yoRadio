@@ -7,7 +7,7 @@ import struct
 import subprocess
 import tarfile
 
-from build import HERE, PIN, run, sha
+from build import HERE, PIN, apply_source_patch, run, sha
 
 
 def capture(command, output):
@@ -50,11 +50,15 @@ def main():
     parser.add_argument("--toolchain-bin", type=Path, required=True)
     parser.add_argument("--cmake", default="cmake")
     parser.add_argument("--ninja", default="ninja")
+    parser.add_argument("--flash-tables", action="store_true")
+    parser.add_argument("--compact-pools", action="store_true")
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     inputs = {name: sha(HERE / name) for name in
-              ("rv32_footprint.py", "footprint.c", "build.py", "libjpeg-turbo-3.2.0-bounded.patch", "UPSTREAM.json")}
+              ("rv32_footprint.py", "footprint.c", "build.py", "libjpeg-turbo-3.2.0-bounded.patch", "UPSTREAM.json",
+               "generate_flash_tables.py", "libjpeg-turbo-3.2.0-flash-tables.patch")}
+    inputs["libjpeg-turbo-3.2.0-compact-pools.patch"] = sha(HERE / "libjpeg-turbo-3.2.0-compact-pools.patch")
     actual = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=args.source, text=True).strip()
     if actual != PIN:
         raise ValueError(f"Expected upstream {PIN}, got {actual}")
@@ -68,10 +72,19 @@ def main():
         stream.extractall(source, filter="data")
     patch = HERE / "libjpeg-turbo-3.2.0-bounded.patch"
     assert sha(patch) == upstream["patch_sha256"]
-    run(["git", "apply", "--check", patch], source)
-    run(["git", "apply", patch], source)
+    apply_source_patch(patch, source)
     for name in ("jdmaster.c", "jdcoefct.c"):
         assert "Small TV modifications" in (source / "src" / name).read_text()
+    flash_patch = HERE / "libjpeg-turbo-3.2.0-flash-tables.patch"
+    if args.flash_tables:
+        assert sha(flash_patch) == upstream["flash_tables_patch_sha256"]
+        apply_source_patch(flash_patch, source)
+        for name in ("small_tv_jpeg12_range.h", "small_tv_jpeg12_color.h"):
+            assert (source / "src" / name).is_file(), name
+    pool_patch = HERE / "libjpeg-turbo-3.2.0-compact-pools.patch"
+    if args.compact_pools:
+        assert sha(pool_patch) == upstream["compact_pools_patch_sha256"]
+        apply_source_patch(pool_patch, source)
     binaries = args.toolchain_bin.resolve()
     suffix = ".exe" if (binaries / "riscv32-esp-elf-gcc.exe").exists() else ""
 
@@ -111,6 +124,7 @@ def main():
     link_flags = ["-r", "--gc-sections", "-e", "jpeg_footprint_entry", "-Map=" + str(output / "decoder.map")]
     run([tool("ld"), *link_flags, entry_object, library, "-o", linked])
     symbols = capture([tool("nm"), "--defined-only", linked], output / "symbols.txt")
+    sized_symbols = capture([tool("nm"), "--defined-only", "--print-size", linked], output / "symbol-sizes.txt")
     unresolved = capture([tool("nm"), "-u", linked], output / "unresolved.txt")
     capture([tool("readelf"), "-h", "-A", linked], output / "elf-architecture.txt")
     capture([tool("size"), "-A", linked], output / "sections.txt")
@@ -142,6 +156,16 @@ def main():
                                   bytes=int(match[5]), kind=match[6]))
     assert stack, "Missing compiler stack-usage diagnostics"
     sizes = elf_sections(linked)
+    flash_symbols = {}
+    if args.flash_tables:
+        for line in sized_symbols.splitlines():
+            fields = line.split()
+            if len(fields) == 4 and fields[3].startswith("small_tv_jpeg12_"):
+                assert fields[2] in ("r", "R"), "Lookup tables must reside in read-only sections"
+                flash_symbols[fields[3]] = int(fields[1], 16)
+        expected_tables = {"small_tv_jpeg12_range": 45056, **{
+            "small_tv_jpeg12_" + name: 16384 for name in ("cr_r", "cb_b", "cr_g", "cb_g")}}
+        assert flash_symbols == expected_tables, flash_symbols
     summary_fields = binutils_summary.splitlines()[1].split()
     assert int(summary_fields[0]) == sizes["code_bytes"] + sizes["readonly_bytes"]
     assert int(summary_fields[1]) == sizes["initialized_writable_bytes"]
@@ -150,6 +174,9 @@ def main():
         raise ValueError("Footprint inputs changed during compilation")
     record = dict(schema_version=1, status="rv32_cross_compile_passed", all_functionality_verified=False,
                   upstream_commit=PIN, source_archive_sha256=sha(archive), patch_sha256=sha(patch),
+                  flash_tables=args.flash_tables, flash_patch_sha256=sha(flash_patch) if args.flash_tables else None,
+                  compact_pools=args.compact_pools, pool_patch_sha256=sha(pool_patch) if args.compact_pools else None,
+                  flash_table_symbols=flash_symbols,
                   source_hashes=inputs, compiler=version.strip(), compiler_sha256=sha(tool("gcc")),
                   specs_sha256=sha(specs), c_flags=flags, cmake_flags=cmake_flags, link_flags=link_flags,
                   library_sha256=sha(library), retained_object_sha256=sha(linked),

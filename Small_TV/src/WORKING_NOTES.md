@@ -63,6 +63,24 @@ function через linker map; palette `fill_inverse_cmap`12 имеет24928byt
 вычисления с exact upstream pixels, затем полноценный link/RAM/stack/storage.
 См. tests/JPEG_RV32_FOOTPRINT.md и jpeg-library-rv32-footprint-20261019.json.
 
+Обновление2026-10-20: host12-bit RAM адаптация выполнена отдельными optional
+flash-tables/compact-pools patches. Все38912actual upstream table entries exact;
+48rich12-bit cases +12truncated, прежние25resource/924lossless/16negative/
+4optional/18budget и18Pillow images проходят. RichRGB12 pool176345→37618,
+progressive347927→45736; worstYCCK12progressive64869 +288000host backing.
+RV32 decoder264666bytes (144394text+120272rodata); все5const symbols r/R,
+110592table bytes, data/bss0. Это ещё не production link/общий RAM/stack.
+Optional unlimited smoothing420 pool вырос1145bytes при exact pixels;
+FIXED_TEST убрал неверную monotonic-memory проверку только этого control scope,
+не hard cap. Сборочный helper исправлен: Git ceiling должен быть parent export,
+иначе new files смешанного patch молча пропускались в sparse worktree.
+Нужны NOR-aware backing, allocator/I/O fault/reuse, RGB565/factory parity,
+полная сборка/heap/stack/HTTP/LCD/full/H10. См. tests/JPEG_FLASH_TABLES.md.
+B50D19Oct full/H10 больше не live:20Oct исходные5identities отсутствуют,
+host boot остаётся14Oct, terminal footer нет; cause unknown. Report178cycles,
+journal179+5pending,3034.24guestsec; не24h pass и не firmware failure. Исходные
+raw files сохраняются отдельно в baseline branch перед любыми новыми запусками.
+
 Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
 groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
 24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.

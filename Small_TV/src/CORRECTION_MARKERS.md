@@ -19,6 +19,13 @@ Host-квалификация новой JPEG-библиотеки также и
 виртуальных окон стенда. Эти метки не утверждают ошибку заводской программы и не
 означают, что библиотека уже включена в production firmware.
 
+В квалификации 12-bit flash tables `REQUESTED_CHANGE` также отмечает перенос
+неизменяемых таблиц и уменьшение spare IMAGE pool chunks. `FIXED_TEST` в
+`qualify.main` сохраняет pixel/cleanup checks optional unlimited modes, но
+не требует монотонного снижения памяти: измеренный прирост1145bytes при smoothing
+остаётся в отчёте. Hard memory cap рабочих cases не ослаблен. См.
+[JPEG_FLASH_TABLES.md](tests/JPEG_FLASH_TABLES.md).
+
 ## Как ставить метку
 
 Метка находится в первом комментарии внутри исправленной функции, рядом с

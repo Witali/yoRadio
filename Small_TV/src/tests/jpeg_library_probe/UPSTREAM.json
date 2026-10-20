@@ -13,9 +13,11 @@
   },
   "modifications": [
     "Skip unused lossless range table for non-quantized non-buffered output.",
-    "Keep one iMCU window when progressive smoothing is explicitly disabled by a non-buffered client."
+    "Keep one iMCU window when progressive smoothing is explicitly disabled by a non-buffered client.",
+    "Optional exact 12-bit range/color lookup tables in read-only storage, replacing 110592 bytes of dynamic tables.",
+    "Optional compact IMAGE pool reserves: 4096 bytes initially and 1024 bytes per additional chunk, preserving object sizes/alignment."
   ],
-  "integration_status": "host-only qualification; not linked into firmware",
+  "integration_status": "Host qualification and RV32 link measurement; not linked into production firmware.",
   "explicitly_unsupported_upstream": [
     "Hierarchical JPEG",
     "DNL marker",
@@ -28,5 +30,10 @@
     "JPEG 2000",
     "JPEG XL",
     "WebP"
-  ]
+  ],
+  "flash_tables_patch": "libjpeg-turbo-3.2.0-flash-tables.patch",
+  "flash_tables_patch_sha256": "1fdf910f05bfbbf6fb1862ef12f9a431b3e63208ee87e24322ce6fd08b58f88f",
+  "flash_tables_generator": "generate_flash_tables.py",
+  "compact_pools_patch": "libjpeg-turbo-3.2.0-compact-pools.patch",
+  "compact_pools_patch_sha256": "735247281197a0df260545468d154fb18a1f6a505f69d0ec6e9ac7aa37efb981"
 }

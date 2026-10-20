@@ -5,12 +5,13 @@
 #include <setjmp.h>
 #include "jpeglib.h"
 #include "probe_memory.h"
+#include "table_dump.h"
 
 typedef struct { struct jpeg_error_mgr pub; jmp_buf jump; } probe_error;
 typedef struct {
     struct jpeg_decompress_struct codec;
     probe_error error;
-    FILE *input, *output;
+    FILE *input, *output, *extra;
     unsigned char *row;
 } decode_session;
 typedef struct {
@@ -34,11 +35,11 @@ static void warn(j_common_ptr codec, int level)
     /* A damaged input must not be silently repaired and reported as successful. */
     if (level < 0) fail(codec);
 }
-static unsigned sample(unsigned x, unsigned y, unsigned channel, unsigned precision, int lossless)
+static unsigned sample(unsigned x, unsigned y, unsigned channel, unsigned precision, int patterned)
 {
     /* Known exact source samples make lossless tests independent of the decoder. */
     unsigned maximum = (1u << precision) - 1u;
-    return lossless ? (x * 17u + y * 31u + channel * 47u) & maximum : 1u << (precision - 1u);
+    return patterned ? (x * 17u + y * 31u + channel * 47u) & maximum : 1u << (precision - 1u);
 }
 static int generate(const char *path, const char *mode, unsigned precision,
                     unsigned width, unsigned height, int predictor, int transform,
@@ -71,12 +72,17 @@ static int generate(const char *path, const char *mode, unsigned precision,
     codec->in_color_space = gray ? JCS_GRAYSCALE : cmyk ? JCS_CMYK : JCS_RGB;
     jpeg_set_defaults(codec);
     codec->data_precision = (int)precision;
-    jpeg_set_quality(codec, 100, FALSE);
+    jpeg_set_quality(codec, strstr(mode, "q83") ? 83 : 100, FALSE);
     codec->optimize_coding = TRUE;
+    if (strstr(mode, "ycck")) jpeg_set_colorspace(codec, JCS_YCCK);
     if (strstr(mode, "444"))
         for (int i = 0; i < codec->num_components; ++i)
             codec->comp_info[i].h_samp_factor = codec->comp_info[i].v_samp_factor = 1;
-    if (strstr(mode, "ycck")) jpeg_set_colorspace(codec, JCS_YCCK);
+    if (strstr(mode, "422")) {
+        codec->comp_info[0].h_samp_factor = 2; codec->comp_info[0].v_samp_factor = 1;
+        for (int i = 1; i < codec->num_components; ++i)
+            codec->comp_info[i].h_samp_factor = codec->comp_info[i].v_samp_factor = 1;
+    }
     if (strstr(mode, "arith")) codec->arith_code = TRUE;
     if (strstr(mode, "progressive")) jpeg_simple_progression(codec);
     if (lossless) {
@@ -91,7 +97,8 @@ static int generate(const char *path, const char *mode, unsigned precision,
     while (codec->next_scanline < codec->image_height) {
         for (unsigned x = 0; x < width; ++x)
             for (unsigned c = 0; c < (unsigned)codec->input_components; ++c) {
-                unsigned value = sample(x, codec->next_scanline, c, precision, lossless);
+                unsigned value = sample(x, codec->next_scanline, c, precision,
+                                        lossless || strstr(mode, "rich") != NULL);
                 if (precision > 8) ((unsigned short *)s->row)[x * codec->input_components + c] = (unsigned short)value;
                 else s->row[x * codec->input_components + c] = (unsigned char)value;
             }
@@ -105,7 +112,7 @@ static int generate(const char *path, const char *mode, unsigned precision,
 }
 
 static int decode(const char *input, const char *output, size_t budget, int backing,
-                  int smoothing, int quantize)
+                  int smoothing, int quantize, const char *color_dump)
 {
     /* Measure only library pools, with separate row size and complete error unwind. */
     decode_session *s = calloc(1, sizeof(*s));
@@ -130,6 +137,13 @@ static int decode(const char *input, const char *output, size_t budget, int back
         s->codec.quantize_colors = quantize ? TRUE : FALSE;
         jpeg_start_decompress(&s->codec);
         channels = s->codec.output_components;
+        if (color_dump) {
+            /* Table inspection intentionally stops before entropy/output; destroy
+             * releases the session normally after all actual values are copied. */
+            s->extra = fopen(color_dump, "wb");
+            if (s->extra && jpeg_probe_dump_tables12(&s->codec, s->output, s->extra)) passed = 1;
+            goto done;
+        }
         row_bytes = (size_t)width * channels * (precision > 8 ? 2 : 1);
         s->row = malloc(row_bytes);
         if (!s->row) goto done;
@@ -147,6 +161,7 @@ done:
     jpeg_destroy_decompress(&s->codec);
     if (s->input) fclose(s->input);
     if (s->output) fclose(s->output);
+    if (s->extra) fclose(s->extra);
     free(s->row);
     probe_memory_stats m = probe_memory_snapshot();
     printf("{\"passed\":%s,\"width\":%u,\"height\":%u,\"precision\":%u,\"channels\":%u,"
@@ -171,8 +186,11 @@ int main(int argc, char **argv)
                         argc == 10 ? (unsigned)atoi(argv[9]) : 0);
     if ((argc == 6 || argc == 8) && !strcmp(argv[1], "decode"))
         return decode(argv[2], argv[3], (size_t)strtoull(argv[4], NULL, 10), atoi(argv[5]),
-                      argc == 8 ? atoi(argv[6]) : 0, argc == 8 ? atoi(argv[7]) : 0);
+                      argc == 8 ? atoi(argv[6]) : 0, argc == 8 ? atoi(argv[7]) : 0, NULL);
+    if (argc == 5 && !strcmp(argv[1], "dump-tables"))
+        return decode(argv[2], argv[3], 0, 0, 0, 0, argv[4]);
     fprintf(stderr, "generate path mode precision [width height predictor transform restart] | "
-                    "decode input output budget backing [smoothing quantize]\n");
+                    "decode input output budget backing [smoothing quantize] | "
+                    "dump-tables input range-output color-output\n");
     return 2;
 }
