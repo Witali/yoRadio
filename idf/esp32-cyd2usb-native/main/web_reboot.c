@@ -105,6 +105,20 @@ esp_err_t web_reboot_commit(web_reboot_lease_t *lease, unsigned delay_ms) {
     return ESP_OK;
 }
 
+esp_err_t web_reboot_restart_reserved_now(web_reboot_lease_t *lease) {
+    if (!lease) return ESP_ERR_INVALID_ARG;
+    portENTER_CRITICAL(&s_deadline_lock);
+    if (!atomic_load(&s_ready) || !lease->epoch || lease->epoch != s_reserved_epoch) {
+        portEXIT_CRITICAL(&s_deadline_lock);
+        return ESP_ERR_INVALID_STATE;
+    }
+    // Retain ownership while the SDK restarts outside the portMUX. In particular,
+    // do not wake an ordinary pending reboot or allow another OTA reservation.
+    portEXIT_CRITICAL(&s_deadline_lock);
+    esp_restart();
+    return ESP_OK; // Only a returning test double can reach this line.
+}
+
 esp_err_t web_reboot_abort(void) {
     // Startup owns this operation; no route may concurrently request reboot.
     portENTER_CRITICAL(&s_deadline_lock);

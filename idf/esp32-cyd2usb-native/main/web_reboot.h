@@ -23,6 +23,14 @@ esp_err_t web_reboot_cancel(web_reboot_lease_t *lease);
 // A valid reservation pins the preallocated reboot service; no allocation here.
 esp_err_t web_reboot_commit(web_reboot_lease_t *lease, unsigned delay_ms);
 
+// The exclusive lease owner may restart immediately after its final eligibility
+// check. The lease must not be copied, cancelled or committed concurrently.
+// The reservation stays active through esp_restart(), called outside the lock;
+// ordinary pending requests and other reservations remain blocked. A successful
+// real restart never returns. If a test restart double returns, return ESP_OK
+// with the lease still reserved; the caller still owns that same lease.
+esp_err_t web_reboot_restart_reserved_now(web_reboot_lease_t *lease);
+
 // Startup rollback only, while upload routes are inactive. A pending reboot
 // cannot be cancelled after credentials were committed.
 esp_err_t web_reboot_abort(void);
