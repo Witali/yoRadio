@@ -1,0 +1,129 @@
+--- .build/cyd-vorbis-books-prep-01/generate_books.py
++++ tests/vorbis_format_corpus/generate_books.py
+@@ -6,13 +6,19 @@
+ from collections import Counter
+ from fractions import Fraction
+ import hashlib
++import importlib.util
+ import json
+ from pathlib import Path
+ 
+-import base_minimal as base
+-
+ HERE = Path(__file__).resolve().parent
++ROOT = HERE.parents[1]
+ BASE_SHA = "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
++BASE_PATH = ROOT / "tests/vorbis_block_matrix/generate_minimal.py"
++if hashlib.sha256(BASE_PATH.read_bytes()).hexdigest() != BASE_SHA:
++    raise ValueError("Pinned canonical minimal helper changed")
++_spec = importlib.util.spec_from_file_location("vorbis_format_books_minimal", BASE_PATH)
++base = importlib.util.module_from_spec(_spec)
++_spec.loader.exec_module(base)  # Definitions only; its guarded main is not called.
+ RATE, SHORT, LONG, CHANNELS = 192000, 256, 2048, 2
+ MODES = base.MODES
+ SPEC = "https://xiph.org/vorbis/doc/Vorbis_I_spec.html"
+@@ -284,7 +290,9 @@
+ def generate(output):
+     need(sha(Path(base.__file__).read_bytes()) == BASE_SHA, "frozen base helper changed")
+     output = output.resolve()
+-    need(output.parent == HERE and not output.exists(), "fresh direct child of this prep required")
++    build_root = ROOT / ".build"
++    need(output != build_root and output.is_relative_to(build_root) and not output.exists(),
++         "fresh output beneath this checkout's .build required")
+     construction_controls()
+     payloads, cases, syntax, spectra = {}, [], {}, {}
+     sizes = [LONG if mode else SHORT for mode in MODES]
+@@ -386,6 +394,7 @@
+         base_helper_sha256=BASE_SHA, references=[SPEC, XIPH], independent_decode_pending=True,
+         files=[dict(path=name, bytes=len(data), sha256=sha(data)) for name, data in sorted(payloads.items())])
+     payloads["manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
++    output.parent.mkdir(parents=True, exist_ok=True)
+     output.mkdir()
+     for name, data in payloads.items():
+         path = output / name
+@@ -399,5 +408,5 @@
+ 
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--output", type=Path, default=HERE / "generated01")
++    parser.add_argument("--output", type=Path, default=ROOT / ".build/vorbis-books-corpus-01")
+     generate(parser.parse_args().output)
+--- .build/cyd-vorbis-floor0-prep-01/generate.py
++++ tests/vorbis_format_corpus/generate_floor0.py
+@@ -6,10 +6,12 @@
+ from pathlib import Path
+ 
+ HERE = Path(__file__).resolve().parent
++ROOT = HERE.parents[1]
+ SUPPORT_SHA = "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+-support_path = HERE / "minimal_support.py"
+-assert hashlib.sha256(support_path.read_bytes()).hexdigest() == SUPPORT_SHA
+-spec = importlib.util.spec_from_file_location("pinned_minimal_support", support_path)
++support_path = ROOT / "tests/vorbis_block_matrix/generate_minimal.py"
++if hashlib.sha256(support_path.read_bytes()).hexdigest() != SUPPORT_SHA:
++    raise ValueError("Pinned canonical minimal helper changed")
++spec = importlib.util.spec_from_file_location("vorbis_format_floor0_minimal", support_path)
+ S = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(S)  # Definitions only; its guarded main is not called.
+ RATE, CHANNELS = 48000, 2
+@@ -179,7 +181,9 @@
+ 
+ def generate(output):
+     output = output.resolve()
+-    assert output.parent == HERE and not output.exists(), "Fresh direct-child output required"
++    build_root = ROOT / ".build"
++    if output == build_root or not output.is_relative_to(build_root) or output.exists():
++        raise ValueError("Fresh output beneath this checkout's .build required")
+     assert S.unpack_float((784 << 21) | 1) == S.Fraction(1, 16)
+     comment = S.comment()
+     payloads, cases, fields = {}, [], dict(comment=comment.report(), variants={}, identifications={})
+@@ -255,10 +259,11 @@
+                 ("construction-fields.json", fields), ("pure-checks.json", checks)):
+         payloads[name] = (json.dumps(value, indent=2) + "\n").encode()
+     manifest = dict(schema="vorbis-floor0-construction-manifest-v1", generator_sha256=S.sha(Path(__file__).read_bytes()),
+-        support_sha256=SUPPORT_SHA, inputs_sha256=S.sha((HERE / "inputs.json").read_bytes()),
++        support_sha256=SUPPORT_SHA, source_references_sha256=S.sha((HERE / "source_references.json").read_bytes()),
+         codec_execution=False, validity_qualified=False,
+         files=[dict(path=p, bytes=len(d), sha256=S.sha(d)) for p, d in sorted(payloads.items())])
+     payloads["manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
++    output.parent.mkdir(parents=True, exist_ok=True)
+     output.mkdir()
+     for name, content in payloads.items():
+         path = output / name
+@@ -271,5 +276,5 @@
+ 
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--output", required=True, type=Path)
++    parser.add_argument("--output", type=Path, default=ROOT / ".build/vorbis-floor0-corpus-01")
+     generate(parser.parse_args().output)
+--- .build/cyd-vorbis-books-prep-01/test_books.py
++++ tests/vorbis_format_corpus/test_books.py
+@@ -1,4 +1,5 @@
+ """Pure byte/construction checks only; no decoder, PCM synthesis or subprocess."""
++import argparse
+ from collections import Counter
+ import hashlib
+ import json
+@@ -8,7 +9,7 @@
+ import generate_books as g
+ 
+ HERE = Path(__file__).resolve().parent
+-DATA = HERE / "generated01"
++DATA = g.ROOT / ".build/vorbis-books-corpus-01"
+ 
+ 
+ class ConstructionTests(unittest.TestCase):
+@@ -114,4 +115,11 @@
+ 
+ 
+ if __name__ == "__main__":
+-    unittest.main(verbosity=2)
++    parser = argparse.ArgumentParser(description=__doc__, add_help=False)
++    parser.add_argument("--data", type=Path, default=DATA)
++    options, remaining = parser.parse_known_args()
++    DATA = options.data.resolve()
++    build_root = g.ROOT / ".build"
++    if DATA == build_root or not DATA.is_relative_to(build_root) or not DATA.is_dir():
++        parser.error("existing corpus beneath this checkout's .build required")
++    unittest.main(argv=[str(Path(__file__)), *remaining], verbosity=2)

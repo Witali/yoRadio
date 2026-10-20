@@ -1,0 +1,265 @@
+{
+  "schema": "vorbis-format-source-adaptation-v1",
+  "scope": "Source/AST comparison only; adapted generator and construction tests not executed",
+  "inputs": [
+    {
+      "path": ".build/cyd-vorbis-books-prep-01/generate_books.py",
+      "bytes": 20513,
+      "sha256": "fd017fdd6179b402755c8b6f26daa2bdb9c5d4964317294af4e1b5e41c78c79f"
+    },
+    {
+      "path": ".build/cyd-vorbis-books-prep-01/test_books.py",
+      "bytes": 6288,
+      "sha256": "be0a93502e68d58c67df5885a4de6151d456475145c86e044fef03337ea15110"
+    },
+    {
+      "path": ".build/cyd-vorbis-books-prep-01/base_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": ".build/cyd-vorbis-floor0-prep-01/generate.py",
+      "bytes": 14111,
+      "sha256": "3955a1fd3c0ef6a9287ea11e9e5f3ad0cec3d6e02dad9a2730cd2a95deae464e"
+    },
+    {
+      "path": ".build/cyd-vorbis-floor0-prep-01/minimal_support.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": "tests/vorbis_block_matrix/generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": ".build/cyd-vorbis-floor0-prep-01/inputs.json",
+      "bytes": 1685,
+      "sha256": "a6ccdba239b5906d19a402ffc8be39649569b45b1b7c1dec230e0b0ee1b06f39"
+    }
+  ],
+  "helper_three_copies_byte_identical": true,
+  "helper_snapshot_copied_to_proposal": false,
+  "relations": [
+    {
+      "original": ".build/cyd-vorbis-books-prep-01/generate_books.py",
+      "proposed": "tests/vorbis_format_corpus/generate_books.py",
+      "original_sha256": "fd017fdd6179b402755c8b6f26daa2bdb9c5d4964317294af4e1b5e41c78c79f",
+      "proposed_sha256": "de9b09de59a0825feda741c0343c6d60821ddad1258ce7df5ae342c68e268fc1",
+      "allowed_edits": [
+        {
+          "before": "import hashlib\n",
+          "after": "import hashlib\nimport importlib.util\n"
+        },
+        {
+          "before": "import base_minimal as base\n\nHERE = Path(__file__).resolve().parent\nBASE_SHA = \"8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1\"\n",
+          "after": "HERE = Path(__file__).resolve().parent\nROOT = HERE.parents[1]\nBASE_SHA = \"8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1\"\nBASE_PATH = ROOT / \"tests/vorbis_block_matrix/generate_minimal.py\"\nif hashlib.sha256(BASE_PATH.read_bytes()).hexdigest() != BASE_SHA:\n    raise ValueError(\"Pinned canonical minimal helper changed\")\n_spec = importlib.util.spec_from_file_location(\"vorbis_format_books_minimal\", BASE_PATH)\nbase = importlib.util.module_from_spec(_spec)\n_spec.loader.exec_module(base)  # Definitions only; its guarded main is not called.\n"
+        },
+        {
+          "before": "    need(output.parent == HERE and not output.exists(), \"fresh direct child of this prep required\")",
+          "after": "    build_root = ROOT / \".build\"\n    need(output != build_root and output.is_relative_to(build_root) and not output.exists(),\n         \"fresh output beneath this checkout's .build required\")"
+        },
+        {
+          "before": "    output.mkdir()\n",
+          "after": "    output.parent.mkdir(parents=True, exist_ok=True)\n    output.mkdir()\n"
+        },
+        {
+          "before": "default=HERE / \"generated01\"",
+          "after": "default=ROOT / \".build/vorbis-books-corpus-01\""
+        }
+      ],
+      "exact_reverse_projection": true,
+      "unchanged_definitions": [
+        {
+          "name": "need",
+          "bytes": 77,
+          "sha256": "0cd4c0a0f818a5d314436fa04eb162ebe09526c798fd6b7564454e434d4b7061"
+        },
+        {
+          "name": "sha",
+          "bytes": 58,
+          "sha256": "fc33541dab55897936faef1ad2869e455cbd6942f02508b99b41efdccc29be21"
+        },
+        {
+          "name": "words",
+          "bytes": 759,
+          "sha256": "5a548ecc56c43fdba821db50e3546637db09fe94c070b5f4203a6567d22e70ef"
+        },
+        {
+          "name": "reverse",
+          "bytes": 48,
+          "sha256": "1eeb3189514a62093a21574e9bf7994103abee6a21846848631703c5e514ed21"
+        },
+        {
+          "name": "configurations",
+          "bytes": 1219,
+          "sha256": "d3cd06132b086f8826bf767d80c78591a9d0b58c9c6136e7dc10fbb6f290cd4b"
+        },
+        {
+          "name": "quantvals",
+          "bytes": 119,
+          "sha256": "e8177445e2856c77f09c81d7fddf880db2d381564106d38693937aca0267a57c"
+        },
+        {
+          "name": "vectors",
+          "bytes": 792,
+          "sha256": "0e3f8050d354440e8727b76ba1b56c94394ea892b5bda9fbe8d4eeb222e36687"
+        },
+        {
+          "name": "write_book",
+          "bytes": 1485,
+          "sha256": "55105928cc1bca186352f3754d3d4d57d0399000906a9f8ae46c8aefdf41f18d"
+        },
+        {
+          "name": "scalar_book",
+          "bytes": 114,
+          "sha256": "f4b530a57d2dc322e0eed08d333f6c73383240de85f09623b165ac39bbc47003"
+        },
+        {
+          "name": "setup",
+          "bytes": 1787,
+          "sha256": "b6fa15f12c84d9545e8c33944122d8ce672b5cb5ce23659aabc162a19d903e30"
+        },
+        {
+          "name": "selected_entries",
+          "bytes": 230,
+          "sha256": "78040201db4a4e0bb844aecb8a62733c603ec0cd89494e9f681f5183e353ecee"
+        },
+        {
+          "name": "audio",
+          "bytes": 860,
+          "sha256": "78701aed31b6bf5db32d913887a271b00fe74c458e27281508a4f438e32b9df7"
+        },
+        {
+          "name": "Reader",
+          "bytes": 625,
+          "sha256": "30cfa6dcab77a4291838df103b0d79dd2222938a8319dd388d94a2bd6af843a8"
+        },
+        {
+          "name": "read_book",
+          "bytes": 1097,
+          "sha256": "2989ff07106b793810d1e6e6c73d0c09d83af698274dba37bf5e8e3ca229309a"
+        },
+        {
+          "name": "inspect_audio",
+          "bytes": 1294,
+          "sha256": "b018abd33a8ae1be42c5d258a143c1aa3efa6a8edd612a19ca76698c4d8e825b"
+        },
+        {
+          "name": "construction_controls",
+          "bytes": 846,
+          "sha256": "2c24f9b05ea9080a6ee85752af8bf5630aca30e311a9c91a373a3c26f28b40af"
+        }
+      ],
+      "generate_changes_only": "output path guard/create parent; floor0 manifest provenance"
+    },
+    {
+      "original": ".build/cyd-vorbis-floor0-prep-01/generate.py",
+      "proposed": "tests/vorbis_format_corpus/generate_floor0.py",
+      "original_sha256": "3955a1fd3c0ef6a9287ea11e9e5f3ad0cec3d6e02dad9a2730cd2a95deae464e",
+      "proposed_sha256": "7bd0f139e496edce90c1335e4dc4370ed9e99499e209e9f14324c68297971a07",
+      "allowed_edits": [
+        {
+          "before": "HERE = Path(__file__).resolve().parent\nSUPPORT_SHA = \"8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1\"\nsupport_path = HERE / \"minimal_support.py\"\nassert hashlib.sha256(support_path.read_bytes()).hexdigest() == SUPPORT_SHA\nspec = importlib.util.spec_from_file_location(\"pinned_minimal_support\", support_path)\n",
+          "after": "HERE = Path(__file__).resolve().parent\nROOT = HERE.parents[1]\nSUPPORT_SHA = \"8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1\"\nsupport_path = ROOT / \"tests/vorbis_block_matrix/generate_minimal.py\"\nif hashlib.sha256(support_path.read_bytes()).hexdigest() != SUPPORT_SHA:\n    raise ValueError(\"Pinned canonical minimal helper changed\")\nspec = importlib.util.spec_from_file_location(\"vorbis_format_floor0_minimal\", support_path)\n"
+        },
+        {
+          "before": "    assert output.parent == HERE and not output.exists(), \"Fresh direct-child output required\"",
+          "after": "    build_root = ROOT / \".build\"\n    if output == build_root or not output.is_relative_to(build_root) or output.exists():\n        raise ValueError(\"Fresh output beneath this checkout's .build required\")"
+        },
+        {
+          "before": "inputs_sha256=S.sha((HERE / \"inputs.json\").read_bytes())",
+          "after": "source_references_sha256=S.sha((HERE / \"source_references.json\").read_bytes())"
+        },
+        {
+          "before": "    output.mkdir()\n",
+          "after": "    output.parent.mkdir(parents=True, exist_ok=True)\n    output.mkdir()\n"
+        },
+        {
+          "before": "parser.add_argument(\"--output\", required=True, type=Path)",
+          "after": "parser.add_argument(\"--output\", type=Path, default=ROOT / \".build/vorbis-floor0-corpus-01\")"
+        }
+      ],
+      "exact_reverse_projection": true,
+      "unchanged_definitions": [
+        {
+          "name": "put_book",
+          "bytes": 808,
+          "sha256": "e65060986caade079956c4b2d95e4df8ee330a43e06e52d1f962a02f9f2d898c"
+        },
+        {
+          "name": "setup",
+          "bytes": 2164,
+          "sha256": "0a6d34e616f6b66d07bfb7bf6c0307d101a3f527b6a93c7332a0723fee0a89b3"
+        },
+        {
+          "name": "lsp_values",
+          "bytes": 388,
+          "sha256": "71235913901fe19046043ac7e61de43663c397cfa2e8cbc311fee6ebf9d1dc14"
+        },
+        {
+          "name": "reverse2",
+          "bytes": 65,
+          "sha256": "744ab4a1c611beab014684bdc56e91d4bc21d292d29a50f2835762fd265e29e2"
+        },
+        {
+          "name": "audio",
+          "bytes": 2023,
+          "sha256": "686438cf97bc5a9ddfc8950ddd1d567dde8ef2fffd9a74b8ebc62b8816149956"
+        },
+        {
+          "name": "syntax_roundtrip",
+          "bytes": 1400,
+          "sha256": "d241afc1149388dcbf2948f2004a8b675665ec2a04c9d8580b18e26a5ef92f97"
+        }
+      ],
+      "generate_changes_only": "output path guard/create parent; floor0 manifest provenance"
+    },
+    {
+      "original": ".build/cyd-vorbis-books-prep-01/test_books.py",
+      "proposed": "tests/vorbis_format_corpus/test_books.py",
+      "original_sha256": "be0a93502e68d58c67df5885a4de6151d456475145c86e044fef03337ea15110",
+      "proposed_sha256": "1c4560bab783d2d31145600af75331d39a37f6cb2e96eed4e907aa071427d5d9",
+      "allowed_edits": [
+        {
+          "before": "from collections import Counter\n",
+          "after": "import argparse\nfrom collections import Counter\n"
+        },
+        {
+          "before": "DATA = HERE / \"generated01\"",
+          "after": "DATA = g.ROOT / \".build/vorbis-books-corpus-01\""
+        },
+        {
+          "before": "    unittest.main(verbosity=2)\n",
+          "after": "    parser = argparse.ArgumentParser(description=__doc__, add_help=False)\n    parser.add_argument(\"--data\", type=Path, default=DATA)\n    options, remaining = parser.parse_known_args()\n    DATA = options.data.resolve()\n    build_root = g.ROOT / \".build\"\n    if DATA == build_root or not DATA.is_relative_to(build_root) or not DATA.is_dir():\n        parser.error(\"existing corpus beneath this checkout's .build required\")\n    unittest.main(argv=[str(Path(__file__)), *remaining], verbosity=2)\n"
+        }
+      ],
+      "exact_reverse_projection": true,
+      "unchanged_definitions": [
+        {
+          "name": "ConstructionTests",
+          "bytes": 5946,
+          "sha256": "4f71fc5f9e5ea7c3c56de0ef2284e88ec96357642e1bb195bb0c172a61f6900f"
+        }
+      ],
+      "generate_changes_only": null
+    }
+  ],
+  "construction_methods": [
+    "test_entry_order_words_and_reversal",
+    "test_actual_header_books_and_ordered_gap",
+    "test_sparse_original_index_lookup2_values",
+    "test_lookup1_extra_entry_and_sequence_reset",
+    "test_every_actual_packet_uses_public_entry_indices",
+    "test_complete_packet_consumption_and_malformed_construction_controls",
+    "test_constructed_spectral_equivalence_and_sequence_difference",
+    "test_stored_manifest_carriers_offsets_and_raw_accounting"
+  ],
+  "expected_generated_differences": [
+    "books manifest.json generator_sha256 only",
+    "floor0 manifest.json generator_sha256 and inputs_sha256 -> source_references_sha256 only",
+    "CLI stdout output path and resulting manifest hash"
+  ],
+  "expected_all_other_generated_files_byte_identical": true,
+  "generated_payload_reproduction_executed": false
+}
