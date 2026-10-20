@@ -1,0 +1,19 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_settings.c:45:5: warning: the result from calling 'memcpy' is not null-terminated [bugprone-not-null-terminated-result]
+   43 |                           uint8_t record[NETWORK_RECORD_SIZE]) {
+      |                                                             
+      |                                                              + 1
+   44 |     memset(record, 0, NETWORK_RECORD_SIZE);
+   45 |     memcpy(record, "NNET", 4U);
+      |     ^~~~~~               ~~~~
+      |     strcpy (char *)
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_settings.c:54:9: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   54 |     if (memcmp(record, "NNET", 4U) || record[4] != 1U || record[5] || record[7])
+      |         ^
+      |                                    != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_settings.c:63:9: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   63 |     if (memcmp(record, canonical, NETWORK_RECORD_SIZE)) return false;
+      |         ^                                             
+      |                                                        != 0
+9 warnings generated.
+Suppressed 6 warnings (6 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

@@ -1,0 +1,15 @@
+In file included from /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-startup-reclaim-02/sources/tests/native/cyd_startup_test.c:234:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-startup-reclaim-02/ring-vendor/production.inc: In function ‘maintenance_state_locked’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-startup-reclaim-02/ring-vendor/production.inc:94:35: error: ‘ESP_ERR_TIMEOUT’ undeclared (first use in this function)
+   94 |     const char *status = error == ESP_ERR_TIMEOUT
+      |                                   ^~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-startup-reclaim-02/ring-vendor/production.inc:94:35: note: each undeclared identifier is reported only once for each function it appears in
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-startup-reclaim-02/ring-vendor/production.inc: In function ‘maintenance_finish_locked’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-startup-reclaim-02/ring-vendor/production.inc:124:60: error: ‘ESP_ERR_TIMEOUT’ undeclared (first use in this function)
+  124 |     if (xSemaphoreTake(s_state->lock, 0) != pdTRUE) return ESP_ERR_TIMEOUT;
+      |                                                            ^~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-startup-reclaim-02/ring-vendor/production.inc:153:5: error: implicit declaration of function ‘native_audio_output_request_pause’; did you mean ‘native_audio_output_name’? [-Werror=implicit-function-declaration]
+  153 |     native_audio_output_request_pause(false);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     native_audio_output_name
+cc1: all warnings being treated as errors

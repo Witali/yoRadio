@@ -1,0 +1,370 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:47:33: warning: The value '0' provided to the cast expression is not in the valid range of values for the enum [clang-analyzer-optin.core.EnumCastOutOfRange]
+   47 |     stream_frame_info_t info = {0};
+      |                                 ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:22:9: note: enum declared here
+   22 | typedef enum { STREAM_FRAME_MP3 = 1, STREAM_FRAME_ADTS } stream_frame_codec_t;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:575:5: note: Loop condition is true.  Entering loop body
+  575 |     while (true) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:576:13: note: Assuming the condition is false
+  576 |         if (maintenance_active()) {
+      |             ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:576:9: note: Taking false branch
+  576 |         if (maintenance_active()) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:586:13: note: Assuming the condition is false
+  586 |         if (xQueueReceive(s_commands, &command, pdMS_TO_TICKS(50)) != pdTRUE)
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:586:9: note: Taking false branch
+  586 |         if (xQueueReceive(s_commands, &command, pdMS_TO_TICKS(50)) != pdTRUE)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:588:13: note: Assuming field 'maintenance' is false
+  588 |         if (command.maintenance || maintenance_active()) continue;
+      |             ^~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:588:13: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:588:36: note: Assuming the condition is false
+  588 |         if (command.maintenance || maintenance_active()) continue;
+      |                                    ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:588:9: note: Taking false branch
+  588 |         if (command.maintenance || maintenance_active()) continue;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:590:16: note: Assuming the condition is false
+  590 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:590:65: note: Left side of '&&' is false
+  590 |         while (atomic_load(&s_generation) == command.generation &&
+      |                                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:594:13: note: Assuming the condition is false
+  594 |         if (atomic_load(&s_generation) != command.generation) {
+      |             ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:594:9: note: Taking false branch
+  594 |         if (atomic_load(&s_generation) != command.generation) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:604:13: note: Assuming field 'restore' is false
+  604 |         if (command.restore)
+      |             ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:604:9: note: Taking false branch
+  604 |         if (command.restore)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:623:13: note: Assuming 'client' is non-null
+  623 |         if (!client) {
+      |             ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:623:9: note: Taking false branch
+  623 |         if (!client) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:632:13: note: Assuming the condition is false
+  632 |         if (atomic_load(&s_generation) != command.generation) {
+      |             ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:632:9: note: Taking false branch
+  632 |         if (atomic_load(&s_generation) != command.generation) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:637:13: note: 'result' is equal to ESP_OK
+  637 |         if (result != ESP_OK) {
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:637:9: note: Taking false branch
+  637 |         if (result != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:645:22: note: Field 'valid' is true
+  645 |         if (!headers.valid) {
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:645:9: note: Taking false branch
+  645 |         if (!headers.valid) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:663:16: note: Assuming the condition is false
+  663 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:663:65: note: Left side of '&&' is false
+  663 |         while (atomic_load(&s_generation) == command.generation &&
+      |                                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:697:13: note: 'end_reason' is equal to AUDIO_END_EOF
+  697 |         if (end_reason == AUDIO_END_EOF && body.metadata_remaining) {
+      |             ^~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:697:13: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:697:49: note: Field 'metadata_remaining' is 0
+  697 |         if (end_reason == AUDIO_END_EOF && body.metadata_remaining) {
+      |                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:697:9: note: Taking false branch
+  697 |         if (end_reason == AUDIO_END_EOF && body.metadata_remaining) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:700:22: note: Calling 'finish_stream_audio'
+  700 |         end_reason = finish_stream_audio(command.generation, &input.codec,
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  701 |                                           &input.first, end_reason);
+      |                                           ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:527:10: note: Assuming field 'active' is true
+  527 |     if ((s_stream_start.active || (*first_chunk && stream_start_eligible(*codec))) &&
+      |          ^~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:527:32: note: Left side of '||' is true
+  527 |     if ((s_stream_start.active || (*first_chunk && stream_start_eligible(*codec))) &&
+      |                                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:528:9: note: 'reason' is equal to AUDIO_END_EOF
+  528 |         reason==AUDIO_END_EOF) {
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:527:5: note: Taking true branch
+  527 |     if ((s_stream_start.active || (*first_chunk && stream_start_eligible(*codec))) &&
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:531:25: note: Assuming field 'skip' is 0
+  531 |         bool incomplete=s_stream_start.skip || s_stream_start.recovering ||
+      |                         ^~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:531:25: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:531:48: note: Assuming field 'recovering' is false
+  531 |         bool incomplete=s_stream_start.skip || s_stream_start.recovering ||
+      |                                                ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:531:25: note: Left side of '||' is false
+  531 |         bool incomplete=s_stream_start.skip || s_stream_start.recovering ||
+      |                         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:535:40: note: Calling 'stream_start_feed'
+  535 |         stream_confirm_result_t result=stream_start_feed(&route,NULL,0,&consumed,true);
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:79:25: note: Field 'active' is true
+   79 |     if (!s_stream_start.active) {
+      |                         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:79:5: note: Taking false branch
+   79 |     if (!s_stream_start.active) {
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:91:12: note: Assuming the condition is true
+   91 |     while (STREAM_INPUT_ACTIVE(route->generation) &&
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:432:42: note: expanded from macro 'STREAM_INPUT_ACTIVE'
+  432 | #define STREAM_INPUT_ACTIVE(generation) (atomic_load(&s_generation) == (generation) && atomic_load(&s_failed_generation) != (generation))
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:91:12: note: Left side of '&&' is true
+   91 |     while (STREAM_INPUT_ACTIVE(route->generation) &&
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:432:42: note: expanded from macro 'STREAM_INPUT_ACTIVE'
+  432 | #define STREAM_INPUT_ACTIVE(generation) (atomic_load(&s_generation) == (generation) && atomic_load(&s_failed_generation) != (generation))
+      |                                          ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:91:12: note: Assuming the condition is true
+   91 |     while (STREAM_INPUT_ACTIVE(route->generation) &&
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:432:88: note: expanded from macro 'STREAM_INPUT_ACTIVE'
+  432 | #define STREAM_INPUT_ACTIVE(generation) (atomic_load(&s_generation) == (generation) && atomic_load(&s_failed_generation) != (generation))
+      |                                                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:91:12: note: Left side of '&&' is true
+   91 |     while (STREAM_INPUT_ACTIVE(route->generation) &&
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:432:41: note: expanded from macro 'STREAM_INPUT_ACTIVE'
+  432 | #define STREAM_INPUT_ACTIVE(generation) (atomic_load(&s_generation) == (generation) && atomic_load(&s_failed_generation) != (generation))
+      |                                         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:92:12: note: Assuming the condition is true
+   92 |            esp_timer_get_time()<s_stream_start.deadline_us) {
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:91:5: note: Loop condition is true.  Entering loop body
+   91 |     while (STREAM_INPUT_ACTIVE(route->generation) &&
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:93:13: note: Assuming field 'skip' is 0
+   93 |         if (s_stream_start.skip) {
+      |             ^~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:93:9: note: Taking false branch
+   93 |         if (s_stream_start.skip) {
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:99:22: note: Calling 'stream_staging_size'
+   99 |         size_t bytes=stream_staging_size(&s_stream_start.window);
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:34:24: note: Assuming 'i' is >= field 'count'
+   34 |     for (unsigned i=0; i<s->count; ++i) bytes += s->length[i];
+      |                        ^~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:34:5: note: Loop condition is false. Execution continues on line 35
+   34 |     for (unsigned i=0; i<s->count; ++i) bytes += s->length[i];
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:35:5: note: Returning value (loaded from 'bytes'), which participates in a condition later
+   35 |     return bytes;
+      |     ^~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:99:22: note: Returning from 'stream_staging_size'
+   99 |         size_t bytes=stream_staging_size(&s_stream_start.window);
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:100:13: note: 'eof' is true
+  100 |         if (eof && *consumed==size && !bytes && s_stream_start.published &&
+      |             ^~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:100:13: note: Left side of '&&' is true
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:100:13: note: Left side of '&&' is true
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:100:39: note: Assuming 'bytes' is not equal to 0
+  100 |         if (eof && *consumed==size && !bytes && s_stream_start.published &&
+      |                                       ^~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:100:46: note: Left side of '&&' is false
+  100 |         if (eof && *consumed==size && !bytes && s_stream_start.published &&
+      |                                              ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:104:42: note: 'eof' is true
+  104 |             &s_stream_start.window,bytes,eof && *consumed==size,
+      |                                          ^~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:104:42: note: Left side of '&&' is true
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:106:13: note: Assuming field 'published' is true
+  106 |             !s_stream_start.published,&info);
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_start.h:103:40: note: Calling 'stream_confirm_window_mode'
+  103 |         stream_confirm_result_t result=stream_confirm_window_mode(stream_staging_read,
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  104 |             &s_stream_start.window,bytes,eof && *consumed==size,
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  105 |             s_stream_start.search_left,STREAM_ID3_RUN_BYTES,
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  106 |             !s_stream_start.published,&info);
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:42:5: note: Loop condition is true.  Entering loop body
+   42 |     while (true) {
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:45:13: note: Assuming the condition is false
+   45 |         if (count > sizeof(header)) count = sizeof(header);
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:45:9: note: Taking false branch
+   45 |         if (count > sizeof(header)) count = sizeof(header);
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:47:14: note: 'count' is not equal to 0
+   47 |         if (!count) {
+      |              ^~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:47:9: note: Taking false branch
+   47 |         if (!count) {
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:51:14: note: Calling 'stream_staging_read'
+   51 |         if (!read(context, start, header, count)) return STREAM_CONFIRM_INVALID;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:69:9: note: Assuming 'offset' is <= 'bytes'
+   69 |     if (offset > bytes || count > bytes-offset) return false;
+      |         ^~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:69:9: note: Left side of '||' is false
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:69:27: note: Assuming the condition is false
+   69 |     if (offset > bytes || count > bytes-offset) return false;
+      |                           ^~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:69:5: note: Taking false branch
+   69 |     if (offset > bytes || count > bytes-offset) return false;
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:70:5: note: Loop condition is true.  Entering loop body
+   70 |     while (count) {
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:73:13: note: Assuming 'n' is <= 'count'
+   73 |         if (n > count) n = count;
+      |             ^~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:73:9: note: Taking false branch
+   73 |         if (n > count) n = count;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_staging.h:70:5: note: Loop condition is false. Execution continues on line 77
+   70 |     while (count) {
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:51:14: note: Returning from 'stream_staging_read'
+   51 |         if (!read(context, start, header, count)) return STREAM_CONFIRM_INVALID;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:51:9: note: Taking false branch
+   51 |         if (!read(context, start, header, count)) return STREAM_CONFIRM_INVALID;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:52:13: note: Calling 'stream_id3_prefix'
+   52 |         if (stream_id3_prefix(header, count)) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_tags.h:22:29: note: Assuming 'size' is >= 3
+   22 |     return memcmp(p, "ID3", size < 3 ? size : 3) == 0;
+      |                             ^~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_tags.h:22:29: note: '?' condition is false
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_tags.h:22:12: note: Assuming the condition is false
+   22 |     return memcmp(p, "ID3", size < 3 ? size : 3) == 0;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:52:13: note: Returning from 'stream_id3_prefix'
+   52 |         if (stream_id3_prefix(header, count)) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:52:9: note: Taking false branch
+   52 |         if (stream_id3_prefix(header, count)) {
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:63:39: note: Calling 'stream_probe_header'
+   63 |         stream_probe_result_t probe = stream_probe_header(header,count);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:42:9: note: Assuming 'n' is < STREAM_PROBE_FLAC_PREFIX_BYTES
+   42 |     if (n >= STREAM_PROBE_FLAC_PREFIX_BYTES && memcmp(p, "fLaC", 4) == 0 &&
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:42:45: note: Left side of '&&' is false
+   42 |     if (n >= STREAM_PROBE_FLAC_PREFIX_BYTES && memcmp(p, "fLaC", 4) == 0 &&
+      |                                             ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:46:9: note: Assuming 'n' is < STREAM_PROBE_OGG_PREFIX_BYTES
+   46 |     if (n >= STREAM_PROBE_OGG_PREFIX_BYTES && memcmp(p, "OggS", 4) == 0 && p[4] == 0)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:46:44: note: Left side of '&&' is false
+   46 |     if (n >= STREAM_PROBE_OGG_PREFIX_BYTES && memcmp(p, "OggS", 4) == 0 && p[4] == 0)
+      |                                            ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:48:9: note: 'n' is < STREAM_PROBE_ADTS_HEADER_BYTES
+   48 |     if (n >= STREAM_PROBE_ADTS_HEADER_BYTES && p[0] == 0xff && (p[1] & 0xf6) == 0xf0 &&
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:48:45: note: Left side of '&&' is false
+   48 |     if (n >= STREAM_PROBE_ADTS_HEADER_BYTES && p[0] == 0xff && (p[1] & 0xf6) == 0xf0 &&
+      |                                             ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:54:9: note: Assuming 'n' is < STREAM_PROBE_MP3_HEADER_BYTES
+   54 |     if (n >= STREAM_PROBE_MP3_HEADER_BYTES && p[0] == 0xff && (p[1] & 0xe0) == 0xe0 &&
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_probe.h:54:44: note: Left side of '&&' is false
+   54 |     if (n >= STREAM_PROBE_MP3_HEADER_BYTES && p[0] == 0xff && (p[1] & 0xe0) == 0xe0 &&
+      |                                            ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:63:39: note: Returning from 'stream_probe_header'
+   63 |         stream_probe_result_t probe = stream_probe_header(header,count);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:64:13: note: 'containers' is false
+   64 |         if (containers && (probe==STREAM_PROBE_FLAC || probe==STREAM_PROBE_OGG)) {
+      |             ^~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:64:24: note: Left side of '&&' is false
+   64 |         if (containers && (probe==STREAM_PROBE_FLAC || probe==STREAM_PROBE_OGG)) {
+      |                        ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_confirm.h:69:38: note: Calling 'stream_frame_header'
+   69 |         stream_frame_result_t parsed=stream_frame_header(header,count,&first);
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:44:10: note: 'size' is 3
+   44 |     if (!size) return STREAM_FRAME_MORE;
+      |          ^~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:44:5: note: Taking false branch
+   44 |     if (!size) return STREAM_FRAME_MORE;
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:45:9: note: Assuming the condition is false
+   45 |     if (p[0] != 0xff) return STREAM_FRAME_INVALID;
+      |         ^~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:45:5: note: Taking false branch
+   45 |     if (p[0] != 0xff) return STREAM_FRAME_INVALID;
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:46:9: note: 'size' is >= 2
+   46 |     if (size < 2) return STREAM_FRAME_MORE;
+      |         ^~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:46:5: note: Taking false branch
+   46 |     if (size < 2) return STREAM_FRAME_MORE;
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h:47:33: note: The value '0' provided to the cast expression is not in the valid range of values for the enum
+   47 |     stream_frame_info_t info = {0};
+      |                                 ^
+19 warnings generated.
+Suppressed 18 warnings (18 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

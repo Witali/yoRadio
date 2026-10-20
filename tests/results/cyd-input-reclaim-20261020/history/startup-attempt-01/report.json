@@ -1,0 +1,30 @@
+{
+  "passed": false,
+  "physical_hardware": false,
+  "scope": "Fault-inject actual CYD startup/codec/queue/reclaim publication with host tasks.\n\nPthreads execute the production notification gate; the complete reclaim module\nand canonical queue execute unchanged. Driver, SDK calloc and RTOS allocation\nAPIs are seams. This does not qualify target scheduling, TLS library or DMA.\n",
+  "source_sha256": {
+    "tests/run-cyd-startup.py": "7733e53ad4fddf1c157244f1b530406fe2c070496949bdfe50c6326a32061f90",
+    "tests/native/cyd_startup_test.c": "b33eb971abb9ab6696fe210e4be5d63c73fb4b9c70681c4cbb654742d6d7dbf6",
+    "tests/native/audio_power_seam.h": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+    "idf/esp32-cyd2usb-native/main/audio_service.c": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+    "idf/esp32-cyd2usb-native/main/audio_service.h": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+    "idf/esp32-cyd2usb-native/main/native_state.c": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+    "idf/esp32-cyd2usb-native/main/native_state.h": "28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+    "idf/esp32-cyd2usb-native/main/native_health.h": "5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.h": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+    "idf/esp32-cyd2usb-native/main/decoder_registration.c": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+    "idf/esp32-cyd2usb-native/main/decoder_registration.h": "54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.c": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.h": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+    "idf/esp32-cyd2usb-native/main/CMakeLists.txt": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+    "idf/esp32-cyd2usb-native/main/Kconfig.projbuild": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+    "idf/esp32-cyd2usb-native/main/compat/input_reclaim/enable.cmake": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+    "idf/esp32-cyd2usb-native/CMakeLists.txt": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+    "idf/components/native_stream/adaptive_input.c": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca",
+    "idf/components/native_stream/include/adaptive_input.h": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+    "idf/components/native_stream/include/stream_probe.h": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+    "idf/components/native_stream/include/stream_bitrate.h": "358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8"
+  },
+  "variants": {},
+  "negative_controls": {}
+}

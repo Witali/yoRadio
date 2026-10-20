@@ -1,0 +1,352 @@
+{
+  "passed": true,
+  "scope": "Qualify whole CYD reclaim service and canonical queue with explicit host seams.\n\nStrict ASan/UBSan; original TLS allocation, heap accounting and pthread RTOS are\nmodeled. No private runtime registry/queue writes, SDK/target build, actual SDK\nOOM, startup/health integration or physical timing qualification is claimed.\n",
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-input-reclaim.py": "5fd0fb17e34ce4e6c610d081891cb685b183e2e7df117a3d213c2eef040c2929",
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.c": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.h": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+    "idf/components/native_stream/adaptive_input.c": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca",
+    "idf/components/native_stream/include/adaptive_input.h": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+    "tests/native/cyd_input_reclaim/platform.h": "daf5145b1c639e711524fd814c0e3b41d3b2a45b8579a342c7bc6181c323f2a3",
+    "tests/native/cyd_input_reclaim/test.c": "921f4732e50878a6db1a1b0d588cacc94bc63f3084b1afcb09fa53d136e6786e",
+    "tests/native/cyd_input_reclaim/README.md": "e4141bd0925bfc4a22f3266d2ed7286b59a0ada1d7a7ada2b9a6a7cd1b09327b"
+  },
+  "cases": {
+    "registry": {
+      "passed": true,
+      "marker": "PASS:registry"
+    },
+    "unbound": {
+      "passed": true,
+      "marker": "PASS:unbound"
+    },
+    "first-success": {
+      "passed": true,
+      "marker": "PASS:first-success"
+    },
+    "malformed-null": {
+      "passed": true,
+      "marker": "PASS:malformed-null"
+    },
+    "malformed-sentinel": {
+      "passed": true,
+      "marker": "PASS:malformed-sentinel"
+    },
+    "isr": {
+      "passed": true,
+      "marker": "PASS:isr"
+    },
+    "exhaustion": {
+      "passed": true,
+      "marker": "PASS:exhaustion"
+    },
+    "repeat-exhaustion": {
+      "passed": true,
+      "marker": "PASS:repeat-exhaustion"
+    },
+    "zero-budget": {
+      "passed": true,
+      "marker": "PASS:zero-budget"
+    },
+    "recovery": {
+      "passed": true,
+      "marker": "PASS:recovery"
+    },
+    "floor-recovery": {
+      "passed": true,
+      "marker": "PASS:floor-recovery"
+    },
+    "restore": {
+      "passed": true,
+      "marker": "PASS:restore"
+    },
+    "control-writing": {
+      "passed": true,
+      "marker": "PASS:control-writing"
+    },
+    "control-ready": {
+      "passed": true,
+      "marker": "PASS:control-ready"
+    },
+    "control-reading": {
+      "passed": true,
+      "marker": "PASS:control-reading"
+    },
+    "no-idle": {
+      "passed": true,
+      "marker": "PASS:no-idle"
+    },
+    "pinned-detach": {
+      "passed": true,
+      "marker": "PASS:pinned-detach"
+    },
+    "free-detach": {
+      "passed": true,
+      "marker": "PASS:free-detach"
+    },
+    "retry-detach": {
+      "passed": true,
+      "marker": "PASS:retry-detach"
+    },
+    "fixed-budget": {
+      "passed": true,
+      "marker": "PASS:fixed-budget"
+    },
+    "concurrent": {
+      "passed": true,
+      "marker": "PASS:concurrent"
+    }
+  },
+  "negative_controls": {
+    "preclaim-before-original": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "first-success",
+      "expected_marker": "original_allocator_first_no_preclaim",
+      "source_sha256": "289ae61ec32cfd26cb7249e7f33920eee3e446394369203f8e9a766165341b99"
+    },
+    "reclaim-malformed": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "malformed-null",
+      "expected_marker": "malformed_delegates_once_without_reclaim",
+      "source_sha256": "4747e7a9f07c8f26014050ae4265fbbf5344e49500ca1bbe59700bdd8f3d6b5f"
+    },
+    "reclaim-isr": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "isr",
+      "expected_marker": "critical_not_nested_or_isr",
+      "source_sha256": "2f0f91de3fcdde8e740a876800e7fc25b7c50332266ace3fd7ce833abd600a40"
+    },
+    "bind-not-idempotent": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "registry",
+      "expected_marker": "same_active_bind_idempotent",
+      "source_sha256": "6f96fc6134bc14e2bf07f2c61ab7339e6a8d1326cb472e4204cc47ced910cfa8"
+    },
+    "overwrite-owner": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "registry",
+      "expected_marker": "null_conflicting_bind_rejected",
+      "source_sha256": "7d52480cf63498cf039a21ebbe4c008523a086e10f181775c7ce603a0e37187f"
+    },
+    "detach-wrong-owner": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "registry",
+      "expected_marker": "wrong_owner_no_effect",
+      "source_sha256": "2c969d7a29f5549c9cc671371912b33b3468dd86db48243548c835d4765e8481"
+    },
+    "detach-pinned-owner": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "pinned-detach",
+      "expected_marker": "pinned_owner_is_busy",
+      "source_sha256": "1a6f9dd7dd79c4564004c24d466806366bb033c1c4b339929cff404ddff5d9fe"
+    },
+    "retire-admission-open": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "pinned-detach",
+      "expected_marker": "retiring_bind_denied",
+      "source_sha256": "2575ebdf52e429a9e6f25814166307e826b9e7e644827a3abafcd9cbf57a72b6"
+    },
+    "admit-new-pins": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "pinned-detach",
+      "expected_marker": "retiring_new_pins_denied",
+      "source_sha256": "0524d84b20e5e9088a11f7297950ca39ce35591f6f4396a26e407d4357c8bc52"
+    },
+    "last-unpin-clears-owner": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "pinned-detach",
+      "expected_marker": "retired_owner_requires_explicit_detach",
+      "source_sha256": "8638bc3842b57034f2213b9d74a026e348e64abb3cabc6c84c564191c1d7fb2c"
+    },
+    "missing-unpin": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "recovery",
+      "expected_marker": "all_allocator_pins_drained",
+      "source_sha256": "48107b870107a59343d1123e14598b82c8ddc21b25bea417a3c5ef28d031c766"
+    },
+    "budget-from-resident": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "fixed-budget",
+      "expected_marker": "fixed_target_budget",
+      "source_sha256": "763994dde2b11758f1553e8d9df9b6ed5f819850f8c81fa895ca0c2d02a7b640"
+    },
+    "unbounded-refill-loop": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "fixed-budget",
+      "expected_marker": "bounded_retry_budget",
+      "source_sha256": "ca834a72664e24a584021cc79be51c865bc6c80bea2882aaf735bf0cb5fb4159"
+    },
+    "retry-before-free": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "recovery",
+      "expected_marker": "retry_after_completed_slot_free",
+      "source_sha256": "779e4348d539b4bb867d1e05b3b4c901dc6324dbf1ace72381afcf99a214d0ea"
+    },
+    "registry-lock-across-queue": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "exhaustion",
+      "expected_marker": "critical_not_nested_or_isr",
+      "source_sha256": "edbee57c6c0d935408cec66dcde596beec8e141724953222a51d53a63166b7de"
+    },
+    "queue-reclaims-leased": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "no-idle",
+      "expected_marker": "no_live_lease_is_freed",
+      "source_sha256": "985a75d435370199849ecd8bd3c6ab6ac20aaa30655c35b23dd83b90255225cf"
+    },
+    "queue-below-floor": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "repeat-exhaustion",
+      "expected_marker": "repeated_pressure_keeps_floor",
+      "source_sha256": "32c880958d8c615515f8162aedf7edf733e4ccbdd34aa8fb654ebe3f86ad21e9"
+    }
+  },
+  "physical_hardware": false,
+  "actual_sdk_allocator": false,
+  "private_runtime_state_seeded": false,
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "concurrent_fifo_packets": 10000,
+  "input_unchanged_after": {
+    "tests/run-cyd-input-reclaim.py": true,
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.c": true,
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.h": true,
+    "idf/components/native_stream/adaptive_input.c": true,
+    "idf/components/native_stream/include/adaptive_input.h": true,
+    "tests/native/cyd_input_reclaim/platform.h": true,
+    "tests/native/cyd_input_reclaim/test.c": true,
+    "tests/native/cyd_input_reclaim/README.md": true
+  },
+  "snapshots_unchanged_after": {
+    "tests/run-cyd-input-reclaim.py": true,
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.c": true,
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.h": true,
+    "idf/components/native_stream/adaptive_input.c": true,
+    "idf/components/native_stream/include/adaptive_input.h": true,
+    "tests/native/cyd_input_reclaim/platform.h": true,
+    "tests/native/cyd_input_reclaim/test.c": true,
+    "tests/native/cyd_input_reclaim/README.md": true
+  },
+  "generated_sha256": {
+    "compiler.log": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+    "positive/adaptive_input.o": "68c744e22191567ec2d948e9af31fe9112f931a6fca825c16dd973021cbb57ed",
+    "positive/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "positive/command.json": "8f5785dee89c78cd30ea83c25f4b9cf057201cde00b24c5c797918d9d49b66c4",
+    "positive/queue-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "positive/queue-command.json": "e0919cacd9446f2cc5716eaffe1e96bff244086ad4af46c4cdb3e81fc8369e32",
+    "positive/run.log": "a3eb2919cd666ca5d1787f7c163080852cf2d39c70836c0e7edf7d66390e2efc",
+    "mutants/admit-new-pins/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/admit-new-pins/command.json": "f2663231e0958915c50becf1fa9a8d8c7da456818475742902235fa1042a4059",
+    "mutants/admit-new-pins/native_input_reclaim.c": "0524d84b20e5e9088a11f7297950ca39ce35591f6f4396a26e407d4357c8bc52",
+    "mutants/admit-new-pins/run.log": "bcc57fbaeeec937be0793546841f6cdc0ae03dece5c3f90f5c737c40fffe528f",
+    "mutants/bind-not-idempotent/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/bind-not-idempotent/command.json": "1f6561aa95b149717a75a50468e2a25165db90156a5a86c640ef83b75d5d7c52",
+    "mutants/bind-not-idempotent/native_input_reclaim.c": "6f96fc6134bc14e2bf07f2c61ab7339e6a8d1326cb472e4204cc47ced910cfa8",
+    "mutants/bind-not-idempotent/run.log": "cb727ff3b0089887be8dd67677169fb8eeea92f1558b90bcc635b625c857748c",
+    "mutants/budget-from-resident/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/budget-from-resident/command.json": "688f04baa5f87941a06c844b7c76ce6360bd435a85be71b06fdcc769133cf5f6",
+    "mutants/budget-from-resident/native_input_reclaim.c": "763994dde2b11758f1553e8d9df9b6ed5f819850f8c81fa895ca0c2d02a7b640",
+    "mutants/budget-from-resident/run.log": "d225e1413a9310b42311827d4848ed0bc733388788739f34e9add9f42a0d5332",
+    "mutants/detach-pinned-owner/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/detach-pinned-owner/command.json": "38daa6b82072b9643e3d20771ed14e2217f9e749c510c12eef1e269694a000bf",
+    "mutants/detach-pinned-owner/native_input_reclaim.c": "1a6f9dd7dd79c4564004c24d466806366bb033c1c4b339929cff404ddff5d9fe",
+    "mutants/detach-pinned-owner/run.log": "778fb0bd8a23c2175cbce34f853905a54ca7edfe3b865dcf58a208822556feee",
+    "mutants/detach-wrong-owner/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/detach-wrong-owner/command.json": "4d54ab259e39b92539d131ef82b5e326788dfb2ef0caed687e9a24ffba20aaf0",
+    "mutants/detach-wrong-owner/native_input_reclaim.c": "2c969d7a29f5549c9cc671371912b33b3468dd86db48243548c835d4765e8481",
+    "mutants/detach-wrong-owner/run.log": "d682e8d027eb19d0184e30f92fa41e97ac4c1c9cf25ef7ac270b5dfc4e64f08b",
+    "mutants/last-unpin-clears-owner/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/last-unpin-clears-owner/command.json": "87e2dc12bb9d49cab12ed6da455f089ffcf2990c2c4d528f62a031677ee56615",
+    "mutants/last-unpin-clears-owner/native_input_reclaim.c": "8638bc3842b57034f2213b9d74a026e348e64abb3cabc6c84c564191c1d7fb2c",
+    "mutants/last-unpin-clears-owner/run.log": "4cb937527922236eb66158898dea56bcccfb8d6b16008583b60a9fdaa39cf0af",
+    "mutants/missing-unpin/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/missing-unpin/command.json": "e6e35633c0d4744c78e9c137bebe3af12a78574209d8930e0b40f7dfec30c905",
+    "mutants/missing-unpin/native_input_reclaim.c": "48107b870107a59343d1123e14598b82c8ddc21b25bea417a3c5ef28d031c766",
+    "mutants/missing-unpin/run.log": "f43f0c8c9bfa8c3247f08ece7adc49ec4702c23e977c5be0844ec9b830a9019f",
+    "mutants/overwrite-owner/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/overwrite-owner/command.json": "052a7361843b32f37c975a0bb272024734d8ffbb8f004b219ae52bdf181bb842",
+    "mutants/overwrite-owner/native_input_reclaim.c": "7d52480cf63498cf039a21ebbe4c008523a086e10f181775c7ce603a0e37187f",
+    "mutants/overwrite-owner/run.log": "010a3c2f59462978fb4b48933d393e31827e6981547eba2b2f83911ac1c390b5",
+    "mutants/preclaim-before-original/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/preclaim-before-original/command.json": "70f35eb1aec922db2a6b230cdd780b98f5bc2fb944573cf373b939572fc588c0",
+    "mutants/preclaim-before-original/native_input_reclaim.c": "289ae61ec32cfd26cb7249e7f33920eee3e446394369203f8e9a766165341b99",
+    "mutants/preclaim-before-original/run.log": "9a76806209f1f7aa771727652b9c0856dd45d8d6cc49ad12ca4f3b2ce267e1f1",
+    "mutants/queue-below-floor/adaptive_input.c": "32c880958d8c615515f8162aedf7edf733e4ccbdd34aa8fb654ebe3f86ad21e9",
+    "mutants/queue-below-floor/adaptive_input.o": "ebd8aeda965d1222caff3d6d0cc3592231bd90d5332013ba434dbfef4fc85981",
+    "mutants/queue-below-floor/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/queue-below-floor/command.json": "6ed37f0f8a6cdd62241d1de827be2f12c4e4a1025d3423dc026b69b474d8531b",
+    "mutants/queue-below-floor/queue-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/queue-below-floor/queue-command.json": "178b64769c1698e3ac3ec6f9b2180171ce2218aaa01756c7ae01f36033928cae",
+    "mutants/queue-below-floor/run.log": "805b1207e867f0f04cf3ef39ee4c73a400fa80168dbe331735649b4d738bcb0c",
+    "mutants/queue-reclaims-leased/adaptive_input.c": "985a75d435370199849ecd8bd3c6ab6ac20aaa30655c35b23dd83b90255225cf",
+    "mutants/queue-reclaims-leased/adaptive_input.o": "b7e3c28217613829b45fcec7ecd5d33ab71d4b0bd12f5002e15cb00d8689b660",
+    "mutants/queue-reclaims-leased/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/queue-reclaims-leased/command.json": "f4b08b85ddba1dc7812e3289bd2620b87f8d405b724af3c10ef0ddf3f15d356b",
+    "mutants/queue-reclaims-leased/queue-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/queue-reclaims-leased/queue-command.json": "f46f83052acd170d8c30ed69817b0b04307d0f9356eeb9cb7deae9d1457486ce",
+    "mutants/queue-reclaims-leased/run.log": "b6f493850726c10fb7273f24376149318b8ec809e59dd5b349a35bf2efbe6aa9",
+    "mutants/reclaim-isr/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/reclaim-isr/command.json": "1ba2245a49d118254b29d39f07d264b5a9183ed94b7c8134bbe4abad825d38e0",
+    "mutants/reclaim-isr/native_input_reclaim.c": "2f0f91de3fcdde8e740a876800e7fc25b7c50332266ace3fd7ce833abd600a40",
+    "mutants/reclaim-isr/run.log": "c3855c2a75b05c68a606bc36e80ec0df331da8052508e3113cee824ae3ba6e18",
+    "mutants/reclaim-malformed/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/reclaim-malformed/command.json": "c95b4ffc12a6fad7584a299acfedd7fbe560db2ec37794585f03134b3c11d29d",
+    "mutants/reclaim-malformed/native_input_reclaim.c": "4747e7a9f07c8f26014050ae4265fbbf5344e49500ca1bbe59700bdd8f3d6b5f",
+    "mutants/reclaim-malformed/run.log": "a04581231b6904a4eb7cd9223eab9a38e54a01fcac61c994b55eca23f44da460",
+    "mutants/registry-lock-across-queue/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/registry-lock-across-queue/command.json": "fc701ebe764e74baabcda14cc5f37c9c730259841065e8653b7e5cc7b9c39c8f",
+    "mutants/registry-lock-across-queue/native_input_reclaim.c": "edbee57c6c0d935408cec66dcde596beec8e141724953222a51d53a63166b7de",
+    "mutants/registry-lock-across-queue/run.log": "c3855c2a75b05c68a606bc36e80ec0df331da8052508e3113cee824ae3ba6e18",
+    "mutants/retire-admission-open/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/retire-admission-open/command.json": "98c2c952b1edcec3296bc62b6bbb93ad0227ee3219f72e1efb0ca157bb3749e5",
+    "mutants/retire-admission-open/native_input_reclaim.c": "2575ebdf52e429a9e6f25814166307e826b9e7e644827a3abafcd9cbf57a72b6",
+    "mutants/retire-admission-open/run.log": "931b926f7243dddef9a55eccaeb880cfb352acbcf6e6d3eec987595d030971ee",
+    "mutants/retry-before-free/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/retry-before-free/command.json": "37fdba58412b96b224996a8a94d7c34c8a65667ff58fa1b2f04292389bc819b4",
+    "mutants/retry-before-free/native_input_reclaim.c": "779e4348d539b4bb867d1e05b3b4c901dc6324dbf1ace72381afcf99a214d0ea",
+    "mutants/retry-before-free/run.log": "314a89e173bcd43c71f1621554e674cd00e2f81393f31690a0356473c5d91a18",
+    "mutants/unbounded-refill-loop/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutants/unbounded-refill-loop/command.json": "07d1f65bc0988712a0ed3aedde402a591cf278cfdd575571606c8b78c1720186",
+    "mutants/unbounded-refill-loop/native_input_reclaim.c": "ca834a72664e24a584021cc79be51c865bc6c80bea2882aaf735bf0cb5fb4159",
+    "mutants/unbounded-refill-loop/run.log": "cfe8869dcb2db35366b082c6acbd0e9313056ae89d01b6f6e6f4fd81ab810b22",
+    "sources/tests/run-cyd-input-reclaim.py": "5fd0fb17e34ce4e6c610d081891cb685b183e2e7df117a3d213c2eef040c2929",
+    "sources/idf/components/native_stream/adaptive_input.c": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca",
+    "sources/idf/components/native_stream/include/adaptive_input.h": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+    "sources/idf/esp32-cyd2usb-native/main/native_input_reclaim.c": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "sources/idf/esp32-cyd2usb-native/main/native_input_reclaim.h": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+    "sources/tests/native/cyd_input_reclaim/platform.h": "daf5145b1c639e711524fd814c0e3b41d3b2a45b8579a342c7bc6181c323f2a3",
+    "sources/tests/native/cyd_input_reclaim/README.md": "e4141bd0925bfc4a22f3266d2ed7286b59a0ada1d7a7ada2b9a6a7cd1b09327b",
+    "sources/tests/native/cyd_input_reclaim/test.c": "921f4732e50878a6db1a1b0d588cacc94bc63f3084b1afcb09fa53d136e6786e",
+    "stubs/freertos/FreeRTOS.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "stubs/freertos/semphr.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "stubs/freertos/task.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083"
+  },
+  "complete_normal_module_source_matches_frozen_bytes": true,
+  "complete_canonical_queue_source_matches_frozen_bytes": true,
+  "limitations": [
+    "TLS failure and heap capacity are host seams, not actual SDK OOM. Success uses ordinary libc calloc/free.",
+    "pthread critical/ISR/barrier seams do not establish ESP32 kernel timing, target ABI or TSAN evidence.",
+    "The representable registry pin-count overflow guard is source-reviewed; the suite does not create SIZE_MAX simultaneous real pins or write private runtime state.",
+    "Startup publication, native_health callback integration, target link/wrapper references and actual QEMU/board qualification are separate gates."
+  ]
+}

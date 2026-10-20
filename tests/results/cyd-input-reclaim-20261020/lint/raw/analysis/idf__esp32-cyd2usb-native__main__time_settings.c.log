@@ -1,0 +1,25 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c:48:33: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+   48 |             if (at == end || *at++ != '.') return false;
+      |                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c:48:17: note: variable is referenced here
+   48 |             if (at == end || *at++ != '.') return false;
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c:85:5: warning: the result from calling 'memcpy' is not null-terminated [bugprone-not-null-terminated-result]
+   83 |                           uint8_t record[TIME_RECORD_SIZE]) {
+      |                                                          
+      |                                                           + 1
+   84 |     memset(record, 0, TIME_RECORD_SIZE);
+   85 |     memcpy(record, "NTIM", 4U);
+      |     ^~~~~~               ~~~~
+      |     strcpy (char *)
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c:101:9: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  101 |     if (memcmp(record, "NTIM", 4U) || record[4] != 1U || record[5] || record[7])
+      |         ^
+      |                                    != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c:117:9: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  117 |     if (memcmp(record, canonical, TIME_RECORD_SIZE)) return false;
+      |         ^                                          
+      |                                                     != 0
+22 warnings generated.
+Suppressed 18 warnings (18 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
