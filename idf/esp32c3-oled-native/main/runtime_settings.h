@@ -47,6 +47,13 @@ esp_err_t runtime_settings_get_time_snapshot(runtime_time_settings_t *output,
 
 bool runtime_settings_get_audio_info(void);
 uint8_t runtime_settings_get_softap_delay_min(void);
+typedef struct {
+    uint32_t revision;
+    uint8_t delay_min;
+} runtime_softap_settings_t;
+// Coherent committed RAM policy, including accepted same-value saves. The
+// boot-local revision never wraps; exhausted writers fail before persistence.
+runtime_softap_settings_t runtime_settings_get_softap_snapshot(void);
 uint8_t runtime_settings_get_audio_buffer_blocks(void);
 void runtime_settings_get_mdns_name(char *output, size_t output_size);
 bool runtime_settings_get_watchdog(void);

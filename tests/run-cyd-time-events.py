@@ -4,6 +4,8 @@ Production app startup and current network facade bodies run unchanged. SDK,
 RTOS, profile loading, display and time boundaries are deterministic host seams.
 Current CYD GOT/loss/time notifications execute in run-cyd-network-runtime.py;
 the old CYD event handler is not represented as current production here.
+The actual C3 STA_START credential/sleep guards use AP notification and connect
+seams; the donor AP lifecycle is qualified separately by run-c3-ap-timeout.py.
 """
 import argparse
 import hashlib
@@ -117,10 +119,10 @@ def main():
         changed = contents.replace(old, new, 1)
         run_case(name, changed if unit == 'network' else network_unit,
                  changed if unit == 'startup' else startup_unit, assertion)
-    old='if (s_have_credentials) esp_wifi_connect();'
+    old='if (s_have_credentials) connect_station();'
     assert c3_unit.count(old)==1
     run_case('donor_empty_file_uses_retained_driver_profile', network_unit, startup_unit,
-             'connect_calls==0U', c3_unit.replace(old,'esp_wifi_connect();',1))
+             'connect_calls==0U', c3_unit.replace(old,'connect_station();',1))
     (out / 'network.inc').write_text(network_unit)
     (out / 'startup.inc').write_text(startup_unit)
     (out / 'c3-events.inc').write_text(c3_unit)

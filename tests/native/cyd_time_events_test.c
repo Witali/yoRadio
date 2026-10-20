@@ -80,6 +80,7 @@ static const char wifi_base[]="wifi",ip_base[]="ip";
 #define IP_EVENT ip_base
 #define WIFI_EVENT_STA_START 1
 #define WIFI_EVENT_STA_DISCONNECTED 2
+#define WIFI_EVENT_STA_CONNECTED 5
 #define IP_EVENT_STA_GOT_IP 3
 #define IP_EVENT_STA_LOST_IP 4
 #define WIFI_RETRIES_PER_CREDENTIAL 2
@@ -96,6 +97,11 @@ static int s_retries;
 static unsigned s_wifi_events,event_bits,connect_calls,time_notices;
 static unsigned xEventGroupSetBits(unsigned handle,unsigned bits){assert(handle==1);event_bits|=bits;return event_bits;}
 static int esp_wifi_connect(void){++connect_calls;return ESP_OK;}
+// This fixture qualifies only the actual donor STA_START credential/sleep
+// guards. AP lifecycle notifications are qualified in run-c3-ap-timeout.py.
+static void softap_operation(bool begin){(void)begin;}
+static void softap_link(bool online,bool pending){(void)online;(void)pending;}
+static int connect_station(void){return esp_wifi_connect();}
 static int select_credential(size_t index){(void)index;return ESP_OK;}
 static int esp_wifi_sta_get_ap_info(wifi_ap_record_t *ap){(void)ap;return ESP_FAIL;}
 static void native_state_set_wifi_rssi(native_state_t *state,int rssi){(void)state;(void)rssi;}

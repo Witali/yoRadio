@@ -30,7 +30,8 @@
 
 static const char *const TAG = "runtime_settings";
 static atomic_bool s_audio_info = RUNTIME_DEFAULT_AUDIO_INFO;
-static atomic_uchar s_softap_delay_min = RUNTIME_DEFAULT_SOFTAP_DELAY_MIN;
+// One lock-free 32-bit publication: five value bits and a non-wrapping revision.
+static atomic_uint s_softap_policy = (1U << 5) | RUNTIME_DEFAULT_SOFTAP_DELAY_MIN;
 static atomic_uchar s_audio_buffer_blocks =
     RUNTIME_DEFAULT_AUDIO_BUFFER_BLOCKS;
 static atomic_bool s_watchdog = RUNTIME_DEFAULT_WATCHDOG;
@@ -172,7 +173,7 @@ esp_err_t runtime_settings_init(void) {
     if (nvs_get_u8(handle, SETTINGS_NVS_AUDIO_INFO, &u8) == ESP_OK &&
         u8 <= 1U) atomic_store(&s_audio_info, u8 != 0U);
     if (nvs_get_u8(handle, SETTINGS_NVS_SOFTAP_DELAY, &u8) == ESP_OK &&
-        u8 <= 30U) atomic_store(&s_softap_delay_min, u8);
+        u8 <= 30U) atomic_store(&s_softap_policy, (1U << 5) | u8);
     if (nvs_get_u8(handle, SETTINGS_NVS_AUDIO_BUFFER, &u8) == ESP_OK &&
         u8 >= RUNTIME_MIN_AUDIO_BUFFER_BLOCKS) {
         uint8_t saved = u8;
@@ -236,7 +237,12 @@ esp_err_t runtime_settings_init(void) {
 
 bool runtime_settings_get_audio_info(void) { return atomic_load(&s_audio_info); }
 uint8_t runtime_settings_get_softap_delay_min(void) {
-    return atomic_load(&s_softap_delay_min);
+    return runtime_settings_get_softap_snapshot().delay_min;
+}
+runtime_softap_settings_t runtime_settings_get_softap_snapshot(void) {
+    uint32_t policy = atomic_load(&s_softap_policy);
+    return (runtime_softap_settings_t){.revision = policy >> 5,
+                                      .delay_min = (uint8_t)(policy & 31U)};
 }
 uint8_t runtime_settings_get_audio_buffer_blocks(void) {
     return atomic_load(&s_audio_buffer_blocks);
@@ -291,10 +297,18 @@ esp_err_t runtime_settings_set_audio_info(bool enabled) {
 esp_err_t runtime_settings_set_softap_delay_min(uint8_t minutes) {
     ESP_RETURN_ON_FALSE(minutes <= 30U, ESP_ERR_INVALID_ARG, TAG,
                         "SoftAP delay range");
-    ESP_RETURN_ON_ERROR(save_u8(SETTINGS_NVS_SOFTAP_DELAY, minutes), TAG,
-                        "Save SoftAP delay");
-    atomic_store(&s_softap_delay_min, minutes);
-    return ESP_OK;
+    ESP_RETURN_ON_ERROR(lock_time_settings(TIME_SETTINGS_LOCK_TIMEOUT_MS), TAG,
+                        "SoftAP settings lock");
+    uint32_t previous = atomic_load(&s_softap_policy);
+    esp_err_t result = ESP_ERR_INVALID_STATE;
+    if ((previous >> 5) != (UINT32_MAX >> 5)) {
+        result = save_u8(SETTINGS_NVS_SOFTAP_DELAY, minutes);
+        // No fallible operation remains between durable commit and publication.
+        if (result == ESP_OK)
+            atomic_store(&s_softap_policy, ((previous & ~31U) + 32U) | minutes);
+    }
+    xSemaphoreGive(s_string_lock);
+    return result;
 }
 esp_err_t runtime_settings_set_audio_buffer_blocks(uint8_t blocks) {
     ESP_RETURN_ON_FALSE(blocks >= RUNTIME_MIN_AUDIO_BUFFER_BLOCKS &&

@@ -59,6 +59,15 @@ typedef struct { int8_t rssi; } wifi_ap_record_t;
 typedef struct { int8_t rssi; } native_state_t;
 static native_state_t state, *s_state = &state;
 static atomic_bool s_stopping_for_sleep;
+// AP policy is qualified by run-c3-ap-timeout.py. These no-op boundaries keep
+// this integration harness limited to power/RSSI/sleep behavior.
+typedef struct { unsigned unused; } softap_policy_t;
+static portMUX_TYPE s_softap_lock = portMUX_INITIALIZER_UNLOCKED;
+static struct { bool started, enabled; } s_softap;
+static void softap_operation(bool begin) { (void)begin; }
+static void softap_poll(softap_policy_t *policy, int64_t now) {
+    (void)policy; (void)now;
+}
 static pthread_mutex_t clock_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t clock_changed = PTHREAD_COND_INITIALIZER;
 static atomic_int_fast64_t now_us;

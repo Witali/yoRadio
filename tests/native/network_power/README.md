@@ -28,6 +28,12 @@ RSSI uses 2 s, sleep stops new polls, failed prepare_sleep clears its guard,
 and the next owner step repairs an intent changed during a blocked SDK call.
 No audio generation, phase or ACK is set by these tests.
 
+AP polling and its operation notifications are no-op seams in this power suite;
+the prepare-sleep AP flags have a field model under a real pthread mutex. Actual
+AP eligibility, settings revisions, SDK cancellation and reboot arbitration are
+qualified separately by `tests/run-c3-ap-timeout.py`. This suite does not prove
+the AP policy.
+
 ASan/UBSan are mandatory. These host results do not measure real driver power
 effects, RF behavior, hardware clocks, target ABI, FreeRTOS scheduling or SMP
 safety. C3's unrelated RSSI validity behavior and audio ownership are qualified

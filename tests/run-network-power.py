@@ -4,6 +4,8 @@ The complete shared production translation unit runs with a pthread portMUX.
 Actual frozen C3 apply/RSSI/intent/sleep bodies run in integration cases. Driver,
 RSSI/state and clock/delay boundaries are field-model host seams. No target ABI,
 Wi-Fi power savings, hardware timing, real RTOS or SMP-safety claim is made.
+AP polling/operation notifications are no-op seams; actual AP policy is
+qualified separately by run-c3-ap-timeout.py.
 """
 import argparse
 import hashlib
