@@ -2336,3 +2336,14 @@ coverage не превращается вsemantic proof. Далее CITY-REINIT,
 HTTP lifetime и RESET/DC pulls; остальные оговорки вBIDIRECTIONAL_AUDIT.md.
 
 Archive integrity:6tests pass; image checksums/partition MD5/current compiled sources/media/34routes/original dump unchanged. Report preserved with captive proof.
+
+
+## 2026-10-20 — интеграция завершённых worktree
+
+Объединены jpeg-library B3FC и боковые selector/header/H10/reset/flash-full
+records; код54F4/source9C16 не меняется.277review inputs exact,5608native,
+10inventory controls и6artifact checks pass в отдельнойintegration-worktree.
+Единственный конфликт WORK_LOG разрешён сохранением актуального текста:
+входящие непустые строки уже есть. Подробности Small_TV/WORKTREE_INTEGRATION_20261020.md.
+Удаление7завершённыхworktree —после verified local archives иpush main;
+active selector H10/CYD инезакоммиченные C3/ESP8266 сохраняются.
