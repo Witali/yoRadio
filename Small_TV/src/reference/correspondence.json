@@ -1225,9 +1225,10 @@
       "status": "source_reviewed",
       "native": [
         "app/web/settings_api.c#update_city",
-        "app/web/settings_api.c#web_settings_post"
+        "app/web/settings_api.c#web_settings_post",
+        "app/settings/settings.c#settings_update_city"
       ],
-      "note": "All registered settings contracts/defaults/ranges reviewed. Strict complete JSON and atomic snapshots replace substring parsing; proven unsafe factory behavior is not reproduced."
+      "note": "Reviewed 0x4200f3a2..0x4200f3dc: persist city/country, request weather, clear theme-init latch even for identical city. Native publishes only location and transient reset revision under one mutex, preserving concurrent theme/brightness/photo changes; strict JSON and regional validation intentionally reject unsafe factory inputs. Same-value commands avoid unnecessary persistence."
     },
     {
       "address": "0x4200f440",
@@ -2524,6 +2525,10 @@
     "third_party/cjson/cJSON.c#cJSON_free": {
       "kind": "library_replacement",
       "note": "Bundled cJSON API/internal support. Factory calls 0x4201322a/0x420137a4/0x420137e0 etc are outside the selected 176 bodies. SDK/library replacement, not instruction-level equivalence; unused APIs may be removed by section GC."
+    },
+    "app/settings/settings.c#mark_settings_changed_locked": {
+      "kind": "reconstruction_support",
+      "note": "Shared debounced generation/dirty/deadline update; every caller holds settings_mutex. Existing theme/replace/photo write scheduling is preserved."
     }
   },
   "assembly_only": {
@@ -2612,7 +2617,7 @@
     "src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
     "src/app/CMakeLists.txt": "0cd3e28a5d426ef3d6d05443658e64e3f77fd8b827ce7e856402cf49aaf4406a",
     "src/app/display/backlight.c": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03",
-    "src/app/display/clock_ui.c": "3d1ff2524cef46ab59cf1dd913d292871cb484a0c4b38980139c3ebed1462663",
+    "src/app/display/clock_ui.c": "8789756db122c93b5c9803d0c50ac48c505b5b383641aedf9681b52a8036b007",
     "src/app/display/factory_animation.c": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09",
     "src/app/display/factory_fonts.c": "a0e98417e6464d0825f8361dfce1d97cc826da8a77f0a7c44aa0b25cc20ff231",
     "src/app/display/factory_photo.c": "1a12f6e63dafe015570d1312138729785cee33449c0f5e9b24af29fb779764af",
@@ -2631,7 +2636,7 @@
     "src/app/include/media.h": "d75d4172760d302ba31a914947bcdbf21f3eee73ae73ec661f371f78be8ad995",
     "src/app/include/network.h": "fc88fdbbb10f4dec709f480cbd260371c7816923f5a0b9c757652e5aed5d708f",
     "src/app/include/services.h": "6490660af9c5cd11519c173a17982def5a33e0c7a5c9de32c3e7218f5faab193",
-    "src/app/include/settings.h": "6ca9118c064394037033f441055b467ba0e2143df651ab03a1c5c9176798c916",
+    "src/app/include/settings.h": "7980fae591f32a12869b06bd02d1a821af9eb28a4113efadbaed4146dfca6426",
     "src/app/include/text.h": "150044cb34ad45edbd4d3d267d7c066aafaf3b6e2635e6e2a93ec88775b3a3ef",
     "src/app/include/timezones.h": "b0f6bc81cea6a32a60a48a9746ff999922b0c7af1f137d2cbe34d2e436e859f8",
     "src/app/include/web.h": "fb5d64e86859718aa5f1ee0f0519d9194c33c0df8d831b30ff4e252e4cd89a23",
@@ -2648,12 +2653,12 @@
     "src/app/services/weather.c": "5f8cf49943d713bffc886707b64b15634dcb4749d483e222b34dd89d7f7b57e7",
     "src/app/services/weather_parser.c": "af09595b9843d4d559526d39db7afd84cd45b6497408b3a7d23c2f61e8ced6e5",
     "src/app/settings/factory_settings.c": "81ad9a3cef18df97d9c345abe1106c5c62ecd4e3c60ebba677200f612d7faa9b",
-    "src/app/settings/settings.c": "f51739b6b0e81434362d7105303fad91589191b43219f0fee44c6fefa2fa93cd",
+    "src/app/settings/settings.c": "f94eeda257d0c3d4a2b952ed72efb699cbe1a83dfd6d40d0c43d857122a65d63",
     "src/app/text/text.c": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa",
     "src/app/web/photo_api.c": "f5935dfe63bd1679855791c58f92e023b36bfba61e6dba995b7259e25eee0400",
     "src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
     "src/app/web/server.c": "f9dc5eecac2e34579bc79e23e1d5c70ea6d1eae67fc086a70da4b21ad85e7663",
-    "src/app/web/settings_api.c": "2c1b9db64dd8f8ae66883e35a106c8f731d6505691ba006ec4327a3a99ddbb0a",
+    "src/app/web/settings_api.c": "a1a2245937227c2baada3a1a97492ae13550af71965c791c65c56e084dccdd09",
     "src/build.ps1": "5354a100ff2f761810bda4a337b6b5d0198b492e7adc6dd264d6ce1c12bedff3",
     "src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
     "src/CMakeLists.txt": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8",
@@ -2898,16 +2903,17 @@
     },
     {
       "id": "CITY-REINIT",
-      "status": "unverified_transition",
+      "status": "fixed_host_and_qemu",
       "factory": [
         "0x4200f2c0",
         "0x42008e08"
       ],
       "native": [
         "app/web/settings_api.c#web_settings_post",
-        "app/display/clock_ui.c#clock_task"
+        "app/display/clock_ui.c#clock_task",
+        "app/settings/settings.c#settings_update_city"
       ],
-      "detail": "Factory updateCity clears theme-init latch even for identical city. Native changes weather/settings generation but theme_selection revision only changes for setclocktype. Evaluate all themes before deciding intentional optimization vs omission."
+      "detail": "Restore unconditional theme-reset intent at 0x4200f3cc (0x3fcc39e9) for valid /updateCity, including identical location. Atomic city/country+revision update preserves concurrent settings; unchanged commands avoid persistence. Pre-fix assertion fails; 5806 native checks, 4 real QEMU themes/8 city commands, and active-fade native frame with zero differing pixels pass. Factory blank defect retained only as observed evidence. See ../qemu/parity/city-reinit-validation-20261020.json; not full/24h/hardware acceptance."
     },
     {
       "id": "HTTP-LIFETIME",

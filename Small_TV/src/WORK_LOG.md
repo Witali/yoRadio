@@ -3415,3 +3415,27 @@ CITY-REINIT → JPEG/NOR integration → AP lifecycle → hardware → full-imag
 → приёмка окончательной версии. Работа в отдельной small-tv-improvement-plan;
 активный H10 B50D/source/SDK/snapshot не меняются. Первое исправление — город
 и команда переинициализации темы, согласованно опубликованные под mutex.
+
+## 2026-10-20 — CITY-REINIT исправлен
+
+Ассемблер0x4200f3cc очищает theme-init latch0x3fcc39e9. Новый settings_update_city
+публикует только city/country и transient theme revision под одним mutex, не
+откатывая более свежие theme/brightness/photo settings из раннего HTTP snapshot.
+Одинаковые команды перерисовывают тему без лишних flash commits. Общий helper
+debounce заменяет повторяющиеся generation/dirty/deadline операции без изменения
+правил остальных настроек. Маркеры FIXED_RECONSTRUCTION и комментарии добавлены.
+
+На pre-fix51cd native city assertion падает. После исправления 5806native,
+10correspondence controls, 6artifact checks pass. Четыре реальные QEMU темы:
+8city commands, init/complete output pass. Отдельные photo-city и прежняя
+photo-theme: original blank bug наблюдён; native full frame57600pixels exact,
+0different. Network-only:15HTTP cases/AP/STA, безLCD. Cold LCD-only:2factory+
+2native processes, exact setup frame, без сетевого readiness criterion.
+Все15финальных VM завершены owners; failed harness attempts также сохранены
+и очищены отдельно. Inputs unchanged. Старый H10/SDK/snapshot не менялись.
+
+App3e030c1c...,1170432bytes/free365568, ELF54293e97..., DEBUGoff/TJpgd;
+архив в firmware/development/small-tv-esp32c2-reconstructed. Proof94raw:
+qemu/parity/city-reinit-validation-20261020.json. Полный suite/24h/physical для
+этой app не выполнялись. Подробности tests/CITY_REINIT.md; план обновлён.
+Следующий этап — NOR-aware JPEG scratch/cache и безопасная metadata publication.

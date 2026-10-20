@@ -179,13 +179,16 @@ esp_err_t web_settings_post(httpd_req_t *req)
      * with unrelated scratch buffers. Persist the validated JSON SSID/password.
      * FIXED_RECONSTRUCTION: /setclocktype is a reinitialization command even
      * when its value is unchanged, as in 0x4200d7f0. Publish that intent explicitly.
+     * FIXED_RECONSTRUCTION: /updateCity clears the same theme latch at 0x4200f3cc;
+     * update only the location and its command revision under the settings mutex.
      * Both credential routes accept normal JSON whitespace instead of relying
      * on the factory handlers' literal substring parsing. */
 
     const char *uri = req->user_ctx;
     tv_settings_t s;
     settings_snapshot(&s);
-    bool valid = false, restart = false, weather = false, select_theme = false;
+    bool valid = false, restart = false, weather = false, select_theme = false,
+         city_update = false;
     if (!strcmp(uri, "/restart"))
     {
         if (req->content_len)
@@ -273,6 +276,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
         {
             valid = update_city(&s, object);
             weather = valid;
+            city_update = valid;
         }
         else if (!strcmp(uri, "/set_clock_color"))
         {
@@ -308,7 +312,16 @@ esp_err_t web_settings_post(httpd_req_t *req)
         }
         cJSON_Delete(object);
     }
-    if (!valid || (select_theme ? settings_select_theme(s.theme) : settings_replace(&s)) != ESP_OK)
+    if (!valid)
+        return web_error(req, "Invalid setting or value");
+    esp_err_t applied;
+    if (city_update)
+        applied = settings_update_city(s.city, s.country);
+    else if (select_theme)
+        applied = settings_select_theme(s.theme);
+    else
+        applied = settings_replace(&s);
+    if (applied != ESP_OK)
         return web_error(req, "Invalid setting or value");
     if (weather)
         weather_request_update();

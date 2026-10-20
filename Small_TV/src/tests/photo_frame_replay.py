@@ -18,8 +18,9 @@ from control_oracle import verify_inputs
 
 class PhotoMachine(JpegMachine):
     """Retain the complete photo pipeline and record only SDK boundary effects."""
-    def __init__(self, variant, dump, manifest):
-        super().__init__(variant, dump)
+    def __init__(self, variant, dump, manifest, *, dependency_root=None):
+        # Keep shared read-only ROM/factory ELF inputs outside the task worktree.
+        super().__init__(variant, dump, dependency_root=dependency_root)
         self.photos = [item for item in assets_list(manifest) if item['file'].startswith('photos/')]
         if len(self.photos) != 5:
             raise AssertionError('Expected all five public photo fixtures')

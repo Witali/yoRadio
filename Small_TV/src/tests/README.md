@@ -16,6 +16,16 @@ native AP и native STA в отдельных ВМ без LCD/debugger, с на�
 [54F4 scoped proof](../../qemu/parity/captive-portal-validation-20261020.json)
 не заменяет полный suite/24h новой версии.
 
+## Переинициализация после смены города
+
+`city_theme.inc` проверяет четыре темы, одинаковые/новые города, отказы без
+побочных эффектов, отсутствие лишних flash commits и сохранение настроек,
+изменённых во время HTTP body I/O. `city_theme_qemu.py` выполняет восемь реальных
+city commands и наблюдает первые init events и завершённый вывод всех тем.
+`photo_reinit_qemu.py --command city` отдельно проверяет active fade с original
+и native VM и точным literal factory frame. По умолчанию остаётся `--command theme`.
+См. [CITY_REINIT.md](CITY_REINIT.md); это не полная или аппаратная приёмка.
+
 ## Цвета и подготовка нового JPEG
 
 Pure color module имеет отдельные host/RV32 проверки grayscale/RGB/CMYK2–16бит

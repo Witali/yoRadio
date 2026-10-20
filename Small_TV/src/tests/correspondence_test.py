@@ -30,7 +30,8 @@ class CorrespondenceTest(unittest.TestCase):
         self.assertTrue(result['passed'])
         self.assertFalse(result['semantic_equivalence_proved'])
         self.assertEqual(result['factory_export_functions'], 176)
-        self.assertEqual(result['native_app_functions'], 168)
+        # CITY-REINIT adds the location command and shared persistence scheduling helper.
+        self.assertEqual(result['native_app_functions'], 170)
         self.assertEqual(len(result['assembly_only']), 11)
 
     def test_missing_factory(self):

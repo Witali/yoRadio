@@ -119,8 +119,9 @@ static void clock_task(void *unused)
      * FIXED_RECONSTRUCTION: photo idle must apply settings/calendar brightness
      * changes as 0x4200913c does, without waiting for another photo timer event.
      * FIXED_RECONSTRUCTION: consume explicit theme selections, including a
-     * same-value /setclocktype request. A configuration-byte comparison alone
-     * loses 0x4200d7f0's reinitialization command. Snapshot both revisions once.
+     * same-value /setclocktype or /updateCity request. A configuration-byte
+     * comparison loses the commands at 0x4200d7f0/0x4200f3cc. Snapshot both
+     * revisions and location once; preserve the fade reset below for city too.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
