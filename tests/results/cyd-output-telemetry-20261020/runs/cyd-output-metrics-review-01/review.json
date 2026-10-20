@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "actionable_production_findings": [],
+  "scope": "Read-only narrow review of the unwired output metrics helper, host qualification and actual standalone SDK Xtensa objects. No production/test/Git edits, app build or physical device operations.",
+  "helper_source_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_output_metrics.c": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_output_metrics.h": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9"
+  },
+  "target_compile_report_sha256": "236595cb51d1c46ce1f8ad91469acc40b3296220c66dcb132f8d909a73da7e2f",
+  "final_host_report_sha256": "a8e22258ba2733620ceba66d208c9a07320b4fe0f33fddcce6edb638f49a5d70",
+  "final_host_cases": 16,
+  "final_exact_semantic_controls": 7,
+  "host_all_six_inputs_current": true,
+  "unchanged_helper_allows_existing_target_objects": true,
+  "counter_review": [
+    "All shared state is accessed under one portMUX. Task writes/snapshot and ISR drops use the correct SDK task/ISR entry/exit APIs; snapshots copy all counters under the same lock.",
+    "The uint32 increment and uint64 addition saturate only after range would be lost. Exact arrival at MAX without lost increments need not set saturated. Flag is sticky; max_write_us is a max of valid int64 nonnegative durations and cannot overflow its uint64 field.",
+    "Elapsed subtraction is safe because it occurs only when started>=0 and ended>=started; the result cannot exceed INT64_MAX. Invalid timestamps do not turn into unsigned elapsed or erase byte/error observations.",
+    "Error/timeout/short-write counters deliberately overlap. Incomplete ESP_OK results and impossible over-reports count as errors; written byte totals preserve the driver-reported quantity. They are not physical PCM/DMA bytes.",
+    "Availability is boot-cumulative successful callback observation; ISR receipt also proves observation. No pause/reconfigure reset is introduced. Queue drops do not imply audible underruns.",
+    "Quiet objects have no esp_timer_get_time reference. Diagnostic clocks are read before taking the metrics critical section and describe whole synchronous API wall time, including preemption."
+  ],
+  "resolved_test_coverage_finding": {
+    "finding": "Original count-limit seeded timing_samples/invalid_time_samples at UINT32_MAX but neither asserted these fields nor exercised invalid-time increment at the boundary. A per-field wrap regression could escape that saturation case.",
+    "resolution": "Parent added a public invalid-clock write plus assertions that both timing counters stay UINT32_MAX while accumulated valid elapsed/max remain10. Two exact per-field wrap mutants fail the new timing_event_counts_saturate assertion.",
+    "status": "resolved in fresh host metrics-03; helper source unchanged",
+    "existing_target_report_context": "compile-report captured earlier test fixture/runner hashes for review context. Those noncompiler inputs were intentionally superseded; final host-metrics-03 is the current test evidence. Actual target dependency/source/config/object hashes remain current."
+  },
+  "actual_sdk_object_evidence": {
+    "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+    "baseline_row": "original-command-row.json",
+    "quiet_and_diagnostic_compiles": true,
+    "warnings_errors": 0,
+    "new_queue_drop_code_bytes": 50,
+    "queue_section": ".iram1.2",
+    "literal_section": ".iram1.2.literal",
+    "metrics_state_bytes": 64,
+    "lock_bytes": 8,
+    "state_sections": [
+      ".dram1.1",
+      ".dram1.0"
+    ],
+    "new_isr_external_callees": [
+      "xPortEnterCriticalTimeout",
+      "vPortExitCritical"
+    ],
+    "actual_IRAM_call_expansion_records": {
+      "quiet": [
+        "vPortExitCritical",
+        "xPortEnterCriticalTimeout"
+      ],
+      "diagnostic": [
+        "vPortExitCritical",
+        "xPortEnterCriticalTimeout"
+      ]
+    },
+    "increment_always_inlined": true,
+    "no_allocation_libatomic_wall_clock_API_in_ISR_path": true,
+    "sdk_baseline_symbols": {
+      "xPortEnterCriticalTimeout": "4008d314 g     F .iram0.text\t0000015b xPortEnterCriticalTimeout",
+      "vPortExitCritical": "4008d26c g     F .iram0.text\t0000009b vPortExitCritical",
+      "esp_cpu_compare_and_set": "4008acd0 g     F .iram0.text\t00000014 esp_cpu_compare_and_set",
+      "__assert_func": "4008c378 g     F .iram0.text\t000000ec __assert_func",
+      "_xtos_set_intlevel": "4000bfdc g       *ABS*\t00000000 _xtos_set_intlevel",
+      "memcpy": "4000c2c8 g     F *ABS*\t000000f5 memcpy",
+      "port_uxCriticalNesting": "3ffb4d0c g     O .dram0.bss\t00000008 port_uxCriticalNesting",
+      "port_uxOldInterruptState": "3ffb4d04 g     O .dram0.bss\t00000008 port_uxOldInterruptState"
+    },
+    "normal_cache_safe_chain": "New IRAM helper calls SDK enter/exit in .iram0.text; compare-and-set is .iram0.text and interrupt-level restore is ROM. SDK nesting/old-state arrays are DRAM. No flash function is needed on a valid-lock normal path.",
+    "clock_nuance": "The pinned SDK spinlock can read the raw CPU cycle counter during contention. No timer/wall-clock API is invoked by this ISR helper; no claim of zero CPU cycle-register reads is made.",
+    "task_snapshot_copy": "GCC emits memcpy for the64-byte task snapshot while holding the lock; baseline ELF resolves memcpy to ROM0x4000c2c8. It is not an ISR helper call."
+  },
+  "limits": [
+    "Object section annotations are not a final integrated firmware memory map. Once wired, verify actual final placement and callback registration/driver write call sites independently.",
+    "SDK primitive placement is checked against the frozen existing CYD baseline ELF/config; no new full app is linked.",
+    "Normal lock-valid ISR path is audited. SDK corruption/assertion/panic handling is outside a whole-program certification claim, although __assert_func itself is IRAM and masks DROM strings with cache disabled.",
+    "pthread tests do not reproduce target SMP/ISR scheduling or prove a TSAN result. No physical IRQ latency, DMA behavior, underrun rate, audible output, hardware resource margin or performance is established.",
+    "Host byte-total boundary uses64-bit size_t; actual target objects are ILP32 and no physical billions-of-writes saturation experiment is claimed.",
+    "No backend integration is present yet. The driver callback and synchronous-write hooks need their own source integration tests before stage acceptance."
+  ],
+  "all_own_processes_terminal": true,
+  "review_script_sha256": "21ca40615828cdc3efb517346259b8df82bb143e1cd7c5fdb3d561c267dea0ab"
+}

@@ -85,3 +85,10 @@ warnings and no errors. Separate actual Xtensa service objects verify the
 short ISR helper and its SDK critical-section callees in IRAM, state and lock
 in DRAM, and no timer reference in the quiet object. These are software checks;
 physical ISR latency, write overhead and full-radio margins remain open.
+
+[Six final GCC application exports](../tests/results/cyd-output-telemetry-20261020/SDK.md)
+cover vendor/custom FLAC on all three backends. Final PDM ELF symbols place
+both the actual registered callback and queue-drop helper in IRAM, with
+64-byte state and an 8-byte lock in DRAM. Configuration differs from each
+matching N5 image only by the new HTTP request-buffer option. No hardware
+measurement or performance claim follows from this static application gate.

@@ -499,3 +499,5 @@ Stream остаётся на core0, decode/output на core1 с прежними
   ревью проходят; полный Clang53 сохраняет 86 warnings/0errors. Actual full-TU
   FLAC QEMU проходит три случая с реальными SDK owners и прежней affinity;
   OOM/backpressure и физическая квалификация остаются открыты.
+
+- 2026-10-20, CYD-C3-05/13/15: [шесть новых GCC exports](../tests/results/cyd-output-telemetry-20261020/SDK.md) из чистого `0f2a37c89` сохранены для vendor/custom FLAC и всех трёх выходов. Проверены ELF/image/configuration/OTA; минимальный запас OTA — 225504 B. Final PDM callback/helper находятся в IRAM, counters/lock 64+8 B — в DRAM. Привязки задач и аппаратные настройки сохранены; единственная sdkconfig разница с соответствующим N5 image — HTTP TX release. Физические gates и остальные пункты 12/13/14 остаются открытыми.

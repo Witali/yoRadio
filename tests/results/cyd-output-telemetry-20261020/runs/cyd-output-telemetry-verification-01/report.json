@@ -1,0 +1,576 @@
+{
+  "passed": true,
+  "reports": {
+    "telemetry": {
+      "path": ".build/cyd-output-telemetry-01/report.json",
+      "sha256": "510acc0cb79ace98f0024b3f79921569091744cdf25450af9a32997569c79de8",
+      "current_inputs": {
+        "tests/run-cyd-output-telemetry.py": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/esp32-cyd2usb-native/main/native_output_metrics.c": true,
+        "idf/esp32-cyd2usb-native/main/native_output_metrics.h": true,
+        "idf/esp32-cyd2usb-native/main/board_config.h": true,
+        "tests/native/cyd_output_telemetry/test.c": true,
+        "tests/native/cyd_output_telemetry/platform.h": true,
+        "tests/native/cyd_output_telemetry/README.md": true
+      },
+      "frozen_inputs": {
+        "tests/run-cyd-output-telemetry.py": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/esp32-cyd2usb-native/main/native_output_metrics.c": true,
+        "idf/esp32-cyd2usb-native/main/native_output_metrics.h": true,
+        "idf/esp32-cyd2usb-native/main/board_config.h": true,
+        "tests/native/cyd_output_telemetry/test.c": true,
+        "tests/native/cyd_output_telemetry/platform.h": true,
+        "tests/native/cyd_output_telemetry/README.md": true
+      },
+      "normal_cases": {
+        "pdm/quiet/writes": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:writes\n"
+        },
+        "pdm/quiet/full-tail-idle": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:full-tail-idle\n"
+        },
+        "pdm/quiet/paused": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:paused\n"
+        },
+        "pdm/quiet/registration-failure": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:registration-failure\n"
+        },
+        "pdm/quiet/callback-concurrent": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:callback-concurrent\n"
+        },
+        "pdm/diagnostic/writes": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:writes\n"
+        },
+        "pdm/diagnostic/full-tail-idle": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:full-tail-idle\n"
+        },
+        "pdm/diagnostic/paused": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:paused\n"
+        },
+        "pdm/diagnostic/registration-failure": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:registration-failure\n"
+        },
+        "pdm/diagnostic/callback-concurrent": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:callback-concurrent\n"
+        },
+        "dac/quiet/writes": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:writes\n"
+        },
+        "dac/quiet/full-tail-idle": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:full-tail-idle\n"
+        },
+        "dac/quiet/paused": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:paused\n"
+        },
+        "dac/diagnostic/writes": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:writes\n"
+        },
+        "dac/diagnostic/full-tail-idle": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:full-tail-idle\n"
+        },
+        "dac/diagnostic/paused": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:paused\n"
+        },
+        "legacy_dac/quiet/writes": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:writes\n"
+        },
+        "legacy_dac/quiet/full-tail-idle": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:full-tail-idle\n"
+        },
+        "legacy_dac/quiet/paused": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:paused\n"
+        },
+        "legacy_dac/diagnostic/writes": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:writes\n"
+        },
+        "legacy_dac/diagnostic/full-tail-idle": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:full-tail-idle\n"
+        },
+        "legacy_dac/diagnostic/paused": {
+          "passed": true,
+          "status": 0,
+          "output": "PASS:paused\n"
+        }
+      },
+      "negative_controls": {
+        "pdm-missing-write-hook": {
+          "detected": true,
+          "status": 80,
+          "marker": "prime_writes_accounted",
+          "case": "writes",
+          "generated_sha256": "a74a04875e12627b6d2cf92cf69dd5316010ed54cd4f0ce595f726bdf9018577"
+        },
+        "dac-missing-write-hook": {
+          "detected": true,
+          "status": 80,
+          "marker": "prime_writes_accounted",
+          "case": "writes",
+          "generated_sha256": "4eb8c991caf00db1d0e3b7457eb668ed490f232db94a38cc9a9d88f2d8a8cb58"
+        },
+        "legacy-missing-write-hook": {
+          "detected": true,
+          "status": 80,
+          "marker": "prime_writes_accounted",
+          "case": "writes",
+          "generated_sha256": "38a11d3d3145b44245bad917193a33c9f1f1494a755b6150428291f0f64e7643"
+        },
+        "legacy-wrong-request-units": {
+          "detected": true,
+          "status": 80,
+          "marker": "prime_writes_accounted",
+          "case": "writes",
+          "generated_sha256": "e9ba8f2b289e7a28531aa87bfe697c66fee843cfc8968365183d3216e86f7175"
+        },
+        "pdm-ignored-registration-failure": {
+          "detected": true,
+          "status": 80,
+          "marker": "pdm_preload_after_registration",
+          "case": "registration-failure",
+          "generated_sha256": "0e67533307c659d85c07049822118f25e507916c8273d04c06761a03af82c675"
+        },
+        "pdm-failed-registration-observed": {
+          "detected": true,
+          "status": 80,
+          "marker": "failed_registration_unavailable",
+          "case": "registration-failure",
+          "generated_sha256": "e885bc5a468957643da811540fda2560a85bfc1d56762373e2aa92140b13342f"
+        },
+        "pdm-missing-isr-hook": {
+          "detected": true,
+          "status": 80,
+          "marker": "registered_isr_hook_count",
+          "case": "callback-concurrent",
+          "generated_sha256": "7c6a47bcc113e7268c54d400ed84a49b40f9ea55a136a75e50e4cfa2a079f845"
+        },
+        "dac-missing-idle-hook": {
+          "detected": true,
+          "status": 80,
+          "marker": "dac_idle_telemetry",
+          "case": "full-tail-idle",
+          "generated_sha256": "35764c073e07dc073ea496591f650f57f9dcf676cf4832cb51bd7321cb80c5c9"
+        }
+      }
+    },
+    "pause": {
+      "path": ".build/cyd-telemetry-regression-output-pause-01/report.json",
+      "sha256": "2426327d9b754f41efbdff5ee46e5d1b6ee5601e6769dce8f856d0d5f1f0fa35",
+      "current_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "tests/native/cyd_output_pause_test.c": true,
+        "tests/run-cyd-output-pause.py": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "frozen_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "tests/native/cyd_output_pause_test.c": true,
+        "tests/run-cyd-output-pause.py": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "normal_cases": {
+        "pdm": "PASS 11 cases; real production pause/ownership; driver DMA barrier seam",
+        "dac": "PASS 17 cases; real production pause/ownership; driver DMA barrier seam",
+        "legacy": "PASS 10 cases; real production pause/ownership; driver DMA barrier seam"
+      },
+      "negative_controls": {
+        "pdm": "rejected by ownership assertion before deleting running DMA",
+        "dac": "rejected by ownership assertion before deleting running DMA"
+      }
+    },
+    "gain": {
+      "path": ".build/cyd-telemetry-regression-output-gain-03/report.json",
+      "sha256": "094a5bbcb31533e1b784060044031cf6f09fbe421d3993f8828f345547b9737f",
+      "current_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "tests/native/cyd_output_gain_test.c": true,
+        "tests/run-cyd-output-gain.py": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "frozen_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "tests/native/cyd_output_gain_test.c": true,
+        "tests/run-cyd-output-gain.py": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "normal_cases": {
+        "pdm": "PASS PCM gain: 5801300 arithmetic cases, 375 output cases, bounded coefficient evaluations",
+        "dac": "PASS PCM gain: 5801300 arithmetic cases, 375 output cases, bounded coefficient evaluations",
+        "legacy": "PASS PCM gain: 5801300 arithmetic cases, 375 output cases, bounded coefficient evaluations"
+      },
+      "negative_controls": {}
+    },
+    "normalizer": {
+      "path": ".build/cyd-telemetry-regression-normalizer-03/report.json",
+      "sha256": "dae935116d7fbca425ed35b37c93be72cec39ed0ed499bd78fce9c824786e7f1",
+      "current_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "tests/native/cyd_normalizer_test.c": true,
+        "tests/native/cyd_normalizer_reference.cpp": true,
+        "tests/run-cyd-normalizer.py": true,
+        "tests/run-cyd-output-gain.py": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.cpp": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.h": true,
+        "idf/components/native_audio_normalizer/CMakeLists.txt": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.cpp": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.h": true,
+        "idf/esp32-cyd2usb-native/CMakeLists.txt": true,
+        "idf/esp32-cyd2usb-native/main/CMakeLists.txt": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/esp32-cyd2usb-native/main/radio_control_platform.h": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "frozen_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "tests/native/cyd_normalizer_test.c": true,
+        "tests/native/cyd_normalizer_reference.cpp": true,
+        "tests/run-cyd-normalizer.py": true,
+        "tests/run-cyd-output-gain.py": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.cpp": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.h": true,
+        "idf/components/native_audio_normalizer/CMakeLists.txt": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.cpp": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.h": true,
+        "idf/esp32-cyd2usb-native/CMakeLists.txt": true,
+        "idf/esp32-cyd2usb-native/main/CMakeLists.txt": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/esp32-cyd2usb-native/main/radio_control_platform.h": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "normal_cases": {
+        "pdm": "PASS normalizer: 239 packets, mono/stereo/wider layouts, immutable unaligned PCM, split identity, cached settings, owner-only reset, rate/layout/discard/EOF, scratch=512 bytes",
+        "dac": "PASS normalizer: 240 packets, mono/stereo/wider layouts, immutable unaligned PCM, split identity, cached settings, owner-only reset, rate/layout/discard/EOF, scratch=512 bytes",
+        "legacy": "PASS normalizer: 239 packets, mono/stereo/wider layouts, immutable unaligned PCM, split identity, cached settings, owner-only reset, rate/layout/discard/EOF, scratch=512 bytes"
+      },
+      "negative_controls": {}
+    },
+    "pcm_layout": {
+      "path": ".build/cyd-telemetry-regression-pcm-layout-03/report.json",
+      "sha256": "446b663bcd39aea61e9c91015b4538bcfb10eb635e3e3e74a27f94369354c70b",
+      "current_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "tests/native/cyd_pcm_layout_test.c": true,
+        "tests/native/cyd_normalizer_test.c": true,
+        "tests/native/cyd_normalizer_reference.cpp": true,
+        "tests/run-cyd-pcm-layout.py": true,
+        "tests/run-cyd-output-gain.py": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.cpp": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.h": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.cpp": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.h": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "frozen_inputs": {
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "tests/native/cyd_pcm_layout_test.c": true,
+        "tests/native/cyd_normalizer_test.c": true,
+        "tests/native/cyd_normalizer_reference.cpp": true,
+        "tests/run-cyd-pcm-layout.py": true,
+        "tests/run-cyd-output-gain.py": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.cpp": true,
+        "idf/components/native_audio_normalizer/native_audio_normalizer.h": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.cpp": true,
+        "yoRadio/src/audioI2S/AudioNormalizer.h": true,
+        "tests/native/cyd_output_metrics_noop.h": true
+      },
+      "normal_cases": {
+        "pdm": "PASS packed PCM: 1359 stream cases, signed LE8/16/24/32, immutable unaligned input, mono/stereo/first-two mix, split/partial frames, driver faults, rate/EOF; conversion checks=721152 PDM checks=1278222 max rational error=2 LSB",
+        "dac": "PASS packed PCM: 1358 stream cases, signed LE8/16/24/32, immutable unaligned input, mono/stereo/first-two mix, split/partial frames, driver faults, rate/EOF; conversion checks=721152 PDM checks=0 max rational error=0 LSB",
+        "legacy": "PASS packed PCM: 1358 stream cases, signed LE8/16/24/32, immutable unaligned input, mono/stereo/first-two mix, split/partial frames, driver faults, rate/EOF; conversion checks=721152 PDM checks=0 max rational error=0 LSB"
+      },
+      "negative_controls": {}
+    },
+    "maintenance_network_power": {
+      "path": ".build/cyd-telemetry-regression-maintenance-01/report.json",
+      "sha256": "c4dca442a07bb65ebf1a13fdf69da76cfacb3ac5451c0774555764b7752c5024",
+      "current_inputs": {
+        "tests/run-cyd-maintenance.py": true,
+        "tests/native/cyd_maintenance_test.c": true,
+        "tests/native/cyd_maintenance_platform.h": true,
+        "tests/native/cyd_output_pause_test.c": true,
+        "tests/native/cyd_output_metrics_noop.h": true,
+        "tests/native/audio_power_seam.h": true,
+        "idf/esp32-cyd2usb-native/main/audio_service.c": true,
+        "idf/esp32-cyd2usb-native/main/audio_service.h": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/esp32-cyd2usb-native/main/native_state.c": true,
+        "idf/esp32-cyd2usb-native/main/native_state.h": true,
+        "idf/esp32-cyd2usb-native/main/native_health.h": true,
+        "idf/esp32-cyd2usb-native/main/input_prefill.h": true,
+        "idf/components/native_stream/adaptive_input.c": true,
+        "idf/components/native_stream/icy_title.c": true,
+        "idf/components/native_stream/include/adaptive_input.h": true,
+        "idf/components/native_stream/include/audio_completion.h": true,
+        "idf/components/native_stream/include/icy_title.h": true,
+        "idf/components/native_stream/include/json_buffer.h": true,
+        "idf/components/native_stream/include/stream_bitrate.h": true,
+        "idf/components/native_stream/include/stream_body.h": true,
+        "idf/components/native_stream/include/stream_confirm.h": true,
+        "idf/components/native_stream/include/stream_encoded_router.h": true,
+        "idf/components/native_stream/include/stream_frames.h": true,
+        "idf/components/native_stream/include/stream_probe.h": true,
+        "idf/components/native_stream/include/stream_staging.h": true,
+        "idf/components/native_stream/include/stream_start.h": true,
+        "idf/components/native_stream/include/stream_tags.h": true,
+        "idf/components/native_stream/include/tls_stream_result.h": true,
+        "idf/components/native_stream/include/websocket_message.h": true,
+        "idf/components/native_network_power/native_network_power.c": true,
+        "idf/components/native_network_power/include/native_network_power.h": true
+      },
+      "frozen_inputs": {
+        "tests/run-cyd-maintenance.py": true,
+        "tests/native/cyd_maintenance_test.c": true,
+        "tests/native/cyd_maintenance_platform.h": true,
+        "tests/native/cyd_output_pause_test.c": true,
+        "tests/native/cyd_output_metrics_noop.h": true,
+        "tests/native/audio_power_seam.h": true,
+        "idf/esp32-cyd2usb-native/main/audio_service.c": true,
+        "idf/esp32-cyd2usb-native/main/audio_service.h": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+        "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+        "idf/esp32-cyd2usb-native/main/native_state.c": true,
+        "idf/esp32-cyd2usb-native/main/native_state.h": true,
+        "idf/esp32-cyd2usb-native/main/native_health.h": true,
+        "idf/esp32-cyd2usb-native/main/input_prefill.h": true,
+        "idf/components/native_stream/adaptive_input.c": true,
+        "idf/components/native_stream/icy_title.c": true,
+        "idf/components/native_stream/include/adaptive_input.h": true,
+        "idf/components/native_stream/include/audio_completion.h": true,
+        "idf/components/native_stream/include/icy_title.h": true,
+        "idf/components/native_stream/include/json_buffer.h": true,
+        "idf/components/native_stream/include/stream_bitrate.h": true,
+        "idf/components/native_stream/include/stream_body.h": true,
+        "idf/components/native_stream/include/stream_confirm.h": true,
+        "idf/components/native_stream/include/stream_encoded_router.h": true,
+        "idf/components/native_stream/include/stream_frames.h": true,
+        "idf/components/native_stream/include/stream_probe.h": true,
+        "idf/components/native_stream/include/stream_staging.h": true,
+        "idf/components/native_stream/include/stream_start.h": true,
+        "idf/components/native_stream/include/stream_tags.h": true,
+        "idf/components/native_stream/include/tls_stream_result.h": true,
+        "idf/components/native_stream/include/websocket_message.h": true,
+        "idf/components/native_network_power/native_network_power.c": true,
+        "idf/components/native_network_power/include/native_network_power.h": true
+      },
+      "normal_cases": {
+        "PDM": {
+          "idle": "PASS idle; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pause_publish": "PASS pause_publish; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "resume": "PASS resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "stop_cancels": "PASS stop_cancels; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "end_no_resume": "PASS end_no_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "end_busy": "PASS end_busy; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "state_lock": "PASS state_lock; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "control_lock": "PASS control_lock; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "queue_failure": "PASS queue_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "wide_epoch": "PASS wide_epoch; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_read": "PASS timeout_read; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_open": "PASS timeout_open; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_headers": "PASS timeout_headers; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_close": "PASS timeout_close; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_cleanup": "PASS timeout_cleanup; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "late_encoded": "PASS late_encoded; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "late_pcm": "PASS late_pcm; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "output_write": "PASS output_write; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "output_disable": "PASS output_disable; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "control_reading": "PASS control_reading; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "staging": "PASS staging; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "back_to_back": "PASS back_to_back; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pause_failure": "PASS pause_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "resume_queue_failure": "PASS resume_queue_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "empty_receive_epoch": "PASS empty_receive_epoch; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "stopped_no_resume": "PASS stopped_no_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pending_resume": "PASS pending_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "delete_failure": "PASS delete_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes"
+        },
+        "DAC": {
+          "idle": "PASS idle; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pause_publish": "PASS pause_publish; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "resume": "PASS resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "stop_cancels": "PASS stop_cancels; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "end_no_resume": "PASS end_no_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "end_busy": "PASS end_busy; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "state_lock": "PASS state_lock; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "control_lock": "PASS control_lock; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "queue_failure": "PASS queue_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "wide_epoch": "PASS wide_epoch; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_read": "PASS timeout_read; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_open": "PASS timeout_open; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_headers": "PASS timeout_headers; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_close": "PASS timeout_close; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_cleanup": "PASS timeout_cleanup; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "late_encoded": "PASS late_encoded; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "late_pcm": "PASS late_pcm; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "output_write": "PASS output_write; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "output_disable": "PASS output_disable; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "control_reading": "PASS control_reading; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "staging": "PASS staging; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "back_to_back": "PASS back_to_back; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pause_failure": "PASS pause_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "resume_queue_failure": "PASS resume_queue_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "empty_receive_epoch": "PASS empty_receive_epoch; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "stopped_no_resume": "PASS stopped_no_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pending_resume": "PASS pending_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "delete_failure": "PASS delete_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes"
+        },
+        "LEGACY_DAC": {
+          "idle": "PASS idle; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pause_publish": "PASS pause_publish; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "resume": "PASS resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "stop_cancels": "PASS stop_cancels; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "end_no_resume": "PASS end_no_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "end_busy": "PASS end_busy; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "state_lock": "PASS state_lock; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "control_lock": "PASS control_lock; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "queue_failure": "PASS queue_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "wide_epoch": "PASS wide_epoch; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_read": "PASS timeout_read; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_open": "PASS timeout_open; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_headers": "PASS timeout_headers; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_close": "PASS timeout_close; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "timeout_cleanup": "PASS timeout_cleanup; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "late_encoded": "PASS late_encoded; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "late_pcm": "PASS late_pcm; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "output_write": "PASS output_write; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "output_disable": "PASS output_disable; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "control_reading": "PASS control_reading; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "staging": "PASS staging; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "back_to_back": "PASS back_to_back; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pause_failure": "PASS pause_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "resume_queue_failure": "PASS resume_queue_failure; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "empty_receive_epoch": "PASS empty_receive_epoch; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "stopped_no_resume": "PASS stopped_no_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes",
+          "pending_resume": "PASS pending_resume; actual stream/decode/output owners + production adaptive FIFO; command=524 token=8 bytes"
+        }
+      },
+      "negative_controls": {
+        "early_pause_publication": {
+          "rejected": true,
+          "status": 134,
+          "case": "pause_publish",
+          "expected_assertion": "maintenance_active()",
+          "kind": "semantic assertion"
+        },
+        "decoder_early_ack": {
+          "rejected": true,
+          "status": 134,
+          "case": "late_encoded",
+          "expected_assertion": "!maintenance_acked(MAINTENANCE_DECODER)",
+          "kind": "semantic assertion"
+        },
+        "decoder_stale_epoch_without_cleanup": {
+          "rejected": true,
+          "status": 134,
+          "case": "empty_receive_epoch",
+          "expected_assertion": "!begin_done && !maintenance_acked(MAINTENANCE_DECODER)",
+          "kind": "semantic assertion"
+        },
+        "output_early_ack": {
+          "rejected": true,
+          "status": 134,
+          "case": "late_pcm",
+          "expected_assertion": "!maintenance_acked(MAINTENANCE_OUTPUT)",
+          "kind": "semantic assertion"
+        },
+        "ignored_dma_pause": {
+          "rejected": true,
+          "status": 134,
+          "case": "output_write",
+          "expected_assertion": "!http_clients&&!decoder_handles&&!driver.allocated",
+          "kind": "semantic assertion"
+        },
+        "lost_resume": {
+          "rejected": true,
+          "status": 134,
+          "case": "resume",
+          "expected_assertion": "esp_timer_get_time()<end",
+          "kind": "semantic assertion"
+        },
+        "stale_park": {
+          "rejected": true,
+          "status": 134,
+          "case": "back_to_back",
+          "expected_assertion": "begin_result==expected",
+          "kind": "semantic assertion"
+        },
+        "lost_pending_generation": {
+          "rejected": true,
+          "status": 134,
+          "case": "pending_resume",
+          "expected_assertion": "esp_timer_get_time()<end",
+          "kind": "semantic assertion"
+        },
+        "stale_metadata": {
+          "rejected": true,
+          "status": 134,
+          "case": "output_write",
+          "expected_assertion": "!snapshot->title[0]",
+          "kind": "semantic assertion"
+        }
+      }
+    }
+  },
+  "production_findings": [],
+  "all_own_processes_terminal": true,
+  "physical_hardware": false,
+  "target_irq_or_dma": false,
+  "fixture_repairs": [
+    "Explicit no-op metrics dependency for existing PCM/normalizer/pause/maintenance scope, captured by each runner.",
+    "Retain production DAC write wrapper and pause function in old extracted producer fixtures; supply already-required enabled state/pause declaration/invalid-state SDK seam.",
+    "Constrain shared function extraction to function definitions; the old regex could select a macro call containing native_audio_output_pause instead."
+  ],
+  "limitations": [
+    "New gate executes actual complete output and metrics translation units with SDK/driver/clock/pthread lock seams; this is not target final placement, physical SMP/ISR timing, real DMA, pin or audible/performance qualification.",
+    "Old suites deliberately exclude metrics via empty seam and retain their previous PCM/ownership scope.",
+    "No private counter, owner-phase or ACK state is written by the new telemetry fixture."
+  ]
+}

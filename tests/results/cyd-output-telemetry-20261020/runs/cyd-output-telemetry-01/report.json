@@ -1,0 +1,216 @@
+{
+  "passed": true,
+  "scope": "Run complete production CYD output backends plus real metrics under ASan/UBSan.\n\nSDK/driver/clock/critical-section seams replace hardware. No PCM/DMA timing,\nphysical IRQ behavior or target memory placement qualification is claimed.\n",
+  "source_sha256": {
+    "tests/run-cyd-output-telemetry.py": "39ae466b7c57cb7669e429e47b8925cce264002e6b3fcd619e4dc3fc618058d7",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.c": "4f564bed759e219600cb0905b5f19c0940a506524cf60d84280526fc5fd302d9",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": "41d0a458c6f2216e627a58062a0897835b1dd20f8a25475cc0e441acf4c931cd",
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.c": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72",
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.h": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+    "idf/esp32-cyd2usb-native/main/board_config.h": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+    "tests/native/cyd_output_telemetry/test.c": "3adbf887c1afaba8e60cc4a0398ece77a2ca506a6ad569462d765dcf59c436a1",
+    "tests/native/cyd_output_telemetry/platform.h": "c75bbbb8941385a81f9b5cd20ad3327b23eb4571f55646e16f4b7b55a57299e4",
+    "tests/native/cyd_output_telemetry/README.md": "332a539ce4b2af1569b3f42f73531565d072aa1fac5cb0b62ab426f096435b62"
+  },
+  "cases": {
+    "pdm/quiet/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "pdm/quiet/full-tail-idle": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:full-tail-idle\n"
+    },
+    "pdm/quiet/paused": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:paused\n"
+    },
+    "pdm/quiet/registration-failure": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:registration-failure\n"
+    },
+    "pdm/quiet/callback-concurrent": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:callback-concurrent\n"
+    },
+    "pdm/diagnostic/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "pdm/diagnostic/full-tail-idle": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:full-tail-idle\n"
+    },
+    "pdm/diagnostic/paused": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:paused\n"
+    },
+    "pdm/diagnostic/registration-failure": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:registration-failure\n"
+    },
+    "pdm/diagnostic/callback-concurrent": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:callback-concurrent\n"
+    },
+    "dac/quiet/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "dac/quiet/full-tail-idle": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:full-tail-idle\n"
+    },
+    "dac/quiet/paused": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:paused\n"
+    },
+    "dac/diagnostic/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "dac/diagnostic/full-tail-idle": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:full-tail-idle\n"
+    },
+    "dac/diagnostic/paused": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:paused\n"
+    },
+    "legacy_dac/quiet/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "legacy_dac/quiet/full-tail-idle": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:full-tail-idle\n"
+    },
+    "legacy_dac/quiet/paused": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:paused\n"
+    },
+    "legacy_dac/diagnostic/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "legacy_dac/diagnostic/full-tail-idle": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:full-tail-idle\n"
+    },
+    "legacy_dac/diagnostic/paused": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:paused\n"
+    }
+  },
+  "negative_controls": {
+    "pdm-missing-write-hook": {
+      "detected": true,
+      "status": 80,
+      "marker": "prime_writes_accounted",
+      "case": "writes",
+      "generated_sha256": "a74a04875e12627b6d2cf92cf69dd5316010ed54cd4f0ce595f726bdf9018577"
+    },
+    "dac-missing-write-hook": {
+      "detected": true,
+      "status": 80,
+      "marker": "prime_writes_accounted",
+      "case": "writes",
+      "generated_sha256": "4eb8c991caf00db1d0e3b7457eb668ed490f232db94a38cc9a9d88f2d8a8cb58"
+    },
+    "legacy-missing-write-hook": {
+      "detected": true,
+      "status": 80,
+      "marker": "prime_writes_accounted",
+      "case": "writes",
+      "generated_sha256": "38a11d3d3145b44245bad917193a33c9f1f1494a755b6150428291f0f64e7643"
+    },
+    "legacy-wrong-request-units": {
+      "detected": true,
+      "status": 80,
+      "marker": "prime_writes_accounted",
+      "case": "writes",
+      "generated_sha256": "e9ba8f2b289e7a28531aa87bfe697c66fee843cfc8968365183d3216e86f7175"
+    },
+    "pdm-ignored-registration-failure": {
+      "detected": true,
+      "status": 80,
+      "marker": "pdm_preload_after_registration",
+      "case": "registration-failure",
+      "generated_sha256": "0e67533307c659d85c07049822118f25e507916c8273d04c06761a03af82c675"
+    },
+    "pdm-failed-registration-observed": {
+      "detected": true,
+      "status": 80,
+      "marker": "failed_registration_unavailable",
+      "case": "registration-failure",
+      "generated_sha256": "e885bc5a468957643da811540fda2560a85bfc1d56762373e2aa92140b13342f"
+    },
+    "pdm-missing-isr-hook": {
+      "detected": true,
+      "status": 80,
+      "marker": "registered_isr_hook_count",
+      "case": "callback-concurrent",
+      "generated_sha256": "7c6a47bcc113e7268c54d400ed84a49b40f9ea55a136a75e50e4cfa2a079f845"
+    },
+    "dac-missing-idle-hook": {
+      "detected": true,
+      "status": 80,
+      "marker": "dac_idle_telemetry",
+      "case": "full-tail-idle",
+      "generated_sha256": "35764c073e07dc073ea496591f650f57f9dcf676cf4832cb51bd7321cb80c5c9"
+    }
+  },
+  "physical_hardware": false,
+  "target_irq_or_dma": false,
+  "live_inputs_match_snapshot": {
+    "tests/run-cyd-output-telemetry.py": true,
+    "idf/esp32-cyd2usb-native/main/native_audio_output.c": true,
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": true,
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.c": true,
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.h": true,
+    "idf/esp32-cyd2usb-native/main/board_config.h": true,
+    "tests/native/cyd_output_telemetry/test.c": true,
+    "tests/native/cyd_output_telemetry/platform.h": true,
+    "tests/native/cyd_output_telemetry/README.md": true
+  },
+  "complete_output_tu_matches_frozen_bytes": true,
+  "complete_metrics_tu_matches_frozen_bytes": true,
+  "generated_stubs_sha256": {
+    "esp_attr.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_check.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_err.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_log.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_timer.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "idf6_i2s_compat.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "native_audio_normalizer.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "native_audio_settings.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "sdkconfig.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "driver/dac_continuous.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "driver/gpio.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "driver/i2s_pdm.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "freertos/FreeRTOS.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "freertos/task.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083"
+  }
+}

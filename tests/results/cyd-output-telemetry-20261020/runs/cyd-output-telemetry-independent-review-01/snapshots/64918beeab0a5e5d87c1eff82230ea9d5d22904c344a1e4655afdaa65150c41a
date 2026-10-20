@@ -1,0 +1,243 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-output-metrics-review-01\objects-quiet\metrics.obj:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.native_output_metrics_end_write:
+
+00000000 <.literal.native_output_metrics_end_write>:
+	...
+			0: R_XTENSA_32	.dram1.0
+			4: R_XTENSA_32	.dram1.1
+			8: R_XTENSA_32	xPortEnterCriticalTimeout
+			c: R_XTENSA_32	vPortExitCritical
+
+Disassembly of section .literal.native_output_metrics_observe_queue:
+
+00000000 <.literal.native_output_metrics_observe_queue>:
+	...
+			0: R_XTENSA_32	.dram1.0
+			4: R_XTENSA_32	.dram1.1
+			8: R_XTENSA_32	xPortEnterCriticalTimeout
+			c: R_XTENSA_32	vPortExitCritical
+
+Disassembly of section .iram1.2.literal:
+
+00000000 <.iram1.2.literal>:
+	...
+			0: R_XTENSA_32	.dram1.0
+			4: R_XTENSA_32	.dram1.1
+			8: R_XTENSA_32	xPortEnterCriticalTimeout
+			c: R_XTENSA_32	vPortExitCritical
+
+Disassembly of section .literal.native_output_metrics_snapshot:
+
+00000000 <.literal.native_output_metrics_snapshot>:
+	...
+			0: R_XTENSA_32	.dram1.0
+			4: R_XTENSA_32	.dram1.1
+			8: R_XTENSA_32	xPortEnterCriticalTimeout
+			c: R_XTENSA_32	memcpy
+			10: R_XTENSA_32	vPortExitCritical
+
+Disassembly of section .text.native_output_metrics_begin_write:
+
+00000000 <native_output_metrics_begin_write>:
+   0:	004136        	entry	a1, 32
+   3:	020c      	movi.n	a2, 0
+   5:	023d      	mov.n	a3, a2
+   7:	f01d      	retw.n
+
+Disassembly of section .text.native_output_metrics_end_write:
+
+00000000 <native_output_metrics_end_write>:
+   0:	004136        	entry	a1, 32
+   3:	000071        	l32r	a7, fffc0004 <native_output_metrics_end_write+0xfffc0004>
+			3: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_end_write
+   6:	fb7c      	movi.n	a11, -1
+   8:	07ad      	mov.n	a10, a7
+   a:	000081        	l32r	a8, fffc000c <native_output_metrics_end_write+0xfffc000c>
+			a: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_end_write+0x8
+			a: R_XTENSA_ASM_EXPAND	xPortEnterCriticalTimeout
+   d:	0008e0        	callx8	a8
+  10:	000081        	l32r	a8, fffc0010 <native_output_metrics_end_write+0xfffc0010>
+			10: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_end_write+0x4
+  13:	8898      	l32i.n	a9, a8, 32
+  15:	070926        	beqi	a9, -1, 20 <native_output_metrics_end_write+0x20>
+			15: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x20
+  18:	991b      	addi.n	a9, a9, 1
+  1a:	8899      	s32i.n	a9, a8, 32
+  1c:	000146        	j	25 <native_output_metrics_end_write+0x25>
+			1c: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x25
+  1f:	00          	.byte	00
+  20:	190c      	movi.n	a9, 1
+  22:	3e4892        	s8i	a9, a8, 62
+  25:	08a8      	l32i.n	a10, a8, 0
+  27:	1898      	l32i.n	a9, a8, 4
+  29:	fb7c      	movi.n	a11, -1
+  2b:	30bab0        	xor	a11, a10, a11
+  2e:	0e0966        	bnei	a9, -1, 40 <native_output_metrics_end_write+0x40>
+			2e: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x40
+  31:	0bbb27        	bgeu	a11, a2, 40 <native_output_metrics_end_write+0x40>
+			31: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x40
+  34:	09ad      	mov.n	a10, a9
+  36:	190c      	movi.n	a9, 1
+  38:	3e4892        	s8i	a9, a8, 62
+  3b:	0acd      	mov.n	a12, a10
+  3d:	000206        	j	49 <native_output_metrics_end_write+0x49>
+			3d: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x49
+  40:	aa2a      	add.n	a10, a10, a2
+  42:	09cd      	mov.n	a12, a9
+  44:	01ba27        	bgeu	a10, a2, 49 <native_output_metrics_end_write+0x49>
+			44: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x49
+  47:	c91b      	addi.n	a12, a9, 1
+  49:	2898      	l32i.n	a9, a8, 8
+  4b:	38b8      	l32i.n	a11, a8, 12
+  4d:	08a9      	s32i.n	a10, a8, 0
+  4f:	18c9      	s32i.n	a12, a8, 4
+  51:	fa7c      	movi.n	a10, -1
+  53:	30a9a0        	xor	a10, a9, a10
+  56:	0c0b66        	bnei	a11, -1, 66 <native_output_metrics_end_write+0x66>
+			56: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x66
+  59:	09ba37        	bgeu	a10, a3, 66 <native_output_metrics_end_write+0x66>
+			59: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x66
+  5c:	1a0c      	movi.n	a10, 1
+  5e:	0b9d      	mov.n	a9, a11
+  60:	3e48a2        	s8i	a10, a8, 62
+  63:	000186        	j	6d <native_output_metrics_end_write+0x6d>
+			63: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x6d
+  66:	993a      	add.n	a9, a9, a3
+  68:	01b937        	bgeu	a9, a3, 6d <native_output_metrics_end_write+0x6d>
+			68: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x6d
+  6b:	bb1b      	addi.n	a11, a11, 1
+  6d:	38b9      	s32i.n	a11, a8, 12
+  6f:	2899      	s32i.n	a9, a8, 8
+  71:	1b0c      	movi.n	a11, 1
+  73:	83b440        	moveqz	a11, a4, a4
+  76:	84cc      	bnez.n	a4, 82 <native_output_metrics_end_write+0x82>
+			76: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x82
+  78:	c0a230        	sub	a10, a2, a3
+  7b:	190c      	movi.n	a9, 1
+  7d:	839ba0        	moveqz	a9, a11, a10
+  80:	a9bc      	beqz.n	a9, be <native_output_metrics_end_write+0xbe>
+			80: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0xbe
+  82:	9898      	l32i.n	a9, a8, 36
+  84:	060926        	beqi	a9, -1, 8e <native_output_metrics_end_write+0x8e>
+			84: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x8e
+  87:	991b      	addi.n	a9, a9, 1
+  89:	9899      	s32i.n	a9, a8, 36
+  8b:	000106        	j	93 <native_output_metrics_end_write+0x93>
+			8b: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0x93
+  8e:	190c      	movi.n	a9, 1
+  90:	3e4892        	s8i	a9, a8, 62
+  93:	07a192        	movi	a9, 0x107
+  96:	109497        	bne	a4, a9, aa <native_output_metrics_end_write+0xaa>
+			96: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0xaa
+  99:	a898      	l32i.n	a9, a8, 40
+  9b:	060926        	beqi	a9, -1, a5 <native_output_metrics_end_write+0xa5>
+			9b: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0xa5
+  9e:	991b      	addi.n	a9, a9, 1
+  a0:	a899      	s32i.n	a9, a8, 40
+  a2:	000106        	j	aa <native_output_metrics_end_write+0xaa>
+			a2: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0xaa
+  a5:	190c      	movi.n	a9, 1
+  a7:	3e4892        	s8i	a9, a8, 62
+  aa:	10b327        	bgeu	a3, a2, be <native_output_metrics_end_write+0xbe>
+			aa: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0xbe
+  ad:	b898      	l32i.n	a9, a8, 44
+  af:	060926        	beqi	a9, -1, b9 <native_output_metrics_end_write+0xb9>
+			af: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0xb9
+  b2:	991b      	addi.n	a9, a9, 1
+  b4:	b899      	s32i.n	a9, a8, 44
+  b6:	000106        	j	be <native_output_metrics_end_write+0xbe>
+			b6: R_XTENSA_SLOT0_OP	.text.native_output_metrics_end_write+0xbe
+  b9:	190c      	movi.n	a9, 1
+  bb:	3e4892        	s8i	a9, a8, 62
+  be:	07ad      	mov.n	a10, a7
+  c0:	000081        	l32r	a8, fffc00c0 <native_output_metrics_end_write+0xfffc00c0>
+			c0: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_end_write+0xc
+			c0: R_XTENSA_ASM_EXPAND	vPortExitCritical
+  c3:	0008e0        	callx8	a8
+  c6:	f01d      	retw.n
+
+Disassembly of section .text.native_output_metrics_observe_queue:
+
+00000000 <native_output_metrics_observe_queue>:
+   0:	004136        	entry	a1, 32
+   3:	0000a1        	l32r	a10, fffc0004 <native_output_metrics_observe_queue+0xfffc0004>
+			3: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_observe_queue
+   6:	fb7c      	movi.n	a11, -1
+   8:	000081        	l32r	a8, fffc0008 <native_output_metrics_observe_queue+0xfffc0008>
+			8: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_observe_queue+0x8
+			8: R_XTENSA_ASM_EXPAND	xPortEnterCriticalTimeout
+   b:	0008e0        	callx8	a8
+   e:	000081        	l32r	a8, fffc0010 <native_output_metrics_observe_queue+0xfffc0010>
+			e: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_observe_queue+0x4
+  11:	01a092        	movi	a9, 1
+  14:	0000a1        	l32r	a10, fffc0014 <native_output_metrics_observe_queue+0xfffc0014>
+			14: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_observe_queue
+  17:	3d4892        	s8i	a9, a8, 61
+  1a:	000081        	l32r	a8, fffc001c <native_output_metrics_observe_queue+0xfffc001c>
+			1a: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_observe_queue+0xc
+			1a: R_XTENSA_ASM_EXPAND	vPortExitCritical
+  1d:	0008e0        	callx8	a8
+  20:	f01d      	retw.n
+
+Disassembly of section .iram1.2:
+
+00000000 <native_output_metrics_queue_drop>:
+   0:	004136        	entry	a1, 32
+   3:	0000a1        	l32r	a10, fffc0004 <native_output_metrics_queue_drop+0xfffc0004>
+			3: R_XTENSA_SLOT0_OP	.iram1.2.literal
+   6:	fb7c      	movi.n	a11, -1
+   8:	000081        	l32r	a8, fffc0008 <native_output_metrics_queue_drop+0xfffc0008>
+			8: R_XTENSA_SLOT0_OP	.iram1.2.literal+0x8
+			8: R_XTENSA_ASM_EXPAND	xPortEnterCriticalTimeout
+   b:	0008e0        	callx8	a8
+   e:	000081        	l32r	a8, fffc0010 <native_output_metrics_queue_drop+0xfffc0010>
+			e: R_XTENSA_SLOT0_OP	.iram1.2.literal+0x4
+  11:	1a0c      	movi.n	a10, 1
+  13:	e898      	l32i.n	a9, a8, 56
+  15:	3d48a2        	s8i	a10, a8, 61
+  18:	080926        	beqi	a9, -1, 24 <native_output_metrics_queue_drop+0x24>
+			18: R_XTENSA_SLOT0_OP	.iram1.2+0x24
+  1b:	991b      	addi.n	a9, a9, 1
+  1d:	e899      	s32i.n	a9, a8, 56
+  1f:	000106        	j	27 <native_output_metrics_queue_drop+0x27>
+			1f: R_XTENSA_SLOT0_OP	.iram1.2+0x27
+  22:	00          	.byte	00
+  23:	00          	.byte	00
+  24:	3e48a2        	s8i	a10, a8, 62
+  27:	0000a1        	l32r	a10, fffc0028 <native_output_metrics_queue_drop+0xfffc0028>
+			27: R_XTENSA_SLOT0_OP	.iram1.2.literal
+  2a:	000081        	l32r	a8, fffc002c <native_output_metrics_queue_drop+0xfffc002c>
+			2a: R_XTENSA_SLOT0_OP	.iram1.2.literal+0xc
+			2a: R_XTENSA_ASM_EXPAND	vPortExitCritical
+  2d:	0008e0        	callx8	a8
+  30:	f01d      	retw.n
+
+Disassembly of section .text.native_output_metrics_snapshot:
+
+00000000 <native_output_metrics_snapshot>:
+   0:	004136        	entry	a1, 32
+   3:	0000a1        	l32r	a10, fffc0004 <native_output_metrics_snapshot+0xfffc0004>
+			3: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_snapshot
+   6:	fb7c      	movi.n	a11, -1
+   8:	000081        	l32r	a8, fffc0008 <native_output_metrics_snapshot+0xfffc0008>
+			8: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_snapshot+0x8
+			8: R_XTENSA_ASM_EXPAND	xPortEnterCriticalTimeout
+   b:	0008e0        	callx8	a8
+   e:	0000b1        	l32r	a11, fffc0010 <native_output_metrics_snapshot+0xfffc0010>
+			e: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_snapshot+0x4
+  11:	0c4c      	movi.n	a12, 64
+  13:	20a220        	or	a10, a2, a2
+  16:	000081        	l32r	a8, fffc0018 <native_output_metrics_snapshot+0xfffc0018>
+			16: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_snapshot+0xc
+			16: R_XTENSA_ASM_EXPAND	memcpy
+  19:	0008e0        	callx8	a8
+  1c:	0000a1        	l32r	a10, fffc001c <native_output_metrics_snapshot+0xfffc001c>
+			1c: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_snapshot
+  1f:	000081        	l32r	a8, fffc0020 <native_output_metrics_snapshot+0xfffc0020>
+			1f: R_XTENSA_SLOT0_OP	.literal.native_output_metrics_snapshot+0x10
+			1f: R_XTENSA_ASM_EXPAND	vPortExitCritical
+  22:	0008e0        	callx8	a8
+  25:	f01d      	retw.n

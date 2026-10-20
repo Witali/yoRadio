@@ -1,0 +1,173 @@
+{
+  "passed": true,
+  "scope": "Qualify the complete CYD output counter service with SDK/ISR clock seams.\n\nBoth quiet and diagnostic units execute with pthread critical sections and\nASan/UBSan. This is not backend integration, target IRQ/IRAM or DMA evidence.\n",
+  "source_sha256": {
+    "tests/run-cyd-output-metrics.py": "5f1e12c90c5a66925c900c980a58d0b50e0588b29c86b5ebaf109b55790a0917",
+    "tests/native/cyd_output_metrics/platform.h": "99c7de97d6f5d7f98dec9d744224665d1047763674e97be110f7db56ce98b5b6",
+    "tests/native/cyd_output_metrics/test.c": "69e8fdcba5cfe7f984c281eaaecc2ddd6a9fe57573e46b1cdbbf671dbf0bd424",
+    "tests/native/cyd_output_metrics/README.md": "8173dd0cbd11adb531938e055fd0f14567311c542f94842ce3161fcc10e23956",
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.c": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72",
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.h": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9"
+  },
+  "cases": {
+    "quiet/initial": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:initial\n"
+    },
+    "quiet/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "quiet/clocks": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:clocks\n"
+    },
+    "quiet/queue": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:queue\n"
+    },
+    "quiet/bytes-limit": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:bytes-limit\n"
+    },
+    "quiet/time-limit": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:time-limit\n"
+    },
+    "quiet/concurrent": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:concurrent\n"
+    },
+    "quiet/count-limit": {
+      "passed": true,
+      "status": 0,
+      "explicit_static_initial_counter_seed": true,
+      "source_sha256": "351a95dca6fb8612969377a405fafadbd83411789f53476342ad4d3ef2376b05"
+    },
+    "diagnostic/initial": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:initial\n"
+    },
+    "diagnostic/writes": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writes\n"
+    },
+    "diagnostic/clocks": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:clocks\n"
+    },
+    "diagnostic/queue": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:queue\n"
+    },
+    "diagnostic/bytes-limit": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:bytes-limit\n"
+    },
+    "diagnostic/time-limit": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:time-limit\n"
+    },
+    "diagnostic/concurrent": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:concurrent\n"
+    },
+    "diagnostic/count-limit": {
+      "passed": true,
+      "status": 0,
+      "explicit_static_initial_counter_seed": true,
+      "source_sha256": "351a95dca6fb8612969377a405fafadbd83411789f53476342ad4d3ef2376b05"
+    }
+  },
+  "negative_controls": {
+    "ignore-short-error": {
+      "detected": true,
+      "status": 80,
+      "marker": "error_and_incomplete_classification",
+      "case": "writes",
+      "generated_sha256": "688ac6369e753fe330cc7db8993cfac9c3fba1553703d44498fc5123d38c1bec",
+      "explicit_static_initial_counter_seed": false
+    },
+    "accept-negative-start": {
+      "detected": true,
+      "status": 80,
+      "marker": "invalid_time_is_not_unsigned_elapsed",
+      "case": "clocks",
+      "generated_sha256": "17a9978c1b44d658a2c837b06218cf46c0894268efa6fbfa5f1e758bd89f7a7f",
+      "explicit_static_initial_counter_seed": false
+    },
+    "lose-isr-counter": {
+      "detected": true,
+      "status": 80,
+      "marker": "actual_isr_calls_increment_queue_drops",
+      "case": "queue",
+      "generated_sha256": "17aba7a681c1dbc72d7c9d11f524d63b1941eb4ac112f0fddbb2a0871dfdc553",
+      "explicit_static_initial_counter_seed": false
+    },
+    "wrap-byte-totals": {
+      "detected": true,
+      "status": 80,
+      "marker": "byte_totals_saturate",
+      "case": "bytes-limit",
+      "generated_sha256": "b6e43c8dc815721ea98328d74acebf6ae68fc2e379f9c4ae8b7652c47042b507",
+      "explicit_static_initial_counter_seed": false
+    },
+    "quiet-clock-read": {
+      "detected": true,
+      "status": 80,
+      "marker": "quiet_has_no_clock_reads",
+      "case": "writes",
+      "generated_sha256": "010a527decea4b40e416a267be0f63f3f97ad1a0a053392a814305a085dc6e67",
+      "explicit_static_initial_counter_seed": false
+    },
+    "wrap-valid-timing-counter": {
+      "detected": true,
+      "status": 80,
+      "marker": "timing_event_counts_saturate",
+      "case": "count-limit",
+      "generated_sha256": "a161c3505c019835cd5ac8d2be558441ffdaaf36b729ba12d1540327d498c8c7",
+      "explicit_static_initial_counter_seed": true
+    },
+    "wrap-invalid-timing-counter": {
+      "detected": true,
+      "status": 80,
+      "marker": "timing_event_counts_saturate",
+      "case": "count-limit",
+      "generated_sha256": "e1717daa011aea5c73853e7d420c75142f44ceaac121ae491dce8a66bed8822e",
+      "explicit_static_initial_counter_seed": true
+    }
+  },
+  "physical_hardware": false,
+  "target_irq_or_dma": false,
+  "live_inputs_match_snapshot": {
+    "tests/run-cyd-output-metrics.py": true,
+    "tests/native/cyd_output_metrics/platform.h": true,
+    "tests/native/cyd_output_metrics/test.c": true,
+    "tests/native/cyd_output_metrics/README.md": true,
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.c": true,
+    "idf/esp32-cyd2usb-native/main/native_output_metrics.h": true
+  },
+  "complete_normal_tu_matches_frozen_bytes": true,
+  "static_boundary_seed": "static DRAM_ATTR native_output_metrics_t s_output_metrics = {.writes=UINT32_MAX,.errors=UINT32_MAX,.timeouts=UINT32_MAX,.short_writes=UINT32_MAX,.timing_samples=UINT32_MAX,.invalid_time_samples=UINT32_MAX,.completion_queue_drops=UINT32_MAX};",
+  "generated_stubs_sha256": {
+    "esp_attr.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_err.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_timer.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "sdkconfig.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "freertos/FreeRTOS.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083"
+  }
+}

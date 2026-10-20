@@ -1,0 +1,287 @@
+---
+MainSourceFile:  'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+Diagnostics:
+  - DiagnosticName:  clang-analyzer-deadcode.DeadStores
+    DiagnosticMessage:
+      Message:         'Although the value stored to ''result'' is used in the enclosing expression, the value is never actually read from ''result'''
+      FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+      FileOffset:      6660
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+          FileOffset:      6669
+          Length:          41
+    Notes:
+      - Message:         'Although the value stored to ''result'' is used in the enclosing expression, the value is never actually read from ''result'''
+        FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+        FileOffset:      6660
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+            FileOffset:      6669
+            Length:          41
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-inc-dec-in-conditions
+    DiagnosticMessage:
+      Message:         'incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++''s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings'
+      FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+      FileOffset:      9438
+      Replacements:    []
+    Notes:
+      - Message:         variable is referenced here
+        FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+        FileOffset:      9419
+        Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''strcmp'' is called without explicitly comparing result'
+      FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+      FileOffset:      11966
+      Replacements:
+        - FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+          Offset:          11987
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-assignment-in-if-condition
+    DiagnosticMessage:
+      Message:         'an assignment within an ''if'' condition is bug-prone'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      4591
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+          FileOffset:      4566
+          Length:          34
+    Notes:
+      - Message:         'if it should be an assignment, move it out of the ''if'' condition'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      4591
+        Replacements:    []
+      - Message:         'if it is meant to be an equality check, change ''='' to ''=='''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      4591
+        Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-narrowing-conversions
+    DiagnosticMessage:
+      Message:         'narrowing conversion from ''size_t'' (aka ''unsigned int'') to signed type ''ssize_t'' (aka ''int'') is implementation-defined'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      5347
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-narrowing-conversions
+    DiagnosticMessage:
+      Message:         'narrowing conversion from ''size_t'' (aka ''unsigned int'') to signed type ''ssize_t'' (aka ''int'') is implementation-defined'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      12264
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-narrowing-conversions
+    DiagnosticMessage:
+      Message:         'narrowing conversion from ''size_t'' (aka ''unsigned int'') to signed type ''int'' is implementation-defined'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      22899
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-narrowing-conversions
+    DiagnosticMessage:
+      Message:         'narrowing conversion from ''size_t'' (aka ''unsigned int'') to signed type ''int'' is implementation-defined'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      24335
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-assignment-in-if-condition
+    DiagnosticMessage:
+      Message:         'an assignment within an ''if'' condition is bug-prone'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      25552
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+          FileOffset:      25544
+          Length:          59
+    Notes:
+      - Message:         'if it should be an assignment, move it out of the ''if'' condition'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      25552
+        Replacements:    []
+      - Message:         'if it is meant to be an equality check, change ''='' to ''=='''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      25552
+        Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-assignment-in-if-condition
+    DiagnosticMessage:
+      Message:         'an assignment within an ''if'' condition is bug-prone'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      26391
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+          FileOffset:      26384
+          Length:          46
+    Notes:
+      - Message:         'if it should be an assignment, move it out of the ''if'' condition'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      26391
+        Replacements:    []
+      - Message:         'if it is meant to be an equality check, change ''='' to ''=='''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      26391
+        Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  clang-analyzer-core.NullDereference
+    DiagnosticMessage:
+      Message:         'Access to field ''ctx'' results in a dereference of a null pointer (loaded from field ''sd'')'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      27989
+      Replacements:    []
+    Notes:
+      - Message:         Loop condition is false. Execution continues on line 879
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      31735
+        Replacements:    []
+      - Message:         'Assuming field ''sd'' is null'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      32741
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      32741
+            Length:          6
+      - Message:         'Left side of ''&&'' is false'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      32748
+        Replacements:    []
+      - Message:         'Calling ''httpd_req_cleanup'''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      32822
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      32822
+            Length:          20
+      - Message:         Assuming the condition is true
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      27948
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      27948
+            Length:          35
+      - Message:         'Left side of ''&&'' is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      27947
+        Replacements:    []
+      - Message:         'Access to field ''ctx'' results in a dereference of a null pointer (loaded from field ''sd'')'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      27989
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      27993
+            Length:          2
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  clang-analyzer-core.NullDereference
+    DiagnosticMessage:
+      Message:         'Access to field ''ctx'' results in a dereference of a null pointer (loaded from field ''sd'')'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      28332
+      Replacements:    []
+    Notes:
+      - Message:         Loop condition is false. Execution continues on line 879
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      31735
+        Replacements:    []
+      - Message:         'Assuming field ''sd'' is null'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      32741
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      32741
+            Length:          6
+      - Message:         'Left side of ''&&'' is false'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      32748
+        Replacements:    []
+      - Message:         'Calling ''httpd_req_cleanup'''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      32822
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      32822
+            Length:          20
+      - Message:         Assuming the condition is false
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      27948
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      27948
+            Length:          35
+      - Message:         'Left side of ''&&'' is false'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      27985
+        Replacements:    []
+      - Message:         'Access to field ''ctx'' results in a dereference of a null pointer (loaded from field ''sd'')'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+        FileOffset:      28332
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+            FileOffset:      28324
+            Length:          2
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''strncasecmp'' is called without explicitly comparing result'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      34282
+      Replacements:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+          Offset:          34315
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''strncasecmp'' is called without explicitly comparing result'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      37959
+      Replacements:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+          Offset:          38001
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''strncasecmp'' is called without explicitly comparing result'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+      FileOffset:      39661
+      Replacements:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-output-telemetry-01\native-httpd-rfc6455\httpd_parse.c'
+          Offset:          39703
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/build-lint-output-telemetry-01'
+...

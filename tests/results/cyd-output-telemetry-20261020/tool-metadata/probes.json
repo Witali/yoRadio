@@ -1,0 +1,55 @@
+{
+  "scope": "Installed tool metadata captured during archive assembly; not historical binary identity proof for prior host runs.",
+  "probes": [
+    {
+      "command": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "--version"
+      ],
+      "status": 0,
+      "log": "tool-metadata/gcc-version.log",
+      "sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048"
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/g++",
+        "--version"
+      ],
+      "status": 0,
+      "log": "tool-metadata/gxx-version.log",
+      "sha256": "59d1cbef41d4ae78d5063d525b7aa13d18dc0493ea00537efc19b2ee398cb5a8"
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/sha256sum",
+        "/usr/bin/gcc",
+        "/usr/bin/g++",
+        "/usr/bin/ld",
+        "/usr/bin/as"
+      ],
+      "status": 0,
+      "log": "tool-metadata/host-tools-sha256.log",
+      "sha256": "38a885879b68c802b73d8b3b43b4f94804e40c353de3343778a3941f64e773f6"
+    }
+  ],
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "python_path": "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+  "python_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "clang": {
+    "path": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\bin\\clang-tidy.exe",
+    "sha256": "f7da288749fc81d990a8fbd9ee2a81927f98cc98148cbf853055b445cb045364",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 20.1.1\n  Optimized build."
+  },
+  "xtensa": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+  },
+  "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e"
+}

@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "variants": {
+    "pdm": "PASS PCM gain: 5801300 arithmetic cases, 375 output cases, bounded coefficient evaluations",
+    "dac": "PASS PCM gain: 5801300 arithmetic cases, 375 output cases, bounded coefficient evaluations",
+    "legacy": "PASS PCM gain: 5801300 arithmetic cases, 375 output cases, bounded coefficient evaluations"
+  },
+  "sources": {
+    "idf/esp32-cyd2usb-native/main/native_audio_output.c": "4f564bed759e219600cb0905b5f19c0940a506524cf60d84280526fc5fd302d9",
+    "tests/native/cyd_output_gain_test.c": "9e18338a472493c54c87c0503fc490d20d72293d735d918916aca076a83e612b",
+    "tests/run-cyd-output-gain.py": "e3fb4aa649dc6d661a1375e511d3ae4abc60b71f5e386421e99a79d8f55eaed2",
+    "tests/native/cyd_output_metrics_noop.h": "54500fa09eacd996661a3ee77999a1c68191298c5e1fe5eef3f52beecae083bc"
+  },
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "scope": "Check actual CYD PCM mixing and three output producers against fixed-point reference.\n\nDriver/resampler calls are capture seams; this does not measure DMA or CPU on CYD.\n",
+  "physical_hardware": false
+}

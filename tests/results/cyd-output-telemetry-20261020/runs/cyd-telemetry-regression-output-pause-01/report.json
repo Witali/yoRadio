@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "variants": {
+    "pdm": "PASS 11 cases; real production pause/ownership; driver DMA barrier seam",
+    "dac": "PASS 17 cases; real production pause/ownership; driver DMA barrier seam",
+    "legacy": "PASS 10 cases; real production pause/ownership; driver DMA barrier seam"
+  },
+  "negative_controls": {
+    "pdm": "rejected by ownership assertion before deleting running DMA",
+    "dac": "rejected by ownership assertion before deleting running DMA"
+  },
+  "source_sha256": {
+    "idf/esp32-cyd2usb-native/main/native_audio_output.c": "4f564bed759e219600cb0905b5f19c0940a506524cf60d84280526fc5fd302d9",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": "41d0a458c6f2216e627a58062a0897835b1dd20f8a25475cc0e441acf4c931cd",
+    "tests/native/cyd_output_pause_test.c": "4306bfd06141854cfa349499a1fbb3c00e3432bd6c8f33084c5cc27b8c961655",
+    "tests/run-cyd-output-pause.py": "1e350573f16e3c5e9d5bae60045b4b00012ffe4b185d4dc33ec00e6bdec180e4",
+    "tests/native/cyd_output_metrics_noop.h": "54500fa09eacd996661a3ee77999a1c68191298c5e1fe5eef3f52beecae083bc"
+  },
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "physical_dma": false
+}

@@ -1,0 +1,133 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-c3-transfer\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .iram0.vectors:
+
+Disassembly of section .iram0.text:
+
+4008d314 <xPortEnterCriticalTimeout>:
+4008d314:	004136        	entry	a1, 32
+4008d317:	205220        	or	a5, a2, a2
+4008d31a:	202330        	or	a2, a3, a3
+4008d31d:	006380        	rsil	a8, 3
+4008d320:	084d      	mov.n	a4, a8
+4008d322:	00e556        	bnez	a5, 4008d334 <xPortEnterCriticalTimeout+0x20>
+4008d325:	cee9d1        	l32r	a13, 40080ecc <_iram_text_start+0xac8> (3f403444 <_esp_trace_encoder_array_end+0x3324>)
+4008d328:	cef3c1        	l32r	a12, 40080ef4 <_iram_text_start+0xaf0> (3f425b18 <__func__$2>)
+4008d32b:	ceeaa1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d32e:	54a0b2        	movi	a11, 84
+4008d331:	ff0465        	call8	4008c378 <__assert_func>
+4008d334:	006370        	rsil	a7, 3
+4008d337:	03eb30        	rsr.prid	a3
+4008d33a:	0588      	l32i.n	a8, a5, 0
+4008d33c:	259387        	bne	a3, a8, 4008d365 <xPortEnterCriticalTimeout+0x51>
+4008d33f:	1588      	l32i.n	a8, a5, 4
+4008d341:	fda0a2        	movi	a10, 253
+4008d344:	980b      	addi.n	a9, a8, -1
+4008d346:	0eba97        	bgeu	a10, a9, 4008d358 <xPortEnterCriticalTimeout+0x44>
+4008d349:	ceebd1        	l32r	a13, 40080ef8 <_iram_text_start+0xaf4> (3f403480 <_esp_trace_encoder_array_end+0x3360>)
+4008d34c:	ceeac1        	l32r	a12, 40080ef4 <_iram_text_start+0xaf0> (3f425b18 <__func__$2>)
+4008d34f:	cee1a1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d352:	6aa0b2        	movi	a11, 106
+4008d355:	ff0225        	call8	4008c378 <__assert_func>
+4008d358:	881b      	addi.n	a8, a8, 1
+4008d35a:	1589      	s32i.n	a8, a5, 4
+4008d35c:	13e670        	wsr.ps	a7
+4008d35f:	002010        	rsync
+4008d362:	003546        	j	4008d43b <xPortEnterCriticalTimeout+0x127>
+4008d365:	ceddb1        	l32r	a11, 40080edc <_iram_text_start+0xad8> (b33fffff <_rtc_slow_reserved_end+0x633fdfff>)
+4008d368:	20c330        	or	a12, a3, a3
+4008d36b:	20a550        	or	a10, a5, a5
+4008d36e:	fd9625        	call8	4008acd0 <esp_cpu_compare_and_set>
+4008d371:	03d216        	beqz	a2, 4008d3b2 <xPortEnterCriticalTimeout+0x9e>
+4008d374:	aafc      	bnez.n	a10, 4008d3b2 <xPortEnterCriticalTimeout+0x9e>
+4008d376:	03ea60        	rsr.ccount	a6
+4008d379:	070266        	bnei	a2, -1, 4008d384 <xPortEnterCriticalTimeout+0x70>
+4008d37c:	ced861        	l32r	a6, 40080edc <_iram_text_start+0xad8> (b33fffff <_rtc_slow_reserved_end+0x633fdfff>)
+4008d37f:	000746        	j	4008d3a0 <xPortEnterCriticalTimeout+0x8c>
+4008d382:	b10000        	sra	a0, a0
+4008d385:	cdced6        	bgez	a14, 4008d065 <esp_restart_noos+0xd5>
+4008d388:	05ad03        	lsi	f0, a13, 20
+4008d38b:	fd9465        	call8	4008acd0 <esp_cpu_compare_and_set>
+4008d38e:	0d6a56        	bnez	a10, 4008d468 <xPortEnterCriticalTimeout+0x154>
+4008d391:	03ea80        	rsr.ccount	a8
+4008d394:	c08860        	sub	a8, a8, a6
+4008d397:	e9b287        	bgeu	a2, a8, 4008d384 <xPortEnterCriticalTimeout+0x70>
+4008d39a:	003146        	j	4008d463 <xPortEnterCriticalTimeout+0x14f>
+4008d39d:	000000        	ill
+4008d3a0:	20c330        	or	a12, a3, a3
+4008d3a3:	20b660        	or	a11, a6, a6
+4008d3a6:	20a550        	or	a10, a5, a5
+4008d3a9:	fd9265        	call8	4008acd0 <esp_cpu_compare_and_set>
+4008d3ac:	ff0a16        	beqz	a10, 4008d3a0 <xPortEnterCriticalTimeout+0x8c>
+4008d3af:	002d46        	j	4008d468 <xPortEnterCriticalTimeout+0x154>
+4008d3b2:	002582        	l32i	a8, a5, 0
+4008d3b5:	034a16        	beqz	a10, 4008d3ed <xPortEnterCriticalTimeout+0xd9>
+4008d3b8:	0e1387        	beq	a3, a8, 4008d3ca <xPortEnterCriticalTimeout+0xb6>
+4008d3bb:	ced0d1        	l32r	a13, 40080efc <_iram_text_start+0xaf8> (3f4034a8 <_esp_trace_encoder_array_end+0x3388>)
+4008d3be:	cecdc1        	l32r	a12, 40080ef4 <_iram_text_start+0xaf0> (3f425b18 <__func__$2>)
+4008d3c1:	cec4a1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d3c4:	8da0b2        	movi	a11, 141
+4008d3c7:	fefb25        	call8	4008c378 <__assert_func>
+4008d3ca:	1588      	l32i.n	a8, a5, 4
+4008d3cc:	d88c      	beqz.n	a8, 4008d3dd <xPortEnterCriticalTimeout+0xc9>
+4008d3ce:	ceccd1        	l32r	a13, 40080f00 <_iram_text_start+0xafc> (3f4034c8 <_esp_trace_encoder_array_end+0x33a8>)
+4008d3d1:	cec8c1        	l32r	a12, 40080ef4 <_iram_text_start+0xaf0> (3f425b18 <__func__$2>)
+4008d3d4:	cec0a1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d3d7:	8ea0b2        	movi	a11, 142
+4008d3da:	fef9e5        	call8	4008c378 <__assert_func>
+4008d3dd:	180c      	movi.n	a8, 1
+4008d3df:	1589      	s32i.n	a8, a5, 4
+4008d3e1:	13e670        	wsr.ps	a7
+4008d3e4:	002010        	rsync
+4008d3e7:	001406        	j	4008d43b <xPortEnterCriticalTimeout+0x127>
+4008d3ea:	000000        	ill
+4008d3ed:	cec591        	l32r	a9, 40080f04 <_iram_text_start+0xb00> (6666 <UserFrameTotalSize+0x6566>)
+4008d3f0:	309390        	xor	a9, a3, a9
+4008d3f3:	171987        	beq	a9, a8, 4008d40e <xPortEnterCriticalTimeout+0xfa>
+4008d3f6:	ceb991        	l32r	a9, 40080edc <_iram_text_start+0xad8> (b33fffff <_rtc_slow_reserved_end+0x633fdfff>)
+4008d3f9:	111897        	beq	a8, a9, 4008d40e <xPortEnterCriticalTimeout+0xfa>
+4008d3fc:	cec3d1        	l32r	a13, 40080f08 <_iram_text_start+0xb04> (3f4034dc <_esp_trace_encoder_array_end+0x33bc>)
+4008d3ff:	cebdc1        	l32r	a12, 40080ef4 <_iram_text_start+0xaf0> (3f425b18 <__func__$2>)
+4008d402:	ceb4a1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d405:	91a0b2        	movi	a11, 145
+4008d408:	201110        	or	a1, a1, a1
+4008d40b:	fef6e5        	call8	4008c378 <__assert_func>
+4008d40e:	012582        	l32i	a8, a5, 4
+4008d411:	fea092        	movi	a9, 254
+4008d414:	0eb987        	bgeu	a9, a8, 4008d426 <xPortEnterCriticalTimeout+0x112>
+4008d417:	cebdd1        	l32r	a13, 40080f0c <_iram_text_start+0xb08> (3f403520 <_esp_trace_encoder_array_end+0x3400>)
+4008d41a:	ceb6c1        	l32r	a12, 40080ef4 <_iram_text_start+0xaf0> (3f425b18 <__func__$2>)
+4008d41d:	ceada1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d420:	92a0b2        	movi	a11, 146
+4008d423:	fef565        	call8	4008c378 <__assert_func>
+4008d426:	13e670        	wsr.ps	a7
+4008d429:	002010        	rsync
+4008d42c:	20a440        	or	a10, a4, a4
+4008d42f:	cc4b81        	l32r	a8, 4008055c <_iram_text_start+0x158> (4000bfdc <_xtos_set_intlevel>)
+4008d432:	0008e0        	callx8	a8
+4008d435:	00a022        	movi	a2, 0
+4008d438:	000c46        	j	4008d46d <xPortEnterCriticalTimeout+0x159>
+4008d43b:	03eb80        	rsr.prid	a8
+4008d43e:	048d80        	extui	a8, a8, 13, 1
+4008d441:	cea891        	l32r	a9, 40080ee4 <_iram_text_start+0xae0> (3ffb4d0c <port_uxCriticalNesting>)
+4008d444:	11a8e0        	slli	a10, a8, 2
+4008d447:	a08890        	addx4	a8, a8, a9
+4008d44a:	0898      	l32i.n	a9, a8, 0
+4008d44c:	991b      	addi.n	a9, a9, 1
+4008d44e:	0899      	s32i.n	a9, a8, 0
+4008d450:	041926        	beqi	a9, 1, 4008d458 <xPortEnterCriticalTimeout+0x144>
+4008d453:	120c      	movi.n	a2, 1
+4008d455:	000506        	j	4008d46d <xPortEnterCriticalTimeout+0x159>
+4008d458:	cea681        	l32r	a8, 40080ef0 <_iram_text_start+0xaec> (3ffb4d04 <port_uxOldInterruptState>)
+4008d45b:	88aa      	add.n	a8, a8, a10
+4008d45d:	0849      	s32i.n	a4, a8, 0
+4008d45f:	fffc06        	j	4008d453 <xPortEnterCriticalTimeout+0x13f>
+4008d462:	058800        	extui	a8, a0, 24, 1
+4008d465:	ffe106        	j	4008d3ed <xPortEnterCriticalTimeout+0xd9>
+4008d468:	0588      	l32i.n	a8, a5, 0
+4008d46a:	ffd286        	j	4008d3b8 <xPortEnterCriticalTimeout+0xa4>
+4008d46d:	f01d      	retw.n
+
+Disassembly of section .flash.text:

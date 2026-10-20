@@ -1,0 +1,67 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-c3-transfer\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .iram0.vectors:
+
+Disassembly of section .iram0.text:
+
+4008d26c <vPortExitCritical>:
+4008d26c:	004136        	entry	a1, 32
+4008d26f:	00e256        	bnez	a2, 4008d281 <vPortExitCritical+0x15>
+4008d272:	cf16d1        	l32r	a13, 40080ecc <_iram_text_start+0xac8> (3f403444 <_esp_trace_encoder_array_end+0x3324>)
+4008d275:	cf16c1        	l32r	a12, 40080ed0 <_iram_text_start+0xacc> (3f425af0 <__func__$0>)
+4008d278:	cf17a1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d27b:	b5a0b2        	movi	a11, 181
+4008d27e:	ff0fa5        	call8	4008c378 <__assert_func>
+4008d281:	0063a0        	rsil	a10, 3
+4008d284:	03eb90        	rsr.prid	a9
+4008d287:	0288      	l32i.n	a8, a2, 0
+4008d289:	111987        	beq	a9, a8, 4008d29e <vPortExitCritical+0x32>
+4008d28c:	cf13d1        	l32r	a13, 40080ed8 <_iram_text_start+0xad4> (3f403534 <_esp_trace_encoder_array_end+0x3414>)
+4008d28f:	cf10c1        	l32r	a12, 40080ed0 <_iram_text_start+0xacc> (3f425af0 <__func__$0>)
+4008d292:	cf10a1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d295:	bea0b2        	movi	a11, 190
+4008d298:	201110        	or	a1, a1, a1
+4008d29b:	ff0de5        	call8	4008c378 <__assert_func>
+4008d29e:	1288      	l32i.n	a8, a2, 4
+4008d2a0:	880b      	addi.n	a8, a8, -1
+4008d2a2:	1289      	s32i.n	a8, a2, 4
+4008d2a4:	98cc      	bnez.n	a8, 4008d2b1 <vPortExitCritical+0x45>
+4008d2a6:	cf0d81        	l32r	a8, 40080edc <_iram_text_start+0xad8> (b33fffff <_rtc_slow_reserved_end+0x633fdfff>)
+4008d2a9:	0289      	s32i.n	a8, a2, 0
+4008d2ab:	0005c6        	j	4008d2c6 <vPortExitCritical+0x5a>
+4008d2ae:	000000        	ill
+4008d2b1:	ffa092        	movi	a9, 255
+4008d2b4:	0eb987        	bgeu	a9, a8, 4008d2c6 <vPortExitCritical+0x5a>
+4008d2b7:	cf0ad1        	l32r	a13, 40080ee0 <_iram_text_start+0xadc> (3f403554 <_esp_trace_encoder_array_end+0x3434>)
+4008d2ba:	cf05c1        	l32r	a12, 40080ed0 <_iram_text_start+0xacc> (3f425af0 <__func__$0>)
+4008d2bd:	cf05a1        	l32r	a10, 40080ed4 <_iram_text_start+0xad0> (3f403474 <_esp_trace_encoder_array_end+0x3354>)
+4008d2c0:	c4a0b2        	movi	a11, 196
+4008d2c3:	ff0b65        	call8	4008c378 <__assert_func>
+4008d2c6:	13e6a0        	wsr.ps	a10
+4008d2c9:	002010        	rsync
+4008d2cc:	03eb80        	rsr.prid	a8
+4008d2cf:	048d80        	extui	a8, a8, 13, 1
+4008d2d2:	cf0491        	l32r	a9, 40080ee4 <_iram_text_start+0xae0> (3ffb4d0c <port_uxCriticalNesting>)
+4008d2d5:	11a8e0        	slli	a10, a8, 2
+4008d2d8:	a08890        	addx4	a8, a8, a9
+4008d2db:	0898      	l32i.n	a9, a8, 0
+4008d2dd:	1119e6        	bgei	a9, 1, 4008d2f2 <vPortExitCritical+0x86>
+4008d2e0:	cf02d1        	l32r	a13, 40080ee8 <_iram_text_start+0xae4> (3f403568 <_esp_trace_encoder_array_end+0x3448>)
+4008d2e3:	cf02c1        	l32r	a12, 40080eec <_iram_text_start+0xae8> (3f425b04 <__func__$1>)
+4008d2e6:	cef8a1        	l32r	a10, 40080ec8 <_iram_text_start+0xac4> (3f40341e <_esp_trace_encoder_array_end+0x32fe>)
+4008d2e9:	08a2b2        	movi	a11, 0x208
+4008d2ec:	201110        	or	a1, a1, a1
+4008d2ef:	ff08a5        	call8	4008c378 <__assert_func>
+4008d2f2:	990b      	addi.n	a9, a9, -1
+4008d2f4:	0899      	s32i.n	a9, a8, 0
+4008d2f6:	b9cc      	bnez.n	a9, 4008d305 <vPortExitCritical+0x99>
+4008d2f8:	cefe81        	l32r	a8, 40080ef0 <_iram_text_start+0xaec> (3ffb4d04 <port_uxOldInterruptState>)
+4008d2fb:	88aa      	add.n	a8, a8, a10
+4008d2fd:	08a8      	l32i.n	a10, a8, 0
+4008d2ff:	cc9781        	l32r	a8, 4008055c <_iram_text_start+0x158> (4000bfdc <_xtos_set_intlevel>)
+4008d302:	0008e0        	callx8	a8
+4008d305:	f01d      	retw.n
+
+Disassembly of section .flash.text:
