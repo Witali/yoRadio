@@ -122,6 +122,39 @@ codebooks/floors/residues/channels, full callback ABI, SMP service, actual audio
 task integration and physical resource gates remain open. C3 matrix execution
 is separate; the earlier C3 raw8192 result does not qualify this larger matrix.
 
+## Unsigned rate checkpoint, 2026-10-20
+
+Vorbis I section 4.2.2 defines the identification rate as unsigned32. The
+fixed vendor ABI stores that bit pattern in signed32 `long`; the old `rate<1`
+guard therefore rejected the upper half of the valid field range. The narrow
+[setup change](../idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c) casts the
+rate to `uint32_t` for validity and the optional `LIMIT_TO_64kHz` comparison.
+The ABI field type/layout, signed bitrate hints, framing and other checks remain.
+
+The [frozen SDK/Xtensa results](../tests/results/cyd-vorbis-uint32-rate-20261020/README.md)
+retain five separate completed campaigns. The baseline reproduces rejection of
+0x80000000 and UINT32_MAX after decoding the other 14 rates. Acceptance decodes
+all 16 rates, including all nine advertised rates, with 1088 paired packets and
+4362240 exact PCM bytes against fresh original vendor handles at 192000 Hz.
+Public metadata, complete consumption, output guards and close results are
+checked throughout; zero still rejects. The optional-cap campaign decodes
+11 rates and rejects all five rates at or above 64000, including both high-bit
+values. Restoring each signed guard independently reaches its exact named
+failure. The coordinator remains on core0 and decoding on core1.
+
+The [canonical protocol tests](../tests/vorbis_rate/README.md) pass all 19
+methods separately. These results cover one stereo S256/L2048 raw fixture,
+not every possible rate or format combination. They do not extend the radio
+output hardware's supported rates or qualify C3/RV32. The same signed-rate
+finding in C3 needs its own independently executed regression and fix.
+
+The [additional format generators](../tests/vorbis_format_corpus/README.md)
+now reproduce all 100 nonmanifest files for 17 books/floor0/residue0 cases;
+eight construction tests pass. Their original host campaign accepted all 17
+with Xiph while FFmpeg native accepted seven and explicitly refused ten lookup2
+cases. Target capture and independent numerical comparison for this corpus are
+still pending. Neither checkpoint closes full G6 or enables radio integration.
+
 ## Entry points and confirmed problems
 
 | Change | Donor implementation | CYD entry and required behavior |

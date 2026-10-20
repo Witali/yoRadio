@@ -1,0 +1,87 @@
+--- prep01/pack.py
++++ prep02/pack.py
+@@ -156,7 +156,7 @@
+         if path.is_file():
+             add(path, path.name)
+     attributes = out / '.gitattributes'
+-    attributes.write_bytes(b'* -text\n** -text\n')
++    attributes.write_bytes(b'* -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol,-space-before-tab\n** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol,-space-before-tab\n')
+     manifest['files']['.gitattributes'] = dict(origin='archive generated attributes', sha256=sha(attributes.read_bytes()),
+         bytes=attributes.stat().st_size, stored='.gitattributes', encoding='raw',
+         stored_bytes=attributes.stat().st_size, stored_sha256=sha(attributes.read_bytes()))
+--- prep01/verify.py
++++ prep02/verify.py
+@@ -250,7 +250,7 @@
+         cflags = read(prefix + 'build/toolchain/cflags').decode().splitlines()
+         need(cflags == ['-Wno-frame-address', '-mlongcalls', '-fno-builtin-memcpy', '-fno-builtin-memset', '-fno-builtin-bzero',
+              '"-specs=' + norm(meta['origin']) + '/build/specs/picolibc.specs"'], 'Preserved six-line Xtensa cflags/specs')
+-        macro_text = read(prefix + 'setup-macros.stdout.log').decode()
++        macro_text = read(prefix + 'setup-macros.stdout.log').decode().replace('\r\n', '\n')
+         macros = dict(re.findall(r'^#define (\w+)(?: (.*))?$', macro_text, re.M))
+         for key, value in {'RATE_EXPECT_UNSIGNED_REJECTION': str(int(mode == 'baseline')),
+             'RATE_LIMITED_POLICY': str(int(mode == 'limited')), 'CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ': '240',
+@@ -265,7 +265,7 @@
+         config = load(prefix + 'build/config/sdkconfig.json')
+         need(config.get('IDF_TARGET') == 'esp32' and config.get('ESP_DEFAULT_CPU_FREQ_MHZ') == 240 and
+              config.get('FREERTOS_UNICORE') is False and config.get('YORADIO_VORBIS_REPAIR') is True, 'Generated SDK config')
+-        symbols = read(prefix + 'symbols.stdout.log').decode()
++        symbols = read(prefix + 'symbols.stdout.log').decode().replace('\r\n', '\n')
+         need(all(re.search(r'\b' + symbol + r'$', symbols, re.M) for symbol in
+              ('__wrap_esp_vorbis_dec_open', '__wrap_esp_vorbis_dec_decode', 'esp_vorbis_dec_open', 'esp_vorbis_dec_decode')), 'Actual original/wrapped symbols')
+         recipe = load(prefix + 'build/flasher_args.json')
+@@ -308,7 +308,7 @@
+             need(len(read(key)) == row['bytes'], 'Actual host test log size')
+             if key.endswith('.stderr.log'):
+                 stderr_key = key
+-        need(stderr_key and re.search(r'Ran 19 tests in .*\n\nOK\s*$', read(stderr_key).decode()), 'Actual nineteen host methods')
++        need(stderr_key and re.search(r'Ran 19 tests in .*\n\nOK\s*$', read(stderr_key).decode().replace('\r\n', '\n')), 'Actual nineteen host methods')
+     return dict(result='OFFLINE_VERIFIED', campaigns=5, owned_commands=45, observed=observations,
+         binary_bytes_reverified=False, omitted_bytes_replayable=False, full_G6_qualified=False,
+         production_radio_integration=False, physical_device=False)
+--- prep01/README.md
++++ prep02/README.md
+@@ -1,10 +1,13 @@
+ # CYD public uint32-rate checkpoint archive
+ 
+-`pack.py` copies evidence only. `verify.py` reads the finished archive using Python
++This bundle preserves five completed CYD public raw uint32-rate campaigns, their
++exact source versions, command receipts and logs. `pack.py` copies evidence only.
++`verify.py` reads the finished archive using Python
+ stdlib only; it launches no process, performs no network operation, imports only
+ the pinned pure protocol module and disables bytecode writes. Both take explicit
+-paths and work independently of the caller's working directory. This proposal
+-has not packed or verified an archive. Source/AST checks are recorded separately.
++paths and work independently of the caller's working directory. Only an offline
++verifier exit code 0 confirms the stored archive. The scripts' source-only
++preparation checks are recorded separately in `source-checks.json`.
+ 
+ The final durable location is
+ `tests/results/cyd-vorbis-uint32-rate-20261020/`. Root may first assemble a fresh
+@@ -14,12 +17,12 @@
+ 
+ ## Root-owned assembly and verification
+ 
+-The following are reviewable commands, not executions performed by this proposal.
+-From the repository root in PowerShell:
++To assemble from the retained campaign directories, use the following from the
++repository root in PowerShell:
+ 
+ ```powershell
+ $rateRepo = (Get-Location).Path
+-$ratePrep = "$rateRepo/.build/cyd-vorbis-uint32-rate-archive-prep-01"
++$ratePrep = "$rateRepo/.build/cyd-vorbis-uint32-rate-archive-prep-02"
+ $rateStage = "$rateRepo/.build/cyd-vorbis-uint32-rate-archive-01"
+ $ratePython = 'C:/Work/yoRadio/.idf/python-3.12.10/tools/python.exe'
+ $rateArgv = @('--repository', $rateRepo, '--output', $rateStage)
+@@ -55,8 +58,9 @@
+ | validity-control | CONTROL_EFFECTIVE | 14/0 before failure | 952 | 3816960 | 985 |
+ | policy-control | CONTROL_EFFECTIVE | 11/3 before failure | 748 | 2999040 | 781 |
+ 
+-These are the root-owned checkpoint results expected by the proposal, not a new
+-archive verification result. Controls must end at exactly
++These are actual root-owned results from the five bound reports; root also
++revalidated all five pure protocols (tool chunk `533a15`). They are distinct from
++verification of the stored archive. Controls end at exactly
+ `legal_unsigned_rate_open_required` or `limited_rate_rejection_required`, as
+ enforced by the frozen strict protocol. Neither a reproduced baseline nor an
+ effective control is classified as successful acceptance.

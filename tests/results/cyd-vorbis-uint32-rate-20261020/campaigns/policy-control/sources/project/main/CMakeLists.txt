@@ -1,0 +1,21 @@
+set(M "$ENV{CYD_VORBIS_CANDIDATE}")
+idf_component_register(SRCS "main.c" INCLUDE_DIRS "."
+ REQUIRES esp_audio_codec freertos heap esp_system esp_rom)
+if(NOT DEFINED RATE_MODE OR NOT RATE_MODE MATCHES "^(baseline|acceptance|limited)$")
+    message(FATAL_ERROR "Select explicit RATE_MODE baseline, acceptance or limited")
+endif()
+set(RATE_EXPECT_UNSIGNED_REJECTION 0)
+set(RATE_LIMITED_POLICY 0)
+if(RATE_MODE STREQUAL "baseline")
+    set(RATE_EXPECT_UNSIGNED_REJECTION 1)
+elseif(RATE_MODE STREQUAL "limited")
+    set(RATE_LIMITED_POLICY 1)
+endif()
+target_compile_definitions(${COMPONENT_LIB} PRIVATE
+ RATE_EXPECT_UNSIGNED_REJECTION=${RATE_EXPECT_UNSIGNED_REJECTION}
+ RATE_LIMITED_POLICY=${RATE_LIMITED_POLICY})
+if(RATE_MODE STREQUAL "limited")
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE LIMIT_TO_64kHz=1)
+endif()
+include("${M}/compat/vorbis_repair/enable.cmake")
+native_enable_vorbis_repair()

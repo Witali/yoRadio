@@ -1,0 +1,94 @@
+{
+  "schema": "public-uint32-rate-caller-proposal-v1",
+  "status": "FROZEN_SOURCE_AND_SYNTHETIC_HOST_ONLY",
+  "files": [
+    {
+      "relative": "main.c",
+      "bytes": 9582,
+      "sha256": "3d97389d3e8befd2ebf6642172cbe9f285d12954aed0b0bd8168d832ba3d7483"
+    },
+    {
+      "relative": "rate_protocol.py",
+      "bytes": 5031,
+      "sha256": "53a9c81ae3293e99c0ea0fe9ef48b62ee2b78fde184fd080151b83f34dc9da79"
+    },
+    {
+      "relative": "test_rate_protocol.py",
+      "bytes": 11769,
+      "sha256": "bf9aee429042a512439f1fdf2ab5594e7e3812ff45bb52fdda8cc1c3c7f61ad8"
+    },
+    {
+      "relative": "README.md",
+      "bytes": 3931,
+      "sha256": "588cf85840e9840b6a413a234fe35b48234435bb5ba3f8c315832d98345df497"
+    },
+    {
+      "relative": "inputs-before-02.json",
+      "bytes": 869,
+      "sha256": "0c0e7bfe10bdf745e58dd2fb1ef742c7d3bfdf3ce305b29cbe2b8912a8f6740b"
+    },
+    {
+      "relative": "host-tests-02.json",
+      "bytes": 1064,
+      "sha256": "cef8ef07812a460bfcc70b58716456a13a646deeea6d0b0ae9d059fb382e1ac2"
+    },
+    {
+      "relative": "host-tests-02.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "relative": "host-tests-02.stderr.log",
+      "bytes": 2378,
+      "sha256": "53c82bb63ad3847d667d6686a85930d914f0ad5160eb0069c7c8adecbeccc2fd"
+    }
+  ],
+  "fixture": {
+    "canonical": "tests/target/cyd_vorbis_format_qemu/main/fixture.h",
+    "sha256": "839febe9f12d7bc33e6afd8a9f0b16ee799f12d6c8ecb88188537b7ae8349378",
+    "copied_here": false
+  },
+  "host_methods_passed": 19,
+  "host_status": "TERMINAL",
+  "host_returncode": 0,
+  "source_inputs_unchanged_after_tests": true,
+  "C_compiler_SDK_codec_reference_QEMU_Git_device_executed": false,
+  "pinned_ABI_changed": false,
+  "expected": {
+    "acceptance": {
+      "accepted": 16,
+      "rejected": 0,
+      "paired_packets": 1088,
+      "pcm_bytes": 4362240,
+      "protocol_lines": 1124
+    },
+    "baseline": {
+      "accepted": 14,
+      "rejected": 2,
+      "paired_packets": 952,
+      "pcm_bytes": 3816960,
+      "protocol_lines": 988
+    },
+    "limited": {
+      "accepted": 11,
+      "rejected": 5,
+      "paired_packets": 748,
+      "pcm_bytes": 2999040,
+      "protocol_lines": 784
+    },
+    "signed-validity": {
+      "mode": "acceptance",
+      "accepted": 14,
+      "rejected": 0,
+      "protocol_lines": 985,
+      "exact_failure": "legal_unsigned_rate_open_required"
+    },
+    "signed-policy": {
+      "mode": "limited",
+      "accepted": 11,
+      "rejected": 3,
+      "protocol_lines": 781,
+      "exact_failure": "limited_rate_rejection_required"
+    }
+  }
+}

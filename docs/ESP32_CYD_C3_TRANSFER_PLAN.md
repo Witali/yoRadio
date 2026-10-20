@@ -111,7 +111,14 @@ allocation и численные настройки C3 являются канд
   четыре malformed-header controls и точный old-guard отказ. Дополнительная
   [матрица размеров блоков](../tests/results/cyd-vorbis-block-matrix-20261020/README.md)
   проходит на Xtensa: 108 случаев, 5472 пакетных сравнения и 32 543 616 точных
-  PCM байт; все 36 пар размеров и переходы short/long сохранены. Полное G6 открыто.
+  PCM байт; все 36 пар размеров и переходы short/long сохранены.
+  [Unsigned-rate regression](../tests/results/cyd-vorbis-uint32-rate-20261020/README.md)
+  исправляет signed32 отказ двух допустимых значений: 16 частот, 1088 пар пакетов,
+  4 362 240 точных PCM байт; отдельный optional-cap прогон и оба восстановления
+  старых guards проходят. Для C3 требуется независимая проверка той же находки.
+  [Новые генераторы](../tests/vorbis_format_corpus/README.md) воспроизводят 17
+  books/floor0/residue0 случаев; их target PCM и независимое численное сравнение
+  ещё не квалифицированы. Полное G6 открыто.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
   Затем полный Clang, три backend exports и физическая приёмка.
@@ -739,3 +746,23 @@ Stream остаётся на core0, decode/output на core1 с прежними
   архивного валидатора сохранены отдельно от SDK/runtime результатов.
   Manifest SHA256:
   `97262bd2eda0a23595b322cdd91055214d919800ee3347143742137f256b0333`.
+- 2026-10-20, CYD-C3-14 G6: `11d0fee4c` сохраняет
+  [генераторы books/floor0/residue0](../tests/vorbis_format_corpus/README.md).
+  Actual canonical generation воспроизводит 17 случаев и все 100 nonmanifest
+  файлов побайтно; различаются только source/provenance поля двух manifest.
+  Все восемь construction tests проходят. Это воспроизводимость исходных
+  reference fixtures; новый target результат этим не заявляется.
+- 2026-10-20, CYD-C3-14 G6: [unsigned-rate checkpoint](../tests/results/cyd-vorbis-uint32-rate-20261020/README.md)
+  воспроизводит signed32 отказ в baseline и исправляет две проверки без изменения
+  vendor ABI. Acceptance на SDK6.0.2/Xtensa/core1 проходит все 16 выбранных частот,
+  1088 пар пакетов и 4 362 240 точных PCM байт; нулевая частота отвергается.
+  Отдельный optional-cap вариант пропускает 11 и отвергает пять частот ≥64000.
+  Оба независимых signed-guard controls достигают точных ожидаемых отказов.
+  Все пять кампаний завершились с exit0; 19 canonical protocol tests проходят.
+  C3 unsigned-rate regression, target расширенного 17-case корпуса, остальное
+  G6/G1–G8 и radio/physical gates остаются. Аппаратные частоты выхода и
+  прежние core/priority/stack этим исправлением не меняются.
+  Архив пяти кампаний и 45 owned command receipts сохранён в 714 файлах;
+  автономная проверка конечного каталога из другого cwd завершилась с exit0.
+  Manifest SHA256:
+  `6b5e4119829d87a30211bc97c0c22a0808df69b7dcb01c3d740d675669a37b80`.
