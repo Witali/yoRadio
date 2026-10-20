@@ -1,0 +1,84 @@
+{
+  "review_complete": true,
+  "qualification_ready": false,
+  "independent_production_orchestration_review": true,
+  "mode": "read-only static planned-build review",
+  "repository_head_at_review": "0255eaac610c664e6946f38e9f9fa5b27f8b5f24",
+  "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "sdk_tracked_clean": true,
+  "reviewed_entrypoint_sha256": {
+    "prepare-input-reclaim-production.py": "a0f7ebe8020565b2035c32762332e37970146615b21f31f38ecdda9519a904fb",
+    "input-reclaim-production-profiles.json": "14a8194c744c6e514bab3f210ad1086e4e6713c203e5c1e69f6f0c9a3ddfd682",
+    "run-input-reclaim-production.ps1": "0f34f3e2fb747fe6af602041eb072986173df7284468cfe833e6cfd7a12deb0e",
+    "qualify-input-reclaim-sdk.py": "0798f31a922b4eb7b3aba7598b0d763c0cb2e0c0c4c3722c1807d575d1d5ff85"
+  },
+  "findings": [
+    {
+      "id": "R1",
+      "priority": 2,
+      "file": ".build/qualify-input-reclaim-sdk.py",
+      "start": 22,
+      "end": 23,
+      "title": "Require the complete seven-profile matrix before declaring PASS",
+      "detail": "The qualifier trusts the profile array without asserting its exact seven expected tuples, names and variants or unique paths. An empty array skips all image checks yet reaches passed=True and the Seven-complete-exports scope; omission or duplication can similarly under-cover the promised matrix. The current seven rows are correct.",
+      "requested_change": "Assert the exact six enabled vendor/custom x three backends plus disabled vendor PDM set, exact names/variants, unique build/config/export paths and final seven checked images."
+    },
+    {
+      "id": "R2",
+      "priority": 2,
+      "file": ".build/qualify-input-reclaim-sdk.py",
+      "start": 62,
+      "end": 65,
+      "title": "Bind the configuration baseline and prepared seed to immutable inputs",
+      "detail": "The sole-new-bool assertion compares output against mutable baseline sdkconfig.json. The qualifier does not verify its baseline receipt/raw-config/JSON identity, their committed Git blobs, profile baseline hash, or receipt seed source_sha256 against prepared_sdkconfig_sha256. firmware/development is excluded from exporter source-content hashing, so a changed baseline JSON could conceal an unintended non-explicit config delta. All current baseline receipts/configs and prepared seeds are valid and match their recorded hashes and current HEAD blobs.",
+      "requested_change": "Require baseline receipt/raw sdkconfig/sdkconfig.json exact HEAD blob bytes and receipt/profile hashes, and each new receipt seed_configuration.source_sha256 equal the prepared profile SHA."
+    },
+    {
+      "id": "R3",
+      "priority": 2,
+      "file": ".build/qualify-input-reclaim-sdk.py",
+      "start": 16,
+      "end": 17,
+      "title": "Verify current clean source content before and after qualification",
+      "detail": "HEAD equality and historical receipt source_dirty=False do not show that the live source still equals the source built in all seven receipts. The qualifier reads several live production/overlay files but never checks current source_snapshot/content SHA or compares receipt source_content_sha256 to the prebuild marker. Same-HEAD edits after export can therefore remain outside the final qualification freshness check.",
+      "requested_change": "Use the actual exporter source_snapshot with core.longpaths in its subprocess environment; require clean source and equal source content/identity against the prebuild marker and all seven receipts before and after qualification. Preserve scope exclusions explicitly. The source marker is intentionally not created yet and its present absence is not a finding."
+    },
+    {
+      "id": "R4",
+      "priority": 2,
+      "file": ".build/qualify-input-reclaim-sdk.py",
+      "start": 39,
+      "end": 40,
+      "title": "Require the intended evidence paths and frozen evidence identities",
+      "detail": "Hashing whatever evidence rows happen to be present permits an empty evidence list or a different self-consistent evidence set. The orchestration currently passes the correct two READMEs and the custom FLAC README for custom rows, but the final qualifier does not require those exact references or bind them to the prebuild frozen evidence marker. tests/results is excluded from exporter source-content hashing.",
+      "requested_change": "Require exact intended evidence path sets per profile and compare their receipt/current hashes with the frozen prebuild marker."
+    }
+  ],
+  "checks": [
+    "Reviewed source statically; no reviewed generator, qualifier or build command was executed.",
+    "Current seven prepared rows form the exact intended matrix with unique in-repository build/config paths and only the new bool as text delta.",
+    "All six baseline receipt/config pairs match recorded hashes and current committed HEAD blob bytes; all seven prepared seeds match profile hashes.",
+    "PowerShell dispatch uses intended evidence sets, captures nonzero child exit and has no flash/serial/device operations.",
+    "Inherited exporter enforces source-before/after identity per export, SDK/target/GCC/image/config/OTA checks and writes manifest completion last.",
+    "Planned qualifier checks actual linked ELF32 Xtensa symbols, canonical reclaim compilation row and linker wrapping flags enabled/off.",
+    "ELF program-header-based initializer proof correctly reads file-backed 32-bit calloc/free globals, expects wrapper only enabled and ordinary free for every image.",
+    "SDK source maps default allocator/free pointers to esp_mbedtls_mem_calloc/free; internal allocator uses MALLOC_CAP_INTERNAL|MALLOC_CAP_8BIT and ordinary free uses heap_caps_free.",
+    "Planned checksum/appended SHA/chip/ELF/app descriptor/two OTA slots/flash limit checks are grounded in the actual image/partition parsers.",
+    "Planned task-call/table and board comparisons retain previous dual-core owner bindings and board constants; config comparison covers existing backend/clock/DMA options once R2 is fixed.",
+    "Planned metrics state/lock DRAM and PDM ISR symbol IRAM checks are target addresses only, not ISR-latency or hardware claims.",
+    "SDK checkout is at the pinned 6.0.2 commit with clean tracked files during this static review."
+  ],
+  "limitations": [
+    "No seven new production exports have been run or qualified by this review; linked object/ELF/image properties above are reviewed assertions, not new execution results.",
+    "Source HEAD marker is deliberately pending final harness commit; absence is expected.",
+    "No target QEMU result, physical OOM, RF, DMA, IRQ latency, audio quality or hardware qualification is inferred.",
+    "The initial review does not execute malformed profile/receipt variants; vacuous acceptance paths are demonstrated directly by control flow.",
+    "One-time generator checks existing profile output after config writes; do not rerun this preparation script as a dry-run. This is a workflow note, not an additional blocker for the current prepared matrix."
+  ],
+  "prepared_profiles": "prepared-profile-checks.json",
+  "inputs": "inputs.json",
+  "all_frozen_inputs_unchanged_after": true,
+  "input_count": 57,
+  "builds_started_by_review": 0,
+  "physical_operations": 0
+}

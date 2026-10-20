@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "scope": "Exercise actual TLS input-reclaim CMake guards without compiling a firmware.",
+  "source_sha256": {
+    "tests/run-cyd-input-reclaim-config.py": "24db372ce1b767bc6e72b3b0444226f264ae3d9987983ef7e90f01f65bf6d9cf",
+    "idf/esp32-cyd2usb-native/main/CMakeLists.txt": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+    "idf/esp32-cyd2usb-native/main/Kconfig.projbuild": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.c": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.h": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+    "idf/esp32-cyd2usb-native/main/compat/input_reclaim/enable.cmake": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8"
+  },
+  "cases": {
+    "enabled": {
+      "exit_status": 0,
+      "expected_rejection": false,
+      "configure_log_sha256": "c3199c91157afecd1902257f5b8e00dba64a220db94ac6ad3bf7cbbc89045d48",
+      "passed": true
+    },
+    "disabled": {
+      "exit_status": 0,
+      "expected_rejection": false,
+      "configure_log_sha256": "4b855987328ec9ad41c3aa189b4bce4752247922e67c8e37eb7d79359bded9b1",
+      "passed": true
+    },
+    "early": {
+      "exit_status": 0,
+      "expected_rejection": false,
+      "configure_log_sha256": "53f0491c1ac43692837b9146592c0af6b9d83a4e4ec33d76fe1bedc61478417d",
+      "passed": true
+    },
+    "no-adaptive": {
+      "exit_status": 1,
+      "expected_rejection": true,
+      "configure_log_sha256": "94a5ea23ab5e41cfb6c54a36694949f139b1398aed11a7cce924f87aaf023a7d",
+      "passed": true
+    },
+    "other-tls": {
+      "exit_status": 1,
+      "expected_rejection": true,
+      "configure_log_sha256": "94a5ea23ab5e41cfb6c54a36694949f139b1398aed11a7cce924f87aaf023a7d",
+      "passed": true
+    },
+    "external-allocator": {
+      "exit_status": 1,
+      "expected_rejection": true,
+      "configure_log_sha256": "94a5ea23ab5e41cfb6c54a36694949f139b1398aed11a7cce924f87aaf023a7d",
+      "passed": true
+    },
+    "custom-allocator": {
+      "exit_status": 1,
+      "expected_rejection": true,
+      "configure_log_sha256": "94a5ea23ab5e41cfb6c54a36694949f139b1398aed11a7cce924f87aaf023a7d",
+      "passed": true
+    },
+    "abort-on-failure": {
+      "exit_status": 1,
+      "expected_rejection": true,
+      "configure_log_sha256": "94a5ea23ab5e41cfb6c54a36694949f139b1398aed11a7cce924f87aaf023a7d",
+      "passed": true
+    }
+  },
+  "physical_hardware": false,
+  "compiled_firmware": false,
+  "tools": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe": "392ab4d6c3c91543fd297ed6c7e7354bf62edcd26fdf2706ad8613ad620cc45e",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": "68865c3276d449d746cea5065fdec2baf755d7813e161ab04205b0907b2629b8"
+  },
+  "inputs_unchanged_after": {
+    "tests/run-cyd-input-reclaim-config.py": true,
+    "idf/esp32-cyd2usb-native/main/CMakeLists.txt": true,
+    "idf/esp32-cyd2usb-native/main/Kconfig.projbuild": true,
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.c": true,
+    "idf/esp32-cyd2usb-native/main/native_input_reclaim.h": true,
+    "idf/esp32-cyd2usb-native/main/compat/input_reclaim/enable.cmake": true
+  },
+  "tools_unchanged_after": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe": true,
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": true
+  }
+}

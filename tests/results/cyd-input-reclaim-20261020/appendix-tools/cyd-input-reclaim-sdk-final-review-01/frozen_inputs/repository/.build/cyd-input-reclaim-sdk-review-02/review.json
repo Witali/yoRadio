@@ -1,0 +1,90 @@
+{
+  "review_complete": true,
+  "planned_orchestration_ready": true,
+  "findings": [],
+  "independent_orchestration_review": true,
+  "mode": "read-only final rereview",
+  "repository_head_at_review": "0255eaac610c664e6946f38e9f9fa5b27f8b5f24",
+  "pinned_sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "sdk_tracked_clean": true,
+  "prior_review_sha256": "bdc3d4903765c804c79f55a1e50a8db9c34084fac2d04588550dbc177bf98b15",
+  "closures": [
+    {
+      "id": "R1",
+      "status": "closed",
+      "references": [
+        ".build/input_reclaim_sdk_contract.py:24-40",
+        ".build/input-reclaim-production-preflight.py:15-18",
+        ".build/run-input-reclaim-production.ps1:9-10",
+        ".build/qualify-input-reclaim-sdk.py:24-28,164"
+      ],
+      "reason": "Exact seven names, bool selections, backend/custom/enabled tuples, variant and baseline identities plus unique case-folded build/config paths are mandatory before builds; the final result also requires seven variants."
+    },
+    {
+      "id": "R2",
+      "status": "closed",
+      "references": [
+        ".build/input_reclaim_sdk_contract.py:42-53,76",
+        ".build/freeze-input-reclaim-production.py:17-19",
+        ".build/input-reclaim-production-preflight.py:21-23",
+        ".build/qualify-input-reclaim-sdk.py:46,79-81"
+      ],
+      "reason": "Baseline receipt, sdkconfig and JSON must equal current committed HEAD blobs; receipt/profile hashes are enforced. Actual exporter sdkconfig_seed.source_sha256 must equal the prepared profile hash. Current real seven baselines/seeds passed the pure metadata checks."
+    },
+    {
+      "id": "R3",
+      "status": "closed",
+      "references": [
+        ".build/input_reclaim_sdk_contract.py:18-22,62-76",
+        ".build/freeze-input-reclaim-production.py:9-28",
+        ".build/input-reclaim-production-preflight.py:9-20",
+        ".build/qualify-input-reclaim-sdk.py:15-30,46,184-189"
+      ],
+      "reason": "The actual exporter source_snapshot runs with inherited core.longpaths. Complete clean included-source snapshot and content SHA match the frozen marker before and after qualification; every receipt must match content, commit, untracked and exclusions. Private profiles, six helper scripts and marker bytes are also hash-bound."
+    },
+    {
+      "id": "R4",
+      "status": "closed",
+      "references": [
+        ".build/input_reclaim_sdk_contract.py:55-60,77-80",
+        ".build/freeze-input-reclaim-production.py:28",
+        ".build/input-reclaim-production-preflight.py:24",
+        ".build/qualify-input-reclaim-sdk.py:44-46,55-56"
+      ],
+      "reason": "Exact intended README paths are derived by profile, frozen before builds, rechecked against current hashes and required as a unique exact receipt evidence set. Empty, missing, extra, changed and duplicate references fail."
+    }
+  ],
+  "checks": [
+    "No new actionable findings after reviewing the final orchestration and all four prior fixes.",
+    "The metadata-only report records fourteen exact assertion predicates, and all three frozen inputs match current and archived bytes; this review did not rerun that test runner.",
+    "The frozen pure contract helper accepted current exact profiles and real committed Git baseline bytes/hashes; all seven prepared seed hashes match. No build/qualifier/preflight/freeze entrypoint was executed.",
+    "The preparer and profile file remain byte-identical to initial review inputs.",
+    "The exporter actual receipt key is sdkconfig_seed and its source_sha256 captures the existing isolated config before build. The final contract uses that exact key.",
+    "Initial SDK allocator initializer/ordinary-free ELF proof, canonical module compile/link checks, image checksum/OTA/config guards and unchanged owner/core/board comparisons remain intact.",
+    "The qualifier additionally forbids linked __wrap_esp_mbedtls_mem_free and tls_large_reserve_ symbols and the free wrapping linker flag.",
+    "PowerShell fails before the first build when preflight fails and stops on any failed export; no board/serial/flash operations are introduced.",
+    "The source marker intentionally remains pending final harness commit; a missing marker causes preflight failure and is not a readiness defect at this planning checkpoint."
+  ],
+  "limitations": [
+    "This is planned-build orchestration approval, not seven-app build or runtime qualification. No SDK/QEMU/app/board run was started.",
+    "The future freeze marker still must be produced after the final harness commit and a clean included source snapshot; production exports and final qualifier must then execute successfully.",
+    "Included-source cleanliness intentionally excludes firmware/development and tests/results. The intended README references have separate frozen hash checks; excluded evolving SDK appendices are not represented as production source content.",
+    "Reviewed ELF/image/IRAM/DRAM assertions are not results for the pending seven images. No physical OOM, RF, DMA, IRQ latency, audio-quality or hardware claim follows.",
+    "One-time preparer retains its previously documented no-rerun workflow note; final matrix is already prepared and the preparer was not executed."
+  ],
+  "reviewed_entrypoint_sha256": {
+    "qualify-input-reclaim-sdk.py": "c74326ad7526592ca388f7bcaa9c95d1840494a84369297e820279858840fcae",
+    "input_reclaim_sdk_contract.py": "f787f2353e623f6696723aa5b4e6f323d8238bb5d3b2f89f2d41b287e14fa32c",
+    "run-input-reclaim-production.ps1": "43513cbcd244d902f942ecc8c65a77dd316e47e75ace764bc2feb5ba6b9d19db",
+    "freeze-input-reclaim-production.py": "531e4d7a1d0e4f13f4cbc255d86048e47e250aedb796856fce36f09ae95d1d81",
+    "input-reclaim-production-preflight.py": "e953d03d7aecf38b49d7c54925e5533cfce1768c0bb395d31ad1e30584a57a8d",
+    "prepare-input-reclaim-production.py": "a0f7ebe8020565b2035c32762332e37970146615b21f31f38ecdda9519a904fb",
+    "input-reclaim-production-profiles.json": "14a8194c744c6e514bab3f210ad1086e4e6713c203e5c1e69f6f0c9a3ddfd682",
+    "test-input-reclaim-sdk-contract.py": "86c1ce11c34349c8a64ea03622a2fb7fd4c1997e743ac661a59a121361d0aba5"
+  },
+  "all_inputs_unchanged_after": true,
+  "input_count": 67,
+  "builds_started_by_review": 0,
+  "inputs": "inputs.json",
+  "metadata_validation": "metadata-validation.json"
+}
