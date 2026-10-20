@@ -2484,3 +2484,37 @@ active selector H10/CYD инезакоммиченные C3/ESP8266 сохран
 H10/CYD не прерывались. Пользовательские изменения root совпадают с начальным
 inventory. Код и firmware не менялись; тесты повторно не запускались.
 Подробности: Small_TV/WORKTREE_INTEGRATION_20261020.md и машинный отчёт.
+
+## 2026-10-20 — актуальный checkpoint JPEG/NOR
+
+Продолжение цели IMPROVEMENT_PLAN в `.worktree/small-tv-improvement-plan`, branch
+`codex/small-tv-improvement-plan`. Root checkout с посторонними C3/ESP8266 изменениями
+не трогать. Основная UI firmware3E03/ELF54293 всё ещё TJpgd,1170432bytes. Prepared
+NOR/guard/journal/transport/espidf/scratch/coefficients/decoder modules не означают
+включённый новый JPEG в UI. Завершённые progress commits идут послеccb29b1db.
+
+Новый codec/jpeg_backing — actual adapter API→shared scratch/NOR, raw или packed
+coefficients, noheap/globals; RV32handle600 +caller bitmap15 +NOR4352. IDs/constant
+capacity сохраняются между jobs, first-use bitmap сбрасывается, dirty abort не
+пишет. Весь запрос проверяется до sector preparation. Deadline/quota из callback
+не маскируются generic I/O; owner читает transport.last_error после STATE.
+Callback cause хранится в decoder diagnostic до cleanup, не брать его из
+backing.last_error после успешного close.
+
+Host61images/7limits/10negative/827physical faults/48stops/12transitions,
+15273unit assertions/134partial+silent faults/6compiled mutants pass. Стандартный
+stdio contract63/7/10/1197/12 также pass. Probe0F637039/ELF040300F8/source15AB27CD
+с matching stamped assets сохранена отдельно в firmware/development/small-tv-jpeg-decoder-probe.
+Полный decoder/NOR pipeline исполняется в собственном C2 QEMU:45576requested heap
+peak,1988/4096stack free, без UI/Wi-Fi. FullCMYK12 занимает около39–45guest seconds;
+это не hardware benchmark. Первый observer ошибочно требовал изменённые bytes на
+повторной записи тех же данных; исправлен FIXED_TEST, сохраняются полные flash images.
+Подробности tests/JPEG_BACKING.md и qemu/parity/jpeg-backing-validation-20261020.json.
+
+Далее source/upload privacy + journal invalidation + physical source/frame SHA +
+durable RGB565 cache и matching assets deployment с сохранением photos/settings.
+Validation и cache generation — один decode; redraw готового кадра без повторного
+multi-scan decode/flash writes. Затем UI link, реальный общий RAM/stack/time, HTTP/
+reset/power-loss, независимые LCD/network/full/24h/hardware. Не закрывать цель.
+Старые H10/frozen46payloads+manifest/SDK readonly; ни QMP/RSP, ни stop для oldH10.
+Все новые процессы принадлежат только standalone probes; после tests reap owners.

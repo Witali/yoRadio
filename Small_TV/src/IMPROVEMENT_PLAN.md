@@ -78,6 +78,11 @@ errors реализован.63positive/7resource/10negative/1197callback failure
 transitions и6compiled mutants pass. Legal4x4 требует524288; при460800 refusal
 до backing I/O. RV32 binding связан, context4984, но не исполнен на target.
 [Результаты](tests/JPEG_DECODER.md). Native UI3E03/TJpgd пока без изменений.
+Следующий checkpoint: API связан с production NOR/packed adapter и исполнен в
+standalone C2 QEMU с real ESP-IDF flash calls.61host positives/827physical faults/
+48global stops,15273unit assertions/6mutants и два fresh target processes pass.
+Target fullCMYK12 requested allocator peak45576, stack free1988/4096; это без
+UI/Wi-Fi и не whole-app fit. [Результаты](tests/JPEG_BACKING.md).
 Далее — расширить sampling/capacity bounds, выбрать budgets; invalidation/source
 hash в upload/cache workflow, matching assets build/deployment с сохранением photos/settings.
 Полный HTTP/power-loss workflow и native UI decoder integration ещё открыты.
@@ -101,6 +106,8 @@ hash в upload/cache workflow, matching assets build/deployment с сохран�
 4. Подключить codec через bounded input/output API и RGB565 converter; сеть/LCD
    не должны знать внутренности libjpeg. Сохранить browser metadata removal/crop
    и серверную privacy validation. Запрет progressive менять после готовности codec.
+   Объединить validation и заполнение RGB565 cache в один decode; готовые кадры
+   читать из cache без повторного multi-scan decode/записи coefficient scratch.
 5. Проверить полный RV32 link, размер app partition, общий peak heap/task stack,
    время decode и abort/reuse после реальных I/O/allocation faults. 64 KiB library
    pools не считать всей RAM приложения. Учесть output policy и большой quantizer stack.

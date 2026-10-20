@@ -22,6 +22,15 @@ void jpeg_decoder_checkpoint(jpeg_decoder_t *s)
     jpeg_decoder_fail(s,status,0,0);
 }
 
+void jpeg_decoder_callback_error(jpeg_decoder_t *s,jpeg_decode_status_t status,int error)
+{
+    /* A flash callback may fail specifically because its shared deadline/quota
+     * expired. Retain its concrete code, then ask the owner before degrading the
+     * cause to generic I/O. Cleanup still runs without a live operation budget. */
+    s->diagnostic.callback_error=error;jpeg_decoder_checkpoint(s);
+    jpeg_decoder_fail(s,status,0,0);
+}
+
 static void fatal(j_common_ptr codec)
 {
     /* Retain stable category, library cause and relevant numeric parameter.
@@ -86,7 +95,7 @@ static boolean fill_source(j_decompress_ptr codec)
     size_t count=s->request.length-s->position;if(count>sizeof(s->input))count=sizeof(s->input);
     if(!count)jpeg_decoder_fail(s,JPEG_DECODE_TRUNCATED,(uint64_t)s->position+1u,s->request.length);
     int result=s->request.read(s->request.context,s->position,s->input,count);
-    if(result){s->diagnostic.callback_error=result;jpeg_decoder_fail(s,JPEG_DECODE_INPUT_IO,0,0);}
+    if(result)jpeg_decoder_callback_error(s,JPEG_DECODE_INPUT_IO,result);
     s->position+=(uint32_t)count;s->diagnostic.input_bytes+=count;jpeg_decoder_checkpoint(s);
     s->source.next_input_byte=s->input;s->source.bytes_in_buffer=count;return TRUE;
 }
@@ -156,7 +165,7 @@ static void decode_rows(jpeg_decoder_t *s)
         }
         if(s->request.row) {
             int result=s->request.row(s->request.context,s->diagnostic.rows,s->rgb565,s->codec.output_width);
-            if(result){s->diagnostic.callback_error=result;jpeg_decoder_fail(s,JPEG_DECODE_OUTPUT_IO,0,0);}
+            if(result)jpeg_decoder_callback_error(s,JPEG_DECODE_OUTPUT_IO,result);
         }
         jpeg_decoder_checkpoint(s);++s->diagnostic.rows;
     }

@@ -3760,3 +3760,83 @@ frozen47files и6oldH10 original owners readonly checked; no QMP/RSP/physical bo
 Далее portable actual NOR/packed backend для нового API, target probe/runtime,
 source/upload/journal/physical hash/RGB565 cache/matching assets/native UI workflow,
 total heap/task stack/time/HTTP/LCD/network/full/24h/hardware. Вся цель активна.
+
+## 2026-10-20 — actual NOR backing нового API и C2 target execution
+
+Продолжена цель IMPROVEMENT_PLAN послеccb29b1db. Добавлен отдельный
+codec/jpeg_backing: соединение portable decoder с existing scratch/NOR и
+coefficient converter, без повторения storage core или знания LCD/network.
+Caller-owned bitmap подготавливает каждый temporary logical sector один раз;
+сохраняются initialized соседние files и physical padding. Raw byte sample files
+не конвертируются; homogeneous mode обязателен. Prefix/bounds/alignment/alias/wrap
+проверяются до first-use clearing. Monotonic handles и constant borrowed capacity
+переживают job reuse. Close/abort не flush и не зависят от expired budget.
+
+Обнаружено при связи с transport: неуспешный callback может означать глобальный
+time/quota stop. Добавлен общий decoder helper: сохранить callback code, опросить
+owner, затем лишь при отсутствии более точной причины вернуть generic I/O.
+Inactive transport.check возвращает STATE, поэтому target owner сохраняет
+первопричину из transport.last_error. После cleanup decoder diagnostic сохраняется;
+last_error адаптера отражает последнюю операцию, включая successful close.
+
+Final native unit15273assertions/134partial+silent physical faults. Четыре полных
+arrays/refinement и interleaved boundary paths, raw bytes, stale IDs, stopped RAM
+и stopped first-use sector, invalid descriptors до I/O.6compiled mutants runtime
+rejected. First RAM-checkpoint mutant survived because underlying scratch also
+checked already-cached reads; добавлен действительно отсутствовавший first-use
+dirty-sector cancellation test. Exact earlier unit source/log сохранены.
+
+Новый API реально связан с adapter/NOR в host driver:61exact RGB565 positives,
+7resource refusals,10negative,12format transitions,827physical failures/recoveries
+и48time/quota/cancel stops. Every small-image physical operation faulted; full
+image boundary/middle/last cases separately. Physical partial bytes сохраняются,
+тот же decoder object восстанавливается; все handles closed/final requested heap0,
+outside-scratch canaries всей4MiB не меняются. Global stop model сначала проверял
+logical вызовы, а не каждую physical callback; стенд исправлен на реальные pre/post
+checks, теперь calls не превышают ordinal. Это исправление тестового transport.
+
+Уточнены реальные отказы4x4:8bit524288/460800backing,12bit70760/65536pool раньше
+backing preflight. При повышении только host pool оба дают524288backing requirement.
+Никаких opens/physical calls во всех refusals. Первые ошибочные test expectations
+сохранены, library errors не замаскированы ради зелёного результата. Existing stdio
+contract63positive/7limits/10negative/1197faults/12transitions pass после cause fix.
+
+Standalone ESP-IDF C2 probe связан полностью, retained libjpeg+actual decoder,
+scratch/NOR/guard/transport/espidf/PSA/RGB565. Probe app0f637039a537b0eca0f2bb5761c6e939d190489bc91823fee9c4c7e09aa45ad8,
+506784bytes; ELF040300f81e15639d4c17abfa53bfff5969833522d5bb57ed83665746013863a5,
+source15ab27cd82bf74f3b4281b8ce2d9da20809c0639338272f8ec49ddcda4573306.
+Matching stamped assets/bootloader/partitions/config/manifest/licences сохранены
+в firmware/development/small-tv-jpeg-decoder-probe. Старый storage probe6CB2 и
+UI3E03/TJpgd неизменны. Fixture source — linked const synthetic JPEG; backing —
+actual esp_flash SDK APIs. Это не native upload/cache/UI/network/LCD test.
+
+Two-process target gate: small/fullCMYK12,lossless16,gray,17-call quota refusal,
+same-object recovery и capacity460799 до любых writes. Whole4MiB comparison разрешает
+изменения лишь scratch extents. Первые два процесса завершили7firmware cases, но
+observer требовал changed bytes даже при идентичном replay. FIXED_TEST разрешает
+идентичные final bytes на повторе, сохраняя positive actual SDK traffic и полное
+сравнение protected bytes. Финальный новый two-process gate сохраняет каждый
+уникальный полный before/after image и UART/session до assertions; история не удалена.
+
+RV32adapter600bytes +bitmap15 +NOR4352, largest adapter frame368 включая256byte
+conversion buffer. Target fullCMYK12 pools40592 +context4984 =45576requested bytes;
+minimum8bit free heap149576, minimum stack free1988/4096. No UI/framebuffer/Wi-Fi:
+это не whole-app fit. First final full decode39137736guest microseconds, с probe-only
+idle yield каждые64checks; не hardware/CPU benchmark или universal production budget.
+Host rich full traffic2582784program/113erases остаётся как44f106cb5; capacity460800
+и compressed source44402 не меняются. Native source inventory не расширяется до
+production UI integration.6artifact/10correspondence checks pass.
+
+Proof qemu/parity/jpeg-backing-validation-20261020.json. Далее durable cache workflow
+(один validation+cache decode), bounded source/hash/journal/ownership/asset deployment,
+privacy/error HTTP +shared UI RAM/stack/time, reset/power-loss, независимые LCD/network/
+full/24h/hardware и остальные factory/network/electrical audit. Цель остаётся активной.
+
+Финальный observer two-process run terminal exit0: оба85checks/7cases, full-image
+hashes/positive issued writes/protected4MiB bytes проверены. Первый before image
+и identical replay сохранены по content hash без копирования одинаковых images.
+Первый full39137736us/2erases, повторный45058612us/113erases; оба2580736program bytes.
+Все4new QEMU owners31824/2476/38320/39016 stopped/reaped, исходные6oldH10 owners
+по original creation timestamps живы, SDK tracked clean, frozen47files exact.
+No old QMP/RSP/native board/other repository writes. Фактические outputs/history
+и current source snapshot включены в proof; base artifact/API inventory прежние.

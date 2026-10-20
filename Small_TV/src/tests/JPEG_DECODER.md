@@ -103,8 +103,10 @@ python -B Small_TV/src/tests/jpeg_decoder/contract.py --build NEW_DECODER --refe
 python -B Small_TV/src/tests/jpeg_decoder/mutation_contract.py --build NEW_DECODER --contract NEW_CONTRACT --output NEW_MUTANTS
 ```
 
-Следом portable NOR/packed-coefficient backing adapter для этого API, target
-execution, source/upload/journal/physical hashes и RGB565 cache workflow,
+Следующий checkpoint: portable NOR/packed backing и standalone C2 target execution
+реализованы отдельно — [JPEG_BACKING.md](JPEG_BACKING.md). Исторические RV32
+link-only цифры выше относятся к первоначальному checkpoint этого API.
+Далее source/upload/journal/physical hashes и RGB565 cache workflow,
 matching assets build/deployment с сохранением photos/settings. Затем UI link,
 total RAM/task stack/time, HTTP/reset, independent LCD/network/full/24h/hardware.
 Error strings/HTTP mapping и privacy validation интегрировать с настоящим WebUI;

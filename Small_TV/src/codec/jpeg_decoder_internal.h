@@ -37,6 +37,7 @@ struct jpeg_decoder {
 
 void jpeg_decoder_fail(jpeg_decoder_t *decoder,jpeg_decode_status_t status,uint64_t required,uint64_t available);
 void jpeg_decoder_checkpoint(jpeg_decoder_t *decoder);
+void jpeg_decoder_callback_error(jpeg_decoder_t *decoder,jpeg_decode_status_t status,int error);
 void jpeg_decoder_install_memory(jpeg_decoder_t *decoder);
 void jpeg_decoder_release_backing(jpeg_decoder_t *decoder);
 #endif

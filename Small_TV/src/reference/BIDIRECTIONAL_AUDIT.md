@@ -45,13 +45,16 @@ journal проверен отдельно на host. Собственные [NOR
 [cache journal](../tests/JPEG_CACHE_JOURNAL.md) и
 [target transport](../tests/JPEG_TRANSPORT.md) и
 [shared scratch](../tests/JPEG_SHARED_SCRATCH.md) хранят отдельные input closures.
-Scratch/actual libjpeg пока исполнены на host NOR model, не в target UI.
+Scratch/actual libjpeg исполнены на host NOR model и в отдельной C2 probe,
+но пока не в target UI.
 Prepared codec/jpeg_coefficients — converter temporary JCOEF storage, не новая
 factory function или новый формат input JPEG; он также ещё вне UI inventory.
 Exact pixels/traffic/error evidence: [JPEG_COEFFICIENTS](../tests/JPEG_COEFFICIENTS.md).
 Portable jpeg_decoder/jpeg_memory — новый bounded library adapter с exact
-resource preflight и typed errors, пока вне UI inventory. Host executed/RV32 linked,
-не target execution. См. [JPEG_DECODER](../tests/JPEG_DECODER.md).
+resource preflight и typed errors, пока вне UI inventory. Новая codec/jpeg_backing
+связывает их с настоящим shared NOR; полный pipeline исполнен в standalone C2 QEMU,
+не в UI. См. [JPEG_DECODER](../tests/JPEG_DECODER.md) и
+[JPEG_BACKING](../tests/JPEG_BACKING.md).
 При native UI integration их нужно включить в source inventory/сборочные inputs.
 Это REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 

@@ -106,7 +106,7 @@ static void read_store(j_common_ptr codec,backing_store_ptr info,void *data,long
     /* Read exact initialized bytes; the backing owner enforces NOR/epoch policy. */
     jpeg_decoder_t *s=state(codec);unsigned i=file_slot(codec,info,offset,bytes);jpeg_decoder_checkpoint(s);
     int result=s->config.backing.read(s->config.backing.context,s->files[i].handle,(uint32_t)offset,data,(size_t)bytes);
-    if(result){s->diagnostic.callback_error=result;jpeg_decoder_fail(s,JPEG_DECODE_BACKING_IO,0,0);}
+    if(result)jpeg_decoder_callback_error(s,JPEG_DECODE_BACKING_IO,result);
     jpeg_decoder_checkpoint(s);
 }
 
@@ -115,7 +115,7 @@ static void write_store(j_common_ptr codec,backing_store_ptr info,void *data,lon
     /* Preserve partial-error causes; callers must not publish provisional rows. */
     jpeg_decoder_t *s=state(codec);unsigned i=file_slot(codec,info,offset,bytes);jpeg_decoder_checkpoint(s);
     int result=s->config.backing.write(s->config.backing.context,s->files[i].handle,(uint32_t)offset,data,(size_t)bytes);
-    if(result){s->diagnostic.callback_error=result;jpeg_decoder_fail(s,JPEG_DECODE_BACKING_IO,0,0);}
+    if(result)jpeg_decoder_callback_error(s,JPEG_DECODE_BACKING_IO,result);
     jpeg_decoder_checkpoint(s);
 }
 
@@ -152,7 +152,7 @@ GLOBAL(void) jpeg_open_backing_store(j_common_ptr codec,backing_store_ptr info,l
     jpeg_decoder_checkpoint(s);uint64_t handle=0;
     bool coefficients=!s->sample_arrays && s->codec.progressive_mode;
     int result=s->config.backing.open(s->config.backing.context,(uint32_t)bytes,coefficients,&handle);
-    if(result){s->diagnostic.callback_error=result;jpeg_decoder_fail(s,JPEG_DECODE_BACKING_IO,0,0);}
+    if(result)jpeg_decoder_callback_error(s,JPEG_DECODE_BACKING_IO,result);
     s->files[i].owner=info;s->files[i].handle=handle;s->files[i].bytes=(uint32_t)bytes;
     s->backing_current+=(uint32_t)bytes;if(s->backing_current>s->diagnostic.backing_peak)s->diagnostic.backing_peak=s->backing_current;
     ++s->diagnostic.stores_opened;info->temp_file=NULL;

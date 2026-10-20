@@ -44,8 +44,10 @@ logical faults и 2238 partial physical error recoveries. Это host execution,
 Сокращение actual NOR traffic через reversible DC/AC temporary encoding, flat
 tradeoffs и независимые pixel/fault gates: [JPEG_COEFFICIENTS.md](JPEG_COEFFICIENTS.md).
 Portable decoder API, resource preflight/typed refusals, RGB565 pixels, callback
-faults/reuse и RV32 binding: [JPEG_DECODER.md](JPEG_DECODER.md). Это ещё не UI/NOR
-workflow или target runtime acceptance нового API.
+faults/reuse и RV32 binding: [JPEG_DECODER.md](JPEG_DECODER.md).
+Новый API с actual NOR/packed backing проверен также в standalone C2 QEMU:
+[JPEG_BACKING.md](JPEG_BACKING.md). Это ещё не UI/upload/cache workflow или
+доказательство общего RAM/stack/time fit приложения с Wi-Fi и дисплеем.
 
 Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
 для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write
