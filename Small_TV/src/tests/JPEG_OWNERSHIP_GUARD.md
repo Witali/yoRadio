@@ -31,7 +31,8 @@ hashes asset manifest; для ESP-IDF ещё требуется adapter суще
 Owner сериализует проверку/изменение ресурсов, хранит authorization только для
 успешно проверенной boot session и закрывает handles перед заменой образа.
 Readonly guard сам не ограничивает прямые вызовы `jpeg_nor_open`: эту границу
-должен обеспечить ещё не реализованный production transport.
+обеспечивает подготовленный transport в standalone probe; подключение к native
+UI ещё требуется.
 
 ## Зачем нужен stamp
 
@@ -107,6 +108,6 @@ Proof с точными sources/compiler pins и85compressed raw outputs:
 6artifact checks подтверждают неизменность app3E03 и archive. Six original
 H10 owner identities подтверждены readonly CIM; его QMP/RSP, SDK и snapshots
 не менялись. Portable [atomic cache journal](JPEG_CACHE_JOURNAL.md) теперь также
-подготовлен отдельно; actual upload/source workflow, hardware faults, transport
-authorization/budgets, build/codec integration и final acceptance остаются
-обязательными следующими этапами.
+подготовлен отдельно; [ESP-IDF transport/budgets](JPEG_TRANSPORT.md) проверен в
+standalone target probe. Actual upload/source workflow, hardware faults,
+native UI build/codec integration и final acceptance остаются обязательными.

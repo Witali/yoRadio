@@ -56,6 +56,13 @@ durable invalidation, mandatory physical frame hash на publish/каждый hi
 Independent Python wire parser проверяет реальные persisted records. Это ещё
 не actual source-upload/HTTP integration, ESP-IDF/hardware или production decoder.
 
+[JPEG_TRANSPORT.md](JPEG_TRANSPORT.md): shared revocable I/O/time budgets и
+настоящий ESP-IDF flash/partition/PSA adapter.31host cases/14compiled mutants;
+standalone probe исполняется в QEMU:4variants/5owned processes, real sector RMW,
+fresh-process persistence, rejected legacy stamp/unknown raw flags/extra partition.
+Основная app3E03/TJpgd не менялась; это storage gate без network/LCD criteria,
+не готовый libjpeg codec/shared subfiles/upload integration или hardware acceptance.
+
 ## JPEG Huffman selectors
 
 Отдельный `jpeg_selector_oracle.py` проверяет136valid/32invalid входа с

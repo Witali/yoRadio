@@ -37,14 +37,15 @@ python Small_TV/src/tests/correspondence_test.py
 заводском образе. Подготовленная libjpeg ещё не подключена; её upstream-код
 и инструменты хостовых проб не являются переносом заводских функций.
 
-Новые `storage/jpeg_nor.c`, `storage/jpeg_guard.c` и `storage/jpeg_journal.c` —
-подготовленные unlinked компоненты для расширения
-JPEG, не перенос отдельной factory функции. Он проверяется собственным
-[NOR contract](../tests/JPEG_NOR_STORAGE.md) и
-[ownership guard](../tests/JPEG_OWNERSHIP_GUARD.md) и
-[cache journal](../tests/JPEG_CACHE_JOURNAL.md); при production integration их
-нужно включить в source inventory и привязку сборочных входов. Это новые
-REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
+Новые storage modules jpeg_nor/guard/journal/transport/espidf — расширение JPEG,
+не перенос отдельных factory функций. Они пока не входят в native UI app3E03.
+NOR/guard/transport/espidf скомпилированы и исполнены в standalone target probe;
+journal проверен отдельно на host. Собственные [NOR contract](../tests/JPEG_NOR_STORAGE.md),
+[ownership guard](../tests/JPEG_OWNERSHIP_GUARD.md),
+[cache journal](../tests/JPEG_CACHE_JOURNAL.md) и
+[target transport](../tests/JPEG_TRANSPORT.md) хранят отдельные input closures.
+При native UI integration их нужно включить в source inventory/сборочные inputs.
+Это REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 
 ## Найденные пробелы
 

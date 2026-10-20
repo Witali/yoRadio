@@ -3548,3 +3548,53 @@ Journal пока не в CMake и не связан с upload. Он не реш�
 replacement сам по себе. Следом authorized ESP-IDF/SHA transport и budgets,
 shared scratch subfiles, actual source/cache workflow и matching stamped assets
 build, затем real codec/final tests. Полная цель IMPROVEMENT_PLAN остаётся открыта.
+
+## 2026-10-20 — guarded ESP-IDF transport и исполнение target probe
+
+Previous goal turn — progress:93ac71929; чистая branch/активная цель/план сверены.
+Новые storage/jpeg_transport.c/.h и jpeg_espidf.c/.h: shared physical calls/bytes/
+erase/time budgets для всех ports, preflight ranges/readonly/alias/overflow,
+epochs/revocation после ошибок и authorization attempt. Перед/после synchronous
+I/O deadline; отдельный check для RAM/codec rows. Нельзя отменить уже выполняемый
+SPI callback; owner abort/reopen cached NOR/journal после fail и drop borrowers
+перед reuse port memory. Создание нового port не обнуляет общий budget.
+
+Проверены реальные pinned SDK APIs, а не придуманный shim. get_physical_size
+отличается от image get_size; обе ёмкости сверены. SDK iterator теряет unknown
+raw flags, поэтому discovery читает whole3KiB raw table, SDK MD5/canonical tail,
+полные flags +ALL SDK partitions/chip/known flags/erase size. Discovery read/call/
+time вычтены из startup limits. SHA public PSA setup/update/finish/abort, timer
+monotonic esp_timer, без software delays. SDK tracked tree clean, mbedTLSce3f348…
+при SDK9a97f6…; core/backend код не меняет SDK/H10.
+
+31host cases MSVC /O2 /W4 /WX: реальные resource hashes BCrypt, fake clock и
+independent raw counters. Quota sharing даже при создании второго port после
+I/O; readonly writes внутри valid scope; pre/post/final-hash deadlines, I/O
+faults, epochs, revoke, ranges/alias/clock bounds.14compiled mutants runtime-
+rejected. Host counters не объявляются coverage percentage/hardware endurance.
+
+Standalone ESP-IDF probe впервые связывает и исполняет NOR/guard/transport/PSA
+на RV32 QEMU. Final app6cb29771…,135504bytes/ELF pinned, archive в firmware/
+development/small-tv-storage-probe. Build captures19source/generated hashes
+BEFORE compilation, verifies after, deterministic source JSON; прежняя successful
+probe494ac7…/ELF сохранена в raw. Первая CMake include попытка имела Windows
+escape error; FIXED_TEST нормализует path. Две harness pre-launch ошибки
+(network=none, missing firmware argument) исправлены/сохранены с original scripts.
+Они не дошли до создания VM и не являются firmware failures.
+
+Final target gate:4variants/5actual processes. Matching writes cross-sector and
+0→1RMW:157callbacks/53314read/1024program bytes/1erase, exact4MiB comparison
+only35expected changed bytes. Process quit/disk flush +fresh emulator reads
+persistent bytes,0program/erase. Unmarked, valid-MD5 unknownflags0x80 и extra
+partition в scratch отвергнуты без изменения flash. Каждый owner завершён по
+своим QMP name/process handle; earlier10successful processes также stopped.
+Frozen47files checked unchanged; no RSP/guest memory/PC patches, network/LCD
+criteria отсутствуют. OldH10 six original process identities readonly-confirmed.
+
+Exact target flag replay:transport2324code/frame240, ESPbinding1448/frame416,
+writable0; executed globals storage536, ports152, NORhandles4352. Это не whole
+heap/task stack или flash delta полной UI+libjpeg.155raw proof:
+qemu/parity/jpeg-transport-validation-20261020.json. Main app3E03/TJpgd unchanged,
+6artifact checks pass. Plan/notes/audit updated; весь IMPROVEMENT_PLAN активен.
+Далее shared scratch subfiles без4KiB rounding per-array, actual libjpeg NOR
+matrix/traffic/bounds, actual upload/source/journal/build integration и final gates.

@@ -49,24 +49,30 @@ RV32 object1848bytes/handle4352/frame304 измерены; это ещё не pr
 Следующий checkpoint: portable immutable-resource/layout guard готов отдельно.
 27payloads + ownership stamp в уже protected padding;49layout/84corruption,
 3050read/3010hash faults,12generator rejects/12controls и10compiled mutants pass.
-Runtime capabilities/build integration пока не подключены. RV32 core1150 и
+Native UI capabilities/build integration пока не подключены. RV32 core1150 и
 const descriptors1448bytes измерены. [Результаты](tests/JPEG_OWNERSHIP_GUARD.md).
 Следующий checkpoint: portable two-bank cache journal готов отдельно. Durable
 invalidation до data writes, verified publication и каждый physical cache hit;
 33400NOR/power-cut cases,769metadata corruptions,6boot failures,12mutants и
 independent wire gate pass. RV32 code2976/const24/handle1032/maxframe448;
 не production link. [Результаты](tests/JPEG_CACHE_JOURNAL.md).
-Далее — ESP-IDF authorization/SHA adapter, привязка invalidation к actual upload/
-cache writes и source hash, сборка matching stamped assets с сохранением photos/
-settings, operation/time budgets и shared scratch subfiles для libjpeg.
-Production остаётся3E03/TJpgd; полный HTTP/power-loss workflow ещё не закрыт.
+Следующий checkpoint: shared budget/port transport и ESP-IDF flash/PSA binding
+реализованы и исполнены в standalone C2 probe.31host cases/14mutants,4target
+variants/5fresh owned processes, actual writes/RMW/cold process persistence и
+readonly rejection чужого map/stamp/flags pass. Probe6cb29771… сохранена отдельно;
+main app3E03/TJpgd не менялась. [Результаты](tests/JPEG_TRANSPORT.md).
+Далее — byte-bounded shared scratch subfiles и actual libjpeg NOR/mode/traffic
+matrix для выбора production budgets; invalidation/source hash в upload/cache
+workflow, matching assets build/deployment с сохранением photos/settings.
+Полный HTTP/power-loss workflow и native UI decoder integration ещё открыты.
 
 1. Зафиксировать матрицу входов/лимитов: baseline/progressive, gray/RGB/CMYK/YCCK,
    8/12-bit lossy и 2–16-bit Huffman lossless. Не обещать весь T.81: библиотека
    не поддерживает hierarchical, DNL, fractional subsampling и lossless arithmetic.
 2. Реализовать отдельный NOR-aware storage module: sparse extents, ограниченный
    RAM sector cache, read/modify/erase/program, измерение износа. Проверенный
-   layout planner пока не выполняет flash I/O. Запас плана — лишь 8 KiB;
+   layout planner сам не выполняет flash I/O; отдельные core/transport уже
+   проверены в model и target probe. Запас плана — лишь 8 KiB;
    460800 bytes backing — максимум fixtures, не предел любого JPEG.
 3. Реализовать atomic metadata/invalidation и cold recovery при прерванных
    upload/decode/erase/write. Перед записью проверять ownership immutable resources

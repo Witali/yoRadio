@@ -119,5 +119,7 @@ Proof с source/compiler pins и118compressed raw outputs:
 [`jpeg-cache-journal-validation-20261020.json`](../../qemu/parity/jpeg-cache-journal-validation-20261020.json).
 6artifact checks подтвердили unchanged production archive;6original H10 owner
 identities readonly-confirmed. QEMU/SDK/snapshot/physical flash не менялись.
-Далее ESP-IDF authorized transport/SHA/budgets, bounded shared scratch subfiles,
-build/HTTP/source/cache workflow и libjpeg integration, затем final gates.
+ESP-IDF [authorized transport/SHA/budgets](JPEG_TRANSPORT.md) теперь проверен
+отдельной target probe; journal пока не связан с ним в native UI. Далее bounded
+shared scratch subfiles, build/HTTP/source/cache workflow и libjpeg integration,
+затем final gates.

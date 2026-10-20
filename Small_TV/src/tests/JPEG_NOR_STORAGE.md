@@ -5,8 +5,9 @@ sector read/modify/erase/program поверх транспортных callbacks
 включён в production CMake и не выполняет запись в подключённое устройство.
 Readonly [ownership guard](JPEG_OWNERSHIP_GUARD.md) теперь также подготовлен
 отдельно, как и [cache journal](JPEG_CACHE_JOURNAL.md) с cold-recovery tests.
-Production authorization/build/upload integration, ESP-IDF adapter и libjpeg
-integration остаются обязательными этапами.
+ESP-IDF [transport](JPEG_TRANSPORT.md) также готов и проверен в отдельной target
+probe. Production authorization/build/upload integration, shared scratch subfiles
+и libjpeg integration остаются обязательными этапами.
 
 ## Контракт записи
 

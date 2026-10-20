@@ -52,6 +52,29 @@ invalidation/source identity, matching assets build и codec integration.
 Журнал сам не восстанавливает source JPEG после interrupted upload. Детали
 tests/JPEG_CACHE_JOURNAL.md; цель/остальные пункты плана сохраняются целиком.
 
+Transport checkpoint20Oct: storage/jpeg_transport +jpeg_espidf обеспечивают shared
+physical read/program/erase/call/time budgets, revocable bounded ports/epochs,
+monotonic pre/post/check deadlines и true ESP-IDF/PSA. Both physical+configured
+flash sizes; full raw MD5 table/unknown flags +ALL SDK partitions cross-check.
+31host cases/14mutants pass. Probe app6cb29771…(135504bytes) отдельно archived
+firmware/development/small-tv-storage-probe;19inputs frozen BEFORE build и checked
+after.4target variants/5final processes: actual RMW/cross-sector writes, fresh
+process cold persistence, guarded rejection of unmarked/extra partition/raw flags;
+whole4MiB comparison only35expected bytes. Earlier10successful processes also
+stopped. Main3E03/TJpgd unchanged;6artifact pass,6oldH10 owners readonly-confirmed.
+155raw proof:jpeg-transport-validation-20261020.json. Нет network/LCD/hardware
+acceptance. Port memory borrowed: abort/drop all old borrowers before reuse;
+RAM-only operations need explicit jpeg_transport_check, not just I/O callback.
+
+Следом shared scratch: byte-bounded files over ONE NOR cache, no per-file sector
+rounding. Pinned upstream c85e6b… src/jmemmgr.c tracks first_undef_row and rejects
+writable gaps; initialized-prefix tracking is a candidate, but must verify real
+codec backing traces/matrix before claiming it. Upstream source available readonly
+at C:/Work/yoRadio/.build/libjpeg-turbo-3.2.0. Current460800bound is only fixtures;
+expand sampling tests and choose real production budgets from NOR traffic/wear,
+not from small probe limits. Then source/upload journal invalidation, actual
+source/frame SHA, matching assets build/native codec bridge and final gates.
+
 ## Независимость проверок подсистем — 2026-10-18
 
 ## План улучшений форматов изображений — 2026-10-19
