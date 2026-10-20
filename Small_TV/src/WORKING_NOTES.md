@@ -2304,3 +2304,14 @@ Checker+10tests проверяют пропуски в обоих направл
 не доказывают semantic equivalence. В native run добавлен обязательный gate.
 Firmware C8FD пока не менялась. Frozen B50D full завершился exit0 в10:56UTC;
 H10 всё ещё running, никаких новых QMP/RSP к нему не подключали.
+
+
+## 2026-10-20 — terminal B50D full suite
+
+Полный regression B50D/ELF85FCCF/sourceFC337C завершён:19automatic groups
+passed, hardware_browser_soak not_run, controller exit0/terminal_passed
+2026-10-20T10:56:30.2074153Z. Исходный report4.5MB иfooter сохранены без
+изменения байтов (gzip) вqemu/parity/raw/b50d-full-20261020; certificate
+qemu/parity/b50d-full-terminal-20261020.json. Это результат B50D, неC8FD/54F4
+и не24h H10. Frozen tree/snapshot не редактировались. H10 supervisor11:56UTC
+всё ещё running,396cycles,cleanup_errors[]; наблюдение только через его файлы.
