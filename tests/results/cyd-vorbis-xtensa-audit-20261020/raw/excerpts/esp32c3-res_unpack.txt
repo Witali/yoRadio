@@ -1,0 +1,252 @@
+tool-output/esp32c3-libesp_audio_codec-647-res012.c.obj-disasm.txt:44
+Disassembly of section .text.res_unpack:
+
+00000000 <res_unpack>:
+   0:	7179                	addi	sp,sp,-48
+   2:	d422                	sw	s0,40(sp)
+   4:	ce4e                	sw	s3,28(sp)
+   6:	cc52                	sw	s4,24(sp)
+   8:	842a                	mv	s0,a0
+   a:	d606                	sw	ra,44(sp)
+   c:	01c5aa03          	lw	s4,28(a1)
+  10:	8532                	mv	a0,a2
+  12:	00042023          	sw	zero,0(s0)
+  16:	00042223          	sw	zero,4(s0)
+  1a:	00042423          	sw	zero,8(s0)
+  1e:	00042623          	sw	zero,12(s0)
+  22:	00042823          	sw	zero,16(s0)
+  26:	00042a23          	sw	zero,20(s0)
+  2a:	00042c23          	sw	zero,24(s0)
+  2e:	45c1                	li	a1,16
+  30:	89b2                	mv	s3,a2
+  32:	00000097          	auipc	ra,0x0	32: R_RISCV_CALL_PLT	tremor_oggpack_read
+	32: R_RISCV_RELAX	*ABS*
+  36:	000080e7          	jalr	ra # 32 <res_unpack+0x32>
+  3a:	c008                	sw	a0,0(s0)
+  3c:	4789                	li	a5,2
+  3e:	04a7f363          	bgeu	a5,a0,84 <.L20>	3e: R_RISCV_BRANCH	.L20
+
+00000042 <.L23>:
+  42:	4048                	lw	a0,4(s0)
+  44:	c509                	beqz	a0,4e <.L22>	44: R_RISCV_RVC_BRANCH	.L22
+  46:	00000097          	auipc	ra,0x0	46: R_RISCV_CALL_PLT	media_lib_free
+	46: R_RISCV_RELAX	*ABS*
+  4a:	000080e7          	jalr	ra # 46 <.L23+0x4>
+
+0000004e <.L22>:
+  4e:	4408                	lw	a0,8(s0)
+  50:	c509                	beqz	a0,5a <.L34>	50: R_RISCV_RVC_BRANCH	.L34
+  52:	00000097          	auipc	ra,0x0	52: R_RISCV_CALL_PLT	media_lib_free
+	52: R_RISCV_RELAX	*ABS*
+  56:	000080e7          	jalr	ra # 52 <.L22+0x4>
+
+0000005a <.L34>:
+  5a:	00042023          	sw	zero,0(s0)
+  5e:	00042223          	sw	zero,4(s0)
+  62:	00042423          	sw	zero,8(s0)
+  66:	00042623          	sw	zero,12(s0)
+  6a:	00042823          	sw	zero,16(s0)
+  6e:	00042a23          	sw	zero,20(s0)
+  72:	00042c23          	sw	zero,24(s0)
+  76:	4505                	li	a0,1
+
+00000078 <.L19>:
+  78:	50b2                	lw	ra,44(sp)
+  7a:	5422                	lw	s0,40(sp)
+  7c:	49f2                	lw	s3,28(sp)
+  7e:	4a62                	lw	s4,24(sp)
+  80:	6145                	addi	sp,sp,48
+  82:	8082                	ret
+
+00000084 <.L20>:
+  84:	45e1                	li	a1,24
+  86:	854e                	mv	a0,s3
+  88:	00000097          	auipc	ra,0x0	88: R_RISCV_CALL_PLT	tremor_oggpack_read
+	88: R_RISCV_RELAX	*ABS*
+  8c:	000080e7          	jalr	ra # 88 <.L20+0x4>
+  90:	c448                	sw	a0,12(s0)
+  92:	45e1                	li	a1,24
+  94:	854e                	mv	a0,s3
+  96:	00000097          	auipc	ra,0x0	96: R_RISCV_CALL_PLT	tremor_oggpack_read
+	96: R_RISCV_RELAX	*ABS*
+  9a:	000080e7          	jalr	ra # 96 <.L20+0x12>
+  9e:	c808                	sw	a0,16(s0)
+  a0:	45e1                	li	a1,24
+  a2:	854e                	mv	a0,s3
+  a4:	00000097          	auipc	ra,0x0	a4: R_RISCV_CALL_PLT	tremor_oggpack_read
+	a4: R_RISCV_RELAX	*ABS*
+  a8:	000080e7          	jalr	ra # a4 <.L20+0x20>
+  ac:	0505                	addi	a0,a0,1
+  ae:	c848                	sw	a0,20(s0)
+  b0:	4599                	li	a1,6
+  b2:	854e                	mv	a0,s3
+  b4:	00000097          	auipc	ra,0x0	b4: R_RISCV_CALL_PLT	tremor_oggpack_read
+	b4: R_RISCV_RELAX	*ABS*
+  b8:	000080e7          	jalr	ra # b4 <.L20+0x30>
+  bc:	0505                	addi	a0,a0,1
+  be:	00a40c23          	sb	a0,24(s0)
+  c2:	45a1                	li	a1,8
+  c4:	854e                	mv	a0,s3
+  c6:	00000097          	auipc	ra,0x0	c6: R_RISCV_CALL_PLT	tremor_oggpack_read
+	c6: R_RISCV_RELAX	*ABS*
+  ca:	000080e7          	jalr	ra # c6 <.L20+0x42>
+  ce:	00a40ca3          	sb	a0,25(s0)
+  d2:	018a2783          	lw	a5,24(s4)
+  d6:	0ff57513          	zext.b	a0,a0
+  da:	f6f554e3          	bge	a0,a5,42 <.L23>	da: R_RISCV_BRANCH	.L23
+  de:	01844603          	lbu	a2,24(s0)
+  e2:	10060f63          	beqz	a2,200 <.L53>	e2: R_RISCV_BRANCH	.L53
+  e6:	d226                	sw	s1,36(sp)
+  e8:	000004b7          	lui	s1,0x0	e8: R_RISCV_HI20	.LC0
+	e8: R_RISCV_RELAX	*ABS*
+  ec:	00048513          	mv	a0,s1	ec: R_RISCV_LO12_I	.LC0
+	ec: R_RISCV_RELAX	*ABS*
+  f0:	4585                	li	a1,1
+  f2:	d04a                	sw	s2,32(sp)
+  f4:	ca56                	sw	s5,20(sp)
+  f6:	c85a                	sw	s6,16(sp)
+  f8:	c65e                	sw	s7,12(sp)
+  fa:	c462                	sw	s8,8(sp)
+  fc:	00000097          	auipc	ra,0x0	fc: R_RISCV_CALL_PLT	media_lib_module_calloc
+	fc: R_RISCV_RELAX	*ABS*
+ 100:	000080e7          	jalr	ra # fc <.L20+0x78>
+ 104:	01844603          	lbu	a2,24(s0)
+ 108:	c048                	sw	a0,4(s0)
+ 10a:	10060e63          	beqz	a2,226 <.L54>	10a: R_RISCV_BRANCH	.L54
+ 10e:	060e                	slli	a2,a2,0x3
+ 110:	00048513          	mv	a0,s1	110: R_RISCV_LO12_I	.LC0
+	110: R_RISCV_RELAX	*ABS*
+ 114:	4585                	li	a1,1
+ 116:	00000097          	auipc	ra,0x0	116: R_RISCV_CALL_PLT	media_lib_module_calloc
+	116: R_RISCV_RELAX	*ABS*
+ 11a:	000080e7          	jalr	ra # 116 <.L20+0x92>
+ 11e:	01844783          	lbu	a5,24(s0)
+ 122:	c408                	sw	a0,8(s0)
+ 124:	c7f9                	beqz	a5,1f2 <.L52>	124: R_RISCV_RVC_BRANCH	.L52
+ 126:	4901                	li	s2,0
+ 128:	a811                	j	13c <.L28>	128: R_RISCV_RVC_JUMP	.L28
+
+0000012a <.L27>:
+ 12a:	405c                	lw	a5,4(s0)
+ 12c:	97ca                	add	a5,a5,s2
+ 12e:	00978023          	sb	s1,0(a5)
+ 132:	01844783          	lbu	a5,24(s0)
+ 136:	0905                	addi	s2,s2,1
+ 138:	04f95163          	bge	s2,a5,17a <.L55>	138: R_RISCV_BRANCH	.L55
+
+0000013c <.L28>:
+ 13c:	458d                	li	a1,3
+ 13e:	854e                	mv	a0,s3
+ 140:	00000097          	auipc	ra,0x0	140: R_RISCV_CALL_PLT	tremor_oggpack_read
+	140: R_RISCV_RELAX	*ABS*
+ 144:	000080e7          	jalr	ra # 140 <.L28+0x4>
+ 148:	84aa                	mv	s1,a0
+ 14a:	4585                	li	a1,1
+ 14c:	854e                	mv	a0,s3
+ 14e:	00000097          	auipc	ra,0x0	14e: R_RISCV_CALL_PLT	tremor_oggpack_read
+	14e: R_RISCV_RELAX	*ABS*
+ 152:	000080e7          	jalr	ra # 14e <.L28+0x12>
+ 156:	d971                	beqz	a0,12a <.L27>	156: R_RISCV_RVC_BRANCH	.L27
+ 158:	4595                	li	a1,5
+ 15a:	854e                	mv	a0,s3
+ 15c:	00000097          	auipc	ra,0x0	15c: R_RISCV_CALL_PLT	tremor_oggpack_read
+	15c: R_RISCV_RELAX	*ABS*
+ 160:	000080e7          	jalr	ra # 15c <.L28+0x20>
+ 164:	405c                	lw	a5,4(s0)
+ 166:	050e                	slli	a0,a0,0x3
+ 168:	8cc9                	or	s1,s1,a0
+ 16a:	97ca                	add	a5,a5,s2
+ 16c:	00978023          	sb	s1,0(a5)
+ 170:	01844783          	lbu	a5,24(s0)
+ 174:	0905                	addi	s2,s2,1
+ 176:	fcf943e3          	blt	s2,a5,13c <.L28>	176: R_RISCV_BRANCH	.L28
+
+0000017a <.L55>:
+ 17a:	4a81                	li	s5,0
+ 17c:	4b01                	li	s6,0
+ 17e:	5c7d                	li	s8,-1
+ 180:	4ba1                	li	s7,8
+ 182:	cba5                	beqz	a5,1f2 <.L52>	182: R_RISCV_RVC_BRANCH	.L52
+
+00000184 <.L29>:
+ 184:	8956                	mv	s2,s5
+ 186:	4481                	li	s1,0
+ 188:	a809                	j	19a <.L32>	188: R_RISCV_RVC_JUMP	.L32
+
+0000018a <.L30>:
+ 18a:	441c                	lw	a5,8(s0)
+ 18c:	97ca                	add	a5,a5,s2
+ 18e:	01878023          	sb	s8,0(a5)
+
+00000192 <.L31>:
+ 192:	0905                	addi	s2,s2,1
+ 194:	84ba                	mv	s1,a4
+ 196:	05770863          	beq	a4,s7,1e6 <.L56>	196: R_RISCV_BRANCH	.L56
+
+0000019a <.L32>:
+ 19a:	405c                	lw	a5,4(s0)
+ 19c:	00148713          	addi	a4,s1,1 # 1 <res_unpack+0x1>
+ 1a0:	97da                	add	a5,a5,s6
+ 1a2:	0007c783          	lbu	a5,0(a5)
+ 1a6:	4097d7b3          	sra	a5,a5,s1
+ 1aa:	8b85                	andi	a5,a5,1
+ 1ac:	dff9                	beqz	a5,18a <.L30>	1ac: R_RISCV_RVC_BRANCH	.L30
+ 1ae:	45a1                	li	a1,8
+ 1b0:	854e                	mv	a0,s3
+ 1b2:	00000097          	auipc	ra,0x0	1b2: R_RISCV_CALL_PLT	tremor_oggpack_read
+	1b2: R_RISCV_RELAX	*ABS*
+ 1b6:	000080e7          	jalr	ra # 1b2 <.L32+0x18>
+ 1ba:	018a2683          	lw	a3,24(s4)
+ 1be:	0ff57793          	zext.b	a5,a0
+ 1c2:	00148713          	addi	a4,s1,1
+ 1c6:	04d7d963          	bge	a5,a3,218 <.L51>	1c6: R_RISCV_BRANCH	.L51
+ 1ca:	441c                	lw	a5,8(s0)
+ 1cc:	97ca                	add	a5,a5,s2
+ 1ce:	00a78023          	sb	a0,0(a5)
+ 1d2:	01a44783          	lbu	a5,26(s0)
+ 1d6:	faf4cee3          	blt	s1,a5,192 <.L31>	1d6: R_RISCV_BRANCH	.L31
+ 1da:	00e40d23          	sb	a4,26(s0)
+ 1de:	0905                	addi	s2,s2,1
+ 1e0:	84ba                	mv	s1,a4
+ 1e2:	fb771ce3          	bne	a4,s7,19a <.L32>	1e2: R_RISCV_BRANCH	.L32
+
+000001e6 <.L56>:
+ 1e6:	01844783          	lbu	a5,24(s0)
+ 1ea:	0b05                	addi	s6,s6,1
+ 1ec:	0aa1                	addi	s5,s5,8
+ 1ee:	f8fb4be3          	blt	s6,a5,184 <.L29>	1ee: R_RISCV_BRANCH	.L29
+
+000001f2 <.L52>:
+ 1f2:	5492                	lw	s1,36(sp)
+ 1f4:	5902                	lw	s2,32(sp)
+ 1f6:	4ad2                	lw	s5,20(sp)
+ 1f8:	4b42                	lw	s6,16(sp)
+ 1fa:	4bb2                	lw	s7,12(sp)
+ 1fc:	4c22                	lw	s8,8(sp)
+ 1fe:	a029                	j	208 <.L25>	1fe: R_RISCV_RVC_JUMP	.L25
+
+00000200 <.L53>:
+ 200:	00042223          	sw	zero,4(s0)
+ 204:	00042423          	sw	zero,8(s0)
+
+00000208 <.L25>:
+ 208:	854e                	mv	a0,s3
+ 20a:	00000097          	auipc	ra,0x0	20a: R_RISCV_CALL_PLT	tremor_oggpack_eop
+	20a: R_RISCV_RELAX	*ABS*
+ 20e:	000080e7          	jalr	ra # 20a <.L25+0x2>
+ 212:	e60503e3          	beqz	a0,78 <.L19>	212: R_RISCV_BRANCH	.L19
+ 216:	b535                	j	42 <.L23>	216: R_RISCV_RVC_JUMP	.L23
+
+00000218 <.L51>:
+ 218:	5492                	lw	s1,36(sp)
+ 21a:	5902                	lw	s2,32(sp)
+ 21c:	4ad2                	lw	s5,20(sp)
+ 21e:	4b42                	lw	s6,16(sp)
+ 220:	4bb2                	lw	s7,12(sp)
+ 222:	4c22                	lw	s8,8(sp)
+ 224:	bd39                	j	42 <.L23>	224: R_RISCV_RVC_JUMP	.L23
+
+00000226 <.L54>:
+ 226:	00042423          	sw	zero,8(s0)
+ 22a:	b7e1                	j	1f2 <.L52>	22a: R_RISCV_RVC_JUMP	.L52
+

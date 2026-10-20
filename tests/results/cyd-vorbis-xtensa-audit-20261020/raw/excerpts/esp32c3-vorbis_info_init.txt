@@ -1,0 +1,31 @@
+tool-output/esp32c3-libesp_audio_codec-642-info.c.obj-disasm.txt:288
+Disassembly of section .text.vorbis_info_init:
+
+00000000 <vorbis_info_init>:
+   0:	1141                	addi	sp,sp,-16
+   2:	c422                	sw	s0,8(sp)
+   4:	c606                	sw	ra,12(sp)
+   6:	842a                	mv	s0,a0
+   8:	00000537          	lui	a0,0x0	8: R_RISCV_HI20	.LC0
+	8: R_RISCV_RELAX	*ABS*
+   c:	00042023          	sw	zero,0(s0)
+  10:	00042223          	sw	zero,4(s0)
+  14:	00042423          	sw	zero,8(s0)
+  18:	00042623          	sw	zero,12(s0)
+  1c:	00042823          	sw	zero,16(s0)
+  20:	00042a23          	sw	zero,20(s0)
+  24:	00042c23          	sw	zero,24(s0)
+  28:	00042e23          	sw	zero,28(s0)
+  2c:	00050513          	mv	a0,a0	2c: R_RISCV_LO12_I	.LC0
+	2c: R_RISCV_RELAX	*ABS*
+  30:	03400613          	li	a2,52
+  34:	4585                	li	a1,1
+  36:	00000097          	auipc	ra,0x0	36: R_RISCV_CALL_PLT	media_lib_module_calloc
+	36: R_RISCV_RELAX	*ABS*
+  3a:	000080e7          	jalr	ra # 36 <vorbis_info_init+0x36>
+  3e:	40b2                	lw	ra,12(sp)
+  40:	cc48                	sw	a0,28(s0)
+  42:	4422                	lw	s0,8(sp)
+  44:	0141                	addi	sp,sp,16
+  46:	8082                	ret
+

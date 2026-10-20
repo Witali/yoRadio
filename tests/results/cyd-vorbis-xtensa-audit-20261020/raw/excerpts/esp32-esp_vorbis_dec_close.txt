@@ -1,0 +1,28 @@
+tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:230
+Disassembly of section .text.esp_vorbis_dec_close:
+
+00000000 <esp_vorbis_dec_close>:
+   0:	004136        	entry	a1, 32
+   3:	52ac      	beqz.n	a2, 2c <esp_vorbis_dec_close+0x2c>	3: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_close+0x2c
+   5:	02a8      	l32i.n	a10, a2, 0
+   7:	9a9c      	beqz.n	a10, 24 <esp_vorbis_dec_close+0x24>	7: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_close+0x24
+   9:	002a72        	l32i	a7, a10, 0
+   c:	000081        	l32r	a8, fffc000c <esp_vorbis_dec_close+0xfffc000c>	c: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_close
+	c: R_XTENSA_ASM_EXPAND	vorbis_dsp_destroy
+   f:	0008e0        	callx8	a8
+  12:	e78c      	beqz.n	a7, 24 <esp_vorbis_dec_close+0x24>	12: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_close+0x24
+  14:	07ad      	mov.n	a10, a7
+  16:	000081        	l32r	a8, fffc0018 <esp_vorbis_dec_close+0xfffc0018>	16: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_close+0x4
+	16: R_XTENSA_ASM_EXPAND	vorbis_info_clear
+  19:	0008e0        	callx8	a8
+  1c:	07ad      	mov.n	a10, a7
+  1e:	000081        	l32r	a8, fffc0020 <esp_vorbis_dec_close+0xfffc0020>	1e: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_close+0x8
+	1e: R_XTENSA_ASM_EXPAND	media_lib_free
+  21:	0008e0        	callx8	a8
+  24:	02ad      	mov.n	a10, a2
+  26:	000081        	l32r	a8, fffc0028 <esp_vorbis_dec_close+0xfffc0028>	26: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_close+0xc
+	26: R_XTENSA_ASM_EXPAND	media_lib_free
+  29:	0008e0        	callx8	a8
+  2c:	020c      	movi.n	a2, 0
+  2e:	f01d      	retw.n
+

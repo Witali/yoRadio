@@ -1,0 +1,643 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-xtensa-audit-01\members\esp32\644-mapping0.c.obj:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.mapping_clear_info:
+
+00000000 <.literal.mapping_clear_info>:
+	...
+	0: R_XTENSA_32	media_lib_free
+	4: R_XTENSA_32	media_lib_free
+	8: R_XTENSA_32	media_lib_free
+	c: R_XTENSA_32	memset
+
+Disassembly of section .literal.mapping_info_unpack:
+
+00000000 <.literal.mapping_info_unpack>:
+	...
+	0: R_XTENSA_32	.rodata.mapping_info_unpack.str1.4
+	4: R_XTENSA_32	memset
+	8: R_XTENSA_32	tremor_oggpack_read
+	c: R_XTENSA_32	tremor_oggpack_read
+	10: R_XTENSA_32	tremor_oggpack_read
+	14: R_XTENSA_32	tremor_oggpack_read
+	18: R_XTENSA_32	tremor_oggpack_read
+	1c: R_XTENSA_32	media_lib_module_calloc
+	20: R_XTENSA_32	tremor_oggpack_read
+	24: R_XTENSA_32	tremor_oggpack_read
+	28: R_XTENSA_32	media_lib_module_calloc
+	2c: R_XTENSA_32	tremor_oggpack_read
+	30: R_XTENSA_32	media_lib_module_calloc
+	34: R_XTENSA_32	tremor_oggpack_read
+	38: R_XTENSA_32	tremor_oggpack_read
+	3c: R_XTENSA_32	tremor_oggpack_read
+	40: R_XTENSA_32	mapping_clear_info
+
+Disassembly of section .literal.mapping_inverse:
+
+00000000 <.literal.mapping_inverse>:
+	...
+	0: R_XTENSA_32	floor1_memosize
+	4: R_XTENSA_32	floor1_inverse1
+	8: R_XTENSA_32	floor0_memosize
+	c: R_XTENSA_32	floor0_inverse1
+	10: R_XTENSA_32	memset
+	14: R_XTENSA_32	res_inverse
+	18: R_XTENSA_32	floor1_inverse2
+	1c: R_XTENSA_32	floor0_inverse2
+	20: R_XTENSA_32	mdct_backward
+
+Disassembly of section .text.mapping_clear_info:
+
+00000000 <mapping_clear_info>:
+   0:	004136        	entry	a1, 32
+   3:	92ac      	beqz.n	a2, 30 <mapping_clear_info+0x30>	3: R_XTENSA_SLOT0_OP	.text.mapping_clear_info+0x30
+   5:	0122a2        	l32i	a10, a2, 4
+   8:	4a8c      	beqz.n	a10, 10 <mapping_clear_info+0x10>	8: R_XTENSA_SLOT0_OP	.text.mapping_clear_info+0x10
+   a:	000081        	l32r	a8, fffc000c <mapping_clear_info+0xfffc000c>	a: R_XTENSA_SLOT0_OP	.literal.mapping_clear_info
+	a: R_XTENSA_ASM_EXPAND	media_lib_free
+   d:	0008e0        	callx8	a8
+  10:	22a8      	l32i.n	a10, a2, 8
+  12:	4a8c      	beqz.n	a10, 1a <mapping_clear_info+0x1a>	12: R_XTENSA_SLOT0_OP	.text.mapping_clear_info+0x1a
+  14:	000081        	l32r	a8, fffc0014 <mapping_clear_info+0xfffc0014>	14: R_XTENSA_SLOT0_OP	.literal.mapping_clear_info+0x4
+	14: R_XTENSA_ASM_EXPAND	media_lib_free
+  17:	0008e0        	callx8	a8
+  1a:	42a8      	l32i.n	a10, a2, 16
+  1c:	4a8c      	beqz.n	a10, 24 <mapping_clear_info+0x24>	1c: R_XTENSA_SLOT0_OP	.text.mapping_clear_info+0x24
+  1e:	000081        	l32r	a8, fffc0020 <mapping_clear_info+0xfffc0020>	1e: R_XTENSA_SLOT0_OP	.literal.mapping_clear_info+0x8
+	1e: R_XTENSA_ASM_EXPAND	media_lib_free
+  21:	0008e0        	callx8	a8
+  24:	4c1c      	movi.n	a12, 20
+  26:	0b0c      	movi.n	a11, 0
+  28:	02ad      	mov.n	a10, a2
+  2a:	000081        	l32r	a8, fffc002c <mapping_clear_info+0xfffc002c>	2a: R_XTENSA_SLOT0_OP	.literal.mapping_clear_info+0xc
+	2a: R_XTENSA_ASM_EXPAND	memset
+  2d:	0008e0        	callx8	a8
+  30:	f01d      	retw.n
+
+Disassembly of section .text.mapping_info_unpack:
+
+00000000 <mapping_info_unpack>:
+   0:	006136        	entry	a1, 48
+   3:	4c1c      	movi.n	a12, 20
+   5:	0b0c      	movi.n	a11, 0
+   7:	02ad      	mov.n	a10, a2
+   9:	072372        	l32i	a7, a3, 28
+   c:	000081        	l32r	a8, fffc000c <mapping_info_unpack+0xfffc000c>	c: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x4
+	c: R_XTENSA_ASM_EXPAND	memset
+   f:	0008e0        	callx8	a8
+  12:	1b0c      	movi.n	a11, 1
+  14:	04ad      	mov.n	a10, a4
+  16:	000081        	l32r	a8, fffc0018 <mapping_info_unpack+0xfffc0018>	16: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x8
+	16: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  19:	0008e0        	callx8	a8
+  1c:	026d      	mov.n	a6, a2
+  1e:	180c      	movi.n	a8, 1
+  20:	aa8c      	beqz.n	a10, 2e <mapping_info_unpack+0x2e>	20: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x2e
+  22:	4b0c      	movi.n	a11, 4
+  24:	04ad      	mov.n	a10, a4
+  26:	000081        	l32r	a8, fffc0028 <mapping_info_unpack+0xfffc0028>	26: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0xc
+	26: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  29:	0008e0        	callx8	a8
+  2c:	8a1b      	addi.n	a8, a10, 1
+  2e:	0689      	s32i.n	a8, a6, 0
+  30:	1b0c      	movi.n	a11, 1
+  32:	04ad      	mov.n	a10, a4
+  34:	000081        	l32r	a8, fffc0034 <mapping_info_unpack+0xfffc0034>	34: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x10
+	34: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  37:	0008e0        	callx8	a8
+  3a:	2adc      	bnez.n	a10, 50 <mapping_info_unpack+0x50>	3a: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x50
+  3c:	2b0c      	movi.n	a11, 2
+  3e:	04ad      	mov.n	a10, a4
+  40:	000081        	l32r	a8, fffc0040 <mapping_info_unpack+0xfffc0040>	40: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x14
+	40: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  43:	0008e0        	callx8	a8
+  46:	021ae6        	bgei	a10, 1, 4c <mapping_info_unpack+0x4c>	46: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x4c
+  49:	0029c6        	j	f4 <mapping_info_unpack+0xf4>	49: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0xf4
+  4c:	005b06        	j	1bc <mapping_info_unpack+0x1bc>	4c: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1bc
+  4f:	00          	.byte	00
+  50:	8b0c      	movi.n	a11, 8
+  52:	04ad      	mov.n	a10, a4
+  54:	000081        	l32r	a8, fffc0054 <mapping_info_unpack+0xfffc0054>	54: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x18
+	54: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  57:	0008e0        	callx8	a8
+  5a:	8a1b      	addi.n	a8, a10, 1
+  5c:	3689      	s32i.n	a8, a6, 12
+  5e:	c88a      	add.n	a12, a8, a8
+  60:	0a0c      	movi.n	a10, 0
+  62:	0c1ca6        	blti	a12, 1, 72 <mapping_info_unpack+0x72>	62: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x72
+  65:	0000a1        	l32r	a10, fffc0068 <mapping_info_unpack+0xfffc0068>	65: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack
+  68:	1b0c      	movi.n	a11, 1
+  6a:	000081        	l32r	a8, fffc006c <mapping_info_unpack+0xfffc006c>	6a: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x1c
+	6a: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  6d:	0008e0        	callx8	a8
+  70:	3688      	l32i.n	a8, a6, 12
+  72:	46a9      	s32i.n	a10, a6, 16
+  74:	c418a6        	blti	a8, 1, 3c <mapping_info_unpack+0x3c>	74: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x3c
+  77:	050c      	movi.n	a5, 0
+  79:	13b8      	l32i.n	a11, a3, 4
+  7b:	052d      	mov.n	a2, a5
+  7d:	180c      	movi.n	a8, 1
+  7f:	8382b0        	moveqz	a8, a2, a11
+  82:	c0bb80        	sub	a11, a11, a8
+  85:	40fb80        	nsau	a8, a11
+  88:	e0c882        	addi	a8, a8, -32
+  8b:	608080        	neg	a8, a8
+  8e:	93b8b0        	movnez	a11, a8, a11
+  91:	04ad      	mov.n	a10, a4
+  93:	000081        	l32r	a8, fffc0094 <mapping_info_unpack+0xfffc0094>	93: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x20
+	93: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  96:	0008e0        	callx8	a8
+  99:	4698      	l32i.n	a9, a6, 16
+  9b:	0a8d      	mov.n	a8, a10
+  9d:	909590        	addx2	a9, a5, a9
+  a0:	0049a2        	s8i	a10, a9, 0
+  a3:	13b8      	l32i.n	a11, a3, 4
+  a5:	190c      	movi.n	a9, 1
+  a7:	8392b0        	moveqz	a9, a2, a11
+  aa:	c0bb90        	sub	a11, a11, a9
+  ad:	40fb90        	nsau	a9, a11
+  b0:	e0c992        	addi	a9, a9, -32
+  b3:	609090        	neg	a9, a9
+  b6:	c55a      	add.n	a12, a5, a5
+  b8:	748080        	extui	a8, a8, 0, 8
+  bb:	93b9b0        	movnez	a11, a9, a11
+  be:	04ad      	mov.n	a10, a4
+  c0:	11c9      	s32i.n	a12, a1, 4
+  c2:	0189      	s32i.n	a8, a1, 0
+  c4:	000081        	l32r	a8, fffc00c4 <mapping_info_unpack+0xfffc00c4>	c4: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x24
+	c4: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  c7:	0008e0        	callx8	a8
+  ca:	4698      	l32i.n	a9, a6, 16
+  cc:	11c8      	l32i.n	a12, a1, 4
+  ce:	0188      	l32i.n	a8, a1, 0
+  d0:	99ca      	add.n	a9, a9, a12
+  d2:	0149a2        	s8i	a10, a9, 1
+  d5:	74a0a0        	extui	a10, a10, 0, 8
+  d8:	539a80        	max	a9, a10, a8
+  db:	551b      	addi.n	a5, a5, 1
+  dd:	029a87        	bne	a10, a8, e3 <mapping_info_unpack+0xe3>	dd: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0xe3
+  e0:	003606        	j	1bc <mapping_info_unpack+0x1bc>	e0: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1bc
+  e3:	13b8      	l32i.n	a11, a3, 4
+  e5:	0229b7        	blt	a9, a11, eb <mapping_info_unpack+0xeb>	e5: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0xeb
+  e8:	003406        	j	1bc <mapping_info_unpack+0x1bc>	e8: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1bc
+  eb:	3688      	l32i.n	a8, a6, 12
+  ed:	8c2587        	blt	a5, a8, 7d <mapping_info_unpack+0x7d>	ed: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x7d
+  f0:	ffd206        	j	3c <mapping_info_unpack+0x3c>	f0: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x3c
+  f3:	00          	.byte	00
+  f4:	0688      	l32i.n	a8, a6, 0
+  f6:	089d      	mov.n	a9, a8
+  f8:	5228a6        	blti	a8, 2, 14e <mapping_info_unpack+0x14e>	f8: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x14e
+  fb:	13c8      	l32i.n	a12, a3, 4
+  fd:	071ce6        	bgei	a12, 1, 108 <mapping_info_unpack+0x108>	fd: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x108
+ 100:	090c      	movi.n	a9, 0
+ 102:	1699      	s32i.n	a9, a6, 4
+ 104:	000606        	j	120 <mapping_info_unpack+0x120>	104: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x120
+ 107:	00          	.byte	00
+ 108:	000021        	l32r	a2, fffc0108 <mapping_info_unpack+0xfffc0108>	108: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack
+ 10b:	1b0c      	movi.n	a11, 1
+ 10d:	02ad      	mov.n	a10, a2
+ 10f:	000081        	l32r	a8, fffc0110 <mapping_info_unpack+0xfffc0110>	10f: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x28
+	10f: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+ 112:	0008e0        	callx8	a8
+ 115:	1388      	l32i.n	a8, a3, 4
+ 117:	16a9      	s32i.n	a10, a6, 4
+ 119:	050c      	movi.n	a5, 0
+ 11b:	0718e6        	bgei	a8, 1, 126 <mapping_info_unpack+0x126>	11b: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x126
+ 11e:	0688      	l32i.n	a8, a6, 0
+ 120:	089d      	mov.n	a9, a8
+ 122:	000a06        	j	14e <mapping_info_unpack+0x14e>	122: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x14e
+ 125:	00          	.byte	00
+ 126:	4b0c      	movi.n	a11, 4
+ 128:	04ad      	mov.n	a10, a4
+ 12a:	000081        	l32r	a8, fffc012c <mapping_info_unpack+0xfffc012c>	12a: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x2c
+	12a: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 12d:	0008e0        	callx8	a8
+ 130:	1688      	l32i.n	a8, a6, 4
+ 132:	885a      	add.n	a8, a8, a5
+ 134:	0048a2        	s8i	a10, a8, 0
+ 137:	1688      	l32i.n	a8, a6, 4
+ 139:	06c8      	l32i.n	a12, a6, 0
+ 13b:	885a      	add.n	a8, a8, a5
+ 13d:	000882        	l8ui	a8, a8, 0
+ 140:	551b      	addi.n	a5, a5, 1
+ 142:	76a8c7        	bge	a8, a12, 1bc <mapping_info_unpack+0x1bc>	142: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1bc
+ 145:	1388      	l32i.n	a8, a3, 4
+ 147:	db2587        	blt	a5, a8, 126 <mapping_info_unpack+0x126>	147: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x126
+ 14a:	002086        	j	1d0 <mapping_info_unpack+0x1d0>	14a: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1d0
+ 14d:	00          	.byte	00
+ 14e:	c88a      	add.n	a12, a8, a8
+ 150:	0a0c      	movi.n	a10, 0
+ 152:	0e1ca6        	blti	a12, 1, 164 <mapping_info_unpack+0x164>	152: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x164
+ 155:	000021        	l32r	a2, fffc0158 <mapping_info_unpack+0xfffc0158>	155: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack
+ 158:	1b0c      	movi.n	a11, 1
+ 15a:	02ad      	mov.n	a10, a2
+ 15c:	000081        	l32r	a8, fffc015c <mapping_info_unpack+0xfffc015c>	15c: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x30
+	15c: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+ 15f:	0008e0        	callx8	a8
+ 162:	0698      	l32i.n	a9, a6, 0
+ 164:	26a9      	s32i.n	a10, a6, 8
+ 166:	0419e6        	bgei	a9, 1, 16e <mapping_info_unpack+0x16e>	166: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x16e
+ 169:	020c      	movi.n	a2, 0
+ 16b:	001a46        	j	1d8 <mapping_info_unpack+0x1d8>	16b: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1d8
+ 16e:	050c      	movi.n	a5, 0
+ 170:	8b0c      	movi.n	a11, 8
+ 172:	04ad      	mov.n	a10, a4
+ 174:	000081        	l32r	a8, fffc0174 <mapping_info_unpack+0xfffc0174>	174: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x34
+	174: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 177:	0008e0        	callx8	a8
+ 17a:	8b0c      	movi.n	a11, 8
+ 17c:	04ad      	mov.n	a10, a4
+ 17e:	000081        	l32r	a8, fffc0180 <mapping_info_unpack+0xfffc0180>	17e: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x38
+	17e: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 181:	0008e0        	callx8	a8
+ 184:	2698      	l32i.n	a9, a6, 8
+ 186:	0a8d      	mov.n	a8, a10
+ 188:	909590        	addx2	a9, a5, a9
+ 18b:	004982        	s8i	a8, a9, 0
+ 18e:	4798      	l32i.n	a9, a7, 16
+ 190:	748080        	extui	a8, a8, 0, 8
+ 193:	8b0c      	movi.n	a11, 8
+ 195:	04ad      	mov.n	a10, a4
+ 197:	355a      	add.n	a3, a5, a5
+ 199:	1fa897        	bge	a8, a9, 1bc <mapping_info_unpack+0x1bc>	199: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1bc
+ 19c:	000081        	l32r	a8, fffc019c <mapping_info_unpack+0xfffc019c>	19c: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x3c
+	19c: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 19f:	0008e0        	callx8	a8
+ 1a2:	2688      	l32i.n	a8, a6, 8
+ 1a4:	551b      	addi.n	a5, a5, 1
+ 1a6:	883a      	add.n	a8, a8, a3
+ 1a8:	0148a2        	s8i	a10, a8, 1
+ 1ab:	5788      	l32i.n	a8, a7, 20
+ 1ad:	74a0a0        	extui	a10, a10, 0, 8
+ 1b0:	08aa87        	bge	a10, a8, 1bc <mapping_info_unpack+0x1bc>	1b0: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1bc
+ 1b3:	0688      	l32i.n	a8, a6, 0
+ 1b5:	b72587        	blt	a5, a8, 170 <mapping_info_unpack+0x170>	1b5: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x170
+ 1b8:	ffeb46        	j	169 <mapping_info_unpack+0x169>	1b8: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x169
+ 1bb:	00          	.byte	00
+ 1bc:	06ad      	mov.n	a10, a6
+ 1be:	000081        	l32r	a8, fffc01c0 <mapping_info_unpack+0xfffc01c0>	1be: R_XTENSA_SLOT0_OP	.literal.mapping_info_unpack+0x40
+	1be: R_XTENSA_ASM_EXPAND	mapping_clear_info
+ 1c1:	0008e0        	callx8	a8
+ 1c4:	f27c      	movi.n	a2, -1
+ 1c6:	000386        	j	1d8 <mapping_info_unpack+0x1d8>	1c6: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1d8
+ 1c9:	080c      	movi.n	a8, 0
+ 1cb:	2689      	s32i.n	a8, a6, 8
+ 1cd:	ffe746        	j	16e <mapping_info_unpack+0x16e>	1cd: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x16e
+ 1d0:	ccca      	add.n	a12, a12, a12
+ 1d2:	821ce6        	bgei	a12, 1, 158 <mapping_info_unpack+0x158>	1d2: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x158
+ 1d5:	fffc06        	j	1c9 <mapping_info_unpack+0x1c9>	1d5: R_XTENSA_SLOT0_OP	.text.mapping_info_unpack+0x1c9
+ 1d8:	f01d      	retw.n
+
+Disassembly of section .text.mapping_inverse:
+
+00000000 <mapping_inverse>:
+   0:	00a136        	entry	a1, 80
+   3:	0248      	l32i.n	a4, a2, 0
+   5:	c2a8      	l32i.n	a10, a2, 48
+   7:	1498      	l32i.n	a9, a4, 4
+   9:	7468      	l32i.n	a6, a4, 28
+   b:	1189e0        	slli	a8, a9, 2
+   e:	88fb      	addi.n	a8, a8, 15
+  10:	418480        	srli	a8, a8, 4
+  13:	1188c0        	slli	a8, a8, 4
+  16:	a0aa60        	addx4	a10, a10, a6
+  19:	0aa8      	l32i.n	a10, a10, 0
+  1b:	c0b180        	sub	a11, a1, a8
+  1e:	017d      	mov.n	a7, a1
+  20:	001b10        	movsp	a1, a11
+  23:	1719      	s32i.n	a1, a7, 4
+  25:	77a9      	s32i.n	a10, a7, 28
+  27:	c0a180        	sub	a10, a1, a8
+  2a:	001a10        	movsp	a1, a10
+  2d:	c0a180        	sub	a10, a1, a8
+  30:	9719      	s32i.n	a1, a7, 36
+  32:	001a10        	movsp	a1, a10
+  35:	c08180        	sub	a8, a1, a8
+  38:	2719      	s32i.n	a1, a7, 8
+  3a:	001810        	movsp	a1, a8
+  3d:	8719      	s32i.n	a1, a7, 32
+  3f:	0b19e6        	bgei	a9, 1, 4e <mapping_inverse+0x4e>	3f: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x4e
+  42:	3388      	l32i.n	a8, a3, 12
+  44:	0218a6        	blti	a8, 1, 4a <mapping_inverse+0x4a>	44: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x4a
+  47:	003ec6        	j	146 <mapping_inverse+0x146>	47: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x146
+  4a:	003886        	j	130 <mapping_inverse+0x130>	4a: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x130
+  4d:	00          	.byte	00
+  4e:	7788      	l32i.n	a8, a7, 28
+  50:	050c      	movi.n	a5, 0
+  52:	1198e0        	slli	a9, a8, 2
+  55:	418190        	srli	a8, a9, 1
+  58:	4789      	s32i.n	a8, a7, 16
+  5a:	8798      	l32i.n	a9, a7, 32
+  5c:	2788      	l32i.n	a8, a7, 8
+  5e:	3749      	s32i.n	a4, a7, 12
+  60:	0729      	s32i.n	a2, a7, 0
+  62:	034d      	mov.n	a4, a3
+  64:	052d      	mov.n	a2, a5
+  66:	063d      	mov.n	a3, a6
+  68:	095d      	mov.n	a5, a9
+  6a:	206880        	or	a6, a8, a8
+  6d:	04a8      	l32i.n	a10, a4, 0
+  6f:	080c      	movi.n	a8, 0
+  71:	082aa6        	blti	a10, 2, 7d <mapping_inverse+0x7d>	71: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x7d
+  74:	1488      	l32i.n	a8, a4, 4
+  76:	882a      	add.n	a8, a8, a2
+  78:	000882        	l8ui	a8, a8, 0
+  7b:	888a      	add.n	a8, a8, a8
+  7d:	24a8      	l32i.n	a10, a4, 8
+  7f:	93b8      	l32i.n	a11, a3, 36
+  81:	8a8a      	add.n	a8, a10, a8
+  83:	000882        	l8ui	a8, a8, 0
+  86:	a3a8      	l32i.n	a10, a3, 40
+  88:	bb8a      	add.n	a11, a11, a8
+  8a:	a0a8a0        	addx4	a10, a8, a10
+  8d:	11f2e0        	slli	a15, a2, 2
+  90:	1188e0        	slli	a8, a8, 2
+  93:	000bb2        	l8ui	a11, a11, 0
+  96:	6789      	s32i.n	a8, a7, 24
+  98:	57f9      	s32i.n	a15, a7, 20
+  9a:	002aa2        	l32i	a10, a10, 0
+  9d:	cbac      	beqz.n	a11, cd <mapping_inverse+0xcd>	9d: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0xcd
+  9f:	000081        	l32r	a8, fffc00a0 <mapping_inverse+0xfffc00a0>	9f: R_XTENSA_SLOT0_OP	.literal.mapping_inverse
+	9f: R_XTENSA_ASM_EXPAND	floor1_memosize
+  a2:	0008e0        	callx8	a8
+  a5:	11aae0        	slli	a10, a10, 2
+  a8:	aafb      	addi.n	a10, a10, 15
+  aa:	41a4a0        	srli	a10, a10, 4
+  ad:	11aac0        	slli	a10, a10, 4
+  b0:	c081a0        	sub	a8, a1, a10
+  b3:	001810        	movsp	a1, a8
+  b6:	a3a8      	l32i.n	a10, a3, 40
+  b8:	6788      	l32i.n	a8, a7, 24
+  ba:	01cd      	mov.n	a12, a1
+  bc:	8a8a      	add.n	a8, a10, a8
+  be:	08b8      	l32i.n	a11, a8, 0
+  c0:	07a8      	l32i.n	a10, a7, 0
+  c2:	000081        	l32r	a8, fffc00c4 <mapping_inverse+0xfffc00c4>	c2: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0x4
+	c2: R_XTENSA_ASM_EXPAND	floor1_inverse1
+  c5:	0008e0        	callx8	a8
+  c8:	57f8      	l32i.n	a15, a7, 20
+  ca:	000a86        	j	f8 <mapping_inverse+0xf8>	ca: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0xf8
+  cd:	000081        	l32r	a8, fffc00d0 <mapping_inverse+0xfffc00d0>	cd: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0x8
+	cd: R_XTENSA_ASM_EXPAND	floor0_memosize
+  d0:	0008e0        	callx8	a8
+  d3:	11aae0        	slli	a10, a10, 2
+  d6:	aafb      	addi.n	a10, a10, 15
+  d8:	41a4a0        	srli	a10, a10, 4
+  db:	11aac0        	slli	a10, a10, 4
+  de:	c081a0        	sub	a8, a1, a10
+  e1:	001810        	movsp	a1, a8
+  e4:	a3a8      	l32i.n	a10, a3, 40
+  e6:	6788      	l32i.n	a8, a7, 24
+  e8:	01cd      	mov.n	a12, a1
+  ea:	8a8a      	add.n	a8, a10, a8
+  ec:	08b8      	l32i.n	a11, a8, 0
+  ee:	07a8      	l32i.n	a10, a7, 0
+  f0:	000081        	l32r	a8, fffc00f0 <mapping_inverse+0xfffc00f0>	f0: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0xc
+	f0: R_XTENSA_ASM_EXPAND	floor0_inverse1
+  f3:	0008e0        	callx8	a8
+  f6:	57f8      	l32i.n	a15, a7, 20
+  f8:	0788      	l32i.n	a8, a7, 0
+  fa:	190c      	movi.n	a9, 1
+  fc:	7888      	l32i.n	a8, a8, 28
+  fe:	0b0c      	movi.n	a11, 0
+ 100:	05a9      	s32i.n	a10, a5, 0
+ 102:	88fa      	add.n	a8, a8, a15
+ 104:	93b9a0        	movnez	a11, a9, a10
+ 107:	47c8      	l32i.n	a12, a7, 16
+ 109:	08a8      	l32i.n	a10, a8, 0
+ 10b:	06b9      	s32i.n	a11, a6, 0
+ 10d:	0b0c      	movi.n	a11, 0
+ 10f:	000081        	l32r	a8, fffc0110 <mapping_inverse+0xfffc0110>	10f: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0x10
+	10f: R_XTENSA_ASM_EXPAND	memset
+ 112:	0008e0        	callx8	a8
+ 115:	3788      	l32i.n	a8, a7, 12
+ 117:	221b      	addi.n	a2, a2, 1
+ 119:	1888      	l32i.n	a8, a8, 4
+ 11b:	664b      	addi.n	a6, a6, 4
+ 11d:	554b      	addi.n	a5, a5, 4
+ 11f:	02a287        	bge	a2, a8, 125 <mapping_inverse+0x125>	11f: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x125
+ 122:	ffd1c6        	j	6d <mapping_inverse+0x6d>	122: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x6d
+ 125:	036d      	mov.n	a6, a3
+ 127:	0728      	l32i.n	a2, a7, 0
+ 129:	043d      	mov.n	a3, a4
+ 12b:	3748      	l32i.n	a4, a7, 12
+ 12d:	ffc446        	j	42 <mapping_inverse+0x42>	12d: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x42
+ 130:	0388      	l32i.n	a8, a3, 0
+ 132:	0218a6        	blti	a8, 1, 138 <mapping_inverse+0x138>	132: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x138
+ 135:	003446        	j	20a <mapping_inverse+0x20a>	135: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x20a
+ 138:	003846        	j	21d <mapping_inverse+0x21d>	138: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x21d
+ 13b:	0388      	l32i.n	a8, a3, 0
+ 13d:	0218a6        	blti	a8, 1, 143 <mapping_inverse+0x143>	13d: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x143
+ 140:	003186        	j	20a <mapping_inverse+0x20a>	140: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x20a
+ 143:	003946        	j	22c <mapping_inverse+0x22c>	143: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x22c
+ 146:	b88a      	add.n	a11, a8, a8
+ 148:	43f8      	l32i.n	a15, a3, 16
+ 14a:	fecbb2        	addi	a11, a11, -2
+ 14d:	41b1b0        	srli	a11, a11, 1
+ 150:	1c0c      	movi.n	a12, 1
+ 152:	27d8      	l32i.n	a13, a7, 8
+ 154:	0fad      	mov.n	a10, a15
+ 156:	e88a      	add.n	a14, a8, a8
+ 158:	bbca      	add.n	a11, a11, a12
+ 15a:	198b76        	loop	a11, 177 <mapping_inverse+0x177>	15a: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x177
+ 15d:	000a82        	l8ui	a8, a10, 0
+ 160:	010a92        	l8ui	a9, a10, 1
+ 163:	a088d0        	addx4	a8, a8, a13
+ 166:	0858      	l32i.n	a5, a8, 0
+ 168:	a099d0        	addx4	a9, a9, a13
+ 16b:	25cc      	bnez.n	a5, 171 <mapping_inverse+0x171>	16b: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x171
+ 16d:	0958      	l32i.n	a5, a9, 0
+ 16f:	258c      	beqz.n	a5, 175 <mapping_inverse+0x175>	16f: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x175
+ 171:	08c9      	s32i.n	a12, a8, 0
+ 173:	09c9      	s32i.n	a12, a9, 0
+ 175:	aa2b      	addi.n	a10, a10, 2
+ 177:	fff006        	j	13b <mapping_inverse+0x13b>	177: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x13b
+ 17a:	13c8      	l32i.n	a12, a3, 4
+ 17c:	022792        	l32i	a9, a7, 8
+ 17f:	208ee0        	or	a8, a14, a14
+ 182:	3cac      	beqz.n	a12, 1a9 <mapping_inverse+0x1a9>	182: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x1a9
+ 184:	d81b      	addi.n	a13, a8, 1
+ 186:	c0ab80        	sub	a10, a11, a8
+ 189:	052bd7        	blt	a11, a13, 192 <mapping_inverse+0x192>	189: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x192
+ 18c:	60b1b0        	abs	a11, a11
+ 18f:	017bf7        	bbci	a11, 31, 194 <mapping_inverse+0x194>	18f: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x194
+ 192:	1a0c      	movi.n	a10, 1
+ 194:	f03d      	nop.n
+ 196:	0b8a76        	loop	a10, 1a5 <mapping_inverse+0x1a5>	196: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x1a5
+ 199:	bc8a      	add.n	a11, a12, a8
+ 19b:	000bb2        	l8ui	a11, a11, 0
+ 19e:	071b57        	beq	a11, a5, 1a9 <mapping_inverse+0x1a9>	19e: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x1a9
+ 1a1:	881b      	addi.n	a8, a8, 1
+ 1a3:	994b      	addi.n	a9, a9, 4
+ 1a5:	000b46        	j	1d6 <mapping_inverse+0x1d6>	1a5: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x1d6
+ 1a8:	00          	.byte	00
+ 1a9:	72b8      	l32i.n	a11, a2, 28
+ 1ab:	09a8      	l32i.n	a10, a9, 0
+ 1ad:	a0b8b0        	addx4	a11, a8, a11
+ 1b0:	07b9      	s32i.n	a11, a7, 0
+ 1b2:	0f0c      	movi.n	a15, 0
+ 1b4:	1b0c      	movi.n	a11, 1
+ 1b6:	93fba0        	movnez	a15, a11, a10
+ 1b9:	07b8      	l32i.n	a11, a7, 0
+ 1bb:	a0de60        	addx4	a13, a14, a6
+ 1be:	0df9      	s32i.n	a15, a13, 0
+ 1c0:	0bd8      	l32i.n	a13, a11, 0
+ 1c2:	17b8      	l32i.n	a11, a7, 4
+ 1c4:	11aee0        	slli	a10, a14, 2
+ 1c7:	abaa      	add.n	a10, a11, a10
+ 1c9:	14b8      	l32i.n	a11, a4, 4
+ 1cb:	881b      	addi.n	a8, a8, 1
+ 1cd:	0ad9      	s32i.n	a13, a10, 0
+ 1cf:	ee1b      	addi.n	a14, a14, 1
+ 1d1:	994b      	addi.n	a9, a9, 4
+ 1d3:	ab28b7        	blt	a8, a11, 182 <mapping_inverse+0x182>	1d3: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x182
+ 1d6:	2398      	l32i.n	a9, a3, 8
+ 1d8:	3788      	l32i.n	a8, a7, 12
+ 1da:	909590        	addx2	a9, a5, a9
+ 1dd:	0109b2        	l8ui	a11, a9, 1
+ 1e0:	b888      	l32i.n	a8, a8, 44
+ 1e2:	17c8      	l32i.n	a12, a7, 4
+ 1e4:	f0bbb0        	subx8	a11, a11, a11
+ 1e7:	a0bb80        	addx4	a11, a11, a8
+ 1ea:	06dd      	mov.n	a13, a6
+ 1ec:	02ad      	mov.n	a10, a2
+ 1ee:	000081        	l32r	a8, fffc01f0 <mapping_inverse+0xfffc01f0>	1ee: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0x14
+	1ee: R_XTENSA_ASM_EXPAND	res_inverse
+ 1f1:	0008e0        	callx8	a8
+ 1f4:	0388      	l32i.n	a8, a3, 0
+ 1f6:	551b      	addi.n	a5, a5, 1
+ 1f8:	142587        	blt	a5, a8, 210 <mapping_inverse+0x210>	1f8: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x210
+ 1fb:	3388      	l32i.n	a8, a3, 12
+ 1fd:	3768      	l32i.n	a6, a7, 12
+ 1ff:	1a18a6        	blti	a8, 1, 21d <mapping_inverse+0x21d>	1ff: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x21d
+ 202:	43f8      	l32i.n	a15, a3, 16
+ 204:	e88a      	add.n	a14, a8, a8
+ 206:	000886        	j	22c <mapping_inverse+0x22c>	206: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x22c
+ 209:	00          	.byte	00
+ 20a:	3769      	s32i.n	a6, a7, 12
+ 20c:	9768      	l32i.n	a6, a7, 36
+ 20e:	050c      	movi.n	a5, 0
+ 210:	14b8      	l32i.n	a11, a4, 4
+ 212:	0e0c      	movi.n	a14, 0
+ 214:	021ba6        	blti	a11, 1, 21a <mapping_inverse+0x21a>	214: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x21a
+ 217:	ffd7c6        	j	17a <mapping_inverse+0x17a>	217: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x17a
+ 21a:	ffee06        	j	1d6 <mapping_inverse+0x1d6>	21a: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x1d6
+ 21d:	1488      	l32i.n	a8, a4, 4
+ 21f:	87e8      	l32i.n	a14, a7, 32
+ 221:	050c      	movi.n	a5, 0
+ 223:	0218a6        	blti	a8, 1, 229 <mapping_inverse+0x229>	223: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x229
+ 226:	002086        	j	2ac <mapping_inverse+0x2ac>	226: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x2ac
+ 229:	003f46        	j	32a <mapping_inverse+0x32a>	229: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x32a
+ 22c:	0727a2        	l32i	a10, a7, 28
+ 22f:	fecf92        	addi	a9, a15, -2
+ 232:	808e90        	add	a8, a14, a9
+ 235:	0b2ae6        	bgei	a10, 2, 244 <mapping_inverse+0x244>	235: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x244
+ 238:	e11f87        	beq	a15, a8, 21d <mapping_inverse+0x21d>	238: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x21d
+ 23b:	fcc882        	addi	a8, a8, -4
+ 23e:	f69987        	bne	a9, a8, 238 <mapping_inverse+0x238>	23e: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x238
+ 241:	fff606        	j	21d <mapping_inverse+0x21d>	241: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x21d
+ 244:	7798      	l32i.n	a9, a7, 28
+ 246:	72a8      	l32i.n	a10, a2, 28
+ 248:	05ef90        	extui	a14, a9, 31, 1
+ 24b:	ee9a      	add.n	a14, a14, a9
+ 24d:	21e1e0        	srai	a14, a14, 1
+ 250:	1749      	s32i.n	a4, a7, 4
+ 252:	069d      	mov.n	a9, a6
+ 254:	000086        	j	25a <mapping_inverse+0x25a>	254: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x25a
+ 257:	00          	.byte	00
+ 258:	0b8d      	mov.n	a8, a11
+ 25a:	0008c2        	l8ui	a12, a8, 0
+ 25d:	0108b2        	l8ui	a11, a8, 1
+ 260:	a0cca0        	addx4	a12, a12, a10
+ 263:	a0bba0        	addx4	a11, a11, a10
+ 266:	160c      	movi.n	a6, 1
+ 268:	0cd8      	l32i.n	a13, a12, 0
+ 26a:	0bb8      	l32i.n	a11, a11, 0
+ 26c:	5366e0        	max	a6, a6, a14
+ 26f:	07a9      	s32i.n	a10, a7, 0
+ 271:	278676        	loop	a6, 29c <mapping_inverse+0x29c>	271: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x29c
+ 274:	0da8      	l32i.n	a10, a13, 0
+ 276:	0bc8      	l32i.n	a12, a11, 0
+ 278:	0a1aa6        	blti	a10, 1, 286 <mapping_inverse+0x286>	278: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x286
+ 27b:	c05ac0        	sub	a5, a10, a12
+ 27e:	4aca      	add.n	a4, a10, a12
+ 280:	101ca6        	blti	a12, 1, 294 <mapping_inverse+0x294>	280: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x294
+ 283:	0001c6        	j	28e <mapping_inverse+0x28e>	283: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x28e
+ 286:	5aca      	add.n	a5, a10, a12
+ 288:	c04ac0        	sub	a4, a10, a12
+ 28b:	051ca6        	blti	a12, 1, 294 <mapping_inverse+0x294>	28b: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x294
+ 28e:	0b59      	s32i.n	a5, a11, 0
+ 290:	000106        	j	298 <mapping_inverse+0x298>	290: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x298
+ 293:	00          	.byte	00
+ 294:	0ba9      	s32i.n	a10, a11, 0
+ 296:	0d49      	s32i.n	a4, a13, 0
+ 298:	dd4b      	addi.n	a13, a13, 4
+ 29a:	bb4b      	addi.n	a11, a11, 4
+ 29c:	07a8      	l32i.n	a10, a7, 0
+ 29e:	fec8b2        	addi	a11, a8, -2
+ 2a1:	b39f87        	bne	a15, a8, 258 <mapping_inverse+0x258>	2a1: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x258
+ 2a4:	1748      	l32i.n	a4, a7, 4
+ 2a6:	096d      	mov.n	a6, a9
+ 2a8:	ffdc46        	j	21d <mapping_inverse+0x21d>	2a8: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x21d
+ 2ab:	00          	.byte	00
+ 2ac:	0749      	s32i.n	a4, a7, 0
+ 2ae:	1759      	s32i.n	a5, a7, 4
+ 2b0:	024d      	mov.n	a4, a2
+ 2b2:	062d      	mov.n	a2, a6
+ 2b4:	0e6d      	mov.n	a6, a14
+ 2b6:	7488      	l32i.n	a8, a4, 28
+ 2b8:	03c8      	l32i.n	a12, a3, 0
+ 2ba:	a08580        	addx4	a8, a5, a8
+ 2bd:	0888      	l32i.n	a8, a8, 0
+ 2bf:	17b8      	l32i.n	a11, a7, 4
+ 2c1:	04ad      	mov.n	a10, a4
+ 2c3:	08dd      	mov.n	a13, a8
+ 2c5:	082ca6        	blti	a12, 2, 2d1 <mapping_inverse+0x2d1>	2c5: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x2d1
+ 2c8:	13b8      	l32i.n	a11, a3, 4
+ 2ca:	bb5a      	add.n	a11, a11, a5
+ 2cc:	000bb2        	l8ui	a11, a11, 0
+ 2cf:	bbba      	add.n	a11, a11, a11
+ 2d1:	23c8      	l32i.n	a12, a3, 8
+ 2d3:	92f8      	l32i.n	a15, a2, 36
+ 2d5:	bcba      	add.n	a11, a12, a11
+ 2d7:	000bb2        	l8ui	a11, a11, 0
+ 2da:	a2c8      	l32i.n	a12, a2, 40
+ 2dc:	ffba      	add.n	a15, a15, a11
+ 2de:	000ff2        	l8ui	a15, a15, 0
+ 2e1:	a0bbc0        	addx4	a11, a11, a12
+ 2e4:	0bb8      	l32i.n	a11, a11, 0
+ 2e6:	06c8      	l32i.n	a12, a6, 0
+ 2e8:	8f8c      	beqz.n	a15, 2f4 <mapping_inverse+0x2f4>	2e8: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x2f4
+ 2ea:	000081        	l32r	a8, fffc02ec <mapping_inverse+0xfffc02ec>	2ea: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0x18
+	2ea: R_XTENSA_ASM_EXPAND	floor1_inverse2
+ 2ed:	0008e0        	callx8	a8
+ 2f0:	000286        	j	2fe <mapping_inverse+0x2fe>	2f0: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x2fe
+ 2f3:	00          	.byte	00
+ 2f4:	08dd      	mov.n	a13, a8
+ 2f6:	04ad      	mov.n	a10, a4
+ 2f8:	000081        	l32r	a8, fffc02f8 <mapping_inverse+0xfffc02f8>	2f8: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0x1c
+	2f8: R_XTENSA_ASM_EXPAND	floor0_inverse2
+ 2fb:	0008e0        	callx8	a8
+ 2fe:	0788      	l32i.n	a8, a7, 0
+ 300:	551b      	addi.n	a5, a5, 1
+ 302:	1888      	l32i.n	a8, a8, 4
+ 304:	664b      	addi.n	a6, a6, 4
+ 306:	ac2587        	blt	a5, a8, 2b6 <mapping_inverse+0x2b6>	306: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x2b6
+ 309:	042d      	mov.n	a2, a4
+ 30b:	0748      	l32i.n	a4, a7, 0
+ 30d:	1918a6        	blti	a8, 1, 32a <mapping_inverse+0x32a>	30d: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x32a
+ 310:	7758      	l32i.n	a5, a7, 28
+ 312:	060c      	movi.n	a6, 0
+ 314:	7288      	l32i.n	a8, a2, 28
+ 316:	05ad      	mov.n	a10, a5
+ 318:	a08680        	addx4	a8, a6, a8
+ 31b:	08b8      	l32i.n	a11, a8, 0
+ 31d:	661b      	addi.n	a6, a6, 1
+ 31f:	000081        	l32r	a8, fffc0320 <mapping_inverse+0xfffc0320>	31f: R_XTENSA_SLOT0_OP	.literal.mapping_inverse+0x20
+	31f: R_XTENSA_ASM_EXPAND	mdct_backward
+ 322:	0008e0        	callx8	a8
+ 325:	1488      	l32i.n	a8, a4, 4
+ 327:	e92687        	blt	a6, a8, 314 <mapping_inverse+0x314>	327: R_XTENSA_SLOT0_OP	.text.mapping_inverse+0x314
+ 32a:	020c      	movi.n	a2, 0
+ 32c:	f01d      	retw.n

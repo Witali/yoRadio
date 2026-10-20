@@ -1,0 +1,24 @@
+tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:47
+Disassembly of section .text.res_clear_info:
+
+00000000 <res_clear_info>:
+   0:	004136        	entry	a1, 32
+   3:	f29c      	beqz.n	a2, 26 <res_clear_info+0x26>	3: R_XTENSA_SLOT0_OP	.text.res_clear_info+0x26
+   5:	0122a2        	l32i	a10, a2, 4
+   8:	4a8c      	beqz.n	a10, 10 <res_clear_info+0x10>	8: R_XTENSA_SLOT0_OP	.text.res_clear_info+0x10
+   a:	000081        	l32r	a8, fffc000c <res_clear_info+0xfffc000c>	a: R_XTENSA_SLOT0_OP	.literal.res_clear_info
+	a: R_XTENSA_ASM_EXPAND	media_lib_free
+   d:	0008e0        	callx8	a8
+  10:	22a8      	l32i.n	a10, a2, 8
+  12:	4a8c      	beqz.n	a10, 1a <res_clear_info+0x1a>	12: R_XTENSA_SLOT0_OP	.text.res_clear_info+0x1a
+  14:	000081        	l32r	a8, fffc0014 <res_clear_info+0xfffc0014>	14: R_XTENSA_SLOT0_OP	.literal.res_clear_info+0x4
+	14: R_XTENSA_ASM_EXPAND	media_lib_free
+  17:	0008e0        	callx8	a8
+  1a:	cc1c      	movi.n	a12, 28
+  1c:	0b0c      	movi.n	a11, 0
+  1e:	02ad      	mov.n	a10, a2
+  20:	000081        	l32r	a8, fffc0020 <res_clear_info+0xfffc0020>	20: R_XTENSA_SLOT0_OP	.literal.res_clear_info+0x8
+	20: R_XTENSA_ASM_EXPAND	memset
+  23:	0008e0        	callx8	a8
+  26:	f01d      	retw.n
+

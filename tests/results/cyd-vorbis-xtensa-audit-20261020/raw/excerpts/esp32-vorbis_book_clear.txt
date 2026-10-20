@@ -1,0 +1,23 @@
+tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:844
+Disassembly of section .text.vorbis_book_clear:
+
+00000000 <vorbis_book_clear>:
+   0:	004136        	entry	a1, 32
+   3:	f2a8      	l32i.n	a10, a2, 60
+   5:	005a16        	beqz	a10, e <vorbis_book_clear+0xe>	5: R_XTENSA_SLOT0_OP	.text.vorbis_book_clear+0xe
+   8:	000081        	l32r	a8, fffc0008 <vorbis_book_clear+0xfffc0008>	8: R_XTENSA_SLOT0_OP	.literal.vorbis_book_clear
+	8: R_XTENSA_ASM_EXPAND	media_lib_free
+   b:	0008e0        	callx8	a8
+   e:	42a8      	l32i.n	a10, a2, 16
+  10:	4a8c      	beqz.n	a10, 18 <vorbis_book_clear+0x18>	10: R_XTENSA_SLOT0_OP	.text.vorbis_book_clear+0x18
+  12:	000081        	l32r	a8, fffc0014 <vorbis_book_clear+0xfffc0014>	12: R_XTENSA_SLOT0_OP	.literal.vorbis_book_clear+0x4
+	12: R_XTENSA_ASM_EXPAND	media_lib_free
+  15:	0008e0        	callx8	a8
+  18:	0c4c      	movi.n	a12, 64
+  1a:	0b0c      	movi.n	a11, 0
+  1c:	02ad      	mov.n	a10, a2
+  1e:	000081        	l32r	a8, fffc0020 <vorbis_book_clear+0xfffc0020>	1e: R_XTENSA_SLOT0_OP	.literal.vorbis_book_clear+0x8
+	1e: R_XTENSA_ASM_EXPAND	memset
+  21:	0008e0        	callx8	a8
+  24:	f01d      	retw.n
+

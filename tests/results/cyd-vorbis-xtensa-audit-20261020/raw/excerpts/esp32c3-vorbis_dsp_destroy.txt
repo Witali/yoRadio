@@ -1,0 +1,81 @@
+tool-output/esp32c3-libesp_audio_codec-637-dsp.c.obj-disasm.txt:248
+Disassembly of section .text.vorbis_dsp_destroy:
+
+00000000 <vorbis_dsp_destroy>:
+   0:	c949                	beqz	a0,92 <.L44>	0: R_RISCV_RVC_BRANCH	.L44
+   2:	4d54                	lw	a3,28(a0)
+   4:	1141                	addi	sp,sp,-16
+   6:	c226                	sw	s1,4(sp)
+   8:	c04a                	sw	s2,0(sp)
+   a:	c606                	sw	ra,12(sp)
+   c:	c422                	sw	s0,8(sp)
+   e:	00052903          	lw	s2,0(a0)
+  12:	84aa                	mv	s1,a0
+  14:	ca95                	beqz	a3,48 <.L46>	14: R_RISCV_RVC_BRANCH	.L46
+  16:	00492703          	lw	a4,4(s2)
+  1a:	02e05263          	blez	a4,3e <.L47>	1a: R_RISCV_BRANCH	.L47
+  1e:	4401                	li	s0,0
+
+00000020 <.L49>:
+  20:	00241793          	slli	a5,s0,0x2
+  24:	97b6                	add	a5,a5,a3
+  26:	4388                	lw	a0,0(a5)
+  28:	c901                	beqz	a0,38 <.L48>	28: R_RISCV_RVC_BRANCH	.L48
+  2a:	00000097          	auipc	ra,0x0	2a: R_RISCV_CALL_PLT	media_lib_free
+	2a: R_RISCV_RELAX	*ABS*
+  2e:	000080e7          	jalr	ra # 2a <.L49+0xa>
+  32:	4cd4                	lw	a3,28(s1)
+  34:	00492703          	lw	a4,4(s2)
+
+00000038 <.L48>:
+  38:	0405                	addi	s0,s0,1
+  3a:	fee443e3          	blt	s0,a4,20 <.L49>	3a: R_RISCV_BRANCH	.L49
+
+0000003e <.L47>:
+  3e:	8536                	mv	a0,a3
+  40:	00000097          	auipc	ra,0x0	40: R_RISCV_CALL_PLT	media_lib_free
+	40: R_RISCV_RELAX	*ABS*
+  44:	000080e7          	jalr	ra # 40 <.L47+0x2>
+
+00000048 <.L46>:
+  48:	5094                	lw	a3,32(s1)
+  4a:	ca95                	beqz	a3,7e <.L50>	4a: R_RISCV_RVC_BRANCH	.L50
+  4c:	00492703          	lw	a4,4(s2)
+  50:	02e05263          	blez	a4,74 <.L51>	50: R_RISCV_BRANCH	.L51
+  54:	4401                	li	s0,0
+
+00000056 <.L53>:
+  56:	00241793          	slli	a5,s0,0x2
+  5a:	97b6                	add	a5,a5,a3
+  5c:	4388                	lw	a0,0(a5)
+  5e:	c901                	beqz	a0,6e <.L52>	5e: R_RISCV_RVC_BRANCH	.L52
+  60:	00000097          	auipc	ra,0x0	60: R_RISCV_CALL_PLT	media_lib_free
+	60: R_RISCV_RELAX	*ABS*
+  64:	000080e7          	jalr	ra # 60 <.L53+0xa>
+  68:	00492703          	lw	a4,4(s2)
+  6c:	5094                	lw	a3,32(s1)
+
+0000006e <.L52>:
+  6e:	0405                	addi	s0,s0,1
+  70:	fee443e3          	blt	s0,a4,56 <.L53>	70: R_RISCV_BRANCH	.L53
+
+00000074 <.L51>:
+  74:	8536                	mv	a0,a3
+  76:	00000097          	auipc	ra,0x0	76: R_RISCV_CALL_PLT	media_lib_free
+	76: R_RISCV_RELAX	*ABS*
+  7a:	000080e7          	jalr	ra # 76 <.L51+0x2>
+
+0000007e <.L50>:
+  7e:	4422                	lw	s0,8(sp)
+  80:	40b2                	lw	ra,12(sp)
+  82:	4902                	lw	s2,0(sp)
+  84:	8526                	mv	a0,s1
+  86:	4492                	lw	s1,4(sp)
+  88:	0141                	addi	sp,sp,16
+  8a:	00000317          	auipc	t1,0x0	8a: R_RISCV_CALL_PLT	media_lib_free
+	8a: R_RISCV_RELAX	*ABS*
+  8e:	00030067          	jr	t1 # 8a <.L50+0xc>
+
+00000092 <.L44>:
+  92:	8082                	ret
+

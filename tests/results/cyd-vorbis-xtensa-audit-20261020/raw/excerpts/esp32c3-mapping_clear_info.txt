@@ -1,0 +1,43 @@
+tool-output/esp32c3-libesp_audio_codec-644-mapping0.c.obj-disasm.txt:5
+Disassembly of section .text.mapping_clear_info:
+
+00000000 <mapping_clear_info>:
+   0:	c529                	beqz	a0,4a <.L19>	0: R_RISCV_RVC_BRANCH	.L19
+   2:	1141                	addi	sp,sp,-16
+   4:	c422                	sw	s0,8(sp)
+   6:	842a                	mv	s0,a0
+   8:	4148                	lw	a0,4(a0)
+   a:	c606                	sw	ra,12(sp)
+   c:	c509                	beqz	a0,16 <.L3>	c: R_RISCV_RVC_BRANCH	.L3
+   e:	00000097          	auipc	ra,0x0	e: R_RISCV_CALL_PLT	media_lib_free
+	e: R_RISCV_RELAX	*ABS*
+  12:	000080e7          	jalr	ra # e <mapping_clear_info+0xe>
+
+00000016 <.L3>:
+  16:	4408                	lw	a0,8(s0)
+  18:	c509                	beqz	a0,22 <.L4>	18: R_RISCV_RVC_BRANCH	.L4
+  1a:	00000097          	auipc	ra,0x0	1a: R_RISCV_CALL_PLT	media_lib_free
+	1a: R_RISCV_RELAX	*ABS*
+  1e:	000080e7          	jalr	ra # 1a <.L3+0x4>
+
+00000022 <.L4>:
+  22:	4808                	lw	a0,16(s0)
+  24:	c509                	beqz	a0,2e <.L5>	24: R_RISCV_RVC_BRANCH	.L5
+  26:	00000097          	auipc	ra,0x0	26: R_RISCV_CALL_PLT	media_lib_free
+	26: R_RISCV_RELAX	*ABS*
+  2a:	000080e7          	jalr	ra # 26 <.L4+0x4>
+
+0000002e <.L5>:
+  2e:	00042023          	sw	zero,0(s0)
+  32:	00042223          	sw	zero,4(s0)
+  36:	00042423          	sw	zero,8(s0)
+  3a:	00042623          	sw	zero,12(s0)
+  3e:	00042823          	sw	zero,16(s0)
+  42:	40b2                	lw	ra,12(sp)
+  44:	4422                	lw	s0,8(sp)
+  46:	0141                	addi	sp,sp,16
+  48:	8082                	ret
+
+0000004a <.L19>:
+  4a:	8082                	ret
+

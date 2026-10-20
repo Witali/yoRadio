@@ -1,0 +1,52 @@
+tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:235
+Disassembly of section .text.vorbis_dsp_destroy:
+
+00000000 <vorbis_dsp_destroy>:
+   0:	004136        	entry	a1, 32
+   3:	027d      	mov.n	a7, a2
+   5:	05d216        	beqz	a2, 66 <vorbis_dsp_destroy+0x66>	5: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x66
+   8:	7298      	l32i.n	a9, a2, 28
+   a:	0268      	l32i.n	a6, a2, 0
+   c:	59ac      	beqz.n	a9, 35 <vorbis_dsp_destroy+0x35>	c: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x35
+   e:	1688      	l32i.n	a8, a6, 4
+  10:	1918a6        	blti	a8, 1, 2d <vorbis_dsp_destroy+0x2d>	10: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x2d
+  13:	020c      	movi.n	a2, 0
+  15:	a0a290        	addx4	a10, a2, a9
+  18:	002aa2        	l32i	a10, a10, 0
+  1b:	009a16        	beqz	a10, 28 <vorbis_dsp_destroy+0x28>	1b: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x28
+  1e:	000081        	l32r	a8, fffc0020 <vorbis_dsp_destroy+0xfffc0020>	1e: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_destroy
+	1e: R_XTENSA_ASM_EXPAND	media_lib_free
+  21:	0008e0        	callx8	a8
+  24:	1688      	l32i.n	a8, a6, 4
+  26:	7798      	l32i.n	a9, a7, 28
+  28:	221b      	addi.n	a2, a2, 1
+  2a:	e72287        	blt	a2, a8, 15 <vorbis_dsp_destroy+0x15>	2a: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x15
+  2d:	09ad      	mov.n	a10, a9
+  2f:	000081        	l32r	a8, fffc0030 <vorbis_dsp_destroy+0xfffc0030>	2f: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_destroy+0x4
+	2f: R_XTENSA_ASM_EXPAND	media_lib_free
+  32:	0008e0        	callx8	a8
+  35:	8798      	l32i.n	a9, a7, 32
+  37:	39ac      	beqz.n	a9, 5e <vorbis_dsp_destroy+0x5e>	37: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x5e
+  39:	1688      	l32i.n	a8, a6, 4
+  3b:	1718a6        	blti	a8, 1, 56 <vorbis_dsp_destroy+0x56>	3b: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x56
+  3e:	020c      	movi.n	a2, 0
+  40:	a0a290        	addx4	a10, a2, a9
+  43:	0aa8      	l32i.n	a10, a10, 0
+  45:	8a8c      	beqz.n	a10, 51 <vorbis_dsp_destroy+0x51>	45: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x51
+  47:	000081        	l32r	a8, fffc0048 <vorbis_dsp_destroy+0xfffc0048>	47: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_destroy+0x8
+	47: R_XTENSA_ASM_EXPAND	media_lib_free
+  4a:	0008e0        	callx8	a8
+  4d:	1688      	l32i.n	a8, a6, 4
+  4f:	8798      	l32i.n	a9, a7, 32
+  51:	221b      	addi.n	a2, a2, 1
+  53:	e92287        	blt	a2, a8, 40 <vorbis_dsp_destroy+0x40>	53: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_destroy+0x40
+  56:	09ad      	mov.n	a10, a9
+  58:	000081        	l32r	a8, fffc0058 <vorbis_dsp_destroy+0xfffc0058>	58: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_destroy+0xc
+	58: R_XTENSA_ASM_EXPAND	media_lib_free
+  5b:	0008e0        	callx8	a8
+  5e:	07ad      	mov.n	a10, a7
+  60:	000081        	l32r	a8, fffc0060 <vorbis_dsp_destroy+0xfffc0060>	60: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_destroy+0x10
+	60: R_XTENSA_ASM_EXPAND	media_lib_free
+  63:	0008e0        	callx8	a8
+  66:	f01d      	retw.n
+

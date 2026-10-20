@@ -1,0 +1,69 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-xtensa-audit-01\members\esp32\14-es_parse_mem.c.obj:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.media_lib_module_malloc:
+
+00000000 <.literal.media_lib_module_malloc>:
+   0:	00000000 		0: R_XTENSA_32	malloc
+
+Disassembly of section .literal.media_lib_module_calloc:
+
+00000000 <.literal.media_lib_module_calloc>:
+   0:	00000000 		0: R_XTENSA_32	calloc
+
+Disassembly of section .literal.media_lib_module_realloc:
+
+00000000 <.literal.media_lib_module_realloc>:
+   0:	00000000 		0: R_XTENSA_32	realloc
+
+Disassembly of section .literal.media_lib_free:
+
+00000000 <.literal.media_lib_free>:
+   0:	00000000 		0: R_XTENSA_32	free
+
+Disassembly of section .text.media_lib_module_malloc:
+
+00000000 <media_lib_module_malloc>:
+   0:	004136        	entry	a1, 32
+   3:	20a330        	or	a10, a3, a3
+   6:	000081        	l32r	a8, fffc0008 <media_lib_module_malloc+0xfffc0008>	6: R_XTENSA_SLOT0_OP	.literal.media_lib_module_malloc
+	6: R_XTENSA_ASM_EXPAND	malloc
+   9:	0008e0        	callx8	a8
+   c:	0a2d      	mov.n	a2, a10
+   e:	f01d      	retw.n
+
+Disassembly of section .text.media_lib_module_calloc:
+
+00000000 <media_lib_module_calloc>:
+   0:	004136        	entry	a1, 32
+   3:	03ad      	mov.n	a10, a3
+   5:	04bd      	mov.n	a11, a4
+   7:	000081        	l32r	a8, fffc0008 <media_lib_module_calloc+0xfffc0008>	7: R_XTENSA_SLOT0_OP	.literal.media_lib_module_calloc
+	7: R_XTENSA_ASM_EXPAND	calloc
+   a:	0008e0        	callx8	a8
+   d:	0a2d      	mov.n	a2, a10
+   f:	f01d      	retw.n
+
+Disassembly of section .text.media_lib_module_realloc:
+
+00000000 <media_lib_module_realloc>:
+   0:	004136        	entry	a1, 32
+   3:	03ad      	mov.n	a10, a3
+   5:	04bd      	mov.n	a11, a4
+   7:	000081        	l32r	a8, fffc0008 <media_lib_module_realloc+0xfffc0008>	7: R_XTENSA_SLOT0_OP	.literal.media_lib_module_realloc
+	7: R_XTENSA_ASM_EXPAND	realloc
+   a:	0008e0        	callx8	a8
+   d:	0a2d      	mov.n	a2, a10
+   f:	f01d      	retw.n
+
+Disassembly of section .text.media_lib_free:
+
+00000000 <media_lib_free>:
+   0:	004136        	entry	a1, 32
+   3:	02ad      	mov.n	a10, a2
+   5:	428c      	beqz.n	a2, d <media_lib_free+0xd>	5: R_XTENSA_SLOT0_OP	.text.media_lib_free+0xd
+   7:	000081        	l32r	a8, fffc0008 <media_lib_free+0xfffc0008>	7: R_XTENSA_SLOT0_OP	.literal.media_lib_free
+	7: R_XTENSA_ASM_EXPAND	free
+   a:	0008e0        	callx8	a8
+   d:	f01d      	retw.n

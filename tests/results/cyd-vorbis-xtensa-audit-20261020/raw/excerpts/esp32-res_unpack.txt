@@ -1,0 +1,179 @@
+tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:70
+Disassembly of section .text.res_unpack:
+
+00000000 <res_unpack>:
+   0:	006136        	entry	a1, 48
+   3:	cc1c      	movi.n	a12, 28
+   5:	0b0c      	movi.n	a11, 0
+   7:	02ad      	mov.n	a10, a2
+   9:	072372        	l32i	a7, a3, 28
+   c:	000081        	l32r	a8, fffc000c <res_unpack+0xfffc000c>	c: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x4
+	c: R_XTENSA_ASM_EXPAND	memset
+   f:	0008e0        	callx8	a8
+  12:	0b1c      	movi.n	a11, 16
+  14:	04ad      	mov.n	a10, a4
+  16:	000081        	l32r	a8, fffc0018 <res_unpack+0xfffc0018>	16: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x8
+	16: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  19:	0008e0        	callx8	a8
+  1c:	02a9      	s32i.n	a10, a2, 0
+  1e:	083ab6        	bltui	a10, 3, 2a <res_unpack+0x2a>	1e: R_XTENSA_SLOT0_OP	.text.res_unpack+0x2a
+  21:	12a8      	l32i.n	a10, a2, 4
+  23:	13aa56        	bnez	a10, 161 <res_unpack+0x161>	23: R_XTENSA_SLOT0_OP	.text.res_unpack+0x161
+  26:	004f46        	j	167 <res_unpack+0x167>	26: R_XTENSA_SLOT0_OP	.text.res_unpack+0x167
+  29:	00          	.byte	00
+  2a:	8b1c      	movi.n	a11, 24
+  2c:	04ad      	mov.n	a10, a4
+  2e:	000081        	l32r	a8, fffc0030 <res_unpack+0xfffc0030>	2e: R_XTENSA_SLOT0_OP	.literal.res_unpack+0xc
+	2e: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  31:	0008e0        	callx8	a8
+  34:	32a9      	s32i.n	a10, a2, 12
+  36:	8b1c      	movi.n	a11, 24
+  38:	04ad      	mov.n	a10, a4
+  3a:	000081        	l32r	a8, fffc003c <res_unpack+0xfffc003c>	3a: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x10
+	3a: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  3d:	0008e0        	callx8	a8
+  40:	42a9      	s32i.n	a10, a2, 16
+  42:	8b1c      	movi.n	a11, 24
+  44:	04ad      	mov.n	a10, a4
+  46:	000081        	l32r	a8, fffc0048 <res_unpack+0xfffc0048>	46: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x14
+	46: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  49:	0008e0        	callx8	a8
+  4c:	aa1b      	addi.n	a10, a10, 1
+  4e:	52a9      	s32i.n	a10, a2, 20
+  50:	6b0c      	movi.n	a11, 6
+  52:	04ad      	mov.n	a10, a4
+  54:	000081        	l32r	a8, fffc0054 <res_unpack+0xfffc0054>	54: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x18
+	54: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  57:	0008e0        	callx8	a8
+  5a:	aa1b      	addi.n	a10, a10, 1
+  5c:	1842a2        	s8i	a10, a2, 24
+  5f:	8b0c      	movi.n	a11, 8
+  61:	04ad      	mov.n	a10, a4
+  63:	000081        	l32r	a8, fffc0064 <res_unpack+0xfffc0064>	63: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x1c
+	63: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  66:	0008e0        	callx8	a8
+  69:	1942a2        	s8i	a10, a2, 25
+  6c:	6788      	l32i.n	a8, a7, 24
+  6e:	74a0a0        	extui	a10, a10, 0, 8
+  71:	acaa87        	bge	a10, a8, 21 <res_unpack+0x21>	71: R_XTENSA_SLOT0_OP	.text.res_unpack+0x21
+  74:	1802c2        	l8ui	a12, a2, 24
+  77:	5ccc      	bnez.n	a12, 80 <res_unpack+0x80>	77: R_XTENSA_SLOT0_OP	.text.res_unpack+0x80
+  79:	12c9      	s32i.n	a12, a2, 4
+  7b:	22c9      	s32i.n	a12, a2, 8
+  7d:	0034c6        	j	154 <res_unpack+0x154>	7d: R_XTENSA_SLOT0_OP	.text.res_unpack+0x154
+  80:	000061        	l32r	a6, fffc0080 <res_unpack+0xfffc0080>	80: R_XTENSA_SLOT0_OP	.literal.res_unpack
+  83:	1b0c      	movi.n	a11, 1
+  85:	06ad      	mov.n	a10, a6
+  87:	000081        	l32r	a8, fffc0088 <res_unpack+0xfffc0088>	87: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x20
+	87: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  8a:	0008e0        	callx8	a8
+  8d:	1802c2        	l8ui	a12, a2, 24
+  90:	12a9      	s32i.n	a10, a2, 4
+  92:	3ccc      	bnez.n	a12, 99 <res_unpack+0x99>	92: R_XTENSA_SLOT0_OP	.text.res_unpack+0x99
+  94:	22c9      	s32i.n	a12, a2, 8
+  96:	002e86        	j	154 <res_unpack+0x154>	96: R_XTENSA_SLOT0_OP	.text.res_unpack+0x154
+  99:	11ccd0        	slli	a12, a12, 3
+  9c:	01a0b2        	movi	a11, 1
+  9f:	20a660        	or	a10, a6, a6
+  a2:	000081        	l32r	a8, fffc00a4 <res_unpack+0xfffc00a4>	a2: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x24
+	a2: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  a5:	0008e0        	callx8	a8
+  a8:	180282        	l8ui	a8, a2, 24
+  ab:	22a9      	s32i.n	a10, a2, 8
+  ad:	0a3816        	beqz	a8, 154 <res_unpack+0x154>	ad: R_XTENSA_SLOT0_OP	.text.res_unpack+0x154
+  b0:	050c      	movi.n	a5, 0
+  b2:	3b0c      	movi.n	a11, 3
+  b4:	04ad      	mov.n	a10, a4
+  b6:	000081        	l32r	a8, fffc00b8 <res_unpack+0xfffc00b8>	b6: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x28
+	b6: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  b9:	0008e0        	callx8	a8
+  bc:	0a6d      	mov.n	a6, a10
+  be:	1b0c      	movi.n	a11, 1
+  c0:	04ad      	mov.n	a10, a4
+  c2:	000081        	l32r	a8, fffc00c4 <res_unpack+0xfffc00c4>	c2: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x2c
+	c2: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  c5:	0008e0        	callx8	a8
+  c8:	ea8c      	beqz.n	a10, da <res_unpack+0xda>	c8: R_XTENSA_SLOT0_OP	.text.res_unpack+0xda
+  ca:	5b0c      	movi.n	a11, 5
+  cc:	04ad      	mov.n	a10, a4
+  ce:	000081        	l32r	a8, fffc00d0 <res_unpack+0xfffc00d0>	ce: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x30
+	ce: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  d1:	0008e0        	callx8	a8
+  d4:	11aad0        	slli	a10, a10, 3
+  d7:	2066a0        	or	a6, a6, a10
+  da:	1288      	l32i.n	a8, a2, 4
+  dc:	885a      	add.n	a8, a8, a5
+  de:	004862        	s8i	a6, a8, 0
+  e1:	180282        	l8ui	a8, a2, 24
+  e4:	551b      	addi.n	a5, a5, 1
+  e6:	c82587        	blt	a5, a8, b2 <res_unpack+0xb2>	e6: R_XTENSA_SLOT0_OP	.text.res_unpack+0xb2
+  e9:	050c      	movi.n	a5, 0
+  eb:	1159      	s32i.n	a5, a1, 4
+  ed:	f97c      	movi.n	a9, -1
+  ef:	055856        	bnez	a8, 148 <res_unpack+0x148>	ef: R_XTENSA_SLOT0_OP	.text.res_unpack+0x148
+  f2:	001786        	j	154 <res_unpack+0x154>	f2: R_XTENSA_SLOT0_OP	.text.res_unpack+0x154
+  f5:	1288      	l32i.n	a8, a2, 4
+  f7:	b31b      	addi.n	a11, a3, 1
+  f9:	885a      	add.n	a8, a8, a5
+  fb:	000882        	l8ui	a8, a8, 0
+  fe:	305837        	bbc	a8, a3, 132 <res_unpack+0x132>	fe: R_XTENSA_SLOT0_OP	.text.res_unpack+0x132
+ 101:	8b0c      	movi.n	a11, 8
+ 103:	04ad      	mov.n	a10, a4
+ 105:	0199      	s32i.n	a9, a1, 0
+ 107:	000081        	l32r	a8, fffc0108 <res_unpack+0xfffc0108>	107: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x34
+	107: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 10a:	0008e0        	callx8	a8
+ 10d:	6788      	l32i.n	a8, a7, 24
+ 10f:	74b0a0        	extui	a11, a10, 0, 8
+ 112:	022b87        	blt	a11, a8, 118 <res_unpack+0x118>	112: R_XTENSA_SLOT0_OP	.text.res_unpack+0x118
+ 115:	ffc206        	j	21 <res_unpack+0x21>	115: R_XTENSA_SLOT0_OP	.text.res_unpack+0x21
+ 118:	2288      	l32i.n	a8, a2, 8
+ 11a:	0198      	l32i.n	a9, a1, 0
+ 11c:	886a      	add.n	a8, a8, a6
+ 11e:	0048a2        	s8i	a10, a8, 0
+ 121:	1a0282        	l8ui	a8, a2, 26
+ 124:	b31b      	addi.n	a11, a3, 1
+ 126:	0f2387        	blt	a3, a8, 139 <res_unpack+0x139>	126: R_XTENSA_SLOT0_OP	.text.res_unpack+0x139
+ 129:	1a42b2        	s8i	a11, a2, 26
+ 12c:	000246        	j	139 <res_unpack+0x139>	12c: R_XTENSA_SLOT0_OP	.text.res_unpack+0x139
+ 12f:	00          	.byte	00
+ 130:	00          	.byte	00
+ 131:	00          	.byte	00
+ 132:	2288      	l32i.n	a8, a2, 8
+ 134:	886a      	add.n	a8, a8, a6
+ 136:	004892        	s8i	a9, a8, 0
+ 139:	0b3d      	mov.n	a3, a11
+ 13b:	661b      	addi.n	a6, a6, 1
+ 13d:	b48b66        	bnei	a11, 8, f5 <res_unpack+0xf5>	13d: R_XTENSA_SLOT0_OP	.text.res_unpack+0xf5
+ 140:	180282        	l8ui	a8, a2, 24
+ 143:	551b      	addi.n	a5, a5, 1
+ 145:	0ba587        	bge	a5, a8, 154 <res_unpack+0x154>	145: R_XTENSA_SLOT0_OP	.text.res_unpack+0x154
+ 148:	f46050        	extui	a6, a5, 0, 16
+ 14b:	1138      	l32i.n	a3, a1, 4
+ 14d:	1166d0        	slli	a6, a6, 3
+ 150:	ffe846        	j	f5 <res_unpack+0xf5>	150: R_XTENSA_SLOT0_OP	.text.res_unpack+0xf5
+ 153:	00          	.byte	00
+ 154:	04ad      	mov.n	a10, a4
+ 156:	000081        	l32r	a8, fffc0158 <res_unpack+0xfffc0158>	156: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x38
+	156: R_XTENSA_ASM_EXPAND	tremor_oggpack_eop
+ 159:	0008e0        	callx8	a8
+ 15c:	0aac      	beqz.n	a10, 180 <res_unpack+0x180>	15c: R_XTENSA_SLOT0_OP	.text.res_unpack+0x180
+ 15e:	ffafc6        	j	21 <res_unpack+0x21>	15e: R_XTENSA_SLOT0_OP	.text.res_unpack+0x21
+ 161:	000081        	l32r	a8, fffc0164 <res_unpack+0xfffc0164>	161: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x3c
+	161: R_XTENSA_ASM_EXPAND	media_lib_free
+ 164:	0008e0        	callx8	a8
+ 167:	22a8      	l32i.n	a10, a2, 8
+ 169:	005a16        	beqz	a10, 172 <res_unpack+0x172>	169: R_XTENSA_SLOT0_OP	.text.res_unpack+0x172
+ 16c:	000081        	l32r	a8, fffc016c <res_unpack+0xfffc016c>	16c: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x40
+	16c: R_XTENSA_ASM_EXPAND	media_lib_free
+ 16f:	0008e0        	callx8	a8
+ 172:	cc1c      	movi.n	a12, 28
+ 174:	0b0c      	movi.n	a11, 0
+ 176:	02ad      	mov.n	a10, a2
+ 178:	000081        	l32r	a8, fffc0178 <res_unpack+0xfffc0178>	178: R_XTENSA_SLOT0_OP	.literal.res_unpack+0x44
+	178: R_XTENSA_ASM_EXPAND	memset
+ 17b:	0008e0        	callx8	a8
+ 17e:	1a0c      	movi.n	a10, 1
+ 180:	0a2d      	mov.n	a2, a10
+ 182:	f01d      	retw.n
+

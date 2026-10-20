@@ -1,0 +1,58 @@
+tool-output/esp32c3-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:126
+Disassembly of section .text.append_packet:
+
+00000000 <append_packet>:
+   0:	c22d                	beqz	a2,62 <.L36>	0: R_RISCV_RVC_BRANCH	.L36
+   2:	5d18                	lw	a4,56(a0)
+   4:	5d54                	lw	a3,60(a0)
+   6:	1101                	addi	sp,sp,-32
+   8:	cc22                	sw	s0,24(sp)
+   a:	ca26                	sw	s1,20(sp)
+   c:	ce06                	sw	ra,28(sp)
+   e:	84b2                	mv	s1,a2
+  10:	963a                	add	a2,a2,a4
+  12:	842a                	mv	s0,a0
+  14:	87ae                	mv	a5,a1
+  16:	5908                	lw	a0,48(a0)
+  18:	02c6f563          	bgeu	a3,a2,42 <.L29>	18: R_RISCV_BRANCH	.L29
+  1c:	00000737          	lui	a4,0x0	1c: R_RISCV_HI20	.LC1
+	1c: R_RISCV_RELAX	*ABS*
+  20:	c62e                	sw	a1,12(sp)
+  22:	10060613          	addi	a2,a2,256
+  26:	85aa                	mv	a1,a0
+  28:	00070513          	mv	a0,a4	28: R_RISCV_LO12_I	.LC1
+	28: R_RISCV_RELAX	*ABS*
+  2c:	c432                	sw	a2,8(sp)
+  2e:	00000097          	auipc	ra,0x0	2e: R_RISCV_CALL_PLT	media_lib_module_realloc
+	2e: R_RISCV_RELAX	*ABS*
+  32:	000080e7          	jalr	ra # 2e <append_packet+0x2e>
+  36:	c10d                	beqz	a0,58 <.L30>	36: R_RISCV_RVC_BRANCH	.L30
+  38:	4622                	lw	a2,8(sp)
+  3a:	5c18                	lw	a4,56(s0)
+  3c:	47b2                	lw	a5,12(sp)
+  3e:	d808                	sw	a0,48(s0)
+  40:	dc50                	sw	a2,60(s0)
+
+00000042 <.L29>:
+  42:	85be                	mv	a1,a5
+  44:	953a                	add	a0,a0,a4
+  46:	8626                	mv	a2,s1
+  48:	00000097          	auipc	ra,0x0	48: R_RISCV_CALL_PLT	memcpy
+	48: R_RISCV_RELAX	*ABS*
+  4c:	000080e7          	jalr	ra # 48 <.L29+0x6>
+  50:	5c1c                	lw	a5,56(s0)
+  52:	4505                	li	a0,1
+  54:	97a6                	add	a5,a5,s1
+  56:	dc1c                	sw	a5,56(s0)
+
+00000058 <.L30>:
+  58:	40f2                	lw	ra,28(sp)
+  5a:	4462                	lw	s0,24(sp)
+  5c:	44d2                	lw	s1,20(sp)
+  5e:	6105                	addi	sp,sp,32
+  60:	8082                	ret
+
+00000062 <.L36>:
+  62:	4505                	li	a0,1
+  64:	8082                	ret
+

@@ -1,0 +1,87 @@
+tool-output/esp32c3-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:952
+Disassembly of section .text.esp_audio_simple_dec_reset:
+
+00000000 <esp_audio_simple_dec_reset>:
+   0:	1101                	addi	sp,sp,-32
+   2:	ce06                	sw	ra,28(sp)
+   4:	c541                	beqz	a0,8c <.L177>	4: R_RISCV_RVC_BRANCH	.L177
+   6:	87aa                	mv	a5,a0
+   8:	4148                	lw	a0,4(a0)
+   a:	02079323          	sh	zero,38(a5)
+   e:	0007a823          	sw	zero,16(a5)
+  12:	0007ae23          	sw	zero,28(a5)
+  16:	02078223          	sb	zero,36(a5)
+  1a:	cd01                	beqz	a0,32 <.L162>	1a: R_RISCV_RVC_BRANCH	.L162
+  1c:	4585                	li	a1,1
+  1e:	c63e                	sw	a5,12(sp)
+  20:	00000097          	auipc	ra,0x0	20: R_RISCV_CALL_PLT	esp_es_parse_reset
+	20: R_RISCV_RELAX	*ABS*
+  24:	000080e7          	jalr	ra # 20 <esp_audio_simple_dec_reset+0x20>
+  28:	47b2                	lw	a5,12(sp)
+  2a:	0007ac23          	sw	zero,24(a5)
+  2e:	0207a023          	sw	zero,32(a5)
+
+00000032 <.L162>:
+  32:	57d4                	lw	a3,44(a5)
+  34:	dfa9c737          	lui	a4,0xdfa9c
+  38:	ea970713          	addi	a4,a4,-343 # dfa9bea9 <.L141+0xdfa9bb27>
+  3c:	9736                	add	a4,a4,a3
+  3e:	4788                	lw	a0,8(a5)
+  40:	cf05                	beqz	a4,78 <.L163>	40: R_RISCV_RVC_BRANCH	.L163
+  42:	bebed737          	lui	a4,0xbebed
+  46:	bb370713          	addi	a4,a4,-1101 # bebecbb3 <.L141+0xbebec831>
+  4a:	9736                	add	a4,a4,a3
+  4c:	c715                	beqz	a4,78 <.L163>	4c: R_RISCV_RVC_BRANCH	.L163
+  4e:	dfdfb737          	lui	a4,0xdfdfb
+  52:	cac70713          	addi	a4,a4,-852 # dfdfacac <.L141+0xdfdfa92a>
+  56:	9736                	add	a4,a4,a3
+  58:	c305                	beqz	a4,78 <.L163>	58: R_RISCV_RVC_BRANCH	.L163
+  5a:	dfb8c737          	lui	a4,0xdfb8c
+  5e:	8b170713          	addi	a4,a4,-1871 # dfb8b8b1 <.L141+0xdfb8b52f>
+  62:	96ba                	add	a3,a3,a4
+  64:	ca91                	beqz	a3,78 <.L163>	64: R_RISCV_RVC_BRANCH	.L163
+  66:	c509                	beqz	a0,70 <.L166>	66: R_RISCV_RVC_BRANCH	.L166
+  68:	00000097          	auipc	ra,0x0	68: R_RISCV_CALL_PLT	esp_audio_dec_reset
+	68: R_RISCV_RELAX	*ABS*
+  6c:	000080e7          	jalr	ra # 68 <.L162+0x36>
+
+00000070 <.L166>:
+  70:	4501                	li	a0,0
+
+00000072 <.L159>:
+  72:	40f2                	lw	ra,28(sp)
+  74:	6105                	addi	sp,sp,32
+  76:	8082                	ret
+
+00000078 <.L163>:
+  78:	dd65                	beqz	a0,70 <.L166>	78: R_RISCV_RVC_BRANCH	.L166
+  7a:	c63e                	sw	a5,12(sp)
+  7c:	00000097          	auipc	ra,0x0	7c: R_RISCV_CALL_PLT	esp_audio_dec_close
+	7c: R_RISCV_RELAX	*ABS*
+  80:	000080e7          	jalr	ra # 7c <.L163+0x4>
+  84:	47b2                	lw	a5,12(sp)
+  86:	0007a423          	sw	zero,8(a5)
+  8a:	b7dd                	j	70 <.L166>	8a: R_RISCV_RVC_JUMP	.L166
+
+0000008c <.L177>:
+  8c:	00000097          	auipc	ra,0x0	8c: R_RISCV_CALL_PLT	esp_log_timestamp
+	8c: R_RISCV_RELAX	*ABS*
+  90:	000080e7          	jalr	ra # 8c <.L177>
+  94:	00000737          	lui	a4,0x0	94: R_RISCV_HI20	.LC0
+	94: R_RISCV_RELAX	*ABS*
+  98:	00070713          	mv	a4,a4	98: R_RISCV_LO12_I	.LC0
+	98: R_RISCV_RELAX	*ABS*
+  9c:	00000637          	lui	a2,0x0	9c: R_RISCV_HI20	.LC9
+	9c: R_RISCV_RELAX	*ABS*
+  a0:	86aa                	mv	a3,a0
+  a2:	85ba                	mv	a1,a4
+  a4:	4505                	li	a0,1
+  a6:	00060613          	mv	a2,a2	a6: R_RISCV_LO12_I	.LC9
+	a6: R_RISCV_RELAX	*ABS*
+  aa:	4781                	li	a5,0
+  ac:	00000097          	auipc	ra,0x0	ac: R_RISCV_CALL_PLT	esp_log
+	ac: R_RISCV_RELAX	*ABS*
+  b0:	000080e7          	jalr	ra # ac <.L177+0x20>
+  b4:	556d                	li	a0,-5
+  b6:	bf75                	j	72 <.L159>	b6: R_RISCV_RVC_JUMP	.L159
+

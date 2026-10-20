@@ -1,0 +1,222 @@
+tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:128
+Disassembly of section .text._make_words:
+
+00000000 <.text._make_words>:
+   0:	01c136        	entry	a1, 224
+   3:	296172        	s32i	a7, a1, 164
+   6:	246122        	s32i	a2, a1, 144
+   9:	286152        	s32i	a5, a1, 160
+   c:	067d      	mov.n	a7, a6
+   e:	0a23e6        	bgei	a3, 2, 1c <.text._make_words+0x1c>	e: R_XTENSA_SLOT0_OP	.text._make_words+0x1c
+  11:	000081        	l32r	a8, fffc0014 <vorbis_book_unpack+0xfffc0014>	11: R_XTENSA_SLOT0_OP	.literal._make_words
+  14:	0489      	s32i.n	a8, a4, 0
+  16:	020c      	movi.n	a2, 0
+  18:	008406        	j	22c <.text._make_words+0x22c>	18: R_XTENSA_SLOT0_OP	.text._make_words+0x22c
+  1b:	00          	.byte	00
+  1c:	84a0c2        	movi	a12, 132
+  1f:	0b0c      	movi.n	a11, 0
+  21:	01ad      	mov.n	a10, a1
+  23:	050c      	movi.n	a5, 0
+  25:	256132        	s32i	a3, a1, 148
+  28:	000081        	l32r	a8, fffc0028 <vorbis_book_unpack+0xfffc0028>	28: R_XTENSA_SLOT0_OP	.literal._make_words+0x4
+	28: R_XTENSA_ASM_EXPAND	memset
+  2b:	0008e0        	callx8	a8
+  2e:	05dd      	mov.n	a13, a5
+  30:	208550        	or	a8, a5, a5
+  33:	052d      	mov.n	a2, a5
+  35:	203660        	or	a3, a6, a6
+  38:	242192        	l32i	a9, a1, 144
+  3b:	998a      	add.n	a9, a9, a8
+  3d:	000972        	l8ui	a7, a9, 0
+  40:	1d8716        	beqz	a7, 21c <.text._make_words+0x21c>	40: R_XTENSA_SLOT0_OP	.text._make_words+0x21c
+  43:	a09710        	addx4	a9, a7, a1
+  46:	0968      	l32i.n	a6, a9, 0
+  48:	1d8c      	beqz.n	a13, 4d <.text._make_words+0x4d>	48: R_XTENSA_SLOT0_OP	.text._make_words+0x4d
+  4a:	1dc616        	beqz	a6, 22a <.text._make_words+0x22a>	4a: R_XTENSA_SLOT0_OP	.text._make_words+0x22a
+  4d:	3f1726        	beqi	a7, 1, 90 <.text._make_words+0x90>	4d: R_XTENSA_SLOT0_OP	.text._make_words+0x90
+  50:	b70b      	addi.n	a11, a7, -1
+  52:	02ad      	mov.n	a10, a2
+  54:	0bcd      	mov.n	a12, a11
+  56:	308c76        	loop	a12, 8a <.text._make_words+0x8a>	56: R_XTENSA_SLOT0_OP	.text._make_words+0x8a
+  59:	400b00        	ssr	a11
+  5c:	919060        	srl	a9, a6
+  5f:	049090        	extui	a9, a9, 0, 1
+  62:	909a90        	addx2	a9, a10, a9
+  65:	b0fa40        	addx8	a15, a10, a4
+  68:	a0e940        	addx4	a14, a9, a4
+  6b:	0b2a57        	blt	a10, a5, 7a <.text._make_words+0x7a>	6b: R_XTENSA_SLOT0_OP	.text._make_words+0x7a
+  6e:	551b      	addi.n	a5, a5, 1
+  70:	0f59      	s32i.n	a5, a15, 0
+  72:	1f29      	s32i.n	a2, a15, 4
+  74:	1199e0        	slli	a9, a9, 2
+  77:	000246        	j	84 <.text._make_words+0x84>	77: R_XTENSA_SLOT0_OP	.text._make_words+0x84
+  7a:	0ea8      	l32i.n	a10, a14, 0
+  7c:	1199e0        	slli	a9, a9, 2
+  7f:	1acc      	bnez.n	a10, 84 <.text._make_words+0x84>	7f: R_XTENSA_SLOT0_OP	.text._make_words+0x84
+  81:	006e52        	s32i	a5, a14, 0
+  84:	949a      	add.n	a9, a4, a9
+  86:	09a8      	l32i.n	a10, a9, 0
+  88:	bb0b      	addi.n	a11, a11, -1
+  8a:	faaa      	add.n	a15, a10, a10
+  8c:	000106        	j	94 <.text._make_words+0x94>	8c: R_XTENSA_SLOT0_OP	.text._make_words+0x94
+  8f:	00          	.byte	00
+  90:	0f0c      	movi.n	a15, 0
+  92:	0fad      	mov.n	a10, a15
+  94:	049060        	extui	a9, a6, 0, 1
+  97:	266192        	s32i	a9, a1, 152
+  9a:	062a57        	blt	a10, a5, a4 <.text._make_words+0xa4>	9a: R_XTENSA_SLOT0_OP	.text._make_words+0xa4
+  9d:	b0aa40        	addx8	a10, a10, a4
+  a0:	551b      	addi.n	a5, a5, 1
+  a2:	1a29      	s32i.n	a2, a10, 4
+  a4:	ad1b      	addi.n	a10, a13, 1
+  a6:	7398      	l32i.n	a9, a3, 28
+  a8:	2761a2        	s32i	a10, a1, 156
+  ab:	192926        	beqi	a9, 2, c8 <.text._make_words+0xc8>	ab: R_XTENSA_SLOT0_OP	.text._make_words+0xc8
+  ae:	0739e6        	bgei	a9, 3, b9 <.text._make_words+0xb9>	ae: R_XTENSA_SLOT0_OP	.text._make_words+0xb9
+  b1:	f99c      	beqz.n	a9, d4 <.text._make_words+0xd4>	b1: R_XTENSA_SLOT0_OP	.text._make_words+0xd4
+  b3:	261926        	beqi	a9, 1, dd <.text._make_words+0xdd>	b3: R_XTENSA_SLOT0_OP	.text._make_words+0xdd
+  b6:	004006        	j	1ba <.text._make_words+0x1ba>	b6: R_XTENSA_SLOT0_OP	.text._make_words+0x1ba
+  b9:	0000a1        	l32r	a10, fffc00bc <vorbis_book_unpack+0xfffc00bc>	b9: R_XTENSA_SLOT0_OP	.literal._make_words
+  bc:	fdc992        	addi	a9, a9, -3
+  bf:	20dda0        	or	a13, a13, a10
+  c2:	93da90        	movnez	a13, a10, a9
+  c5:	003d06        	j	1bd <.text._make_words+0x1bd>	c5: R_XTENSA_SLOT0_OP	.text._make_words+0x1bd
+  c8:	03a8      	l32i.n	a10, a3, 0
+  ca:	021aa6        	blti	a10, 1, d0 <.text._make_words+0xd0>	ca: R_XTENSA_SLOT0_OP	.text._make_words+0xd0
+  cd:	002ec6        	j	18c <.text._make_words+0x18c>	cd: R_XTENSA_SLOT0_OP	.text._make_words+0x18c
+  d0:	003986        	j	1ba <.text._make_words+0x1ba>	d0: R_XTENSA_SLOT0_OP	.text._make_words+0x1ba
+  d3:	00          	.byte	00
+  d4:	0000d1        	l32r	a13, fffc00d4 <vorbis_book_unpack+0xfffc00d4>	d4: R_XTENSA_SLOT0_OP	.literal._make_words
+  d7:	20d8d0        	or	a13, a8, a13
+  da:	0037c6        	j	1bd <.text._make_words+0x1bd>	da: R_XTENSA_SLOT0_OP	.text._make_words+0x1bd
+  dd:	382192        	l32i	a9, a1, 224
+  e0:	03a8      	l32i.n	a10, a3, 0
+  e2:	061926        	beqi	a9, 1, ec <.text._make_words+0xec>	e2: R_XTENSA_SLOT0_OP	.text._make_words+0xec
+  e5:	491ae6        	bgei	a10, 1, 132 <.text._make_words+0x132>	e5: R_XTENSA_SLOT0_OP	.text._make_words+0x132
+  e8:	003386        	j	1ba <.text._make_words+0x1ba>	e8: R_XTENSA_SLOT0_OP	.text._make_words+0x1ba
+  eb:	00          	.byte	00
+  ec:	021ae6        	bgei	a10, 1, f2 <.text._make_words+0xf2>	ec: R_XTENSA_SLOT0_OP	.text._make_words+0xf2
+  ef:	0031c6        	j	1ba <.text._make_words+0x1ba>	ef: R_XTENSA_SLOT0_OP	.text._make_words+0x1ba
+  f2:	f398      	l32i.n	a9, a3, 60
+  f4:	0b0c      	movi.n	a11, 0
+  f6:	2a6172        	s32i	a7, a1, 168
+  f9:	d3e8      	l32i.n	a14, a3, 52
+  fb:	282172        	l32i	a7, a1, 160
+  fe:	2b6162        	s32i	a6, a1, 172
+ 101:	08cd      	mov.n	a12, a8
+ 103:	20dbb0        	or	a13, a11, a11
+ 106:	206990        	or	a6, a9, a9
+ 109:	168a76        	loop	a10, 123 <.text._make_words+0x123>	109: R_XTENSA_SLOT0_OP	.text._make_words+0x123
+ 10c:	f29c70        	rems	a9, a12, a7
+ 10f:	909960        	addx2	a9, a9, a6
+ 112:	001992        	l16ui	a9, a9, 0
+ 115:	d2cc70        	quos	a12, a12, a7
+ 118:	401b00        	ssl	a11
+ 11b:	a19900        	sll	a9, a9
+ 11e:	20dd90        	or	a13, a13, a9
+ 121:	bbea      	add.n	a11, a11, a14
+ 123:	000091        	l32r	a9, fffc0124 <vorbis_book_unpack+0xfffc0124>	123: R_XTENSA_SLOT0_OP	.literal._make_words
+ 126:	2a2172        	l32i	a7, a1, 168
+ 129:	2b2162        	l32i	a6, a1, 172
+ 12c:	20dd90        	or	a13, a13, a9
+ 12f:	002286        	j	1bd <.text._make_words+0x1bd>	12f: R_XTENSA_SLOT0_OP	.text._make_words+0x1bd
+ 132:	0c0c      	movi.n	a12, 0
+ 134:	d3b8      	l32i.n	a11, a3, 52
+ 136:	2c6152        	s32i	a5, a1, 176
+ 139:	035d      	mov.n	a5, a3
+ 13b:	043d      	mov.n	a3, a4
+ 13d:	292142        	l32i	a4, a1, 164
+ 140:	2a6172        	s32i	a7, a1, 168
+ 143:	2b6162        	s32i	a6, a1, 172
+ 146:	2d6182        	s32i	a8, a1, 180
+ 149:	0c7d      	mov.n	a7, a12
+ 14b:	0c6d      	mov.n	a6, a12
+ 14d:	2e61f2        	s32i	a15, a1, 184
+ 150:	04ad      	mov.n	a10, a4
+ 152:	000081        	l32r	a8, fffc0154 <vorbis_book_unpack+0xfffc0154>	152: R_XTENSA_SLOT0_OP	.literal._make_words+0x8
+	152: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 155:	0008e0        	callx8	a8
+ 158:	d5b8      	l32i.n	a11, a5, 52
+ 15a:	05d8      	l32i.n	a13, a5, 0
+ 15c:	82eb60        	mull	a14, a11, a6
+ 15f:	661b      	addi.n	a6, a6, 1
+ 161:	401e00        	ssl	a14
+ 164:	a1aa00        	sll	a10, a10
+ 167:	2077a0        	or	a7, a7, a10
+ 16a:	e226d7        	blt	a6, a13, 150 <.text._make_words+0x150>	16a: R_XTENSA_SLOT0_OP	.text._make_words+0x150
+ 16d:	0000d1        	l32r	a13, fffc0170 <vorbis_book_unpack+0xfffc0170>	16d: R_XTENSA_SLOT0_OP	.literal._make_words
+ 170:	07cd      	mov.n	a12, a7
+ 172:	034d      	mov.n	a4, a3
+ 174:	2b2162        	l32i	a6, a1, 172
+ 177:	053d      	mov.n	a3, a5
+ 179:	2d2182        	l32i	a8, a1, 180
+ 17c:	2a2172        	l32i	a7, a1, 168
+ 17f:	2e21f2        	l32i	a15, a1, 184
+ 182:	2c2152        	l32i	a5, a1, 176
+ 185:	20dcd0        	or	a13, a12, a13
+ 188:	000c46        	j	1bd <.text._make_words+0x1bd>	188: R_XTENSA_SLOT0_OP	.text._make_words+0x1bd
+ 18b:	00          	.byte	00
+ 18c:	0b0c      	movi.n	a11, 0
+ 18e:	2a6172        	s32i	a7, a1, 168
+ 191:	e3e8      	l32i.n	a14, a3, 56
+ 193:	282172        	l32i	a7, a1, 160
+ 196:	08cd      	mov.n	a12, a8
+ 198:	0bdd      	mov.n	a13, a11
+ 19a:	108a76        	loop	a10, 1ae <.text._make_words+0x1ae>	19a: R_XTENSA_SLOT0_OP	.text._make_words+0x1ae
+ 19d:	f29c70        	rems	a9, a12, a7
+ 1a0:	401b00        	ssl	a11
+ 1a3:	a19900        	sll	a9, a9
+ 1a6:	d2cc70        	quos	a12, a12, a7
+ 1a9:	20dd90        	or	a13, a13, a9
+ 1ac:	bbea      	add.n	a11, a11, a14
+ 1ae:	000091        	l32r	a9, fffc01b0 <vorbis_book_unpack+0xfffc01b0>	1ae: R_XTENSA_SLOT0_OP	.literal._make_words
+ 1b1:	2a2172        	l32i	a7, a1, 168
+ 1b4:	20dd90        	or	a13, a13, a9
+ 1b7:	000086        	j	1bd <.text._make_words+0x1bd>	1b7: R_XTENSA_SLOT0_OP	.text._make_words+0x1bd
+ 1ba:	0000d1        	l32r	a13, fffc01bc <vorbis_book_unpack+0xfffc01bc>	1ba: R_XTENSA_SLOT0_OP	.literal._make_words
+ 1bd:	262192        	l32i	a9, a1, 152
+ 1c0:	07bd      	mov.n	a11, a7
+ 1c2:	a9fa      	add.n	a10, a9, a15
+ 1c4:	a0aa40        	addx4	a10, a10, a4
+ 1c7:	a09710        	addx4	a9, a7, a1
+ 1ca:	0ad9      	s32i.n	a13, a10, 0
+ 1cc:	09ad      	mov.n	a10, a9
+ 1ce:	20d770        	or	a13, a7, a7
+ 1d1:	1e8d76        	loop	a13, 1f3 <.text._make_words+0x1f3>	1d1: R_XTENSA_SLOT0_OP	.text._make_words+0x1f3
+ 1d4:	0ac8      	l32i.n	a12, a10, 0
+ 1d6:	0bfd      	mov.n	a15, a11
+ 1d8:	ec1b      	addi.n	a14, a12, 1
+ 1da:	bb0b      	addi.n	a11, a11, -1
+ 1dc:	0e6c07        	bbci	a12, 0, 1ee <.text._make_words+0x1ee>	1dc: R_XTENSA_SLOT0_OP	.text._make_words+0x1ee
+ 1df:	a0bb10        	addx4	a11, a11, a1
+ 1e2:	0ba8      	l32i.n	a10, a11, 0
+ 1e4:	a0ff10        	addx4	a15, a15, a1
+ 1e7:	aaaa      	add.n	a10, a10, a10
+ 1e9:	0fa9      	s32i.n	a10, a15, 0
+ 1eb:	000106        	j	1f3 <.text._make_words+0x1f3>	1eb: R_XTENSA_SLOT0_OP	.text._make_words+0x1f3
+ 1ee:	0ae9      	s32i.n	a14, a10, 0
+ 1f0:	fccaa2        	addi	a10, a10, -4
+ 1f3:	771b      	addi.n	a7, a7, 1
+ 1f5:	20a0a2        	movi	a10, 32
+ 1f8:	1d2a77        	blt	a10, a7, 219 <.text._make_words+0x219>	1f8: R_XTENSA_SLOT0_OP	.text._make_words+0x219
+ 1fb:	dfc772        	addi	a7, a7, -33
+ 1fe:	607070        	neg	a7, a7
+ 201:	06ad      	mov.n	a10, a6
+ 203:	1968      	l32i.n	a6, a9, 4
+ 205:	41b160        	srli	a11, a6, 1
+ 208:	0d9ba7        	bne	a11, a10, 219 <.text._make_words+0x219>	208: R_XTENSA_SLOT0_OP	.text._make_words+0x219
+ 20b:	09a8      	l32i.n	a10, a9, 0
+ 20d:	994b      	addi.n	a9, a9, 4
+ 20f:	aaaa      	add.n	a10, a10, a10
+ 211:	09a9      	s32i.n	a10, a9, 0
+ 213:	ffc772        	addi	a7, a7, -1
+ 216:	fe7756        	bnez	a7, 201 <.text._make_words+0x201>	216: R_XTENSA_SLOT0_OP	.text._make_words+0x201
+ 219:	2721d2        	l32i	a13, a1, 156
+ 21c:	252192        	l32i	a9, a1, 148
+ 21f:	881b      	addi.n	a8, a8, 1
+ 221:	021987        	beq	a9, a8, 227 <.text._make_words+0x227>	221: R_XTENSA_SLOT0_OP	.text._make_words+0x227
+ 224:	ff8406        	j	38 <.text._make_words+0x38>	224: R_XTENSA_SLOT0_OP	.text._make_words+0x38
+ 227:	ff7ac6        	j	16 <.text._make_words+0x16>	227: R_XTENSA_SLOT0_OP	.text._make_words+0x16
+ 22a:	f27c      	movi.n	a2, -1
+ 22c:	f01d      	retw.n
+

@@ -1,0 +1,154 @@
+tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:302
+Disassembly of section .text.esp_vorbis_dec_open:
+
+00000000 <esp_vorbis_dec_open>:
+   0:	00c136        	entry	a1, 96
+   3:	080c      	movi.n	a8, 0
+   5:	f0c3a2        	addi	a10, a3, -16
+   8:	190c      	movi.n	a9, 1
+   a:	1b0c      	movi.n	a11, 1
+   c:	939840        	movnez	a9, a8, a4
+   f:	938ba0        	movnez	a8, a11, a10
+  12:	208980        	or	a8, a9, a8
+  15:	027d      	mov.n	a7, a2
+  17:	58cc      	bnez.n	a8, 20 <esp_vorbis_dec_open+0x20>	17: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x20
+  19:	0b2d      	mov.n	a2, a11
+  1b:	932870        	movnez	a2, a8, a7
+  1e:	32ac      	beqz.n	a2, 45 <esp_vorbis_dec_open+0x45>	1e: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x45
+  20:	000081        	l32r	a8, fffc0020 <esp_vorbis_dec_open+0xfffc0020>	20: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x10
+	20: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  23:	0008e0        	callx8	a8
+  26:	0000b1        	l32r	a11, fffc0028 <esp_vorbis_dec_open+0xfffc0028>	26: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open
+  29:	0000c1        	l32r	a12, fffc002c <esp_vorbis_dec_open+0xfffc002c>	29: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x4
+  2c:	0add      	mov.n	a13, a10
+  2e:	1139      	s32i.n	a3, a1, 4
+  30:	0149      	s32i.n	a4, a1, 0
+  32:	07fd      	mov.n	a15, a7
+  34:	0bed      	mov.n	a14, a11
+  36:	1a0c      	movi.n	a10, 1
+  38:	000081        	l32r	a8, fffc0038 <esp_vorbis_dec_open+0xfffc0038>	38: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x14
+	38: R_XTENSA_ASM_EXPAND	esp_log
+  3b:	0008e0        	callx8	a8
+  3e:	b67c      	movi.n	a6, -5
+  40:	004006        	j	144 <esp_vorbis_dec_open+0x144>	40: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x144
+  43:	00          	.byte	00
+  44:	00          	.byte	00
+  45:	0000a1        	l32r	a10, fffc0048 <esp_vorbis_dec_open+0xfffc0048>	45: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x8
+  48:	0c3c      	movi.n	a12, 48
+  4a:	1b0c      	movi.n	a11, 1
+  4c:	000081        	l32r	a8, fffc004c <esp_vorbis_dec_open+0xfffc004c>	4c: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x18
+	4c: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  4f:	0008e0        	callx8	a8
+  52:	0a3d      	mov.n	a3, a10
+  54:	feaf62        	movi	a6, -2
+  57:	0e9a16        	beqz	a10, 144 <esp_vorbis_dec_open+0x144>	57: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x144
+  5a:	0000a1        	l32r	a10, fffc005c <esp_vorbis_dec_open+0xfffc005c>	5a: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x8
+  5d:	20a0c2        	movi	a12, 32
+  60:	01a0b2        	movi	a11, 1
+  63:	000081        	l32r	a8, fffc0064 <esp_vorbis_dec_open+0xfffc0064>	63: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x1c
+	63: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  66:	0008e0        	callx8	a8
+  69:	205aa0        	or	a5, a10, a10
+  6c:	09ca16        	beqz	a10, 10c <esp_vorbis_dec_open+0x10c>	6c: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x10c
+  6f:	000081        	l32r	a8, fffc0070 <esp_vorbis_dec_open+0xfffc0070>	6f: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x20
+	6f: R_XTENSA_ASM_EXPAND	vorbis_info_init
+  72:	0008e0        	callx8	a8
+  75:	028d      	mov.n	a8, a2
+  77:	10c1b2        	addi	a11, a1, 16
+  7a:	2cc122        	addi	a2, a1, 44
+  7d:	28c192        	addi	a9, a1, 40
+  80:	086d      	mov.n	a6, a8
+  82:	4169      	s32i.n	a6, a1, 16
+  84:	8169      	s32i.n	a6, a1, 32
+  86:	9169      	s32i.n	a6, a1, 36
+  88:	0269      	s32i.n	a6, a2, 0
+  8a:	2269      	s32i.n	a6, a2, 8
+  8c:	a1b9      	s32i.n	a11, a1, 40
+  8e:	7199      	s32i.n	a9, a1, 28
+  90:	58fc      	bnez.n	a8, c9 <esp_vorbis_dec_open+0xc9>	90: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0xc9
+  92:	1788      	l32i.n	a8, a7, 4
+  94:	07c8      	l32i.n	a12, a7, 0
+  96:	05ad      	mov.n	a10, a5
+  98:	c189      	s32i.n	a8, a1, 48
+  9a:	51c9      	s32i.n	a12, a1, 20
+  9c:	6189      	s32i.n	a8, a1, 24
+  9e:	000081        	l32r	a8, fffc00a0 <esp_vorbis_dec_open+0xfffc00a0>	9e: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x24
+	9e: R_XTENSA_ASM_EXPAND	_vorbis_unpack_info
+  a1:	0008e0        	callx8	a8
+  a4:	10c1b2        	addi	a11, a1, 16
+  a7:	28c192        	addi	a9, a1, 40
+  aa:	6abc      	beqz.n	a10, e4 <esp_vorbis_dec_open+0xe4>	aa: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0xe4
+  ac:	000081        	l32r	a8, fffc00ac <esp_vorbis_dec_open+0xfffc00ac>	ac: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x28
+	ac: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  af:	0008e0        	callx8	a8
+  b2:	0000b1        	l32r	a11, fffc00b4 <esp_vorbis_dec_open+0xfffc00b4>	b2: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open
+  b5:	0000c1        	l32r	a12, fffc00b8 <esp_vorbis_dec_open+0xfffc00b8>	b5: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0xc
+  b8:	0add      	mov.n	a13, a10
+  ba:	0bed      	mov.n	a14, a11
+  bc:	1a0c      	movi.n	a10, 1
+  be:	000081        	l32r	a8, fffc00c0 <esp_vorbis_dec_open+0xfffc00c0>	be: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x2c
+	be: R_XTENSA_ASM_EXPAND	esp_log
+  c1:	0008e0        	callx8	a8
+  c4:	c67c      	movi.n	a6, -4
+  c6:	000a06        	j	f2 <esp_vorbis_dec_open+0xf2>	c6: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0xf2
+  c9:	3788      	l32i.n	a8, a7, 12
+  cb:	2798      	l32i.n	a9, a7, 8
+  cd:	05ad      	mov.n	a10, a5
+  cf:	c189      	s32i.n	a8, a1, 48
+  d1:	5199      	s32i.n	a9, a1, 20
+  d3:	066182        	s32i	a8, a1, 24
+  d6:	000081        	l32r	a8, fffc00d8 <esp_vorbis_dec_open+0xfffc00d8>	d6: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x30
+	d6: R_XTENSA_ASM_EXPAND	_vorbis_unpack_books
+  d9:	0008e0        	callx8	a8
+  dc:	0a6d      	mov.n	a6, a10
+  de:	053a16        	beqz	a10, 135 <esp_vorbis_dec_open+0x135>	de: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x135
+  e1:	fff1c6        	j	ac <esp_vorbis_dec_open+0xac>	e1: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0xac
+  e4:	180c      	movi.n	a8, 1
+  e6:	ffe606        	j	82 <esp_vorbis_dec_open+0x82>	e6: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x82
+  e9:	03a9      	s32i.n	a10, a3, 0
+  eb:	0439      	s32i.n	a3, a4, 0
+  ed:	0014c6        	j	144 <esp_vorbis_dec_open+0x144>	ed: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x144
+  f0:	e67c      	movi.n	a6, -2
+  f2:	05ad      	mov.n	a10, a5
+  f4:	000081        	l32r	a8, fffc00f4 <esp_vorbis_dec_open+0xfffc00f4>	f4: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x34
+	f4: R_XTENSA_ASM_EXPAND	vorbis_info_clear
+  f7:	0008e0        	callx8	a8
+  fa:	05ad      	mov.n	a10, a5
+  fc:	000081        	l32r	a8, fffc00fc <esp_vorbis_dec_open+0xfffc00fc>	fc: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x38
+	fc: R_XTENSA_ASM_EXPAND	media_lib_free
+  ff:	0008e0        	callx8	a8
+ 102:	03ad      	mov.n	a10, a3
+ 104:	057d      	mov.n	a7, a5
+ 106:	000081        	l32r	a8, fffc0108 <esp_vorbis_dec_open+0xfffc0108>	106: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x3c
+	106: R_XTENSA_ASM_EXPAND	media_lib_free
+ 109:	0008e0        	callx8	a8
+ 10c:	03a8      	l32i.n	a10, a3, 0
+ 10e:	8a9c      	beqz.n	a10, 12a <esp_vorbis_dec_open+0x12a>	10e: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x12a
+ 110:	0a78      	l32i.n	a7, a10, 0
+ 112:	000081        	l32r	a8, fffc0114 <esp_vorbis_dec_open+0xfffc0114>	112: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x40
+	112: R_XTENSA_ASM_EXPAND	vorbis_dsp_destroy
+ 115:	0008e0        	callx8	a8
+ 118:	e78c      	beqz.n	a7, 12a <esp_vorbis_dec_open+0x12a>	118: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x12a
+ 11a:	07ad      	mov.n	a10, a7
+ 11c:	000081        	l32r	a8, fffc011c <esp_vorbis_dec_open+0xfffc011c>	11c: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x44
+	11c: R_XTENSA_ASM_EXPAND	vorbis_info_clear
+ 11f:	0008e0        	callx8	a8
+ 122:	07ad      	mov.n	a10, a7
+ 124:	000081        	l32r	a8, fffc0124 <esp_vorbis_dec_open+0xfffc0124>	124: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x48
+	124: R_XTENSA_ASM_EXPAND	media_lib_free
+ 127:	0008e0        	callx8	a8
+ 12a:	03ad      	mov.n	a10, a3
+ 12c:	000081        	l32r	a8, fffc012c <esp_vorbis_dec_open+0xfffc012c>	12c: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x4c
+	12c: R_XTENSA_ASM_EXPAND	media_lib_free
+ 12f:	0008e0        	callx8	a8
+ 132:	000386        	j	144 <esp_vorbis_dec_open+0x144>	132: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0x144
+ 135:	05ad      	mov.n	a10, a5
+ 137:	000081        	l32r	a8, fffc0138 <esp_vorbis_dec_open+0xfffc0138>	137: R_XTENSA_SLOT0_OP	.literal.esp_vorbis_dec_open+0x50
+	137: R_XTENSA_ASM_EXPAND	vorbis_dsp_create
+ 13a:	0008e0        	callx8	a8
+ 13d:	fa8a56        	bnez	a10, e9 <esp_vorbis_dec_open+0xe9>	13d: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0xe9
+ 140:	ffeb06        	j	f0 <esp_vorbis_dec_open+0xf0>	140: R_XTENSA_SLOT0_OP	.text.esp_vorbis_dec_open+0xf0
+ 143:	00          	.byte	00
+ 144:	062d      	mov.n	a2, a6
+ 146:	f01d      	retw.n
+

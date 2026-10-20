@@ -1,0 +1,2627 @@
+{
+  "status": "read_only_source_and_binary_audit_complete_implementation_and_target_qualification_not_run",
+  "stage": 14,
+  "created_utc": "2026-10-20T11:08:08.089835+00:00",
+  "scope": {
+    "included": "C3 checked Vorbis setup/output/Ogg wrappers; current CYD Vorbis registration and decoder retry/EOF ownership; actual installed codec2.6.2 ESP32/C3 archive selected members and public interfaces; read-only nm/objdump.",
+    "excluded": "Deferred AAC private owner-view is wholly excluded. No such source/object is selected or investigated, no transitive AAC verifier executes. Generic shared public container interfaces are inspected only for Ogg/Vorbis ownership. No builds, source/test/docs/Git edits or board operations.",
+    "mutations": "Only new ignored audit outputs in this folder. No tracked source/test/docs/Git/SDK mutations, builds, decoder execution or device operations."
+  },
+  "conclusions": [
+    "Proceed with a separately qualified Xtensa-specific port: six concrete target binary defects/call-order problems justify the checked setup, checked Ogg open/error propagation, PCM preflight and pending-packet preservation.",
+    "No conflicting offset was found in the independently examined target consumers/cleanup paths; this is partial corroboration, not proof that RV32 private ABI is portable in full. All sizes, alignment, signed fields and consumers must be qualified with actual Xtensa builds and decodes before production enablement.",
+    "Most existing CYD registration rollback, PCM owner release, resize retry, EOS drain loop and failed-handle close already exist; reuse them and test the actual service. Do not copy task core affinity, stack sizes, pool/TLS/IRAM tuning or donor performance numbers.",
+    "No standard conformance pass, target PCM/OOM result, heap reduction or speedup is claimed by this audit. Stage14 remains open."
+  ],
+  "installed_identity": {
+    "component_version": "2.6.2 from idf_component.yml",
+    "public_headers": "Shared installed headers are architecture-neutral API declarations; private layouts are absent.",
+    "component_selection": "Installed CMake chooses lib/${CONFIG_IDF_TARGET}. Frozen existing CYD project_description identifies target=esp32, SDKv6.0.2 and the same codec component path.",
+    "parser_embedded_version": "v1.0.1 in esp_es_parser_version.c.obj on both targets; a parser subcomponent version, not a replacement for package2.6.2.",
+    "archives": {
+      "esp32/libesp_audio_codec.a": {
+        "path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+        "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+        "bytes": 4384572
+      },
+      "esp32/libesp_audio_simple_dec.a": {
+        "path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+        "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+        "bytes": 156872
+      },
+      "esp32c3/libesp_audio_codec.a": {
+        "path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32c3\\libesp_audio_codec.a",
+        "sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+        "bytes": 3572832
+      },
+      "esp32c3/libesp_audio_simple_dec.a": {
+        "path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32c3\\libesp_audio_simple_dec.a",
+        "sha256": "232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f",
+        "bytes": 131128
+      }
+    },
+    "member_count": 38,
+    "machine_ids": {
+      "esp32": 94,
+      "esp32c3": 243
+    },
+    "selected_debug_info_count": 0,
+    "compiler_comment": "Both selected public Vorbis wrappers record GCC15.2.0 crosstool-NG esp-15.2.0_20251204. This does not imply ABI equivalence.",
+    "wrapper_symbol_availability": {
+      "esp_vorbis_dec_open": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj",
+              "name": "esp_vorbis_dec_open",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 328
+            }
+          ],
+          "selected_undefined_references": []
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_codec-634-esp_vorbis_dec.c.obj",
+              "name": "esp_vorbis_dec_open",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 418
+            }
+          ],
+          "selected_undefined_references": []
+        }
+      },
+      "esp_vorbis_dec_register": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj",
+              "name": "esp_vorbis_dec_register",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 19
+            }
+          ],
+          "selected_undefined_references": []
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_codec-634-esp_vorbis_dec.c.obj",
+              "name": "esp_vorbis_dec_register",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 24
+            }
+          ],
+          "selected_undefined_references": []
+        }
+      },
+      "esp_vorbis_dec_decode": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj",
+              "name": "esp_vorbis_dec_decode",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 318
+            }
+          ],
+          "selected_undefined_references": []
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_codec-634-esp_vorbis_dec.c.obj",
+              "name": "esp_vorbis_dec_decode",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 436
+            }
+          ],
+          "selected_undefined_references": []
+        }
+      },
+      "esp_audio_simple_dec_open": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_audio_simple_dec_open",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 574
+            }
+          ],
+          "selected_undefined_references": []
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_audio_simple_dec_open",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 750
+            }
+          ],
+          "selected_undefined_references": []
+        }
+      },
+      "esp_audio_simple_dec_process": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_audio_simple_dec_process",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 804
+            }
+          ],
+          "selected_undefined_references": []
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_audio_simple_dec_process",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 906
+            }
+          ],
+          "selected_undefined_references": []
+        }
+      },
+      "esp_audio_simple_dec_reset": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_audio_simple_dec_reset",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 158
+            }
+          ],
+          "selected_undefined_references": []
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_audio_simple_dec_reset",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 184
+            }
+          ],
+          "selected_undefined_references": []
+        }
+      },
+      "esp_es_parse_frame": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj",
+              "name": "esp_es_parse_frame",
+              "kind": "W",
+              "section_relative_address": "00000000",
+              "bytes": 1163
+            }
+          ],
+          "selected_undefined_references": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_es_parse_frame",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            }
+          ]
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-16-esp_es_parse.c.obj",
+              "name": "esp_es_parse_frame",
+              "kind": "W",
+              "section_relative_address": "00000000",
+              "bytes": 1320
+            }
+          ],
+          "selected_undefined_references": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj",
+              "name": "esp_es_parse_frame",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            }
+          ]
+        }
+      },
+      "esp_ogg_parse_frame": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj",
+              "name": "esp_ogg_parse_frame",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 974
+            }
+          ],
+          "selected_undefined_references": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-11-ogg_dec.c.obj",
+              "name": "esp_ogg_parse_frame",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            }
+          ]
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-12-ogg_parser.c.obj",
+              "name": "esp_ogg_parse_frame",
+              "kind": "T",
+              "section_relative_address": "00000000",
+              "bytes": 1232
+            }
+          ],
+          "selected_undefined_references": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-11-ogg_dec.c.obj",
+              "name": "esp_ogg_parse_frame",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            }
+          ]
+        }
+      },
+      "media_lib_module_realloc": {
+        "esp32": {
+          "selected_definitions": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-14-es_parse_mem.c.obj",
+              "name": "media_lib_module_realloc",
+              "kind": "W",
+              "section_relative_address": "00000000",
+              "bytes": 17
+            }
+          ],
+          "selected_undefined_references": [
+            {
+              "member": "esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj",
+              "name": "media_lib_module_realloc",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            },
+            {
+              "member": "esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj",
+              "name": "media_lib_module_realloc",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            }
+          ]
+        },
+        "esp32c3": {
+          "selected_definitions": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-14-es_parse_mem.c.obj",
+              "name": "media_lib_module_realloc",
+              "kind": "W",
+              "section_relative_address": "00000000",
+              "bytes": 12
+            }
+          ],
+          "selected_undefined_references": [
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-12-ogg_parser.c.obj",
+              "name": "media_lib_module_realloc",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            },
+            {
+              "member": "esp32c3-libesp_audio_simple_dec-16-esp_es_parse.c.obj",
+              "name": "media_lib_module_realloc",
+              "kind": "U",
+              "section_relative_address": null,
+              "bytes": null
+            }
+          ]
+        }
+      }
+    },
+    "allocator_resolution_limit": "media_lib_module_calloc/media_lib_module_realloc/media_lib_free are external dependencies of selected members; existing target linking resolves them elsewhere. The new target gate must verify the real allocator definition and --wrap relocation/callback routes in its actual linked ELF, not infer from an undefined symbol."
+  },
+  "confirmed_binary_flow_findings": [
+    {
+      "id": "V1",
+      "priority": "high",
+      "classification": "confirmed_binary_control_flow_defect",
+      "title": "Failed Vorbis open reads and frees an already freed wrapper",
+      "scenario": "After wrapper/info allocation succeeds, an invalid or allocation-failed setup header takes the cleanup path. The wrapper pointer remains in a3 after media_lib_free; execution falls through to read a3+0 and later calls media_lib_free on a3 again.",
+      "observed": "esp_vorbis_dec_open +0xf7 clears info, +0xff frees info, +0x109 frees wrapper; +0x10c loads wrapper->dsp from the freed wrapper; +0x12f frees the wrapper again. Symbolic allocator relocations and instructions establish the defect without donor layout assumptions.",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "esp_vorbis_dec.c.obj",
+          "archive_index": 634,
+          "member_sha256": "e7a0f9519dc54d54c2f3967734996b783110d3f7f59624141e38b823ed3bbac7",
+          "symbol_or_section": "esp_vorbis_dec_open",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+          "disassembly_sha256": "56935c880d30f4008d58948d17ec2b95ccf8af6abb4906aef8567ec67b5d23b4",
+          "excerpt": {
+            "payload": "excerpts/esp32-esp_vorbis_dec_open.txt",
+            "sha256": "907c8055d3f01c582f2daaedd677f3cd04dc5379e78ad76d1d3fd5d9b2b00130",
+            "original": "tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+            "first_line": 302,
+            "last_line": 454
+          },
+          "instructions": [
+            {
+              "section_offset": "0xf7",
+              "line": 415,
+              "instruction": "f7:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_vorbis_dec_open+0xf7](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:415)"
+            },
+            {
+              "section_offset": "0xff",
+              "line": 419,
+              "instruction": "ff:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_vorbis_dec_open+0xff](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:419)"
+            },
+            {
+              "section_offset": "0x109",
+              "line": 424,
+              "instruction": "109:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_vorbis_dec_open+0x109](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:424)"
+            },
+            {
+              "section_offset": "0x10c",
+              "line": 425,
+              "instruction": "10c:\t03a8      \tl32i.n\ta10, a3, 0",
+              "link": "[esp_vorbis_dec_open+0x10c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:425)"
+            },
+            {
+              "section_offset": "0x12f",
+              "line": 443,
+              "instruction": "12f:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_vorbis_dec_open+0x12f](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:443)"
+            }
+          ]
+        }
+      ],
+      "candidate": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+        "line": 1018,
+        "sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/setup.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/setup.c:1018)"
+      },
+      "gate": "Xtensa whole actual archive malformed-header and fail-every-allocation runs: handle stays NULL, exactly one owner frees each allocation, no leaked bytes, later valid open/decode/close works."
+    },
+    {
+      "id": "V2",
+      "priority": "high",
+      "classification": "confirmed_binary_control_flow_defect",
+      "title": "Vorbis DSP and setup constructors dereference unchecked allocation results",
+      "scenario": "The first 80-byte DSP allocation fails. The returned NULL is used as the store base immediately. Additional pointer tables/channel buffers and floor constructors also have unchecked paths.",
+      "observed": "vorbis_dsp_create +0xd calls calloc; +0x17 stores the info pointer through its result without a conditional branch. floor0_info_unpack allocates 40 bytes and later stores via its result; floor1_info_unpack allocates 36 and stores partitions at +0x20 without a NULL check.",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "dsp.c.obj",
+          "archive_index": 637,
+          "member_sha256": "931a435e8fecfcd7b349ad672383d34377e5e874c1345c136958f01cfcda6fea",
+          "symbol_or_section": "vorbis_dsp_create",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt",
+          "disassembly_sha256": "6bb13b9f489a9a0046125b01cb79226218c3c75c4711f23003baeda5b389f237",
+          "excerpt": {
+            "payload": "excerpts/esp32-vorbis_dsp_create.txt",
+            "sha256": "68f09233d00094ce3956ce7cf6fbbd0c632ca950827d0344d397b7b0b19c3d99",
+            "original": "tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt",
+            "first_line": 135,
+            "last_line": 234
+          },
+          "instructions": [
+            {
+              "section_offset": "0xd",
+              "line": 144,
+              "instruction": "d:\t0008e0        \tcallx8\ta8",
+              "link": "[vorbis_dsp_create+0xd](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:144)"
+            },
+            {
+              "section_offset": "0x17",
+              "line": 148,
+              "instruction": "17:\t0a29      \ts32i.n\ta2, a10, 0",
+              "link": "[vorbis_dsp_create+0x17](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:148)"
+            },
+            {
+              "section_offset": "0x36",
+              "line": 163,
+              "instruction": "36:\t73a9      \ts32i.n\ta10, a3, 28",
+              "link": "[vorbis_dsp_create+0x36](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:163)"
+            },
+            {
+              "section_offset": "0x52",
+              "line": 175,
+              "instruction": "52:\t83a9      \ts32i.n\ta10, a3, 32",
+              "link": "[vorbis_dsp_create+0x52](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:175)"
+            }
+          ]
+        },
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "floor0.c.obj",
+          "archive_index": 638,
+          "member_sha256": "ad09db80f2892f51b478e20092ae424e7b2f8315af335c46a50be160ae7eeaac",
+          "symbol_or_section": "floor0_info_unpack",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt",
+          "disassembly_sha256": "54eda0e96f47c6a2ba3626d76f2a66ee577e47e2a228da052323ce6ba66dc740",
+          "excerpt": {
+            "payload": "excerpts/esp32-floor0_info_unpack.txt",
+            "sha256": "17173137dc3291e50ca9c049edb25dbee5373a72fb24d0baa17c5d01a7d2c510",
+            "original": "tool-output/esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt",
+            "first_line": 533,
+            "last_line": 615
+          },
+          "instructions": [
+            {
+              "section_offset": "0xf",
+              "line": 543,
+              "instruction": "f:\t0008e0        \tcallx8\ta8",
+              "link": "[floor0_info_unpack+0xf](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt:543)"
+            },
+            {
+              "section_offset": "0x1e",
+              "line": 550,
+              "instruction": "1e:\t02a9      \ts32i.n\ta10, a2, 0",
+              "link": "[floor0_info_unpack+0x1e](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt:550)"
+            }
+          ]
+        },
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "floor1.c.obj",
+          "archive_index": 639,
+          "member_sha256": "4d08cdcc95682470da26a2aa3fe22a0dbea993469de6d5988160478080e7b119",
+          "symbol_or_section": "floor1_info_unpack",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt",
+          "disassembly_sha256": "cebb0c7a74173516a6375bce1886702040d1c2e1ab9ae423620e080de515d4d4",
+          "excerpt": {
+            "payload": "excerpts/esp32-floor1_info_unpack.txt",
+            "sha256": "6ebaa2ab19c39b08ca00aaaeb94c81f707f0d4a95c57c768595bccb01917d4dd",
+            "original": "tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt",
+            "first_line": 116,
+            "last_line": 663
+          },
+          "instructions": [
+            {
+              "section_offset": "0xf",
+              "line": 126,
+              "instruction": "f:\t0008e0        \tcallx8\ta8",
+              "link": "[floor1_info_unpack+0xf](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:126)"
+            },
+            {
+              "section_offset": "0x20",
+              "line": 134,
+              "instruction": "20:\t64a9      \ts32i.n\ta10, a4, 24",
+              "link": "[floor1_info_unpack+0x20](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:134)"
+            }
+          ]
+        }
+      ],
+      "candidate": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+        "line": 985,
+        "sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/setup.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/setup.c:985)"
+      },
+      "gate": "Fresh target OOM sweep must discover the actual Xtensa allocation order including all channels, tables, floors, mappings, books, parser caches, and cleanup after partial construction; donor allocation counts are not target evidence."
+    },
+    {
+      "id": "V3",
+      "priority": "high",
+      "classification": "confirmed_binary_control_flow_defect",
+      "title": "Ogg simple open writes through a failed initial calloc",
+      "scenario": "The 48-byte simple state allocation fails during Ogg open.",
+      "observed": "esp_audio_simple_dec_open +0x3d calls calloc, +0x42 copies the result to a3, +0x47 writes the container at a3+44 without any NULL test.",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+          "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+          "member": "esp_audio_simple_dec.c.obj",
+          "archive_index": 4,
+          "member_sha256": "15d77d414aaf223b8e3340f4846e4193b8a31e6d5ce1c7304a7a79f3f43899fd",
+          "symbol_or_section": "esp_audio_simple_dec_open",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+          "disassembly_sha256": "b6a73b7c05bcf58be8f1aa62b5a27ffd71476efe083f36cc95efb45393c9dead",
+          "excerpt": {
+            "payload": "excerpts/esp32-esp_audio_simple_dec_open.txt",
+            "sha256": "27581cf67f1b6b03d88580b76364ea206f96716f768d3f917e6fec375169b65b",
+            "original": "tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+            "first_line": 201,
+            "last_line": 461
+          },
+          "instructions": [
+            {
+              "section_offset": "0x38",
+              "line": 228,
+              "instruction": "38:\t0c3c      \tmovi.n\ta12, 48",
+              "link": "[esp_audio_simple_dec_open+0x38](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:228)"
+            },
+            {
+              "section_offset": "0x3d",
+              "line": 231,
+              "instruction": "3d:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_audio_simple_dec_open+0x3d](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:231)"
+            },
+            {
+              "section_offset": "0x42",
+              "line": 233,
+              "instruction": "42:\t0a3d      \tmov.n\ta3, a10",
+              "link": "[esp_audio_simple_dec_open+0x42](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:233)"
+            },
+            {
+              "section_offset": "0x47",
+              "line": 235,
+              "instruction": "47:\tb389      \ts32i.n\ta8, a3, 44",
+              "link": "[esp_audio_simple_dec_open+0x47](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:235)"
+            }
+          ]
+        }
+      ],
+      "candidate": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\simple.c",
+        "line": 55,
+        "sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/simple.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/simple.c:55)"
+      },
+      "gate": "Checked Ogg-only initializer with NULL publication until ready; prove original close/reset accepts the extended allocation and parser-open/config/decoder failures release exactly their owned resources. Other simple types must forward unchanged."
+    },
+    {
+      "id": "V4",
+      "priority": "high",
+      "classification": "confirmed_binary_call_order_with_runtime_effect_to_qualify",
+      "title": "PCM capacity is checked after Vorbis synthesis mutates history",
+      "scenario": "A valid audio packet is offered with a too-small PCM buffer and the caller resizes then retries the same packet, as current CYD audio_service does.",
+      "observed": "esp_vorbis_dec_decode calls vorbis_dsp_synthesis at +0xab, then computes output bytes from dsp out_begin/out_end/channels and checks output capacity at +0xe9. The insufficient-buffer branch sets needed_size and returns -8. The history mutation follows from the called target synthesis implementation; exact audible corruption is not measured here.",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "esp_vorbis_dec.c.obj",
+          "archive_index": 634,
+          "member_sha256": "e7a0f9519dc54d54c2f3967734996b783110d3f7f59624141e38b823ed3bbac7",
+          "symbol_or_section": "esp_vorbis_dec_decode",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+          "disassembly_sha256": "56935c880d30f4008d58948d17ec2b95ccf8af6abb4906aef8567ec67b5d23b4",
+          "excerpt": {
+            "payload": "excerpts/esp32-esp_vorbis_dec_decode.txt",
+            "sha256": "b8835b5691202a9a8623aa87d558d5b06bf108d1610326b5d58d63ce3f2fb50d",
+            "original": "tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+            "first_line": 82,
+            "last_line": 229
+          },
+          "instructions": [
+            {
+              "section_offset": "0xab",
+              "line": 163,
+              "instruction": "ab:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_vorbis_dec_decode+0xab](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:163)"
+            },
+            {
+              "section_offset": "0xd9",
+              "line": 184,
+              "instruction": "d9:\t9a88      \tl32i.n\ta8, a10, 36",
+              "link": "[esp_vorbis_dec_decode+0xd9](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:184)"
+            },
+            {
+              "section_offset": "0xdd",
+              "line": 186,
+              "instruction": "dd:\taac8      \tl32i.n\ta12, a10, 40",
+              "link": "[esp_vorbis_dec_decode+0xdd](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:186)"
+            },
+            {
+              "section_offset": "0xdf",
+              "line": 187,
+              "instruction": "df:\t1b78      \tl32i.n\ta7, a11, 4",
+              "link": "[esp_vorbis_dec_decode+0xdf](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:187)"
+            },
+            {
+              "section_offset": "0xe9",
+              "line": 191,
+              "instruction": "e9:\t09b987        \tbgeu\ta9, a8, f6 <esp_vorbis_dec_decode+0xf6>\te9: R_XTENSA_SLOT0_OP\t.text.esp_vorbis_dec_decode+0xf6",
+              "link": "[esp_vorbis_dec_decode+0xe9](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:191)"
+            }
+          ]
+        },
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "dsp.c.obj",
+          "archive_index": 637,
+          "member_sha256": "931a435e8fecfcd7b349ad672383d34377e5e874c1345c136958f01cfcda6fea",
+          "symbol_or_section": "vorbis_dsp_synthesis",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt",
+          "disassembly_sha256": "6bb13b9f489a9a0046125b01cb79226218c3c75c4711f23003baeda5b389f237",
+          "excerpt": {
+            "payload": "excerpts/esp32-vorbis_dsp_synthesis.txt",
+            "sha256": "b46edf471055d7a618d1974b47d4cd95db3d734a3b58dcf9a29d168b5b5af3fd",
+            "original": "tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt",
+            "first_line": 420,
+            "last_line": 673
+          },
+          "instructions": [
+            {
+              "section_offset": "0x0",
+              "line": 423,
+              "instruction": "0:\t006136        \tentry\ta1, 48",
+              "link": "[vorbis_dsp_synthesis+0x0](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:423)"
+            }
+          ]
+        }
+      ],
+      "candidate": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\output.c",
+        "line": 9,
+        "sha256": "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/output.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/output.c:9)"
+      },
+      "current_cyd_entry": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c",
+        "line": 1058,
+        "sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "link": "[idf/esp32-cyd2usb-native/main/audio_service.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/audio_service.c:1058)"
+      },
+      "gate": "Actual Xtensa raw-packet ample-buffer oracle vs repeated needed_size-1 and then exact-size retries; first priming block, short/long changes, byte-two window flags, EOS trimming. Require consumed=decoded=0 and unchanged history on every rejected retry."
+    },
+    {
+      "id": "V5",
+      "priority": "medium",
+      "classification": "confirmed_binary_control_flow_defect",
+      "title": "A second undersized retry drops the retained Ogg packet",
+      "scenario": "The Ogg simple decoder already holds pending_data/pending_bytes after BUFF_NOT_ENOUGH. A retry still returns BUFF_NOT_ENOUGH.",
+      "observed": "esp_audio_simple_dec_process +0xc0 reads pending_bytes, +0xd9 calls decode. Every nonzero result branches +0xde to +0x100; +0x102 stores zero pending_bytes and +0x104 reports the prior pending_consumed. The initial parser-fed -8 branch at +0x21c instead retains these fields. No error-specific exception exists on the retry path.",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+          "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+          "member": "esp_audio_simple_dec.c.obj",
+          "archive_index": 4,
+          "member_sha256": "15d77d414aaf223b8e3340f4846e4193b8a31e6d5ce1c7304a7a79f3f43899fd",
+          "symbol_or_section": "esp_audio_simple_dec_process",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+          "disassembly_sha256": "b6a73b7c05bcf58be8f1aa62b5a27ffd71476efe083f36cc95efb45393c9dead",
+          "excerpt": {
+            "payload": "excerpts/esp32-esp_audio_simple_dec_process.txt",
+            "sha256": "76e729b61937f203c1247cf98c79d510022164b753d7180c46a61ad6ca8b334b",
+            "original": "tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+            "first_line": 495,
+            "last_line": 845
+          },
+          "instructions": [
+            {
+              "section_offset": "0xc0",
+              "line": 581,
+              "instruction": "c0:\t4238      \tl32i.n\ta3, a2, 16",
+              "link": "[esp_audio_simple_dec_process+0xc0](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:581)"
+            },
+            {
+              "section_offset": "0xd9",
+              "line": 593,
+              "instruction": "d9:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_audio_simple_dec_process+0xd9](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:593)"
+            },
+            {
+              "section_offset": "0xde",
+              "line": 595,
+              "instruction": "de:\teadc      \tbnez.n\ta10, 100 <esp_audio_simple_dec_process+0x100>\tde: R_XTENSA_SLOT0_OP\t.text.esp_audio_simple_dec_process+0x100",
+              "link": "[esp_audio_simple_dec_process+0xde](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:595)"
+            },
+            {
+              "section_offset": "0x100",
+              "line": 610,
+              "instruction": "100:\t5298      \tl32i.n\ta9, a2, 20",
+              "link": "[esp_audio_simple_dec_process+0x100](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:610)"
+            },
+            {
+              "section_offset": "0x102",
+              "line": 611,
+              "instruction": "102:\t4249      \ts32i.n\ta4, a2, 16",
+              "link": "[esp_audio_simple_dec_process+0x102](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:611)"
+            },
+            {
+              "section_offset": "0x104",
+              "line": 612,
+              "instruction": "104:\t3799      \ts32i.n\ta9, a7, 12",
+              "link": "[esp_audio_simple_dec_process+0x104](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:612)"
+            },
+            {
+              "section_offset": "0x21c",
+              "line": 733,
+              "instruction": "21c:\t159a97        \tbne\ta10, a9, 235 <esp_audio_simple_dec_process+0x235>\t21c: R_XTENSA_SLOT0_OP\t.text.esp_audio_simple_dec_process+0x235",
+              "link": "[esp_audio_simple_dec_process+0x21c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:733)"
+            },
+            {
+              "section_offset": "0x226",
+              "line": 737,
+              "instruction": "226:\t4299      \ts32i.n\ta9, a2, 16",
+              "link": "[esp_audio_simple_dec_process+0x226](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:737)"
+            }
+          ]
+        }
+      ],
+      "candidate": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\simple.c",
+        "line": 136,
+        "sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/simple.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/simple.c:136)"
+      },
+      "gate": "Actual container decode must reject the same pending packet repeatedly, preserve data/bytes/consumed ownership, then produce the exact same PCM as ample buffers without duplicate or missing frames."
+    },
+    {
+      "id": "V6",
+      "priority": "medium",
+      "classification": "confirmed_binary_error_propagation_defect",
+      "title": "Ogg allocation failure can be reported as ordinary progress/success",
+      "scenario": "Vorbis identification/setup header realloc fails, or the elementary parser returns ESP_ES_PARSE_ERR_NO_MEM (-3) during Ogg processing.",
+      "observed": "parse_vorbis_header failed realloc at +0x8a/+0xba branches to +0x21 (return boolean 0, the same non-match path). Separately simple process receives parser result at +0x146; only -6/-9 take the explicit unsupported path, while -3 stores consumed and follows +0x162/+0x166 to the ordinary +0x262 return-0 path when no PCM/padding exists. The scope wrapper can preserve both signals.",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+          "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+          "member": "ogg_parser.c.obj",
+          "archive_index": 12,
+          "member_sha256": "ac9b10afc3866d7af3cdb391fcc99c24e73463c22b37f7115841c9037359ab3f",
+          "symbol_or_section": "parse_vorbis_header",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt",
+          "disassembly_sha256": "a0c0879b91afc02c063e8c725b946ed1a823e42601de02c47e29e9355325ef38",
+          "excerpt": {
+            "payload": "excerpts/esp32-parse_vorbis_header.txt",
+            "sha256": "65d20791dab83ea66868e594d883cc17100dec0a855b13b0aebc6be09c1c4ec0",
+            "original": "tool-output/esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt",
+            "first_line": 104,
+            "last_line": 201
+          },
+          "instructions": [
+            {
+              "section_offset": "0x21",
+              "line": 122,
+              "instruction": "21:\t020c      \tmovi.n\ta2, 0",
+              "link": "[parse_vorbis_header+0x21](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:122)"
+            },
+            {
+              "section_offset": "0x8a",
+              "line": 164,
+              "instruction": "8a:\t0008e0        \tcallx8\ta8",
+              "link": "[parse_vorbis_header+0x8a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:164)"
+            },
+            {
+              "section_offset": "0x8f",
+              "line": 166,
+              "instruction": "8f:\tf8ea16        \tbeqz\ta10, 21 <.text.parse_vorbis_header+0x21>\t8f: R_XTENSA_SLOT0_OP\t.text.parse_vorbis_header+0x21",
+              "link": "[parse_vorbis_header+0x8f](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:166)"
+            },
+            {
+              "section_offset": "0xba",
+              "line": 187,
+              "instruction": "ba:\t0008e0        \tcallx8\ta8",
+              "link": "[parse_vorbis_header+0xba](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:187)"
+            },
+            {
+              "section_offset": "0xbf",
+              "line": 189,
+              "instruction": "bf:\tf5ea16        \tbeqz\ta10, 21 <.text.parse_vorbis_header+0x21>\tbf: R_XTENSA_SLOT0_OP\t.text.parse_vorbis_header+0x21",
+              "link": "[parse_vorbis_header+0xbf](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:189)"
+            }
+          ]
+        },
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+          "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+          "member": "esp_audio_simple_dec.c.obj",
+          "archive_index": 4,
+          "member_sha256": "15d77d414aaf223b8e3340f4846e4193b8a31e6d5ce1c7304a7a79f3f43899fd",
+          "symbol_or_section": "esp_audio_simple_dec_process",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+          "disassembly_sha256": "b6a73b7c05bcf58be8f1aa62b5a27ffd71476efe083f36cc95efb45393c9dead",
+          "excerpt": {
+            "payload": "excerpts/esp32-esp_audio_simple_dec_process.txt",
+            "sha256": "76e729b61937f203c1247cf98c79d510022164b753d7180c46a61ad6ca8b334b",
+            "original": "tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+            "first_line": 495,
+            "last_line": 845
+          },
+          "instructions": [
+            {
+              "section_offset": "0x146",
+              "line": 639,
+              "instruction": "146:\t0008e0        \tcallx8\ta8",
+              "link": "[esp_audio_simple_dec_process+0x146](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:639)"
+            },
+            {
+              "section_offset": "0x149",
+              "line": 640,
+              "instruction": "149:\tca9c      \tbeqz.n\ta10, 169 <esp_audio_simple_dec_process+0x169>\t149: R_XTENSA_SLOT0_OP\t.text.esp_audio_simple_dec_process+0x169",
+              "link": "[esp_audio_simple_dec_process+0x149](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:640)"
+            },
+            {
+              "section_offset": "0x153",
+              "line": 644,
+              "instruction": "153:\t0a1b16        \tbeqz\ta11, 1f8 <esp_audio_simple_dec_process+0x1f8>\t153: R_XTENSA_SLOT0_OP\t.text.esp_audio_simple_dec_process+0x1f8",
+              "link": "[esp_audio_simple_dec_process+0x153](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:644)"
+            },
+            {
+              "section_offset": "0x15a",
+              "line": 647,
+              "instruction": "15a:\t9398a0        \tmovnez\ta9, a8, a10",
+              "link": "[esp_audio_simple_dec_process+0x15a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:647)"
+            },
+            {
+              "section_offset": "0x162",
+              "line": 650,
+              "instruction": "162:\t9188      \tl32i.n\ta8, a1, 36",
+              "link": "[esp_audio_simple_dec_process+0x162](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:650)"
+            },
+            {
+              "section_offset": "0x166",
+              "line": 652,
+              "instruction": "166:\t005286        \tj\t2b4 <esp_audio_simple_dec_process+0x2b4>\t166: R_XTENSA_SLOT0_OP\t.text.esp_audio_simple_dec_process+0x2b4",
+              "link": "[esp_audio_simple_dec_process+0x166](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:652)"
+            },
+            {
+              "section_offset": "0x262",
+              "line": 765,
+              "instruction": "262:\t080c      \tmovi.n\ta8, 0",
+              "link": "[esp_audio_simple_dec_process+0x262](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:765)"
+            }
+          ]
+        }
+      ],
+      "candidate": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\simple.c",
+        "line": 100,
+        "sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/simple.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/simple.c:100)"
+      },
+      "gate": "Actual Xtensa task-local nested failure scopes; inject each packet/header realloc and parser cache allocation, return MEM_LACK with decoded_size=0, close failed handle in CYD. Verify two task/core scopes cannot contaminate one another and zero-size realloc/non-Ogg forwarding remains unchanged."
+    }
+  ],
+  "private_layout_observations_not_full_abi_proof": {
+    "status": "Partial positive corroboration; no observed conflicting field among examined consumers; do not relabel donor ABI as Xtensa proven.",
+    "observations": [
+      {
+        "type": "wrapper",
+        "donor": "48 bytes; dsp0, packet8, sent_info40",
+        "target_observed": "calloc48 in open; decode passes wrapper+8 to synthesis and uses byte40; close loads dsp0.",
+        "evidence": [
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "esp_vorbis_dec.c.obj",
+            "archive_index": 634,
+            "member_sha256": "e7a0f9519dc54d54c2f3967734996b783110d3f7f59624141e38b823ed3bbac7",
+            "symbol_or_section": "esp_vorbis_dec_open",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+            "disassembly_sha256": "56935c880d30f4008d58948d17ec2b95ccf8af6abb4906aef8567ec67b5d23b4",
+            "excerpt": {
+              "payload": "excerpts/esp32-esp_vorbis_dec_open.txt",
+              "sha256": "907c8055d3f01c582f2daaedd677f3cd04dc5379e78ad76d1d3fd5d9b2b00130",
+              "original": "tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+              "first_line": 302,
+              "last_line": 454
+            },
+            "instructions": [
+              {
+                "section_offset": "0x48",
+                "line": 337,
+                "instruction": "48:\t0c3c      \tmovi.n\ta12, 48",
+                "link": "[esp_vorbis_dec_open+0x48](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:337)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "esp_vorbis_dec.c.obj",
+            "archive_index": 634,
+            "member_sha256": "e7a0f9519dc54d54c2f3967734996b783110d3f7f59624141e38b823ed3bbac7",
+            "symbol_or_section": "esp_vorbis_dec_decode",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+            "disassembly_sha256": "56935c880d30f4008d58948d17ec2b95ccf8af6abb4906aef8567ec67b5d23b4",
+            "excerpt": {
+              "payload": "excerpts/esp32-esp_vorbis_dec_decode.txt",
+              "sha256": "b8835b5691202a9a8623aa87d558d5b06bf108d1610326b5d58d63ce3f2fb50d",
+              "original": "tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+              "first_line": 82,
+              "last_line": 229
+            },
+            "instructions": [
+              {
+                "section_offset": "0x9e",
+                "line": 156,
+                "instruction": "9e:\tb28b      \taddi.n\ta11, a2, 8",
+                "link": "[esp_vorbis_dec_decode+0x9e](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:156)"
+              },
+              {
+                "section_offset": "0x118",
+                "line": 212,
+                "instruction": "118:\t280292        \tl8ui\ta9, a2, 40",
+                "link": "[esp_vorbis_dec_decode+0x118](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:212)"
+              },
+              {
+                "section_offset": "0x133",
+                "line": 224,
+                "instruction": "133:\t284282        \ts8i\ta8, a2, 40",
+                "link": "[esp_vorbis_dec_decode+0x133](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:224)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "vorbis_info / codec_setup",
+        "donor": "info32 setup pointer28; setup52 with blocks0/4, counts8/12/16/20/24 and arrays28/32/36/40/44/48",
+        "target_observed": "info memset32, setup calloc52 at info+28; target cleanup uses the asserted array offsets and count offsets with mapping20/residue28/book64 strides.",
+        "evidence": [
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "info.c.obj",
+            "archive_index": 642,
+            "member_sha256": "1ff7485a721d4b4f727f4e30a5f431055ae55859b80f97dc9435d2745986eb6c",
+            "symbol_or_section": "vorbis_info_init",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-642-info.c.obj-disasm.txt",
+            "disassembly_sha256": "21d96e30d033ab5c9a33d0156d75bee56e5a24200f8e9c57fae4d947803b6336",
+            "excerpt": {
+              "payload": "excerpts/esp32-vorbis_info_init.txt",
+              "sha256": "9db8100258ce04c52e69f00666f8dbdd51e9f893c227be8490a0d82a2ed75016",
+              "original": "tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt",
+              "first_line": 352,
+              "last_line": 370
+            },
+            "instructions": [
+              {
+                "section_offset": "0x3",
+                "line": 356,
+                "instruction": "3:\t0c2c      \tmovi.n\ta12, 32",
+                "link": "[vorbis_info_init+0x3](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:356)"
+              },
+              {
+                "section_offset": "0x13",
+                "line": 363,
+                "instruction": "13:\t4c3c      \tmovi.n\ta12, 52",
+                "link": "[vorbis_info_init+0x13](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:363)"
+              },
+              {
+                "section_offset": "0x1d",
+                "line": 368,
+                "instruction": "1d:\t72a9      \ts32i.n\ta10, a2, 28",
+                "link": "[vorbis_info_init+0x1d](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:368)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "info.c.obj",
+            "archive_index": 642,
+            "member_sha256": "1ff7485a721d4b4f727f4e30a5f431055ae55859b80f97dc9435d2745986eb6c",
+            "symbol_or_section": "vorbis_info_clear",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-642-info.c.obj-disasm.txt",
+            "disassembly_sha256": "21d96e30d033ab5c9a33d0156d75bee56e5a24200f8e9c57fae4d947803b6336",
+            "excerpt": {
+              "payload": "excerpts/esp32-vorbis_info_clear.txt",
+              "sha256": "8d4f5b9c7d73fec0d199404401fc3ed5bbc06fa6c7abdc35f375359816591516",
+              "original": "tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt",
+              "first_line": 371,
+              "last_line": 475
+            },
+            "instructions": [
+              {
+                "section_offset": "0x5",
+                "line": 376,
+                "instruction": "5:\t7228      \tl32i.n\ta2, a2, 28",
+                "link": "[vorbis_info_clear+0x5](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:376)"
+              },
+              {
+                "section_offset": "0xa",
+                "line": 378,
+                "instruction": "a:\t72a8      \tl32i.n\ta10, a2, 28",
+                "link": "[vorbis_info_clear+0xa](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:378)"
+              },
+              {
+                "section_offset": "0x15",
+                "line": 383,
+                "instruction": "15:\t82a8      \tl32i.n\ta10, a2, 32",
+                "link": "[vorbis_info_clear+0x15](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:383)"
+              },
+              {
+                "section_offset": "0x3b",
+                "line": 400,
+                "instruction": "3b:\ta2a8      \tl32i.n\ta10, a2, 40",
+                "link": "[vorbis_info_clear+0x3b](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:400)"
+              },
+              {
+                "section_offset": "0x46",
+                "line": 405,
+                "instruction": "46:\t9288      \tl32i.n\ta8, a2, 36",
+                "link": "[vorbis_info_clear+0x46](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:405)"
+              },
+              {
+                "section_offset": "0x7e",
+                "line": 430,
+                "instruction": "7e:\tb2a8      \tl32i.n\ta10, a2, 44",
+                "link": "[vorbis_info_clear+0x7e](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:430)"
+              },
+              {
+                "section_offset": "0xa6",
+                "line": 447,
+                "instruction": "a6:\tc2a8      \tl32i.n\ta10, a2, 48",
+                "link": "[vorbis_info_clear+0xa6](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:447)"
+              },
+              {
+                "section_offset": "0xb1",
+                "line": 452,
+                "instruction": "b1:\t1187a0        \tslli\ta8, a7, 6",
+                "link": "[vorbis_info_clear+0xb1](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:452)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "dsp",
+        "donor": "80 bytes; info0, work28/mdctright32, output36/40, lW44/W48, 64-bit counters56/64/72",
+        "target_observed": "Constructor allocation and stores corroborate these offsets; decode reads output36/40 and PCM preflight must independently match target synthesis use of W48.",
+        "evidence": [
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "dsp.c.obj",
+            "archive_index": 637,
+            "member_sha256": "931a435e8fecfcd7b349ad672383d34377e5e874c1345c136958f01cfcda6fea",
+            "symbol_or_section": "vorbis_dsp_create",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt",
+            "disassembly_sha256": "6bb13b9f489a9a0046125b01cb79226218c3c75c4711f23003baeda5b389f237",
+            "excerpt": {
+              "payload": "excerpts/esp32-vorbis_dsp_create.txt",
+              "sha256": "68f09233d00094ce3956ce7cf6fbbd0c632ca950827d0344d397b7b0b19c3d99",
+              "original": "tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt",
+              "first_line": 135,
+              "last_line": 234
+            },
+            "instructions": [
+              {
+                "section_offset": "0x6",
+                "line": 140,
+                "instruction": "6:\t0c5c      \tmovi.n\ta12, 80",
+                "link": "[vorbis_dsp_create+0x6](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:140)"
+              },
+              {
+                "section_offset": "0x17",
+                "line": 148,
+                "instruction": "17:\t0a29      \ts32i.n\ta2, a10, 0",
+                "link": "[vorbis_dsp_create+0x17](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:148)"
+              },
+              {
+                "section_offset": "0x36",
+                "line": 163,
+                "instruction": "36:\t73a9      \ts32i.n\ta10, a3, 28",
+                "link": "[vorbis_dsp_create+0x36](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:163)"
+              },
+              {
+                "section_offset": "0x52",
+                "line": 175,
+                "instruction": "52:\t83a9      \ts32i.n\ta10, a3, 32",
+                "link": "[vorbis_dsp_create+0x52](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:175)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "esp_vorbis_dec.c.obj",
+            "archive_index": 634,
+            "member_sha256": "e7a0f9519dc54d54c2f3967734996b783110d3f7f59624141e38b823ed3bbac7",
+            "symbol_or_section": "esp_vorbis_dec_decode",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+            "disassembly_sha256": "56935c880d30f4008d58948d17ec2b95ccf8af6abb4906aef8567ec67b5d23b4",
+            "excerpt": {
+              "payload": "excerpts/esp32-esp_vorbis_dec_decode.txt",
+              "sha256": "b8835b5691202a9a8623aa87d558d5b06bf108d1610326b5d58d63ce3f2fb50d",
+              "original": "tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt",
+              "first_line": 82,
+              "last_line": 229
+            },
+            "instructions": [
+              {
+                "section_offset": "0xd9",
+                "line": 184,
+                "instruction": "d9:\t9a88      \tl32i.n\ta8, a10, 36",
+                "link": "[esp_vorbis_dec_decode+0xd9](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:184)"
+              },
+              {
+                "section_offset": "0xdd",
+                "line": 186,
+                "instruction": "dd:\taac8      \tl32i.n\ta12, a10, 40",
+                "link": "[esp_vorbis_dec_decode+0xdd](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:186)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "codebook",
+        "donor": "64 bytes; dec_table16, q_val60, other typed fields0..56",
+        "target_observed": "Target clear frees q_val60 and dec_table16 and zeros64; setup cleanup strides64. Decode-map reads typed vector fields. Not a complete field-by-field mathematical type proof.",
+        "evidence": [
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "codebook.c.obj",
+            "archive_index": 636,
+            "member_sha256": "eade75b153a0cbe45916a87c30e70f37d7d82bc54a5e4dc0993790c2075e35be",
+            "symbol_or_section": "vorbis_book_clear",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+            "disassembly_sha256": "ae46d12542eda7b3c859afec641f05ac8040df9d9e5ffe92b40090074154685e",
+            "excerpt": {
+              "payload": "excerpts/esp32-vorbis_book_clear.txt",
+              "sha256": "973f49d5355667280995edfbe1929be8bc30b485446760df12faf9988c72270e",
+              "original": "tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+              "first_line": 844,
+              "last_line": 865
+            },
+            "instructions": [
+              {
+                "section_offset": "0x3",
+                "line": 848,
+                "instruction": "3:\tf2a8      \tl32i.n\ta10, a2, 60",
+                "link": "[vorbis_book_clear+0x3](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:848)"
+              },
+              {
+                "section_offset": "0xe",
+                "line": 853,
+                "instruction": "e:\t42a8      \tl32i.n\ta10, a2, 16",
+                "link": "[vorbis_book_clear+0xe](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:853)"
+              },
+              {
+                "section_offset": "0x18",
+                "line": 858,
+                "instruction": "18:\t0c4c      \tmovi.n\ta12, 64",
+                "link": "[vorbis_book_clear+0x18](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:858)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "codebook.c.obj",
+            "archive_index": 636,
+            "member_sha256": "eade75b153a0cbe45916a87c30e70f37d7d82bc54a5e4dc0993790c2075e35be",
+            "symbol_or_section": "decode_map",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+            "disassembly_sha256": "ae46d12542eda7b3c859afec641f05ac8040df9d9e5ffe92b40090074154685e",
+            "excerpt": {
+              "payload": "excerpts/esp32-decode_map.txt",
+              "sha256": "532a57470667e065a94639c248d707ba47b9d5c84cdbb9ad2a65f9f4a25ca941",
+              "original": "tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+              "first_line": 1719,
+              "last_line": 1894
+            },
+            "instructions": [
+              {
+                "section_offset": "0x1c",
+                "line": 1735,
+                "instruction": "1c:\t72b8      \tl32i.n\ta11, a2, 28",
+                "link": "[decode_map+0x1c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:1735)"
+              },
+              {
+                "section_offset": "0x35",
+                "line": 1744,
+                "instruction": "35:\td2c8      \tl32i.n\ta12, a2, 52",
+                "link": "[decode_map+0x35](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:1744)"
+              },
+              {
+                "section_offset": "0x6a",
+                "line": 1764,
+                "instruction": "6a:\te288      \tl32i.n\ta8, a2, 56",
+                "link": "[decode_map+0x6a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:1764)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "floors/residue/mapping",
+        "donor": "floor0=40; floor1=36 with six owned pointers0..20; class stride11; residue28; mapping20",
+        "target_observed": "Allocation/clear sizes and nested owned-pointer cleanup match. floor1 class allocation uses addx4(i,i), then addx2(5i,i), thus 11i. Full subclass book interpretation and signed-char behavior still require target fixtures.",
+        "evidence": [
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "floor0.c.obj",
+            "archive_index": 638,
+            "member_sha256": "ad09db80f2892f51b478e20092ae424e7b2f8315af335c46a50be160ae7eeaac",
+            "symbol_or_section": "floor0_info_unpack",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt",
+            "disassembly_sha256": "54eda0e96f47c6a2ba3626d76f2a66ee577e47e2a228da052323ce6ba66dc740",
+            "excerpt": {
+              "payload": "excerpts/esp32-floor0_info_unpack.txt",
+              "sha256": "17173137dc3291e50ca9c049edb25dbee5373a72fb24d0baa17c5d01a7d2c510",
+              "original": "tool-output/esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt",
+              "first_line": 533,
+              "last_line": 615
+            },
+            "instructions": [
+              {
+                "section_offset": "0x6",
+                "line": 538,
+                "instruction": "6:\t8c2c      \tmovi.n\ta12, 40",
+                "link": "[floor0_info_unpack+0x6](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt:538)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "floor1.c.obj",
+            "archive_index": 639,
+            "member_sha256": "4d08cdcc95682470da26a2aa3fe22a0dbea993469de6d5988160478080e7b119",
+            "symbol_or_section": "floor1_free_info",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt",
+            "disassembly_sha256": "cebb0c7a74173516a6375bce1886702040d1c2e1ab9ae423620e080de515d4d4",
+            "excerpt": {
+              "payload": "excerpts/esp32-floor1_free_info.txt",
+              "sha256": "d5db31887d991451a8dbe64601252257e10d6b8191b14c349497634e832c8057",
+              "original": "tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt",
+              "first_line": 69,
+              "last_line": 115
+            },
+            "instructions": [
+              {
+                "section_offset": "0x6",
+                "line": 74,
+                "instruction": "6:\t02a8      \tl32i.n\ta10, a2, 0",
+                "link": "[floor1_free_info+0x6](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:74)"
+              },
+              {
+                "section_offset": "0x10",
+                "line": 79,
+                "instruction": "10:\t12a8      \tl32i.n\ta10, a2, 4",
+                "link": "[floor1_free_info+0x10](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:79)"
+              },
+              {
+                "section_offset": "0x1a",
+                "line": 84,
+                "instruction": "1a:\t22a8      \tl32i.n\ta10, a2, 8",
+                "link": "[floor1_free_info+0x1a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:84)"
+              },
+              {
+                "section_offset": "0x42",
+                "line": 104,
+                "instruction": "42:\t4c2c      \tmovi.n\ta12, 36",
+                "link": "[floor1_free_info+0x42](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:104)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "floor1.c.obj",
+            "archive_index": 639,
+            "member_sha256": "4d08cdcc95682470da26a2aa3fe22a0dbea993469de6d5988160478080e7b119",
+            "symbol_or_section": "floor1_info_unpack",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt",
+            "disassembly_sha256": "cebb0c7a74173516a6375bce1886702040d1c2e1ab9ae423620e080de515d4d4",
+            "excerpt": {
+              "payload": "excerpts/esp32-floor1_info_unpack.txt",
+              "sha256": "6ebaa2ab19c39b08ca00aaaeb94c81f707f0d4a95c57c768595bccb01917d4dd",
+              "original": "tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt",
+              "first_line": 116,
+              "last_line": 663
+            },
+            "instructions": [
+              {
+                "section_offset": "0x7f",
+                "line": 177,
+                "instruction": "7f:\ta05660        \taddx4\ta5, a6, a6",
+                "link": "[floor1_info_unpack+0x7f](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:177)"
+              },
+              {
+                "section_offset": "0x82",
+                "line": 178,
+                "instruction": "82:\t908560        \taddx2\ta8, a5, a6",
+                "link": "[floor1_info_unpack+0x82](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt:178)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "mapping0.c.obj",
+            "archive_index": 644,
+            "member_sha256": "61a607fb6bec159b463adc49ea275531132abb8e5a226c779c578cd00a7d19a7",
+            "symbol_or_section": "mapping_clear_info",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-644-mapping0.c.obj-disasm.txt",
+            "disassembly_sha256": "67a6c7f9d031f10d38c2a360fedc6c17b5c9c1ff54ed9426a0787ee42704d471",
+            "excerpt": {
+              "payload": "excerpts/esp32-mapping_clear_info.txt",
+              "sha256": "a9c7290f3ccbf61e06f2dbc080c908e7774d3618f3dab08af692a18c84e1cc8b",
+              "original": "tool-output/esp32-libesp_audio_codec-644-mapping0.c.obj-disasm.txt",
+              "first_line": 50,
+              "last_line": 77
+            },
+            "instructions": [
+              {
+                "section_offset": "0x5",
+                "line": 55,
+                "instruction": "5:\t0122a2        \tl32i\ta10, a2, 4",
+                "link": "[mapping_clear_info+0x5](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-644-mapping0.c.obj-disasm.txt:55)"
+              },
+              {
+                "section_offset": "0x10",
+                "line": 60,
+                "instruction": "10:\t22a8      \tl32i.n\ta10, a2, 8",
+                "link": "[mapping_clear_info+0x10](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-644-mapping0.c.obj-disasm.txt:60)"
+              },
+              {
+                "section_offset": "0x1a",
+                "line": 65,
+                "instruction": "1a:\t42a8      \tl32i.n\ta10, a2, 16",
+                "link": "[mapping_clear_info+0x1a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-644-mapping0.c.obj-disasm.txt:65)"
+              },
+              {
+                "section_offset": "0x24",
+                "line": 70,
+                "instruction": "24:\t4c1c      \tmovi.n\ta12, 20",
+                "link": "[mapping_clear_info+0x24](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-644-mapping0.c.obj-disasm.txt:70)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "res012.c.obj",
+            "archive_index": 647,
+            "member_sha256": "96ea8c6c3958ca1efef81b0ca66484551ca6dd68843ad7bb386a923b84113975",
+            "symbol_or_section": "res_clear_info",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt",
+            "disassembly_sha256": "85cf633901c963d6462b77640993dc9e04b9b437978f46646550c492ee56cc1e",
+            "excerpt": {
+              "payload": "excerpts/esp32-res_clear_info.txt",
+              "sha256": "ece4db82918afa3153e30e4a43971e6ce23cee73d33bbd30b545683e73bcaa37",
+              "original": "tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt",
+              "first_line": 47,
+              "last_line": 69
+            },
+            "instructions": [
+              {
+                "section_offset": "0x5",
+                "line": 52,
+                "instruction": "5:\t0122a2        \tl32i\ta10, a2, 4",
+                "link": "[res_clear_info+0x5](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:52)"
+              },
+              {
+                "section_offset": "0x10",
+                "line": 57,
+                "instruction": "10:\t22a8      \tl32i.n\ta10, a2, 8",
+                "link": "[res_clear_info+0x10](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:57)"
+              },
+              {
+                "section_offset": "0x1a",
+                "line": 62,
+                "instruction": "1a:\tcc1c      \tmovi.n\ta12, 28",
+                "link": "[res_clear_info+0x1a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:62)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "bitreader and stack packet construction",
+        "donor": "ogg_buffer16/ref16/pack24; packet32 has two int64 values and wrapper starts packet at8",
+        "target_observed": "readinit zeros24 and reads ref buffer0/begin4/length8 and buffer.data0; writes pack head12/tail16/headptr4/headend8/count20. This corroborates the fields used by repair_header, not every ownership field or alignment.",
+        "evidence": [
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+            "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+            "member": "bitwise.c.obj",
+            "archive_index": 635,
+            "member_sha256": "0fa72d8faf716b7f35584bed86b8e2734bc394da887aca1375632c7462da68f1",
+            "symbol_or_section": "tremor_oggpack_readinit",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt",
+            "disassembly_sha256": "e2939fa9d8d2dcd7ce60549ff48856f04ca11f51e5f36a09a618d6322bdb8305",
+            "excerpt": {
+              "payload": "excerpts/esp32-tremor_oggpack_readinit.txt",
+              "sha256": "2b1060ea19f6f23dd91074f47c35f8785641ffbef0153649ab30de0ceca97aef",
+              "original": "tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt",
+              "first_line": 71,
+              "last_line": 97
+            },
+            "instructions": [
+              {
+                "section_offset": "0x3",
+                "line": 75,
+                "instruction": "3:\t8c1c      \tmovi.n\ta12, 24",
+                "link": "[tremor_oggpack_readinit+0x3](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:75)"
+              },
+              {
+                "section_offset": "0x10",
+                "line": 81,
+                "instruction": "10:\t0388      \tl32i.n\ta8, a3, 0",
+                "link": "[tremor_oggpack_readinit+0x10](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:81)"
+              },
+              {
+                "section_offset": "0x12",
+                "line": 82,
+                "instruction": "12:\t13a8      \tl32i.n\ta10, a3, 4",
+                "link": "[tremor_oggpack_readinit+0x12](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:82)"
+              },
+              {
+                "section_offset": "0x14",
+                "line": 83,
+                "instruction": "14:\t0888      \tl32i.n\ta8, a8, 0",
+                "link": "[tremor_oggpack_readinit+0x14](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:83)"
+              },
+              {
+                "section_offset": "0x16",
+                "line": 84,
+                "instruction": "16:\t2398      \tl32i.n\ta9, a3, 8",
+                "link": "[tremor_oggpack_readinit+0x16](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:84)"
+              },
+              {
+                "section_offset": "0x1c",
+                "line": 87,
+                "instruction": "1c:\t52a9      \ts32i.n\ta10, a2, 20",
+                "link": "[tremor_oggpack_readinit+0x1c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:87)"
+              },
+              {
+                "section_offset": "0x1e",
+                "line": 88,
+                "instruction": "1e:\t3239      \ts32i.n\ta3, a2, 12",
+                "link": "[tremor_oggpack_readinit+0x1e](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:88)"
+              },
+              {
+                "section_offset": "0x20",
+                "line": 89,
+                "instruction": "20:\t4239      \ts32i.n\ta3, a2, 16",
+                "link": "[tremor_oggpack_readinit+0x20](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:89)"
+              },
+              {
+                "section_offset": "0x22",
+                "line": 90,
+                "instruction": "22:\t1289      \ts32i.n\ta8, a2, 4",
+                "link": "[tremor_oggpack_readinit+0x22](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:90)"
+              },
+              {
+                "section_offset": "0x24",
+                "line": 91,
+                "instruction": "24:\t2299      \ts32i.n\ta9, a2, 8",
+                "link": "[tremor_oggpack_readinit+0x24](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt:91)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "simple registration/state",
+        "donor": "registration32 parser_type20; state48 parser4/decoder8/pending12/16/20/padding24/28/32/ready36/errors38/limit40/align42/container44",
+        "target_observed": "Target open reads registration decoder16/parser20; process/reset/close use the asserted state offsets. Allocation is48. The extension remains our allocation and target close calls media_lib_free on base state.",
+        "evidence": [
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+            "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+            "member": "esp_audio_simple_dec.c.obj",
+            "archive_index": 4,
+            "member_sha256": "15d77d414aaf223b8e3340f4846e4193b8a31e6d5ce1c7304a7a79f3f43899fd",
+            "symbol_or_section": "esp_audio_simple_dec_open",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+            "disassembly_sha256": "b6a73b7c05bcf58be8f1aa62b5a27ffd71476efe083f36cc95efb45393c9dead",
+            "excerpt": {
+              "payload": "excerpts/esp32-esp_audio_simple_dec_open.txt",
+              "sha256": "27581cf67f1b6b03d88580b76364ea206f96716f768d3f917e6fec375169b65b",
+              "original": "tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+              "first_line": 201,
+              "last_line": 461
+            },
+            "instructions": [
+              {
+                "section_offset": "0x38",
+                "line": 228,
+                "instruction": "38:\t0c3c      \tmovi.n\ta12, 48",
+                "link": "[esp_audio_simple_dec_open+0x38](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:228)"
+              },
+              {
+                "section_offset": "0x114",
+                "line": 325,
+                "instruction": "114:\t4a98      \tl32i.n\ta9, a10, 16",
+                "link": "[esp_audio_simple_dec_open+0x114](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:325)"
+              },
+              {
+                "section_offset": "0x116",
+                "line": 326,
+                "instruction": "116:\t5aa8      \tl32i.n\ta10, a10, 20",
+                "link": "[esp_audio_simple_dec_open+0x116](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:326)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+            "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+            "member": "esp_audio_simple_dec.c.obj",
+            "archive_index": 4,
+            "member_sha256": "15d77d414aaf223b8e3340f4846e4193b8a31e6d5ce1c7304a7a79f3f43899fd",
+            "symbol_or_section": "esp_audio_simple_dec_process",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+            "disassembly_sha256": "b6a73b7c05bcf58be8f1aa62b5a27ffd71476efe083f36cc95efb45393c9dead",
+            "excerpt": {
+              "payload": "excerpts/esp32-esp_audio_simple_dec_process.txt",
+              "sha256": "76e729b61937f203c1247cf98c79d510022164b753d7180c46a61ad6ca8b334b",
+              "original": "tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+              "first_line": 495,
+              "last_line": 845
+            },
+            "instructions": [
+              {
+                "section_offset": "0xc0",
+                "line": 581,
+                "instruction": "c0:\t4238      \tl32i.n\ta3, a2, 16",
+                "link": "[esp_audio_simple_dec_process+0xc0](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:581)"
+              },
+              {
+                "section_offset": "0x109",
+                "line": 614,
+                "instruction": "109:\t240282        \tl8ui\ta8, a2, 36",
+                "link": "[esp_audio_simple_dec_process+0x109](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:614)"
+              },
+              {
+                "section_offset": "0x198",
+                "line": 672,
+                "instruction": "198:\tc898      \tl32i.n\ta9, a8, 48",
+                "link": "[esp_audio_simple_dec_process+0x198](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:672)"
+              },
+              {
+                "section_offset": "0x19a",
+                "line": 673,
+                "instruction": "19a:\td888      \tl32i.n\ta8, a8, 52",
+                "link": "[esp_audio_simple_dec_process+0x19a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:673)"
+              }
+            ]
+          },
+          {
+            "architecture": "Xtensa ESP32",
+            "elf_machine": 94,
+            "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+            "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+            "member": "esp_audio_simple_dec.c.obj",
+            "archive_index": 4,
+            "member_sha256": "15d77d414aaf223b8e3340f4846e4193b8a31e6d5ce1c7304a7a79f3f43899fd",
+            "symbol_or_section": "esp_audio_simple_dec_close",
+            "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+            "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+            "disassembly_sha256": "b6a73b7c05bcf58be8f1aa62b5a27ffd71476efe083f36cc95efb45393c9dead",
+            "excerpt": {
+              "payload": "excerpts/esp32-esp_audio_simple_dec_close.txt",
+              "sha256": "bbceb91ee8d9cacb6da1680b6be7c1ad14006856b612dfb89d2cd9b3504f17a6",
+              "original": "tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt",
+              "first_line": 1097,
+              "last_line": 1120
+            },
+            "instructions": [
+              {
+                "section_offset": "0x0",
+                "line": 1100,
+                "instruction": "0:\t004136        \tentry\ta1, 32",
+                "link": "[esp_audio_simple_dec_close+0x0](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:1100)"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "not_proven": [
+      "No DWARF types in any of the38 selected members. Pointers/long/size_t/int64 alignment must be compiler-asserted for actual Xtensa configuration.",
+      "Every codebook decode table representation, quantization signedness, floor subclass/mode mapping and all DSP consumers have not been proven equivalent by this audit.",
+      "The actual linker can resolve function pointers differently from direct wraps; target registration open/decode callback identities and parser dispatch must be verified from the final ELF plus execution.",
+      "64-bit host natural layout is different and cannot execute these private structures against vendor Xtensa objects. Host fixtures need explicit ILP32/layout seams and cannot qualify target ABI."
+    ]
+  },
+  "additional_bounded_candidates_and_caveats": [
+    {
+      "candidate": "Carry checked codebook capacities and temporary ownership with setup repair",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "codebook.c.obj",
+          "archive_index": 636,
+          "member_sha256": "eade75b153a0cbe45916a87c30e70f37d7d82bc54a5e4dc0993790c2075e35be",
+          "symbol_or_section": "_make_decode_table",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+          "disassembly_sha256": "ae46d12542eda7b3c859afec641f05ac8040df9d9e5ffe92b40090074154685e",
+          "excerpt": {
+            "payload": "excerpts/esp32-_make_decode_table.txt",
+            "sha256": "7a336d463de07def4210cc40e25d5982c8446896110408d46dda2508d4baea1f",
+            "original": "tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+            "first_line": 533,
+            "last_line": 799
+          },
+          "instructions": [
+            {
+              "section_offset": "0x5",
+              "line": 538,
+              "instruction": "5:\t22c8      \tl32i.n\ta12, a2, 8",
+              "link": "[_make_decode_table+0x5](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:538)"
+            },
+            {
+              "section_offset": "0xc",
+              "line": 541,
+              "instruction": "c:\tb08c80        \taddx8\ta8, a12, a8",
+              "link": "[_make_decode_table+0xc](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:541)"
+            },
+            {
+              "section_offset": "0x21",
+              "line": 550,
+              "instruction": "21:\t0008e0        \tcallx8\ta8",
+              "link": "[_make_decode_table+0x21](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:550)"
+            },
+            {
+              "section_offset": "0x28",
+              "line": 553,
+              "instruction": "28:\t12b8      \tl32i.n\ta11, a2, 4",
+              "link": "[_make_decode_table+0x28](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:553)"
+            },
+            {
+              "section_offset": "0x39",
+              "line": 562,
+              "instruction": "39:\t0008e0        \tcallx8\ta8",
+              "link": "[_make_decode_table+0x39](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:562)"
+            },
+            {
+              "section_offset": "0x44",
+              "line": 566,
+              "instruction": "44:\tcc0b      \taddi.n\ta12, a12, -1",
+              "link": "[_make_decode_table+0x44](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:566)"
+            },
+            {
+              "section_offset": "0x46",
+              "line": 567,
+              "instruction": "46:\t11ccd0        \tslli\ta12, a12, 3",
+              "link": "[_make_decode_table+0x46](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:567)"
+            },
+            {
+              "section_offset": "0x76",
+              "line": 589,
+              "instruction": "76:\t0008e0        \tcallx8\ta8",
+              "link": "[_make_decode_table+0x76](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:589)"
+            }
+          ]
+        },
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "codebook.c.obj",
+          "archive_index": 636,
+          "member_sha256": "eade75b153a0cbe45916a87c30e70f37d7d82bc54a5e4dc0993790c2075e35be",
+          "symbol_or_section": "_make_words",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+          "disassembly_sha256": "ae46d12542eda7b3c859afec641f05ac8040df9d9e5ffe92b40090074154685e",
+          "excerpt": {
+            "payload": "excerpts/esp32-_make_words.txt",
+            "sha256": "898ec4f8904576f7e89b5007d23aaaf99de1c94651bd60809b498972bab01fc3",
+            "original": "tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+            "first_line": 128,
+            "last_line": 348
+          },
+          "instructions": [
+            {
+              "section_offset": "0x65",
+              "line": 171,
+              "instruction": "65:\tb0fa40        \taddx8\ta15, a10, a4",
+              "link": "[_make_words+0x65](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:171)"
+            },
+            {
+              "section_offset": "0x70",
+              "line": 175,
+              "instruction": "70:\t0f59      \ts32i.n\ta5, a15, 0",
+              "link": "[_make_words+0x70](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:175)"
+            },
+            {
+              "section_offset": "0x72",
+              "line": 176,
+              "instruction": "72:\t1f29      \ts32i.n\ta2, a15, 4",
+              "link": "[_make_words+0x72](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:176)"
+            },
+            {
+              "section_offset": "0xa2",
+              "line": 196,
+              "instruction": "a2:\t1a29      \ts32i.n\ta2, a10, 4",
+              "link": "[_make_words+0xa2](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:196)"
+            },
+            {
+              "section_offset": "0x1ca",
+              "line": 308,
+              "instruction": "1ca:\t0ad9      \ts32i.n\ta13, a10, 0",
+              "link": "[_make_words+0x1ca](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:308)"
+            }
+          ]
+        }
+      ],
+      "interpretation": "Target table workspace already uses used-entry sizing, so it is not a demonstrated new heap optimization. Target _make_words receives entry count and has no output-capacity parameter; donor adds checks before each node write and checked allocation arithmetic. A legal/malformed sparse-tree corpus is required to establish behavior, not an invented savings number.",
+      "source": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+        "line": 194,
+        "sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/setup.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/setup.c:194)"
+      }
+    },
+    {
+      "candidate": "Keep a real final byte for empty separate EOF",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+          "archive_sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+          "member": "esp_es_parse.c.obj",
+          "archive_index": 16,
+          "member_sha256": "39f51ac5eb4d633c9306478254acc31df913a03712647b4d7399df37dec890cc",
+          "symbol_or_section": "esp_es_parse_frame",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt",
+          "disassembly_sha256": "2c4522cd711fe078556d7b0cae9367c40f070bf40bfedf0705ff3a23808f168e",
+          "excerpt": {
+            "payload": "excerpts/esp32-esp_es_parse_frame.txt",
+            "sha256": "d86c6bf720439dd965016bb573f6496a5cbbf72c7a37173d3b13c87a98c42667",
+            "original": "tool-output/esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt",
+            "first_line": 698,
+            "last_line": 1220
+          },
+          "instructions": [
+            {
+              "section_offset": "0x2c",
+              "line": 721,
+              "instruction": "2c:\t0388      \tl32i.n\ta8, a3, 0",
+              "link": "[esp_es_parse_frame+0x2c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt:721)"
+            },
+            {
+              "section_offset": "0x30",
+              "line": 723,
+              "instruction": "30:\tc8fc      \tbnez.n\ta8, 70 <esp_es_parse_frame+0x70>\t30: R_XTENSA_SLOT0_OP\t.text.esp_es_parse_frame+0x70",
+              "link": "[esp_es_parse_frame+0x30](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt:723)"
+            },
+            {
+              "section_offset": "0x6a",
+              "line": 751,
+              "instruction": "6a:\tea7c      \tmovi.n\ta10, -2",
+              "link": "[esp_es_parse_frame+0x6a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt:751)"
+            },
+            {
+              "section_offset": "0x460",
+              "line": 1201,
+              "instruction": "460:\t5188      \tl32i.n\ta8, a1, 20",
+              "link": "[esp_es_parse_frame+0x460](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt:1201)"
+            },
+            {
+              "section_offset": "0x462",
+              "line": 1202,
+              "instruction": "462:\tfd4816        \tbeqz\ta8, 43a <esp_es_parse_frame+0x43a>\t462: R_XTENSA_SLOT0_OP\t.text.esp_es_parse_frame+0x43a",
+              "link": "[esp_es_parse_frame+0x462](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt:1202)"
+            },
+            {
+              "section_offset": "0x43a",
+              "line": 1184,
+              "instruction": "43a:\t0a0c      \tmovi.n\ta10, 0",
+              "link": "[esp_es_parse_frame+0x43a](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt:1184)"
+            }
+          ]
+        }
+      ],
+      "interpretation": "Target parser requires a non-NULL buffer and bypasses parsing when input length is zero, even with buffered state and EOS. CYD already drains on EOS but cannot force this branch through an empty packet. The donor genuine-byte tail staging is justified as a candidate; missing final PCM count and granule trimming remain to be reproduced on target. Do not fabricate zero padding.",
+      "source": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\simple.c",
+        "line": 162,
+        "sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/simple.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/simple.c:162)"
+      }
+    },
+    {
+      "candidate": "Review inherited block-size profile before claiming standards support",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "info.c.obj",
+          "archive_index": 642,
+          "member_sha256": "1ff7485a721d4b4f727f4e30a5f431055ae55859b80f97dc9435d2745986eb6c",
+          "symbol_or_section": "_vorbis_unpack_info",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-642-info.c.obj-disasm.txt",
+          "disassembly_sha256": "21d96e30d033ab5c9a33d0156d75bee56e5a24200f8e9c57fae4d947803b6336",
+          "excerpt": {
+            "payload": "excerpts/esp32-_vorbis_unpack_info.txt",
+            "sha256": "d17c601ca6dbaa7bc0157a896f02ba4173afaaf546432ec7cac6e9fb18636d04",
+            "original": "tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt",
+            "first_line": 476,
+            "last_line": 583
+          },
+          "instructions": [
+            {
+              "section_offset": "0x7c",
+              "line": 537,
+              "instruction": "7c:\t0000a1        \tl32r\ta10, fffc007c <_vorbis_unpack_info+0xfffc007c>\t7c: R_XTENSA_SLOT0_OP\t.literal._vorbis_unpack_info",
+              "link": "[_vorbis_unpack_info+0x7c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:537)"
+            },
+            {
+              "section_offset": "0x81",
+              "line": 539,
+              "instruction": "81:\t1d2a97        \tblt\ta10, a9, a2 <_vorbis_unpack_info+0xa2>\t81: R_XTENSA_SLOT0_OP\t.text._vorbis_unpack_info+0xa2",
+              "link": "[_vorbis_unpack_info+0x81](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:539)"
+            },
+            {
+              "section_offset": "0x8c",
+              "line": 543,
+              "instruction": "8c:\t000091        \tl32r\ta9, fffc008c <_vorbis_unpack_info+0xfffc008c>\t8c: R_XTENSA_SLOT0_OP\t.literal._vorbis_unpack_info+0x4",
+              "link": "[_vorbis_unpack_info+0x8c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:543)"
+            },
+            {
+              "section_offset": "0x8f",
+              "line": 544,
+              "instruction": "8f:\t0fa987        \tbge\ta9, a8, a2 <_vorbis_unpack_info+0xa2>\t8f: R_XTENSA_SLOT0_OP\t.text._vorbis_unpack_info+0xa2",
+              "link": "[_vorbis_unpack_info+0x8f](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:544)"
+            },
+            {
+              "section_offset": "0xb1",
+              "line": 559,
+              "instruction": "b1:\t0000c1        \tl32r\ta12, fffc00b4 <_vorbis_unpack_info+0xfffc00b4>\tb1: R_XTENSA_SLOT0_OP\t.literal._vorbis_unpack_info+0x8",
+              "link": "[_vorbis_unpack_info+0xb1](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:559)"
+            },
+            {
+              "section_offset": "0xb6",
+              "line": 561,
+              "instruction": "b6:\t022c87        \tblt\ta12, a8, bc <_vorbis_unpack_info+0xbc>\tb6: R_XTENSA_SLOT0_OP\t.text._vorbis_unpack_info+0xbc",
+              "link": "[_vorbis_unpack_info+0xb6](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:561)"
+            }
+          ]
+        }
+      ],
+      "interpretation": "Both donor setup and target original reject longblock>4096 for rate<64000; target literals are63999/4096/8192. The shared public README advertises8-48kHz mono/stereo16-bit. The official spec allows8192; this audit established no explicit hardware exception authorizing this particular gate. Do not silently broaden binary DSP support or call the inherited restriction full conformance. Add a legal48k/8192 target fixture and separate supported-profile decision.",
+      "source": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+        "line": 954,
+        "sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+        "link": "[idf/esp32c3-oled-native/main/vorbis_repair/setup.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/setup.c:954)"
+      }
+    },
+    {
+      "candidate": "Retain original DSP arithmetic while measuring its remaining stack demand",
+      "interpretation": "Selected target res_inverse and vorbis_book_decode*v* still use input-derived movsp stack allocation. Donor setup/output repair does not replace those synthesis functions. Their retained existence is a limit on any claim that the whole decoder has bounded stack or complete malformed-input hardening; no safe stack-size reduction is justified.",
+      "evidence": [
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "res012.c.obj",
+          "archive_index": 647,
+          "member_sha256": "96ea8c6c3958ca1efef81b0ca66484551ca6dd68843ad7bb386a923b84113975",
+          "symbol_or_section": "res_inverse",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt",
+          "disassembly_sha256": "85cf633901c963d6462b77640993dc9e04b9b437978f46646550c492ee56cc1e",
+          "excerpt": null,
+          "instructions": [
+            {
+              "section_offset": "0x93",
+              "line": 311,
+              "instruction": "93:\t001810        \tmovsp\ta1, a8",
+              "link": "[res_inverse+0x93](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:311)"
+            },
+            {
+              "section_offset": "0xb4",
+              "line": 323,
+              "instruction": "b4:\t001c10        \tmovsp\ta1, a12",
+              "link": "[res_inverse+0xb4](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:323)"
+            },
+            {
+              "section_offset": "0x330",
+              "line": 590,
+              "instruction": "330:\t001810        \tmovsp\ta1, a8",
+              "link": "[res_inverse+0x330](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt:590)"
+            }
+          ]
+        },
+        {
+          "architecture": "Xtensa ESP32",
+          "elf_machine": 94,
+          "archive_path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+          "archive_sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+          "member": "codebook.c.obj",
+          "archive_index": 636,
+          "member_sha256": "eade75b153a0cbe45916a87c30e70f37d7d82bc54a5e4dc0993790c2075e35be",
+          "symbol_or_section": "vorbis_book_decodev_add",
+          "address_kind": "section-relative byte offsets, never absolute runtime addresses",
+          "disassembly": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\tool-output\\esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt",
+          "disassembly_sha256": "ae46d12542eda7b3c859afec641f05ac8040df9d9e5ffe92b40090074154685e",
+          "excerpt": null,
+          "instructions": [
+            {
+              "section_offset": "0x1b",
+              "line": 1962,
+              "instruction": "1b:\tc08180        \tsub\ta8, a1, a8",
+              "link": "[vorbis_book_decodev_add+0x1b](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:1962)"
+            },
+            {
+              "section_offset": "0x1e",
+              "line": 1963,
+              "instruction": "1e:\t001810        \tmovsp\ta1, a8",
+              "link": "[vorbis_book_decodev_add+0x1e](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-xtensa-audit-01/tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:1963)"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "current_cyd_already_present": [
+    {
+      "item": "Transactional registration and rollback",
+      "entry": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\decoder_registration.c",
+        "line": 14,
+        "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+        "link": "[idf/esp32-cyd2usb-native/main/decoder_registration.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/decoder_registration.c:14)"
+      }
+    },
+    {
+      "item": "Independent decoder/PCM release, including failed opens",
+      "entry": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c",
+        "line": 809,
+        "sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "link": "[idf/esp32-cyd2usb-native/main/audio_service.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/audio_service.c:809)"
+      }
+    },
+    {
+      "item": "Output resize/retry",
+      "entry": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c",
+        "line": 1058,
+        "sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "link": "[idf/esp32-cyd2usb-native/main/audio_service.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/audio_service.c:1058)"
+      }
+    },
+    {
+      "item": "EOS drain loop",
+      "entry": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c",
+        "line": 1115,
+        "sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "link": "[idf/esp32-cyd2usb-native/main/audio_service.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/audio_service.c:1115)"
+      }
+    }
+  ],
+  "implementation_plan_unimplemented": [
+    {
+      "step": 1,
+      "work": "Separate target ABI bridge and guard preflight; no production default enabled yet",
+      "details": "New CYD-local typed bridge retains Tremor license/provenance. Assert every shared size/offset plus sizeof(long/pointer/size_t), alignof(int64), signed-char assumptions with actual Xtensa compiler/config. Guard target==esp32, exact selected component path/version, both ESP32 archive hashes, required symbol definitions and wrapper routes. Reject wrong/missing hash/target, including supplying donor C3 archives. Do not point the C3 helper at esp32 or weaken its guard.",
+      "entry": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\CMakeLists.txt",
+        "line": 4,
+        "sha256": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+        "link": "[idf/esp32c3-oled-native/main/CMakeLists.txt](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/CMakeLists.txt:4)"
+      }
+    },
+    {
+      "step": 2,
+      "work": "Bounded checked setup/open and Ogg ownership port",
+      "details": "Port setup/simple scope ownership only after target ABI audit. Publish handle only after success, clear every partial child once, preserve used-entry table bounds. Ogg-only checked state preserves public APIs and original close/reset. Preserve thread-local previous scope restoration for nesting and cross-core isolation; global allocator wrapper transparent outside scope. Do not replace native_health failed-allocation hook, numeric reservations, or retained DSP arithmetic.",
+      "entries": [
+        {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 1018,
+          "sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+          "link": "[idf/esp32c3-oled-native/main/vorbis_repair/setup.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/setup.c:1018)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\simple.c",
+          "line": 122,
+          "sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+          "link": "[idf/esp32c3-oled-native/main/vorbis_repair/simple.c](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/simple.c:122)"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "work": "Target output preflight, repeated pending retry and real-byte EOF staging",
+      "details": "Port as separate logical change once raw ample target oracle is frozen. Reject too-small PCM before synthesis, preserve pending packet on every repeated rejection, retain genuine byte for separate empty EOF, clear extension on reset. Validate first-packet, transition, truncation and final granule contracts. Keep current CYD generation/EOF/PCM owners and task core affinity."
+    },
+    {
+      "step": 4,
+      "work": "Qualify and then integrate with actual radio service",
+      "details": "New standalone Xtensa verifier must not import C3 verifier because that imports an unrelated deferred audit and recognizes RV32 jump patterns. Parse Xtensa callx/literal relocations and actual linked callback tables. Enable production only after gates below; capture source/tool/SDK/archive/config/golden/ELF before/after hashes, finite terminal markers, no omitted cases. Apply full lint once source is frozen and all3 output variants compile."
+    }
+  ],
+  "required_gates_all_unrun_here": [
+    {
+      "gate": "G1 actual Xtensa compile/link/ABI",
+      "checks": "Compile whole repair TUs against SDK6.0.2 real headers/config. Assert all bridge fields, ELF machine94, two CPU target with assertions, all nine wrappers and real targets linked once, operation table selects repaired open/decode; no direct original route or accidental C3 object. Exact negative guards for wrong archive/target/missing wrapper. Host private-layout tests are supplementary."
+    },
+    {
+      "gate": "G2 actual archive PCM oracle",
+      "checks": "Freeze original ESP32 raw-packet ample-buffer output with packet boundaries and trim metadata. Compare repaired raw output exact byte/sample/hash equality; independent pinned libvorbis/ffmpeg golden for container/granule and documented fixed-point tolerance. C3 fixture/golden may seed corpus but its PCM counts, hashes and error bounds are not ESP32 results."
+    },
+    {
+      "gate": "G3 output retry/EOS",
+      "checks": "Actual Ogg and raw at tiny, needed_size-1, repeated tiny, exact needed_size and ample capacity; alternating short/long blocks, first priming frame,64modes/two-byte header, last page multiple packets, final-byte split, empty separate EOF, repeated EOF, reset/reopen, empty/truncated streams. Named checks for no consumed or PCM/history change on rejected retry, no missing/duplicate PCM and final trim."
+    },
+    {
+      "gate": "G4 OOM/lifetime",
+      "checks": "Discover successful target allocation sequence first, then fail every actual alloc/realloc on open/setup/DSP/Ogg header/cache/packet and PCM resize. Guard regions and owner ledger detect UAF/double free/leaks; each failure returns a defined error and no PCM, NULL publication when open fails, repeated owner release safe, then valid play works. Include persistent registration failures and rollback. Fault instrumentation must not replace native_health hook or confuse allocator fault injection with physical heap measurement."
+    },
+    {
+      "gate": "G5 task isolation and actual service",
+      "checks": "Real FreeRTOS tasks on both cores with barriers: independent Ogg handles, nested process scopes, out-of-scope and zero-size realloc, non-Ogg passthrough, reset only after per-handle process quiescence. Actual decoder_task generation changes, Stop→Play, output resize-failure, network EOF/no-EOS/error, stale data and queue leases. This does not authorize concurrent reset/close on one handle, excluded by public API."
+    },
+    {
+      "gate": "G6 standards corpus and explicit profile",
+      "checks": "Legal sparse codebooks including unused entries and0/1-used cases; map types0/1/2, ordered/unordered, floor0/1, residue0/1/2, channel coupling/submaps, mono/stereo advertised rates,8192-block profile decision. Distinguish legal audio packet truncation from malformed setup. Ogg lacing255/0, cross-page packets, CRC/version/sequence errors, BOS/EOS, serial changes/chained logical streams and granule trim against authoritative expected behavior. This bounded audit and one golden are not conformance certification."
+    },
+    {
+      "gate": "G7 meaningful exact controls",
+      "checks": "Undo each fix separately: reintroduce early free, omit one NULL check, wrong bridge offset, synthesize before capacity check, clear pending on second -8, swallow allocation failure, use process-global instead of task-local scope, drop final real byte. Each expected named semantic check must fail; unexpected panic/timeouts are not successful controls except an explicitly retained historical crash reproduction."
+    },
+    {
+      "gate": "G8 target measurements and production integration",
+      "checks": "Measure actual allocated and largest free blocks, peak live heap, stack high-water per decoder path and task/core CPU/cycles on ESP32; retain original ample baseline. No C3 or ESP32-S3 performance table numbers. Build/lint all3 CYD output backends and current option combinations; preserve existing affinity. Actual radio playback/network/resource validation and release artifact export remain separate board gates."
+    }
+  ],
+  "authorities": [
+    {
+      "title": "Xiph.Org Vorbis I specification",
+      "url": "https://www.xiph.org/vorbis/doc/Vorbis_I_spec.html",
+      "verified": "2026-10-20 with web tool, sections1.1.5/1.1.6,2.1.8,3.2.1,4.2.2,4.3.8,AppendixA.2",
+      "summary": "Legal block sizes include8192. Sparse unused entries have no Huffman nodes. First audio block primes overlap; later output depends on both block sizes. Audio packet truncation has defined semantics. Ogg Vorbis may cross pages; final granule can trim PCM. Hardware exceptions require explicit support in the specification."
+    },
+    {
+      "title": "RFC3533 Ogg encapsulation version0",
+      "url": "https://www.rfc-editor.org/rfc/rfc3533",
+      "verified": "2026-10-20 with web tool, sections5/6",
+      "summary": "Page continuation, zero lacing terminators, checksum, stream serials, BOS/EOS and page sequence are container test authorities. Their coverage is not established by one repaired decoder fixture."
+    },
+    {
+      "title": "Pinned Xiph Tremor source provenance",
+      "url": "https://android.googlesource.com/platform/external/tremor/+/0ad0141e864cfbb130db4f22e279d421832e7336/Tremor/",
+      "verified": "2026-10-20 with web tool; immutable referenced tree exists",
+      "summary": "Provenance for donor setup adaptation only. It is not proof that vendor machine code was built from this exact tree."
+    }
+  ],
+  "evidence": {
+    "capture": {
+      "path": "capture.json",
+      "sha256": "093606921a1e2c4811211f161984b795aa272d8cb6391b0b9385e36525d0e9cf"
+    },
+    "analysis_checks": {
+      "path": "analysis-checks.json",
+      "sha256": "015ae773ddfe708a17d041c2b57c28e3a4df12bf08977c86145dca74814074f3"
+    },
+    "symbol_inventory": {
+      "path": "symbol-inventory.json",
+      "sha256": "967376d3dd21a6584b0b47819c8fafca49efa4820684cc9115faaad0892607a2"
+    },
+    "static_call_references": {
+      "path": "xtensa-call-references.json",
+      "sha256": "c06bf430e51ba03af8ebdb52b77b64f0df348df077b411fc1b77f784ced20310"
+    },
+    "excerpt_map": {
+      "path": "excerpt-map.json",
+      "sha256": "f0d87d09003a08c0f967023814b5693dc5c44b5e9382c90c6f3cd365bfd0aebc"
+    },
+    "all_input_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair_abi.h": "dd26a294cf3887853e12174f3958ea9cccdaa9425ff6a7b21d46faa350bde61c",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\simple.c": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\output.c": "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\README.md": "09b179105c78d41f670ec8a4a80c03817d9f06f46c294df7a973ae50df94ebbd",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\COPYING": "29460b3b44148114c28cc2480737368428747e68374d16cb8d910949ded03d19",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\CMakeLists.txt": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\Kconfig.projbuild": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\qemu_vorbis_lifecycle.c": "ac7a80b90938da4fd535ab282d8d1a1e29eb37c6cedb71a32b7397d5b070abe9",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\qemu_vorbis_output.inc": "83463fe1a3e30ab32f567e6ba5b7eeb58c2f1bd9ba81af2c7b5256924d1b993f",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_registration.c": "5381c1fb82755086c9a5922041212434417da8c531122d5512a7d2f35f573a1b",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_registration.h": "c340e8b5b893258721ea13cf7b8d838d25a0fbcd32caf6ffecde26dffdb3f892",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_resources.h": "04c7dc1f4bdd3935d87e793dc9c7f1d641b7d6e762e4ef7dc9b0970b77016c11",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_pcm.h": "f04e5fdde0f782ae0351e7f308c833602adcec12788cdf58404543dcc7399216",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\decoder_registration.c": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\decoder_registration.h": "54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\board_config.h": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\CMakeLists.txt": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build.ps1": "6da129dd5cf17ec83ab4f9e67f32f59005b6e692eb191709e456c6828eafe02f",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\run_vorbis_lifecycle.py": "cb5e4cc38ce153b0d2b407a823a665b7596cb2b061eae290444a37c3f5d54eb6",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\run_vorbis_output.py": "47741ce9043b1eb0b39e018fb3ff48e08ffad9588a388edd32bd7cd4a0b93925",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\vorbis_packets.py": "7ac7b9af0800c6813e6a9ed4e6756f5c50d82d75650f2b9174ef56116671e301",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\save_vorbis_lifecycle.py": "2f24ec57dd5134d3d2c3d2f427eefe972a16c99fb3fe500aecfef54f88993f06",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\verify_vorbis_repair_build.py": "75e2545585c63a12607bd7542ff4d725f9627f3a3c93c6155632fcbd1b329ff2",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-lifecycle.py": "3af79c357337c3cccedce4463a45fa7917de05cad600f751663969bf3f607361",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-output.py": "b6fdadd6a09ecd485a1a5194d49f0953ad018610397a0674d63e566b6edd6d69",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-repair-evidence.py": "2e9c1f8b025994c38703e336848e41d04b92f8c4344b8d317527fbdec266e5ec",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-output-evidence.py": "08d543f31acbce216c18b2ad7ec669549cce5fd9b407c675bd691cfa446b8be2",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\ESP32C3_VORBIS_REPAIR_PLAN.md": "f2cd53e27da54093c7069b335f16bd255eade7bb92280d4ee42fde14b6c230b9",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\ESP32C3_VORBIS_REPAIR_20261004.md": "fee40d1db0fa885edab12f3278e0a005544c1fb70ec6797e271eefd7d0fede99",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\ESP32C3_VORBIS_OUTPUT_20261005.md": "3e76bf0d53c0a5fe53de01fd72a2dd9350811fd255888fe54caa2852140f4c9f",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\esp32c3-vorbis-audit-20261004\\manifest.json": "38e2f4c18cf06bd738cb2e27238629093d18e9ffc12171a865bc78512ffc94d7",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\esp32c3-vorbis-output-20261005\\manifest.json": "eb638e38f6207ff0009810ce77cb16d6769b915c2de8af6d9987852e8c00d278",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\esp32c3-vorbis-output-20261005\\reference-error.json": "164de11fdfd6010de2452d497f59043fef2dc8d1adc1ceffcf2139d0da249f0e",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\esp32c3_calibration\\vorbis-q10.ogg": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\idf_component.yml": "804fd34627f294c7461b63d7b1dcc7261638e136b1c9f24f3ddd7124f3d45c43",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\CMakeLists.txt": "30d3a30ef49e029447afcf1aea28bc02a45414e1c1b64cf4da6b5f0d63e11029",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_vorbis_dec.h": "288aada7336181f878240a6df6c891f88a8e20ced3de38e50bb80b1c29bee8a4",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec.h": "8713fb9801824c9e041db2a7f6624a397f12be92477a5100005928427e0eb941",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec_reg.h": "b883d6edf6f08d6114426b17d4a2678b16824b65feb2849cf266431a04717756",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec.h": "94b5f996b8276f9b4fb291d4878d73201b5fd6aacc8e67c2ff87cdfde2e39750",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec_reg.h": "de08e5c318810652de0c66c463bd99fed84369705a4ad8533ff42ffce02aaef1",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_es_parse_types.h": "27cc20b9ccd4f08936e09ef82974137a254e5d50e63c7728f21a103edf40489c",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_ogg_parse.h": "1b49166ad991de46f1ecbed08047ffaf5554d0b0c7d3baedf730ab1bca26ad80",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\src\\simple_decoder_reg.c": "387c826bf080fcb06d87804951cea52156e962a0efa08ba6361136e8704b7064",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\capture.py": "4216116d45a0d71d289cde62888da5fb0635d9f6f9ea9b23c981eff8afdd485b",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-nm.exe": "3962a7c898d8dc17c3f0e846ee3b5f5e5c00c2c395d2ae7084dfe57464f75d4e",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-objdump.exe": "80ca832a5aa5bdce9a810faf1cdac6130c556a55dff924d90508ece774af0cba",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32c3\\libesp_audio_codec.a": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32c3\\libesp_audio_simple_dec.a": "232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f",
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\README.md": "48b5938d59ab0752c385acd2a1367571ab5228c3325823ae71216bbf44da3d01",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\project_description.json": "5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364",
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\cmake\\version.cmake": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\analyze.py": "387f2944970a9364a3c10af0a932472aed935d87cf987eede112f0483b8fc29e"
+    },
+    "tool_hash_only": {
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-nm.exe": "3962a7c898d8dc17c3f0e846ee3b5f5e5c00c2c395d2ae7084dfe57464f75d4e",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-objdump.exe": "80ca832a5aa5bdce9a810faf1cdac6130c556a55dff924d90508ece774af0cba"
+    },
+    "source_snapshots": "Content-addressed snapshots/map in capture.json and supplement.json. Four archives and38 selected ELF members preserved; tools hash-only.",
+    "finalizer_sha256": "5f8c60ea6af6e97d5e835981c6ca4b391f08b9fd2fab4ca0cdfd0399e1a8ccd3",
+    "input_unchanged_final": {
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair_abi.h": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\simple.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\output.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\README.md": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\COPYING": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\CMakeLists.txt": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\Kconfig.projbuild": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\qemu_vorbis_lifecycle.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\qemu_vorbis_output.inc": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_registration.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_registration.h": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_resources.h": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\decoder_pcm.h": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\decoder_registration.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\decoder_registration.h": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\board_config.h": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\CMakeLists.txt": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build.ps1": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\run_vorbis_lifecycle.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\run_vorbis_output.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\vorbis_packets.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\save_vorbis_lifecycle.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\verify_vorbis_repair_build.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-lifecycle.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-output.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-repair-evidence.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\test-vorbis-output-evidence.py": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\ESP32C3_VORBIS_REPAIR_PLAN.md": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\ESP32C3_VORBIS_REPAIR_20261004.md": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\docs\\ESP32C3_VORBIS_OUTPUT_20261005.md": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\esp32c3-vorbis-audit-20261004\\manifest.json": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\esp32c3-vorbis-output-20261005\\manifest.json": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\esp32c3-vorbis-output-20261005\\reference-error.json": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\esp32c3_calibration\\vorbis-q10.ogg": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\idf_component.yml": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\CMakeLists.txt": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_vorbis_dec.h": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec.h": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec_reg.h": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec.h": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec_reg.h": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_es_parse_types.h": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_ogg_parse.h": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\src\\simple_decoder_reg.c": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\capture.py": true,
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe": true,
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": true,
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-nm.exe": true,
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-objdump.exe": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32c3\\libesp_audio_codec.a": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32c3\\libesp_audio_simple_dec.a": true,
+      "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\README.md": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\project_description.json": true,
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\cmake\\version.cmake": true,
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-xtensa-audit-01\\analyze.py": true
+    },
+    "payloads_sha256": {
+      "analysis-checks.json": "015ae773ddfe708a17d041c2b57c28e3a4df12bf08977c86145dca74814074f3",
+      "analyze.py": "387f2944970a9364a3c10af0a932472aed935d87cf987eede112f0483b8fc29e",
+      "capture.json": "093606921a1e2c4811211f161984b795aa272d8cb6391b0b9385e36525d0e9cf",
+      "capture.py": "4216116d45a0d71d289cde62888da5fb0635d9f6f9ea9b23c981eff8afdd485b",
+      "excerpt-map.json": "f0d87d09003a08c0f967023814b5693dc5c44b5e9382c90c6f3cd365bfd0aebc",
+      "excerpts\\esp32-_make_decode_table.txt": "7a336d463de07def4210cc40e25d5982c8446896110408d46dda2508d4baea1f",
+      "excerpts\\esp32-_make_words.txt": "898ec4f8904576f7e89b5007d23aaaf99de1c94651bd60809b498972bab01fc3",
+      "excerpts\\esp32-_vorbis_unpack_books.txt": "d10c33dc87950dd7f8655b08169102787c270fb026843bd3cf4a06f1f875a040",
+      "excerpts\\esp32-_vorbis_unpack_info.txt": "d17c601ca6dbaa7bc0157a896f02ba4173afaaf546432ec7cac6e9fb18636d04",
+      "excerpts\\esp32-append_packet.txt": "f381f38e55e2717593f4ea8f1be4e86d24c227626c449dab4e156dcd81fbb1f2",
+      "excerpts\\esp32-decode_map.txt": "532a57470667e065a94639c248d707ba47b9d5c84cdbb9ad2a65f9f4a25ca941",
+      "excerpts\\esp32-esp_audio_simple_dec_close.txt": "bbceb91ee8d9cacb6da1680b6be7c1ad14006856b612dfb89d2cd9b3504f17a6",
+      "excerpts\\esp32-esp_audio_simple_dec_open.txt": "27581cf67f1b6b03d88580b76364ea206f96716f768d3f917e6fec375169b65b",
+      "excerpts\\esp32-esp_audio_simple_dec_process.txt": "76e729b61937f203c1247cf98c79d510022164b753d7180c46a61ad6ca8b334b",
+      "excerpts\\esp32-esp_audio_simple_dec_reset.txt": "2f113603f8695313d147524ed09d129ec25779e8637686aa64fea85cde99fd93",
+      "excerpts\\esp32-esp_es_parse_frame.txt": "d86c6bf720439dd965016bb573f6496a5cbbf72c7a37173d3b13c87a98c42667",
+      "excerpts\\esp32-esp_ogg_parse_frame.txt": "2f531792a0500a6e1d1b61a7643f83cd3eb8405951b9bacffef31f1f2e86e2ea",
+      "excerpts\\esp32-esp_vorbis_dec_close.txt": "47c9e3852e378246a9d253ff00333129005594451523a2f00defc4df8f1e2536",
+      "excerpts\\esp32-esp_vorbis_dec_decode.txt": "b8835b5691202a9a8623aa87d558d5b06bf108d1610326b5d58d63ce3f2fb50d",
+      "excerpts\\esp32-esp_vorbis_dec_open.txt": "907c8055d3f01c582f2daaedd677f3cd04dc5379e78ad76d1d3fd5d9b2b00130",
+      "excerpts\\esp32-esp_vorbis_dec_register.txt": "205895f871ff5dd7a3115868c792f7bf2686763f0afdd2322505be00be9834d9",
+      "excerpts\\esp32-floor0_free_info.txt": "ad1d320a9cdbaef054304ba50a6ed1120e12b70b1e3b722e0db49e592862c793",
+      "excerpts\\esp32-floor0_info_unpack.txt": "17173137dc3291e50ca9c049edb25dbee5373a72fb24d0baa17c5d01a7d2c510",
+      "excerpts\\esp32-floor1_free_info.txt": "d5db31887d991451a8dbe64601252257e10d6b8191b14c349497634e832c8057",
+      "excerpts\\esp32-floor1_info_unpack.txt": "6ebaa2ab19c39b08ca00aaaeb94c81f707f0d4a95c57c768595bccb01917d4dd",
+      "excerpts\\esp32-floor1_inverse1.txt": "4b486e56803c76869aedc13b82f39dec589d117d2bea222430d591924a4b14ef",
+      "excerpts\\esp32-mapping_clear_info.txt": "a9c7290f3ccbf61e06f2dbc080c908e7774d3618f3dab08af692a18c84e1cc8b",
+      "excerpts\\esp32-mapping_info_unpack.txt": "057fe5c66165e4616392583f4f96b4fbe5982d258c2db1d1871f434b3b6a9eb5",
+      "excerpts\\esp32-parse_vorbis_header.txt": "65d20791dab83ea66868e594d883cc17100dec0a855b13b0aebc6be09c1c4ec0",
+      "excerpts\\esp32-res_clear_info.txt": "ece4db82918afa3153e30e4a43971e6ce23cee73d33bbd30b545683e73bcaa37",
+      "excerpts\\esp32-res_unpack.txt": "6aa9b987d9e2314e3219df517e1d64c32f8c8858620389c30c41649b25790c16",
+      "excerpts\\esp32-tremor_oggpack_eop.txt": "bead6ffc5322fc8e8e7b6cd467fb86c3939297c23ddda7cdbd396228df9053b6",
+      "excerpts\\esp32-tremor_oggpack_read.txt": "2f6188d19f1c726eafc301c0dee96cb70a92c8897456c97c142ab666b8d671a3",
+      "excerpts\\esp32-tremor_oggpack_readinit.txt": "2b1060ea19f6f23dd91074f47c35f8785641ffbef0153649ab30de0ceca97aef",
+      "excerpts\\esp32-vorbis_book_clear.txt": "973f49d5355667280995edfbe1929be8bc30b485446760df12faf9988c72270e",
+      "excerpts\\esp32-vorbis_dsp_create.txt": "68f09233d00094ce3956ce7cf6fbbd0c632ca950827d0344d397b7b0b19c3d99",
+      "excerpts\\esp32-vorbis_dsp_destroy.txt": "be53b94553b21b4c1bf9afbc054ebd9069dfec9669c331e0f72f86549fdce669",
+      "excerpts\\esp32-vorbis_dsp_restart.txt": "6caaf9f22f973892188a39fe1a6f7f8ffacb4ab2053bf00ac40b9be2a688e4a6",
+      "excerpts\\esp32-vorbis_dsp_synthesis.txt": "b46edf471055d7a618d1974b47d4cd95db3d734a3b58dcf9a29d168b5b5af3fd",
+      "excerpts\\esp32-vorbis_info_clear.txt": "8d4f5b9c7d73fec0d199404401fc3ed5bbc06fa6c7abdc35f375359816591516",
+      "excerpts\\esp32-vorbis_info_init.txt": "9db8100258ce04c52e69f00666f8dbdd51e9f893c227be8490a0d82a2ed75016",
+      "excerpts\\esp32c3-_make_decode_table.txt": "1aefb8ad9be0f8d515be8b49b1e711acd602e9d4a2d0b73f8d4f5428ae337f82",
+      "excerpts\\esp32c3-_make_words.txt": "a37fc62764c314a48b1127308f0738f72728d94243933fa7d8fcd4cf5092d913",
+      "excerpts\\esp32c3-_vorbis_unpack_books.txt": "5e6d458532d8730759bbabfb96abe6904797f9634fdb180b3bcd48f6ea0ca96a",
+      "excerpts\\esp32c3-_vorbis_unpack_info.txt": "5c94192d95f33a75a823b2d15f7aeda53754fd5880d313270693ef5b897e9d1e",
+      "excerpts\\esp32c3-append_packet.txt": "602b2b06748be645243d3d599d8547ecbe1230fcda11446863e999c65b05fdb1",
+      "excerpts\\esp32c3-decode_map.txt": "6c6182eff66203c08c5ed1752fa25519493064b1dfc16e5da381c7e669343ccf",
+      "excerpts\\esp32c3-esp_audio_simple_dec_close.txt": "e83f31b04505c0cc9dfb8dad54c1e56517fcd0e41dffced2bfca1a4b5a0e6560",
+      "excerpts\\esp32c3-esp_audio_simple_dec_open.txt": "05587952f52e6ea49e565a35252156da95d101524f69a1cec22ef338849768bb",
+      "excerpts\\esp32c3-esp_audio_simple_dec_process.txt": "2ea842978145e7e2397c85b15cc23fc3eb81897f3920bdb8b3d01a155effe5ad",
+      "excerpts\\esp32c3-esp_audio_simple_dec_reset.txt": "1a6f7d9abea87ee9a3fc5ca6189966fc637179d8320b1ef8e8fe7684a8a6406b",
+      "excerpts\\esp32c3-esp_es_parse_frame.txt": "22ed391e7365ed8060c9e2393693c7ab68f69a61e4aaf9037acf9a936d30d1ef",
+      "excerpts\\esp32c3-esp_ogg_parse_frame.txt": "2f07f31b4c74eb962c980fc97c053b3e0cccf34a058030d58c1e4d9d3ea21e5d",
+      "excerpts\\esp32c3-esp_vorbis_dec_close.txt": "fe5dfd0b2563fd7e9e894eb95ae49e05c38e73d38e744e02cdb4e6b7ff5a8a05",
+      "excerpts\\esp32c3-esp_vorbis_dec_decode.txt": "94b0fdb5a889103da934762e61458853c58bc1383c1cdd963050860a68c6aada",
+      "excerpts\\esp32c3-esp_vorbis_dec_open.txt": "6e46db06672364773ec230ca6999d8dbceabeb522ae922db8adca1dbdc8398d0",
+      "excerpts\\esp32c3-esp_vorbis_dec_register.txt": "bcfe874fcde25b211ab984514252bc543e21c34f270939a3fb2ce76ed408d851",
+      "excerpts\\esp32c3-floor0_free_info.txt": "4e58f3170ea29021d89e0f320ac7c706146c1331a8912320ad47786752b02665",
+      "excerpts\\esp32c3-floor0_info_unpack.txt": "ca4f539ebbdc5466458e2c5330c0fc34d083e91f5f20e40af82fe48f81455e8d",
+      "excerpts\\esp32c3-floor1_free_info.txt": "2d875f61bb6c4886d166789affa3b96babcea5c8de873a1ff4f1282f7af211bf",
+      "excerpts\\esp32c3-floor1_info_unpack.txt": "5456d801b4f1dfee13b4b39004f803bef4ff8d68a47bf9c072f7c3db980dbb98",
+      "excerpts\\esp32c3-floor1_inverse1.txt": "98b7e031f64e30e38ce68bb44ee591e9bccb983c9be51e6ee3ce33345830c361",
+      "excerpts\\esp32c3-mapping_clear_info.txt": "8b2dede3e11cbeeb8bfc9432dad60fd2221710a163ce15c013c1d6cdbce2f71f",
+      "excerpts\\esp32c3-mapping_info_unpack.txt": "c72769664104985c431e11095ab192ae871305d5e7dda91d8a6029c6cd84855f",
+      "excerpts\\esp32c3-parse_vorbis_header.txt": "0686d78ea19fa801b251e61b34be7a271df1a673cad485acad7fbb016ed7c9a9",
+      "excerpts\\esp32c3-res_clear_info.txt": "7b563e10c7c285e3b8d9f24fd14eeb85382e4e2a42fb26ccfa1b66449cc6b27e",
+      "excerpts\\esp32c3-res_unpack.txt": "77482c1ecee80a2de7bb2df01d3045b400c4f20ec1c54aa20f864c11b023dc98",
+      "excerpts\\esp32c3-tremor_oggpack_eop.txt": "19c49283b615136c06aa9c5d019626f15efa8ee21c11b2f25f804f896dc5a848",
+      "excerpts\\esp32c3-tremor_oggpack_read.txt": "4d57617ec0ccc2a4d8b72a08ca48404e3ee38cf65be7a00926c98ebd2a2b494d",
+      "excerpts\\esp32c3-tremor_oggpack_readinit.txt": "48117eb3a67f91ea829df447186b65c32e8c5ada1a85cc0a45138e40206fec28",
+      "excerpts\\esp32c3-vorbis_book_clear.txt": "1e1553c30f4f1314c56aae2919fe190542cd86218c237b25e73e5f748302ad08",
+      "excerpts\\esp32c3-vorbis_dsp_create.txt": "edc6985cacf0df0d82cfdd6e39fec798133452eed368bddbce0d9150f4f75eb9",
+      "excerpts\\esp32c3-vorbis_dsp_destroy.txt": "f8a13908cd4d41baf293eec313f104bdd572c814ea64eadc3bc8957f350ab3ff",
+      "excerpts\\esp32c3-vorbis_dsp_restart.txt": "7be12252eabc832e410eff1e9397e553f34a04bf7f82b5b6d81e6165271c1492",
+      "excerpts\\esp32c3-vorbis_dsp_synthesis.txt": "6309c8fc4b8a41a3b08f37e8fb2f3a5d06fa9d3691b941b2821de244ebe152d8",
+      "excerpts\\esp32c3-vorbis_info_clear.txt": "d4e43da124a7c779adf0dc20b3a2f34ecbdcd73ecbc4332b6c9584763259d709",
+      "excerpts\\esp32c3-vorbis_info_init.txt": "3c2dddf6f4079fbb919eaf21004aa156cf0f358b589d5daec5ed15f3e35af040",
+      "finalize.py": "5f8c60ea6af6e97d5e835981c6ca4b391f08b9fd2fab4ca0cdfd0399e1a8ccd3",
+      "members\\esp32\\11-ogg_dec.c.obj": "6dfa7d23cb33c4d6ac0315691db3a635f9433dd947fd951d221ab95717035de6",
+      "members\\esp32\\12-ogg_parser.c.obj": "ac9b10afc3866d7af3cdb391fcc99c24e73463c22b37f7115841c9037359ab3f",
+      "members\\esp32\\13-es_parse_default.c.obj": "09c7e35fe6d698f69bfe4682b5735400593b0f32f001c193a311e7b1ef6cd2f7",
+      "members\\esp32\\14-es_parse_mem.c.obj": "8a428d773d52ae97174500850657f921cf1dd1d0265210846d719c8e5d6ce6f1",
+      "members\\esp32\\15-es_parse_reg.c.obj": "4d5c5b612c0a7e6161c5926b7ea185a8bdd0f174f745263fbe5854153d93c8b4",
+      "members\\esp32\\16-esp_es_parse.c.obj": "39f51ac5eb4d633c9306478254acc31df913a03712647b4d7399df37dec890cc",
+      "members\\esp32\\17-esp_es_parser_version.c.obj": "6b732bb207d83248f0fa1cc77b4acefd98b68efe58f0e0040cb0b2e57d260fac",
+      "members\\esp32\\3-audio_simple_dec_reg.c.obj": "a38f1226841e26357e22a7d244087b1f52bd3de0c1339facc84847fe5f13943c",
+      "members\\esp32\\4-esp_audio_simple_dec.c.obj": "15d77d414aaf223b8e3340f4846e4193b8a31e6d5ce1c7304a7a79f3f43899fd",
+      "members\\esp32\\634-esp_vorbis_dec.c.obj": "e7a0f9519dc54d54c2f3967734996b783110d3f7f59624141e38b823ed3bbac7",
+      "members\\esp32\\635-bitwise.c.obj": "0fa72d8faf716b7f35584bed86b8e2734bc394da887aca1375632c7462da68f1",
+      "members\\esp32\\636-codebook.c.obj": "eade75b153a0cbe45916a87c30e70f37d7d82bc54a5e4dc0993790c2075e35be",
+      "members\\esp32\\637-dsp.c.obj": "931a435e8fecfcd7b349ad672383d34377e5e874c1345c136958f01cfcda6fea",
+      "members\\esp32\\638-floor0.c.obj": "ad09db80f2892f51b478e20092ae424e7b2f8315af335c46a50be160ae7eeaac",
+      "members\\esp32\\639-floor1.c.obj": "4d08cdcc95682470da26a2aa3fe22a0dbea993469de6d5988160478080e7b119",
+      "members\\esp32\\640-floor_lookup.c.obj": "74e27482845a9639e4f463c426ade74dad89bc3bb8a8ae319a766ab9757afb29",
+      "members\\esp32\\642-info.c.obj": "1ff7485a721d4b4f727f4e30a5f431055ae55859b80f97dc9435d2745986eb6c",
+      "members\\esp32\\644-mapping0.c.obj": "61a607fb6bec159b463adc49ea275531132abb8e5a226c779c578cd00a7d19a7",
+      "members\\esp32\\647-res012.c.obj": "96ea8c6c3958ca1efef81b0ca66484551ca6dd68843ad7bb386a923b84113975",
+      "members\\esp32c3\\11-ogg_dec.c.obj": "b77fce8762b69817780ad315ab7e5146a9895fceda2ddce131dbdb0975327e1c",
+      "members\\esp32c3\\12-ogg_parser.c.obj": "affb83f31225ed9b3fb09264276bb926a1b491e422973a75a0c08b680f961510",
+      "members\\esp32c3\\13-es_parse_default.c.obj": "936ab362be83004a794ffa191289073cbd50a7741de5702248829a0f3a3e36a6",
+      "members\\esp32c3\\14-es_parse_mem.c.obj": "cc80f369062b8709b8b2d75790d1e7647bce6c5adedc06388b12eaf368742c77",
+      "members\\esp32c3\\15-es_parse_reg.c.obj": "b441406c818fd0a8303143b6baba729a2396a2f49084b8c88d777a74518c9956",
+      "members\\esp32c3\\16-esp_es_parse.c.obj": "94a333913c813e81b66a8ee9b314da571898a6fefa7828091fa00965b40d23fe",
+      "members\\esp32c3\\17-esp_es_parser_version.c.obj": "11b9866bcc7790a5572ec5a96d74649f4ebb737e02ebf318f3181a5ad010c4dd",
+      "members\\esp32c3\\3-audio_simple_dec_reg.c.obj": "644e4eb26f224b9cf03906e9a2bf7dadff0c1438195acc36ac06f8dd3a7e7460",
+      "members\\esp32c3\\4-esp_audio_simple_dec.c.obj": "bbe33e873eecc93f99f0f14db8f6f244865303714b151a4409e6600bd6aa8b65",
+      "members\\esp32c3\\634-esp_vorbis_dec.c.obj": "764a7b8d108ba05910dbb5d642f1af5e13147f3ceaee7fb2c520daf5c3fffc03",
+      "members\\esp32c3\\635-bitwise.c.obj": "8c457f67894d833790fdda6f827e304917a8012b5ec07191cb05d11397d301a0",
+      "members\\esp32c3\\636-codebook.c.obj": "7e856fde8ffafe0c93109cea0be716b9d977e731ffba8c1b664464e79a86026f",
+      "members\\esp32c3\\637-dsp.c.obj": "b2a1ed9246c9f0d1e17a5a61132f612abb8b81ccc863b34a337deeae62f7c1db",
+      "members\\esp32c3\\638-floor0.c.obj": "28012fb7dc75e830259fadb909f804656115080793c7f03cd8c3eeca2c8bfb8e",
+      "members\\esp32c3\\639-floor1.c.obj": "afd28ca65b67041571a106cebc0b04fc0979c22fe8169cdae6b6637fe581a4ce",
+      "members\\esp32c3\\640-floor_lookup.c.obj": "d563977c478f3c2d7ce2ff1af6c7954e2911e2638be2b53575622a99a9fd4b04",
+      "members\\esp32c3\\642-info.c.obj": "8a1bad0a23bb8c9a9a31137ff68180a7bf2b0e607ceeeabad344024d9c9a268d",
+      "members\\esp32c3\\644-mapping0.c.obj": "6a579be2f110d3087da05e3e5c28a16f72d42e4aadae346e2f5cce836154118d",
+      "members\\esp32c3\\647-res012.c.obj": "8d1b6b22673cfe78e049fb76f28db1239aac1853a046227704f77c3c32450497",
+      "snapshots\\04c7dc1f4bdd3935d87e793dc9c7f1d641b7d6e762e4ef7dc9b0970b77016c11": "04c7dc1f4bdd3935d87e793dc9c7f1d641b7d6e762e4ef7dc9b0970b77016c11",
+      "snapshots\\08d543f31acbce216c18b2ad7ec669549cce5fd9b407c675bd691cfa446b8be2": "08d543f31acbce216c18b2ad7ec669549cce5fd9b407c675bd691cfa446b8be2",
+      "snapshots\\09b179105c78d41f670ec8a4a80c03817d9f06f46c294df7a973ae50df94ebbd": "09b179105c78d41f670ec8a4a80c03817d9f06f46c294df7a973ae50df94ebbd",
+      "snapshots\\09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f",
+      "snapshots\\164de11fdfd6010de2452d497f59043fef2dc8d1adc1ceffcf2139d0da249f0e": "164de11fdfd6010de2452d497f59043fef2dc8d1adc1ceffcf2139d0da249f0e",
+      "snapshots\\1b49166ad991de46f1ecbed08047ffaf5554d0b0c7d3baedf730ab1bca26ad80": "1b49166ad991de46f1ecbed08047ffaf5554d0b0c7d3baedf730ab1bca26ad80",
+      "snapshots\\232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f": "232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f",
+      "snapshots\\27cc20b9ccd4f08936e09ef82974137a254e5d50e63c7728f21a103edf40489c": "27cc20b9ccd4f08936e09ef82974137a254e5d50e63c7728f21a103edf40489c",
+      "snapshots\\288aada7336181f878240a6df6c891f88a8e20ced3de38e50bb80b1c29bee8a4": "288aada7336181f878240a6df6c891f88a8e20ced3de38e50bb80b1c29bee8a4",
+      "snapshots\\29460b3b44148114c28cc2480737368428747e68374d16cb8d910949ded03d19": "29460b3b44148114c28cc2480737368428747e68374d16cb8d910949ded03d19",
+      "snapshots\\2e9c1f8b025994c38703e336848e41d04b92f8c4344b8d317527fbdec266e5ec": "2e9c1f8b025994c38703e336848e41d04b92f8c4344b8d317527fbdec266e5ec",
+      "snapshots\\2f24ec57dd5134d3d2c3d2f427eefe972a16c99fb3fe500aecfef54f88993f06": "2f24ec57dd5134d3d2c3d2f427eefe972a16c99fb3fe500aecfef54f88993f06",
+      "snapshots\\30d3a30ef49e029447afcf1aea28bc02a45414e1c1b64cf4da6b5f0d63e11029": "30d3a30ef49e029447afcf1aea28bc02a45414e1c1b64cf4da6b5f0d63e11029",
+      "snapshots\\311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+      "snapshots\\387c826bf080fcb06d87804951cea52156e962a0efa08ba6361136e8704b7064": "387c826bf080fcb06d87804951cea52156e962a0efa08ba6361136e8704b7064",
+      "snapshots\\387f2944970a9364a3c10af0a932472aed935d87cf987eede112f0483b8fc29e": "387f2944970a9364a3c10af0a932472aed935d87cf987eede112f0483b8fc29e",
+      "snapshots\\38e2f4c18cf06bd738cb2e27238629093d18e9ffc12171a865bc78512ffc94d7": "38e2f4c18cf06bd738cb2e27238629093d18e9ffc12171a865bc78512ffc94d7",
+      "snapshots\\3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+      "snapshots\\3af79c357337c3cccedce4463a45fa7917de05cad600f751663969bf3f607361": "3af79c357337c3cccedce4463a45fa7917de05cad600f751663969bf3f607361",
+      "snapshots\\3e76bf0d53c0a5fe53de01fd72a2dd9350811fd255888fe54caa2852140f4c9f": "3e76bf0d53c0a5fe53de01fd72a2dd9350811fd255888fe54caa2852140f4c9f",
+      "snapshots\\40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+      "snapshots\\4216116d45a0d71d289cde62888da5fb0635d9f6f9ea9b23c981eff8afdd485b": "4216116d45a0d71d289cde62888da5fb0635d9f6f9ea9b23c981eff8afdd485b",
+      "snapshots\\47741ce9043b1eb0b39e018fb3ff48e08ffad9588a388edd32bd7cd4a0b93925": "47741ce9043b1eb0b39e018fb3ff48e08ffad9588a388edd32bd7cd4a0b93925",
+      "snapshots\\48b5938d59ab0752c385acd2a1367571ab5228c3325823ae71216bbf44da3d01": "48b5938d59ab0752c385acd2a1367571ab5228c3325823ae71216bbf44da3d01",
+      "snapshots\\4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+      "snapshots\\5381c1fb82755086c9a5922041212434417da8c531122d5512a7d2f35f573a1b": "5381c1fb82755086c9a5922041212434417da8c531122d5512a7d2f35f573a1b",
+      "snapshots\\54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0": "54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+      "snapshots\\5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364": "5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364",
+      "snapshots\\64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+      "snapshots\\6da129dd5cf17ec83ab4f9e67f32f59005b6e692eb191709e456c6828eafe02f": "6da129dd5cf17ec83ab4f9e67f32f59005b6e692eb191709e456c6828eafe02f",
+      "snapshots\\75e2545585c63a12607bd7542ff4d725f9627f3a3c93c6155632fcbd1b329ff2": "75e2545585c63a12607bd7542ff4d725f9627f3a3c93c6155632fcbd1b329ff2",
+      "snapshots\\771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+      "snapshots\\7ac7b9af0800c6813e6a9ed4e6756f5c50d82d75650f2b9174ef56116671e301": "7ac7b9af0800c6813e6a9ed4e6756f5c50d82d75650f2b9174ef56116671e301",
+      "snapshots\\7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2": "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2",
+      "snapshots\\804fd34627f294c7461b63d7b1dcc7261638e136b1c9f24f3ddd7124f3d45c43": "804fd34627f294c7461b63d7b1dcc7261638e136b1c9f24f3ddd7124f3d45c43",
+      "snapshots\\83463fe1a3e30ab32f567e6ba5b7eeb58c2f1bd9ba81af2c7b5256924d1b993f": "83463fe1a3e30ab32f567e6ba5b7eeb58c2f1bd9ba81af2c7b5256924d1b993f",
+      "snapshots\\8713fb9801824c9e041db2a7f6624a397f12be92477a5100005928427e0eb941": "8713fb9801824c9e041db2a7f6624a397f12be92477a5100005928427e0eb941",
+      "snapshots\\92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+      "snapshots\\94b5f996b8276f9b4fb291d4878d73201b5fd6aacc8e67c2ff87cdfde2e39750": "94b5f996b8276f9b4fb291d4878d73201b5fd6aacc8e67c2ff87cdfde2e39750",
+      "snapshots\\9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+      "snapshots\\ac7a80b90938da4fd535ab282d8d1a1e29eb37c6cedb71a32b7397d5b070abe9": "ac7a80b90938da4fd535ab282d8d1a1e29eb37c6cedb71a32b7397d5b070abe9",
+      "snapshots\\b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+      "snapshots\\b6fdadd6a09ecd485a1a5194d49f0953ad018610397a0674d63e566b6edd6d69": "b6fdadd6a09ecd485a1a5194d49f0953ad018610397a0674d63e566b6edd6d69",
+      "snapshots\\b883d6edf6f08d6114426b17d4a2678b16824b65feb2849cf266431a04717756": "b883d6edf6f08d6114426b17d4a2678b16824b65feb2849cf266431a04717756",
+      "snapshots\\c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+      "snapshots\\c340e8b5b893258721ea13cf7b8d838d25a0fbcd32caf6ffecde26dffdb3f892": "c340e8b5b893258721ea13cf7b8d838d25a0fbcd32caf6ffecde26dffdb3f892",
+      "snapshots\\ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+      "snapshots\\cb5e4cc38ce153b0d2b407a823a665b7596cb2b061eae290444a37c3f5d54eb6": "cb5e4cc38ce153b0d2b407a823a665b7596cb2b061eae290444a37c3f5d54eb6",
+      "snapshots\\d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+      "snapshots\\d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+      "snapshots\\dd26a294cf3887853e12174f3958ea9cccdaa9425ff6a7b21d46faa350bde61c": "dd26a294cf3887853e12174f3958ea9cccdaa9425ff6a7b21d46faa350bde61c",
+      "snapshots\\de08e5c318810652de0c66c463bd99fed84369705a4ad8533ff42ffce02aaef1": "de08e5c318810652de0c66c463bd99fed84369705a4ad8533ff42ffce02aaef1",
+      "snapshots\\e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+      "snapshots\\eb638e38f6207ff0009810ce77cb16d6769b915c2de8af6d9987852e8c00d278": "eb638e38f6207ff0009810ce77cb16d6769b915c2de8af6d9987852e8c00d278",
+      "snapshots\\f04e5fdde0f782ae0351e7f308c833602adcec12788cdf58404543dcc7399216": "f04e5fdde0f782ae0351e7f308c833602adcec12788cdf58404543dcc7399216",
+      "snapshots\\f2cd53e27da54093c7069b335f16bd255eade7bb92280d4ee42fde14b6c230b9": "f2cd53e27da54093c7069b335f16bd255eade7bb92280d4ee42fde14b6c230b9",
+      "snapshots\\fee40d1db0fa885edab12f3278e0a005544c1fb70ec6797e271eefd7d0fede99": "fee40d1db0fa885edab12f3278e0a005544c1fb70ec6797e271eefd7d0fede99",
+      "supplement.json": "63a34a40c7a7cea008dfa273dee1d9b4efcc49cc41771f401541b38fec12e0be",
+      "symbol-inventory.json": "967376d3dd21a6584b0b47819c8fafca49efa4820684cc9115faaad0892607a2",
+      "tool-output\\esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt": "56935c880d30f4008d58948d17ec2b95ccf8af6abb4906aef8567ec67b5d23b4",
+      "tool-output\\esp32-libesp_audio_codec-634-esp_vorbis_dec.c.obj-nm.txt": "47beb358dfed71bd5a3a8d3d880ab7b8d908e2aaab50b6771a898def03cba0c4",
+      "tool-output\\esp32-libesp_audio_codec-635-bitwise.c.obj-disasm.txt": "e2939fa9d8d2dcd7ce60549ff48856f04ca11f51e5f36a09a618d6322bdb8305",
+      "tool-output\\esp32-libesp_audio_codec-635-bitwise.c.obj-nm.txt": "0bd39c4601fb4d89bc14abd236c594318978898cefba4eacba05e37c2e832cc3",
+      "tool-output\\esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt": "ae46d12542eda7b3c859afec641f05ac8040df9d9e5ffe92b40090074154685e",
+      "tool-output\\esp32-libesp_audio_codec-636-codebook.c.obj-nm.txt": "937995e2b5ec2923f619fe73f62bfabdef5f63a1322bfb1d73203877dcbcb4d4",
+      "tool-output\\esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt": "6bb13b9f489a9a0046125b01cb79226218c3c75c4711f23003baeda5b389f237",
+      "tool-output\\esp32-libesp_audio_codec-637-dsp.c.obj-nm.txt": "5442e50b90550665209e4a25f904a92a65474d5d90611be2761057f2a534e2ba",
+      "tool-output\\esp32-libesp_audio_codec-638-floor0.c.obj-disasm.txt": "54eda0e96f47c6a2ba3626d76f2a66ee577e47e2a228da052323ce6ba66dc740",
+      "tool-output\\esp32-libesp_audio_codec-638-floor0.c.obj-nm.txt": "a9abea16fee178d0c69df1d8a1f1dff315a36cc38514c0587994bf4876040caf",
+      "tool-output\\esp32-libesp_audio_codec-639-floor1.c.obj-disasm.txt": "cebb0c7a74173516a6375bce1886702040d1c2e1ab9ae423620e080de515d4d4",
+      "tool-output\\esp32-libesp_audio_codec-639-floor1.c.obj-nm.txt": "638f99daf5ae41c452706cfd23395e2283457ad6e93f1a98dc2bae7824a4cdc9",
+      "tool-output\\esp32-libesp_audio_codec-640-floor_lookup.c.obj-disasm.txt": "de32b6dec10c02ba1535b9369e4ca017489339dae7b68f80feda4256c339353c",
+      "tool-output\\esp32-libesp_audio_codec-640-floor_lookup.c.obj-nm.txt": "d38b49dd6cabe79d1749a5a86f9e0757b81ddaddd0460709ac6894bd32c78d12",
+      "tool-output\\esp32-libesp_audio_codec-642-info.c.obj-disasm.txt": "21d96e30d033ab5c9a33d0156d75bee56e5a24200f8e9c57fae4d947803b6336",
+      "tool-output\\esp32-libesp_audio_codec-642-info.c.obj-nm.txt": "1f0da39ee606a828b1fe508d80d7e90ef491a9a33b673ad3037550fdacff5828",
+      "tool-output\\esp32-libesp_audio_codec-644-mapping0.c.obj-disasm.txt": "67a6c7f9d031f10d38c2a360fedc6c17b5c9c1ff54ed9426a0787ee42704d471",
+      "tool-output\\esp32-libesp_audio_codec-644-mapping0.c.obj-nm.txt": "35b3495ab3963c25c85709be8997a1cf3f5e2ba68b1045dfcb00ca7348ead923",
+      "tool-output\\esp32-libesp_audio_codec-647-res012.c.obj-disasm.txt": "85cf633901c963d6462b77640993dc9e04b9b437978f46646550c492ee56cc1e",
+      "tool-output\\esp32-libesp_audio_codec-647-res012.c.obj-nm.txt": "60b960f7a98db78c7fdb774c33ba59b79ab89ef8ecfb801159006727ec792087",
+      "tool-output\\esp32-libesp_audio_simple_dec-11-ogg_dec.c.obj-disasm.txt": "6ceb4895bc6bb1babafa2ee76b6b7b0634e5fd2ca6a1ac8b600be1cc3cf2066c",
+      "tool-output\\esp32-libesp_audio_simple_dec-11-ogg_dec.c.obj-nm.txt": "04caac2c9a778403afe4260c40042983cea20fd5eb316363d4972cee53d727e7",
+      "tool-output\\esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt": "a0c0879b91afc02c063e8c725b946ed1a823e42601de02c47e29e9355325ef38",
+      "tool-output\\esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-nm.txt": "e8c81221df94d0b10e698abbc30c525d073469a59f3a7b9477d66676c9303bee",
+      "tool-output\\esp32-libesp_audio_simple_dec-13-es_parse_default.c.obj-disasm.txt": "159a1eb6602b84a7367cbfee66afb6a49423750f6f128a0c6b801779331d0c0d",
+      "tool-output\\esp32-libesp_audio_simple_dec-13-es_parse_default.c.obj-nm.txt": "5f03c3bfc29d7ebfcc314afc8cbbd3b6c66477f302f3441ccc66e9e8ee9d2e7e",
+      "tool-output\\esp32-libesp_audio_simple_dec-14-es_parse_mem.c.obj-disasm.txt": "8b6ee2b23bc31e1a9f04924973de1986929562705c2d22a6078a1f29d9cd8b46",
+      "tool-output\\esp32-libesp_audio_simple_dec-14-es_parse_mem.c.obj-nm.txt": "b2a00c9487a09f20560e734b52cabb4c3b589f1648dc7d01ebcff7ab7e332a2a",
+      "tool-output\\esp32-libesp_audio_simple_dec-15-es_parse_reg.c.obj-disasm.txt": "98b6ca874a3b85e28b56819075332a431c128cdb411777c056813dae58d2984a",
+      "tool-output\\esp32-libesp_audio_simple_dec-15-es_parse_reg.c.obj-nm.txt": "f6087fe4251efd72c1f4f0e06baab0a29f6fdbca9eaca3e553b3b436912fac1a",
+      "tool-output\\esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt": "2c4522cd711fe078556d7b0cae9367c40f070bf40bfedf0705ff3a23808f168e",
+      "tool-output\\esp32-libesp_audio_simple_dec-16-esp_es_parse.c.obj-nm.txt": "1518242b40248fa907b2ec0f7063d60923ef98283e68cb6b54f38c257c21977c",
+      "tool-output\\esp32-libesp_audio_simple_dec-17-esp_es_parser_version.c.obj-disasm.txt": "0961853cd854de8cf1ac441fff489b690063e872b55c7bf6e803615b0f04af3d",
+      "tool-output\\esp32-libesp_audio_simple_dec-17-esp_es_parser_version.c.obj-nm.txt": "7ea8458108ec943ce0c2a0302ea15a129fa2db65d04230fb42ddff43169b697c",
+      "tool-output\\esp32-libesp_audio_simple_dec-3-audio_simple_dec_reg.c.obj-disasm.txt": "897473f087db9c34a9300487c510c3af6b8c32d1df03973391b2b37eb42d338b",
+      "tool-output\\esp32-libesp_audio_simple_dec-3-audio_simple_dec_reg.c.obj-nm.txt": "8a4ab179d805b4fba6a39fa0314a24b6865b4ad4ce1cc68245c1025cd07fe57e",
+      "tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt": "b6a73b7c05bcf58be8f1aa62b5a27ffd71476efe083f36cc95efb45393c9dead",
+      "tool-output\\esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-nm.txt": "b77639e600d2358c2d1c71df1c0423325af4edb8bbcc07ccf7ec89670def8bba",
+      "tool-output\\esp32-nm-version.txt": "0f280b10a7b045d2e1a97af4b4199aa723429180f26ebe12bc7ccf51da65a713",
+      "tool-output\\esp32-objdump-version.txt": "ef6bfa561d421f034aeff6bdfb7910f45866ce01fac008fa99b316758b33ed57",
+      "tool-output\\esp32c3-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt": "1f48e0f4ddb8efff0e81f0082d0df16d57271035fca4188e8716baa77f4d2eec",
+      "tool-output\\esp32c3-libesp_audio_codec-634-esp_vorbis_dec.c.obj-nm.txt": "730b85569b180b266d75f3450090fc1fc56035f4a9190d26467a67028f3ce61c",
+      "tool-output\\esp32c3-libesp_audio_codec-635-bitwise.c.obj-disasm.txt": "01b1c312dcbf5f28ff3fe29af55a86c6bf7b663bb24ba0e7b5e86b076f1c8b3e",
+      "tool-output\\esp32c3-libesp_audio_codec-635-bitwise.c.obj-nm.txt": "2abbff1eb500298b0b85cf3227c6d0f3bbdfe964ac1a017b08af03c82075ac74",
+      "tool-output\\esp32c3-libesp_audio_codec-636-codebook.c.obj-disasm.txt": "ceb4e4d0e4ebf9667ed110cf2006ebff05a1a4fdfd56980215ac6561dd9be2ec",
+      "tool-output\\esp32c3-libesp_audio_codec-636-codebook.c.obj-nm.txt": "567cea1e7a52c9e1a3884bcfd01e4ac2fa5fd94f8fde30e1141ce53d1a5dde0a",
+      "tool-output\\esp32c3-libesp_audio_codec-637-dsp.c.obj-disasm.txt": "d5f35c30de66d462ba4f8c89845ca2d3d4618647d446ec228cfa13af9b1f729d",
+      "tool-output\\esp32c3-libesp_audio_codec-637-dsp.c.obj-nm.txt": "613730bb3bece068f904994a3d6173c6a208066171c1d76ad87aef8a0121807b",
+      "tool-output\\esp32c3-libesp_audio_codec-638-floor0.c.obj-disasm.txt": "43d938cf4cb413eaa1deddf4cf5aa4adb813bd17e436bb9124cd0b893ea1657e",
+      "tool-output\\esp32c3-libesp_audio_codec-638-floor0.c.obj-nm.txt": "50f0efa999af6e26f340fe3accb0c15976b891d4c79b1ad9e20b14afe8bc9104",
+      "tool-output\\esp32c3-libesp_audio_codec-639-floor1.c.obj-disasm.txt": "462b4f90ad254c295553db5209da40e8ff2a9998128c34f9a3ff405ddd9ceea3",
+      "tool-output\\esp32c3-libesp_audio_codec-639-floor1.c.obj-nm.txt": "9c74e40cc727cef4e4f87c88e76068b3268358e919752589c784f571786b54fd",
+      "tool-output\\esp32c3-libesp_audio_codec-640-floor_lookup.c.obj-disasm.txt": "1316adf804af9856629a7f50f087d92d62772e1355cde411121185e739fbce63",
+      "tool-output\\esp32c3-libesp_audio_codec-640-floor_lookup.c.obj-nm.txt": "d38b49dd6cabe79d1749a5a86f9e0757b81ddaddd0460709ac6894bd32c78d12",
+      "tool-output\\esp32c3-libesp_audio_codec-642-info.c.obj-disasm.txt": "ccf30f02edb009b6f202b6194d7c6a083a7e51244ef39a06bf2b437b00b2db77",
+      "tool-output\\esp32c3-libesp_audio_codec-642-info.c.obj-nm.txt": "f0234f50829c28e2e4d33e2f8de3a1ab36d050469cca90bcea4223842719f620",
+      "tool-output\\esp32c3-libesp_audio_codec-644-mapping0.c.obj-disasm.txt": "19b85e1d782a5babdf5555118b9f73b463556060283f250b9aa6da4c4f47b2d9",
+      "tool-output\\esp32c3-libesp_audio_codec-644-mapping0.c.obj-nm.txt": "8685df781f1fe32cab0fc99cd2b9970ef70ccfb51c1871872898a4ba1ae5a426",
+      "tool-output\\esp32c3-libesp_audio_codec-647-res012.c.obj-disasm.txt": "d392287cd39045ba0cadd229460dc0142f35551e5edd49336e4146f12a7c5daa",
+      "tool-output\\esp32c3-libesp_audio_codec-647-res012.c.obj-nm.txt": "e7a59aaf9da31de79d3cb8e47f96ce154636d38e402c82f4d33f68ec4e9bd57e",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-11-ogg_dec.c.obj-disasm.txt": "8eb2243c4cc1ce0409ff276908041486fbc66b91eb73a809a00ceaf69254ae31",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-11-ogg_dec.c.obj-nm.txt": "22cb027db35eefea36bdf093e1446242fd8fa4cffbb572ce3f88eb1d97d5d060",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt": "665176cde67098bfa017c34f05583669abeb407f062cd98a72969d8a19201f4e",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-12-ogg_parser.c.obj-nm.txt": "fd59388af47800dc5e2b47013f7fcc37db7381b0c1b446db0056211ece8fe9e5",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-13-es_parse_default.c.obj-disasm.txt": "5f80f6c5f30e3cbc9f11415c53d2a3b273390a5bf1566bc12747dc6bf535cd98",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-13-es_parse_default.c.obj-nm.txt": "eb65f2c64cbe164ffd350aacf4de7b0c4456335c8622e135199ff0df93d01279",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-14-es_parse_mem.c.obj-disasm.txt": "0f701b573088f2faa4a37515512183317641d3a835b56fb6a18a7e24056efbc3",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-14-es_parse_mem.c.obj-nm.txt": "bba1bd9b2597349b92b2de1e3e0301214c9025aa5aee684df1bbefee1c093349",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-15-es_parse_reg.c.obj-disasm.txt": "4ea53ff7253c1ac2154d1cc0faa84affe99756944f4c098c94ff53a65aa3a6cc",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-15-es_parse_reg.c.obj-nm.txt": "7acede9779d5650225e552a4332d1c914c67ed402d6b0700116ad044adfc72dc",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-16-esp_es_parse.c.obj-disasm.txt": "bdb5951760a85a242cbc7afef66cb63822b1090ccb74755c0ae3f6e34d50adde",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-16-esp_es_parse.c.obj-nm.txt": "451eca00dfe5a9dad3967c04d31a20ad051032a9ff6bb3654c62ce5f853f2dfe",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-17-esp_es_parser_version.c.obj-disasm.txt": "0cdfeec5f59df049d114985f1c6202f6633e08455e677e256586825651bb9ebe",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-17-esp_es_parser_version.c.obj-nm.txt": "2e698bd3c7939dc520892ca63f9d44e02e108ac6970993b201a053a80a8ba78f",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-3-audio_simple_dec_reg.c.obj-disasm.txt": "d22e8dec42eaeb02c629bc9b51e02f8174370e256d658ba4d285d53d1a401494",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-3-audio_simple_dec_reg.c.obj-nm.txt": "9e973f18fd1906b5b9e5311d58faadf95af8f1e195ba304bcd36321760528115",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt": "e482191187518a4f398c239339ba291d843abf1bc11ceb440a46311912a3e95e",
+      "tool-output\\esp32c3-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-nm.txt": "72ad3587746eeb583167418ed58142e1482eb3d3eff1f7255e5e4e4f033fa626",
+      "tool-output\\esp32c3-nm-version.txt": "0f280b10a7b045d2e1a97af4b4199aa723429180f26ebe12bc7ccf51da65a713",
+      "tool-output\\esp32c3-objdump-version.txt": "ef6bfa561d421f034aeff6bdfb7910f45866ce01fac008fa99b316758b33ed57",
+      "xtensa-call-references.json": "c06bf430e51ba03af8ebdb52b77b64f0df348df077b411fc1b77f784ced20310"
+    },
+    "payload_count": 256
+  },
+  "failed_attempts": [
+    {
+      "step": "Initial ignored analyze.py metadata capture",
+      "exit_status": 1,
+      "reason": "Assumed SDK version.txt did not exist. Replaced metadata input with existing tools/cmake/version.cmake before successful analysis. No decoder or compilation executed in either attempt.",
+      "missing_path": "C:/Work/yoRadio/.idf/v6.0.2/version.txt"
+    }
+  ]
+}

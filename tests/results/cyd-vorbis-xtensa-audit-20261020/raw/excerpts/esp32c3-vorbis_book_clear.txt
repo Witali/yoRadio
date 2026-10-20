@@ -1,0 +1,32 @@
+tool-output/esp32c3-libesp_audio_codec-636-codebook.c.obj-disasm.txt:988
+Disassembly of section .text.vorbis_book_clear:
+
+00000000 <vorbis_book_clear>:
+   0:	1141                	addi	sp,sp,-16
+   2:	c422                	sw	s0,8(sp)
+   4:	842a                	mv	s0,a0
+   6:	5d48                	lw	a0,60(a0)
+   8:	c606                	sw	ra,12(sp)
+   a:	c509                	beqz	a0,14 <.L179>	a: R_RISCV_RVC_BRANCH	.L179
+   c:	00000097          	auipc	ra,0x0	c: R_RISCV_CALL_PLT	media_lib_free
+	c: R_RISCV_RELAX	*ABS*
+  10:	000080e7          	jalr	ra # c <vorbis_book_clear+0xc>
+
+00000014 <.L179>:
+  14:	4808                	lw	a0,16(s0)
+  16:	c509                	beqz	a0,20 <.L180>	16: R_RISCV_RVC_BRANCH	.L180
+  18:	00000097          	auipc	ra,0x0	18: R_RISCV_CALL_PLT	media_lib_free
+	18: R_RISCV_RELAX	*ABS*
+  1c:	000080e7          	jalr	ra # 18 <.L179+0x4>
+
+00000020 <.L180>:
+  20:	8522                	mv	a0,s0
+  22:	4422                	lw	s0,8(sp)
+  24:	40b2                	lw	ra,12(sp)
+  26:	04000613          	li	a2,64
+  2a:	4581                	li	a1,0
+  2c:	0141                	addi	sp,sp,16
+  2e:	00000317          	auipc	t1,0x0	2e: R_RISCV_CALL_PLT	memset
+	2e: R_RISCV_RELAX	*ABS*
+  32:	00030067          	jr	t1 # 2e <.L180+0xe>
+

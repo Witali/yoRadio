@@ -1,0 +1,55 @@
+tool-output/esp32c3-libesp_audio_codec-634-esp_vorbis_dec.c.obj-disasm.txt:210
+Disassembly of section .text.esp_vorbis_dec_close:
+
+00000000 <esp_vorbis_dec_close>:
+   0:	c529                	beqz	a0,4a <.L30>	0: R_RISCV_RVC_BRANCH	.L30
+   2:	87aa                	mv	a5,a0
+   4:	4108                	lw	a0,0(a0)
+   6:	1101                	addi	sp,sp,-32
+   8:	ce06                	sw	ra,28(sp)
+   a:	c51d                	beqz	a0,38 <.L21>	a: R_RISCV_RVC_BRANCH	.L21
+   c:	c63e                	sw	a5,12(sp)
+   e:	411c                	lw	a5,0(a0)
+  10:	cc22                	sw	s0,24(sp)
+  12:	843e                	mv	s0,a5
+  14:	00000097          	auipc	ra,0x0	14: R_RISCV_CALL_PLT	vorbis_dsp_destroy
+	14: R_RISCV_RELAX	*ABS*
+  18:	000080e7          	jalr	ra # 14 <esp_vorbis_dec_close+0x14>
+  1c:	47b2                	lw	a5,12(sp)
+  1e:	c805                	beqz	s0,4e <.L33>	1e: R_RISCV_RVC_BRANCH	.L33
+  20:	8522                	mv	a0,s0
+  22:	00000097          	auipc	ra,0x0	22: R_RISCV_CALL_PLT	vorbis_info_clear
+	22: R_RISCV_RELAX	*ABS*
+  26:	000080e7          	jalr	ra # 22 <esp_vorbis_dec_close+0x22>
+  2a:	8522                	mv	a0,s0
+  2c:	00000097          	auipc	ra,0x0	2c: R_RISCV_CALL_PLT	media_lib_free
+	2c: R_RISCV_RELAX	*ABS*
+  30:	000080e7          	jalr	ra # 2c <esp_vorbis_dec_close+0x2c>
+  34:	47b2                	lw	a5,12(sp)
+  36:	4462                	lw	s0,24(sp)
+
+00000038 <.L21>:
+  38:	853e                	mv	a0,a5
+  3a:	00000097          	auipc	ra,0x0	3a: R_RISCV_CALL_PLT	media_lib_free
+	3a: R_RISCV_RELAX	*ABS*
+  3e:	000080e7          	jalr	ra # 3a <.L21+0x2>
+  42:	40f2                	lw	ra,28(sp)
+  44:	4501                	li	a0,0
+  46:	6105                	addi	sp,sp,32
+  48:	8082                	ret
+
+0000004a <.L30>:
+  4a:	4501                	li	a0,0
+  4c:	8082                	ret
+
+0000004e <.L33>:
+  4e:	853e                	mv	a0,a5
+  50:	4462                	lw	s0,24(sp)
+  52:	00000097          	auipc	ra,0x0	52: R_RISCV_CALL_PLT	media_lib_free
+	52: R_RISCV_RELAX	*ABS*
+  56:	000080e7          	jalr	ra # 52 <.L33+0x4>
+  5a:	40f2                	lw	ra,28(sp)
+  5c:	4501                	li	a0,0
+  5e:	6105                	addi	sp,sp,32
+  60:	8082                	ret
+

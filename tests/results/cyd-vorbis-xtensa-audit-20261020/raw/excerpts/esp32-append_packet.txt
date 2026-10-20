@@ -1,0 +1,39 @@
+tool-output/esp32-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:202
+Disassembly of section .text.append_packet:
+
+00000000 <.text.append_packet>:
+   0:	004136        	entry	a1, 32
+   3:	047d      	mov.n	a7, a4
+   5:	54bc      	beqz.n	a4, 3e <.text.append_packet+0x3e>	5: R_XTENSA_SLOT0_OP	.text.append_packet+0x3e
+   7:	e2a8      	l32i.n	a10, a2, 56
+   9:	f298      	l32i.n	a9, a2, 60
+   b:	ca4a      	add.n	a12, a10, a4
+   d:	c288      	l32i.n	a8, a2, 48
+   f:	19b9c7        	bgeu	a9, a12, 2c <.text.append_packet+0x2c>	f: R_XTENSA_SLOT0_OP	.text.append_packet+0x2c
+  12:	0000a1        	l32r	a10, fffc0014 <esp_ogg_parse_frame+0xfffc0014>	12: R_XTENSA_SLOT0_OP	.literal.append_packet
+  15:	01dc42        	addmi	a4, a12, 0x100
+  18:	08bd      	mov.n	a11, a8
+  1a:	04cd      	mov.n	a12, a4
+  1c:	000081        	l32r	a8, fffc001c <esp_ogg_parse_frame+0xfffc001c>	1c: R_XTENSA_SLOT0_OP	.literal.append_packet+0x4
+	1c: R_XTENSA_ASM_EXPAND	media_lib_module_realloc
+  1f:	0008e0        	callx8	a8
+  22:	0a8d      	mov.n	a8, a10
+  24:	ca9c      	beqz.n	a10, 44 <.text.append_packet+0x44>	24: R_XTENSA_SLOT0_OP	.text.append_packet+0x44
+  26:	e2a8      	l32i.n	a10, a2, 56
+  28:	c289      	s32i.n	a8, a2, 48
+  2a:	f249      	s32i.n	a4, a2, 60
+  2c:	a8aa      	add.n	a10, a8, a10
+  2e:	07cd      	mov.n	a12, a7
+  30:	03bd      	mov.n	a11, a3
+  32:	000081        	l32r	a8, fffc0034 <esp_ogg_parse_frame+0xfffc0034>	32: R_XTENSA_SLOT0_OP	.literal.append_packet+0x8
+	32: R_XTENSA_ASM_EXPAND	memcpy
+  35:	0008e0        	callx8	a8
+  38:	e288      	l32i.n	a8, a2, 56
+  3a:	487a      	add.n	a4, a8, a7
+  3c:	e249      	s32i.n	a4, a2, 56
+  3e:	120c      	movi.n	a2, 1
+  40:	000086        	j	46 <.text.append_packet+0x46>	40: R_XTENSA_SLOT0_OP	.text.append_packet+0x46
+  43:	00          	.byte	00
+  44:	0a2d      	mov.n	a2, a10
+  46:	f01d      	retw.n
+

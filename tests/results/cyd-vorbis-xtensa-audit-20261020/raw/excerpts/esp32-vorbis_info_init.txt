@@ -1,0 +1,20 @@
+tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:352
+Disassembly of section .text.vorbis_info_init:
+
+00000000 <vorbis_info_init>:
+   0:	004136        	entry	a1, 32
+   3:	0c2c      	movi.n	a12, 32
+   5:	0b0c      	movi.n	a11, 0
+   7:	20a220        	or	a10, a2, a2
+   a:	000081        	l32r	a8, fffc000c <vorbis_info_init+0xfffc000c>	a: R_XTENSA_SLOT0_OP	.literal.vorbis_info_init+0x4
+	a: R_XTENSA_ASM_EXPAND	memset
+   d:	0008e0        	callx8	a8
+  10:	0000a1        	l32r	a10, fffc0010 <vorbis_info_init+0xfffc0010>	10: R_XTENSA_SLOT0_OP	.literal.vorbis_info_init
+  13:	4c3c      	movi.n	a12, 52
+  15:	1b0c      	movi.n	a11, 1
+  17:	000081        	l32r	a8, fffc0018 <vorbis_info_init+0xfffc0018>	17: R_XTENSA_SLOT0_OP	.literal.vorbis_info_init+0x8
+	17: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  1a:	0008e0        	callx8	a8
+  1d:	72a9      	s32i.n	a10, a2, 28
+  1f:	f01d      	retw.n
+

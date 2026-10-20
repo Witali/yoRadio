@@ -1,0 +1,363 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-xtensa-audit-01\members\esp32\635-bitwise.c.obj:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.tremor_oggpack_readinit:
+
+00000000 <.literal.tremor_oggpack_readinit>:
+	...
+	0: R_XTENSA_32	memset
+	4: R_XTENSA_32	.text._span
+
+Disassembly of section .literal.tremor_oggpack_look:
+
+00000000 <.literal.tremor_oggpack_look>:
+   0:	00000000 		0: R_XTENSA_32	.rodata.tremor_mask
+
+Disassembly of section .literal.tremor_oggpack_adv:
+
+00000000 <.literal.tremor_oggpack_adv>:
+   0:	00000000 		0: R_XTENSA_32	.text._span
+
+Disassembly of section .literal.tremor_oggpack_read:
+
+00000000 <.literal.tremor_oggpack_read>:
+	...
+	0: R_XTENSA_32	tremor_oggpack_look
+	4: R_XTENSA_32	.text._span
+
+Disassembly of section .text._span:
+
+00000000 <.text._span>:
+   0:	004136        	entry	a1, 32
+   3:	02b8      	l32i.n	a11, a2, 0
+   5:	22c8      	l32i.n	a12, a2, 8
+   7:	2183b0        	srai	a8, a11, 3
+   a:	c0cc80        	sub	a12, a12, a8
+   d:	431ce6        	bgei	a12, 1, 54 <.text._span+0x54>	d: R_XTENSA_SLOT0_OP	.text._span+0x54
+  10:	32a8      	l32i.n	a10, a2, 12
+  12:	0000c6        	j	19 <.text._span+0x19>	12: R_XTENSA_SLOT0_OP	.text._span+0x19
+  15:	08ad      	mov.n	a10, a8
+  17:	09cd      	mov.n	a12, a9
+  19:	3a88      	l32i.n	a8, a10, 12
+  1b:	24b0b0        	extui	a11, a11, 0, 3
+  1e:	48ac      	beqz.n	a8, 46 <.text._span+0x46>	1e: R_XTENSA_SLOT0_OP	.text._span+0x46
+  20:	2ad8      	l32i.n	a13, a10, 8
+  22:	52a8      	l32i.n	a10, a2, 20
+  24:	2898      	l32i.n	a9, a8, 8
+  26:	aada      	add.n	a10, a10, a13
+  28:	9c9a      	add.n	a9, a12, a9
+  2a:	52a9      	s32i.n	a10, a2, 20
+  2c:	3289      	s32i.n	a8, a2, 12
+  2e:	e319a6        	blti	a9, 1, 15 <.text._span+0x15>	2e: R_XTENSA_SLOT0_OP	.text._span+0x15
+  31:	08d8      	l32i.n	a13, a8, 0
+  33:	18a8      	l32i.n	a10, a8, 4
+  35:	0d88      	l32i.n	a8, a13, 0
+  37:	c0aac0        	sub	a10, a10, a12
+  3a:	88aa      	add.n	a8, a8, a10
+  3c:	1289      	s32i.n	a8, a2, 4
+  3e:	2299      	s32i.n	a9, a2, 8
+  40:	02b9      	s32i.n	a11, a2, 0
+  42:	000386        	j	54 <.text._span+0x54>	42: R_XTENSA_SLOT0_OP	.text._span+0x54
+  45:	00          	.byte	00
+  46:	22c9      	s32i.n	a12, a2, 8
+  48:	02b9      	s32i.n	a11, a2, 0
+  4a:	11ccd0        	slli	a12, a12, 3
+  4d:	03acb7        	bge	a12, a11, 54 <.text._span+0x54>	4d: R_XTENSA_SLOT0_OP	.text._span+0x54
+  50:	f87c      	movi.n	a8, -1
+  52:	2289      	s32i.n	a8, a2, 8
+  54:	f01d      	retw.n
+
+Disassembly of section .text.tremor_oggpack_readinit:
+
+00000000 <tremor_oggpack_readinit>:
+   0:	004136        	entry	a1, 32
+   3:	8c1c      	movi.n	a12, 24
+   5:	00a0b2        	movi	a11, 0
+   8:	02ad      	mov.n	a10, a2
+   a:	000081        	l32r	a8, fffc000c <tremor_oggpack_readinit+0xfffc000c>	a: R_XTENSA_SLOT0_OP	.literal.tremor_oggpack_readinit
+	a: R_XTENSA_ASM_EXPAND	memset
+   d:	0008e0        	callx8	a8
+  10:	0388      	l32i.n	a8, a3, 0
+  12:	13a8      	l32i.n	a10, a3, 4
+  14:	0888      	l32i.n	a8, a8, 0
+  16:	2398      	l32i.n	a9, a3, 8
+  18:	88aa      	add.n	a8, a8, a10
+  1a:	0a0c      	movi.n	a10, 0
+  1c:	52a9      	s32i.n	a10, a2, 20
+  1e:	3239      	s32i.n	a3, a2, 12
+  20:	4239      	s32i.n	a3, a2, 16
+  22:	1289      	s32i.n	a8, a2, 4
+  24:	2299      	s32i.n	a9, a2, 8
+  26:	02ad      	mov.n	a10, a2
+  28:	000081        	l32r	a8, fffc0028 <tremor_oggpack_readinit+0xfffc0028>	28: R_XTENSA_SLOT0_OP	.literal.tremor_oggpack_readinit+0x4
+	28: R_XTENSA_ASM_EXPAND	.text._span
+  2b:	0008e0        	callx8	a8
+  2e:	f01d      	retw.n
+
+Disassembly of section .text.tremor_oggpack_look:
+
+00000000 <tremor_oggpack_look>:
+   0:	004136        	entry	a1, 32
+   3:	2298      	l32i.n	a9, a2, 8
+   5:	02b8      	l32i.n	a11, a2, 0
+   7:	0000a1        	l32r	a10, fffc0008 <tremor_oggpack_look+0xfffc0008>	7: R_XTENSA_SLOT0_OP	.literal.tremor_oggpack_look
+   a:	028d      	mov.n	a8, a2
+   c:	a0a3a0        	addx4	a10, a3, a10
+   f:	2b3a      	add.n	a2, a11, a3
+  11:	11c9d0        	slli	a12, a9, 3
+  14:	0ad8      	l32i.n	a13, a10, 0
+  16:	18a8      	l32i.n	a10, a8, 4
+  18:	02a2c7        	bge	a2, a12, 1e <tremor_oggpack_look+0x1e>	18: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1e
+  1b:	004246        	j	128 <tremor_oggpack_look+0x128>	1b: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x128
+  1e:	18a996        	bltz	a9, 1ac <tremor_oggpack_look+0x1ac>	1e: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ac
+  21:	189216        	beqz	a2, 1ae <tremor_oggpack_look+0x1ae>	21: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ae
+  24:	032882        	l32i	a8, a8, 12
+  27:	011956        	bnez	a9, 3c <tremor_oggpack_look+0x3c>	27: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x3c
+  2a:	3888      	l32i.n	a8, a8, 12
+  2c:	17c816        	beqz	a8, 1ac <tremor_oggpack_look+0x1ac>	2c: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ac
+  2f:	2898      	l32i.n	a9, a8, 8
+  31:	ff5916        	beqz	a9, 2a <tremor_oggpack_look+0x2a>	31: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x2a
+  34:	08a8      	l32i.n	a10, a8, 0
+  36:	18c8      	l32i.n	a12, a8, 4
+  38:	0aa8      	l32i.n	a10, a10, 0
+  3a:	aaca      	add.n	a10, a10, a12
+  3c:	000ae2        	l8ui	a14, a10, 0
+  3f:	8c0c      	movi.n	a12, 8
+  41:	400b00        	ssr	a11
+  44:	b1e0e0        	sra	a14, a14
+  47:	022c27        	blt	a12, a2, 4d <tremor_oggpack_look+0x4d>	47: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x4d
+  4a:	001a46        	j	b7 <tremor_oggpack_look+0xb7>	4a: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xb7
+  4d:	c90b      	addi.n	a12, a9, -1
+  4f:	151966        	bnei	a9, 1, 68 <tremor_oggpack_look+0x68>	4f: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x68
+  52:	3888      	l32i.n	a8, a8, 12
+  54:	154816        	beqz	a8, 1ac <tremor_oggpack_look+0x1ac>	54: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ac
+  57:	28c8      	l32i.n	a12, a8, 8
+  59:	ff5c16        	beqz	a12, 52 <tremor_oggpack_look+0x52>	59: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x52
+  5c:	08a8      	l32i.n	a10, a8, 0
+  5e:	1898      	l32i.n	a9, a8, 4
+  60:	0aa8      	l32i.n	a10, a10, 0
+  62:	aa9a      	add.n	a10, a10, a9
+  64:	000086        	j	6a <tremor_oggpack_look+0x6a>	64: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x6a
+  67:	00          	.byte	00
+  68:	aa1b      	addi.n	a10, a10, 1
+  6a:	000a92        	l8ui	a9, a10, 0
+  6d:	f8cbf2        	addi	a15, a11, -8
+  70:	60f0f0        	neg	a15, a15
+  73:	401f00        	ssl	a15
+  76:	a19900        	sll	a9, a9
+  79:	0f1c      	movi.n	a15, 16
+  7b:	20e9e0        	or	a14, a9, a14
+  7e:	022f27        	blt	a15, a2, 84 <tremor_oggpack_look+0x84>	7e: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x84
+  81:	000c86        	j	b7 <tremor_oggpack_look+0xb7>	81: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xb7
+  84:	9c0b      	addi.n	a9, a12, -1
+  86:	141c66        	bnei	a12, 1, 9e <tremor_oggpack_look+0x9e>	86: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x9e
+  89:	3888      	l32i.n	a8, a8, 12
+  8b:	11d816        	beqz	a8, 1ac <tremor_oggpack_look+0x1ac>	8b: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ac
+  8e:	2898      	l32i.n	a9, a8, 8
+  90:	ff5916        	beqz	a9, 89 <tremor_oggpack_look+0x89>	90: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x89
+  93:	08a8      	l32i.n	a10, a8, 0
+  95:	18c8      	l32i.n	a12, a8, 4
+  97:	0aa8      	l32i.n	a10, a10, 0
+  99:	aaca      	add.n	a10, a10, a12
+  9b:	000046        	j	a0 <tremor_oggpack_look+0xa0>	9b: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xa0
+  9e:	aa1b      	addi.n	a10, a10, 1
+  a0:	000ac2        	l8ui	a12, a10, 0
+  a3:	f0cbf2        	addi	a15, a11, -16
+  a6:	60f0f0        	neg	a15, a15
+  a9:	401f00        	ssl	a15
+  ac:	a1cc00        	sll	a12, a12
+  af:	8f1c      	movi.n	a15, 24
+  b1:	20ece0        	or	a14, a12, a14
+  b4:	052f27        	blt	a15, a2, bd <tremor_oggpack_look+0xbd>	b4: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xbd
+  b7:	102de0        	and	a2, a13, a14
+  ba:	003c06        	j	1ae <tremor_oggpack_look+0x1ae>	ba: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ae
+  bd:	c90b      	addi.n	a12, a9, -1
+  bf:	151966        	bnei	a9, 1, d8 <tremor_oggpack_look+0xd8>	bf: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xd8
+  c2:	3888      	l32i.n	a8, a8, 12
+  c4:	0e4816        	beqz	a8, 1ac <tremor_oggpack_look+0x1ac>	c4: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ac
+  c7:	28c8      	l32i.n	a12, a8, 8
+  c9:	ff5c16        	beqz	a12, c2 <tremor_oggpack_look+0xc2>	c9: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xc2
+  cc:	08a8      	l32i.n	a10, a8, 0
+  ce:	1898      	l32i.n	a9, a8, 4
+  d0:	0aa8      	l32i.n	a10, a10, 0
+  d2:	aa9a      	add.n	a10, a10, a9
+  d4:	000086        	j	da <tremor_oggpack_look+0xda>	d4: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xda
+  d7:	00          	.byte	00
+  d8:	aa1b      	addi.n	a10, a10, 1
+  da:	000a92        	l8ui	a9, a10, 0
+  dd:	e8cbf2        	addi	a15, a11, -24
+  e0:	60f0f0        	neg	a15, a15
+  e3:	401f00        	ssl	a15
+  e6:	a19900        	sll	a9, a9
+  e9:	0f2c      	movi.n	a15, 32
+  eb:	2099e0        	or	a9, a9, a14
+  ee:	5eaf27        	bge	a15, a2, 150 <tremor_oggpack_look+0x150>	ee: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x150
+  f1:	1bcc      	bnez.n	a11, f6 <tremor_oggpack_look+0xf6>	f1: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xf6
+  f3:	001646        	j	150 <tremor_oggpack_look+0x150>	f3: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x150
+  f6:	141c66        	bnei	a12, 1, 10e <tremor_oggpack_look+0x10e>	f6: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x10e
+  f9:	3888      	l32i.n	a8, a8, 12
+  fb:	0ad816        	beqz	a8, 1ac <tremor_oggpack_look+0x1ac>	fb: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ac
+  fe:	28a8      	l32i.n	a10, a8, 8
+ 100:	ff5a16        	beqz	a10, f9 <tremor_oggpack_look+0xf9>	100: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0xf9
+ 103:	08a8      	l32i.n	a10, a8, 0
+ 105:	1888      	l32i.n	a8, a8, 4
+ 107:	0aa8      	l32i.n	a10, a10, 0
+ 109:	aa8a      	add.n	a10, a10, a8
+ 10b:	000046        	j	110 <tremor_oggpack_look+0x110>	10b: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x110
+ 10e:	aa1b      	addi.n	a10, a10, 1
+ 110:	000a22        	l8ui	a2, a10, 0
+ 113:	e0cbb2        	addi	a11, a11, -32
+ 116:	60b0b0        	neg	a11, a11
+ 119:	401b00        	ssl	a11
+ 11c:	a12200        	sll	a2, a2
+ 11f:	202290        	or	a2, a2, a9
+ 122:	1022d0        	and	a2, a2, a13
+ 125:	002146        	j	1ae <tremor_oggpack_look+0x1ae>	125: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ae
+ 128:	000a82        	l8ui	a8, a10, 0
+ 12b:	890c      	movi.n	a9, 8
+ 12d:	400b00        	ssr	a11
+ 130:	b18080        	sra	a8, a8
+ 133:	022927        	blt	a9, a2, 139 <tremor_oggpack_look+0x139>	133: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x139
+ 136:	0014c6        	j	18d <tremor_oggpack_look+0x18d>	136: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x18d
+ 139:	010a92        	l8ui	a9, a10, 1
+ 13c:	f8cbc2        	addi	a12, a11, -8
+ 13f:	60c0c0        	neg	a12, a12
+ 142:	401c00        	ssl	a12
+ 145:	a19900        	sll	a9, a9
+ 148:	0c1c      	movi.n	a12, 16
+ 14a:	209980        	or	a9, a9, a8
+ 14d:	072c27        	blt	a12, a2, 158 <tremor_oggpack_look+0x158>	14d: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x158
+ 150:	102d90        	and	a2, a13, a9
+ 153:	0015c6        	j	1ae <tremor_oggpack_look+0x1ae>	153: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ae
+ 156:	00          	.byte	00
+ 157:	00          	.byte	00
+ 158:	020a82        	l8ui	a8, a10, 2
+ 15b:	f0cbc2        	addi	a12, a11, -16
+ 15e:	60c0c0        	neg	a12, a12
+ 161:	401c00        	ssl	a12
+ 164:	a18800        	sll	a8, a8
+ 167:	8c1c      	movi.n	a12, 24
+ 169:	208890        	or	a8, a8, a9
+ 16c:	042c27        	blt	a12, a2, 174 <tremor_oggpack_look+0x174>	16c: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x174
+ 16f:	000686        	j	18d <tremor_oggpack_look+0x18d>	16f: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x18d
+ 172:	00          	.byte	00
+ 173:	00          	.byte	00
+ 174:	030a92        	l8ui	a9, a10, 3
+ 177:	e8cbc2        	addi	a12, a11, -24
+ 17a:	60c0c0        	neg	a12, a12
+ 17d:	401c00        	ssl	a12
+ 180:	a19900        	sll	a9, a9
+ 183:	0c2c      	movi.n	a12, 32
+ 185:	208980        	or	a8, a9, a8
+ 188:	01ac27        	bge	a12, a2, 18d <tremor_oggpack_look+0x18d>	188: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x18d
+ 18b:	5bcc      	bnez.n	a11, 194 <tremor_oggpack_look+0x194>	18b: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x194
+ 18d:	102d80        	and	a2, a13, a8
+ 190:	000686        	j	1ae <tremor_oggpack_look+0x1ae>	190: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ae
+ 193:	00          	.byte	00
+ 194:	040a22        	l8ui	a2, a10, 4
+ 197:	e0cbb2        	addi	a11, a11, -32
+ 19a:	60b0b0        	neg	a11, a11
+ 19d:	401b00        	ssl	a11
+ 1a0:	a12200        	sll	a2, a2
+ 1a3:	202280        	or	a2, a2, a8
+ 1a6:	1022d0        	and	a2, a2, a13
+ 1a9:	000046        	j	1ae <tremor_oggpack_look+0x1ae>	1a9: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_look+0x1ae
+ 1ac:	f27c      	movi.n	a2, -1
+ 1ae:	f01d      	retw.n
+
+Disassembly of section .text.tremor_oggpack_adv:
+
+00000000 <tremor_oggpack_adv>:
+   0:	004136        	entry	a1, 32
+   3:	02b8      	l32i.n	a11, a2, 0
+   5:	2288      	l32i.n	a8, a2, 8
+   7:	1298      	l32i.n	a9, a2, 4
+   9:	33ba      	add.n	a3, a3, a11
+   b:	21b330        	srai	a11, a3, 3
+   e:	c088b0        	sub	a8, a8, a11
+  11:	243030        	extui	a3, a3, 0, 3
+  14:	99ba      	add.n	a9, a9, a11
+  16:	0239      	s32i.n	a3, a2, 0
+  18:	2289      	s32i.n	a8, a2, 8
+  1a:	1299      	s32i.n	a9, a2, 4
+  1c:	0818e6        	bgei	a8, 1, 28 <tremor_oggpack_adv+0x28>	1c: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_adv+0x28
+  1f:	20a220        	or	a10, a2, a2
+  22:	000081        	l32r	a8, fffc0024 <tremor_oggpack_adv+0xfffc0024>	22: R_XTENSA_SLOT0_OP	.literal.tremor_oggpack_adv
+	22: R_XTENSA_ASM_EXPAND	.text._span
+  25:	0008e0        	callx8	a8
+  28:	f01d      	retw.n
+
+Disassembly of section .text.tremor_oggpack_eop:
+
+00000000 <tremor_oggpack_eop>:
+   0:	004136        	entry	a1, 32
+   3:	2228      	l32i.n	a2, a2, 8
+   5:	312f20        	srai	a2, a2, 31
+   8:	f01d      	retw.n
+
+Disassembly of section .text.tremor_oggpack_read:
+
+00000000 <tremor_oggpack_read>:
+   0:	004136        	entry	a1, 32
+   3:	03bd      	mov.n	a11, a3
+   5:	20a220        	or	a10, a2, a2
+   8:	000081        	l32r	a8, fffc0008 <tremor_oggpack_read+0xfffc0008>	8: R_XTENSA_SLOT0_OP	.literal.tremor_oggpack_read
+	8: R_XTENSA_ASM_EXPAND	tremor_oggpack_look
+   b:	0008e0        	callx8	a8
+   e:	02b8      	l32i.n	a11, a2, 0
+  10:	2288      	l32i.n	a8, a2, 8
+  12:	1298      	l32i.n	a9, a2, 4
+  14:	33ba      	add.n	a3, a3, a11
+  16:	21b330        	srai	a11, a3, 3
+  19:	c088b0        	sub	a8, a8, a11
+  1c:	243030        	extui	a3, a3, 0, 3
+  1f:	99ba      	add.n	a9, a9, a11
+  21:	0239      	s32i.n	a3, a2, 0
+  23:	2289      	s32i.n	a8, a2, 8
+  25:	1299      	s32i.n	a9, a2, 4
+  27:	0a3d      	mov.n	a3, a10
+  29:	0718e6        	bgei	a8, 1, 34 <tremor_oggpack_read+0x34>	29: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_read+0x34
+  2c:	02ad      	mov.n	a10, a2
+  2e:	000081        	l32r	a8, fffc0030 <tremor_oggpack_read+0xfffc0030>	2e: R_XTENSA_SLOT0_OP	.literal.tremor_oggpack_read+0x4
+	2e: R_XTENSA_ASM_EXPAND	.text._span
+  31:	0008e0        	callx8	a8
+  34:	032d      	mov.n	a2, a3
+  36:	f01d      	retw.n
+
+Disassembly of section .text.tremor_oggpack_bytes:
+
+00000000 <tremor_oggpack_bytes>:
+   0:	004136        	entry	a1, 32
+   3:	3288      	l32i.n	a8, a2, 12
+   5:	52b8      	l32i.n	a11, a2, 20
+   7:	2888      	l32i.n	a8, a8, 8
+   9:	22a8      	l32i.n	a10, a2, 8
+   b:	029d      	mov.n	a9, a2
+   d:	28ba      	add.n	a2, a8, a11
+   f:	011a96        	bltz	a10, 24 <tremor_oggpack_bytes+0x24>	f: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_bytes+0x24
+  12:	0988      	l32i.n	a8, a9, 0
+  14:	c022a0        	sub	a2, a2, a10
+  17:	987b      	addi.n	a9, a8, 7
+  19:	88eb      	addi.n	a8, a8, 14
+  1b:	b38990        	movgez	a8, a9, a9
+  1e:	218380        	srai	a8, a8, 3
+  21:	802820        	add	a2, a8, a2
+  24:	f01d      	retw.n
+
+Disassembly of section .text.tremor_oggpack_bits:
+
+00000000 <tremor_oggpack_bits>:
+   0:	004136        	entry	a1, 32
+   3:	3288      	l32i.n	a8, a2, 12
+   5:	52a8      	l32i.n	a10, a2, 20
+   7:	2888      	l32i.n	a8, a8, 8
+   9:	2298      	l32i.n	a9, a2, 8
+   b:	88aa      	add.n	a8, a8, a10
+   d:	0059d6        	bgez	a9, 16 <tremor_oggpack_bits+0x16>	d: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_bits+0x16
+  10:	1128d0        	slli	a2, a8, 3
+  13:	0001c6        	j	1e <tremor_oggpack_bits+0x1e>	13: R_XTENSA_SLOT0_OP	.text.tremor_oggpack_bits+0x1e
+  16:	02a8      	l32i.n	a10, a2, 0
+  18:	c02890        	sub	a2, a8, a9
+  1b:	b022a0        	addx8	a2, a2, a10
+  1e:	f01d      	retw.n

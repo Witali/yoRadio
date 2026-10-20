@@ -1,0 +1,284 @@
+tool-output/esp32-libesp_audio_codec-642-info.c.obj-disasm.txt:584
+Disassembly of section .text._vorbis_unpack_books:
+
+00000000 <_vorbis_unpack_books>:
+   0:	004136        	entry	a1, 32
+   3:	026d      	mov.n	a6, a2
+   5:	7228      	l32i.n	a2, a2, 28
+   7:	037d      	mov.n	a7, a3
+   9:	25f216        	beqz	a2, 26c <_vorbis_unpack_books+0x26c>	9: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x26c
+   c:	8b0c      	movi.n	a11, 8
+   e:	03ad      	mov.n	a10, a3
+  10:	000081        	l32r	a8, fffc0010 <_vorbis_unpack_books+0xfffc0010>	10: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x4
+	10: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  13:	0008e0        	callx8	a8
+  16:	ba1b      	addi.n	a11, a10, 1
+  18:	62b9      	s32i.n	a11, a2, 24
+  1a:	071be6        	bgei	a11, 1, 25 <_vorbis_unpack_books+0x25>	1a: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x25
+  1d:	080c      	movi.n	a8, 0
+  1f:	c289      	s32i.n	a8, a2, 48
+  21:	000f46        	j	62 <_vorbis_unpack_books+0x62>	21: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x62
+  24:	00          	.byte	00
+  25:	0000a1        	l32r	a10, fffc0028 <_vorbis_unpack_books+0xfffc0028>	25: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books
+  28:	0c4c      	movi.n	a12, 64
+  2a:	000081        	l32r	a8, fffc002c <_vorbis_unpack_books+0xfffc002c>	2a: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x8
+	2a: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  2d:	0008e0        	callx8	a8
+  30:	6288      	l32i.n	a8, a2, 24
+  32:	c2a9      	s32i.n	a10, a2, 48
+  34:	2a18a6        	blti	a8, 1, 62 <_vorbis_unpack_books+0x62>	34: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x62
+  37:	030c      	movi.n	a3, 0
+  39:	11b3a0        	slli	a11, a3, 6
+  3c:	baba      	add.n	a11, a10, a11
+  3e:	07ad      	mov.n	a10, a7
+  40:	000081        	l32r	a8, fffc0040 <_vorbis_unpack_books+0xfffc0040>	40: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0xc
+	40: R_XTENSA_ASM_EXPAND	vorbis_book_unpack
+  43:	0008e0        	callx8	a8
+  46:	331b      	addi.n	a3, a3, 1
+  48:	ca8c      	beqz.n	a10, 58 <_vorbis_unpack_books+0x58>	48: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x58
+  4a:	06ad      	mov.n	a10, a6
+  4c:	000081        	l32r	a8, fffc004c <_vorbis_unpack_books+0xfffc004c>	4c: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x10
+	4c: R_XTENSA_ASM_EXPAND	vorbis_info_clear
+  4f:	0008e0        	callx8	a8
+  52:	7baf22        	movi	a2, -133
+  55:	008586        	j	26f <_vorbis_unpack_books+0x26f>	55: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x26f
+  58:	6288      	l32i.n	a8, a2, 24
+  5a:	04a387        	bge	a3, a8, 62 <_vorbis_unpack_books+0x62>	5a: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x62
+  5d:	c2a8      	l32i.n	a10, a2, 48
+  5f:	fff586        	j	39 <_vorbis_unpack_books+0x39>	5f: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x39
+  62:	6b0c      	movi.n	a11, 6
+  64:	20a770        	or	a10, a7, a7
+  67:	000081        	l32r	a8, fffc0068 <_vorbis_unpack_books+0xfffc0068>	67: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x14
+	67: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  6a:	0008e0        	callx8	a8
+  6d:	0a3d      	mov.n	a3, a10
+  6f:	018ad6        	bgez	a10, 8b <_vorbis_unpack_books+0x8b>	6f: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x8b
+  72:	6b0c      	movi.n	a11, 6
+  74:	07ad      	mov.n	a10, a7
+  76:	000081        	l32r	a8, fffc0078 <_vorbis_unpack_books+0xfffc0078>	76: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x18
+	76: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  79:	0008e0        	callx8	a8
+  7c:	8a1b      	addi.n	a8, a10, 1
+  7e:	4289      	s32i.n	a8, a2, 16
+  80:	11c8e0        	slli	a12, a8, 2
+  83:	0a0c      	movi.n	a10, 0
+  85:	181ce6        	bgei	a12, 1, a1 <_vorbis_unpack_books+0xa1>	85: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0xa1
+  88:	000886        	j	ae <_vorbis_unpack_books+0xae>	88: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0xae
+  8b:	0b1c      	movi.n	a11, 16
+  8d:	07ad      	mov.n	a10, a7
+  8f:	000081        	l32r	a8, fffc0090 <_vorbis_unpack_books+0xfffc0090>	8f: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x1c
+	8f: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  92:	0008e0        	callx8	a8
+  95:	330b      	addi.n	a3, a3, -1
+  97:	fafa56        	bnez	a10, 4a <_vorbis_unpack_books+0x4a>	97: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+  9a:	ed0366        	bnei	a3, -1, 8b <_vorbis_unpack_books+0x8b>	9a: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x8b
+  9d:	fff446        	j	72 <_vorbis_unpack_books+0x72>	9d: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x72
+  a0:	00          	.byte	00
+  a1:	0000a1        	l32r	a10, fffc00a4 <_vorbis_unpack_books+0xfffc00a4>	a1: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books
+  a4:	1b0c      	movi.n	a11, 1
+  a6:	000081        	l32r	a8, fffc00a8 <_vorbis_unpack_books+0xfffc00a8>	a6: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x20
+	a6: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  a9:	0008e0        	callx8	a8
+  ac:	4288      	l32i.n	a8, a2, 16
+  ae:	a2a9      	s32i.n	a10, a2, 40
+  b0:	0818e6        	bgei	a8, 1, bc <_vorbis_unpack_books+0xbc>	b0: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0xbc
+  b3:	080c      	movi.n	a8, 0
+  b5:	9289      	s32i.n	a8, a2, 36
+  b7:	0005c6        	j	d2 <_vorbis_unpack_books+0xd2>	b7: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0xd2
+  ba:	00          	.byte	00
+  bb:	00          	.byte	00
+  bc:	0000a1        	l32r	a10, fffc00bc <_vorbis_unpack_books+0xfffc00bc>	bc: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books
+  bf:	08cd      	mov.n	a12, a8
+  c1:	1b0c      	movi.n	a11, 1
+  c3:	000081        	l32r	a8, fffc00c4 <_vorbis_unpack_books+0xfffc00c4>	c3: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x24
+	c3: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  c6:	0008e0        	callx8	a8
+  c9:	4288      	l32i.n	a8, a2, 16
+  cb:	92a9      	s32i.n	a10, a2, 36
+  cd:	030c      	movi.n	a3, 0
+  cf:	1b18e6        	bgei	a8, 1, ee <_vorbis_unpack_books+0xee>	cf: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0xee
+  d2:	6b0c      	movi.n	a11, 6
+  d4:	07ad      	mov.n	a10, a7
+  d6:	000081        	l32r	a8, fffc00d8 <_vorbis_unpack_books+0xfffc00d8>	d6: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x28
+	d6: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  d9:	0008e0        	callx8	a8
+  dc:	8a1b      	addi.n	a8, a10, 1
+  de:	f0c880        	subx8	a12, a8, a8
+  e1:	5289      	s32i.n	a8, a2, 20
+  e3:	11cce0        	slli	a12, a12, 2
+  e6:	0a0c      	movi.n	a10, 0
+  e8:	551ce6        	bgei	a12, 1, 141 <_vorbis_unpack_books+0x141>	e8: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x141
+  eb:	0017c6        	j	14e <_vorbis_unpack_books+0x14e>	eb: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x14e
+  ee:	0b1c      	movi.n	a11, 16
+  f0:	07ad      	mov.n	a10, a7
+  f2:	000081        	l32r	a8, fffc00f4 <_vorbis_unpack_books+0xfffc00f4>	f2: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x2c
+	f2: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  f5:	0008e0        	callx8	a8
+  f8:	9288      	l32i.n	a8, a2, 36
+  fa:	07bd      	mov.n	a11, a7
+  fc:	883a      	add.n	a8, a8, a3
+  fe:	0048a2        	s8i	a10, a8, 0
+ 101:	9288      	l32i.n	a8, a2, 36
+ 103:	06ad      	mov.n	a10, a6
+ 105:	883a      	add.n	a8, a8, a3
+ 107:	000882        	l8ui	a8, a8, 0
+ 10a:	1143e0        	slli	a4, a3, 2
+ 10d:	0228b6        	bltui	a8, 2, 113 <_vorbis_unpack_books+0x113>	10d: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x113
+ 110:	ffcd86        	j	4a <_vorbis_unpack_books+0x4a>	110: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 113:	a258      	l32i.n	a5, a2, 40
+ 115:	a05350        	addx4	a5, a3, a5
+ 118:	888c      	beqz.n	a8, 124 <_vorbis_unpack_books+0x124>	118: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x124
+ 11a:	000081        	l32r	a8, fffc011c <_vorbis_unpack_books+0xfffc011c>	11a: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x30
+	11a: R_XTENSA_ASM_EXPAND	floor1_info_unpack
+ 11d:	0008e0        	callx8	a8
+ 120:	000186        	j	12a <_vorbis_unpack_books+0x12a>	120: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x12a
+ 123:	00          	.byte	00
+ 124:	000081        	l32r	a8, fffc0124 <_vorbis_unpack_books+0xfffc0124>	124: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x34
+	124: R_XTENSA_ASM_EXPAND	floor0_info_unpack
+ 127:	0008e0        	callx8	a8
+ 12a:	05a9      	s32i.n	a10, a5, 0
+ 12c:	a288      	l32i.n	a8, a2, 40
+ 12e:	331b      	addi.n	a3, a3, 1
+ 130:	884a      	add.n	a8, a8, a4
+ 132:	0888      	l32i.n	a8, a8, 0
+ 134:	f12816        	beqz	a8, 4a <_vorbis_unpack_books+0x4a>	134: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 137:	4288      	l32i.n	a8, a2, 16
+ 139:	b12387        	blt	a3, a8, ee <_vorbis_unpack_books+0xee>	139: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0xee
+ 13c:	ffe486        	j	d2 <_vorbis_unpack_books+0xd2>	13c: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0xd2
+ 13f:	00          	.byte	00
+ 140:	00          	.byte	00
+ 141:	0000a1        	l32r	a10, fffc0144 <_vorbis_unpack_books+0xfffc0144>	141: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books
+ 144:	1b0c      	movi.n	a11, 1
+ 146:	000081        	l32r	a8, fffc0148 <_vorbis_unpack_books+0xfffc0148>	146: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x38
+	146: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+ 149:	0008e0        	callx8	a8
+ 14c:	5288      	l32i.n	a8, a2, 20
+ 14e:	b2a9      	s32i.n	a10, a2, 44
+ 150:	2018a6        	blti	a8, 1, 174 <_vorbis_unpack_books+0x174>	150: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x174
+ 153:	050c      	movi.n	a5, 0
+ 155:	f08550        	subx8	a8, a5, a5
+ 158:	07cd      	mov.n	a12, a7
+ 15a:	06bd      	mov.n	a11, a6
+ 15c:	a0a8a0        	addx4	a10, a8, a10
+ 15f:	000081        	l32r	a8, fffc0160 <_vorbis_unpack_books+0xfffc0160>	15f: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x3c
+	15f: R_XTENSA_ASM_EXPAND	res_unpack
+ 162:	0008e0        	callx8	a8
+ 165:	551b      	addi.n	a5, a5, 1
+ 167:	edfa56        	bnez	a10, 4a <_vorbis_unpack_books+0x4a>	167: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 16a:	5288      	l32i.n	a8, a2, 20
+ 16c:	04a587        	bge	a5, a8, 174 <_vorbis_unpack_books+0x174>	16c: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x174
+ 16f:	b2a8      	l32i.n	a10, a2, 44
+ 171:	fff806        	j	155 <_vorbis_unpack_books+0x155>	171: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x155
+ 174:	6b0c      	movi.n	a11, 6
+ 176:	07ad      	mov.n	a10, a7
+ 178:	000081        	l32r	a8, fffc0178 <_vorbis_unpack_books+0xfffc0178>	178: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x40
+	178: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 17b:	0008e0        	callx8	a8
+ 17e:	8a1b      	addi.n	a8, a10, 1
+ 180:	a0c880        	addx4	a12, a8, a8
+ 183:	3289      	s32i.n	a8, a2, 12
+ 185:	11cce0        	slli	a12, a12, 2
+ 188:	0a0c      	movi.n	a10, 0
+ 18a:	0c1ca6        	blti	a12, 1, 19a <_vorbis_unpack_books+0x19a>	18a: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x19a
+ 18d:	0000a1        	l32r	a10, fffc0190 <_vorbis_unpack_books+0xfffc0190>	18d: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books
+ 190:	1b0c      	movi.n	a11, 1
+ 192:	000081        	l32r	a8, fffc0194 <_vorbis_unpack_books+0xfffc0194>	192: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x44
+	192: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+ 195:	0008e0        	callx8	a8
+ 198:	3288      	l32i.n	a8, a2, 12
+ 19a:	82a9      	s32i.n	a10, a2, 32
+ 19c:	050c      	movi.n	a5, 0
+ 19e:	1818e6        	bgei	a8, 1, 1ba <_vorbis_unpack_books+0x1ba>	19e: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x1ba
+ 1a1:	6b0c      	movi.n	a11, 6
+ 1a3:	20a770        	or	a10, a7, a7
+ 1a6:	000081        	l32r	a8, fffc01a8 <_vorbis_unpack_books+0xfffc01a8>	1a6: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x48
+	1a6: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 1a9:	0008e0        	callx8	a8
+ 1ac:	8a1b      	addi.n	a8, a10, 1
+ 1ae:	2289      	s32i.n	a8, a2, 8
+ 1b0:	c88a      	add.n	a12, a8, a8
+ 1b2:	090c      	movi.n	a9, 0
+ 1b4:	311ce6        	bgei	a12, 1, 1e9 <_vorbis_unpack_books+0x1e9>	1b4: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x1e9
+ 1b7:	000f46        	j	1f8 <_vorbis_unpack_books+0x1f8>	1b7: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x1f8
+ 1ba:	0b1c      	movi.n	a11, 16
+ 1bc:	20a770        	or	a10, a7, a7
+ 1bf:	000081        	l32r	a8, fffc01c0 <_vorbis_unpack_books+0xfffc01c0>	1bf: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x4c
+	1bf: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 1c2:	0008e0        	callx8	a8
+ 1c5:	a08550        	addx4	a8, a5, a5
+ 1c8:	07cd      	mov.n	a12, a7
+ 1ca:	06bd      	mov.n	a11, a6
+ 1cc:	e7aa56        	bnez	a10, 4a <_vorbis_unpack_books+0x4a>	1cc: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 1cf:	82a8      	l32i.n	a10, a2, 32
+ 1d1:	551b      	addi.n	a5, a5, 1
+ 1d3:	a0a8a0        	addx4	a10, a8, a10
+ 1d6:	000081        	l32r	a8, fffc01d8 <_vorbis_unpack_books+0xfffc01d8>	1d6: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x50
+	1d6: R_XTENSA_ASM_EXPAND	mapping_info_unpack
+ 1d9:	0008e0        	callx8	a8
+ 1dc:	e6aa56        	bnez	a10, 4a <_vorbis_unpack_books+0x4a>	1dc: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 1df:	3288      	l32i.n	a8, a2, 12
+ 1e1:	d52587        	blt	a5, a8, 1ba <_vorbis_unpack_books+0x1ba>	1e1: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x1ba
+ 1e4:	ffee46        	j	1a1 <_vorbis_unpack_books+0x1a1>	1e4: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x1a1
+ 1e7:	00          	.byte	00
+ 1e8:	00          	.byte	00
+ 1e9:	0000a1        	l32r	a10, fffc01ec <_vorbis_unpack_books+0xfffc01ec>	1e9: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books
+ 1ec:	1b0c      	movi.n	a11, 1
+ 1ee:	000081        	l32r	a8, fffc01f0 <_vorbis_unpack_books+0xfffc01f0>	1ee: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x54
+	1ee: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+ 1f1:	0008e0        	callx8	a8
+ 1f4:	2288      	l32i.n	a8, a2, 8
+ 1f6:	0a9d      	mov.n	a9, a10
+ 1f8:	7299      	s32i.n	a9, a2, 28
+ 1fa:	050c      	movi.n	a5, 0
+ 1fc:	1418e6        	bgei	a8, 1, 214 <_vorbis_unpack_books+0x214>	1fc: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x214
+ 1ff:	1b0c      	movi.n	a11, 1
+ 201:	07ad      	mov.n	a10, a7
+ 203:	000081        	l32r	a8, fffc0204 <_vorbis_unpack_books+0xfffc0204>	203: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x58
+	203: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 206:	0008e0        	callx8	a8
+ 209:	021a26        	beqi	a10, 1, 20f <_vorbis_unpack_books+0x20f>	209: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x20f
+ 20c:	ff8e86        	j	4a <_vorbis_unpack_books+0x4a>	20c: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 20f:	020c      	movi.n	a2, 0
+ 211:	001686        	j	26f <_vorbis_unpack_books+0x26f>	211: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x26f
+ 214:	1b0c      	movi.n	a11, 1
+ 216:	07ad      	mov.n	a10, a7
+ 218:	000081        	l32r	a8, fffc0218 <_vorbis_unpack_books+0xfffc0218>	218: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x5c
+	218: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 21b:	0008e0        	callx8	a8
+ 21e:	7288      	l32i.n	a8, a2, 28
+ 220:	0b1c      	movi.n	a11, 16
+ 222:	908580        	addx2	a8, a5, a8
+ 225:	0048a2        	s8i	a10, a8, 0
+ 228:	07ad      	mov.n	a10, a7
+ 22a:	000081        	l32r	a8, fffc022c <_vorbis_unpack_books+0xfffc022c>	22a: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x60
+	22a: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 22d:	0008e0        	callx8	a8
+ 230:	0a8d      	mov.n	a8, a10
+ 232:	455a      	add.n	a4, a5, a5
+ 234:	0b1c      	movi.n	a11, 16
+ 236:	07ad      	mov.n	a10, a7
+ 238:	e0e856        	bnez	a8, 4a <_vorbis_unpack_books+0x4a>	238: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 23b:	000081        	l32r	a8, fffc023c <_vorbis_unpack_books+0xfffc023c>	23b: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x64
+	23b: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 23e:	0008e0        	callx8	a8
+ 241:	0a8d      	mov.n	a8, a10
+ 243:	8b0c      	movi.n	a11, 8
+ 245:	07ad      	mov.n	a10, a7
+ 247:	dff856        	bnez	a8, 4a <_vorbis_unpack_books+0x4a>	247: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 24a:	000081        	l32r	a8, fffc024c <_vorbis_unpack_books+0xfffc024c>	24a: R_XTENSA_SLOT0_OP	.literal._vorbis_unpack_books+0x68
+	24a: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+ 24d:	0008e0        	callx8	a8
+ 250:	7288      	l32i.n	a8, a2, 28
+ 252:	551b      	addi.n	a5, a5, 1
+ 254:	884a      	add.n	a8, a8, a4
+ 256:	0148a2        	s8i	a10, a8, 1
+ 259:	3288      	l32i.n	a8, a2, 12
+ 25b:	74a0a0        	extui	a10, a10, 0, 8
+ 25e:	022a87        	blt	a10, a8, 264 <_vorbis_unpack_books+0x264>	25e: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x264
+ 261:	ff7946        	j	4a <_vorbis_unpack_books+0x4a>	261: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x4a
+ 264:	2288      	l32i.n	a8, a2, 8
+ 266:	aa2587        	blt	a5, a8, 214 <_vorbis_unpack_books+0x214>	266: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x214
+ 269:	ffe486        	j	1ff <_vorbis_unpack_books+0x1ff>	269: R_XTENSA_SLOT0_OP	.text._vorbis_unpack_books+0x1ff
+ 26c:	7faf22        	movi	a2, -129
+ 26f:	f01d      	retw.n
+

@@ -1,0 +1,122 @@
+tool-output/esp32c3-libesp_audio_simple_dec-12-ogg_parser.c.obj-disasm.txt:5
+Disassembly of section .text.parse_vorbis_header:
+
+00000000 <parse_vorbis_header>:
+   0:	4799                	li	a5,6
+   2:	0ac7f663          	bgeu	a5,a2,ae <.L9>	2: R_RISCV_BRANCH	.L9
+   6:	0015a803          	lw	a6,1(a1)
+   a:	627277b7          	lui	a5,0x62727
+   e:	f7678793          	addi	a5,a5,-138 # 62726f76 <.L252+0x62726aae>
+  12:	0af81263          	bne	a6,a5,b6 <.L22>	12: R_RISCV_BRANCH	.L22
+  16:	0055d803          	lhu	a6,5(a1)
+  1a:	679d                	lui	a5,0x7
+  1c:	36978793          	addi	a5,a5,873 # 7369 <.L252+0x6ea1>
+  20:	08f81b63          	bne	a6,a5,b6 <.L22>	20: R_RISCV_BRANCH	.L22
+  24:	0005c803          	lbu	a6,0(a1)
+  28:	4785                	li	a5,1
+  2a:	0fb87893          	andi	a7,a6,251
+  2e:	08f89663          	bne	a7,a5,ba <.L8>	2e: R_RISCV_BRANCH	.L8
+  32:	03655783          	lhu	a5,54(a0)
+  36:	06f66c63          	bltu	a2,a5,ae <.L9>	36: R_RISCV_BRANCH	.L9
+  3a:	c6c9                	beqz	a3,c4 <.L24>	3a: R_RISCV_RVC_BRANCH	.L24
+  3c:	1101                	addi	sp,sp,-32
+  3e:	cc22                	sw	s0,24(sp)
+  40:	ce06                	sw	ra,28(sp)
+  42:	87ae                	mv	a5,a1
+  44:	ff960413          	addi	s0,a2,-7
+  48:	09181563          	bne	a6,a7,d2 <.L13>	48: R_RISCV_BRANCH	.L13
+  4c:	53425637          	lui	a2,0x53425
+  50:	f5660613          	addi	a2,a2,-170 # 53424f56 <.L252+0x53424a8e>
+  54:	c110                	sw	a2,0(a0)
+  56:	00b5c603          	lbu	a2,11(a1)
+  5a:	490c                	lw	a1,16(a0)
+  5c:	c62a                	sw	a0,12(sp)
+  5e:	02c700a3          	sb	a2,33(a4)
+  62:	00c7a803          	lw	a6,12(a5)
+  66:	00000537          	lui	a0,0x0	66: R_RISCV_HI20	.LC1
+	66: R_RISCV_RELAX	*ABS*
+  6a:	00050513          	mv	a0,a0	6a: R_RISCV_LO12_I	.LC1
+	6a: R_RISCV_RELAX	*ABS*
+  6e:	8622                	mv	a2,s0
+  70:	01072e23          	sw	a6,28(a4)
+  74:	c43e                	sw	a5,8(sp)
+  76:	c23a                	sw	a4,4(sp)
+  78:	00000097          	auipc	ra,0x0	78: R_RISCV_CALL_PLT	media_lib_module_realloc
+	78: R_RISCV_RELAX	*ABS*
+  7c:	000080e7          	jalr	ra # 78 <parse_vorbis_header+0x78>
+  80:	c521                	beqz	a0,c8 <.L3>	80: R_RISCV_RVC_BRANCH	.L3
+  82:	47a2                	lw	a5,8(sp)
+  84:	8622                	mv	a2,s0
+  86:	c42a                	sw	a0,8(sp)
+  88:	00778593          	addi	a1,a5,7
+  8c:	00000097          	auipc	ra,0x0	8c: R_RISCV_CALL_PLT	memcpy
+	8c: R_RISCV_RELAX	*ABS*
+  90:	000080e7          	jalr	ra # 8c <parse_vorbis_header+0x8c>
+  94:	46b2                	lw	a3,12(sp)
+  96:	4822                	lw	a6,8(sp)
+  98:	4712                	lw	a4,4(sp)
+  9a:	478d                	li	a5,3
+  9c:	0106a823          	sw	a6,16(a3)
+  a0:	cac0                	sw	s0,20(a3)
+  a2:	02f68123          	sb	a5,34(a3)
+  a6:	00072023          	sw	zero,0(a4)
+  aa:	4505                	li	a0,1
+  ac:	a839                	j	ca <.L7>	ac: R_RISCV_RVC_JUMP	.L7
+
+000000ae <.L9>:
+  ae:	800007b7          	lui	a5,0x80000
+  b2:	17fd                	addi	a5,a5,-1 # 7fffffff <.L252+0x7ffffb37>
+  b4:	c31c                	sw	a5,0(a4)
+
+000000b6 <.L22>:
+  b6:	4501                	li	a0,0
+  b8:	8082                	ret
+
+000000ba <.L8>:
+  ba:	470d                	li	a4,3
+  bc:	fee81de3          	bne	a6,a4,b6 <.L22>	bc: R_RISCV_BRANCH	.L22
+  c0:	04f50023          	sb	a5,64(a0) # 40 <parse_vorbis_header+0x40>
+
+000000c4 <.L24>:
+  c4:	4505                	li	a0,1
+  c6:	8082                	ret
+
+000000c8 <.L3>:
+  c8:	4501                	li	a0,0
+
+000000ca <.L7>:
+  ca:	40f2                	lw	ra,28(sp)
+  cc:	4462                	lw	s0,24(sp)
+  ce:	6105                	addi	sp,sp,32
+  d0:	8082                	ret
+
+000000d2 <.L13>:
+  d2:	c62e                	sw	a1,12(sp)
+  d4:	4d0c                	lw	a1,24(a0)
+  d6:	c22a                	sw	a0,4(sp)
+  d8:	00000537          	lui	a0,0x0	d8: R_RISCV_HI20	.LC1
+	d8: R_RISCV_RELAX	*ABS*
+  dc:	00050513          	mv	a0,a0	dc: R_RISCV_LO12_I	.LC1
+	dc: R_RISCV_RELAX	*ABS*
+  e0:	8622                	mv	a2,s0
+  e2:	c446                	sw	a7,8(sp)
+  e4:	00000097          	auipc	ra,0x0	e4: R_RISCV_CALL_PLT	media_lib_module_realloc
+	e4: R_RISCV_RELAX	*ABS*
+  e8:	000080e7          	jalr	ra # e4 <.L13+0x12>
+  ec:	dd71                	beqz	a0,c8 <.L3>	ec: R_RISCV_RVC_BRANCH	.L3
+  ee:	47b2                	lw	a5,12(sp)
+  f0:	8622                	mv	a2,s0
+  f2:	c62a                	sw	a0,12(sp)
+  f4:	00778593          	addi	a1,a5,7
+  f8:	00000097          	auipc	ra,0x0	f8: R_RISCV_CALL_PLT	memcpy
+	f8: R_RISCV_RELAX	*ABS*
+  fc:	000080e7          	jalr	ra # f8 <.L13+0x26>
+ 100:	4692                	lw	a3,4(sp)
+ 102:	4732                	lw	a4,12(sp)
+ 104:	48a2                	lw	a7,8(sp)
+ 106:	cec0                	sw	s0,28(a3)
+ 108:	ce98                	sw	a4,24(a3)
+ 10a:	031680a3          	sb	a7,33(a3)
+ 10e:	4505                	li	a0,1
+ 110:	bf6d                	j	ca <.L7>	110: R_RISCV_RVC_JUMP	.L7
+

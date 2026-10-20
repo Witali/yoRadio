@@ -1,0 +1,73 @@
+tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:897
+Disassembly of section .text.esp_audio_simple_dec_reset:
+
+00000000 <esp_audio_simple_dec_reset>:
+   0:	004136        	entry	a1, 32
+   3:	01f256        	bnez	a2, 26 <esp_audio_simple_dec_reset+0x26>	3: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x26
+   6:	000081        	l32r	a8, fffc0008 <esp_audio_simple_dec_reset+0xfffc0008>	6: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x18
+	6: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+   9:	0008e0        	callx8	a8
+   c:	0000b1        	l32r	a11, fffc000c <esp_audio_simple_dec_reset+0xfffc000c>	c: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset
+   f:	0000c1        	l32r	a12, fffc0010 <esp_audio_simple_dec_reset+0xfffc0010>	f: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x4
+  12:	02fd      	mov.n	a15, a2
+  14:	0add      	mov.n	a13, a10
+  16:	0bed      	mov.n	a14, a11
+  18:	1a0c      	movi.n	a10, 1
+  1a:	000081        	l32r	a8, fffc001c <esp_audio_simple_dec_reset+0xfffc001c>	1a: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x1c
+	1a: R_XTENSA_ASM_EXPAND	esp_log
+  1d:	0008e0        	callx8	a8
+  20:	b27c      	movi.n	a2, -5
+  22:	001d86        	j	9c <esp_audio_simple_dec_reset+0x9c>	22: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x9c
+  25:	00          	.byte	00
+  26:	090c      	movi.n	a9, 0
+  28:	080c      	movi.n	a8, 0
+  2a:	12a8      	l32i.n	a10, a2, 4
+  2c:	135292        	s16i	a9, a2, 38
+  2f:	4289      	s32i.n	a8, a2, 16
+  31:	7289      	s32i.n	a8, a2, 28
+  33:	244292        	s8i	a9, a2, 36
+  36:	ca8c      	beqz.n	a10, 46 <esp_audio_simple_dec_reset+0x46>	36: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x46
+  38:	1b0c      	movi.n	a11, 1
+  3a:	000081        	l32r	a8, fffc003c <esp_audio_simple_dec_reset+0xfffc003c>	3a: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x20
+	3a: R_XTENSA_ASM_EXPAND	esp_es_parse_reset
+  3d:	0008e0        	callx8	a8
+  40:	080c      	movi.n	a8, 0
+  42:	6289      	s32i.n	a8, a2, 24
+  44:	8289      	s32i.n	a8, a2, 32
+  46:	b2b8      	l32i.n	a11, a2, 44
+  48:	000091        	l32r	a9, fffc0048 <esp_audio_simple_dec_reset+0xfffc0048>	48: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x8
+  4b:	22a8      	l32i.n	a10, a2, 8
+  4d:	c09b90        	sub	a9, a11, a9
+  50:	40f980        	nsau	a8, a9
+  53:	1c0c      	movi.n	a12, 1
+  55:	418580        	srli	a8, a8, 5
+  58:	29ac      	beqz.n	a9, 7e <esp_audio_simple_dec_reset+0x7e>	58: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x7e
+  5a:	000091        	l32r	a9, fffc005c <esp_audio_simple_dec_reset+0xfffc005c>	5a: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0xc
+  5d:	c09b90        	sub	a9, a11, a9
+  60:	838c90        	moveqz	a8, a12, a9
+  63:	78dc      	bnez.n	a8, 7e <esp_audio_simple_dec_reset+0x7e>	63: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x7e
+  65:	000081        	l32r	a8, fffc0068 <esp_audio_simple_dec_reset+0xfffc0068>	65: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x10
+  68:	c08b80        	sub	a8, a11, a8
+  6b:	40f890        	nsau	a9, a8
+  6e:	419590        	srli	a9, a9, 5
+  71:	988c      	beqz.n	a8, 7e <esp_audio_simple_dec_reset+0x7e>	71: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x7e
+  73:	000081        	l32r	a8, fffc0074 <esp_audio_simple_dec_reset+0xfffc0074>	73: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x14
+  76:	c0bb80        	sub	a11, a11, a8
+  79:	93c9b0        	movnez	a12, a9, a11
+  7c:	0c9c      	beqz.n	a12, 90 <esp_audio_simple_dec_reset+0x90>	7c: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x90
+  7e:	8a8c      	beqz.n	a10, 8a <esp_audio_simple_dec_reset+0x8a>	7e: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x8a
+  80:	000081        	l32r	a8, fffc0080 <esp_audio_simple_dec_reset+0xfffc0080>	80: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x24
+	80: R_XTENSA_ASM_EXPAND	esp_audio_dec_close
+  83:	0008e0        	callx8	a8
+  86:	080c      	movi.n	a8, 0
+  88:	2289      	s32i.n	a8, a2, 8
+  8a:	020c      	movi.n	a2, 0
+  8c:	000306        	j	9c <esp_audio_simple_dec_reset+0x9c>	8c: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x9c
+  8f:	00          	.byte	00
+  90:	ff6a16        	beqz	a10, 8a <esp_audio_simple_dec_reset+0x8a>	90: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x8a
+  93:	000081        	l32r	a8, fffc0094 <esp_audio_simple_dec_reset+0xfffc0094>	93: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_reset+0x28
+	93: R_XTENSA_ASM_EXPAND	esp_audio_dec_reset
+  96:	0008e0        	callx8	a8
+  99:	fffb46        	j	8a <esp_audio_simple_dec_reset+0x8a>	99: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_reset+0x8a
+  9c:	f01d      	retw.n
+

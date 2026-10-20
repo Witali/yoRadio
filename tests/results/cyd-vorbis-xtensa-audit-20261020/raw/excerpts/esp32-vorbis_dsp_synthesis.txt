@@ -1,0 +1,255 @@
+tool-output/esp32-libesp_audio_codec-637-dsp.c.obj-disasm.txt:420
+Disassembly of section .text.vorbis_dsp_synthesis:
+
+00000000 <vorbis_dsp_synthesis>:
+   0:	006136        	entry	a1, 48
+   3:	025d      	mov.n	a5, a2
+   5:	03b8      	l32i.n	a11, a3, 0
+   7:	654b      	addi.n	a6, a5, 4
+   9:	0228      	l32i.n	a2, a2, 0
+   b:	06ad      	mov.n	a10, a6
+   d:	0149      	s32i.n	a4, a1, 0
+   f:	207330        	or	a7, a3, a3
+  12:	016162        	s32i	a6, a1, 4
+  15:	072232        	l32i	a3, a2, 28
+  18:	000081        	l32r	a8, fffc0018 <vorbis_dsp_synthesis+0xfffc0018>	18: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_synthesis
+	18: R_XTENSA_ASM_EXPAND	tremor_oggpack_readinit
+  1b:	0008e0        	callx8	a8
+  1e:	01a0b2        	movi	a11, 1
+  21:	20a660        	or	a10, a6, a6
+  24:	000081        	l32r	a8, fffc0024 <vorbis_dsp_synthesis+0xfffc0024>	24: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_synthesis+0x4
+	24: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  27:	0008e0        	callx8	a8
+  2a:	0a4d      	mov.n	a4, a10
+  2c:	229a56        	bnez	a10, 259 <vorbis_dsp_synthesis+0x259>	2c: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x259
+  2f:	23b8      	l32i.n	a11, a3, 8
+  31:	190c      	movi.n	a9, 1
+  33:	839ab0        	moveqz	a9, a10, a11
+  36:	c0bb90        	sub	a11, a11, a9
+  39:	40fb90        	nsau	a9, a11
+  3c:	e0c992        	addi	a9, a9, -32
+  3f:	609090        	neg	a9, a9
+  42:	93b9b0        	movnez	a11, a9, a11
+  45:	06ad      	mov.n	a10, a6
+  47:	000081        	l32r	a8, fffc0048 <vorbis_dsp_synthesis+0xfffc0048>	47: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_synthesis+0x8
+	47: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  4a:	0008e0        	callx8	a8
+  4d:	050a66        	bnei	a10, -1, 56 <vorbis_dsp_synthesis+0x56>	4d: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x56
+  50:	78af42        	movi	a4, -136
+  53:	008146        	j	25c <vorbis_dsp_synthesis+0x25c>	53: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+  56:	2398      	l32i.n	a9, a3, 8
+  58:	f4aa97        	bge	a10, a9, 50 <vorbis_dsp_synthesis+0x50>	58: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x50
+  5b:	7398      	l32i.n	a9, a3, 28
+  5d:	c5b8      	l32i.n	a11, a5, 48
+  5f:	909a90        	addx2	a9, a10, a9
+  62:	b5b9      	s32i.n	a11, a5, 44
+  64:	000992        	l8ui	a9, a9, 0
+  67:	12c8      	l32i.n	a12, a2, 4
+  69:	8aaa      	add.n	a8, a10, a10
+  6b:	c599      	s32i.n	a9, a5, 48
+  6d:	2189      	s32i.n	a8, a1, 8
+  6f:	2c1ca6        	blti	a12, 1, 9f <vorbis_dsp_synthesis+0x9f>	6f: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x9f
+  72:	046d      	mov.n	a6, a4
+  74:	85c8      	l32i.n	a12, a5, 32
+  76:	75a8      	l32i.n	a10, a5, 28
+  78:	a0db30        	addx4	a13, a11, a3
+  7b:	a0a6a0        	addx4	a10, a6, a10
+  7e:	a0c6c0        	addx4	a12, a6, a12
+  81:	0ab8      	l32i.n	a11, a10, 0
+  83:	0cc8      	l32i.n	a12, a12, 0
+  85:	0da8      	l32i.n	a10, a13, 0
+  87:	01c662        	addi	a6, a6, 1
+  8a:	000081        	l32r	a8, fffc008c <vorbis_dsp_synthesis+0xfffc008c>	8a: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_synthesis+0xc
+	8a: R_XTENSA_ASM_EXPAND	mdct_shift_right
+  8d:	0008e0        	callx8	a8
+  90:	12a8      	l32i.n	a10, a2, 4
+  92:	0426a7        	blt	a6, a10, 9a <vorbis_dsp_synthesis+0x9a>	92: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x9a
+  95:	c598      	l32i.n	a9, a5, 48
+  97:	000106        	j	9f <vorbis_dsp_synthesis+0x9f>	97: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x9f
+  9a:	b5b8      	l32i.n	a11, a5, 44
+  9c:	fff506        	j	74 <vorbis_dsp_synthesis+0x74>	9c: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x74
+  9f:	79cc      	bnez.n	a9, aa <vorbis_dsp_synthesis+0xaa>	9f: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0xaa
+  a1:	0188      	l32i.n	a8, a1, 0
+  a3:	06d816        	beqz	a8, 114 <vorbis_dsp_synthesis+0x114>	a3: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x114
+  a6:	000746        	j	c7 <vorbis_dsp_synthesis+0xc7>	a6: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0xc7
+  a9:	00          	.byte	00
+  aa:	1168      	l32i.n	a6, a1, 4
+  ac:	1b0c      	movi.n	a11, 1
+  ae:	06ad      	mov.n	a10, a6
+  b0:	000081        	l32r	a8, fffc00b0 <vorbis_dsp_synthesis+0xfffc00b0>	b0: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_synthesis+0x10
+	b0: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  b3:	0008e0        	callx8	a8
+  b6:	1b0c      	movi.n	a11, 1
+  b8:	20a660        	or	a10, a6, a6
+  bb:	000081        	l32r	a8, fffc00bc <vorbis_dsp_synthesis+0xfffc00bc>	bb: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_synthesis+0x14
+	bb: R_XTENSA_ASM_EXPAND	tremor_oggpack_read
+  be:	0008e0        	callx8	a8
+  c1:	dc0a66        	bnei	a10, -1, a1 <vorbis_dsp_synthesis+0xa1>	c1: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0xa1
+  c4:	ffe206        	j	50 <vorbis_dsp_synthesis+0x50>	c4: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x50
+  c7:	7398      	l32i.n	a9, a3, 28
+  c9:	2188      	l32i.n	a8, a1, 8
+  cb:	83b8      	l32i.n	a11, a3, 32
+  cd:	998a      	add.n	a9, a9, a8
+  cf:	010992        	l8ui	a9, a9, 1
+  d2:	05ad      	mov.n	a10, a5
+  d4:	a09990        	addx4	a9, a9, a9
+  d7:	a0b9b0        	addx4	a11, a9, a11
+  da:	000081        	l32r	a8, fffc00dc <vorbis_dsp_synthesis+0xfffc00dc>	da: R_XTENSA_SLOT0_OP	.literal.vorbis_dsp_synthesis+0x18
+	da: R_XTENSA_ASM_EXPAND	mapping_inverse
+  dd:	0008e0        	callx8	a8
+  e0:	9598      	l32i.n	a9, a5, 36
+  e2:	080966        	bnei	a9, -1, ee <vorbis_dsp_synthesis+0xee>	e2: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0xee
+  e5:	090c      	movi.n	a9, 0
+  e7:	9599      	s32i.n	a9, a5, 36
+  e9:	a599      	s32i.n	a9, a5, 40
+  eb:	000946        	j	114 <vorbis_dsp_synthesis+0x114>	eb: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x114
+  ee:	b5a8      	l32i.n	a10, a5, 44
+  f0:	c598      	l32i.n	a9, a5, 48
+  f2:	a0aa30        	addx4	a10, a10, a3
+  f5:	a09930        	addx4	a9, a9, a3
+  f8:	0ac8      	l32i.n	a12, a10, 0
+  fa:	09b8      	l32i.n	a11, a9, 0
+  fc:	9c3b      	addi.n	a9, a12, 3
+  fe:	ab3b      	addi.n	a10, a11, 3
+ 100:	b39cc0        	movgez	a9, a12, a12
+ 103:	b3abb0        	movgez	a10, a11, a11
+ 106:	21a2a0        	srai	a10, a10, 2
+ 109:	219290        	srai	a9, a9, 2
+ 10c:	99aa      	add.n	a9, a9, a10
+ 10e:	0a0c      	movi.n	a10, 0
+ 110:	95a9      	s32i.n	a10, a5, 36
+ 112:	a599      	s32i.n	a9, a5, 40
+ 114:	6798      	l32i.n	a9, a7, 24
+ 116:	77c8      	l32i.n	a12, a7, 28
+ 118:	de7c      	movi.n	a14, -3
+ 11a:	99ea      	add.n	a9, a9, a14
+ 11c:	1025a2        	l32i	a10, a5, 64
+ 11f:	1125b2        	l32i	a11, a5, 68
+ 122:	dc0b      	addi.n	a13, a12, -1
+ 124:	01b9e7        	bgeu	a9, a14, 129 <vorbis_dsp_synthesis+0x129>	124: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x129
+ 127:	0cdd      	mov.n	a13, a12
+ 129:	020a66        	bnei	a10, -1, 12f <vorbis_dsp_synthesis+0x12f>	129: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x12f
+ 12c:	280b26        	beqi	a11, -1, 158 <vorbis_dsp_synthesis+0x158>	12c: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x158
+ 12f:	aa1b      	addi.n	a10, a10, 1
+ 131:	40fac0        	nsau	a12, a10
+ 134:	41c5c0        	srli	a12, a12, 5
+ 137:	bbca      	add.n	a11, a11, a12
+ 139:	1b9a97        	bne	a10, a9, 158 <vorbis_dsp_synthesis+0x158>	139: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x158
+ 13c:	189bd7        	bne	a11, a13, 158 <vorbis_dsp_synthesis+0x158>	13c: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x158
+ 13f:	1225c2        	l32i	a12, a5, 72
+ 142:	106592        	s32i	a9, a5, 64
+ 145:	1165d2        	s32i	a13, a5, 68
+ 148:	1325e2        	l32i	a14, a5, 76
+ 14b:	e5a8      	l32i.n	a10, a5, 56
+ 14d:	f5b8      	l32i.n	a11, a5, 60
+ 14f:	220c66        	bnei	a12, -1, 175 <vorbis_dsp_synthesis+0x175>	14f: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x175
+ 152:	1f0e66        	bnei	a14, -1, 175 <vorbis_dsp_synthesis+0x175>	152: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x175
+ 155:	0012c6        	j	1a4 <vorbis_dsp_synthesis+0x1a4>	155: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1a4
+ 158:	0c0c      	movi.n	a12, 0
+ 15a:	fa7c      	movi.n	a10, -1
+ 15c:	47f8      	l32i.n	a15, a7, 16
+ 15e:	57e8      	l32i.n	a14, a7, 20
+ 160:	1165d2        	s32i	a13, a5, 68
+ 163:	e5a9      	s32i.n	a10, a5, 56
+ 165:	f5a9      	s32i.n	a10, a5, 60
+ 167:	106592        	s32i	a9, a5, 64
+ 16a:	1265c2        	s32i	a12, a5, 72
+ 16d:	1365c2        	s32i	a12, a5, 76
+ 170:	0cdd      	mov.n	a13, a12
+ 172:	001086        	j	1b8 <vorbis_dsp_synthesis+0x1b8>	172: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1b8
+ 175:	b5d8      	l32i.n	a13, a5, 44
+ 177:	c598      	l32i.n	a9, a5, 48
+ 179:	a0dd30        	addx4	a13, a13, a3
+ 17c:	a09930        	addx4	a9, a9, a3
+ 17f:	0d68      	l32i.n	a6, a13, 0
+ 181:	09f8      	l32i.n	a15, a9, 0
+ 183:	963b      	addi.n	a9, a6, 3
+ 185:	df3b      	addi.n	a13, a15, 3
+ 187:	b39660        	movgez	a9, a6, a6
+ 18a:	b3dff0        	movgez	a13, a15, a15
+ 18d:	21d2d0        	srai	a13, a13, 2
+ 190:	219290        	srai	a9, a9, 2
+ 193:	99da      	add.n	a9, a9, a13
+ 195:	31df90        	srai	a13, a9, 31
+ 198:	c9ca      	add.n	a12, a9, a12
+ 19a:	ddea      	add.n	a13, a13, a14
+ 19c:	08bc97        	bgeu	a12, a9, 1a8 <vorbis_dsp_synthesis+0x1a8>	19c: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1a8
+ 19f:	dd1b      	addi.n	a13, a13, 1
+ 1a1:	0000c6        	j	1a8 <vorbis_dsp_synthesis+0x1a8>	1a1: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1a8
+ 1a4:	0c0c      	movi.n	a12, 0
+ 1a6:	0cdd      	mov.n	a13, a12
+ 1a8:	1265c2        	s32i	a12, a5, 72
+ 1ab:	1365d2        	s32i	a13, a5, 76
+ 1ae:	47f8      	l32i.n	a15, a7, 16
+ 1b0:	57e8      	l32i.n	a14, a7, 20
+ 1b2:	400a66        	bnei	a10, -1, 1f6 <vorbis_dsp_synthesis+0x1f6>	1b2: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1f6
+ 1b5:	3d0b66        	bnei	a11, -1, 1f6 <vorbis_dsp_synthesis+0x1f6>	1b5: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1f6
+ 1b8:	050f66        	bnei	a15, -1, 1c1 <vorbis_dsp_synthesis+0x1c1>	1b8: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1c1
+ 1bb:	020e66        	bnei	a14, -1, 1c1 <vorbis_dsp_synthesis+0x1c1>	1bb: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1c1
+ 1be:	002686        	j	25c <vorbis_dsp_synthesis+0x25c>	1be: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 1c1:	e5f9      	s32i.n	a15, a5, 56
+ 1c3:	f5e9      	s32i.n	a14, a5, 60
+ 1c5:	0b2ed7        	blt	a14, a13, 1d4 <vorbis_dsp_synthesis+0x1d4>	1c5: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1d4
+ 1c8:	021de7        	beq	a13, a14, 1ce <vorbis_dsp_synthesis+0x1ce>	1c8: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1ce
+ 1cb:	002346        	j	25c <vorbis_dsp_synthesis+0x25c>	1cb: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 1ce:	023fc7        	bltu	a15, a12, 1d4 <vorbis_dsp_synthesis+0x1d4>	1ce: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1d4
+ 1d1:	0021c6        	j	25c <vorbis_dsp_synthesis+0x25c>	1d1: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 1d4:	3798      	l32i.n	a9, a7, 12
+ 1d6:	a5a8      	l32i.n	a10, a5, 40
+ 1d8:	898c      	beqz.n	a9, 1e4 <vorbis_dsp_synthesis+0x1e4>	1d8: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x1e4
+ 1da:	9afa      	add.n	a9, a10, a15
+ 1dc:	c099c0        	sub	a9, a9, a12
+ 1df:	a599      	s32i.n	a9, a5, 40
+ 1e1:	001dc6        	j	25c <vorbis_dsp_synthesis+0x25c>	1e1: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 1e4:	9598      	l32i.n	a9, a5, 36
+ 1e6:	c099f0        	sub	a9, a9, a15
+ 1e9:	99ca      	add.n	a9, a9, a12
+ 1eb:	4399a0        	min	a9, a9, a10
+ 1ee:	9599      	s32i.n	a9, a5, 36
+ 1f0:	001a06        	j	25c <vorbis_dsp_synthesis+0x25c>	1f0: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 1f3:	00          	.byte	00
+ 1f4:	00          	.byte	00
+ 1f5:	00          	.byte	00
+ 1f6:	b5c8      	l32i.n	a12, a5, 44
+ 1f8:	c598      	l32i.n	a9, a5, 48
+ 1fa:	a0cc30        	addx4	a12, a12, a3
+ 1fd:	a09930        	addx4	a9, a9, a3
+ 200:	0c68      	l32i.n	a6, a12, 0
+ 202:	09d8      	l32i.n	a13, a9, 0
+ 204:	963b      	addi.n	a9, a6, 3
+ 206:	cd3b      	addi.n	a12, a13, 3
+ 208:	b39660        	movgez	a9, a6, a6
+ 20b:	b3cdd0        	movgez	a12, a13, a13
+ 20e:	21c2c0        	srai	a12, a12, 2
+ 211:	219290        	srai	a9, a9, 2
+ 214:	99ca      	add.n	a9, a9, a12
+ 216:	31cf90        	srai	a12, a9, 31
+ 219:	a9aa      	add.n	a10, a9, a10
+ 21b:	bcba      	add.n	a11, a12, a11
+ 21d:	01ba97        	bgeu	a10, a9, 222 <vorbis_dsp_synthesis+0x222>	21d: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x222
+ 220:	bb1b      	addi.n	a11, a11, 1
+ 222:	e5a9      	s32i.n	a10, a5, 56
+ 224:	f5b9      	s32i.n	a11, a5, 60
+ 226:	109fe0        	and	a9, a15, a14
+ 229:	2f0926        	beqi	a9, -1, 25c <vorbis_dsp_synthesis+0x25c>	229: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 22c:	309af0        	xor	a9, a10, a15
+ 22f:	30cbe0        	xor	a12, a11, a14
+ 232:	2099c0        	or	a9, a9, a12
+ 235:	39ac      	beqz.n	a9, 25c <vorbis_dsp_synthesis+0x25c>	235: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 237:	052eb7        	blt	a14, a11, 240 <vorbis_dsp_synthesis+0x240>	237: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x240
+ 23a:	139be7        	bne	a11, a14, 251 <vorbis_dsp_synthesis+0x251>	23a: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x251
+ 23d:	10bfa7        	bgeu	a15, a10, 251 <vorbis_dsp_synthesis+0x251>	23d: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x251
+ 240:	c09af0        	sub	a9, a10, a15
+ 243:	0a1af7        	beq	a10, a15, 251 <vorbis_dsp_synthesis+0x251>	243: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x251
+ 246:	37a8      	l32i.n	a10, a7, 12
+ 248:	5a8c      	beqz.n	a10, 251 <vorbis_dsp_synthesis+0x251>	248: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x251
+ 24a:	a5a8      	l32i.n	a10, a5, 40
+ 24c:	c09a90        	sub	a9, a10, a9
+ 24f:	a599      	s32i.n	a9, a5, 40
+ 251:	e5f9      	s32i.n	a15, a5, 56
+ 253:	f5e9      	s32i.n	a14, a5, 60
+ 255:	0000c6        	j	25c <vorbis_dsp_synthesis+0x25c>	255: R_XTENSA_SLOT0_OP	.text.vorbis_dsp_synthesis+0x25c
+ 258:	00          	.byte	00
+ 259:	79af42        	movi	a4, -135
+ 25c:	042d      	mov.n	a2, a4
+ 25e:	f01d      	retw.n

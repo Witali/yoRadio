@@ -1,0 +1,240 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-xtensa-audit-01\members\esp32\15-es_parse_reg.c.obj:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.esp_es_parse_get_avail_customer_type:
+
+00000000 <.literal.esp_es_parse_get_avail_customer_type>:
+   0:	00000000 		0: R_XTENSA_32	.bss.parser_list
+
+Disassembly of section .literal.esp_es_parse_add_parser:
+
+00000000 <.literal.esp_es_parse_add_parser>:
+   0:	00000000 		0: R_XTENSA_32	.rodata.esp_es_parse_add_parser.str1.4
+   4:	00000010 		4: R_XTENSA_32	.rodata.esp_es_parse_add_parser.str1.4
+   8:	00000000 		8: R_XTENSA_32	.bss.parser_list
+   c:	00000044 		c: R_XTENSA_32	.rodata.esp_es_parse_add_parser.str1.4
+  10:	00000050 		10: R_XTENSA_32	.rodata.esp_es_parse_add_parser.str1.4
+  14:	00000078 		14: R_XTENSA_32	.rodata.esp_es_parse_add_parser.str1.4
+	...
+	18: R_XTENSA_32	esp_log_timestamp
+	1c: R_XTENSA_32	esp_log
+	20: R_XTENSA_32	media_lib_module_calloc
+	24: R_XTENSA_32	esp_log_timestamp
+	28: R_XTENSA_32	esp_log
+	2c: R_XTENSA_32	esp_log_timestamp
+	30: R_XTENSA_32	esp_log
+
+Disassembly of section .literal.esp_es_parse_get_parser:
+
+00000000 <.literal.esp_es_parse_get_parser>:
+	...
+	0: R_XTENSA_32	.bss.parser_list
+	4: R_XTENSA_32	esp_es_parse_get_default
+
+Disassembly of section .literal.esp_es_parse_get_free_func:
+
+00000000 <.literal.esp_es_parse_get_free_func>:
+   0:	00000000 		0: R_XTENSA_32	.bss.parser_list
+
+Disassembly of section .literal.esp_es_parse_remove_parser:
+
+00000000 <.literal.esp_es_parse_remove_parser>:
+	...
+	0: R_XTENSA_32	.bss.parser_list
+	4: R_XTENSA_32	media_lib_free
+
+Disassembly of section .literal.esp_es_parse_remove_all:
+
+00000000 <.literal.esp_es_parse_remove_all>:
+	...
+	0: R_XTENSA_32	.bss.parser_list
+	4: R_XTENSA_32	media_lib_free
+
+Disassembly of section .text.esp_es_parse_get_avail_customer_type:
+
+00000000 <esp_es_parse_get_avail_customer_type>:
+   0:	004136        	entry	a1, 32
+   3:	000081        	l32r	a8, fffc0004 <esp_es_parse_get_avail_customer_type+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_get_avail_customer_type
+   6:	80a022        	movi	a2, 128
+   9:	0888      	l32i.n	a8, a8, 0
+   b:	689c      	beqz.n	a8, 25 <esp_es_parse_get_avail_customer_type+0x25>	b: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_avail_customer_type+0x25
+   d:	02cd      	mov.n	a12, a2
+   f:	afafb2        	movi	a11, -81
+  12:	1898      	l32i.n	a9, a8, 4
+  14:	10a9b0        	and	a10, a9, a11
+  17:	0509c7        	bnone	a9, a12, 20 <esp_es_parse_get_avail_customer_type+0x20>	17: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_avail_customer_type+0x20
+  1a:	023a27        	bltu	a10, a2, 20 <esp_es_parse_get_avail_customer_type+0x20>	1a: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_avail_customer_type+0x20
+  1d:	01ca22        	addi	a2, a10, 1
+  20:	3888      	l32i.n	a8, a8, 12
+  22:	fec856        	bnez	a8, 12 <esp_es_parse_get_avail_customer_type+0x12>	22: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_avail_customer_type+0x12
+  25:	f01d      	retw.n
+
+Disassembly of section .text.esp_es_parse_add_parser:
+
+00000000 <esp_es_parse_add_parser>:
+   0:	006136        	entry	a1, 48
+   3:	40f390        	nsau	a9, a3
+   6:	047d      	mov.n	a7, a4
+   8:	419590        	srli	a9, a9, 5
+   b:	538c      	beqz.n	a3, 14 <esp_es_parse_add_parser+0x14>	b: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x14
+   d:	180c      	movi.n	a8, 1
+   f:	938920        	movnez	a8, a9, a2
+  12:	f89c      	beqz.n	a8, 35 <esp_es_parse_add_parser+0x35>	12: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x35
+  14:	000081        	l32r	a8, fffc0014 <esp_es_parse_add_parser+0xfffc0014>	14: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x18
+	14: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  17:	0008e0        	callx8	a8
+  1a:	0000b1        	l32r	a11, fffc001c <esp_es_parse_add_parser+0xfffc001c>	1a: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser
+  1d:	0000c1        	l32r	a12, fffc0020 <esp_es_parse_add_parser+0xfffc0020>	1d: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x4
+  20:	0129      	s32i.n	a2, a1, 0
+  22:	0add      	mov.n	a13, a10
+  24:	03fd      	mov.n	a15, a3
+  26:	0bed      	mov.n	a14, a11
+  28:	1a0c      	movi.n	a10, 1
+  2a:	000081        	l32r	a8, fffc002c <esp_es_parse_add_parser+0xfffc002c>	2a: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x1c
+	2a: R_XTENSA_ASM_EXPAND	esp_log
+  2d:	0008e0        	callx8	a8
+  30:	e27c      	movi.n	a2, -2
+  32:	0022c6        	j	c1 <esp_es_parse_add_parser+0xc1>	32: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0xc1
+  35:	000081        	l32r	a8, fffc0038 <esp_es_parse_add_parser+0xfffc0038>	35: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x8
+  38:	002842        	l32i	a4, a8, 0
+  3b:	009416        	beqz	a4, 48 <esp_es_parse_add_parser+0x48>	3b: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x48
+  3e:	1488      	l32i.n	a8, a4, 4
+  40:	5c1287        	beq	a2, a8, a0 <esp_es_parse_add_parser+0xa0>	40: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0xa0
+  43:	3448      	l32i.n	a4, a4, 12
+  45:	ff5456        	bnez	a4, 3e <esp_es_parse_add_parser+0x3e>	45: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x3e
+  48:	0000a1        	l32r	a10, fffc0048 <esp_es_parse_add_parser+0xfffc0048>	48: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0xc
+  4b:	0c1c      	movi.n	a12, 16
+  4d:	1b0c      	movi.n	a11, 1
+  4f:	000081        	l32r	a8, fffc0050 <esp_es_parse_add_parser+0xfffc0050>	4f: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x20
+	4f: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  52:	0008e0        	callx8	a8
+  55:	fadc      	bnez.n	a10, 78 <esp_es_parse_add_parser+0x78>	55: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x78
+  57:	000081        	l32r	a8, fffc0058 <esp_es_parse_add_parser+0xfffc0058>	57: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x24
+	57: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  5a:	0008e0        	callx8	a8
+  5d:	0000b1        	l32r	a11, fffc0060 <esp_es_parse_add_parser+0xfffc0060>	5d: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser
+  60:	0000c1        	l32r	a12, fffc0060 <esp_es_parse_add_parser+0xfffc0060>	60: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x10
+  63:	02fd      	mov.n	a15, a2
+  65:	0add      	mov.n	a13, a10
+  67:	0bed      	mov.n	a14, a11
+  69:	1a0c      	movi.n	a10, 1
+  6b:	000081        	l32r	a8, fffc006c <esp_es_parse_add_parser+0xfffc006c>	6b: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x28
+	6b: R_XTENSA_ASM_EXPAND	esp_log
+  6e:	0008e0        	callx8	a8
+  71:	d27c      	movi.n	a2, -3
+  73:	001286        	j	c1 <esp_es_parse_add_parser+0xc1>	73: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0xc1
+  76:	00          	.byte	00
+  77:	00          	.byte	00
+  78:	000081        	l32r	a8, fffc0078 <esp_es_parse_add_parser+0xfffc0078>	78: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x8
+  7b:	1a29      	s32i.n	a2, a10, 4
+  7d:	0888      	l32i.n	a8, a8, 0
+  7f:	0a39      	s32i.n	a3, a10, 0
+  81:	2a79      	s32i.n	a7, a10, 8
+  83:	988c      	beqz.n	a8, 90 <esp_es_parse_add_parser+0x90>	83: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x90
+  85:	089d      	mov.n	a9, a8
+  87:	3888      	l32i.n	a8, a8, 12
+  89:	ff8856        	bnez	a8, 85 <esp_es_parse_add_parser+0x85>	89: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x85
+  8c:	000246        	j	99 <esp_es_parse_add_parser+0x99>	8c: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x99
+  8f:	00          	.byte	00
+  90:	000081        	l32r	a8, fffc0090 <esp_es_parse_add_parser+0xfffc0090>	90: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x8
+  93:	08a9      	s32i.n	a10, a8, 0
+  95:	000086        	j	9b <esp_es_parse_add_parser+0x9b>	95: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x9b
+  98:	00          	.byte	00
+  99:	39a9      	s32i.n	a10, a9, 12
+  9b:	020c      	movi.n	a2, 0
+  9d:	000806        	j	c1 <esp_es_parse_add_parser+0xc1>	9d: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0xc1
+  a0:	000081        	l32r	a8, fffc00a0 <esp_es_parse_add_parser+0xfffc00a0>	a0: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x2c
+	a0: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  a3:	0008e0        	callx8	a8
+  a6:	0000b1        	l32r	a11, fffc00a8 <esp_es_parse_add_parser+0xfffc00a8>	a6: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser
+  a9:	0000c1        	l32r	a12, fffc00ac <esp_es_parse_add_parser+0xfffc00ac>	a9: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x14
+  ac:	0add      	mov.n	a13, a10
+  ae:	02fd      	mov.n	a15, a2
+  b0:	0bed      	mov.n	a14, a11
+  b2:	3a0c      	movi.n	a10, 3
+  b4:	000081        	l32r	a8, fffc00b4 <esp_es_parse_add_parser+0xfffc00b4>	b4: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_add_parser+0x30
+	b4: R_XTENSA_ASM_EXPAND	esp_log
+  b7:	0008e0        	callx8	a8
+  ba:	0439      	s32i.n	a3, a4, 0
+  bc:	2479      	s32i.n	a7, a4, 8
+  be:	fff646        	j	9b <esp_es_parse_add_parser+0x9b>	be: R_XTENSA_SLOT0_OP	.text.esp_es_parse_add_parser+0x9b
+  c1:	f01d      	retw.n
+
+Disassembly of section .text.esp_es_parse_get_parser:
+
+00000000 <esp_es_parse_get_parser>:
+   0:	004136        	entry	a1, 32
+   3:	000081        	l32r	a8, fffc0004 <esp_es_parse_get_parser+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_get_parser
+   6:	0888      	l32i.n	a8, a8, 0
+   8:	888c      	beqz.n	a8, 14 <esp_es_parse_get_parser+0x14>	8: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_parser+0x14
+   a:	1898      	l32i.n	a9, a8, 4
+   c:	111297        	beq	a2, a9, 21 <esp_es_parse_get_parser+0x21>	c: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_parser+0x21
+   f:	3888      	l32i.n	a8, a8, 12
+  11:	ff5856        	bnez	a8, a <esp_es_parse_get_parser+0xa>	11: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_parser+0xa
+  14:	02ad      	mov.n	a10, a2
+  16:	000081        	l32r	a8, fffc0018 <esp_es_parse_get_parser+0xfffc0018>	16: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_get_parser+0x4
+	16: R_XTENSA_ASM_EXPAND	esp_es_parse_get_default
+  19:	0008e0        	callx8	a8
+  1c:	0a2d      	mov.n	a2, a10
+  1e:	000046        	j	23 <esp_es_parse_get_parser+0x23>	1e: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_parser+0x23
+  21:	0828      	l32i.n	a2, a8, 0
+  23:	f01d      	retw.n
+
+Disassembly of section .text.esp_es_parse_get_free_func:
+
+00000000 <esp_es_parse_get_free_func>:
+   0:	004136        	entry	a1, 32
+   3:	000081        	l32r	a8, fffc0004 <esp_es_parse_get_free_func+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_get_free_func
+   6:	0888      	l32i.n	a8, a8, 0
+   8:	888c      	beqz.n	a8, 14 <esp_es_parse_get_free_func+0x14>	8: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_free_func+0x14
+   a:	1898      	l32i.n	a9, a8, 4
+   c:	091297        	beq	a2, a9, 19 <esp_es_parse_get_free_func+0x19>	c: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_free_func+0x19
+   f:	3888      	l32i.n	a8, a8, 12
+  11:	ff5856        	bnez	a8, a <esp_es_parse_get_free_func+0xa>	11: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_free_func+0xa
+  14:	082d      	mov.n	a2, a8
+  16:	000046        	j	1b <esp_es_parse_get_free_func+0x1b>	16: R_XTENSA_SLOT0_OP	.text.esp_es_parse_get_free_func+0x1b
+  19:	2828      	l32i.n	a2, a8, 8
+  1b:	f01d      	retw.n
+
+Disassembly of section .text.esp_es_parse_remove_parser:
+
+00000000 <esp_es_parse_remove_parser>:
+   0:	004136        	entry	a1, 32
+   3:	0000c1        	l32r	a12, fffc0004 <esp_es_parse_remove_parser+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_remove_parser
+   6:	0c88      	l32i.n	a8, a12, 0
+   8:	18ac      	beqz.n	a8, 2d <esp_es_parse_remove_parser+0x2d>	8: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_parser+0x2d
+   a:	0b0c      	movi.n	a11, 0
+   c:	1898      	l32i.n	a9, a8, 4
+   e:	08ad      	mov.n	a10, a8
+  10:	3888      	l32i.n	a8, a8, 12
+  12:	129927        	bne	a9, a2, 28 <esp_es_parse_remove_parser+0x28>	12: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_parser+0x28
+  15:	3bcc      	bnez.n	a11, 1c <esp_es_parse_remove_parser+0x1c>	15: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_parser+0x1c
+  17:	0c89      	s32i.n	a8, a12, 0
+  19:	000046        	j	1e <esp_es_parse_remove_parser+0x1e>	19: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_parser+0x1e
+  1c:	3b89      	s32i.n	a8, a11, 12
+  1e:	000081        	l32r	a8, fffc0020 <esp_es_parse_remove_parser+0xfffc0020>	1e: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_remove_parser+0x4
+	1e: R_XTENSA_ASM_EXPAND	media_lib_free
+  21:	0008e0        	callx8	a8
+  24:	000146        	j	2d <esp_es_parse_remove_parser+0x2d>	24: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_parser+0x2d
+  27:	00          	.byte	00
+  28:	0abd      	mov.n	a11, a10
+  2a:	fde856        	bnez	a8, c <esp_es_parse_remove_parser+0xc>	2a: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_parser+0xc
+  2d:	f01d      	retw.n
+
+Disassembly of section .text.esp_es_parse_remove_all:
+
+00000000 <esp_es_parse_remove_all>:
+   0:	004136        	entry	a1, 32
+   3:	000081        	l32r	a8, fffc0004 <esp_es_parse_remove_all+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_remove_all
+   6:	0878      	l32i.n	a7, a8, 0
+   8:	c78c      	beqz.n	a7, 18 <esp_es_parse_remove_all+0x18>	8: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_all+0x18
+   a:	07ad      	mov.n	a10, a7
+   c:	032772        	l32i	a7, a7, 12
+   f:	000081        	l32r	a8, fffc0010 <esp_es_parse_remove_all+0xfffc0010>	f: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_remove_all+0x4
+	f: R_XTENSA_ASM_EXPAND	media_lib_free
+  12:	0008e0        	callx8	a8
+  15:	ff1756        	bnez	a7, a <esp_es_parse_remove_all+0xa>	15: R_XTENSA_SLOT0_OP	.text.esp_es_parse_remove_all+0xa
+  18:	000091        	l32r	a9, fffc0018 <esp_es_parse_remove_all+0xfffc0018>	18: R_XTENSA_SLOT0_OP	.literal.esp_es_parse_remove_all
+  1b:	0979      	s32i.n	a7, a9, 0
+  1d:	f01d      	retw.n

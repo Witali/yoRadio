@@ -1,0 +1,25 @@
+tool-output/esp32-libesp_audio_simple_dec-4-esp_audio_simple_dec.c.obj-disasm.txt:1097
+Disassembly of section .text.esp_audio_simple_dec_close:
+
+00000000 <esp_audio_simple_dec_close>:
+   0:	004136        	entry	a1, 32
+   3:	32ac      	beqz.n	a2, 2a <esp_audio_simple_dec_close+0x2a>	3: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_close+0x2a
+   5:	0122a2        	l32i	a10, a2, 4
+   8:	8a8c      	beqz.n	a10, 14 <esp_audio_simple_dec_close+0x14>	8: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_close+0x14
+   a:	000081        	l32r	a8, fffc000c <esp_audio_simple_dec_close+0xfffc000c>	a: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_close
+	a: R_XTENSA_ASM_EXPAND	esp_es_parse_close
+   d:	0008e0        	callx8	a8
+  10:	080c      	movi.n	a8, 0
+  12:	1289      	s32i.n	a8, a2, 4
+  14:	22a8      	l32i.n	a10, a2, 8
+  16:	8a8c      	beqz.n	a10, 22 <esp_audio_simple_dec_close+0x22>	16: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_close+0x22
+  18:	000081        	l32r	a8, fffc0018 <esp_audio_simple_dec_close+0xfffc0018>	18: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_close+0x4
+	18: R_XTENSA_ASM_EXPAND	esp_audio_dec_close
+  1b:	0008e0        	callx8	a8
+  1e:	080c      	movi.n	a8, 0
+  20:	2289      	s32i.n	a8, a2, 8
+  22:	02ad      	mov.n	a10, a2
+  24:	000081        	l32r	a8, fffc0024 <esp_audio_simple_dec_close+0xfffc0024>	24: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_close+0x8
+	24: R_XTENSA_ASM_EXPAND	media_lib_free
+  27:	0008e0        	callx8	a8
+  2a:	f01d      	retw.n

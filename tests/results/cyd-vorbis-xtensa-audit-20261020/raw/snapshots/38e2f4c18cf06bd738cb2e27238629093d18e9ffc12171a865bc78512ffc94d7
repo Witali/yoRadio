@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-04",
+  "kind": "static binary inspection; no new runtime tests",
+  "reviewed_git_head": "8db05fed2ac2e31887ec0ccc0d6cd8c449af03b4",
+  "component_version": "2.6.2",
+  "archive_sha256": {
+    "libesp_audio_codec.a": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+    "libesp_audio_simple_dec.a": "232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f"
+  },
+  "elf_sha256": "6f99c0ec4c6201190e494735fe7bea64c23fcec919011229e7e231aef1f1705e",
+  "app_sha256": "d77fa6d328ae8f73fa3df67cf53f61272cbb373504c36820e08bd144ea665e8d",
+  "tool": "riscv32-esp-elf-objdump -d --disassemble=<symbol> <ELF>",
+  "functions": [
+    "esp_vorbis_dec_open",
+    "vorbis_dsp_create",
+    "media_lib_module_calloc"
+  ],
+  "normalization": "UTF-8 LF; remove local input filename line only",
+  "files": {
+    "linked-open.asm": {
+      "bytes": 7013,
+      "sha256": "f0d62f6dba71c54c39b5c4ae9542e3a5589b706423581ede3565724f53498202"
+    },
+    "linked-create.asm": {
+      "bytes": 4742,
+      "sha256": "3d53e94eb2ee00e5d5d32960ea6a000810514fe71bc060a1be36f1019ae646ca"
+    },
+    "linked-calloc.asm": {
+      "bytes": 242,
+      "sha256": "aaabf9ecf339d9ab23db61db40ab53c91b2db4e16780d7fdccf12d352a559dae"
+    }
+  }
+}

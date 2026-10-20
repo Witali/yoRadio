@@ -1,0 +1,268 @@
+tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:533
+Disassembly of section .text._make_decode_table:
+
+00000000 <.text._make_decode_table>:
+   0:	008136        	entry	a1, 64
+   3:	5288      	l32i.n	a8, a2, 20
+   5:	22c8      	l32i.n	a12, a2, 8
+   7:	069d      	mov.n	a9, a6
+   9:	374866        	bnei	a8, 4, 44 <.text._make_decode_table+0x44>	9: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x44
+   c:	b08c80        	addx8	a8, a12, a8
+   f:	0c0c      	movi.n	a12, 0
+  11:	1318a6        	blti	a8, 1, 28 <.text._make_decode_table+0x28>	11: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28
+  14:	0000a1        	l32r	a10, fffc0014 <vorbis_book_unpack+0xfffc0014>	14: R_XTENSA_SLOT0_OP	.literal._make_decode_table
+  17:	08cd      	mov.n	a12, a8
+  19:	1b0c      	movi.n	a11, 1
+  1b:	046162        	s32i	a6, a1, 16
+  1e:	000081        	l32r	a8, fffc0020 <vorbis_book_unpack+0xfffc0020>	1e: R_XTENSA_SLOT0_OP	.literal._make_decode_table+0x4
+	1e: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  21:	0008e0        	callx8	a8
+  24:	4198      	l32i.n	a9, a1, 16
+  26:	0acd      	mov.n	a12, a10
+  28:	12b8      	l32i.n	a11, a2, 4
+  2a:	42c9      	s32i.n	a12, a2, 16
+  2c:	05fd      	mov.n	a15, a5
+  2e:	0199      	s32i.n	a9, a1, 0
+  30:	02ed      	mov.n	a14, a2
+  32:	04dd      	mov.n	a13, a4
+  34:	03ad      	mov.n	a10, a3
+  36:	000081        	l32r	a8, fffc0038 <vorbis_book_unpack+0xfffc0038>	36: R_XTENSA_SLOT0_OP	.literal._make_decode_table+0x8
+	36: R_XTENSA_ASM_EXPAND	.text._make_words
+  39:	0008e0        	callx8	a8
+  3c:	150c      	movi.n	a5, 1
+  3e:	835aa0        	moveqz	a5, a10, a10
+  41:	0093c6        	j	294 <.text._make_decode_table+0x294>	41: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x294
+  44:	cc0b      	addi.n	a12, a12, -1
+  46:	11ccd0        	slli	a12, a12, 3
+  49:	041ce6        	bgei	a12, 1, 51 <.text._make_decode_table+0x51>	49: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x51
+  4c:	150c      	movi.n	a5, 1
+  4e:	009086        	j	294 <.text._make_decode_table+0x294>	4e: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x294
+  51:	0000a1        	l32r	a10, fffc0054 <vorbis_book_unpack+0xfffc0054>	51: R_XTENSA_SLOT0_OP	.literal._make_decode_table
+  54:	1b0c      	movi.n	a11, 1
+  56:	4169      	s32i.n	a6, a1, 16
+  58:	000081        	l32r	a8, fffc0058 <vorbis_book_unpack+0xfffc0058>	58: R_XTENSA_SLOT0_OP	.literal._make_decode_table+0xc
+	58: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  5b:	0008e0        	callx8	a8
+  5e:	0a6d      	mov.n	a6, a10
+  60:	fe8a16        	beqz	a10, 4c <.text._make_decode_table+0x4c>	60: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x4c
+  63:	4198      	l32i.n	a9, a1, 16
+  65:	12b8      	l32i.n	a11, a2, 4
+  67:	05fd      	mov.n	a15, a5
+  69:	0acd      	mov.n	a12, a10
+  6b:	0199      	s32i.n	a9, a1, 0
+  6d:	02ed      	mov.n	a14, a2
+  6f:	04dd      	mov.n	a13, a4
+  71:	03ad      	mov.n	a10, a3
+  73:	000081        	l32r	a8, fffc0074 <vorbis_book_unpack+0xfffc0074>	73: R_XTENSA_SLOT0_OP	.literal._make_decode_table+0x10
+	73: R_XTENSA_ASM_EXPAND	.text._make_words
+  76:	0008e0        	callx8	a8
+  79:	0a5d      	mov.n	a5, a10
+  7b:	fcda56        	bnez	a10, 4c <.text._make_decode_table+0x4c>	7b: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x4c
+  7e:	6288      	l32i.n	a8, a2, 24
+  80:	2298      	l32i.n	a9, a2, 8
+  82:	c81b      	addi.n	a12, a8, 1
+  84:	82cc90        	mull	a12, a12, a9
+  87:	52b8      	l32i.n	a11, a2, 20
+  89:	feccc2        	addi	a12, a12, -2
+  8c:	82ccb0        	mull	a12, a12, a11
+  8f:	0e1ca6        	blti	a12, 1, a1 <.text._make_decode_table+0xa1>	8f: R_XTENSA_SLOT0_OP	.text._make_decode_table+0xa1
+  92:	0000a1        	l32r	a10, fffc0094 <vorbis_book_unpack+0xfffc0094>	92: R_XTENSA_SLOT0_OP	.literal._make_decode_table
+  95:	1b0c      	movi.n	a11, 1
+  97:	000081        	l32r	a8, fffc0098 <vorbis_book_unpack+0xfffc0098>	97: R_XTENSA_SLOT0_OP	.literal._make_decode_table+0x14
+	97: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  9a:	0008e0        	callx8	a8
+  9d:	6288      	l32i.n	a8, a2, 24
+  9f:	52b8      	l32i.n	a11, a2, 20
+  a1:	42a9      	s32i.n	a10, a2, 16
+  a3:	7f1866        	bnei	a8, 1, 126 <.text._make_decode_table+0x126>	a3: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x126
+  a6:	0f1b26        	beqi	a11, 1, b9 <.text._make_decode_table+0xb9>	a6: R_XTENSA_SLOT0_OP	.text._make_decode_table+0xb9
+  a9:	022b26        	beqi	a11, 2, af <.text._make_decode_table+0xaf>	a9: R_XTENSA_SLOT0_OP	.text._make_decode_table+0xaf
+  ac:	0076c6        	j	28b <.text._make_decode_table+0x28b>	ac: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+  af:	2288      	l32i.n	a8, a2, 8
+  b1:	4d28e6        	bgei	a8, 2, 102 <.text._make_decode_table+0x102>	b1: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x102
+  b4:	0074c6        	j	28b <.text._make_decode_table+0x28b>	b4: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+  b7:	00          	.byte	00
+  b8:	00          	.byte	00
+  b9:	2288      	l32i.n	a8, a2, 8
+  bb:	0228e6        	bgei	a8, 2, c1 <.text._make_decode_table+0xc1>	bb: R_XTENSA_SLOT0_OP	.text._make_decode_table+0xc1
+  be:	007246        	j	28b <.text._make_decode_table+0x28b>	be: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+  c1:	0698      	l32i.n	a9, a6, 0
+  c3:	80afc2        	movi	a12, -128
+  c6:	058f90        	extui	a8, a9, 31, 1
+  c9:	118890        	slli	a8, a8, 7
+  cc:	208890        	or	a8, a8, a9
+  cf:	004a82        	s8i	a8, a10, 0
+  d2:	2288      	l32i.n	a8, a2, 8
+  d4:	880b      	addi.n	a8, a8, -1
+  d6:	888a      	add.n	a8, a8, a8
+  d8:	0228e6        	bgei	a8, 2, de <.text._make_decode_table+0xde>	d8: R_XTENSA_SLOT0_OP	.text._make_decode_table+0xde
+  db:	006b06        	j	28b <.text._make_decode_table+0x28b>	db: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+  de:	a64b      	addi.n	a10, a6, 4
+  e0:	0ad8      	l32i.n	a13, a10, 0
+  e2:	4298      	l32i.n	a9, a2, 16
+  e4:	7588d0        	extui	a8, a13, 24, 8
+  e7:	1088c0        	and	a8, a8, a12
+  ea:	99ba      	add.n	a9, a9, a11
+  ec:	2088d0        	or	a8, a8, a13
+  ef:	004982        	s8i	a8, a9, 0
+  f2:	2288      	l32i.n	a8, a2, 8
+  f4:	bb1b      	addi.n	a11, a11, 1
+  f6:	880b      	addi.n	a8, a8, -1
+  f8:	888a      	add.n	a8, a8, a8
+  fa:	aa4b      	addi.n	a10, a10, 4
+  fc:	e02b87        	blt	a11, a8, e0 <.text._make_decode_table+0xe0>	fc: R_XTENSA_SLOT0_OP	.text._make_decode_table+0xe0
+  ff:	006206        	j	28b <.text._make_decode_table+0x28b>	ff: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+ 102:	497c      	movi.n	a9, -12
+ 104:	b09890        	addx8	a9, a8, a9
+ 107:	419290        	srli	a9, a9, 2
+ 10a:	06bd      	mov.n	a11, a6
+ 10c:	991b      	addi.n	a9, a9, 1
+ 10e:	118976        	loop	a9, 123 <.text._make_decode_table+0x123>	10e: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x123
+ 111:	0bc8      	l32i.n	a12, a11, 0
+ 113:	bb4b      	addi.n	a11, a11, 4
+ 115:	058fc0        	extui	a8, a12, 31, 1
+ 118:	118810        	slli	a8, a8, 15
+ 11b:	2088c0        	or	a8, a8, a12
+ 11e:	005a82        	s16i	a8, a10, 0
+ 121:	aa2b      	addi.n	a10, a10, 2
+ 123:	005906        	j	28b <.text._make_decode_table+0x28b>	123: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+ 126:	22c8      	l32i.n	a12, a2, 8
+ 128:	908cc0        	addx2	a8, a12, a12
+ 12b:	fecc92        	addi	a9, a12, -2
+ 12e:	fec882        	addi	a8, a8, -2
+ 131:	d99a      	add.n	a13, a9, a9
+ 133:	021b26        	beqi	a11, 1, 139 <.text._make_decode_table+0x139>	133: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x139
+ 136:	002c06        	j	1ea <.text._make_decode_table+0x1ea>	136: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1ea
+ 139:	14ed96        	bltz	a13, 28b <.text._make_decode_table+0x28b>	139: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+ 13c:	400b00        	ssr	a11
+ 13f:	91c0d0        	srl	a12, a13
+ 142:	ee7c      	movi.n	a14, -2
+ 144:	fecdd2        	addi	a13, a13, -2
+ 147:	b09960        	addx8	a9, a9, a6
+ 14a:	ccba      	add.n	a12, a12, a11
+ 14c:	01ade7        	bge	a13, a14, 151 <.text._make_decode_table+0x151>	14c: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x151
+ 14f:	0bcd      	mov.n	a12, a11
+ 151:	928c76        	loop	a12, 1e7 <.text._make_decode_table+0x1e7>	151: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1e7
+ 154:	09e8      	l32i.n	a14, a9, 0
+ 156:	b80b      	addi.n	a11, a8, -1
+ 158:	1938      	l32i.n	a3, a9, 4
+ 15a:	b02e60        	addx8	a2, a14, a6
+ 15d:	fec8f2        	addi	a15, a8, -2
+ 160:	4148e0        	srli	a4, a14, 8
+ 163:	baba      	add.n	a11, a10, a11
+ 165:	da8a      	add.n	a13, a10, a8
+ 167:	041ed6        	bgez	a14, 1ac <.text._make_decode_table+0x1ac>	167: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1ac
+ 16a:	80af72        	movi	a7, -128
+ 16d:	fdcdd2        	addi	a13, a13, -3
+ 170:	204470        	or	a4, a4, a7
+ 173:	fafa      	add.n	a15, a10, a15
+ 175:	01c3d6        	bgez	a3, 195 <.text._make_decode_table+0x195>	175: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x195
+ 178:	fcc882        	addi	a8, a8, -4
+ 17b:	ea8a      	add.n	a14, a10, a8
+ 17d:	004e42        	s8i	a4, a14, 0
+ 180:	19e8      	l32i.n	a14, a9, 4
+ 182:	41e8e0        	srli	a14, a14, 8
+ 185:	20ee70        	or	a14, a14, a7
+ 188:	004de2        	s8i	a14, a13, 0
+ 18b:	09d8      	l32i.n	a13, a9, 0
+ 18d:	004fd2        	s8i	a13, a15, 0
+ 190:	19d8      	l32i.n	a13, a9, 4
+ 192:	001246        	j	1df <.text._make_decode_table+0x1df>	192: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1df
+ 195:	fdc882        	addi	a8, a8, -3
+ 198:	da8a      	add.n	a13, a10, a8
+ 19a:	004d42        	s8i	a4, a13, 0
+ 19d:	19d8      	l32i.n	a13, a9, 4
+ 19f:	b0dd60        	addx8	a13, a13, a6
+ 1a2:	0dd8      	l32i.n	a13, a13, 0
+ 1a4:	004fd2        	s8i	a13, a15, 0
+ 1a7:	09d8      	l32i.n	a13, a9, 0
+ 1a9:	000c86        	j	1df <.text._make_decode_table+0x1df>	1a9: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1df
+ 1ac:	02e8      	l32i.n	a14, a2, 0
+ 1ae:	fecdd2        	addi	a13, a13, -2
+ 1b1:	01b3d6        	bgez	a3, 1d0 <.text._make_decode_table+0x1d0>	1b1: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1d0
+ 1b4:	fdc882        	addi	a8, a8, -3
+ 1b7:	fa8a      	add.n	a15, a10, a8
+ 1b9:	004fe2        	s8i	a14, a15, 0
+ 1bc:	19e8      	l32i.n	a14, a9, 4
+ 1be:	80aff2        	movi	a15, -128
+ 1c1:	41e8e0        	srli	a14, a14, 8
+ 1c4:	20eef0        	or	a14, a14, a15
+ 1c7:	004de2        	s8i	a14, a13, 0
+ 1ca:	19d8      	l32i.n	a13, a9, 4
+ 1cc:	0003c6        	j	1df <.text._make_decode_table+0x1df>	1cc: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1df
+ 1cf:	00          	.byte	00
+ 1d0:	fec882        	addi	a8, a8, -2
+ 1d3:	da8a      	add.n	a13, a10, a8
+ 1d5:	004de2        	s8i	a14, a13, 0
+ 1d8:	19d8      	l32i.n	a13, a9, 4
+ 1da:	b0dd60        	addx8	a13, a13, a6
+ 1dd:	0dd8      	l32i.n	a13, a13, 0
+ 1df:	f8c992        	addi	a9, a9, -8
+ 1e2:	004bd2        	s8i	a13, a11, 0
+ 1e5:	2989      	s32i.n	a8, a9, 8
+ 1e7:	002806        	j	28b <.text._make_decode_table+0x28b>	1e7: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+ 1ea:	022ce6        	bgei	a12, 2, 1f0 <.text._make_decode_table+0x1f0>	1ea: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x1f0
+ 1ed:	002686        	j	28b <.text._make_decode_table+0x28b>	1ed: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+ 1f0:	41e1d0        	srli	a14, a13, 1
+ 1f3:	feafb2        	movi	a11, -2
+ 1f6:	fecdd2        	addi	a13, a13, -2
+ 1f9:	b09960        	addx8	a9, a9, a6
+ 1fc:	01cee2        	addi	a14, a14, 1
+ 1ff:	02adb7        	bge	a13, a11, 205 <.text._make_decode_table+0x205>	1ff: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x205
+ 202:	01a0e2        	movi	a14, 1
+ 205:	828e76        	loop	a14, 28b <.text._make_decode_table+0x28b>	205: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x28b
+ 208:	b80b      	addi.n	a11, a8, -1
+ 20a:	09c8      	l32i.n	a12, a9, 0
+ 20c:	3bba      	add.n	a3, a11, a11
+ 20e:	19f8      	l32i.n	a15, a9, 4
+ 210:	b04c60        	addx8	a4, a12, a6
+ 213:	fec332        	addi	a3, a3, -2
+ 216:	90bba0        	addx2	a11, a11, a10
+ 219:	038cd6        	bgez	a12, 255 <.text._make_decode_table+0x255>	219: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x255
+ 21c:	fdc8d2        	addi	a13, a8, -3
+ 21f:	b02f60        	addx8	a2, a15, a6
+ 222:	90dda0        	addx2	a13, a13, a10
+ 225:	f570f0        	extui	a7, a15, 16, 16
+ 228:	f540c0        	extui	a4, a12, 16, 16
+ 22b:	3a3a      	add.n	a3, a10, a3
+ 22d:	013fd6        	bgez	a15, 244 <.text._make_decode_table+0x244>	22d: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x244
+ 230:	fcc882        	addi	a8, a8, -4
+ 233:	9028a0        	addx2	a2, a8, a10
+ 236:	005242        	s16i	a4, a2, 0
+ 239:	005d72        	s16i	a7, a13, 0
+ 23c:	0053c2        	s16i	a12, a3, 0
+ 23f:	0fcd      	mov.n	a12, a15
+ 241:	000f86        	j	283 <.text._make_decode_table+0x283>	241: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x283
+ 244:	fdc882        	addi	a8, a8, -3
+ 247:	02d8      	l32i.n	a13, a2, 0
+ 249:	90f8a0        	addx2	a15, a8, a10
+ 24c:	005f42        	s16i	a4, a15, 0
+ 24f:	0053d2        	s16i	a13, a3, 0
+ 252:	000b46        	j	283 <.text._make_decode_table+0x283>	252: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x283
+ 255:	fec8d2        	addi	a13, a8, -2
+ 258:	0448      	l32i.n	a4, a4, 0
+ 25a:	b0cf60        	addx8	a12, a15, a6
+ 25d:	90dda0        	addx2	a13, a13, a10
+ 260:	f530f0        	extui	a3, a15, 16, 16
+ 263:	011fd6        	bgez	a15, 278 <.text._make_decode_table+0x278>	263: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x278
+ 266:	fdc882        	addi	a8, a8, -3
+ 269:	90c8a0        	addx2	a12, a8, a10
+ 26c:	005c42        	s16i	a4, a12, 0
+ 26f:	005d32        	s16i	a3, a13, 0
+ 272:	0fcd      	mov.n	a12, a15
+ 274:	0002c6        	j	283 <.text._make_decode_table+0x283>	274: R_XTENSA_SLOT0_OP	.text._make_decode_table+0x283
+ 277:	00          	.byte	00
+ 278:	fec882        	addi	a8, a8, -2
+ 27b:	90d8a0        	addx2	a13, a8, a10
+ 27e:	0cc8      	l32i.n	a12, a12, 0
+ 280:	005d42        	s16i	a4, a13, 0
+ 283:	005bc2        	s16i	a12, a11, 0
+ 286:	0989      	s32i.n	a8, a9, 0
+ 288:	f8c992        	addi	a9, a9, -8
+ 28b:	20a660        	or	a10, a6, a6
+ 28e:	000081        	l32r	a8, fffc0290 <vorbis_book_unpack+0xfffc0290>	28e: R_XTENSA_SLOT0_OP	.literal._make_decode_table+0x18
+	28e: R_XTENSA_ASM_EXPAND	media_lib_free
+ 291:	0008e0        	callx8	a8
+ 294:	052d      	mov.n	a2, a5
+ 296:	f01d      	retw.n
+

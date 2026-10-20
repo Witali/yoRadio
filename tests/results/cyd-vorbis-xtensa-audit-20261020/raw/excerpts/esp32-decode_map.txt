@@ -1,0 +1,177 @@
+tool-output/esp32-libesp_audio_codec-636-codebook.c.obj-disasm.txt:1719
+Disassembly of section .text.decode_map:
+
+00000000 <decode_map>:
+   0:	004136        	entry	a1, 32
+   3:	03bd      	mov.n	a11, a3
+   5:	02ad      	mov.n	a10, a2
+   7:	000081        	l32r	a8, fffc0008 <decode_map+0xfffc0008>	7: R_XTENSA_SLOT0_OP	.literal.decode_map
+	7: R_XTENSA_ASM_EXPAND	.text.decode_packed_entry_number
+   a:	0008e0        	callx8	a8
+   d:	0a8d      	mov.n	a8, a10
+   f:	03ad      	mov.n	a10, a3
+  11:	083d      	mov.n	a3, a8
+  13:	000081        	l32r	a8, fffc0014 <decode_map+0xfffc0014>	13: R_XTENSA_SLOT0_OP	.literal.decode_map+0x4
+	13: R_XTENSA_ASM_EXPAND	tremor_oggpack_eop
+  16:	0008e0        	callx8	a8
+  19:	18da56        	bnez	a10, 1aa <decode_map+0x1aa>	19: R_XTENSA_SLOT0_OP	.text.decode_map+0x1aa
+  1c:	72b8      	l32i.n	a11, a2, 28
+  1e:	402b26        	beqi	a11, 2, 62 <decode_map+0x62>	1e: R_XTENSA_SLOT0_OP	.text.decode_map+0x62
+  21:	023b66        	bnei	a11, 3, 27 <decode_map+0x27>	21: R_XTENSA_SLOT0_OP	.text.decode_map+0x27
+  24:	002306        	j	b4 <decode_map+0xb4>	24: R_XTENSA_SLOT0_OP	.text.decode_map+0xb4
+  27:	021b26        	beqi	a11, 1, 2d <decode_map+0x2d>	27: R_XTENSA_SLOT0_OP	.text.decode_map+0x2d
+  2a:	005f06        	j	1aa <decode_map+0x1aa>	2a: R_XTENSA_SLOT0_OP	.text.decode_map+0x1aa
+  2d:	0298      	l32i.n	a9, a2, 0
+  2f:	0219e6        	bgei	a9, 1, 35 <decode_map+0x35>	2f: R_XTENSA_SLOT0_OP	.text.decode_map+0x35
+  32:	0033c6        	j	105 <decode_map+0x105>	32: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  35:	d2c8      	l32i.n	a12, a2, 52
+  37:	1189e0        	slli	a8, a9, 2
+  3a:	fcc882        	addi	a8, a8, -4
+  3d:	401c00        	ssl	a12
+  40:	a1bb00        	sll	a11, a11
+  43:	418280        	srli	a8, a8, 2
+  46:	cb0b      	addi.n	a12, a11, -1
+  48:	881b      	addi.n	a8, a8, 1
+  4a:	20b440        	or	a11, a4, a4
+  4d:	0e8876        	loop	a8, 5f <decode_map+0x5f>	4d: R_XTENSA_SLOT0_OP	.text.decode_map+0x5f
+  50:	10d3c0        	and	a13, a3, a12
+  53:	0bd9      	s32i.n	a13, a11, 0
+  55:	d2d8      	l32i.n	a13, a2, 52
+  57:	bb4b      	addi.n	a11, a11, 4
+  59:	400d00        	ssr	a13
+  5c:	913030        	srl	a3, a3
+  5f:	002886        	j	105 <decode_map+0x105>	5f: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  62:	0298      	l32i.n	a9, a2, 0
+  64:	0219e6        	bgei	a9, 1, 6a <decode_map+0x6a>	64: R_XTENSA_SLOT0_OP	.text.decode_map+0x6a
+  67:	002686        	j	105 <decode_map+0x105>	67: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  6a:	e288      	l32i.n	a8, a2, 56
+  6c:	401b00        	ssl	a11
+  6f:	a1b900        	sll	a11, a9
+  72:	fccbb2        	addi	a11, a11, -4
+  75:	1e0c      	movi.n	a14, 1
+  77:	401800        	ssl	a8
+  7a:	a1ee00        	sll	a14, a14
+  7d:	41b2b0        	srli	a11, a11, 2
+  80:	f2d8      	l32i.n	a13, a2, 60
+  82:	ee0b      	addi.n	a14, a14, -1
+  84:	04cd      	mov.n	a12, a4
+  86:	01cbb2        	addi	a11, a11, 1
+  89:	238b76        	loop	a11, b0 <decode_map+0xb0>	89: R_XTENSA_SLOT0_OP	.text.decode_map+0xb0
+  8c:	d2f8      	l32i.n	a15, a2, 52
+  8e:	108e30        	and	a8, a14, a3
+  91:	860c      	movi.n	a6, 8
+  93:	9078d0        	addx2	a7, a8, a13
+  96:	8d8a      	add.n	a8, a13, a8
+  98:	0526f7        	blt	a6, a15, a1 <decode_map+0xa1>	98: R_XTENSA_SLOT0_OP	.text.decode_map+0xa1
+  9b:	000882        	l8ui	a8, a8, 0
+  9e:	000086        	j	a4 <decode_map+0xa4>	9e: R_XTENSA_SLOT0_OP	.text.decode_map+0xa4
+  a1:	001782        	l16ui	a8, a7, 0
+  a4:	0c89      	s32i.n	a8, a12, 0
+  a6:	e288      	l32i.n	a8, a2, 56
+  a8:	cc4b      	addi.n	a12, a12, 4
+  aa:	400800        	ssr	a8
+  ad:	913030        	srl	a3, a3
+  b0:	001446        	j	105 <decode_map+0x105>	b0: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  b3:	00          	.byte	00
+  b4:	e288      	l32i.n	a8, a2, 56
+  b6:	f2b8      	l32i.n	a11, a2, 60
+  b8:	823380        	mull	a3, a3, a8
+  bb:	d288      	l32i.n	a8, a2, 52
+  bd:	9033b0        	addx2	a3, a3, a11
+  c0:	8b0c      	movi.n	a11, 8
+  c2:	0298      	l32i.n	a9, a2, 0
+  c4:	05ab87        	bge	a11, a8, cd <decode_map+0xcd>	c4: R_XTENSA_SLOT0_OP	.text.decode_map+0xcd
+  c7:	2219e6        	bgei	a9, 1, ed <decode_map+0xed>	c7: R_XTENSA_SLOT0_OP	.text.decode_map+0xed
+  ca:	000dc6        	j	105 <decode_map+0x105>	ca: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  cd:	3419a6        	blti	a9, 1, 105 <decode_map+0x105>	cd: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  d0:	1189e0        	slli	a8, a9, 2
+  d3:	fcc882        	addi	a8, a8, -4
+  d6:	418280        	srli	a8, a8, 2
+  d9:	04bd      	mov.n	a11, a4
+  db:	881b      	addi.n	a8, a8, 1
+  dd:	088876        	loop	a8, e9 <decode_map+0xe9>	dd: R_XTENSA_SLOT0_OP	.text.decode_map+0xe9
+  e0:	0003c2        	l8ui	a12, a3, 0
+  e3:	331b      	addi.n	a3, a3, 1
+  e5:	0bc9      	s32i.n	a12, a11, 0
+  e7:	bb4b      	addi.n	a11, a11, 4
+  e9:	000606        	j	105 <decode_map+0x105>	e9: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  ec:	00          	.byte	00
+  ed:	899a      	add.n	a8, a9, a9
+  ef:	fec882        	addi	a8, a8, -2
+  f2:	418180        	srli	a8, a8, 1
+  f5:	04bd      	mov.n	a11, a4
+  f7:	881b      	addi.n	a8, a8, 1
+  f9:	088876        	loop	a8, 105 <decode_map+0x105>	f9: R_XTENSA_SLOT0_OP	.text.decode_map+0x105
+  fc:	0013c2        	l16ui	a12, a3, 0
+  ff:	332b      	addi.n	a3, a3, 2
+ 101:	0bc9      	s32i.n	a12, a11, 0
+ 103:	bb4b      	addi.n	a11, a11, 4
+ 105:	9288      	l32i.n	a8, a2, 36
+ 107:	b2d8      	l32i.n	a13, a2, 44
+ 109:	c0b580        	sub	a11, a5, a8
+ 10c:	82c8      	l32i.n	a12, a2, 32
+ 10e:	c0f5d0        	sub	a15, a5, a13
+ 111:	081ba6        	blti	a11, 1, 11d <decode_map+0x11d>	111: R_XTENSA_SLOT0_OP	.text.decode_map+0x11d
+ 114:	400b00        	ssr	a11
+ 117:	b1c0c0        	sra	a12, a12
+ 11a:	000206        	j	126 <decode_map+0x126>	11a: R_XTENSA_SLOT0_OP	.text.decode_map+0x126
+ 11d:	c08850        	sub	a8, a8, a5
+ 120:	401800        	ssl	a8
+ 123:	a1cc00        	sll	a12, a12
+ 126:	061fe6        	bgei	a15, 1, 130 <decode_map+0x130>	126: R_XTENSA_SLOT0_OP	.text.decode_map+0x130
+ 129:	3319e6        	bgei	a9, 1, 160 <decode_map+0x160>	129: R_XTENSA_SLOT0_OP	.text.decode_map+0x160
+ 12c:	001f06        	j	1ac <decode_map+0x1ac>	12c: R_XTENSA_SLOT0_OP	.text.decode_map+0x1ac
+ 12f:	00          	.byte	00
+ 130:	7819a6        	blti	a9, 1, 1ac <decode_map+0x1ac>	130: R_XTENSA_SLOT0_OP	.text.decode_map+0x1ac
+ 133:	11e9e0        	slli	a14, a9, 2
+ 136:	fccee2        	addi	a14, a14, -4
+ 139:	41e2e0        	srli	a14, a14, 2
+ 13c:	04dd      	mov.n	a13, a4
+ 13e:	11b9e0        	slli	a11, a9, 2
+ 141:	ee1b      	addi.n	a14, a14, 1
+ 143:	128e76        	loop	a14, 159 <decode_map+0x159>	143: R_XTENSA_SLOT0_OP	.text.decode_map+0x159
+ 146:	0d88      	l32i.n	a8, a13, 0
+ 148:	a258      	l32i.n	a5, a2, 40
+ 14a:	828850        	mull	a8, a8, a5
+ 14d:	400f00        	ssr	a15
+ 150:	b18080        	sra	a8, a8
+ 153:	88ca      	add.n	a8, a8, a12
+ 155:	0d89      	s32i.n	a8, a13, 0
+ 157:	dd4b      	addi.n	a13, a13, 4
+ 159:	c288      	l32i.n	a8, a2, 48
+ 15b:	d8ec      	bnez.n	a8, 18c <decode_map+0x18c>	15b: R_XTENSA_SLOT0_OP	.text.decode_map+0x18c
+ 15d:	0012c6        	j	1ac <decode_map+0x1ac>	15d: R_XTENSA_SLOT0_OP	.text.decode_map+0x1ac
+ 160:	11e9e0        	slli	a14, a9, 2
+ 163:	fccee2        	addi	a14, a14, -4
+ 166:	41e2e0        	srli	a14, a14, 2
+ 169:	c0fd50        	sub	a15, a13, a5
+ 16c:	11b9e0        	slli	a11, a9, 2
+ 16f:	04dd      	mov.n	a13, a4
+ 171:	ee1b      	addi.n	a14, a14, 1
+ 173:	128e76        	loop	a14, 189 <decode_map+0x189>	173: R_XTENSA_SLOT0_OP	.text.decode_map+0x189
+ 176:	0d88      	l32i.n	a8, a13, 0
+ 178:	a258      	l32i.n	a5, a2, 40
+ 17a:	828850        	mull	a8, a8, a5
+ 17d:	401f00        	ssl	a15
+ 180:	a18800        	sll	a8, a8
+ 183:	88ca      	add.n	a8, a8, a12
+ 185:	0d89      	s32i.n	a8, a13, 0
+ 187:	dd4b      	addi.n	a13, a13, 4
+ 189:	fff306        	j	159 <decode_map+0x159>	189: R_XTENSA_SLOT0_OP	.text.decode_map+0x159
+ 18c:	1c1926        	beqi	a9, 1, 1ac <decode_map+0x1ac>	18c: R_XTENSA_SLOT0_OP	.text.decode_map+0x1ac
+ 18f:	f8cbb2        	addi	a11, a11, -8
+ 192:	41b2b0        	srli	a11, a11, 2
+ 195:	0488      	l32i.n	a8, a4, 0
+ 197:	bb1b      	addi.n	a11, a11, 1
+ 199:	444b      	addi.n	a4, a4, 4
+ 19b:	078b76        	loop	a11, 1a6 <decode_map+0x1a6>	19b: R_XTENSA_SLOT0_OP	.text.decode_map+0x1a6
+ 19e:	0498      	l32i.n	a9, a4, 0
+ 1a0:	889a      	add.n	a8, a8, a9
+ 1a2:	0489      	s32i.n	a8, a4, 0
+ 1a4:	444b      	addi.n	a4, a4, 4
+ 1a6:	000086        	j	1ac <decode_map+0x1ac>	1a6: R_XTENSA_SLOT0_OP	.text.decode_map+0x1ac
+ 1a9:	00          	.byte	00
+ 1aa:	fa7c      	movi.n	a10, -1
+ 1ac:	0a2d      	mov.n	a2, a10
+ 1ae:	f01d      	retw.n
+

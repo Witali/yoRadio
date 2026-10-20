@@ -1,0 +1,155 @@
+tool-output/esp32c3-libesp_audio_codec-642-info.c.obj-disasm.txt:318
+Disassembly of section .text.vorbis_info_clear:
+
+00000000 <vorbis_info_clear>:
+   0:	1101                	addi	sp,sp,-32
+   2:	cc22                	sw	s0,24(sp)
+   4:	4d40                	lw	s0,28(a0)
+   6:	c64e                	sw	s3,12(sp)
+   8:	ce06                	sw	ra,28(sp)
+   a:	89aa                	mv	s3,a0
+   c:	cc6d                	beqz	s0,106 <.L61>	c: R_RISCV_RVC_BRANCH	.L61
+   e:	4c48                	lw	a0,28(s0)
+  10:	ca26                	sw	s1,20(sp)
+  12:	c84a                	sw	s2,16(sp)
+  14:	c509                	beqz	a0,1e <.L62>	14: R_RISCV_RVC_BRANCH	.L62
+  16:	00000097          	auipc	ra,0x0	16: R_RISCV_CALL_PLT	media_lib_free
+	16: R_RISCV_RELAX	*ABS*
+  1a:	000080e7          	jalr	ra # 16 <vorbis_info_clear+0x16>
+
+0000001e <.L62>:
+  1e:	5008                	lw	a0,32(s0)
+  20:	c50d                	beqz	a0,4a <.L63>	20: R_RISCV_RVC_BRANCH	.L63
+  22:	445c                	lw	a5,12(s0)
+  24:	00f05f63          	blez	a5,42 <.L64>	24: R_RISCV_BRANCH	.L64
+  28:	4901                	li	s2,0
+  2a:	4481                	li	s1,0
+
+0000002c <.L65>:
+  2c:	954a                	add	a0,a0,s2
+  2e:	00000097          	auipc	ra,0x0	2e: R_RISCV_CALL_PLT	mapping_clear_info
+	2e: R_RISCV_RELAX	*ABS*
+  32:	000080e7          	jalr	ra # 2e <.L65+0x2>
+  36:	445c                	lw	a5,12(s0)
+  38:	0485                	addi	s1,s1,1
+  3a:	5008                	lw	a0,32(s0)
+  3c:	0951                	addi	s2,s2,20
+  3e:	fef4c7e3          	blt	s1,a5,2c <.L65>	3e: R_RISCV_BRANCH	.L65
+
+00000042 <.L64>:
+  42:	00000097          	auipc	ra,0x0	42: R_RISCV_CALL_PLT	media_lib_free
+	42: R_RISCV_RELAX	*ABS*
+  46:	000080e7          	jalr	ra # 42 <.L64>
+
+0000004a <.L63>:
+  4a:	5408                	lw	a0,40(s0)
+  4c:	c931                	beqz	a0,a0 <.L66>	4c: R_RISCV_RVC_BRANCH	.L66
+  4e:	481c                	lw	a5,16(s0)
+  50:	02f05f63          	blez	a5,8e <.L67>	50: R_RISCV_BRANCH	.L67
+  54:	4481                	li	s1,0
+  56:	a811                	j	6a <.L70>	56: R_RISCV_RVC_JUMP	.L70
+
+00000058 <.L100>:
+  58:	00000097          	auipc	ra,0x0	58: R_RISCV_CALL_PLT	floor1_free_info
+	58: R_RISCV_RELAX	*ABS*
+  5c:	000080e7          	jalr	ra # 58 <.L100>
+  60:	481c                	lw	a5,16(s0)
+  62:	0485                	addi	s1,s1,1
+  64:	5408                	lw	a0,40(s0)
+  66:	02f4d463          	bge	s1,a5,8e <.L67>	66: R_RISCV_BRANCH	.L67
+
+0000006a <.L70>:
+  6a:	505c                	lw	a5,36(s0)
+  6c:	00249713          	slli	a4,s1,0x2
+  70:	953a                	add	a0,a0,a4
+  72:	97a6                	add	a5,a5,s1
+  74:	0007c783          	lbu	a5,0(a5)
+  78:	4108                	lw	a0,0(a0)
+  7a:	fff9                	bnez	a5,58 <.L100>	7a: R_RISCV_RVC_BRANCH	.L100
+  7c:	00000097          	auipc	ra,0x0	7c: R_RISCV_CALL_PLT	floor0_free_info
+	7c: R_RISCV_RELAX	*ABS*
+  80:	000080e7          	jalr	ra # 7c <.L70+0x12>
+  84:	481c                	lw	a5,16(s0)
+  86:	0485                	addi	s1,s1,1
+  88:	5408                	lw	a0,40(s0)
+  8a:	fef4c0e3          	blt	s1,a5,6a <.L70>	8a: R_RISCV_BRANCH	.L70
+
+0000008e <.L67>:
+  8e:	00000097          	auipc	ra,0x0	8e: R_RISCV_CALL_PLT	media_lib_free
+	8e: R_RISCV_RELAX	*ABS*
+  92:	000080e7          	jalr	ra # 8e <.L67>
+  96:	5048                	lw	a0,36(s0)
+  98:	00000097          	auipc	ra,0x0	98: R_RISCV_CALL_PLT	media_lib_free
+	98: R_RISCV_RELAX	*ABS*
+  9c:	000080e7          	jalr	ra # 98 <.L67+0xa>
+
+000000a0 <.L66>:
+  a0:	5448                	lw	a0,44(s0)
+  a2:	c50d                	beqz	a0,cc <.L71>	a2: R_RISCV_RVC_BRANCH	.L71
+  a4:	485c                	lw	a5,20(s0)
+  a6:	00f05f63          	blez	a5,c4 <.L72>	a6: R_RISCV_BRANCH	.L72
+  aa:	4901                	li	s2,0
+  ac:	4481                	li	s1,0
+
+000000ae <.L73>:
+  ae:	954a                	add	a0,a0,s2
+  b0:	00000097          	auipc	ra,0x0	b0: R_RISCV_CALL_PLT	res_clear_info
+	b0: R_RISCV_RELAX	*ABS*
+  b4:	000080e7          	jalr	ra # b0 <.L73+0x2>
+  b8:	485c                	lw	a5,20(s0)
+  ba:	0485                	addi	s1,s1,1
+  bc:	5448                	lw	a0,44(s0)
+  be:	0971                	addi	s2,s2,28
+  c0:	fef4c7e3          	blt	s1,a5,ae <.L73>	c0: R_RISCV_BRANCH	.L73
+
+000000c4 <.L72>:
+  c4:	00000097          	auipc	ra,0x0	c4: R_RISCV_CALL_PLT	media_lib_free
+	c4: R_RISCV_RELAX	*ABS*
+  c8:	000080e7          	jalr	ra # c4 <.L72>
+
+000000cc <.L71>:
+  cc:	5808                	lw	a0,48(s0)
+  ce:	c50d                	beqz	a0,f8 <.L74>	ce: R_RISCV_RVC_BRANCH	.L74
+  d0:	4c1c                	lw	a5,24(s0)
+  d2:	00f05f63          	blez	a5,f0 <.L75>	d2: R_RISCV_BRANCH	.L75
+  d6:	4481                	li	s1,0
+
+000000d8 <.L76>:
+  d8:	00649793          	slli	a5,s1,0x6
+  dc:	953e                	add	a0,a0,a5
+  de:	00000097          	auipc	ra,0x0	de: R_RISCV_CALL_PLT	vorbis_book_clear
+	de: R_RISCV_RELAX	*ABS*
+  e2:	000080e7          	jalr	ra # de <.L76+0x6>
+  e6:	4c1c                	lw	a5,24(s0)
+  e8:	0485                	addi	s1,s1,1
+  ea:	5808                	lw	a0,48(s0)
+  ec:	fef4c6e3          	blt	s1,a5,d8 <.L76>	ec: R_RISCV_BRANCH	.L76
+
+000000f0 <.L75>:
+  f0:	00000097          	auipc	ra,0x0	f0: R_RISCV_CALL_PLT	media_lib_free
+	f0: R_RISCV_RELAX	*ABS*
+  f4:	000080e7          	jalr	ra # f0 <.L75>
+
+000000f8 <.L74>:
+  f8:	8522                	mv	a0,s0
+  fa:	00000097          	auipc	ra,0x0	fa: R_RISCV_CALL_PLT	media_lib_free
+	fa: R_RISCV_RELAX	*ABS*
+  fe:	000080e7          	jalr	ra # fa <.L74+0x2>
+ 102:	44d2                	lw	s1,20(sp)
+ 104:	4942                	lw	s2,16(sp)
+
+00000106 <.L61>:
+ 106:	0009a023          	sw	zero,0(s3)
+ 10a:	0009a223          	sw	zero,4(s3)
+ 10e:	0009a423          	sw	zero,8(s3)
+ 112:	0009a623          	sw	zero,12(s3)
+ 116:	0009a823          	sw	zero,16(s3)
+ 11a:	0009aa23          	sw	zero,20(s3)
+ 11e:	0009ac23          	sw	zero,24(s3)
+ 122:	0009ae23          	sw	zero,28(s3)
+ 126:	40f2                	lw	ra,28(sp)
+ 128:	4462                	lw	s0,24(sp)
+ 12a:	49b2                	lw	s3,12(sp)
+ 12c:	6105                	addi	sp,sp,32
+ 12e:	8082                	ret
+

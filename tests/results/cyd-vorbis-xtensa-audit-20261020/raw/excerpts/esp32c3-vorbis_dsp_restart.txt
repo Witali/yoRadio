@@ -1,0 +1,27 @@
+tool-output/esp32c3-libesp_audio_codec-637-dsp.c.obj-disasm.txt:89
+Disassembly of section .text.vorbis_dsp_restart:
+
+00000000 <vorbis_dsp_restart>:
+   0:	c115                	beqz	a0,24 <.L18>	0: R_RISCV_RVC_BRANCH	.L18
+   2:	411c                	lw	a5,0(a0)
+   4:	c385                	beqz	a5,24 <.L18>	4: R_RISCV_RVC_BRANCH	.L18
+   6:	4fdc                	lw	a5,28(a5)
+   8:	cf91                	beqz	a5,24 <.L18>	8: R_RISCV_RVC_BRANCH	.L18
+   a:	577d                	li	a4,-1
+   c:	57fd                	li	a5,-1
+   e:	56fd                	li	a3,-1
+  10:	d514                	sw	a3,40(a0)
+  12:	d154                	sw	a3,36(a0)
+  14:	dd18                	sw	a4,56(a0)
+  16:	dd5c                	sw	a5,60(a0)
+  18:	c138                	sw	a4,64(a0)
+  1a:	c17c                	sw	a5,68(a0)
+  1c:	c538                	sw	a4,72(a0)
+  1e:	c57c                	sw	a5,76(a0)
+  20:	4501                	li	a0,0
+  22:	8082                	ret
+
+00000024 <.L18>:
+  24:	557d                	li	a0,-1
+  26:	8082                	ret
+

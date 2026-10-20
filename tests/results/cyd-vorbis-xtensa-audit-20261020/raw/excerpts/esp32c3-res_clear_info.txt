@@ -1,0 +1,40 @@
+tool-output/esp32c3-libesp_audio_codec-647-res012.c.obj-disasm.txt:5
+Disassembly of section .text.res_clear_info:
+
+00000000 <res_clear_info>:
+   0:	c529                	beqz	a0,4a <.L15>	0: R_RISCV_RVC_BRANCH	.L15
+   2:	87aa                	mv	a5,a0
+   4:	4148                	lw	a0,4(a0)
+   6:	1101                	addi	sp,sp,-32
+   8:	ce06                	sw	ra,28(sp)
+   a:	c519                	beqz	a0,18 <.L3>	a: R_RISCV_RVC_BRANCH	.L3
+   c:	c63e                	sw	a5,12(sp)
+   e:	00000097          	auipc	ra,0x0	e: R_RISCV_CALL_PLT	media_lib_free
+	e: R_RISCV_RELAX	*ABS*
+  12:	000080e7          	jalr	ra # e <res_clear_info+0xe>
+  16:	47b2                	lw	a5,12(sp)
+
+00000018 <.L3>:
+  18:	4788                	lw	a0,8(a5)
+  1a:	c519                	beqz	a0,28 <.L4>	1a: R_RISCV_RVC_BRANCH	.L4
+  1c:	c63e                	sw	a5,12(sp)
+  1e:	00000097          	auipc	ra,0x0	1e: R_RISCV_CALL_PLT	media_lib_free
+	1e: R_RISCV_RELAX	*ABS*
+  22:	000080e7          	jalr	ra # 1e <.L3+0x6>
+  26:	47b2                	lw	a5,12(sp)
+
+00000028 <.L4>:
+  28:	0007a023          	sw	zero,0(a5)
+  2c:	0007a223          	sw	zero,4(a5)
+  30:	0007a423          	sw	zero,8(a5)
+  34:	0007a623          	sw	zero,12(a5)
+  38:	0007a823          	sw	zero,16(a5)
+  3c:	0007aa23          	sw	zero,20(a5)
+  40:	0007ac23          	sw	zero,24(a5)
+  44:	40f2                	lw	ra,28(sp)
+  46:	6105                	addi	sp,sp,32
+  48:	8082                	ret
+
+0000004a <.L15>:
+  4a:	8082                	ret
+
