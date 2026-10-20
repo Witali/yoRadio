@@ -96,6 +96,22 @@ contract различать unsupported mode, malformed/truncated input, RAM/scr
 все файлы этого coding mode невозможны. Нужны отдельные tests точной причины и
 отсутствия опубликованного частичного cache. Новый контракт ещё не включён в UI.
 
+Coefficient checkpoint20Oct по запросу уменьшить объём: codec/jpeg_coefficients
+сохраняет DC two's-complement, AC sign/magnitude, complement both(zeroFF).
+Exact signed16 bijection/INT16_MIN reserved negativezero. Pinned direct progressive
+JBLOCK path, other backings raw.256byte buffer, same4KiB cache,15byte first-use
+bitmap. Prepare FF once per sector/job, preserve initialized adjacent-file bytes;
+reset bitmap on next job, keep physical flash. RichCMYK12 program3780608→2582784,
+erase923→113; scratch460800/pool42275 прежние. FlatCMYK program460800→2048, но
+erase0→113: не universal wear gain.19726488native assertions/4194304value-position
+cases/983040refinements,7pure+4integration compiled mutants;18traffic cases,
+standard JPEG matrix,1227logical+1573physical recoveries pass. RV32converter234code/
+frame0/static0, не target execution/full app memory. Proof jpeg-coefficients-
+validation-20261020.json; tests/JPEG_COEFFICIENTS.md. Main3E03/TJpgd/probe6cb
+unchanged;6artifact/10map controls, SDK/H10 readonly. Следом precise error/resource
+preflight и actual native source/upload/journal/cache/codec integration; весь план
+сохраняется активным.
+
 ## Независимость проверок подсистем — 2026-10-18
 
 ## План улучшений форматов изображений — 2026-10-19

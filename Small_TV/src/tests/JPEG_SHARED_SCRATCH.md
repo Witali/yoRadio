@@ -1,5 +1,9 @@
 # Общее временное хранилище JPEG
 
+Следующий checkpoint сохраняет этот storage contract, меняя representation
+временных коэффициентов для сокращения flash-записей. Ниже сохранены исходные
+raw-backing измерения; новые A/B результаты и tradeoffs — [JPEG_COEFFICIENTS](JPEG_COEFFICIENTS.md).
+
 Checkpoint 2026-10-20. `storage/jpeg_scratch.c/.h` и настоящий libjpeg проверены
 совместно на host с NOR core. Это **не включение libjpeg в рабочую UI прошивку**:
 app `3e030c1c…` по-прежнему использует TJpgd. Предыдущая standalone target probe

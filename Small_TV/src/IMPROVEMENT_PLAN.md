@@ -67,6 +67,11 @@ main app3E03/TJpgd не менялась. [Результаты](tests/JPEG_TRAN
 16432native assertions/13mutants и RV32 object1240/handle576/frame48 измерены.
 Трафик richCMYK12 —3780608program bytes/923erases на один tested240×240decode;
 это не production limits или endurance. [Результаты](tests/JPEG_SHARED_SCRATCH.md).
+По запросу уменьшить трафик добавлен reversible coefficient converter и first-use
+sector initialization. На same-executable raw/packed richCMYK12 program3780608→
+2582784(-31.68%), erase923→113(-87.76%); capacity/pool peak прежние. Flat tradeoff
+учтён.19726488native assertions/11compiled mutants, actual codec/fault gates pass;
+это пока host, не native UI. [Результаты](tests/JPEG_COEFFICIENTS.md).
 Далее — расширить sampling/capacity bounds, выбрать budgets; invalidation/source
 hash в upload/cache workflow, matching assets build/deployment с сохранением photos/settings.
 Полный HTTP/power-loss workflow и native UI decoder integration ещё открыты.

@@ -65,7 +65,8 @@ def main():
     build_inputs = {name: sha(HERE / name) for name in input_names}
     if args.nor_fixtures:
         for name in ("../jpeg_scratch/probe_backing_nor.c", "../jpeg_scratch/nor_model.c", "../jpeg_scratch/nor_model.h",
-                     "../../storage/jpeg_scratch.c", "../../storage/jpeg_scratch.h", "../../storage/jpeg_nor.c", "../../storage/jpeg_nor.h"):
+                     "../../storage/jpeg_scratch.c", "../../storage/jpeg_scratch.h", "../../storage/jpeg_nor.c", "../../storage/jpeg_nor.h",
+                     "../../codec/jpeg_coefficients.c", "../../codec/jpeg_coefficients.h"):
             build_inputs[name] = sha(HERE/name)
     fixture_inputs = {str(p.resolve()): sha(p) for p in (args.nor_fixtures/'scratch_fixture.h',args.nor_fixtures/'plan.json')} if args.nor_fixtures else {}
     source = args.source.resolve()

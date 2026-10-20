@@ -1,5 +1,9 @@
 # Квалификация библиотеки JPEG для Small TV
 
+Позднейший checkpoint2026-10-20 сокращает physical write traffic через обратимое
+хранение DC/AC и first-use initialization, сохраняя pixels/capacity. Измерены также
+flat tradeoffs; native UI ещё TJpgd. См. [JPEG_COEFFICIENTS.md](../JPEG_COEFFICIENTS.md).
+
 Checkpoint2026-10-20: добавлен выбираемый shared NOR backend, отдельный от
 прежнего stdio oracle и общего pool allocator. Actual codec/NOR matrix и
 2238partial physical failure recoveries прошли; production UI decoder пока

@@ -41,6 +41,8 @@ NOR/HTTP/LCD или полный/суточный прогон будущей fi
 Actual libjpeg с одним общим NOR scratch проверен отдельной матрицей pixels,
 logical faults и 2238 partial physical error recoveries. Это host execution,
 не target UI integration. См. [JPEG_SHARED_SCRATCH.md](JPEG_SHARED_SCRATCH.md).
+Сокращение actual NOR traffic через reversible DC/AC temporary encoding, flat
+tradeoffs и независимые pixel/fault gates: [JPEG_COEFFICIENTS.md](JPEG_COEFFICIENTS.md).
 
 Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
 для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write

@@ -3658,3 +3658,44 @@ deployment, затем native codec link/HTTP/LCD/full/24h/hardware acceptance.
 unsupported, invalid/truncated, RAM/scratch limit и I/O не смешивать; required/
 available для resource limit, без публикации partial cache. Это следующий
 контракт интеграции; текущий checkpoint не объявляет его уже реализованным в UI.
+
+## 2026-10-20 — сокращение JPEG NOR traffic без потери коэффициентов
+
+Предыдущий goal turn — progress: focused commit1261d1444. Продолжение прочитало
+clean worktree и native/параметры jmemmgr. Планировался error/resource preflight;
+пользователь спросил, можно ли уменьшить объём записей. Выполнена эта оптимизация,
+preflight остаётся следующим шагом, весь IMPROVEMENT_PLAN активен.
+
+Новый отдельный codec/jpeg_coefficients converter: DC complement two's-complement,
+AC complement sign/magnitude, INT16_MIN через reserved negative-zero. All65536values
+обратимы, включая invalid intermediate data. Correct successive DC/AC refinements
+программируют1→0; DC нельзя трактовать как AC.256byte conversion buffer, прежние
+4KiB cache и scratch capacity. Selected pinned direct progressive non-quantized
+JBLOCK path; другие backings raw. Host environment0/1 для same-executable A/B.
+
+Initial pack-only prototype улучшил richCMYK12 program3780608→3041536/erase923→225.
+Найдены лишние первые RMW при восстановлении uninitialized old bytes. Final
+15byte bitmap готовит каждый113sector лишь раз/job с logicalFF через тот же
+cache/buffer; соседние valid bytes потом не очищаются. Reset bitmap после abort,
+physical flash сохраняется. Checkpoints/I/O failures распространяются; actual
+short transfers затрагивают partial data. Final program2582784(-31.68%), erase113
+(-87.76%), read16850432→13532672/calls61729→49114; pool42275/scratch460800 те же.
+Flat tradeoff честно измерен: CMYK program460800→2048, erase0→113. Это не universal
+wear/timing improvement, whole RAM или включение нового codec в UI.
+
+Native19726488assertions/4194304value-position cases/983040independent refinement
+steps pass;7pure mutants+4compiled integration mutants caught by exact pixels or
+repeated erase in first/reused job.18traffic cases(14rich/4flat), 25resources/
+924lossless/16invalid/4optional/18budget,38912tables/48rich12bit/12truncated и
+18Pillow independent images pass.1227logical errors/36damaged recoveries/12format
+transitions;1573physical partial errors(all1345small,4full-size по57sampled) pass,
+same object/partial flash/exact recovery pixels, no leaked stores/pool. Silent
+arbitrary read corruption не заявляется. RV32converter234code/static0/frame0,
+не target runtime или full app link. Intermediate versions сохранены отдельно.
+
+6artifact/10map controls pass. Main3E03/TJpgd/probe6cb unchanged. SDK tracked clean,
+frozen47files и6oldH10 original owners readonly-verified, no QMP/RSP/device actions.
+Proof qemu/parity/jpeg-coefficients-validation-20261020.json. Далее precise
+unsupported/invalid/resource/I/O errors и preflight с required/available, expanded
+sampling/capacity, actual native upload/source/journal/cache/codec integration
+и target link/heap/stack/time/HTTP/LCD/full/24h/hardware. Не объявлять цель закрытой.

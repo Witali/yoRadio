@@ -6,6 +6,7 @@
 #include "probe_backing.h"
 #include "probe_faults.h"
 #include "jpeg_scratch.h"
+#include "jpeg_coefficients.h"
 #include "nor_model.h"
 #include "scratch_fixture.h"
 #include <assert.h>
@@ -14,14 +15,18 @@
 static probe_memory_stats *stats;
 static jpeg_nor_t nor;
 static jpeg_scratch_t scratch;
-static struct {backing_store_ptr owner;jpeg_scratch_file_t file;long bytes;} files[16];
-static bool model_started;
+static struct {backing_store_ptr owner;jpeg_scratch_file_t file;long bytes;bool packed;} files[16];
+static bool model_started,packing_enabled;
+static uint8_t fresh_sectors[((SCRATCH_LOGICAL_BYTES+4095u)/4096u+7u)/8u];
+_Static_assert(sizeof(JCOEF)==sizeof(int16_t),"The pinned coefficient ABI must be signed16");
 
 void probe_backing_reset(probe_memory_stats *current)
 {
     /* The model retains physical bytes; reset accounting only for a new harness run. */
     for(unsigned i=0;i<16;++i)REQUIRE(!files[i].owner);
     jpeg_scratch_abort(&scratch);stats=current;model_started=false;memset(files,0,sizeof(files));
+    /* Host comparison switch only; no firmware environment/configuration API. */
+    const char *setting=getenv("SMALL_TV_COEFF_PACKING");packing_enabled=!setting || strcmp(setting,"0");
 }
 
 void probe_backing_snapshot(probe_memory_stats *current)
@@ -50,6 +55,7 @@ static void start_store(j_common_ptr cinfo)
     if(jpeg_nor_open(&nor,&device,scratch_extents,SCRATCH_EXTENT_COUNT,SCRATCH_LOGICAL_BYTES,
                      scratch_extents,SCRATCH_EXTENT_COUNT)!=JPEG_NOR_OK ||
         jpeg_scratch_open(&scratch,&nor,scratch_model_check,NULL)!=JPEG_SCRATCH_OK)ERREXIT(cinfo,JERR_NO_BACKING_STORE);
+    memset(fresh_sectors,0,sizeof(fresh_sectors));
 }
 
 static unsigned find_file(j_common_ptr cinfo,backing_store_ptr info,long offset,long count)
@@ -60,13 +66,71 @@ static unsigned find_file(j_common_ptr cinfo,backing_store_ptr info,long offset,
     ERREXIT(cinfo,JERR_TFILE_SEEK);return 0;
 }
 
+static jpeg_scratch_result_t prepare_fresh(unsigned slot,uint32_t offset,size_t bytes,uint8_t buffer[256])
+{
+    /* REQUESTED_CHANGE: a new job has no initialized temp bytes. Fill each sector
+     * with logicalFF before its first packed write, using the existing cache and
+     * conversion buffer. Do not restore obsolete uninitialized bytes on erase:
+     * otherwise the next coefficient row would erase the same sector again.
+     * One15-byte bitmap covers the current113sectors; never clear a sector twice
+     * in a job, since other files can already own valid bytes in that sector. */
+    for(unsigned i=0;i<16;++i)REQUIRE(!files[i].owner || files[i].packed);
+    uint32_t start=scratch.files[files[slot].file.slot].offset+offset;
+    uint32_t last=(start+(uint32_t)bytes-1u)/4096u;
+    for(uint32_t sector=start/4096u;sector<=last;++sector) {
+        unsigned mask=1u<<(sector%8u);
+        if(fresh_sectors[sector/8u]&mask)continue;
+        memset(buffer,0xff,256);
+        uint32_t base=sector*4096u,length=SCRATCH_LOGICAL_BYTES-base;
+        if(length>4096u)length=4096u;
+        for(uint32_t at=0;at<length;) {
+            if(scratch.check(scratch.check_context)){scratch.failed=true;return JPEG_SCRATCH_STOP;}
+            unsigned count=length-at;if(count>256u)count=256u;
+            scratch.last_nor_error=jpeg_nor_write(&nor,base+at,buffer,count);
+            if(scratch.last_nor_error!=JPEG_NOR_OK){scratch.failed=true;return JPEG_SCRATCH_IO;}
+            at+=count;
+        }
+        fresh_sectors[sector/8u]|=(uint8_t)mask;
+    }
+    return JPEG_SCRATCH_OK;
+}
+
+static jpeg_scratch_result_t transfer(unsigned slot,uint32_t offset,void *data,size_t bytes,bool writing)
+{
+    /* REQUESTED_CHANGE: convert at most256bytes, keeping the same single4KiB NOR
+     * cache and exact backing capacity. A short-transfer fault may end on half
+     * a coefficient: really transfer that prefix, then the caller raises fatal.
+     * The original checked request provides the extra input byte for packing. */
+    if(!files[slot].packed || !bytes)
+        return writing ? jpeg_scratch_write(&files[slot].file,offset,data,bytes) :
+                         jpeg_scratch_read(&files[slot].file,offset,data,bytes);
+    uint8_t encoded[256];uint8_t *current=data;
+    while(bytes) {
+        size_t block=bytes<sizeof(encoded) ? bytes : sizeof(encoded);
+        jpeg_scratch_result_t result;
+        if(writing) {
+            result=prepare_fresh(slot,offset,block,encoded);
+            if(result!=JPEG_SCRATCH_OK)return result;
+            REQUIRE(jpeg_coefficients_pack(encoded,current,(block+1u)&~(size_t)1u,offset));
+            result=jpeg_scratch_write(&files[slot].file,offset,encoded,block);
+        } else {
+            result=jpeg_scratch_read(&files[slot].file,offset,encoded,block);
+            if(result==JPEG_SCRATCH_OK)REQUIRE(jpeg_coefficients_unpack(current,encoded,block&~(size_t)1u,offset));
+        }
+        if(result!=JPEG_SCRATCH_OK)return result;
+        offset+=(uint32_t)block;current+=block;bytes-=block;
+    }
+    return JPEG_SCRATCH_OK;
+}
+
 static void read_store(j_common_ptr cinfo,backing_store_ptr info,void *data,long offset,long count)
 {
     /* Initialized-prefix enforcement detects unexpected real virtual-array traces. */
     unsigned slot=find_file(cinfo,info,offset,count);
+    if(files[slot].packed && ((unsigned long)offset%128u || (unsigned long)count%128u))ERREXIT(cinfo,JERR_TFILE_SEEK);
     if(probe_fault_visit(PROBE_FAULT_SEEK))ERREXIT(cinfo,JERR_TFILE_SEEK);
     size_t wanted=(size_t)count,request=probe_fault_visit(PROBE_FAULT_READ)&&wanted ? wanted-1 : wanted;
-    jpeg_scratch_result_t result=jpeg_scratch_read(&files[slot].file,(uint32_t)offset,data,request);
+    jpeg_scratch_result_t result=transfer(slot,(uint32_t)offset,data,request,false);
     if(result!=JPEG_SCRATCH_OK){stats->scratch_error=(unsigned)result;ERREXIT(cinfo,JERR_TFILE_READ);}
     stats->bytes_read+=request;if(request!=wanted)ERREXIT(cinfo,JERR_TFILE_READ);
 }
@@ -75,9 +139,10 @@ static void write_store(j_common_ptr cinfo,backing_store_ptr info,void *data,lon
 {
     /* One shared cache handles interleaved component arrays and boundary sectors. */
     unsigned slot=find_file(cinfo,info,offset,count);
+    if(files[slot].packed && ((unsigned long)offset%128u || (unsigned long)count%128u))ERREXIT(cinfo,JERR_TFILE_SEEK);
     if(probe_fault_visit(PROBE_FAULT_SEEK))ERREXIT(cinfo,JERR_TFILE_SEEK);
     size_t wanted=(size_t)count,request=probe_fault_visit(PROBE_FAULT_WRITE)&&wanted ? wanted-1 : wanted;
-    jpeg_scratch_result_t result=jpeg_scratch_write(&files[slot].file,(uint32_t)offset,data,request);
+    jpeg_scratch_result_t result=transfer(slot,(uint32_t)offset,data,request,true);
     if(result!=JPEG_SCRATCH_OK){stats->scratch_error=(unsigned)result;ERREXIT(cinfo,JERR_TFILE_WRITE);}
     stats->bytes_written+=request;if(request!=wanted)ERREXIT(cinfo,JERR_TFILE_WRITE);
 }
@@ -105,6 +170,13 @@ GLOBAL(void) jpeg_open_backing_store(j_common_ptr cinfo,backing_store_ptr info,l
     jpeg_scratch_result_t result=jpeg_scratch_allocate(&scratch,(uint32_t)bytes,&files[slot].file);
     if(result!=JPEG_SCRATCH_OK){stats->scratch_error=(unsigned)result;ERREXIT(cinfo,JERR_NO_BACKING_STORE);}
     files[slot].owner=info;files[slot].bytes=bytes;info->temp_file=NULL;
+    /* Pinned jdmaster/jdcoefct: direct progressive output without quantizer,
+     * buffered-image or raw-data requests only virtual JBLOCK arrays. Other
+     * paths retain raw backing, including lossless sample arrays/quantization. */
+    j_decompress_ptr decoder=(j_decompress_ptr)cinfo;
+    files[slot].packed=packing_enabled && cinfo->is_decompressor && decoder->progressive_mode &&
+        !decoder->quantize_colors && !decoder->buffered_image && !decoder->raw_data_out;
+    if(files[slot].packed)REQUIRE(bytes%128==0);
     info->read_backing_store=read_store;info->write_backing_store=write_store;info->close_backing_store=close_store;
     ++stats->stores_opened;stats->backing_capacity+=(unsigned long long)bytes;
 }

@@ -46,6 +46,9 @@ journal проверен отдельно на host. Собственные [NOR
 [target transport](../tests/JPEG_TRANSPORT.md) и
 [shared scratch](../tests/JPEG_SHARED_SCRATCH.md) хранят отдельные input closures.
 Scratch/actual libjpeg пока исполнены на host NOR model, не в target UI.
+Prepared codec/jpeg_coefficients — converter temporary JCOEF storage, не новая
+factory function или новый формат input JPEG; он также ещё вне UI inventory.
+Exact pixels/traffic/error evidence: [JPEG_COEFFICIENTS](../tests/JPEG_COEFFICIENTS.md).
 При native UI integration их нужно включить в source inventory/сборочные inputs.
 Это REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 
