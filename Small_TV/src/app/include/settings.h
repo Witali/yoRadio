@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "esp_err.h"
 #include "board.h"
+#include "color_convert.h"
 /* The factory raw sector reserves 20 bytes, including NUL, for regional keys. */
 #define TV_COUNTRY_BYTES 20
 #define TV_SETTINGS_VERSION 2
@@ -27,5 +28,3 @@ esp_err_t settings_flush(void);
 uint32_t settings_generation(void);
 bool settings_valid(const tv_settings_t *s);
 bool settings_country_valid(const char country[TV_COUNTRY_BYTES]);
-uint16_t rgb565_from_rgb888(uint32_t rgb);
-uint32_t rgb888_from_rgb565(uint16_t rgb);

@@ -3288,3 +3288,33 @@ true. Это только начало нового прогона, не 24 ча
 - Production app B50D, frozen ELF/resources/SDK/full/H10 не менялись. На10:05UTC
   H10 supervisor сообщает100cycles, cleanup[]; terminal acceptance ещё нет.
   NOR backing/износ, RGB565, final app link и hardware gates остаются открытыми.
+
+## 2026-10-20 — отдельный модуль цветов и RGB5652–16-bit qualification
+
+- RGB888↔RGB565 helpers перенесены из settings.c в app/media/color_convert.c,
+  общий header подключён через settings.h без изменения callers. Pure row API
+  gray/RGB/CMYK2…16бит использует caller buffers, явную CMYK polarity, native
+  samples и display-owned SPI byte order. Проверяются range/size/address wrap/
+  overlap до output writes; нет heap/float/I/O. Gray и8-bit path сокращают работу,
+  black component читается один раз наpixel. CMYK generic, не ICC transform.
+- Literal factory helpers сверены по manifest bytes:65536expand/3304pack,
+  без LCD/format adapters.61host rows/549676samples и141actual RV32 rows exact;
+  65host+68RV32negative cases не меняют buffers, включая32-bit address wrap.
+  66realJPEG,18independent Pillow RGB565 cases pass. RV32 standalone540code+
+  4read-only bytes, frame96, no unresolved stubs. Row API ещё не вызывается app.
+- Полная DEBUGoff сборка C8FD1170032bytes, app partition1536000; ELF368AB7B5,
+  sourceE34BEBEB. Saved development app/bootloader/manifest. СтарыйTJpgd остаётся,
+  новая libjpeg не включена.5531native checks повторены на окончательных sources.
+- Scoped display gate2factory+2native cold processes: full setup pixels exact,
+  62inputs unchanged, network not_run. Отдельный network withoutLCD gate:
+  original/native HTTP и freshSNTP до/послеreset,59inputs unchanged, display
+  not_run. Все свои scoped ВМ закрыты. Первый sandbox display запуск получил
+  QMP startup timeout; original PID9856 отсутствует, failed report сохранён.
+  Retry вне sandbox —новый directory и pass. Причина timeout не установлена.
+- Proof color-conversion-validation-20261020.json сохраняет reports/raw frames,
+  synthetic fixtures и matchingELF. Full/H10 B50D в другом tree не изменены;
+  C8FD не объявляется full/24h/physical accepted. Следующие работы: codec adapter,
+  NOR temporary backing иwear policy, общий heap/stack, privacy/HTTP/LCD/full/soak.
+- Read-only OS checkpoint10:23:31UTC подтверждает все5original B50D full/H10
+  process identities; H10running149cycles/cleanup[], full безterminal footer.
+  Собственных scoped display/network ВМ больше нет. Это checkpoint, не24h pass.

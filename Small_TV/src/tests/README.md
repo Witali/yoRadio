@@ -1,5 +1,17 @@
 # Функциональные тесты Small TV ESP32-C2
 
+## Цвета и подготовка нового JPEG
+
+Pure color module имеет отдельные host/RV32 проверки grayscale/RGB/CMYK2–16бит
+и буквальное выполнение заводских RGB helpers. C8FD прошла native regression,
+отдельные cold LCD и network-without-LCD gates; новая JPEG library ещё не
+подключена. См. [COLOR_CONVERSION.md](COLOR_CONVERSION.md).
+
+Host libjpeg allocation/I/O faults и recovery после abort проверяются отдельно:
+1227инъекций,36truncated recoveries и12format transitions. См.
+[JPEG_FAULT_RECOVERY.md](JPEG_FAULT_RECOVERY.md). Эти результаты не заменяют
+NOR/HTTP/LCD или полный/суточный прогон будущей firmware.
+
 ## JPEG Huffman selectors
 
 Отдельный `jpeg_selector_oracle.py` проверяет136valid/32invalid входа с

@@ -3,7 +3,7 @@ if(NOT EXISTS "${CMAKE_BINARY_DIR}/resources/web_pages.c")
 endif()
 idf_component_register(
     SRCS app_main.c settings/settings.c settings/factory_settings.c display/st7789.c display/backlight.c
-         display/clock_ui.c display/factory_timer.c display/factory_photo.c display/factory_animation.c display/factory_fonts.c display/ui_renderer.c media/assets.c media/photo_upload.c network/wifi.c
+         display/clock_ui.c display/factory_timer.c display/factory_photo.c display/factory_animation.c display/factory_fonts.c display/ui_renderer.c media/assets.c media/photo_upload.c media/color_convert.c network/wifi.c
          network/dns.c network/dns_packet.c services/time_sync.c services/timezones.c services/weather.c services/weather_parser.c web/server.c
          web/request_body.c web/settings_api.c web/photo_api.c text/text.c
          ../third_party/tjpgd/tjpgd.c ../third_party/cjson/cJSON.c

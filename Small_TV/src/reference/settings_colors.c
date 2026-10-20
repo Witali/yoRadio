@@ -1,6 +1,7 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/settings/settings.c.
+ * Executable reconstruction: app/settings/settings.c; RGB helpers in
+ * app/media/color_convert.c.
  */
 
 // Audit label: application_review; entry: ram:42008552; name: load_settings_and_defaults_at_42008552

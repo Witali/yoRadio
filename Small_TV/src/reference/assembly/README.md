@@ -1,5 +1,13 @@
 # Factory instruction audit checkpoint
 
+Color-module checkpoint2026-10-20: the unchanged RGB helpers now live in
+`app/media/color_convert.c`. All65536RGB565 expansion inputs and3304RGB888 pack
+vectors match literal `0x42008a34`/`0x42008a6a`/`0x42008a96` bytes through Unicorn,
+with code hashes checked against this manifest and no boundary adapters used.
+The new2–16-bit row API has separate host/RV32 contracts; it is not a factory
+codec path. See `../../tests/COLOR_CONVERSION.md` and the scoped proof
+`../../../qemu/parity/color-conversion-validation-20261020.json`.
+
 AP service lifetime: `application_main_at_42008e56.asm`,
 `0x42009032..0x42009052`, checks the initialized AP flag and stays in the setup
 loop after AP initialization/display. Native `services_start` uses the actual

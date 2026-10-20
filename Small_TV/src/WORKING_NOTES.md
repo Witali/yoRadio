@@ -104,6 +104,20 @@ tests/JPEG_FAULT_RECOVERY.md; proof jpeg-library-fault-recovery-20261020.json.
 Далее RGB565 module, NOR-aware backing/износ, production link/heap/stack и
 HTTP/LCD/full/soak. Frozen baseline app/resources/SDK по-прежнему не менять.
 
+RGB565 checkpoint20Oct: `app/media/color_convert.c` отделён от settings. Прежние
+pack/expand exact factory:65536expand+3304pack actual RV32 inputs. Новый row
+API2–16-bit gray/RGB/CMYK с явной полярностью, no heap/I/O, bounded buffers и
+no-write-on-error:61host rows/549676samples,141RV32 rows,65host+68RV32negative,
+66JPEG/18Pillow cases pass.540code+4rodata, frame96byte; это scoped module.
+Row API поканеподключён, productionTJpgd остаётся. Новая compile C8FD/app1170032,
+ELF368AB7B5/sourceE34BEBEB сохранена в firmware/development веткиlibrary.
+5531native pass, отдельные LCD2factory+2native exact full frame и network
+withoutLCD HTTP/freshSNTP до/после reset pass (62/59inputs unchanged).
+Первый sandbox LCD QMP timeout сохранён failed, outside-sandbox retry отдельный.
+Детали tests/COLOR_CONVERSION.md; proof color-conversion-validation-20261020.json.
+Не переносить full/H10 B50D на C8FD. Далее libjpeg/NOR-aware scratch/износ,
+codec adapter/privacy и общий production RAM/stack, затем HTTP/LCD/full/soak.
+
 Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
 groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
 24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.

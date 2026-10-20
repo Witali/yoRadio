@@ -31,6 +31,11 @@ Host-квалификация новой JPEG-библиотеки также и
 только abort/destroy, затем проверяются recovery pixels и cleanup. Это тестовый
 стенд; production source/output/NOR failures остаются отдельной работой.
 
+`REQUESTED_CHANGE` в `color_convert_row_rgb565` обозначает расширение grayscale/
+RGB/CMYK row conversion до2–16бит. Два прежних RGB888↔RGB565 helper только
+перенесены в этот модуль и не получают метку исправления: их результаты сохранены
+и сверены с original RV32 code. Новый row API ещё не используется media decoder.
+
 ## Как ставить метку
 
 Метка находится в первом комментарии внутри исправленной функции, рядом с
