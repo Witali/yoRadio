@@ -75,6 +75,17 @@ allocation counts and performance measurements are not CYD evidence.
    maintenance, network EOF/error and stale input. Repeat full Clang after the
    source set is final and build all three output backends.
 
+## Deferred Ogg target extension
+
+The additional public Ogg EOF/reset/pending-ownership campaign is
+[explicitly deferred](CYD_VORBIS_OGG_DEFERRED_20261020.md) after an automatic
+content review stopped its agent. The already launched attempt completed SDK
+compilation but failed its observer-selection check before QEMU. No new Ogg
+runtime case or semantic control is qualified. The existing isolated raw-PCM
+bridge qualification remains unchanged; the draft is not connected to radio.
+The tooling restriction is not a confirmed firmware vulnerability and is not
+bypassed by rephrasing or replacement execution.
+
 ## Required qualification
 
 The format requirements use the primary

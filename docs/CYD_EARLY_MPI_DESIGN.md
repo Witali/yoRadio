@@ -64,7 +64,16 @@ retains the final canonical reports, exact source snapshots, independent review
 closure and an offline hash verifier. Historical prototype and initial host
 results are labelled separately from current canonical evidence.
 
-Full application exports, actual radio pre-application observation and physical
-CYD memory/boot/audio qualification remain separate gates. The minimal SDK
-fixture does not establish that the full radio firmware has the same
+The [seven full application exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md)
+now pass from clean `1190aebce`: vendor/custom FLAC across PDM, continuous DAC
+and legacy DAC, plus a disabled vendor-PDM control. The final linked ELF checks
+confirm the first `app_main` call and public acquire/release pair, unchanged
+allocator/free/reclaim ownership, task profiles and board settings. The only
+configuration delta against each matching reclaim baseline is the MPI option.
+The images are saved under `firmware/development/`; the minimum OTA headroom
+is 224912 bytes. The default remains off.
+
+Actual radio pre-application observation and physical CYD memory/boot/audio
+qualification remain separate gates. Neither static application checks nor the
+minimal SDK fixture establish that the full radio firmware has the same
 pre-application lock history or receives a useful resource benefit.

@@ -70,9 +70,15 @@ omission controls and the real-heap void-API OOM gate. Independent review found
 and closed a duplicated board constant in the initial host fixture.
 [The immutable qualification archive](../tests/results/cyd-early-mpi-20261020/README.md)
 retains the canonical reports, inputs, controls and review closure.
-Full production exports, actual radio pre-application observation and physical
-benefit/default activation remain open. The source audit below is historical
-evidence from before this implementation, rather than its current status.
+The [seven full production exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md)
+also pass from clean `1190aebce`, covering all vendor/custom output combinations
+and a disabled PDM control. Final ELF checks confirm first-call ordering,
+allocator/free/reclaim pairing and unchanged task/board profiles. The only
+configuration delta against the matching reclaim images is the MPI bool;
+minimum OTA headroom is 224912 bytes. Actual radio pre-application observation
+and physical benefit/default activation remain open. The source audit below
+is historical evidence from before this implementation, rather than its
+current status.
 
 ## Remaining work
 
@@ -81,8 +87,9 @@ evidence from before this implementation, rather than its current status.
   CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity
   formula do not apply. Preserve the SDK full-record capacity expression,
   ordinary allocator/free pairing and input reclaim; verify cleanup, OOM,
-  reconnect and concurrent clients. Complete the early-MPI full-application and
-  radio-boot gates; its SDK void API does not offer recoverable OOM.
+  reconnect and concurrent clients. Complete the early-MPI radio-boot and
+  physical gates; its SDK void API does not offer recoverable OOM. Its seven
+  full-application exports are already qualified.
 - Measure internal/DMA heap, largest blocks, TLS peaks, stack margins and
   scheduler latency on CYD with TFT, network and audio active. Select input
   pool sizes, IRAM placement and stack changes from those results.
