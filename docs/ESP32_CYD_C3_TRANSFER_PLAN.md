@@ -85,7 +85,8 @@ allocation и численные настройки C3 являются канд
   проверки actual startup/SDK mutex/OOM/двух ядер, а также
   [семь полных application exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md);
   physical benefit ещё открыт. Кандидат reserve прошёл локальные host/config
-  проверки, но пока не подключён к firmware; target SDK/QEMU ещё не запускались.
+  проверки, но пока не подключён к firmware; изолированная SDK/QEMU матрица
+  выполняется и пока не закрывает полный target gate.
   Освобождение HTTP GET TX и lifetime-safe reclaim уже реализованы;
   семь production exports reclaim проверены, физический выигрыш ещё не измерен.
 - **Этап 14, Vorbis/Ogg:** завершить [изолированный ESP32 bridge](CYD_VORBIS_TRANSFER_DESIGN.md)
@@ -568,3 +569,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   SDK compile и остановился на observer-selection до QEMU; ноль новых runtime
   случаев/controls квалифицировано. Raw bridge и прежние успешные проверки
   сохранены, неподтверждённые drafts в radio не подключены. Ограничение не обходилось.
+- 2026-10-20, предупреждения сборки: `12b4be262` исправил зависимость
+  `native_ota` от заголовков `native_stream`: PRIVATE target link используется,
+  когда компонент уже включён; иначе сохраняется прежний private include.
+  Состав компонентов и C/H исходники C3 не изменены. [Четыре SDK проверки](../tests/results/cyd-ota-component-dependency-20261020/README.md)
+  проходят: 12 actual OTA translation units, точная private/header связь,
+  zero common config delta и zero new source warnings. Полная CYD конфигурация
+  совпадает с baseline; C3 проверен изолированным компонентным проектом, без
+  full application/link/image утверждений. Исторические ошибки стенда и
+  существующие SDK diagnostics сохранены отдельно; offline и staged-byte
+  проверки архива проходят.
