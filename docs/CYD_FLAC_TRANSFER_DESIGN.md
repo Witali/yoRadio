@@ -198,12 +198,14 @@ claim or default change.
    cover metadata EOF, terminal errors, blocked send cancellation, generation
    changes, reopen, allocation failures and frame-window policy. The retained
    vendor path has regression coverage; its host codec calls remain doubles.
-4. **Partially complete:** fresh host exact PCM/sanitizers and pinned Xtensa
-   integration/component compilation pass. Complete application builds and a
-   custom-path QEMU harness checking PCM/guards/lifecycle remain pending. Separate
-   host platform seams and vendor prebuilt coverage from target execution evidence.
-5. **Not implemented:** production build/archive and physical CYD A/B with matched
-   configuration, both audio output profiles, ordinary/demanding FLAC, HTTP/HTTPS,
+4. **Application matrix complete:** [six full GCC exports](../tests/results/cyd-network-settings-20261020/SDK.md)
+   cover vendor/custom FLAC with PDM, continuous DAC and legacy DAC from clean
+   source `195cd3b0e`. ELF symbols verify the selected decoder; custom changes
+   exactly the two FLAC configuration selectors. A custom-path QEMU harness
+   checking PCM/guards/lifecycle remains pending. Separate host platform seams
+   and vendor prebuilt coverage from target execution evidence.
+5. **Physical qualification open:** CYD A/B with matched
+   configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.
    No custom default switch or speedup claim before this gate passes.
 

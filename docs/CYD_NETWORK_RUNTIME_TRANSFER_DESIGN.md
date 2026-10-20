@@ -2,8 +2,8 @@
 
 Обновлено: 2026-10-20. Сетевой runtime этапа **CYD-C3-09** из
 [общего плана](ESP32_CYD_C3_TRANSFER_PLAN.md#L72). Блоки N0–N5 реализованы
-и программно проверены. Полные SDK exports новых настроек и физическая
-приёмка остаются открытыми. Приватный редактор desired credentials и
+и программно проверены. [Шесть SDK exports](../tests/results/cyd-network-settings-20261020/SDK.md)
+новых настроек сохранены; физическая приёмка остаётся открытой. Приватный редактор desired credentials и
 [time service](CYD_TIME_TRANSFER_DESIGN.md) выполняются отдельно.
 
 ## Реализованный runtime и входы
