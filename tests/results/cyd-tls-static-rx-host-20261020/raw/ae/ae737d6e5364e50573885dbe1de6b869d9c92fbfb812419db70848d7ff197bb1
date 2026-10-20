@@ -1,0 +1,17 @@
+#pragma once
+#include <assert.h>
+#include <pthread.h>
+#include "tls_types.h"
+enum {ESP_OK=0};
+typedef int BaseType_t;
+typedef uint32_t TickType_t;
+typedef pthread_mutex_t portMUX_TYPE;
+#define portMUX_INITIALIZER_UNLOCKED PTHREAD_MUTEX_INITIALIZER
+void host_enter(portMUX_TYPE *lock);
+void host_exit(portMUX_TYPE *lock);
+#define portENTER_CRITICAL(lock) host_enter(lock)
+#define portEXIT_CRITICAL(lock) host_exit(lock)
+/* Task-only service seam: xPortInIsrContext is always false. */
+#define portENTER_CRITICAL_SAFE(lock) host_enter(lock)
+#define portEXIT_CRITICAL_SAFE(lock) host_exit(lock)
+bool xPortInIsrContext(void);

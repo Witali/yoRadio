@@ -1,0 +1,30 @@
+"""Phase-scope only the target revocation-loan semantic control for its oracle."""
+from pathlib import Path
+import hashlib
+import json
+
+HERE=Path(__file__).resolve().parent
+REPO=HERE/'repository'
+TEST=REPO/'tests/native/cyd_tls_static_rx'
+changes=[]
+def edit(path,old,new):
+    raw=path.read_bytes();text=raw.decode();assert text.count(old)==1,(path,old,text.count(old));path.write_bytes(text.replace(old,new,1).encode());changes.append({'file':str(path.relative_to(HERE)),'old_sha256':hashlib.sha256(raw).hexdigest(),'new_sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+predicate='''/* Target semantic-control phase only. The canonical module never calls this. */
+static bool s_forget_failure_phase;
+int tls_reserve_test_forget_phase(void) {
+    portENTER_CRITICAL_SAFE(&s_trace_lock);bool armed=s_forget_failure_phase;portEXIT_CRITICAL_SAFE(&s_trace_lock);return armed;
+}
+static void arm_forget_failure_phase(bool armed) {
+    portENTER_CRITICAL_SAFE(&s_trace_lock);s_forget_failure_phase=armed;portEXIT_CRITICAL_SAFE(&s_trace_lock);
+}
+'''
+for path in [HERE/'target-cases.inc',TEST/'target/project/main/main.c']:
+    edit(path,'static void registry_userdata_lifetimes(void) {',predicate+'static void registry_userdata_lifetimes(void) {')
+    edit(path,'    /* This is the pinned real ESP-TLS teardown order, not a mock teardown. */\n    mbedtls_ssl_config_free(&config);','    /* This is the pinned real ESP-TLS teardown order, not a mock teardown. */\n    arm_forget_failure_phase(true);mbedtls_ssl_config_free(&config);arm_forget_failure_phase(false);')
+path=TEST/'target/freeze-run.py'
+edit(path,"    elif args.variant=='forget-resets-loan':\n        replace(module,", "    elif args.variant=='forget-resets-loan':\n        replace(module,'#include \"tf_psa_crypto_common.h\"','#include \"tf_psa_crypto_common.h\"\\nextern int tls_reserve_test_forget_phase(void);')\n        replace(module,")
+edit(path,'if (s_state == RX_LOANED) s_state = RX_FREE;', 'if (tls_reserve_test_forget_phase() && s_state == RX_LOANED) s_state = RX_FREE;')
+edit(path,"'early_publish_mutation_phase_scoped': args.variant == 'early-publish-phase'", "'early_publish_mutation_phase_scoped': args.variant == 'early-publish-phase',\n              'forget_loan_mutation_phase_scoped': args.variant == 'forget-resets-loan',\n              'phase_scoped_mutation': args.variant in ('early-publish-phase','forget-resets-loan')")
+path=REPO/'tests/run-cyd-tls-static-rx-qemu.py'
+edit(path,"'phase_scoped_mutation': name == 'early-publish-phase'", "'phase_scoped_mutation': name in ('early-publish-phase','forget-resets-loan')")
+(HERE/'phase-scope-review.json').write_text(json.dumps({'scope':__doc__,'reason':'Fully active target forget mutation would fail earlier in ownership_and_rollback; arm only around intended config-free-while-live case','changes':changes,'oracle':'config_free_keeps_exclusive_loan','generic_failures_never_pass':True,'compiled_or_executed':False,'unit_mutation_remains_whole_source':True},indent=2)+'\n')

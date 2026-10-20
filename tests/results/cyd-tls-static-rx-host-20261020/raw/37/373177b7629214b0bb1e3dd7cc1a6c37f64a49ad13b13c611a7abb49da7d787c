@@ -1,0 +1,46 @@
+"""Apply root's source-only preparation review corrections in this NEW draft."""
+from pathlib import Path
+import hashlib
+import json
+
+HERE=Path(__file__).resolve().parent
+REPO=HERE/'repository'
+TEST=REPO/'tests/native/cyd_tls_static_rx'
+changes=[]
+def edit(path,old,new):
+    raw=path.read_bytes();text=raw.decode();assert text.count(old)==1,(path,old,text.count(old));new_raw=text.replace(old,new,1).encode();path.write_bytes(new_raw);changes.append({'file':str(path.relative_to(HERE)),'old_sha256':hashlib.sha256(raw).hexdigest(),'new_sha256':hashlib.sha256(new_raw).hexdigest()})
+path=TEST/'source_contract.py'
+edit(path,'''    raw=Path(path).read_bytes();assert hashlib.sha256(raw).hexdigest()==MODULE_SHA256,"Canonical registry source identity changed"
+    assert b"mbedtls_ssl_conf_" not in raw and b"user_data" not in raw
+    assert b"static uintptr_t s_radio_configurations[RX_CONFIGURATION_CAPACITY];" in raw
+    return {"sha256":MODULE_SHA256,"userdata_api_used":False,"integer_identity_keys":True,"semantic_change_from_prior_registry":True}''','''    raw=Path(path).read_bytes();normalized=raw.replace(b"\\r\\n",b"\\n")
+    uniform=raw==normalized or raw==normalized.replace(b"\\n",b"\\r\\n")
+    assert uniform,"Mixed module line endings are not qualified"
+    assert hashlib.sha256(normalized).hexdigest()==MODULE_SHA256,"Canonical registry source identity changed"
+    assert b"mbedtls_ssl_conf_" not in normalized and b"user_data" not in normalized
+    assert b"static uintptr_t s_radio_configurations[RX_CONFIGURATION_CAPACITY];" in normalized
+    return {"sha256":hashlib.sha256(raw).hexdigest(),"normalized_lf_sha256":MODULE_SHA256,"bytes":len(raw),"line_endings":"LF" if raw==normalized else "CRLF","userdata_api_used":False,"integer_identity_keys":True,"semantic_change_from_prior_registry":True}''')
+path=REPO/'tests/run-cyd-tls-static-rx-unit.py'
+tools="        code,log=execute('tools-before',tools);assert code==0,log;report['tools_before']=json.loads(log.splitlines()[0])\n"
+raw=path.read_bytes();text=raw.decode();assert text.count(tools)==1;text=text.replace(tools,'',1)
+text=text.replace("        cpp=out/'stale-storage.o'",tools+"        cpp=out/'stale-storage.o'",1);path.write_bytes(text.encode());changes.append({'file':str(path.relative_to(HERE)),'old_sha256':hashlib.sha256(raw).hexdigest(),'new_sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+edit(path,"        report['module_contract']=contract.validate_module(main/'native_tls_rx_reserve.c')","        freeze(HERE/'source_contract.py',Path('source_contract.py'));contract=load(out/'inputs/source_contract.py','frozen_unit_source_contract')\n        report['module_contract']=contract.validate_module(main/'native_tls_rx_reserve.c')")
+edit(path,"        freeze(HERE/'source_contract.py',Path('source_contract.py'));freeze(HERE/'sdk_spans.py'","        freeze(HERE/'sdk_spans.py'")
+path=REPO/'tests/run-cyd-tls-static-rx-service.py'
+edit(path,"        own=frozen/HERE.relative_to(ROOT)","        own=frozen/HERE.relative_to(ROOT)\n        contract=load(frozen/'tests/native/cyd_tls_static_rx/source_contract.py','frozen_service_source_contract')")
+edit(path,'#define portEXIT_CRITICAL(lock) host_exit(lock)\\nbool xPortInIsrContext(void);','#define portEXIT_CRITICAL(lock) host_exit(lock)\\n/* Task-only service seam: xPortInIsrContext is always false. */\\n#define portENTER_CRITICAL_SAFE(lock) host_enter(lock)\\n#define portEXIT_CRITICAL_SAFE(lock) host_exit(lock)\\nbool xPortInIsrContext(void);')
+path=REPO/'tests/run-cyd-tls-static-rx-config.py'
+edit(path,'Freeze all 17 guarded SDK files and unapplied overlay','Freeze all 19 guarded SDK files and canonical source overlay')
+edit(path,"        report['module_contract']=contract.validate_module(ROOT/MAIN/'native_tls_rx_reserve.c')","        spec=importlib.util.spec_from_file_location('frozen_config_contract',out/'inputs/repository/tests/native/cyd_tls_static_rx/source_contract.py');contract=importlib.util.module_from_spec(spec);spec.loader.exec_module(contract)\n        report['module_contract']=contract.validate_module(out/'inputs/repository'/MAIN/'native_tls_rx_reserve.c')")
+path=REPO/'tests/run-cyd-tls-static-rx-qemu.py'
+edit(path,"    spec=importlib.util.spec_from_file_location('target_contract',HERE.parent/'source_contract.py');contract=importlib.util.module_from_spec(spec);spec.loader.exec_module(contract)","    executed_contract_file=HERE.parent/'source_contract.py';executed_contract_sha256=sha(executed_contract_file)\n    spec=importlib.util.spec_from_file_location('target_contract',executed_contract_file);contract=importlib.util.module_from_spec(spec);spec.loader.exec_module(contract)")
+edit(path,'    source_contract=contract.preflight(ROOT,sdk)','    source_contract=contract.preflight(ROOT,sdk)\n    assert sha(executed_contract_file)==executed_contract_sha256')
+edit(path,"        report['candidate_sha256'] = sha(MAIN / 'native_tls_rx_reserve.c')\n        assert report['candidate_sha256'] == '17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555'","        report['candidate_sha256'] = sha(MAIN / 'native_tls_rx_reserve.c')\n        report['candidate_normalized_lf_sha256']=hashlib.sha256((MAIN/'native_tls_rx_reserve.c').read_bytes().replace(b'\\r\\n',b'\\n')).hexdigest()\n        assert report['candidate_normalized_lf_sha256']==contract.MODULE_SHA256\n        assert report['inputs'][str(executed_contract_file.resolve())]['sha256']==executed_contract_sha256\n        report['executed_source_contract_sha256']=executed_contract_sha256")
+for path in [HERE/'target-cases.inc',TEST/'target/project/main/main.c']:
+    edit(path,'setup(&live,&config);mbedtls_ssl_config_free(&config);configure(&config,true);','setup(&live,&config);mbedtls_ssl_config_free(&config);configure(&config,true);\n    mbedtls_ssl_conf_set_user_data_n(&config,UINTPTR_MAX);')
+# Guard JSON's hash is intentionally raw/pinned; preserve its actual LF bytes on
+# fresh Windows checkouts rather than weakening existing SDK/manifest guards.
+attribute=REPO/'idf/esp32-cyd2usb-native/main/compat/tls_static_rx/.gitattributes'
+assert not attribute.exists();attribute.write_bytes(b'sdk-source-guards.json -text\n')
+changes.append({'file':str(attribute.relative_to(HERE)),'new_sha256':hashlib.sha256(attribute.read_bytes()).hexdigest(),'reason':'raw guard manifest preservation across Git checkout'})
+(HERE/'root-review-fixes.json').write_text(json.dumps({'scope':__doc__,'changes':changes,'executed_compilers':0,'sdk_or_qemu':False},indent=2)+'\n')

@@ -1,0 +1,124 @@
+"""Pure archival rule checks on existing evidence; no compiler/gate reruns."""
+import argparse
+import ast
+import copy
+import json
+import re
+from pathlib import Path
+
+from archive_core import encode, hashfile, require
+import evidence_rules as rules
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--attempt', default='prep-check-01')
+    args = parser.parse_args()
+    require(re.fullmatch('prep-check-[0-9]{2}', args.attempt), 'Fresh exact preparation check name')
+    out = HERE / args.attempt
+    require(not out.exists(), 'Preserve prior preparation checks')
+    out.mkdir()
+    sources = out / 'sources'
+    sources.mkdir()
+    source_map = {}
+    for path in sorted(HERE.iterdir()):
+        if path.is_file():
+            raw = path.read_bytes()
+            (sources / path.name).write_bytes(raw)
+            source_map[path.name] = {'sha256': rules.sha(raw), 'bytes': len(raw)}
+    (out / 'source-map.json').write_bytes(encode(source_map))
+    report = {'passed': False, 'scope': 'Filesystem-only rule/oracle replay on existing completed evidence; no compiler/SDK/QEMU/WSL/Git/network/device executions', 'checks': []}
+    pins = {str(ROOT / '.build' / n / 'report.json'): hashfile(ROOT / '.build' / n / 'report.json') for n in ['rxu01', 'rxc01', 'rxs01']}
+    def checked(name, fn):
+        fn()
+        report['checks'].append({'name': name, 'passed': True})
+    def reject(name, fn):
+        try:
+            fn()
+        except (ValueError, KeyError, AssertionError):
+            report['checks'].append({'name': name, 'passed': True, 'expected_rejection': True})
+            return
+        raise ValueError('Negative preparation control accepted: ' + name)
+    try:
+        for path in HERE.glob('*.py'):
+            ast.parse(path.read_bytes())
+        report['checks'].append({'name': 'all_self_contained_python_syntax', 'passed': True})
+        loaded = {}
+        for name, dirname in [('unit', 'rxu01'), ('config', 'rxc01'), ('service', 'rxs01')]:
+            base = ROOT / '.build' / dirname
+            value = json.loads((base / 'report.json').read_bytes())
+            read = lambda p, base=base: (base / p).read_bytes()
+            identity = lambda p, base=base: hashfile(base / p)
+            loaded[name] = (value, read, identity)
+            checked(name + '_original_pure_filesystem_oracles', lambda name=name, value=value, read=read, identity=identity: rules.service(value, read, identity) if name == 'service' else getattr(rules, name)(value, read))
+        checked('uniform_LF_CRLF_relation', lambda: require(rules.normalized(b'a\nb\n') == rules.normalized(b'a\r\nb\r\n'), 'Uniform text relationship'))
+        reject('mixed_line_endings', lambda: rules.normalized(b'a\r\nb\n'))
+        value, read, _ = loaded['unit']
+        raw = rules.input_bytes(value, read, rules.SSL_TLS)
+        patcher = rules.input_bytes(value, read, 'tools/patch_cyd_tls_static_rx.py')
+        reject('changed_whole_SDK_source', lambda: rules.patch(raw + b'\n', patcher))
+        def altered_unit_positive():
+            changed = copy.deepcopy(value)
+            old = read('canonical-userdata.log')
+            new = old.replace(b'releases=45', b'releases=44')
+            changed['positive_cases']['userdata']['result'] = new.decode().strip()
+            for row in changed['commands']:
+                if row['label'] == 'canonical-userdata':
+                    row['log_sha256'] = rules.sha(new)
+            rules.unit(changed, lambda p: new if p == 'canonical-userdata.log' else read(p))
+        reject('unit_named_success_cannot_hide_unbalanced_free', altered_unit_positive)
+        def altered_unit_control():
+            changed = copy.deepcopy(value)
+            new = b'TLS_RX_HOST_FAILURE init_revokes_stale_identity\nAddressSanitizer: synthetic archival guard\n'
+            for row in changed['commands']:
+                if row['label'] == 'skip-init-lifetime':
+                    row['log_sha256'] = rules.sha(new)
+            rules.unit(changed, lambda p: new if p == 'skip-init-lifetime.log' else read(p))
+        reject('unit_named_control_plus_sanitizer_rejected', altered_unit_control)
+        reject('numeric_accessor_bytes_missing', lambda: rules.sdk_evidence(value, lambda p: b'/* omitted numeric getter */' if p == 'stubs/public_user_data.h' else read(p)))
+        reject('compiled_canonical_module_copy_changed', lambda: rules.unit(value, lambda p: read(p) + b'/* synthetic change */' if p == 'canonical/module.c' else read(p)))
+        reject('compiled_control_sdk_hook_copy_changed', lambda: rules.unit(value, lambda p: read('canonical/sdk.c') if p == 'skip-init/sdk.c' else read(p)))
+        service, service_read, service_identity = loaded['service']
+        changed = copy.deepcopy(service)
+        changed['variant_count'] = 11
+        reject('incomplete_service_not_terminal', lambda: rules.service(changed, service_read, service_identity))
+        changed2 = copy.deepcopy(service)
+        changed2['positive_case_count'] = 535
+        reject('service_count_not_promoted', lambda: rules.service(changed2, service_read, service_identity))
+        def wrong_service_control():
+            changed = copy.deepcopy(service)
+            new = b'TLS_SERVICE_FAILURE unrelated_predicate\n'
+            for row in changed['commands']:
+                if row['label'] == 'control-wrong-radio-callback':
+                    row['log_sha256'] = rules.sha(new)
+            rules.service(changed, lambda p: new if p == 'control-wrong-radio-callback.log' else service_read(p), service_identity)
+        reject('wrong_named_service_control', wrong_service_control)
+        config, config_read, _ = loaded['config']
+        changed = copy.deepcopy(config)
+        changed['configure_case_count'] = 44
+        reject('configure_missing_guard_case', lambda: rules.config(changed, config_read))
+        helper_path = 'off/repository/' + rules.MAIN + 'compat/tls_static_rx/enable.cmake'
+        reject('configure_per_case_helper_changed', lambda: rules.config(config, lambda p: config_read(p) + b'\n# synthetic mutation\n' if p == helper_path else config_read(p)))
+        def extra_config_source():
+            changed = copy.deepcopy(config)
+            original = config_read('canonical/build/capture.txt')
+            new = original.replace(b'keep-sdk', b'keep-sdk;extra-wrap', 1)
+            require(new != original, 'Synthetic control must change actual bytes')
+            changed['cases']['canonical']['exact_capture'] = new.decode().splitlines()
+            rules.config(changed, lambda p: new if p == 'canonical/build/capture.txt' else config_read(p))
+        reject('configure_extra_link_option', extra_config_source)
+        require(all(hashfile(Path(p)) == digest for p, digest in pins.items()), 'All original completed reports remain byte-exact')
+        report.update(passed=True, original_report_hashes_unchanged=pins, check_count=len(report['checks']))
+    except BaseException as error:
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        (out / 'report.json').write_bytes(encode(report))
+        raise
+    (out / 'report.json').write_bytes(encode(report))
+    print(encode(report).decode())
+
+
+if __name__ == '__main__':
+    main()

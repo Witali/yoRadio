@@ -1,0 +1,59 @@
+--- candidate02/native_tls_rx_reserve.c
++++ idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c
+@@ -40,7 +40,7 @@
+ /* Soft eligibility limit only. A full registry never evicts a live identity
+  * and never changes certificate attach/setup results: that config uses heap. */
+ enum { RX_CONFIGURATION_CAPACITY = 8 };
+-static const mbedtls_ssl_config *s_radio_configurations[RX_CONFIGURATION_CAPACITY];
++static uintptr_t s_radio_configurations[RX_CONFIGURATION_CAPACITY];
+ static portMUX_TYPE s_lock = portMUX_INITIALIZER_UNLOCKED;
+ typedef enum { RX_FREE, RX_LOANED, RX_RETURNING } rx_state_t;
+ static rx_state_t s_state;
+@@ -50,10 +50,11 @@
+  * bounded critical section does no allocation, erase or external callback. */
+ void yoradio_tls_static_rx_forget_configuration(const mbedtls_ssl_config *configuration) {
+     if (!configuration) return;
++    const uintptr_t identity = (uintptr_t)configuration;
+     portENTER_CRITICAL_SAFE(&s_lock);
+     for (unsigned index = 0; index < RX_CONFIGURATION_CAPACITY; ++index) {
+-        if (s_radio_configurations[index] == configuration)
+-            s_radio_configurations[index] = NULL;
++        if (s_radio_configurations[index] == identity)
++            s_radio_configurations[index] = 0;
+     }
+     portEXIT_CRITICAL_SAFE(&s_lock);
+     /* Deliberately independent of s_state. ESP-TLS config_free precedes
+@@ -61,10 +62,11 @@
+ }
+ 
+ static void register_configuration(const mbedtls_ssl_config *configuration) {
++    const uintptr_t identity = (uintptr_t)configuration;
+     unsigned empty = RX_CONFIGURATION_CAPACITY;
+     portENTER_CRITICAL_SAFE(&s_lock);
+     for (unsigned index = 0; index < RX_CONFIGURATION_CAPACITY; ++index) {
+-        if (s_radio_configurations[index] == configuration) {
++        if (s_radio_configurations[index] == identity) {
+             portEXIT_CRITICAL_SAFE(&s_lock);
+             return;
+         }
+@@ -72,7 +74,7 @@
+             empty = index;
+     }
+     if (empty != RX_CONFIGURATION_CAPACITY)
+-        s_radio_configurations[empty] = configuration;
++        s_radio_configurations[empty] = identity;
+     portEXIT_CRITICAL_SAFE(&s_lock);
+ }
+ 
+@@ -93,9 +95,10 @@
+                                  size_t count, size_t bytes) {
+     bool claimed = false;
+     if (configuration && !xPortInIsrContext() && count == 1 && bytes == sizeof(s_rx)) {
++        const uintptr_t identity = (uintptr_t)configuration;
+         portENTER_CRITICAL(&s_lock);
+         for (unsigned index = 0; index < RX_CONFIGURATION_CAPACITY; ++index) {
+-            if (s_radio_configurations[index] == configuration && s_state == RX_FREE) {
++            if (s_radio_configurations[index] == identity && s_state == RX_FREE) {
+                 s_state = RX_LOANED;
+                 claimed = true;
+                 break;

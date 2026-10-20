@@ -88,7 +88,8 @@ allocation и численные настройки C3 являются канд
   host/config проверки, но не подключён к firmware: ревью выявило неполный
   контракт pointer/numeric `user_data`. [Новая привязка конфигураций](CYD_MEMORY_TRANSFER_DESIGN.md)
   уже подключена к радио отдельной default-off опцией и не использует application
-  userdata. Текущие исходники прошли unit, полную service-матрицу и CMake-проверки;
+  userdata. [Текущие host-результаты](../tests/results/cyd-tls-static-rx-host-20261020/README.md)
+  сохраняют unit, полную service-матрицу и CMake-проверки;
   actual SDK/QEMU, lint/application exports и физическая польза ещё впереди.
   Первая target-матрица завершилась nonpass; полный target gate остаётся открытым.
   Освобождение HTTP GET TX и lifetime-safe reclaim уже реализованы;
@@ -613,3 +614,11 @@ Stream остаётся на core0, decode/output на core1 с прежними
   seams. Source/snapshot/log/tool identities перепроверены после terminal0 всех
   трёх runners. Это не actual target ISR/SMP/OOM, SDK/QEMU или physical PASS;
   целевая матрица и production qualification остаются открытыми.
+- 2026-10-20, CYD-C3-13: [canonical host-архив TLS RX](../tests/results/cyd-tls-static-rx-host-20261020/README.md)
+  сохраняет исходные unit8/9controls/14compile rejections/8restored, service536
+  и CMake45. Самостоятельный verifier и независимый запуск из другого каталога
+  проходят: raw sources/logs/config, точное воспроизведение SDK overlay и host
+  predicates, 34 applied/preparation равенства и явные binary/tool omissions.
+  Исходники зафиксированы в `affa3caf1` после выполнения тестов; чистота Git
+  на момент тестов не заявляется. Actual SDK/QEMU, application и physical gates
+  остаются отдельными проверками; старый nonpass prototype не переименован.

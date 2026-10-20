@@ -1,0 +1,22 @@
+static inline void mbedtls_ssl_conf_set_user_data_p(
+    mbedtls_ssl_config *conf,
+    void *p)
+{
+    conf->MBEDTLS_PRIVATE(user_data).p = p;
+}
+static inline void *mbedtls_ssl_conf_get_user_data_p(
+    mbedtls_ssl_config *conf)
+{
+    return conf->MBEDTLS_PRIVATE(user_data).p;
+}
+static inline void mbedtls_ssl_conf_set_user_data_n(
+    mbedtls_ssl_config *conf,
+    uintptr_t n)
+{
+    conf->MBEDTLS_PRIVATE(user_data).n = n;
+}
+static inline uintptr_t mbedtls_ssl_conf_get_user_data_n(
+    mbedtls_ssl_config *conf)
+{
+    return conf->MBEDTLS_PRIVATE(user_data).n;
+}

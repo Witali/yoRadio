@@ -1,0 +1,117 @@
+/* Real public SDK configuration APIs. No private SSL/config fields are read. */
+static void require_reserved_probe(const mbedtls_ssl_config *config,const char *name) {
+    void *p=yoradio_tls_static_rx_calloc(config,1,MBEDTLS_SSL_IN_BUFFER_LEN);
+    require(p==s_reserve,name);yoradio_tls_static_rx_free(p);
+}
+static void require_ordinary_probe(const mbedtls_ssl_config *config,const char *name) {
+    void *p=yoradio_tls_static_rx_calloc(config,1,MBEDTLS_SSL_IN_BUFFER_LEN);
+    require(p&&p!=s_reserve,name);yoradio_tls_static_rx_free(p);
+}
+esp_err_t __real_esp_crt_bundle_attach(void *configuration);
+static bool s_attach_return_failure;
+esp_err_t __wrap_esp_crt_bundle_attach(void *configuration) {
+    esp_err_t result=__real_esp_crt_bundle_attach(configuration);
+    /* Scoped result injection AFTER the real provider. This is not an actual
+     * certificate validation failure, handshake or authentication test. */
+    return result==ESP_OK&&s_attach_return_failure?ESP_FAIL:result;
+}
+/* Target semantic-control phase only. The canonical module never calls this. */
+static bool s_forget_failure_phase;
+int tls_reserve_test_forget_phase(void) {
+    portENTER_CRITICAL_SAFE(&s_trace_lock);bool armed=s_forget_failure_phase;portEXIT_CRITICAL_SAFE(&s_trace_lock);return armed;
+}
+static void arm_forget_failure_phase(bool armed) {
+    portENTER_CRITICAL_SAFE(&s_trace_lock);s_forget_failure_phase=armed;portEXIT_CRITICAL_SAFE(&s_trace_lock);
+}
+static void registry_userdata_lifetimes(void) {
+    mbedtls_ssl_config config,secondary;mbedtls_ssl_context live,other;int cookie;
+    configure(&config,false);mbedtls_ssl_conf_set_user_data_p(&config,&cookie);
+    require(native_tls_rx_reserve_crt_bundle_attach(&config)==ESP_OK&&mbedtls_ssl_conf_get_user_data_p(&config)==&cookie,"pointer_radio_userdata_preserved");
+    require_reserved_probe(&config,"pointer_radio_eligible");mbedtls_ssl_config_free(&config);
+    const uintptr_t values[]={0,1,UINTPTR_MAX,UINTPTR_MAX-17U};
+    for(unsigned i=0;i<sizeof(values)/sizeof(values[0]);++i) {
+        configure(&config,false);mbedtls_ssl_conf_set_user_data_n(&config,values[i]);
+        require(native_tls_rx_reserve_crt_bundle_attach(&config)==ESP_OK&&mbedtls_ssl_conf_get_user_data_n(&config)==values[i],"integer_radio_userdata_preserved");
+        require_reserved_probe(&config,"integer_radio_eligible");mbedtls_ssl_config_free(&config);
+        configure(&config,false);mbedtls_ssl_conf_set_user_data_n(&config,values[i]);
+        require_ordinary_probe(&config,"integer_nonradio_ordinary");mbedtls_ssl_config_free(&config);
+    }
+    configure(&config,true);mbedtls_ssl_config_init(&config);
+    require_ordinary_probe(&config,"init_revokes_stale_identity");mbedtls_ssl_config_free(&config);
+    configure(&config,true);mbedtls_ssl_config_free(&config);
+    require_ordinary_probe(&config,"free_revokes_stale_identity");
+    configure(&config,true);setup(&live,&config);memset(s_reserve,0x67,MBEDTLS_SSL_IN_BUFFER_LEN);
+    /* This is the pinned real ESP-TLS teardown order, not a mock teardown. */
+    arm_forget_failure_phase(true);mbedtls_ssl_config_free(&config);arm_forget_failure_phase(false);
+    require(((unsigned char *)s_reserve)[0]==0x67,"config_free_never_erases_live_rx");
+    configure(&secondary,true);require_ordinary_probe(&secondary,"config_free_keeps_exclusive_loan");mbedtls_ssl_config_free(&secondary);
+    configure(&config,false);mbedtls_ssl_conf_set_user_data_n(&config,UINTPTR_MAX);
+    setup(&other,&config);require(trace(&config).pointer!=s_reserve,"reused_address_ordinary_while_prior_loan_live");cleanup(&other);
+    cleanup(&live);setup(&other,&config);require(trace(&config).pointer!=s_reserve,"reused_unrelated_address_stays_ordinary");cleanup(&other);
+    require(native_tls_rx_reserve_crt_bundle_attach(&config)==ESP_OK,"explicit_reattach_after_address_reuse");
+    require_reserved_probe(&config,"reused_address_radio_eligible");
+    setup(&live,&config);mbedtls_ssl_config_free(&config);configure(&config,true);
+    mbedtls_ssl_conf_set_user_data_n(&config,UINTPTR_MAX);
+    require_ordinary_probe(&config,"new_radio_same_address_waits_for_old_loan");
+    cleanup(&live);
+    require_reserved_probe(&config,"old_ssl_free_preserves_new_radio_registration");
+    setup(&live,&config);memset(s_reserve,0x38,MBEDTLS_SSL_IN_BUFFER_LEN);
+    s_attach_return_failure=true;
+    esp_err_t failed=native_tls_rx_reserve_crt_bundle_attach(&config);
+    s_attach_return_failure=false;
+    require(failed==ESP_FAIL&&mbedtls_ssl_conf_get_user_data_n(&config)==UINTPTR_MAX,"injected_attach_failure_preserves_result_userdata");
+    require(((unsigned char *)s_reserve)[0]==0x38,"failed_attach_never_erases_live_loan");
+    cleanup(&live);require_ordinary_probe(&config,"failed_attach_revokes_eligibility");mbedtls_ssl_config_free(&config);
+    /* Public valid version values in an invalid min>max combination force the
+     * actual SDK pre-RX validation path, without a fake calloc result. */
+    configure(&config,true);unsigned calls=trace(&config).calls;
+    mbedtls_ssl_conf_min_tls_version(&config,MBEDTLS_SSL_VERSION_TLS1_3);
+    mbedtls_ssl_conf_max_tls_version(&config,MBEDTLS_SSL_VERSION_TLS1_2);
+    mbedtls_ssl_init(&live);int result=mbedtls_ssl_setup(&live,&config);
+    require(result==MBEDTLS_ERR_SSL_BAD_CONFIG&&trace(&config).calls==calls,"actual_setup_rejects_before_rx");cleanup(&live);
+    require_reserved_probe(&config,"early_setup_failure_retains_config_registration");mbedtls_ssl_config_free(&config);
+    for(unsigned i=0;i<24;++i){configure(&config,true);mbedtls_ssl_config_free(&config);}
+    configure(&config,true);require_reserved_probe(&config,"cancel_before_setup_registry_recycles");mbedtls_ssl_config_free(&config);
+    integrity("registry_lifetimes_heap_integrity");
+    puts("TLS_RX_TARGET_CASE registry_userdata_init_free_live_reuse attach_return_injection=1 early_setup_actual=1");
+}
+static mbedtls_ssl_config s_registry_configs[9];
+static void registry_full(void) {
+    for(unsigned i=0;i<9;++i) {
+        configure(&s_registry_configs[i],false);mbedtls_ssl_conf_set_user_data_n(&s_registry_configs[i],i+1U);
+        require(native_tls_rx_reserve_crt_bundle_attach(&s_registry_configs[i])==ESP_OK,"registry_full_attach_result_preserved");
+        if(i==0)for(unsigned repeat=0;repeat<16;++repeat)require(native_tls_rx_reserve_crt_bundle_attach(&s_registry_configs[i])==ESP_OK,"duplicate_attach_idempotent");
+    }
+    for(unsigned i=0;i<8;++i)require_reserved_probe(&s_registry_configs[i],"full_registry_does_not_evict");
+    require_ordinary_probe(&s_registry_configs[8],"full_registry_ordinary_fallback");
+    mbedtls_ssl_config_free(&s_registry_configs[3]);
+    require(native_tls_rx_reserve_crt_bundle_attach(&s_registry_configs[8])==ESP_OK,"registry_slot_recovery_attach");
+    require_reserved_probe(&s_registry_configs[8],"registry_slot_recovery_eligible");
+    for(unsigned i=0;i<9;++i)mbedtls_ssl_config_free(&s_registry_configs[i]);
+    integrity("registry_full_heap_integrity");puts("TLS_RX_TARGET_CASE registry_capacity entries=8 clients=9 soft_fallback=1");
+}
+static mbedtls_ssl_config s_isr_config;
+static SemaphoreHandle_t s_init_done;
+static volatile bool s_init_seen_isr;
+static void init_isr_callback(void *argument) {
+    (void)argument;s_init_seen_isr=xPortInIsrContext();
+    mbedtls_ssl_config_init(&s_isr_config);
+    BaseType_t wake=pdFALSE;xSemaphoreGiveFromISR(s_init_done,&wake);
+    if(wake)esp_timer_isr_dispatch_need_yield();
+}
+static void initializer_from_actual_isr(void) {
+    /* Only global bundle callback/numeric userdata are attached: there are no
+     * owned PSK/key allocations to abandon when exercising the pure reset. */
+    mbedtls_ssl_config_init(&s_isr_config);mbedtls_ssl_conf_set_user_data_n(&s_isr_config,UINTPTR_MAX);
+    require(native_tls_rx_reserve_crt_bundle_attach(&s_isr_config)==ESP_OK,"isr_reset_radio_attach");
+    require_reserved_probe(&s_isr_config,"isr_reset_prior_registration");
+    s_init_done=xSemaphoreCreateBinary();require(s_init_done!=NULL,"isr_done_semaphore");
+    esp_timer_handle_t timer=NULL;
+    esp_timer_create_args_t args={.callback=init_isr_callback,.dispatch_method=ESP_TIMER_ISR,.name="tls-config-init"};
+    require(esp_timer_create(&args,&timer)==ESP_OK,"actual_isr_timer_create");
+    require(esp_timer_start_once(timer,1000)==ESP_OK,"actual_isr_timer_start");
+    require(xSemaphoreTake(s_init_done,pdMS_TO_TICKS(5000))==pdTRUE&&s_init_seen_isr,"actual_initializer_isr_observed");
+    require(esp_timer_delete(timer)==ESP_OK,"actual_isr_timer_delete");vSemaphoreDelete(s_init_done);
+    require_ordinary_probe(&s_isr_config,"actual_isr_init_revokes_eligibility");mbedtls_ssl_config_free(&s_isr_config);
+    integrity("actual_isr_init_heap_integrity");puts("TLS_RX_TARGET_CASE actual_initializer_isr registry_revoked=1");
+}

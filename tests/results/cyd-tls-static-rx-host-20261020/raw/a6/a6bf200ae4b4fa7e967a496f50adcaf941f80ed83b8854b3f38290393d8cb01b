@@ -1,0 +1,78 @@
+"""Freeze reviewed preparation metadata only; never compile or alter tracked sources."""
+from pathlib import Path
+import difflib
+import hashlib
+import json
+import subprocess
+
+HERE=Path(__file__).resolve().parent
+ROOT=HERE.parents[1]
+REPOSITORY=HERE/'repository'
+
+def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def write(path,value):
+    assert not path.exists(),str(path)
+    path.write_bytes((json.dumps(value,indent=2)+'\n').encode())
+def git(*args):
+    return subprocess.run(['git','-c','core.longpaths=true','--no-optional-locks',*args],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True).stdout
+
+report=json.loads((HERE/'checks01/report.json').read_bytes())
+assert report['prepared'] and not report['execution_qualified']
+assert not any(report[key] for key in ('compiler_invoked','sdk_build_invoked','qemu_invoked','lint_invoked'))
+assert report['proposed_files']==34 and report['prepared_variants']==12
+files=sorted(path for path in REPOSITORY.rglob('*') if path.is_file())
+assert len(files)==34
+for path in files:
+    assert report['sources'][str(path)]['sha256']==sha(path),str(path)
+head=git('rev-parse','HEAD').decode().strip()
+patch=[]
+baselines={}
+for path in files:
+    relative=path.relative_to(REPOSITORY).as_posix()
+    probe=subprocess.run(['git','-c','core.longpaths=true','--no-optional-locks','cat-file','-e',f'{head}:{relative}'],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    old=git('show',f'{head}:{relative}') if probe.returncode==0 else b''
+    new=path.read_bytes()
+    if old==new:continue
+    # The patch is a textual review aid. Exact final raw source bytes are bound
+    # by the manifest; apply those bytes, rather than normalizing the compiled inputs.
+    before=old.decode().replace('\r\n','\n').splitlines(keepends=True)
+    after=new.decode().replace('\r\n','\n').splitlines(keepends=True)
+    patch.extend(difflib.unified_diff(before,after,fromfile='a/'+relative if old else '/dev/null',tofile='b/'+relative))
+    baselines[relative]={'head_sha256':hashlib.sha256(old).hexdigest() if old else None,'proposed_raw_sha256':sha(path)}
+patch_path=HERE/'canonical-integration-and-tests-final.patch'
+assert not patch_path.exists()
+patch_path.write_bytes(''.join(patch).encode())
+history_root=HERE.parent/'cyd-tls-reserve-registry-prep-01'
+host=history_root/'host-attempt02/report.json'
+closure=history_root/'host-closure01/report.json'
+assert json.loads(host.read_bytes())['passed'] and json.loads(closure.read_bytes())['passed']
+write(HERE/'finalization.json',{
+    'scope':__doc__,'tracked_or_git_writes':False,'compiler_sdk_lint_qemu_device_network_invoked':False,
+    'baseline_HEAD':head,'observed_root_owned_status':git('status','--porcelain=v1').decode(),
+    'final_patch':patch_path.name,'final_patch_sha256':sha(patch_path),'patch_baselines':baselines,
+    'raw_sources_must_be_applied_exactly':True,'checks01_sha256':sha(HERE/'checks01/report.json'),
+    'prior_registry_host':{'path':str(host),'sha256':sha(host),'owner':25561,'terminal_exit':0,'module_sha256':'58cb83830fa825b912068087007440fba9f4205fb0c64abbe684696b3e53485a'},
+    'prior_registry_host_closure':{'path':str(closure),'sha256':sha(closure)},
+    'current_module_normalized_lf_sha256':'17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555',
+    'current_module_execution_qualified':False,
+    'new_target_forget_control_phase_scoped':True,'new_target_early_publish_control_phase_scoped':True,
+    'old_target_bypass_control_remains_nonpass':True,
+})
+manifest_files={path.relative_to(HERE).as_posix():{'sha256':sha(path),'bytes':path.stat().st_size}
+                for path in sorted(HERE.rglob('*')) if path.is_file()}
+write(HERE/'manifest.json',{'scope':'Exact raw immutable preparation sources, source-only snapshots, reports and logs; no executed compiler cohort','files':manifest_files,'file_count':len(manifest_files),'proposed_file_count':34})
+write(HERE/'readiness.json',{
+    'prepared':True,'execution_qualified':False,'compiler_sdk_lint_qemu_device_network_invoked':False,
+    'manifest_sha256':sha(HERE/'manifest.json'),'checks_report_sha256':sha(HERE/'checks01/report.json'),
+    'final_patch_sha256':sha(patch_path),'proposed_files':34,'proposed_test_files':25,'existing_source_dependencies':35,
+    'sdk_commit':'7101770dc6db2667b3c477cc31365dd1acd6db4e',
+    'target_matrix':{'total':12,'option_positives':4,'exact_named_controls':8,'phase_scoped_controls':['forget-resets-loan','early-publish-phase'],'isr_task_lock_control_host_only':True},
+    'host_proposed':{'positive_groups':8,'named_controls':9,'compile_rejections':14,'restored_positive_groups':8},
+    'service_proposed':{'variants':12,'expected_rows':536,'named_controls':2,'actual_report_computes_counts':True},
+    'configure_proposed':{'expected_cases':45,'sdk_source_guard_mutations':19,'actual_report_computes_counts':True},
+    'production_plan_owned_elsewhere':{'path':str(HERE.parent/'cyd-tls-static-rx-production-prep-01'),'exports':7,'full_clang_profiles':6},
+    'next_gates':'Root review/copy canonical tests, then final repository byte-bound unit/service/config; target runner only after explicit root authorization; production exporter after clean focused commit',
+    'limits':['No compilation of uintptr_t candidate yet','Host types/HTTP/crypto/RTOS are labelled seams','No target ABI/ISR/SMP/OOM outcome yet','No physical heap benefit/playback/stack result','Feature default-off'],
+})
+assert all(sha(HERE/path)==entry['sha256'] for path,entry in manifest_files.items())
+print(json.dumps({'prepared':True,'execution_qualified':False,'files':len(manifest_files),'manifest_sha256':sha(HERE/'manifest.json'),'readiness_sha256':sha(HERE/'readiness.json'),'checks_sha256':sha(HERE/'checks01/report.json'),'patch_sha256':sha(patch_path),'host_closure_sha256':sha(closure)}))

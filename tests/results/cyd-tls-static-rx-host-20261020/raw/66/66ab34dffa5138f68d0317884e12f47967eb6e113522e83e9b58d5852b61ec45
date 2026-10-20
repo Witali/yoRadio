@@ -1,0 +1,19 @@
+"""Focused source-only refinements before the first preparation checks."""
+from pathlib import Path
+import hashlib
+import json
+
+HERE=Path(__file__).resolve().parent
+ROOT=HERE.parent.parent
+REPO=HERE/'repository'
+TEST=REPO/'tests/native/cyd_tls_static_rx'
+changes=[]
+def edit(path,old,new):
+    raw=path.read_bytes();text=raw.decode();assert text.count(old)==1,(path,old,text.count(old));changed=text.replace(old,new,1).encode();path.write_bytes(changed);changes.append({'file':path.relative_to(REPO).as_posix(),'old_sha256':hashlib.sha256(raw).hexdigest(),'new_sha256':hashlib.sha256(changed).hexdigest()})
+path=REPO/'tests/run-cyd-tls-static-rx-unit.py'
+edit(path,"freeze(HERE/'sdk_spans.py',Path('sdk_spans.py'));", "freeze(HERE/'source_contract.py',Path('source_contract.py'));freeze(HERE/'sdk_spans.py',Path('sdk_spans.py'));")
+path=TEST/'service/tls_bridge.c'
+edit(path,'mbedtls_ssl_config nested={.max_tls_version=0x303};mbedtls_ssl_context ssl;','mbedtls_ssl_config nested;mbedtls_ssl_config_init(&nested);nested.max_tls_version=0x303;mbedtls_ssl_context ssl;')
+edit(path,'        mbedtls_ssl_free(&ssl);\n    }','        mbedtls_ssl_config_free(&nested);mbedtls_ssl_free(&ssl);\n    }')
+edit(path,'mbedtls_ssl_config conf={.max_tls_version=0x303};mbedtls_ssl_context ssl;','mbedtls_ssl_config conf;mbedtls_ssl_config_init(&conf);conf.max_tls_version=0x303;mbedtls_ssl_context ssl;')
+(HERE/'refinements.json').write_text(json.dumps({'scope':__doc__,'changes':changes,'compiler_or_target_execution':False},indent=2)+'\n')

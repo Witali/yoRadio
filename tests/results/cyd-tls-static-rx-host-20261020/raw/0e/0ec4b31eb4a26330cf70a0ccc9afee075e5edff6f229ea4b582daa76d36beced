@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.20)
+set(IDF_TARGET esp32)
+set(IDF_COMPONENT_MANAGER OFF)
+set(COMPONENTS main)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(cyd_tls_static_rx_fixture)

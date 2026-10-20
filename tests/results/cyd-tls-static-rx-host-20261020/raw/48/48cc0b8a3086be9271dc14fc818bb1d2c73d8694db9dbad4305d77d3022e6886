@@ -1,0 +1,130 @@
+# Canonical registry source/tests: unexecuted target preparation
+
+`repository/` is a self-contained proposed checked-in layout. This preparation
+did not write tracked source; root owns integration. Runtime sources read repository files and explicitly supplied
+installed SDK/tools; they never import historical ignored `.build` sources.
+`canonical-integration-and-tests-final.patch` is the final review aid; the earlier
+unsuffixed patch is preserved initial history. Apply the final frozen
+file bytes after root review because source identity includes line endings.
+
+The production module normalized-LF SHA is
+`17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555`.
+It changes the previously host-qualified58cb registry from pointer keys to
+uintptr_t keys/conversions. `integer-identity-delta.patch` records that exact
+semantic source delta. Config identity storage therefore does not retain pointer
+values after object lifetime ends. Array capacity remains8 (32bytes on classic
+ESP32). Neither userdata kind is read or written; full registry is soft fallback.
+Uniform LF and CRLF checkouts share that pinned identity. Every runner records
+actual raw input hashes/line endings and freezes unchanged raw compiled inputs;
+mixed module endings are rejected. SDK newline/hash guards stay unchanged.
+The complete SDK RX expression, ordinary allocator/free and independently enabled
+canonical reclaim remain unchanged. Init/free and failed attach revoke future
+eligibility while a live loan remains owned until exact SSL release/erase.
+
+The prior registry host result remains immutable:
+`../cyd-tls-reserve-registry-prep-01/host-attempt02/report.json`, SHA
+`4309ae9603bb13f6237489867b58dffde877660fefd679cf9dcde4de2f7f14a4`,
+owner25561 terminal0: seven positive groups, nine exact controls, fourteen strict
+compile rejections and seven restored positives. Independent readback is in
+`../cyd-tls-reserve-registry-prep-01/host-closure01/report.json`. These results
+bind58cb, not this new17e98 module. No prior proof is rewritten or relabelled.
+
+The older pointer-marker prototype is superseded. Its target runner14586 ended
+exit1: expected bypass-reclaim marker was followed by a timekeeping-lock panic
+during esp_restart under exhausted heap. That control stays nonpass, and the
+three option-only profiles never ran. The new fixture captures every predicate
+under pressure and releases only test-owned pressure allocations before reporting
+or restarting. No production lock workaround or relaxed panic oracle is added.
+
+## Proposed canonical files
+
+- Production: `idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.{c,h}`,
+  `main/compat/tls_static_rx/{enable.cmake,sdk-source-guards.json}`,
+  `tools/patch_cyd_tls_static_rx.py`; minimal radio/CMake wiring and default-off
+  production Kconfig option. Guard manifest has19 real SDK source identities.
+- Shared tests: `tests/native/cyd_tls_static_rx/{sdk_spans.py,tls_types.h,source_contract.py}`;
+  explicit host seams in `unit/` and `service/`; complete canonical target fixture
+  and freeze/build helpers in `target/`.
+- Runners: `tests/run-cyd-tls-static-rx-{unit,service,config,qemu}.py`.
+  `--preflight-only` reads source/tool requirements without creating outputs.
+  Unit/service `--prepare-only` freezes/extracts sources without a compiler.
+
+The target's Kconfig file sources the production Kconfig exactly once. It defines
+no duplicate reserve option; explicit fixture defaults enable reserve as required.
+Frozen target copies preserve canonical repository paths so the actual helper
+resolves the actual module/header/tool/guard files. Four option settings use
+original SDK source/no module or wraps when disabled. There is no first-client
+selection or application-userdata contract.
+
+## Proposed execution counts, all pending
+
+- Unit:8 positive groups (the prior7 plus a C++ placement-new storage-lifetime
+  case),9 named controls,14 compile rejections, then8 restored positives.
+  The C++ seam ends a trivial host config object's lifetime and creates a fresh
+  object in the same storage, without disabling ASan quarantine. It is host
+  layout/lifetime coverage, not actual target ABI. New lifetime cases also attach
+  NEW radio config at OLD config address while OLD SSL still owns RX; OLD ssl_free
+  must retain NEW registration and allow borrowing afterward.
+- Whole service:12 reserve/reclaim/backend variants,536 scenario executions and
+  two exact binding/registration controls. Actual service/three owner loops remain
+  whole. Typed HTTP seam now executes actual patched config init/free bodies,
+  including real ESP-TLS config-free-before-ssl-free order. Both userdata kinds
+  and unrelated clients are covered. HTTP/crypto/RTOS/layout remain host seams.
+- Configure:45 real project(NONE) cases, including19 supporting-source mutation
+  rejections, exact helper sources/options/dependencies and off/early traps.
+- Actual target:12 variants =4 option-positive profiles (reserve/reclaim all four
+  combinations) +8 exact controls: omitted init/free hook, full-registry eviction,
+  revocation releasing a live loan, omitted exclusivity, phase-scoped early
+  publication, ordinary heap free of static storage, bypassed reclaim. All keep
+  strict no-panic/no-sanitizer/no-timeout control oracles. The task-only ISR-lock
+  mutation is host-only; an SDK panic cannot be a successful target control.
+
+Both revocation-releases-loan and early-publication target controls are explicitly
+phase-scoped. The first arms only around the config-free-while-loaned lifetime
+scenario, so earlier ordinary configuration creation cannot steal its intended
+`config_free_keeps_exclusive_loan` oracle. The canonical module calls neither
+test phase predicate. Unit revocation mutation remains whole-source.
+
+`checks01/report.json` passed source-only AST/preflight/extraction/freeze checks:
+34 proposed files, 35 minimal existing dependencies and 12 unbuilt variants.
+No compiler, configure, SDK build, lint or QEMU ran. `manifest.json` freezes the
+exact sources, check snapshots/logs and review history; `readiness.json` keeps
+execution qualification false. The preserved initial `preparation.json` contains
+generation-time hashes and is superseded by the final manifest for current bytes.
+
+Enabled target profiles add numeric/pointer data, init/free revocation, actual
+teardown ordering, unrelated/new-radio address reuse while prior loan lives,
+full-registry soft fallback, real dual-core shared/distinct config ownership,
+erase handover, actual public pre-RX config rejection, four labelled rollback
+injections, actual backend NULL/recovery and canonical reclaim with live leases.
+An actual esp_timer ISR calls the original public config initializer and proves
+revocation. Host SAFE seams do not establish that target result. The fixture's
+ISR config owns no PSK/key allocations before this pure-reset test. The original
+certificate callback runs in real SDK; a labelled failure-result injection after
+its success tests revocation only, without claiming certificate validation.
+
+## Pending commands after source review/integration
+
+Use explicitly installed bootstrap Python, `-B -X utf8`, and fresh ignored output
+directories under the checkout's `.build`. First apply/review a clean focused
+source/test commit, then run final-byte-bound gates:
+
+```
+python -B -X utf8 tests/run-cyd-tls-static-rx-unit.py --sdk <SDK6.0.2> --output .build/rx-unit-final
+python -B -X utf8 tests/run-cyd-tls-static-rx-service.py --sdk <SDK6.0.2> --output .build/rx-service-final
+python -B -X utf8 tests/run-cyd-tls-static-rx-config.py --sdk <SDK6.0.2> --cmake <cmake.exe> --ninja <ninja.exe> --output .build/rx-config-final
+python -B -X utf8 tests/run-cyd-tls-static-rx-qemu.py --sdk <SDK6.0.2> --tools <IDF-tools> --qemu <qemu-system-xtensa.exe> --powershell <pwsh.exe> --output .build/rx-target-final
+```
+
+Unit/service require WSL GCC/G++ plus ASan/UBSan; strict C and C++ language modes
+are separate. Actual target runner freezes every variant before build, binds
+tool/SDK/source identities, checks ELF94, config/allocator words/source/header
+closure and config-init/free hook disassembly, then merges and runs no-NIC QEMU
+with exact completion/control markers. No run above has happened for17e98.
+
+Seven production exports and six full Clang profiles are independently prepared
+in `../cyd-tls-static-rx-production-prep-01`; that task owns their exact commands,
+frozen MPI baselines and allowed reserve-only config delta checks. The old24-seed
+proposal is unchanged and is not the required export count. Default remains off;
+physical resource/usefulness/playback/stack checks remain pending. No deferred
+codec extension work is included.

@@ -110,6 +110,11 @@ groups, nine exact semantic controls, fourteen invalid-profile compile rejection
 and all eight restored groups with ASan/UBSan. Whole-service coverage passed 536
 scenarios across twelve reserve/reclaim/backend variants and two binding
 controls; forty-five configure-only cases include nineteen SDK guard mutations.
+The [immutable host archive](../tests/results/cyd-tls-static-rx-host-20261020/README.md)
+retains the original reports, sources and logs. Its standalone verifier checks
+the exact host/config/service predicates without invoking the original tools.
+The 34 canonical files match final preparation snapshots; the tests ran before
+their source commit, so this equality does not backdate a clean Git tree.
 These checks retain explicit host layout/crypto/RTOS/capacity seams. Actual
 Xtensa SDK/QEMU, the real ISR and two-core checks, full lint/application exports,
 TLS traffic and physical resource benefit still need qualification. The static

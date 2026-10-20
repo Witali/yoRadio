@@ -1,0 +1,244 @@
+"""Self-contained canonical production/test proposal; never build or apply it."""
+import ast
+import difflib
+import hashlib
+import json
+from pathlib import Path
+import re
+
+HERE=Path(__file__).resolve().parent
+ROOT=HERE.parent.parent
+REG=ROOT/'.build/cyd-tls-reserve-registry-prep-01'
+OLD=ROOT/'.build/cyd-tls-reserve-integration-prep-01'
+CAN=ROOT/'.build/cyd-tls-reserve-canonical-tests-prep-01/repository'
+REPO=HERE/'repository'
+MAIN=Path('idf/esp32-cyd2usb-native/main')
+TEST=Path('tests/native/cyd_tls_static_rx')
+def sha(data):return hashlib.sha256(data).hexdigest()
+def once(data,old,new):assert data.count(old)==1,(old,data.count(old));return data.replace(old,new,1)
+def write(relative,data):
+    dest=REPO/relative;assert not dest.exists(),dest;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(data if isinstance(data,bytes) else data.encode());return dest
+def main():
+    assert not REPO.exists();REPO.mkdir()
+    lineage={}
+    def read(path):
+        data=path.read_bytes();lineage[str(path)]={'sha256':sha(data),'bytes':len(data)};return data.decode().replace('\r\n','\n')
+    # Proposed canonical production paths; preserve all older inputs verbatim.
+    originals={}
+    for f in (OLD/'overlay02/repository').rglob('*'):
+        if f.is_file():
+            rel=f.relative_to(OLD/'overlay02/repository');originals[rel.as_posix()]=f.read_bytes()
+    for name in ['native_tls_rx_reserve.c','native_tls_rx_reserve.h']:
+        originals[(MAIN/name).as_posix()]=(REG/'candidate02'/name).read_bytes()
+    originals[(MAIN/'compat/tls_static_rx/enable.cmake').as_posix()]=(REG/'candidate02/enable.cmake').read_bytes()
+    originals[(MAIN/'compat/tls_static_rx/sdk-source-guards.json').as_posix()]=(REG/'candidate02/sdk-source-guards.json').read_bytes()
+    originals['tools/patch_cyd_tls_static_rx.py']=(REG/'candidate02/patch_cyd_tls_static_rx.py').read_bytes()
+    module=originals[(MAIN/'native_tls_rx_reserve.c').as_posix()].decode().replace('\r\n','\n')
+    module=once(module,'static const mbedtls_ssl_config *s_radio_configurations[RX_CONFIGURATION_CAPACITY];','static uintptr_t s_radio_configurations[RX_CONFIGURATION_CAPACITY];')
+    module=once(module,'    if (!configuration) return;\n    portENTER_CRITICAL_SAFE','    if (!configuration) return;\n    const uintptr_t identity = (uintptr_t)configuration;\n    portENTER_CRITICAL_SAFE')
+    module=once(module,'static void register_configuration(const mbedtls_ssl_config *configuration) {\n    unsigned empty','static void register_configuration(const mbedtls_ssl_config *configuration) {\n    const uintptr_t identity = (uintptr_t)configuration;\n    unsigned empty')
+    module=once(module,'if (configuration && !xPortInIsrContext() && count == 1 && bytes == sizeof(s_rx)) {\n        portENTER_CRITICAL','if (configuration && !xPortInIsrContext() && count == 1 && bytes == sizeof(s_rx)) {\n        const uintptr_t identity = (uintptr_t)configuration;\n        portENTER_CRITICAL')
+    assert module.count('== configuration')==3
+    module=module.replace('== configuration','== identity').replace('s_radio_configurations[index] = NULL;','s_radio_configurations[index] = 0;').replace('s_radio_configurations[empty] = configuration;','s_radio_configurations[empty] = identity;')
+    originals[(MAIN/'native_tls_rx_reserve.c').as_posix()]=module.encode();module_sha=sha(module.encode())
+    kconfig=originals[(MAIN/'Kconfig.projbuild').as_posix()].decode()
+    kconfig=kconfig.replace('only to the radio\'s explicitly labelled TLS configuration. Retain','only to explicitly attached radio config identities. A bounded\n            registry tracks config init/free without using application userdata.\n            Registry overflow uses ordinary TLS allocation. Retain')
+    originals[(MAIN/'Kconfig.projbuild').as_posix()]=kconfig.encode()
+    for relative,data in originals.items():write(relative,data)
+    source_contract='''"""Canonical registry module identity; earlier pointer-marker evidence is superseded."""
+import hashlib
+import importlib.util
+from pathlib import Path
+MODULE_SHA256="'''+module_sha+'''"
+PRIOR_REGISTRY_SHA256="58cb83830fa825b912068087007440fba9f4205fb0c64abbe684696b3e53485a"
+def validate_module(path):
+    raw=Path(path).read_bytes();assert hashlib.sha256(raw).hexdigest()==MODULE_SHA256,"Canonical registry source identity changed"
+    assert b"mbedtls_ssl_conf_" not in raw and b"user_data" not in raw
+    assert b"static uintptr_t s_radio_configurations[RX_CONFIGURATION_CAPACITY];" in raw
+    return {"sha256":MODULE_SHA256,"userdata_api_used":False,"integer_identity_keys":True,"semantic_change_from_prior_registry":True}
+def preflight(root,sdk):
+    root=Path(root);main=root/'idf/esp32-cyd2usb-native/main'
+    required=[main/name for name in ('native_tls_rx_reserve.c','native_tls_rx_reserve.h','compat/tls_static_rx/enable.cmake','compat/tls_static_rx/sdk-source-guards.json','Kconfig.projbuild','native_input_reclaim.c','native_input_reclaim.h','compat/input_reclaim/enable.cmake')]+[root/'tools/patch_cyd_tls_static_rx.py',root/'idf/components/native_stream/adaptive_input.c',root/'idf/components/native_stream/include/adaptive_input.h']
+    assert all(path.is_file() for path in required),'Canonical source input missing'
+    result=validate_module(main/'native_tls_rx_reserve.c')
+    spec=importlib.util.spec_from_file_location('canonical_registry_patcher',root/'tools/patch_cyd_tls_static_rx.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+    checked=m.validate_sdk_guards(sdk,main/'compat/tls_static_rx/sdk-source-guards.json');assert len(checked)==19
+    return {'module':result,'supporting_sdk_sources':checked,'runtime_or_build':False}
+'''
+    write(TEST/'source_contract.py',source_contract)
+    write(TEST/'sdk_spans.py',read(REG/'sdk_spans.py'))
+    # Whole-service shared types remain explicit HOST types; declare actual
+    # extracted config APIs as well as the existing SSL lifetime APIs.
+    types=read(CAN/TEST/'tls_types.h')+'\nvoid mbedtls_ssl_config_init(mbedtls_ssl_config *conf);\nvoid mbedtls_ssl_config_free(mbedtls_ssl_config *conf);\n'
+    write(TEST/'tls_types.h',types)
+    for name in ['platform.h','test.c']:
+        text=read(REG/'harness'/name)
+        if name=='test.c':
+            text=once(text,'int main(int argc,char **argv) {','void registry_host_check(bool condition,const char *name) {check(condition,name);}\nvoid registry_stale_storage_case(void *reserve);\nint main(int argc,char **argv) {')
+            text=once(text,'if(!strcmp(argv[1],"userdata"))userdata();','if(!strcmp(argv[1],"stale_storage"))registry_stale_storage_case(known_reserve);else if(!strcmp(argv[1],"userdata"))userdata();')
+            anchor='    /* Cancellation after callback but before setup must not fill the registry. */'
+            extra='''    /* NEW radio at the same address while OLD SSL still owns the loan. */
+    configuration(&conf,true);setup(&ssl,&conf);mbedtls_ssl_config_free(&conf);
+    configuration(&conf,true);setup(&other,&conf);
+    CHECK(other.in_buf!=known_reserve,"new_radio_same_address_waits_for_old_loan");clean(&other);
+    clean(&ssl);expect_reserve(&conf,"old_ssl_free_preserves_new_radio_registration");mbedtls_ssl_config_free(&conf);
+'''
+            text=once(text,anchor,extra+anchor)
+        write(TEST/'unit'/name,text)
+    write(TEST/'unit/stale-storage.cpp',read(HERE/'stale-storage.cpp'))
+    # Canonical unit runner, no ignored source paths. --prepare-only executes no compiler.
+    unit=read(REG/'run-host-v2.py')
+    unit=once(unit,'HERE=Path(__file__).resolve().parent\nROOT=HERE.parent.parent','ROOT=Path(__file__).resolve().parents[1]\nHERE=ROOT/"tests/native/cyd_tls_static_rx"')
+    unit=once(unit,"p.add_argument('--output',type=Path,required=True);a=p.parse_args()",'p.add_argument("--output",type=Path,required=True);p.add_argument("--preflight-only",action="store_true");p.add_argument("--prepare-only",action="store_true");a=p.parse_args()')
+    unit=once(unit,'assert out.is_relative_to(HERE) and not out.exists();out.mkdir()','assert out.is_relative_to(ROOT/".build") and not out.exists()\n    contract=load(HERE/"source_contract.py","unit_source_contract")\n    if a.preflight_only:print(json.dumps(contract.preflight(ROOT,sdk)));return\n    out.mkdir()')
+    unit=once(unit,"        for f in (HERE/'candidate02').iterdir():freeze(f,Path('candidate')/f.name)",'''        main=ROOT/'idf/esp32-cyd2usb-native/main'
+        report['module_contract']=contract.validate_module(main/'native_tls_rx_reserve.c')
+        for name in ['native_tls_rx_reserve.c','native_tls_rx_reserve.h']:freeze(main/name,Path('candidate')/name)
+        freeze(main/'compat/tls_static_rx/enable.cmake',Path('candidate/enable.cmake'))
+        freeze(main/'compat/tls_static_rx/sdk-source-guards.json',Path('candidate/sdk-source-guards.json'))
+        freeze(ROOT/'tools/patch_cyd_tls_static_rx.py',Path('candidate/patch_cyd_tls_static_rx.py'))''')
+    unit=unit.replace("HERE/'harness'/name","HERE/'unit'/name").replace("HERE/'lifecycle-tests.c.inc'","HERE/'unit/stale-storage.cpp'").replace("Path('lifecycle-tests.c.inc')","Path('harness/stale-storage.cpp')")
+    unit=once(unit,"        code,log=execute('tools-before',tools);",'''        if a.prepare_only:
+            report['status']='inputs_prepared_uncompiled_unrun';report['prepared_inputs_only']=True;save();print(json.dumps({'prepared':True,'passed':False,'compiled':False}));return
+        cpp=out/'stale-storage.o'
+        # A separate language mode preserves strict C flags for the production
+        # module/SDK spans; the placement-new fixture has no exceptions or RTTI.
+        cppdir=out/'cpp-config';cppdir.mkdir();config(cppdir)
+        cpp_flags=[value for value in flags(cppdir) if value not in ['-std=c11','-H','-no-pie']]
+        code,log=execute('cpp-lifetime-build',['/usr/bin/g++','-std=c++17','-fno-exceptions','-fno-rtti',*cpp_flags[1:],'-c',host(out/'inputs/harness/stale-storage.cpp'),'-o',host(cpp)]);assert code==0,log
+        code,log=execute('tools-before',tools);''')
+    unit=unit.replace('names=["/usr/bin/gcc","/usr/bin/as","/usr/bin/ld"]','names=["/usr/bin/gcc","/usr/bin/g++","/usr/bin/as","/usr/bin/ld"]')
+    unit=unit.replace('"-print-prog-name=cc1",','"-print-prog-name=cc1","-print-prog-name=cc1plus",')
+    unit=unit.replace("b'    if (!configuration) return;\\n    portENTER_CRITICAL_SAFE(&s_lock);", "b'    if (!configuration) return;\\n    const uintptr_t identity = (uintptr_t)configuration;\\n    portENTER_CRITICAL_SAFE(&s_lock);")
+    unit=unit.replace("b'    if (!configuration) return;\\n    portENTER_CRITICAL(&s_lock);", "b'    if (!configuration) return;\\n    const uintptr_t identity = (uintptr_t)configuration;\\n    portENTER_CRITICAL(&s_lock);")
+    unit=unit.replace('s_radio_configurations[empty] = configuration;','s_radio_configurations[empty] = identity;').replace('s_radio_configurations[0] = configuration;','s_radio_configurations[0] = identity;')
+    unit=unit.replace("b'== configuration && s_state == RX_FREE)',b'== configuration)'","b'== identity && s_state == RX_FREE)',b'== identity)'")
+    unit=once(unit,"scenarios=['userdata','lifetime','registry_full','attach_failure','rollback','fallback','concurrent']","scenarios=['userdata','lifetime','registry_full','attach_failure','rollback','fallback','concurrent','stale_storage']")
+    unit=once(unit,"host(out/'inputs/harness/test.c'),'-o'","host(out/'inputs/harness/test.c'),host(cpp),'-o'")
+    # C++ case reports through the common final COMPLETE marker, never a distinct
+    # fallback protocol; no reduced production service is introduced.
+    write('tests/run-cyd-tls-static-rx-unit.py',unit)
+
+    # Canonical whole-service/config sources are prepared for later final-byte
+    # runs. Lifetime HTTP seam now executes actual config-init/free SDK spans.
+    for name in ['tls_bridge.c','tls_bridge.h','http-seam.c.inc','service-scenarios.c.inc']:
+        text=read(CAN/TEST/'service'/name)
+        if name=='tls_bridge.c':
+            text=once(text,'tls_close(&ssl);\n}', 'mbedtls_ssl_config_free(&conf);tls_close(&ssl);\n}')
+        if name=='http-seam.c.inc':
+            text=text.replace('static atomic_bool fail_tls_setup;','static atomic_bool fail_tls_setup,numeric_userdata;')
+            text=once(text,'c->tls_config=(mbedtls_ssl_config){.max_tls_version=0x303};','mbedtls_ssl_config_init(&c->tls_config);c->tls_config.max_tls_version=0x303;')
+            text=once(text,'if(occupy_userdata)mbedtls_ssl_conf_set_user_data_p(&c->tls_config,&occupied_cookie);','if(occupy_userdata)mbedtls_ssl_conf_set_user_data_p(&c->tls_config,&occupied_cookie);\n        if(numeric_userdata)mbedtls_ssl_conf_set_user_data_n(&c->tls_config,UINTPTR_MAX);')
+            text=once(text,'c->tls_initialized=true;','if(numeric_userdata)tls_check(mbedtls_ssl_conf_get_user_data_n(&c->tls_config)==UINTPTR_MAX,"numeric_radio_data_preserved");\n        c->tls_initialized=true;')
+            text=once(text,'if(c->tls_initialized){tls_close(&c->tls);','if(c->tls_initialized){mbedtls_ssl_config_free(&c->tls_config);tls_close(&c->tls);')
+        if name=='service-scenarios.c.inc':
+            text=once(text,'if(!strcmp(scenario,"tls_occupied"))occupy_userdata=true;','if(!strcmp(scenario,"tls_occupied"))occupy_userdata=true;\n        if(!strcmp(scenario,"tls_numeric"))numeric_userdata=true;')
+            text=text.replace('CONFIG_YORADIO_TLS_STATIC_RX_RESERVE&&!occupy_userdata&&strcmp','CONFIG_YORADIO_TLS_STATIC_RX_RESERVE&&strcmp')
+        write(TEST/'service'/name,text)
+    service=read(CAN/'tests/run-cyd-tls-static-rx-service.py')
+    service=service.replace("b'void mbedtls_ssl_free(']","b'void mbedtls_ssl_free(',b'void mbedtls_ssl_config_init(',b'void mbedtls_ssl_config_free(']")
+    service=once(service,"extract.function(public,b'static inline void *mbedtls_ssl_conf_get_user_data_p(')+b'\\n'","extract.function(public,b'static inline void *mbedtls_ssl_conf_get_user_data_p(')+b'\\n'+extract.function(public,b'static inline void mbedtls_ssl_conf_set_user_data_n(')+b'\\n'+extract.function(public,b'static inline uintptr_t mbedtls_ssl_conf_get_user_data_n(')+b'\\n'")
+    service=service.replace("'tls_occupied','tls_attach_error'","'tls_occupied','tls_numeric','tls_attach_error'")
+    service=once(service,"('omitted-radio-marker',candidate/'native_tls_rx_reserve.c','if (result == ESP_OK && configuration) {','if (false && result == ESP_OK && configuration) {','live_radio_loan_matches_transport')","('omitted-radio-registration',candidate/'native_tls_rx_reserve.c','if (result == ESP_OK)\\n            register_configuration(configuration);','if (false && result == ESP_OK)\\n            register_configuration(configuration);','live_radio_loan_matches_transport')")
+    write('tests/run-cyd-tls-static-rx-service.py',service)
+    write('tests/run-cyd-tls-static-rx-config.py',read(CAN/'tests/run-cyd-tls-static-rx-config.py'))
+
+    # Target project and runner start from the canonical-path preparation, not
+    # runtime imports of any ignored predecessor.
+    target=CAN/TEST/'target'
+    for source in target.rglob('*'):
+        if source.is_file() and source.name not in ['freeze-run.py']:
+            data=read(source)
+            if source.name=='sdkconfig.defaults':data+='\nCONFIG_ESP_TIMER_SUPPORTS_ISR_DISPATCH_METHOD=y\n'
+            if source.name=='CMakeLists.txt' and source.parent.name=='main':data=data.replace('heap_caps_calloc heap_caps_free)','heap_caps_calloc heap_caps_free esp_crt_bundle_attach)')
+            if source.name=='main.c':
+                data=read(REG/'target-pressure-fix/reference-after.c')
+                data=data.replace('UNBUILT PREPARATION. Actual SDK APIs','Registry canonical-source fixture. Actual SDK APIs').replace('unbuilt_candidate_fixture=1','registry_fixture=1').replace('canonical_candidate=1','registry_fixture=1')
+                data=once(data,'#include "esp_system.h"','#include "esp_system.h"\n#include "esp_timer.h"')
+                data=once(data,'static void *s_reserve;','static void *s_reserve;\nstatic void *s_rx_by_core[2];')
+                data=once(data,'    portENTER_CRITICAL(&s_trace_lock);\n    unsigned slot;','    portENTER_CRITICAL(&s_trace_lock);\n    s_rx_by_core[xPortGetCoreID()] = result;\n    unsigned slot;')
+                # Trace identity keys also avoid retaining expired config pointers.
+                data=data.replace('const mbedtls_ssl_config *configuration;','uintptr_t configuration_identity;')
+                data=data.replace('s_traces[slot].configuration','s_traces[slot].configuration_identity')
+                data=data.replace('configuration_identity == configuration','configuration_identity == (uintptr_t)configuration')
+                data=data.replace('(rx_trace_t){configuration, result','(rx_trace_t){(uintptr_t)configuration, result')
+                data=once(data,'static void ownership_and_rollback(void) {',read(HERE/'target-cases.inc')+'\nstatic void ownership_and_rollback(void) {')
+                data=once(data,'require(trace(&occupied).pointer != s_reserve, "occupied_client_ordinary_rx");','require(trace(&occupied).pointer == s_reserve, "occupied_radio_eligible");')
+                data=once(data,'    bool release;\n} worker_t;','    bool release;\n    const mbedtls_ssl_config *borrowed;\n} worker_t;')
+                data=once(data,'else setup(&s_worker.context, &s_worker.configuration);','else setup(&s_worker.context, s_worker.borrowed ? s_worker.borrowed : &s_worker.configuration);')
+                data=once(data,'    setup(&context, &radio);\n    require(trace(&radio).pointer != s_reserve, "no_reloan_during_erase");','    mbedtls_ssl_config_free(&radio);configure(&radio,true);\n    setup(&context, &radio);\n    require(trace(&radio).pointer != s_reserve, "no_reloan_during_erase");')
+                data=once(data,'    mbedtls_ssl_config_free(&s_worker.configuration);','''    /* Shared immutable config, two actual pinned cores, no private SSL fields. */
+    setup(&context,&radio);s_worker.borrowed=&radio;s_worker.release=false;
+    xSemaphoreGive(s_worker_start);wait_worker();
+    portENTER_CRITICAL(&s_trace_lock);void *core0=s_rx_by_core[0],*core1=s_rx_by_core[1];portEXIT_CRITICAL(&s_trace_lock);
+    require(core0!=core1&&((core0==s_reserve)!=(core1==s_reserve)),"shared_config_two_core_exclusive_loan");
+    cleanup(&context);s_worker.release=true;xSemaphoreGive(s_worker_start);wait_worker();s_worker.borrowed=NULL;
+    mbedtls_ssl_config_free(&s_worker.configuration);''')
+                data=once(data,'    smp_and_erase();','    registry_userdata_lifetimes();registry_full();initializer_from_actual_isr();\n    smp_and_erase();')
+            write(TEST/'target'/source.relative_to(target),data)
+    # New canonical target mutation recipes; exactly eight named controls.
+    freeze=read(target/'freeze-run.py')
+    start=freeze.index('VARIANTS = ');end=freeze.index('\n\n\ndef sha',start)
+    freeze=freeze[:start]+"VARIANTS = ('canonical','skip-init','skip-free','evict-full','forget-resets-loan','skip-exclusive','early-publish-phase','ordinary-free-static','bypass-reclaim')"+freeze[end:]
+    start=freeze.index('    if args.variant == ');end=freeze.index('    generated = ',start)
+    cases='''    if args.variant in ('skip-init','skip-free'):
+        name='init' if args.variant=='skip-init' else 'free'
+        # Mutate only the exact selected hook replacement, retaining its SDK source guard.
+        old="    yoradio_tls_static_rx_forget_configuration(conf);\\\\n"
+        data=patcher.read_text();anchor="b'void mbedtls_ssl_config_"+name+"("
+        first=data.index(anchor);second=data.index(anchor,first+len(anchor))
+        location=data.index(old,second);data=data[:location]+data[location:].replace(old,"    /* negative: omitted lifecycle forget */\\\\n",1)
+        patcher.write_bytes(data.encode());edits.append({'file':patcher.relative_to(out).as_posix(),'hook':name,'kind':'exact replacement-span lifecycle omission'})
+        expected='init_revokes_stale_identity' if name=='init' else 'free_revokes_stale_identity'
+    elif args.variant=='evict-full':
+        replace(module,'if (empty != RX_CONFIGURATION_CAPACITY)\\n        s_radio_configurations[empty] = identity;','if (empty != RX_CONFIGURATION_CAPACITY)\\n        s_radio_configurations[empty] = identity;\\n    else s_radio_configurations[0] = identity;')
+        expected='full_registry_does_not_evict'
+    elif args.variant=='forget-resets-loan':
+        replace(module,'    if (!configuration) return;\\n    const uintptr_t identity = (uintptr_t)configuration;\\n    portENTER_CRITICAL_SAFE(&s_lock);','    if (!configuration) return;\\n    const uintptr_t identity = (uintptr_t)configuration;\\n    portENTER_CRITICAL_SAFE(&s_lock);\\n    if (s_state == RX_LOANED) s_state = RX_FREE;')
+        expected='config_free_keeps_exclusive_loan'
+    elif args.variant=='skip-exclusive':
+        replace(module,'== identity && s_state == RX_FREE)','== identity)')
+        expected='independent_context_rx_no_alias'
+    elif args.variant=='early-publish-phase':
+        replace(module,'#include "tf_psa_crypto_common.h"','#include "tf_psa_crypto_common.h"\\nextern int tls_reserve_test_erase_phase(void);')
+        replace(module,'s_state = RX_RETURNING;','s_state = tls_reserve_test_erase_phase() ? RX_FREE : RX_RETURNING;')
+        expected='no_reloan_during_erase'
+    elif args.variant=='ordinary-free-static':
+        replace(module,'if (pointer != s_rx) return false;','if (pointer != s_rx) return false;\\n    mbedtls_free(pointer);\\n    return true;')
+        expected='reserved_pointer_never_sdk_heap_free'
+    elif args.variant=='bypass-reclaim':
+        replace(module,'#include "tf_psa_crypto_common.h"','#include "tf_psa_crypto_common.h"\\nextern void *__real_esp_mbedtls_mem_calloc(size_t,size_t);')
+        replace(module,'return mbedtls_calloc(count, bytes);','return __real_esp_mbedtls_mem_calloc(count, bytes);')
+        expected='busy_slot_reclaim_retry_preserved'
+'''
+    freeze=freeze[:start]+cases+freeze[end:];write(TEST/'target/freeze-run.py',freeze)
+    qemu=read(CAN/'tests/run-cyd-tls-static-rx-qemu.py')
+    start=qemu.index('VARIANTS = ');end=qemu.index('\n\n\ndef sha',start)
+    qemu=qemu[:start]+"VARIANTS = ('canonical','skip-init','skip-free','evict-full','forget-resets-loan','skip-exclusive','early-publish-phase','ordinary-free-static','bypass-reclaim','canonical-reclaim-off','reserve-off-reclaim-on','reserve-off-reclaim-off')"+qemu[end:]
+    qemu=qemu.replace('12b5eb83e7adfebacdd9ba5dbc9256dd8676f1c38be91b902d4bd0c9495d55f9',module_sha)
+    qemu=qemu.replace('canonical_source_fixture=1','registry_fixture=1').replace('full ten-variant','full twelve-variant')
+    qemu=qemu.replace("for symbol in ['yoradio_tls_static_rx_calloc', 'mbedtls_platform_zeroize', 'heap_caps_calloc', 'heap_caps_free']:","for symbol in ['yoradio_tls_static_rx_calloc', 'mbedtls_platform_zeroize', 'heap_caps_calloc', 'heap_caps_free', 'esp_crt_bundle_attach']:")
+    qemu=once(qemu,"'s_radio_configuration_marker', 's_rx']:","'s_radio_configurations', 'yoradio_tls_static_rx_forget_configuration', '__wrap_esp_crt_bundle_attach', 's_rx']:")
+    qemu=qemu.replace("['native_tls_rx_reserve.h'] if reserve else []","['native_tls_rx_reserve.h','portmacro.h','esp_timer.h'] if reserve else []")
+    qemu=once(qemu,"                assert log.count('TLS_RX_TARGET_CASE smp_ownership_handover_erase cores=0,1') == 1","""                assert log.count('TLS_RX_TARGET_CASE smp_ownership_handover_erase cores=0,1') == 1
+                assert log.count('TLS_RX_TARGET_CASE registry_userdata_init_free_live_reuse attach_return_injection=1 early_setup_actual=1')==1
+                assert log.count('TLS_RX_TARGET_CASE registry_capacity entries=8 clients=9 soft_fallback=1')==1
+                assert log.count('TLS_RX_TARGET_CASE actual_initializer_isr registry_revoked=1')==1""")
+    # New config lifecycle hooks must occur in actual compiled assembly too.
+    qemu=once(qemu,"if reserve: assembly_symbols.append('yoradio_tls_static_rx_calloc')","if reserve: assembly_symbols += ['yoradio_tls_static_rx_calloc','mbedtls_ssl_config_init','mbedtls_ssl_config_free']")
+    qemu=once(qemu,"                assert '__wrap_heap_caps_free' in asm['esp_mbedtls_mem_free']","""                assert '__wrap_heap_caps_free' in asm['esp_mbedtls_mem_free']
+                if name!='skip-init':assert 'yoradio_tls_static_rx_forget_configuration' in asm['mbedtls_ssl_config_init']
+                if name!='skip-free':assert 'yoradio_tls_static_rx_forget_configuration' in asm['mbedtls_ssl_config_free']""")
+    write('tests/run-cyd-tls-static-rx-qemu.py',qemu)
+    for path in REPO.rglob('*.py'):ast.parse(path.read_bytes(),filename=str(path))
+    changes=''.join(difflib.unified_diff((REG/'candidate02/native_tls_rx_reserve.c').read_text().splitlines(keepends=True),module.splitlines(keepends=True),fromfile='candidate02/native_tls_rx_reserve.c',tofile=(MAIN/'native_tls_rx_reserve.c').as_posix()))
+    (HERE/'integer-identity-delta.patch').write_text(changes)
+    diff=[]
+    for path in sorted(REPO.rglob('*')):
+        if not path.is_file():continue
+        relative=path.relative_to(REPO);baseline=(ROOT/relative).read_text() if (ROOT/relative).is_file() else ''
+        diff.extend(difflib.unified_diff(baseline.splitlines(keepends=True),path.read_text().splitlines(keepends=True),fromfile='a/'+relative.as_posix() if baseline else '/dev/null',tofile='b/'+relative.as_posix()))
+    (HERE/'canonical-integration-and-tests.patch').write_text(''.join(diff))
+    (HERE/'preparation.json').write_text(json.dumps({'prepared':True,'integrated':False,'compiled':False,'qemu':False,'module_sha256':module_sha,'prior_registry_module_sha256':'58cb83830fa825b912068087007440fba9f4205fb0c64abbe684696b3e53485a','delta':'uintptr_t identity storage/conversions plus explicit new host/target lifetime cases; not comment-only','target_variants':12,'target_option_positives':4,'target_named_controls':8,'host_positive_groups':8,'host_named_controls':9,'host_compile_rejections':14,'whole_service_cases_proposed':536,'whole_service_variants':12,'configure_cases_proposed':45,'production_exports_proposed':7,'clang_profiles_proposed':6,'lineage':lineage,'files':{f.relative_to(REPO).as_posix():sha(f.read_bytes()) for f in REPO.rglob('*') if f.is_file()}},indent=2)+'\n')
+    print(json.dumps({'prepared':True,'module_sha256':module_sha,'files':len([p for p in REPO.rglob('*') if p.is_file()]),'executed_builds':0}),flush=True)
+if __name__=='__main__':main()

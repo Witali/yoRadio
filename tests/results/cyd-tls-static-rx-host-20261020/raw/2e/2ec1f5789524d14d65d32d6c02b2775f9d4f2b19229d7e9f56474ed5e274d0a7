@@ -1,0 +1,115 @@
+"""Minimal source-map AST/preflight/extraction/freeze checks; no compilation.
+
+Only proposed files plus their small existing source dependencies are copied.
+There is no whole-repository snapshot, SDK configure/build, compiler, lint or QEMU
+execution. Actual tool/SDK dependencies are explicit command-line arguments.
+"""
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+HERE=Path(__file__).resolve().parent
+ROOT=HERE.parent.parent
+TEST=Path('tests/native/cyd_tls_static_rx')
+MAIN=Path('idf/esp32-cyd2usb-native/main')
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def load(path,name):
+    spec=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True);p.add_argument('--sdk',type=Path,required=True);p.add_argument('--tools',type=Path,required=True);p.add_argument('--qemu',type=Path,required=True);p.add_argument('--powershell',type=Path,required=True);a=p.parse_args()
+    out=a.output.resolve();assert out.is_relative_to(HERE) and not out.exists();out.mkdir(parents=True)
+    checkout=HERE/(out.name+'-source-map');assert not checkout.exists();shutil.copytree(HERE/'repository',checkout)
+    report={'prepared':False,'execution_qualified':False,'compiler_invoked':False,'sdk_build_invoked':False,'qemu_invoked':False,'lint_invoked':False,'scope':__doc__,'commands':[],'checks':{},'sources':{}}
+    env=os.environ.copy();env.update(PYTHONDONTWRITEBYTECODE='1',GIT_OPTIONAL_LOCKS='0')
+    def save():(out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
+    def execute(label,argv):
+        result=subprocess.run(list(map(str,argv)),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env=env,timeout=60);(out/(label+'.log')).write_bytes(result.stdout)
+        report['commands'].append({'label':label,'argv':list(map(str,argv)),'exit_status':result.returncode,'log_sha256':hashlib.sha256(result.stdout).hexdigest()});save()
+        assert result.returncode==0,(label,result.stdout.decode(errors='replace')[-7000:]);return result.stdout.decode(errors='replace')
+    try:
+        existing=[ROOT/MAIN/name for name in ('audio_service.h','native_audio_output.c','native_audio_output.h','native_state.c','native_state.h','native_health.h','native_output_metrics.h','input_prefill.h','native_input_reclaim.c','native_input_reclaim.h','compat/input_reclaim/enable.cmake','board_config.h')]
+        shared=ROOT/'idf/components/native_stream'
+        existing += [shared/'adaptive_input.c',shared/'icy_title.c',*sorted((shared/'include').glob('*.h'))]
+        existing += [ROOT/'tests'/name for name in ('run-cyd-maintenance.py','native/cyd_maintenance_test.c','native/cyd_maintenance_platform.h','native/cyd_output_pause_test.c','native/cyd_output_metrics_noop.h','native/audio_power_seam.h')]
+        for source in existing:
+            destination=checkout/source.relative_to(ROOT);assert not destination.exists();destination.parent.mkdir(parents=True,exist_ok=True);destination.write_bytes(source.read_bytes());report['sources'][str(source)]={'sha256':sha(source),'copy':str(destination)}
+        files=[path for path in (HERE/'repository').rglob('*') if path.is_file()]
+        for source in files:
+            data=source.read_bytes()
+            if source.suffix=='.py':ast.parse(data,filename=str(source))
+            if source.suffix in ['.py','.c','.h','.cpp','.inc','.ps1','.cmake']:
+                assert not any(value in data for value in [b'cyd-tls-reserve-host-draft',b'cyd-tls-reserve-target-prep',b'cyd-tls-reserve-integration-prep',b'attempt05',b'candidate02']),source
+            report['sources'][str(source)]={'sha256':sha(source),'copy':str(checkout/source.relative_to(HERE/'repository'))}
+        fixture=checkout/TEST;contract=load(fixture/'source_contract.py','prep_contract');module=checkout/MAIN/'native_tls_rx_reserve.c'
+        report['checks']['no_historical_runtime_dependencies']=True
+        raw=module.read_bytes();normalized=raw.replace(b'\r\n',b'\n')
+        for name,data in [('lf',normalized),('crlf',normalized.replace(b'\n',b'\r\n'))]:
+            sample=out/('module-'+name+'.c');sample.write_bytes(data);identity=contract.validate_module(sample)
+            assert identity['sha256']==sha(sample) and identity['normalized_lf_sha256']==contract.MODULE_SHA256;report['checks']['module-'+name]=identity
+        mixed=out/'module-mixed.c';mixed.write_bytes(normalized.replace(b'\n',b'\r\n',1))
+        try:contract.validate_module(mixed)
+        except AssertionError as e:assert str(e)=='Mixed module line endings are not qualified'
+        else:raise AssertionError('mixed module endings accepted')
+        report['checks']['module-mixed-rejected']=True
+        assert (checkout/MAIN/'compat/tls_static_rx/.gitattributes').read_text()=='sdk-source-guards.json -text\n'
+        assert sum(path.read_text().count('config YORADIO_TLS_STATIC_RX_RESERVE') for path in checkout.rglob('Kconfig.projbuild'))==1
+        assert (fixture/'target/project/main/Kconfig.projbuild').read_text()=='source "$RX_RESERVE_PRODUCTION_KCONFIG"\n'
+        report['checks']['raw_guard_attribute_and_single_kconfig']=True
+        extract=load(fixture/'sdk_spans.py','prep_spans')
+        sample=b'int f(void){ /* } */ const char *s="{"; if(s){return 1;}return 0;}\n'
+        assert extract.function(sample,b'int f(')==sample.rstrip(b'\n')
+        base=[sys.executable,'-B','-X','utf8']
+        for name in ['unit','service']:
+            runner=checkout/'tests'/('run-cyd-tls-static-rx-'+name+'.py');output=checkout/'.build'/('preflight-'+name)
+            value=json.loads(execute(name+'-preflight',base+[runner,'--sdk',a.sdk,'--output',output,'--preflight-only']));assert value['runtime_or_build'] is False and not output.exists()
+            output=checkout/'.build'/('inputs-'+name)
+            value=json.loads(execute(name+'-inputs',base+[runner,'--sdk',a.sdk,'--output',output,'--prepare-only']))
+            result=json.loads((output/'report.json').read_text());assert value['prepared'] and not value['passed'] and result['prepared_inputs_only'] and not result['passed'] and not result['commands']
+            assert any(Path(path).name=='source_contract.py' for path in result['inputs'])
+            assert all(sha(Path(path))==entry['sha256'] and sha(output/entry['snapshot'])==entry['sha256'] for path,entry in result['inputs'].items())
+            assert all(Path(path).is_relative_to(checkout) or Path(path).is_relative_to(a.sdk) for path in result['inputs'])
+            if name=='service':
+                assert '#define portENTER_CRITICAL_SAFE(lock) host_enter(lock)' in (output/'stubs/platform.h').read_text()
+                assert '#define portEXIT_CRITICAL_SAFE(lock) host_exit(lock)' in (output/'stubs/platform.h').read_text()
+            report['checks'][name+'_frozen_source_only']=True
+        unit=(checkout/'tests/run-cyd-tls-static-rx-unit.py').read_text()
+        assert unit.index("execute('tools-before'")<unit.index("execute('cpp-lifetime-build'")
+        report['checks']['tools_captured_before_any_compiler']=True
+        execute('config-preflight',base+[checkout/'tests/run-cyd-tls-static-rx-config.py','--sdk',a.sdk,'--cmake',a.tools/'tools/cmake/4.0.3/bin/cmake.exe','--ninja',a.tools/'tools/ninja/1.12.1/ninja.exe','--output',checkout/'.build/config-preflight','--preflight-only'])
+        qemu_runner=checkout/'tests/run-cyd-tls-static-rx-qemu.py'
+        value=json.loads(execute('target-preflight',base+[qemu_runner,'--sdk',a.sdk,'--tools',a.tools,'--qemu',a.qemu,'--powershell',a.powershell,'--output',checkout/'.build/target-preflight','--preflight-only']))
+        assert not value['build_or_runtime'] and len(value['variants'])==12
+        patchers=[]
+        for name in value['variants']:
+            variant='canonical' if name in ['canonical-reclaim-off','reserve-off-reclaim-on','reserve-off-reclaim-off'] else name
+            campaign=checkout/'.build'/('freeze-'+name)
+            execute('freeze-'+name,base+[fixture/'target/freeze-run.py','--output',campaign,'--variant',variant])
+            frozen=json.loads((campaign/'source-manifest.json').read_text())
+            assert all(sha(campaign/path)==value for path,value in frozen['frozen_sources'].items())
+            assert all(Path(path).is_relative_to(checkout) for path in frozen['original_inputs'])
+            assert frozen['canonical_module_contract']['normalized_lf_sha256']==contract.MODULE_SHA256
+            assert frozen['phase_scoped_mutation']==(name in ['early-publish-phase','forget-resets-loan'])
+            patcher=load(campaign/'sources/repository/tools/patch_cyd_tls_static_rx.py','prep_patch_'+name.replace('-','_'))
+            patcher.validate_sdk_guards(a.sdk,campaign/'sources/repository'/MAIN/'compat/tls_static_rx/sdk-source-guards.json')
+            tls=(a.sdk/'components/mbedtls/mbedtls/library/ssl_tls.c').read_bytes();patched=patcher.patch(tls)
+            init=extract.function(patched,b'void mbedtls_ssl_config_init(');free=extract.function(patched,b'void mbedtls_ssl_config_free(')
+            assert (b'yoradio_tls_static_rx_forget_configuration(conf);' in init)==(name!='skip-init')
+            assert (b'yoradio_tls_static_rx_forget_configuration(conf);' in free)==(name!='skip-free')
+            patchers.append(name)
+        report['checks']['twelve_unbuilt_variant_freezes_and_exact_hook_recipes']=patchers
+        ps=out/'parse-build-helper.ps1';launcher=fixture/'target/sdk-build.ps1'
+        ps.write_text('$syntaxErrors=$null\n$tokens=$null\n[System.Management.Automation.Language.Parser]::ParseFile(\''+str(launcher).replace("'","''")+'\',[ref]$tokens,[ref]$syntaxErrors) | Out-Null\nif ($syntaxErrors.Count) { $syntaxErrors | Out-String | Write-Error; exit 1 }\nWrite-Output "POWERSHELL_AST_PASS"\n')
+        assert 'POWERSHELL_AST_PASS' in execute('powershell-ast',[a.powershell,'-NoProfile','-NonInteractive','-File',ps])
+        assert all(sha(Path(path))==entry['sha256'] and sha(Path(entry['copy']))==entry['sha256'] for path,entry in report['sources'].items())
+        report['prepared']=True;report['minimal_existing_dependencies']=len(existing);report['proposed_files']=len(files);report['prepared_variants']=12
+        print(json.dumps({'prepared':True,'execution_qualified':False,'checks':list(report['checks']),'minimal_existing_dependencies':len(existing),'proposed_files':len(files)}),flush=True)
+    except BaseException as e:report['error']=repr(e);raise
+    finally:save()
+if __name__=='__main__':main()

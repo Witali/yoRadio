@@ -1,0 +1,1534 @@
+{
+  "passed": true,
+  "scope": "Whole new registry module + exact pinned SDK RX/config lifetime spans.\n\nHost layout/crypto/RTOS/capacity inputs and adaptive metadata remain explicit\nseams. Canonical reclaim source is whole. No SDK build/QEMU/hardware/real OOM or\nTLS conformance claim. Numeric/pointer userdata is never interpreted by module.\n",
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\source_contract.py": {
+      "sha256": "1a89b1276e0687375f20df4db6e5b8d10659d4b2c9ff56159469392a3496f29f",
+      "snapshot": "inputs/source_contract.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.c": {
+      "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+      "snapshot": "inputs/candidate/native_tls_rx_reserve.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.h": {
+      "sha256": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "snapshot": "inputs/candidate/native_tls_rx_reserve.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\tls_static_rx\\enable.cmake": {
+      "sha256": "a0d38149fea63311c75e6014a77b2bda8973bc1c30a3c35fd8f7d578d1aa4617",
+      "snapshot": "inputs/candidate/enable.cmake"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\tls_static_rx\\sdk-source-guards.json": {
+      "sha256": "81fc22bbd240f71cb664ab08490f4e79ae805b066f0d61dbe24299af47ab49bb",
+      "snapshot": "inputs/candidate/sdk-source-guards.json"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\patch_cyd_tls_static_rx.py": {
+      "sha256": "c22a827a099ffdbec8fcbf07ea11bb91db79ce73cdf7783e83ef678764b72e22",
+      "snapshot": "inputs/candidate/patch_cyd_tls_static_rx.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\unit\\platform.h": {
+      "sha256": "303cd59bac051fcf10338e43057e91dc723114f9cde48c22841d7a1067826e17",
+      "snapshot": "inputs/harness/platform.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\unit\\test.c": {
+      "sha256": "e349a235d63ecc15743b86f567b01314afa26c3285a8c0b10d69a014d1380435",
+      "snapshot": "inputs/harness/test.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\sdk_spans.py": {
+      "sha256": "4bf6912279132465065cffefb6d90cdf757758bbeca86a239cecd275c91e4f8e",
+      "snapshot": "inputs/sdk_spans.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-tls-static-rx-unit.py": {
+      "sha256": "0ac4cc6f0d5c4e647fa86827d7b5a28c40a29508ea9a7c8938315ce4827e819b",
+      "snapshot": "inputs/run-host.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\unit\\stale-storage.cpp": {
+      "sha256": "ac394074803b7b85986ecc02c604e2d57af0288e1b64af2e54873ed871d1410c",
+      "snapshot": "inputs/harness/stale-storage.cpp"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c": {
+      "sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+      "snapshot": "inputs/reclaim/native_input_reclaim.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.h": {
+      "sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+      "snapshot": "inputs/reclaim/native_input_reclaim.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c": {
+      "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/library/ssl_tls.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h": {
+      "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/library/ssl_misc.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\include\\mbedtls\\ssl.h": {
+      "sha256": "e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/include/mbedtls/ssl.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform.h": {
+      "sha256": "84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform_util.h": {
+      "sha256": "814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform_util.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\tf_psa_crypto_common.h": {
+      "sha256": "ffe3ef63009cf74588d900aa88e3d98172a2015dd8fa8121856a1fb7875eb8de",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/core/tf_psa_crypto_common.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform.c": {
+      "sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform_util.c": {
+      "sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\mbedtls\\esp_config.h": {
+      "sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+      "snapshot": "inputs/sdk/components/mbedtls/port/include/mbedtls/esp_config.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_mem.c": {
+      "sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+      "snapshot": "inputs/sdk/components/mbedtls/port/esp_mem.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\CMakeLists.txt": {
+      "sha256": "4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+      "snapshot": "inputs/sdk/components/mbedtls/CMakeLists.txt"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\esp_crt_bundle\\esp_crt_bundle.c": {
+      "sha256": "5efb7440442b8f450b6cf41736e0e577f6a7e9bfa2ff054af1728129db75db10",
+      "snapshot": "inputs/sdk/components/mbedtls/esp_crt_bundle/esp_crt_bundle.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\esp_crt_bundle\\include\\esp_crt_bundle.h": {
+      "sha256": "33b442fc0c82ebfdb3b737785a2e85e1529f8594709103908a42ca4e0f08c97b",
+      "snapshot": "inputs/sdk/components/mbedtls/esp_crt_bundle/include/esp_crt_bundle.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp-tls\\esp_tls_mbedtls.c": {
+      "sha256": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+      "snapshot": "inputs/sdk/components/esp-tls/esp_tls_mbedtls.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\tcp_transport\\transport_ssl.c": {
+      "sha256": "c629965fb7b7f1999c420e763e0fb2a78860f1e2c93cd729982cdda4735420d7",
+      "snapshot": "inputs/sdk/components/tcp_transport/transport_ssl.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\esp_http_client.c": {
+      "sha256": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+      "snapshot": "inputs/sdk/components/esp_http_client/esp_http_client.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_common\\include\\esp_idf_version.h": {
+      "sha256": "10eec73116b19e5fc959a56e07c7f394cefb8d59d3858108ab8c4d2b57bd253f",
+      "snapshot": "inputs/sdk/components/esp_common/include/esp_idf_version.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h": {
+      "sha256": "6400442b731b8cd9ec7ab8f2e95c279fdeac16abe632321d78fd25ca0a0f589c",
+      "snapshot": "inputs/sdk/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\port.c": {
+      "sha256": "6c954972a2acfaa0bd0baad27bcdfd32971cec097a89274cf0bd458e6faa4f2c",
+      "snapshot": "inputs/sdk/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c"
+    }
+  },
+  "commands": [
+    {
+      "label": "tools-before",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/python3",
+        "-c",
+        "import hashlib,json,pathlib,subprocess; names=[\"/usr/bin/gcc\",\"/usr/bin/g++\",\"/usr/bin/as\",\"/usr/bin/ld\"]; names += [subprocess.check_output([\"/usr/bin/gcc\",v],text=True).strip() for v in [\"-print-prog-name=cc1\",\"-print-prog-name=cc1plus\",\"-print-prog-name=collect2\",\"-print-file-name=libasan.so\",\"-print-file-name=libubsan.so\"]]; print(json.dumps({str(pathlib.Path(p).resolve()):hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for p in names})); print(subprocess.check_output([\"/usr/bin/gcc\",\"--version\"],text=True))"
+      ],
+      "exit_status": 0,
+      "log_sha256": "930638b21b6ab6aa90abac89a46fc08bbbf9e2661fb026a18398e63bd079f2e8"
+    },
+    {
+      "label": "cpp-lifetime-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/g++",
+        "-std=c++17",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/cpp-config",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/stale-storage.cpp",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o"
+      ],
+      "exit_status": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "canonical-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "e9700c54f6a33090040b2d3f71b1f6141cd6f3e7268fa1fa9acdfd8f2a16bf38"
+    },
+    {
+      "label": "canonical-userdata",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "userdata"
+      ],
+      "exit_status": 0,
+      "log_sha256": "8cea5ffaac572c20170fa7b242cce86cc0434f6f1dee4657c5820ba12e4a62fd"
+    },
+    {
+      "label": "canonical-lifetime",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "lifetime"
+      ],
+      "exit_status": 0,
+      "log_sha256": "371027985a026e20fa5c10fb0b2e19b7535553ee3d5a8131fb2922502c1433a2"
+    },
+    {
+      "label": "canonical-registry_full",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "registry_full"
+      ],
+      "exit_status": 0,
+      "log_sha256": "60f5639fd167fbe00c5375cacccaa4ce56ca87d02d04249c1f8eea3c83e9721f"
+    },
+    {
+      "label": "canonical-attach_failure",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "attach_failure"
+      ],
+      "exit_status": 0,
+      "log_sha256": "40ce230fafb2ad026b877d9725705377a45348ca80bce7abf3bdd26da036e103"
+    },
+    {
+      "label": "canonical-rollback",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "rollback"
+      ],
+      "exit_status": 0,
+      "log_sha256": "5389fc9275c57ba2933fe030652b78f0d5efe495ae0b8ea7549cb4ab0a08300d"
+    },
+    {
+      "label": "canonical-fallback",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "fallback"
+      ],
+      "exit_status": 0,
+      "log_sha256": "f40558f83db226a804ff4c3b455b2ef240bc3f34e86e8d1414e1a0f1c59fd772"
+    },
+    {
+      "label": "canonical-concurrent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "concurrent"
+      ],
+      "exit_status": 0,
+      "log_sha256": "3eac47d8b58f1945e71c1d2e51a950a40a88a5f56462064c2b863d7cd4f1caf7"
+    },
+    {
+      "label": "canonical-stale_storage",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "stale_storage"
+      ],
+      "exit_status": 0,
+      "log_sha256": "6b956e33146e28d6a840aefa650fbb95f515feea61e235bda9f62a3ba659861a"
+    },
+    {
+      "label": "skip-init-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-init",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-init/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-init/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-init/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "fda0a1589a97d18e1782d3c868544c316acbf0fe82dff60710d330999bb8ad78"
+    },
+    {
+      "label": "skip-init-lifetime",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-init/test",
+        "lifetime"
+      ],
+      "exit_status": 2,
+      "log_sha256": "a81233da19edbbae2e76c963d1a1f0ea7c2511cf27f08611864969df7783d9f0"
+    },
+    {
+      "label": "skip-free-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-free",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-free/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-free/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-free/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "3d72bb6d840aaea9b2632b0491f5df16ad3d7216d2886af1f1edaaaaf94ff717"
+    },
+    {
+      "label": "skip-free-lifetime",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-free/test",
+        "lifetime"
+      ],
+      "exit_status": 2,
+      "log_sha256": "282aff3adf6f7999567eb2f93b41be618fd91b661f7f01c2a09fde631c60b0a6"
+    },
+    {
+      "label": "evict-full-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/evict-full",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/evict-full/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/evict-full/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/evict-full/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "ba33155aad88a54bf63ca5a8ee5682a5e5ed7cd8ce8677512d104056b78a6b0f"
+    },
+    {
+      "label": "evict-full-registry_full",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/evict-full/test",
+        "registry_full"
+      ],
+      "exit_status": 2,
+      "log_sha256": "292f2996bd092e5585adeaa29229b5fa61ece2c727c2470a6c6721dd05eb80ca"
+    },
+    {
+      "label": "forget-resets-loan-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/forget-resets-loan",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/forget-resets-loan/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/forget-resets-loan/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/forget-resets-loan/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "68a22c59a665809de2d6276b5b5600968f15f8f8f2d5a054646d82a899eae77b"
+    },
+    {
+      "label": "forget-resets-loan-lifetime",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/forget-resets-loan/test",
+        "lifetime"
+      ],
+      "exit_status": 2,
+      "log_sha256": "a4f43dc8bb9f3370b43538077dded6821d1e267a810b2bb6ed95790d42e92842"
+    },
+    {
+      "label": "task-only-init-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/task-only-init",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/task-only-init/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/task-only-init/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/task-only-init/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "0ada4bf5b722f26b7195d4681f2cfe31ce2404b5287cc8d3f098b7f20d330772"
+    },
+    {
+      "label": "task-only-init-lifetime",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/task-only-init/test",
+        "lifetime"
+      ],
+      "exit_status": 2,
+      "log_sha256": "355448b5f324231f44d8a1bba7df2f519c80973b39a0d3afb2a88e5200f9dfc4"
+    },
+    {
+      "label": "skip-exclusive-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-exclusive",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-exclusive/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-exclusive/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-exclusive/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "23caf3b6b743c0532714129d00ad047878d6eaca7fb4dc4f76030e1d7ccd6e35"
+    },
+    {
+      "label": "skip-exclusive-concurrent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/skip-exclusive/test",
+        "concurrent"
+      ],
+      "exit_status": 2,
+      "log_sha256": "dec913ee0e15c292c4022e7d9c2fdf9b9f196c2cdbe0f17b44307e6e262d8100"
+    },
+    {
+      "label": "early-publish-phase-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/early-publish-phase",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/early-publish-phase/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/early-publish-phase/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/early-publish-phase/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "e944e71fd242c2c9df213a5083296bf3722c36195a38a665fbba7f40b6e5d9d2"
+    },
+    {
+      "label": "early-publish-phase-concurrent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/early-publish-phase/test",
+        "concurrent"
+      ],
+      "exit_status": 2,
+      "log_sha256": "080ed9286d2b9aa6d73255b235134f500e2b23fe9c73d146c7e3307d4ad2e9c8"
+    },
+    {
+      "label": "ordinary-free-static-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/ordinary-free-static",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/ordinary-free-static/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/ordinary-free-static/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/ordinary-free-static/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "6cee1ad57e0e354ab556b5381fbf4aa63bc63c290597854b0890ef9631e8dae1"
+    },
+    {
+      "label": "ordinary-free-static-userdata",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/ordinary-free-static/test",
+        "userdata"
+      ],
+      "exit_status": 2,
+      "log_sha256": "d2f5b5a5681541e8de45020790cdb2afdec5dc404a5e9ee5831ea970663455eb"
+    },
+    {
+      "label": "bypass-reclaim-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/bypass-reclaim",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/bypass-reclaim/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/bypass-reclaim/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness/test.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stale-storage.o",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/bypass-reclaim/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "921b366ddf37be50e488db4fe173bf68836768274eae4f3748a95aab29a783bc"
+    },
+    {
+      "label": "bypass-reclaim-fallback",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/bypass-reclaim/test",
+        "fallback"
+      ],
+      "exit_status": 2,
+      "log_sha256": "0038deedbdc9dc52fc4e6f530957aa3cc4b304e9e856cfc32075c9ab2361ee6a"
+    },
+    {
+      "label": "reject-YORADIO_TLS_STATIC_RX_RESERVE-zero",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-YORADIO_TLS_STATIC_RX_RESERVE-zero",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-YORADIO_TLS_STATIC_RX_RESERVE-zero/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-YORADIO_TLS_STATIC_RX_RESERVE-zero/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "512cdd727f51a3f463e2c4ed3182f6af890b48da9810f3be0548aef39a6cc593"
+    },
+    {
+      "label": "reject-IDF_TARGET_ESP32-zero",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-IDF_TARGET_ESP32-zero",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-IDF_TARGET_ESP32-zero/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-IDF_TARGET_ESP32-zero/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "e01fe160d10f96d0c79ef2a0de5161136923abb54684e7c7448e1c5cdf76bde6"
+    },
+    {
+      "label": "reject-ESP_TLS_USING_MBEDTLS-zero",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-ESP_TLS_USING_MBEDTLS-zero",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-ESP_TLS_USING_MBEDTLS-zero/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-ESP_TLS_USING_MBEDTLS-zero/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "7934589e80c9085d13ff0d739771e669b01021f620b64964d0b39d31a1315a5c"
+    },
+    {
+      "label": "reject-MBEDTLS_INTERNAL_MEM_ALLOC-zero",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_INTERNAL_MEM_ALLOC-zero",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_INTERNAL_MEM_ALLOC-zero/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_INTERNAL_MEM_ALLOC-zero/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "24c1724f507ba1ea52e29ddb99aa11c1967042b0c9a217218769c4e7d8d84353"
+    },
+    {
+      "label": "reject-MBEDTLS_CERTIFICATE_BUNDLE-zero",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_CERTIFICATE_BUNDLE-zero",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_CERTIFICATE_BUNDLE-zero/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_CERTIFICATE_BUNDLE-zero/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "2e6262501759f0ca6c8e6351ee9c1d4f73c49e58b7f14d1f0be91dba7c8c4353"
+    },
+    {
+      "label": "reject-YORADIO_TLS_STATIC_RX_RESERVE-absent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-YORADIO_TLS_STATIC_RX_RESERVE-absent",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-YORADIO_TLS_STATIC_RX_RESERVE-absent/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-YORADIO_TLS_STATIC_RX_RESERVE-absent/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "00948df09d3076a55d7c5150e574a6204d0d296da8438e36d019b13556e87493"
+    },
+    {
+      "label": "reject-IDF_TARGET_ESP32-absent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-IDF_TARGET_ESP32-absent",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-IDF_TARGET_ESP32-absent/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-IDF_TARGET_ESP32-absent/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "48bc54a4effbe22eef904581ba9b202aa4c2fd11fd89a3dce4867841089e5a07"
+    },
+    {
+      "label": "reject-ESP_TLS_USING_MBEDTLS-absent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-ESP_TLS_USING_MBEDTLS-absent",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-ESP_TLS_USING_MBEDTLS-absent/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-ESP_TLS_USING_MBEDTLS-absent/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "37df10b5a6f70e664ad8f0953cd9d5b880ee20317d04a627207532a201f68012"
+    },
+    {
+      "label": "reject-MBEDTLS_INTERNAL_MEM_ALLOC-absent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_INTERNAL_MEM_ALLOC-absent",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_INTERNAL_MEM_ALLOC-absent/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_INTERNAL_MEM_ALLOC-absent/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "5eb9c14f4e9d9fa4f0949b982771ab9e365d7b1c0a360f597f813875ac2765a7"
+    },
+    {
+      "label": "reject-MBEDTLS_CERTIFICATE_BUNDLE-absent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_CERTIFICATE_BUNDLE-absent",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_CERTIFICATE_BUNDLE-absent/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-MBEDTLS_CERTIFICATE_BUNDLE-absent/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "5d7e13a2a8bf5f5050f1e35468783c72e38d3ea444f9b694052dbd01f94533b7"
+    },
+    {
+      "label": "reject-dynamic",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-dynamic",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-dynamic/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-dynamic/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "ac5905a9be1282a91c14b16506eb1937c15c58af32154d1e151ffc378483aea4"
+    },
+    {
+      "label": "reject-custom",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-custom",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-custom/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-custom/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "736020b430d038e1b2a17b4b5184bd39b82a251de7ef1d7e59e3e815c118ea2b"
+    },
+    {
+      "label": "reject-variable",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-variable",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-variable/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-variable/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "5e57866372bb999bdcf7b9dd3c1b27130e12da170bc56cc9908b979f0819b475"
+    },
+    {
+      "label": "reject-version",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-version",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-version/module.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/reject-version/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "6a2088a7c32b630eb38fdb64c10655790d89cfee22ad0397df1568db596c7726"
+    },
+    {
+      "label": "restored-userdata",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "userdata"
+      ],
+      "exit_status": 0,
+      "log_sha256": "8cea5ffaac572c20170fa7b242cce86cc0434f6f1dee4657c5820ba12e4a62fd"
+    },
+    {
+      "label": "restored-lifetime",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "lifetime"
+      ],
+      "exit_status": 0,
+      "log_sha256": "371027985a026e20fa5c10fb0b2e19b7535553ee3d5a8131fb2922502c1433a2"
+    },
+    {
+      "label": "restored-registry_full",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "registry_full"
+      ],
+      "exit_status": 0,
+      "log_sha256": "60f5639fd167fbe00c5375cacccaa4ce56ca87d02d04249c1f8eea3c83e9721f"
+    },
+    {
+      "label": "restored-attach_failure",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "attach_failure"
+      ],
+      "exit_status": 0,
+      "log_sha256": "40ce230fafb2ad026b877d9725705377a45348ca80bce7abf3bdd26da036e103"
+    },
+    {
+      "label": "restored-rollback",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "rollback"
+      ],
+      "exit_status": 0,
+      "log_sha256": "5389fc9275c57ba2933fe030652b78f0d5efe495ae0b8ea7549cb4ab0a08300d"
+    },
+    {
+      "label": "restored-fallback",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "fallback"
+      ],
+      "exit_status": 0,
+      "log_sha256": "f40558f83db226a804ff4c3b455b2ef240bc3f34e86e8d1414e1a0f1c59fd772"
+    },
+    {
+      "label": "restored-concurrent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "concurrent"
+      ],
+      "exit_status": 0,
+      "log_sha256": "3eac47d8b58f1945e71c1d2e51a950a40a88a5f56462064c2b863d7cd4f1caf7"
+    },
+    {
+      "label": "restored-stale_storage",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxu01/canonical/test",
+        "stale_storage"
+      ],
+      "exit_status": 0,
+      "log_sha256": "6b956e33146e28d6a840aefa650fbb95f515feea61e235bda9f62a3ba659861a"
+    },
+    {
+      "label": "tools-after",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/python3",
+        "-c",
+        "import hashlib,json,pathlib,subprocess; names=[\"/usr/bin/gcc\",\"/usr/bin/g++\",\"/usr/bin/as\",\"/usr/bin/ld\"]; names += [subprocess.check_output([\"/usr/bin/gcc\",v],text=True).strip() for v in [\"-print-prog-name=cc1\",\"-print-prog-name=cc1plus\",\"-print-prog-name=collect2\",\"-print-file-name=libasan.so\",\"-print-file-name=libubsan.so\"]]; print(json.dumps({str(pathlib.Path(p).resolve()):hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for p in names})); print(subprocess.check_output([\"/usr/bin/gcc\",\"--version\"],text=True))"
+      ],
+      "exit_status": 0,
+      "log_sha256": "930638b21b6ab6aa90abac89a46fc08bbbf9e2661fb026a18398e63bd079f2e8"
+    }
+  ],
+  "positive_cases": {
+    "userdata": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_CASE userdata_both_kinds_untouched\nTLS_RX_HOST_COMPLETE case=userdata allocations=45 releases=45"
+    },
+    "lifetime": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_CASE config_init_free_cancel_address_reuse\nTLS_RX_HOST_COMPLETE case=lifetime allocations=31 releases=31"
+    },
+    "registry_full": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_CASE bounded_registry_soft_fallback_no_eviction\nTLS_RX_HOST_COMPLETE case=registry_full allocations=1 releases=1"
+    },
+    "attach_failure": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_CASE original_attach_failure_revocation_nested\nTLS_RX_HOST_COMPLETE case=attach_failure allocations=11 releases=11"
+    },
+    "rollback": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_CASE setup_failure_before_rx_and_four_rollbacks\nTLS_RX_HOST_COMPLETE case=rollback allocations=9 releases=9"
+    },
+    "fallback": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_CASE canonical_reclaim_fallback_preserved\nTLS_RX_HOST_COMPLETE case=fallback allocations=2 releases=2"
+    },
+    "concurrent": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_CASE parallel_shared_distinct_config_lifetime_and_erase\nTLS_RX_HOST_COMPLETE case=concurrent allocations=27 releases=27"
+    },
+    "stale_storage": {
+      "exit_status": 0,
+      "result": "TLS_RX_HOST_COMPLETE case=stale_storage allocations=1 releases=1"
+    }
+  },
+  "controls": {
+    "skip-init": {
+      "case": "lifetime",
+      "exit_status": 2,
+      "expected_named_failure": "init_revokes_stale_identity",
+      "phase_scoped": false
+    },
+    "skip-free": {
+      "case": "lifetime",
+      "exit_status": 2,
+      "expected_named_failure": "free_revokes_stale_identity",
+      "phase_scoped": false
+    },
+    "evict-full": {
+      "case": "registry_full",
+      "exit_status": 2,
+      "expected_named_failure": "full_registry_does_not_evict",
+      "phase_scoped": false
+    },
+    "forget-resets-loan": {
+      "case": "lifetime",
+      "exit_status": 2,
+      "expected_named_failure": "config_free_keeps_exclusive_loan",
+      "phase_scoped": false
+    },
+    "task-only-init": {
+      "case": "lifetime",
+      "exit_status": 2,
+      "expected_named_failure": "task_critical_not_isr",
+      "phase_scoped": false
+    },
+    "skip-exclusive": {
+      "case": "concurrent",
+      "exit_status": 2,
+      "expected_named_failure": "parallel_shared_or_distinct_exactly_one_loan",
+      "phase_scoped": false
+    },
+    "early-publish-phase": {
+      "case": "concurrent",
+      "exit_status": 2,
+      "expected_named_failure": "no_reloan_during_erase_after_config_reuse",
+      "phase_scoped": true
+    },
+    "ordinary-free-static": {
+      "case": "userdata",
+      "exit_status": 2,
+      "expected_named_failure": "reserved_pointer_never_sdk_heap_free",
+      "phase_scoped": false
+    },
+    "bypass-reclaim": {
+      "case": "fallback",
+      "exit_status": 2,
+      "expected_named_failure": "busy_slot_reclaim_retry_preserved",
+      "phase_scoped": false
+    }
+  },
+  "compile_rejections": {
+    "YORADIO_TLS_STATIC_RX_RESERVE-zero": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "IDF_TARGET_ESP32-zero": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "ESP_TLS_USING_MBEDTLS-zero": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "MBEDTLS_INTERNAL_MEM_ALLOC-zero": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "MBEDTLS_CERTIFICATE_BUNDLE-zero": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "YORADIO_TLS_STATIC_RX_RESERVE-absent": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "IDF_TARGET_ESP32-absent": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "ESP_TLS_USING_MBEDTLS-absent": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "MBEDTLS_INTERNAL_MEM_ALLOC-absent": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "MBEDTLS_CERTIFICATE_BUNDLE-absent": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "dynamic": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "custom": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "variable": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+    },
+    "version": {
+      "exit_status": 1,
+      "exact_diagnostic": "CYD RX reserve requires the audited ESP-IDF6.0.2 declaration/layout profile"
+    }
+  },
+  "target_build": false,
+  "qemu": false,
+  "physical_benefit": false,
+  "module_contract": {
+    "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+    "normalized_lf_sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+    "bytes": 6424,
+    "line_endings": "LF",
+    "userdata_api_used": false,
+    "integer_identity_keys": true,
+    "semantic_change_from_prior_registry": true
+  },
+  "exact_sdk_spans": {
+    "static int ssl_handshake_init(": "132cd54ff798bb8ee666317a5a57baca361942c0d32f9784b2133171ffc84f92",
+    "void mbedtls_ssl_init(": "2969ae0eaa85049ddf2fac08552d62ec2acda22850852e3f437285db67470156",
+    "int mbedtls_ssl_setup(": "6817bee207c3c43fcb31e94115a8183185be8beba861c872e2317e1e79a293d6",
+    "void mbedtls_ssl_session_reset_msg_layer(": "f0e9bc07ef0003ec84ff0058f3512a920699ebc715aef43ca85f95afe4fba353",
+    "void mbedtls_ssl_free(": "ec924894ab331561b32a7779cd92fe0927d8c802f490e557ebd2c432c5a8bdf7",
+    "void mbedtls_ssl_config_init(": "4cdf8f3a893bf44a01db9b1c11fb2f0a6c1d49749bc6419919a4d2cde15235d6",
+    "void mbedtls_ssl_config_free(": "c5512937c77e81995a3cd883d5e80b2f914d34f02959964e87b5c2f6fc6d8ea7"
+  },
+  "module_sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+  "userdata_getter_setter_absent": true,
+  "tools_before": {
+    "/usr/bin/x86_64-linux-gnu-gcc-13": "1b99826121ae6682a634e5efe09bd3e3df58ce58e0b28f849114ab5b89139c26",
+    "/usr/bin/x86_64-linux-gnu-g++-13": "1353e9bdd29a7295c7226bf6c63abccce056d8cac31f112e5cdbecc3f28c2769",
+    "/usr/bin/x86_64-linux-gnu-as": "21aff249b692b5c31a44007491f922dcb49f41323e362c57d2ada3f52eddb7f0",
+    "/usr/bin/x86_64-linux-gnu-ld.bfd": "e9ceb054c12207970f2726dfc07e9a66b411602748628baf27399f02a9bbb31b",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/cc1": "5d1679131184e2de4435b426eb264bf13472fe026db8e5c6bc97445814e8e2f4",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/cc1plus": "840b332fb62ec6f694ac77d91fe69ef7f80b0d69512ed89374af0ee7a506255d",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/collect2": "4d1f341ae5b763b513258ee2812422a45e063c30a2f1924a0cf63d3699f3a158",
+    "/usr/lib/x86_64-linux-gnu/libasan.so.8.0.0": "8d5845bdf056b5db4cfb9fff40ad5eeea8f6da05a8ca6f5935a7d1c138ed2558",
+    "/usr/lib/x86_64-linux-gnu/libubsan.so.1.0.0": "f4a999fcf8392a200e9d93fb066ddb9e89daab8cd94a62137f4506472240a2e8"
+  },
+  "tools_after": {
+    "/usr/bin/x86_64-linux-gnu-gcc-13": "1b99826121ae6682a634e5efe09bd3e3df58ce58e0b28f849114ab5b89139c26",
+    "/usr/bin/x86_64-linux-gnu-g++-13": "1353e9bdd29a7295c7226bf6c63abccce056d8cac31f112e5cdbecc3f28c2769",
+    "/usr/bin/x86_64-linux-gnu-as": "21aff249b692b5c31a44007491f922dcb49f41323e362c57d2ada3f52eddb7f0",
+    "/usr/bin/x86_64-linux-gnu-ld.bfd": "e9ceb054c12207970f2726dfc07e9a66b411602748628baf27399f02a9bbb31b",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/cc1": "5d1679131184e2de4435b426eb264bf13472fe026db8e5c6bc97445814e8e2f4",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/cc1plus": "840b332fb62ec6f694ac77d91fe69ef7f80b0d69512ed89374af0ee7a506255d",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/collect2": "4d1f341ae5b763b513258ee2812422a45e063c30a2f1924a0cf63d3699f3a158",
+    "/usr/lib/x86_64-linux-gnu/libasan.so.8.0.0": "8d5845bdf056b5db4cfb9fff40ad5eeea8f6da05a8ca6f5935a7d1c138ed2558",
+    "/usr/lib/x86_64-linux-gnu/libubsan.so.1.0.0": "f4a999fcf8392a200e9d93fb066ddb9e89daab8cd94a62137f4506472240a2e8"
+  },
+  "host_pthreads_are_not_actual_core_proof": true
+}

@@ -1,0 +1,5 @@
+$syntaxErrors=$null
+$tokens=$null
+[System.Management.Automation.Language.Parser]::ParseFile('C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-tls-reserve-registry-target-prep-01\checks01-source-map\tests\native\cyd_tls_static_rx\target\sdk-build.ps1',[ref]$tokens,[ref]$syntaxErrors) | Out-Null
+if ($syntaxErrors.Count) { $syntaxErrors | Out-String | Write-Error; exit 1 }
+Write-Output "POWERSHELL_AST_PASS"

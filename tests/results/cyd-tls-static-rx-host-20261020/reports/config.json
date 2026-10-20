@@ -1,0 +1,883 @@
+{
+  "passed": true,
+  "scope": "Actual canonical-path helper, configure-only project(NONE). No SDK build.\n\nFreeze all 19 guarded SDK files and canonical source overlay, then configure source\ncopies in their actual intended paths. Verify exact source/options/dependencies\nand byte-equal canonical SDK overlay; off/early must not access any SDK input.\n",
+  "compiler": false,
+  "sdk_build": false,
+  "qemu": false,
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-tls-static-rx-config.py": {
+      "sha256": "f64b5635ee8a95a31523e8a97760d2397df4ddeca2b42f6f99a04b9bc9e221ac",
+      "snapshot": "inputs/runner/run-cyd-tls-static-rx-config.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.c": {
+      "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+      "snapshot": "inputs/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.h": {
+      "sha256": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "snapshot": "inputs/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\tls_static_rx\\enable.cmake": {
+      "sha256": "a0d38149fea63311c75e6014a77b2bda8973bc1c30a3c35fd8f7d578d1aa4617",
+      "snapshot": "inputs/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/enable.cmake"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\tls_static_rx\\sdk-source-guards.json": {
+      "sha256": "81fc22bbd240f71cb664ab08490f4e79ae805b066f0d61dbe24299af47ab49bb",
+      "snapshot": "inputs/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/sdk-source-guards.json"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": {
+      "sha256": "858c4e6d40dfc28d7063f329dd9d6275a31829aaa367747959b93a1c128e3723",
+      "snapshot": "inputs/repository/idf/esp32-cyd2usb-native/main/Kconfig.projbuild"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\patch_cyd_tls_static_rx.py": {
+      "sha256": "c22a827a099ffdbec8fcbf07ea11bb91db79ce73cdf7783e83ef678764b72e22",
+      "snapshot": "inputs/repository/tools/patch_cyd_tls_static_rx.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\source_contract.py": {
+      "sha256": "1a89b1276e0687375f20df4db6e5b8d10659d4b2c9ff56159469392a3496f29f",
+      "snapshot": "inputs/repository/tests/native/cyd_tls_static_rx/source_contract.py"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c": {
+      "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/library/ssl_tls.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h": {
+      "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/library/ssl_misc.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\include\\mbedtls\\ssl.h": {
+      "sha256": "e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/include/mbedtls/ssl.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform.h": {
+      "sha256": "84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform_util.h": {
+      "sha256": "814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform_util.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\tf_psa_crypto_common.h": {
+      "sha256": "ffe3ef63009cf74588d900aa88e3d98172a2015dd8fa8121856a1fb7875eb8de",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/core/tf_psa_crypto_common.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform.c": {
+      "sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform_util.c": {
+      "sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\mbedtls\\esp_config.h": {
+      "sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+      "snapshot": "inputs/sdk/components/mbedtls/port/include/mbedtls/esp_config.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_mem.c": {
+      "sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+      "snapshot": "inputs/sdk/components/mbedtls/port/esp_mem.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\CMakeLists.txt": {
+      "sha256": "4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+      "snapshot": "inputs/sdk/components/mbedtls/CMakeLists.txt"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\esp_crt_bundle\\esp_crt_bundle.c": {
+      "sha256": "5efb7440442b8f450b6cf41736e0e577f6a7e9bfa2ff054af1728129db75db10",
+      "snapshot": "inputs/sdk/components/mbedtls/esp_crt_bundle/esp_crt_bundle.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\esp_crt_bundle\\include\\esp_crt_bundle.h": {
+      "sha256": "33b442fc0c82ebfdb3b737785a2e85e1529f8594709103908a42ca4e0f08c97b",
+      "snapshot": "inputs/sdk/components/mbedtls/esp_crt_bundle/include/esp_crt_bundle.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp-tls\\esp_tls_mbedtls.c": {
+      "sha256": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+      "snapshot": "inputs/sdk/components/esp-tls/esp_tls_mbedtls.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\tcp_transport\\transport_ssl.c": {
+      "sha256": "c629965fb7b7f1999c420e763e0fb2a78860f1e2c93cd729982cdda4735420d7",
+      "snapshot": "inputs/sdk/components/tcp_transport/transport_ssl.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\esp_http_client.c": {
+      "sha256": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+      "snapshot": "inputs/sdk/components/esp_http_client/esp_http_client.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_common\\include\\esp_idf_version.h": {
+      "sha256": "10eec73116b19e5fc959a56e07c7f394cefb8d59d3858108ab8c4d2b57bd253f",
+      "snapshot": "inputs/sdk/components/esp_common/include/esp_idf_version.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h": {
+      "sha256": "6400442b731b8cd9ec7ab8f2e95c279fdeac16abe632321d78fd25ca0a0f589c",
+      "snapshot": "inputs/sdk/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\port.c": {
+      "sha256": "6c954972a2acfaa0bd0baad27bcdfd32971cec097a89274cf0bd458e6faa4f2c",
+      "snapshot": "inputs/sdk/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c"
+    }
+  },
+  "cases": {
+    "canonical": {
+      "exit_status": 0,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\canonical\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\canonical\\build"
+      ],
+      "log_sha256": "6fe9d752af325c82ca894528ef16fd5a001a08d3adb97a60ef55ac3dd36d1638",
+      "overlay_sha256": "dbe30b6b34290683c63547264b77921b33230f15d1969bf4b156705b776f9332",
+      "exact_capture": [
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/../../native_tls_rx_reserve.c",
+        "keep-main",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/build/native-tls-static-rx/ssl_tls.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/project/keep.c",
+        "keep-sdk",
+        "|",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/library/ssl_tls.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/repository/tools/patch_cyd_tls_static_rx.py;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/sdk-source-guards.json;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/esp-tls/esp_tls_mbedtls.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/esp_common/include/esp_idf_version.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/esp_http_client/esp_http_client.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/CMakeLists.txt;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/esp_crt_bundle/esp_crt_bundle.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/esp_crt_bundle/include/esp_crt_bundle.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/include/mbedtls/ssl.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/library/ssl_misc.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/library/ssl_tls.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/tf-psa-crypto/core/tf_psa_crypto_common.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform_util.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/port/esp_mem.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/mbedtls/port/include/mbedtls/esp_config.h;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/canonical/sdk/components/tcp_transport/transport_ssl.c"
+      ],
+      "passed": true
+    },
+    "off": {
+      "exit_status": 0,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\off\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\off\\build"
+      ],
+      "log_sha256": "f6f7210c83b2072f4910d52b91a0066f0842ea727f6c38dc0a4327b3f14da0bf",
+      "exact_capture": [
+        "main_sources-NOTFOUND",
+        "keep-main",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/off/sdk/components/mbedtls/mbedtls/library/ssl_tls.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/off/project/keep.c",
+        "keep-sdk",
+        "|",
+        ""
+      ],
+      "passed": true
+    },
+    "forced-zero": {
+      "exit_status": 0,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\forced-zero\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\forced-zero\\build"
+      ],
+      "log_sha256": "fa4a3c3d45b2a70ad829a26a418de5b82712dde0bb43f45afece23c983afbd3b",
+      "exact_capture": [
+        "main_sources-NOTFOUND",
+        "keep-main",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/forced-zero/sdk/components/mbedtls/mbedtls/library/ssl_tls.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/forced-zero/project/keep.c",
+        "keep-sdk",
+        "|",
+        ""
+      ],
+      "passed": true
+    },
+    "early": {
+      "exit_status": 0,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\early\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\early\\build"
+      ],
+      "log_sha256": "ce3ec5631e3bd065404fed9876bdc8a0a19d71a2111b3ad3e4746309deedac01",
+      "exact_capture": [
+        "main_sources-NOTFOUND",
+        "keep-main",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/early/sdk/components/mbedtls/mbedtls/library/ssl_tls.c;C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/rxc01/early/project/keep.c",
+        "keep-sdk",
+        "|",
+        ""
+      ],
+      "passed": true
+    },
+    "target": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\target\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\target\\build"
+      ],
+      "log_sha256": "ab155bb7e6972513f2ccc82a05376026dfc903c118d4b08b0dff9045728f8a47",
+      "exact_rejection": "CYD static RX reserve requires exact ESP32 IDF6.0.2",
+      "passed": true
+    },
+    "target-symbol-zero": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\target-symbol-zero\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\target-symbol-zero\\build"
+      ],
+      "log_sha256": "66775f202799a3fbdb0ed6c2c141f24511bdcae01d9cceaff2f6e38dfe3a2ae6",
+      "exact_rejection": "CYD static RX reserve requires exact ESP32 IDF6.0.2",
+      "passed": true
+    },
+    "major": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\major\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\major\\build"
+      ],
+      "log_sha256": "db5f9a83871674b6b89cf293d981129fd11aa6f8cd1702a1e735aa33df6192bb",
+      "exact_rejection": "CYD static RX reserve requires exact ESP32 IDF6.0.2",
+      "passed": true
+    },
+    "minor": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\minor\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\minor\\build"
+      ],
+      "log_sha256": "9218557b089c14bc9541b00f18434b5f7f7b9b02d6bf696567e10ef2c724fa4f",
+      "exact_rejection": "CYD static RX reserve requires exact ESP32 IDF6.0.2",
+      "passed": true
+    },
+    "patch": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\patch\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\patch\\build"
+      ],
+      "log_sha256": "6047a7bbddd5c0e5f6f414eb016213d195ccd9a44a5ddea9fa6686c33d6c45c4",
+      "exact_rejection": "CYD static RX reserve requires exact ESP32 IDF6.0.2",
+      "passed": true
+    },
+    "malformed-major": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\malformed-major\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\malformed-major\\build"
+      ],
+      "log_sha256": "64868957545075b58fa8037a117ab687d1e494af57f70c089de72a21ccac6c83",
+      "exact_rejection": "CYD static RX reserve requires exact ESP32 IDF6.0.2",
+      "passed": true
+    },
+    "external": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\external\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\external\\build"
+      ],
+      "log_sha256": "2c94a34e57c4701efb445344a1386a14819669c3497c94205d12892e27a27a7c",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "custom": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\custom\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\custom\\build"
+      ],
+      "log_sha256": "00dbd86eee0671d1d8c940e26e7d3e9cf7a366333b321f00b3f76ce3e75aec85",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "dynamic": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\dynamic\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\dynamic\\build"
+      ],
+      "log_sha256": "9a4268147f54814313f12b6113fab1961dd32cfcf316b2cbf6be19958d5a9d29",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "variable": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\variable\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\variable\\build"
+      ],
+      "log_sha256": "aec274bbc7499d37af770427ce80fbfa41c5bec6ca80dc60bed39c7a2a50bd84",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "tls-zero": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\tls-zero\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\tls-zero\\build"
+      ],
+      "log_sha256": "c4b630ccb2098d6700cf2063d7ae49ba6df05f48377b35b3dae28d654f6f8ca8",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "bundle-zero": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\bundle-zero\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\bundle-zero\\build"
+      ],
+      "log_sha256": "a89f3f9409700b2bb896daaf5eea7e79e74aa25f84954222dea0f0fbf667eff4",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "short-content": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\short-content\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\short-content\\build"
+      ],
+      "log_sha256": "f8f917f9480226a7d20406753fb6b1fd85be22e0a9454d3a953f9c27926a8d1b",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "serialize": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\serialize\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\serialize\\build"
+      ],
+      "log_sha256": "e86c38f65009b5e12dc2a6df9d88b570b7876e2cd9b1c5edb9342f298f5ba538",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "gmt": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\gmt\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\gmt\\build"
+      ],
+      "log_sha256": "1731e0f20b874f0b6fd6fd8801fdecd213a178cab5d0cea3958fb13a335d6840",
+      "exact_rejection": "CYD static RX reserve rejects unsupported allocator/buffer/config lifetime",
+      "passed": true
+    },
+    "missing-target": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-target\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-target\\build"
+      ],
+      "log_sha256": "4cbe4ee1248367f0ed560ec8399ad22decd69892aea1412c09ba1cc1e968efeb",
+      "exact_rejection": "CYD static RX reserve requires registered canonical targets",
+      "passed": true
+    },
+    "source-absent": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\source-absent\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\source-absent\\build"
+      ],
+      "log_sha256": "c15da7df8abd9c1857d1e4f84b7694860d215a5731ff5fcd20447e8dc6aa42db",
+      "exact_rejection": "Expected exactly one audited static RX source",
+      "passed": true
+    },
+    "source-duplicate": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\source-duplicate\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\source-duplicate\\build"
+      ],
+      "log_sha256": "93f9803ee8855796358a37be8269ac4898ebf6633c52885fcb285058ed4500fe",
+      "exact_rejection": "Expected exactly one audited static RX source",
+      "passed": true
+    },
+    "missing-module": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-module\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-module\\build"
+      ],
+      "log_sha256": "59258b0b14fef1091e9c7b4728635bcf28e3fb1422f3e3c3b847205f63e0905b",
+      "exact_rejection": "Missing canonical static RX reserve inputs",
+      "passed": true
+    },
+    "missing-header": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-header\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-header\\build"
+      ],
+      "log_sha256": "75a2514554d0010dc42d32b9cc87cdfe4c0e4970368e50e14ba5b0c80a370399",
+      "exact_rejection": "Missing canonical static RX reserve header",
+      "passed": true
+    },
+    "missing-patcher": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-patcher\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-patcher\\build"
+      ],
+      "log_sha256": "cf5bd175d1b6af11fd484d0b8c4b2217907521a590eac101535d29d41bcff445",
+      "exact_rejection": "Missing canonical static RX reserve inputs",
+      "passed": true
+    },
+    "missing-guards": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-guards\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\missing-guards\\build"
+      ],
+      "log_sha256": "2d01ef5094d2063c3c0d4602a16e8ac4798f95efd8df37a484e00193d4948fb3",
+      "exact_rejection": "Missing canonical static RX reserve inputs",
+      "passed": true
+    },
+    "guard-0": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-0\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-0\\build"
+      ],
+      "log_sha256": "c4304bf11be517373ae2d43b6bd384b747f8c934a17c637e587420b7bc4e1f4e",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-1": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-1\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-1\\build"
+      ],
+      "log_sha256": "3bcf19ab97a0e82836e252c2e09f0d8719752ee0c648a0768eafd0616df38831",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-2": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-2\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-2\\build"
+      ],
+      "log_sha256": "6b3ee193e174a903b8e1f12c25e3115bc1532c367d03ce5e0eb0e876da65e3fb",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-3": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-3\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-3\\build"
+      ],
+      "log_sha256": "4f776a8077e2dc6424b44e12161042b10081ed86e6927d1b6db2e46a8424134d",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-4": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-4\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-4\\build"
+      ],
+      "log_sha256": "ca49231cbd1977bf9b7f196ea7ad9ec5e22d97b81020d692579ed2f2f1a48217",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-5": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-5\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-5\\build"
+      ],
+      "log_sha256": "7fd8a547c2bee874614ace26bfa6846d634769f0622d28e61bfe5074967ecde2",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-6": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-6\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-6\\build"
+      ],
+      "log_sha256": "3e8649e31d70c9ab9225cbfcb0d6d216514b33399b7150d6f73f2fcff6ff612d",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-7": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-7\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-7\\build"
+      ],
+      "log_sha256": "d7afb8b49d93ed96e8e1cf8e36cc851b509db27469ef2a6a8e0a81cc586632c1",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-8": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-8\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-8\\build"
+      ],
+      "log_sha256": "e3116049ace6764b90d27041333586b4e5164022d814f6da9a5bc82af46b0e68",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-9": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-9\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-9\\build"
+      ],
+      "log_sha256": "0ccd357f2cf2e06ee601fbe2123086e7de63de873d3a7fce3252556062f36cfb",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-10": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-10\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-10\\build"
+      ],
+      "log_sha256": "a3b287c2b303f926e3a3d285ce23266ae5af7b2c3255277443484911de041268",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-11": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-11\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-11\\build"
+      ],
+      "log_sha256": "d636376fe3ec9a10f5d5870efe15d0b81e48fe2e7959fd744674a2a5752872e9",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-12": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-12\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-12\\build"
+      ],
+      "log_sha256": "678e9a5addb3af11d42c6e47af337ead7a4594a4b0dbd4bf2182a9357c7c671e",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-13": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-13\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-13\\build"
+      ],
+      "log_sha256": "1b61cf173996764dfe3658a00695c5f5e847875e3a8a6b3dbb9c80a8b736ce67",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-14": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-14\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-14\\build"
+      ],
+      "log_sha256": "3a3b14068d7a353e6c2618f88886561b2712d9bcb60801adfb04fee7bc2dd74b",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-15": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-15\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-15\\build"
+      ],
+      "log_sha256": "af8cc6af16451a5d958796b105ddb4a126dd2d8f42b269d1cdea8609eefe53e8",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-16": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-16\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-16\\build"
+      ],
+      "log_sha256": "22d3829b23496790411046281ad5a382f1e429d65ab753433690bea3fedaaad7",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-17": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-17\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-17\\build"
+      ],
+      "log_sha256": "562b13b880b1942abaad0551e811db50feea4a6e6175d2c662e2044551870512",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    },
+    "guard-18": {
+      "exit_status": 1,
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-18\\project",
+        "-B",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\rxc01\\guard-18\\build"
+      ],
+      "log_sha256": "3f7c2a3e893abd7b748d5cceab075bdedbeb93556b7da09a9732bbe83ce8838e",
+      "exact_rejection": "CYD static RX overlay rejected SDK",
+      "passed": true
+    }
+  },
+  "module_contract": {
+    "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+    "normalized_lf_sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+    "bytes": 6424,
+    "line_endings": "LF",
+    "userdata_api_used": false,
+    "integer_identity_keys": true,
+    "semantic_change_from_prior_registry": true
+  },
+  "tools": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe": "392ab4d6c3c91543fd297ed6c7e7354bf62edcd26fdf2706ad8613ad620cc45e",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": "68865c3276d449d746cea5065fdec2baf755d7813e161ab04205b0907b2629b8",
+    "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a"
+  },
+  "configure_case_count": 45
+}

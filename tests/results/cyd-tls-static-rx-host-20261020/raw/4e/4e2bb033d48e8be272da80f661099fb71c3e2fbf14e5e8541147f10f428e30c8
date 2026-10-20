@@ -1,0 +1,15 @@
+"""Last source-only closure refinements; no compiler/configure/runtime action."""
+from pathlib import Path
+import hashlib
+import json
+
+HERE=Path(__file__).resolve().parent
+REPO=HERE/'repository'
+changes=[]
+def edit(relative,old,new):
+    p=REPO/relative;before=p.read_bytes();text=before.decode();assert text.count(old)==1,(relative,old,text.count(old));p.write_bytes(text.replace(old,new,1).encode());changes.append({'file':str(relative),'before_sha256':hashlib.sha256(before).hexdigest(),'after_sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
+edit(Path('tests/native/cyd_tls_static_rx/target/freeze-run.py'),'data=patcher.read_text();anchor=','data=patcher.read_bytes().decode();anchor=')
+edit(Path('tests/run-cyd-tls-static-rx-service.py'),"        report['passed']=True","        report['positive_case_count']=sum(len(v) for v in report['variants'].values());report['variant_count']=len(report['variants']);report['named_control_count']=len(report['controls'])\n        report['passed']=True")
+edit(Path('tests/run-cyd-tls-static-rx-config.py'),"        report['passed']=True;print(str(len(cases))+' canonical path configure cases PASS',flush=True)","        report['configure_case_count']=len(cases);report['passed']=True;print(str(len(cases))+' canonical path configure cases PASS',flush=True)")
+edit(Path('tests/run-cyd-tls-static-rx-qemu.py'),"                if name != 'skip-rollback': assert 'yoradio_tls_static_rx_free' in asm['mbedtls_ssl_setup']","                assert 'yoradio_tls_static_rx_free' in asm['mbedtls_ssl_setup']")
+(HERE/'final-source-review.json').write_text(json.dumps({'changes':changes,'executed_compilers':0,'sdk_or_qemu':False},indent=2)+'\n')

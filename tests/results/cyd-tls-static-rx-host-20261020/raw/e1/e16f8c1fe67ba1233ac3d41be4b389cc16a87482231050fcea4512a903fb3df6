@@ -1,0 +1,375 @@
+"""Canonical-source SDK/Xtensa fixture campaign.
+
+Run only after root review. No network/device operations: QEMU has no NIC.
+Host seams do not establish target behavior; injected rollback and real allocator observations
+are parsed separately. Generic panic/build failure/timeout never pass controls.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import struct
+import subprocess
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+HERE = ROOT / "tests/native/cyd_tls_static_rx/target"
+MAIN = ROOT / "idf/esp32-cyd2usb-native/main"
+SDK_COMMIT = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+VARIANTS = ('canonical','skip-init','skip-free','evict-full','forget-resets-loan','skip-exclusive','early-publish-phase','ordinary-free-static','bypass-reclaim','canonical-reclaim-off','reserve-off-reclaim-on','reserve-off-reclaim-off')
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def write_json(path, value):
+    Path(path).write_bytes((json.dumps(value, indent=2) + '\n').encode())
+
+
+def elf_word(data, address):
+    offset = struct.unpack_from('<I', data, 32)[0]
+    size, count = struct.unpack_from('<HH', data, 46)
+    for index in range(count):
+        section = struct.unpack_from('<10I', data, offset + index * size)
+        _, kind, _, base, file_offset, length, *_ = section
+        if kind != 8 and base <= address and address + 4 <= base + length:
+            return struct.unpack_from('<I', data, file_offset + address - base)[0]
+    raise ValueError('Initialized ELF word not found at ' + hex(address))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--sdk', type=Path, required=True)
+    parser.add_argument('--tools', type=Path, required=True)
+    parser.add_argument('--qemu', type=Path, required=True)
+    parser.add_argument('--powershell', type=Path, required=True)
+    parser.add_argument('--variants', nargs='+', choices=VARIANTS, default=list(VARIANTS))
+    parser.add_argument('--preflight-only', action='store_true')
+    parser.add_argument('--compile-only', action='store_true')
+    parser.add_argument('--freeze-only', action='store_true')
+    args = parser.parse_args()
+    out, sdk, tools, qemu, ps = [getattr(args, key).resolve() for key in ('output', 'sdk', 'tools', 'qemu', 'powershell')]
+    if out.exists() or not out.is_relative_to(ROOT / '.build') or out.is_relative_to(HERE):
+        parser.error('Choose a fresh sibling ignored output')
+    if len(set(args.variants)) != len(args.variants):
+        parser.error('Duplicate variants are not permitted')
+    protected = [sdk, tools, qemu.parent, ps.parent, Path(sys.executable).resolve().parent]
+    if any(out == path or out.is_relative_to(path) or path.is_relative_to(out) for path in protected):
+        parser.error('Output overlaps installed SDK/tools')
+    if any((parent / 'report.json').exists() or (parent / 'source-manifest.json').exists() for parent in out.parents):
+        parser.error('Output is nested in existing evidence')
+    py = tools / 'python_env/idf6.0_py3.12_env/Scripts/python.exe'
+    rom = qemu.parent.parent / 'pc-bios'
+    toolbin = tools / 'tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin'
+    tool_paths = [py, ps, qemu, rom / 'esp32-v3-rom.bin', rom / 'esp32-v3-rom-app.bin',
+                  tools / 'tools/ninja/1.12.1/ninja.exe', tools / 'tools/cmake/4.0.3/bin/cmake.exe',
+                  *[toolbin / ('xtensa-esp32-elf-' + name + '.exe') for name in ('gcc', 'nm', 'objdump')]]
+    required = [*tool_paths, sdk / 'tools/idf.py', sdk / 'export.ps1', sdk / 'tools/tools.json',
+                HERE / 'freeze-run.py', HERE / 'sdk-build.ps1', MAIN / 'compat/tls_static_rx/sdk-source-guards.json',
+                MAIN / 'native_tls_rx_reserve.c', HERE / 'project/main/main.c']
+    if not all(path.is_file() for path in required):
+        parser.error('Required source or installed tool is missing')
+    import importlib.util
+    executed_contract_file=HERE.parent/'source_contract.py';executed_contract_sha256=sha(executed_contract_file)
+    spec=importlib.util.spec_from_file_location('target_contract',executed_contract_file);contract=importlib.util.module_from_spec(spec);spec.loader.exec_module(contract)
+    source_contract=contract.preflight(ROOT,sdk)
+    assert sha(executed_contract_file)==executed_contract_sha256
+    assert (HERE/'project/main/Kconfig.projbuild').read_text().strip()=='source "$RX_RESERVE_PRODUCTION_KCONFIG"'
+    if args.preflight_only:
+        print(json.dumps({'preflight_passed': True, 'output_created': False,
+                          'build_or_runtime': False, 'variants': args.variants}))
+        return
+    out.mkdir(parents=True)
+    (out / 'tool-temp').mkdir()
+    (out / 'campaigns').mkdir()
+    env = os.environ.copy()
+    env.update(PYTHONDONTWRITEBYTECODE='1', PYTHONNOUSERSITE='1', PYTHONUTF8='1',
+               PYTHONIOENCODING='utf-8', GIT_OPTIONAL_LOCKS='0', TEMP=str(out / 'tool-temp'), TMP=str(out / 'tool-temp'))
+    report = {'passed': False, 'scope': __doc__, 'production_integration': False,
+              'physical_benefit_claimed': False, 'network_or_device': False,
+              'compile_only': args.compile_only, 'commands': [], 'inputs': {},
+              'tools': {str(path): sha(path) for path in [*tool_paths, Path(sys.executable).resolve()]}, 'variants': {}}
+    manifest_hashes = {}
+    initialized = False
+    def save():
+        if initialized:
+            write_json(out / 'report.json', report)
+    def execute(label, command, timeout=60):
+        command = list(map(str, command))
+        started = time.monotonic()
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
+                                   creationflags=subprocess.CREATE_NO_WINDOW)
+        timed_out = False
+        try:
+            data, _ = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            # Never start another process for this variant after an observation
+            # timeout. Close the exact child tree and collect its terminal exit.
+            timed_out = True
+            cleanup = subprocess.run(['taskkill.exe', '/PID', str(process.pid), '/T', '/F'],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=15, creationflags=subprocess.CREATE_NO_WINDOW)
+            (out / (label + '-timeout-cleanup.log')).write_bytes(cleanup.stdout)
+            data, _ = process.communicate(timeout=15)
+        (out / (label + '.log')).write_bytes(data)
+        report['commands'].append({'label': label, 'argv': command, 'pid': process.pid,
+            'terminal_exit': process.returncode, 'timed_out': timed_out,
+            'seconds': time.monotonic() - started, 'log_sha256': hashlib.sha256(data).hexdigest()})
+        save()
+        if timed_out or process.returncode:
+            raise RuntimeError(label + (' timed out' if timed_out else ' failed') + ': ' + data.decode(errors='replace')[-5000:])
+        return data.decode(errors='replace').replace('\r\n', '\n')
+    def sdk_state(label):
+        command = ['git', '-c', 'core.longpaths=true', '-C', sdk]
+        assert execute('sdk-head-' + label, command + ['rev-parse', 'HEAD']).strip() == SDK_COMMIT
+        assert not execute('sdk-state-' + label, command + ['status', '--porcelain', '--untracked-files=no']).strip()
+    def current():
+        return all(sha(path) == entry['sha256'] and sha(out / entry['snapshot']) == entry['sha256']
+                   for path, entry in report['inputs'].items()) and all(sha(path) == digest for path, digest in report['tools'].items()) \
+            and all(sha(path) == digest for path, digest in manifest_hashes.items())
+    try:
+        # Freeze all independent variants before writing a parent report, so the
+        # reviewed freeze tool's evidence-nesting prohibition remains enforced.
+        campaigns = {}
+        for name in args.variants:
+            campaign = out / 'campaigns' / name
+            variant = 'canonical' if name == 'canonical-reclaim-off' or name.startswith('reserve-off-') else name
+            execute('freeze-' + name, [sys.executable, '-B', '-X', 'utf8', HERE / 'freeze-run.py',
+                                      '--output', campaign, '--variant', variant])
+            campaigns[name] = campaign
+            manifest_hashes[str(campaign / 'source-manifest.json')] = sha(campaign / 'source-manifest.json')
+        initialized = True
+        report['frozen_campaign_manifests'] = manifest_hashes
+        for name, campaign in campaigns.items():
+            manifest = json.loads((campaign / 'source-manifest.json').read_text())
+            for original, entry in manifest['original_inputs'].items():
+                destination = out / 'input-snapshots' / entry['sha256']
+                destination.parent.mkdir(exist_ok=True)
+                destination.write_bytes(Path(original).read_bytes())
+                assert sha(destination) == entry['sha256']
+                report['inputs'][original] = {'sha256': entry['sha256'], 'snapshot': destination.relative_to(out).as_posix()}
+        frozen_runner = out / 'input-snapshots' / sha(__file__)
+        frozen_runner.write_bytes(Path(__file__).read_bytes())
+        report['inputs'][str(Path(__file__).resolve())] = {'sha256': sha(__file__), 'snapshot': frozen_runner.relative_to(out).as_posix()}
+        support = json.loads((MAIN / 'compat/tls_static_rx/sdk-source-guards.json').read_text())
+        for relative in [*support, 'tools/idf.py', 'export.ps1', 'tools/tools.json', 'tools/cmake/version.cmake']:
+            path = sdk / relative
+            snapshot = out / 'sdk-inputs' / relative
+            snapshot.parent.mkdir(parents=True, exist_ok=True)
+            snapshot.write_bytes(path.read_bytes())
+            report['inputs'][str(path)] = {'sha256': sha(path), 'snapshot': snapshot.relative_to(out).as_posix()}
+        report['candidate_sha256'] = sha(MAIN / 'native_tls_rx_reserve.c')
+        report['candidate_normalized_lf_sha256']=hashlib.sha256((MAIN/'native_tls_rx_reserve.c').read_bytes().replace(b'\r\n',b'\n')).hexdigest()
+        assert report['candidate_normalized_lf_sha256']==contract.MODULE_SHA256
+        assert report['inputs'][str(executed_contract_file.resolve())]['sha256']==executed_contract_sha256
+        report['executed_source_contract_sha256']=executed_contract_sha256
+        save(); assert current()
+        sdk_state('before')
+        if args.freeze_only:
+            report['preparation_passed'] = current()
+            report['status'] = 'frozen_unbuilt_unrun'
+            report['target_build_invoked'] = False
+            report['qemu_invoked'] = False
+            save()
+            print(json.dumps({'preparation_passed': report['preparation_passed'], 'passed': False,
+                              'status': report['status'], 'report_sha256': sha(out / 'report.json')}))
+            return
+        for name, campaign in campaigns.items():
+            manifest = json.loads((campaign / 'source-manifest.json').read_text())
+            frozen = manifest['frozen_sources']
+            assert all(sha(campaign / path) == digest for path, digest in frozen.items())
+            print('Building actual SDK candidate ' + name, flush=True)
+            command = [ps, '-NoLogo', '-NoProfile', '-NonInteractive', '-File', campaign / 'sources/sdk-build.ps1',
+                       '-CampaignDirectory', campaign, '-RepositoryDirectory', ROOT, '-SdkDirectory', sdk, '-ToolsDirectory', tools]
+            reserve = not name.startswith('reserve-off-')
+            reclaim = name not in ('canonical-reclaim-off', 'reserve-off-reclaim-off')
+            if not reclaim: command.append('-DisableReclaim')
+            if not reserve: command.append('-DisableReserve')
+            execute(name + '-build', command, 1800)
+            sdk_state(name + '-after-build')
+            assert current() and all(sha(campaign / path) == digest for path, digest in frozen.items())
+            build = campaign / 'working-build'
+            desc = json.loads((build / 'project_description.json').read_text())
+            cfg = json.loads((build / 'config/sdkconfig.json').read_text())
+            assert desc['target'] == 'esp32' and Path(desc['idf_path']).resolve() == sdk
+            for key in ['ESP_TLS_USING_MBEDTLS', 'MBEDTLS_INTERNAL_MEM_ALLOC',
+                        'MBEDTLS_CERTIFICATE_BUNDLE', 'COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE']:
+                assert cfg[key], key
+            assert bool(cfg.get('YORADIO_TLS_STATIC_RX_RESERVE', False)) == reserve
+            assert cfg['MBEDTLS_SSL_IN_CONTENT_LEN'] == 16384 and cfg['MBEDTLS_SSL_OUT_CONTENT_LEN'] == 4096
+            for key in ['FREERTOS_UNICORE', 'MBEDTLS_DYNAMIC_BUFFER', 'MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH',
+                        'MBEDTLS_CUSTOM_MEM_ALLOC', 'HEAP_ABORT_WHEN_ALLOCATION_FAILS']:
+                assert not cfg.get(key, False), key
+            assert bool(cfg.get('YORADIO_TLS_INPUT_RECLAIM', False)) == reclaim
+            compiler = Path(desc['c_compiler'])
+            nm, objdump = [compiler.with_name('xtensa-esp32-elf-' + tool + '.exe') for tool in ('nm', 'objdump')]
+            for tool in [compiler, nm, objdump]:
+                assert str(tool) in report['tools'] and sha(tool) == report['tools'][str(tool)]
+            elf = build / desc['app_elf']
+            image = elf.read_bytes()
+            assert image[:4] == b'\x7fELF' and image[4:6] == b'\x01\x01' and struct.unpack_from('<H', image, 18)[0] == 94
+            symbols = execute(name + '-nm', [nm, '-n', '-S', elf])
+            addresses = {match[4]: int(match[1], 16) for match in re.finditer(r'^([0-9a-f]+)\s+([0-9a-f]+)\s+([A-Za-z])\s+(.+)$', symbols, re.M)}
+            expected_calloc = '__wrap_esp_mbedtls_mem_calloc' if reclaim else 'esp_mbedtls_mem_calloc'
+            assert elf_word(image, addresses['mbedtls_calloc_func']) == addresses[expected_calloc]
+            assert elf_word(image, addresses['mbedtls_free_func']) == addresses['esp_mbedtls_mem_free']
+            assert '__wrap_esp_mbedtls_mem_free' not in addresses
+            if not reserve:
+                for symbol in ['native_tls_rx_reserve_crt_bundle_attach', 'yoradio_tls_static_rx_calloc',
+                               'yoradio_tls_static_rx_free', 'yoradio_tls_static_rx_zeroize_free',
+                               '__wrap_yoradio_tls_static_rx_calloc', '__wrap_mbedtls_platform_zeroize',
+                               '__wrap_heap_caps_calloc', '__wrap_heap_caps_free', 's_radio_configurations', 'yoradio_tls_static_rx_forget_configuration', '__wrap_esp_crt_bundle_attach', 's_rx']:
+                    assert symbol not in addresses, 'Reserve-off unexpected symbol: ' + symbol
+            asm = {}
+            assembly_symbols = ['mbedtls_ssl_setup', 'mbedtls_ssl_free', 'esp_mbedtls_mem_free']
+            if reserve: assembly_symbols += ['yoradio_tls_static_rx_calloc','mbedtls_ssl_config_init','mbedtls_ssl_config_free']
+            for symbol in assembly_symbols:
+                asm[symbol] = execute(name + '-asm-' + symbol, [objdump, '-dwC', '--disassemble=' + symbol, elf])
+            if reserve:
+                assert '__wrap_yoradio_tls_static_rx_calloc' in asm['mbedtls_ssl_setup']
+                assert 'yoradio_tls_static_rx_free' in asm['mbedtls_ssl_setup']
+                assert 'yoradio_tls_static_rx_zeroize_free' in asm['mbedtls_ssl_free']
+                assert '__wrap_heap_caps_free' in asm['esp_mbedtls_mem_free']
+                if name!='skip-init':assert 'yoradio_tls_static_rx_forget_configuration' in asm['mbedtls_ssl_config_init']
+                if name!='skip-free':assert 'yoradio_tls_static_rx_forget_configuration' in asm['mbedtls_ssl_config_free']
+            else:
+                assert 'yoradio_tls_static_rx' not in asm['mbedtls_ssl_setup'] + asm['mbedtls_ssl_free']
+                assert 'mbedtls_calloc' in asm['mbedtls_ssl_setup']
+                assert 'mbedtls_zeroize_and_free' in asm['mbedtls_ssl_free']
+                assert 'heap_caps_free' in asm['esp_mbedtls_mem_free']
+            rows = json.loads((build / 'compile_commands.json').read_text())
+            module_path = campaign / 'sources/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c'
+            overlay_path = build / 'native-tls-static-rx/ssl_tls.c'
+            original_sdk_path = sdk / 'components/mbedtls/mbedtls/library/ssl_tls.c'
+            chosen = [row for row in rows if Path(row['file']).resolve() in
+                      (module_path.resolve(), overlay_path.resolve(), original_sdk_path.resolve())]
+            if reserve:
+                assert len(chosen) == 2 and {Path(row['file']).resolve() for row in chosen} == {module_path.resolve(), overlay_path.resolve()}
+            else:
+                assert len(chosen) == 1 and Path(chosen[0]['file']).resolve() == original_sdk_path.resolve()
+                assert not overlay_path.exists()
+                assert not any('native_tls_rx_reserve.c' in row['file'] for row in rows)
+            reclaim_rows = [row for row in rows if Path(row['file']).name == 'native_input_reclaim.c']
+            assert len(reclaim_rows) == int(reclaim)
+            # Re-run only the pure patch transformation in the frozen script;
+            # compare actual compiled overlay bytes to that variant's recipe.
+            import importlib.util
+            spec = importlib.util.spec_from_file_location('variant_patcher', campaign / 'sources/repository/tools/patch_cyd_tls_static_rx.py')
+            patcher = importlib.util.module_from_spec(spec); spec.loader.exec_module(patcher)
+            patcher.validate_sdk_guards(sdk, campaign / 'sources/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/sdk-source-guards.json')
+            if reserve:
+                assert overlay_path.read_bytes() == patcher.patch(original_sdk_path.read_bytes())
+            cache = (build / 'CMakeCache.txt').read_text()
+            ninja = Path(re.search(r'^CMAKE_MAKE_PROGRAM:FILEPATH=(.+)$', cache, re.M)[1].strip())
+            assert str(ninja) in report['tools'] and sha(ninja) == report['tools'][str(ninja)]
+            dependencies = execute(name + '-dependencies', [ninja, '-C', build, '-t', 'deps'])
+            actual_build_commands = execute(name + '-ninja-commands', [ninja, '-C', build, '-t', 'commands'])
+            for symbol in ['yoradio_tls_static_rx_calloc', 'mbedtls_platform_zeroize', 'heap_caps_calloc', 'heap_caps_free', 'esp_crt_bundle_attach']:
+                assert ('--wrap=' + symbol in actual_build_commands) == reserve
+            assert ('--wrap=esp_mbedtls_mem_calloc' in actual_build_commands) == reclaim
+            closure = {}
+            for line in dependencies.splitlines():
+                if not line.startswith('    '): continue
+                path = Path(line.strip())
+                path = path.resolve() if path.is_absolute() else (build / path).resolve()
+                if path.is_file(): closure[str(path)] = sha(path)
+            for required_header in ['ssl_misc.h', 'tf_psa_crypto_common.h', 'ssl.h', 'platform.h'] + (['native_tls_rx_reserve.h','portmacro.h','esp_timer.h'] if reserve else []):
+                assert any(Path(path).name == required_header for path in closure), required_header
+            evidence = campaign / 'execution'
+            evidence.mkdir()
+            write_json(evidence / 'compiled-header-closure.json', {'captured_before_qemu': True, 'sha256': closure})
+            write_json(evidence / 'actual-module-sdk-commands.json', chosen)
+            proof = {'candidate_only': True, 'elf_machine': 94, 'elf_sha256': sha(elf),
+                     'reserve_enabled': reserve, 'reclaim_enabled': reclaim,
+                     'allocator_words': {'calloc': expected_calloc, 'free': 'esp_mbedtls_mem_free'},
+                     'frozen_sources': frozen, 'compiled_header_closure': closure,
+                     'tools': report['tools'], 'sdk_commit': SDK_COMMIT, 'configuration': cfg}
+            for path in [elf, build / desc['app_bin'], build / 'compile_commands.json', build / 'project_description.json',
+                         build / 'config/sdkconfig.json', build / 'CMakeCache.txt', campaign / 'working-sdkconfig']:
+                destination = evidence / ('artifacts/' + (path.relative_to(build).as_posix() if path.is_relative_to(build) else path.name))
+                destination.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(path, destination)
+            if args.compile_only:
+                report['variants'][name] = {'compiled': True, 'runtime_unrun': True, 'proof': proof}
+                save(); continue
+            recipe = json.loads((build / 'flasher_args.json').read_text())
+            flash_files = [(int(offset, 0), build / relative) for offset, relative in recipe['flash_files'].items()]
+            flash = evidence / 'qemu-flash.bin'
+            merge = [py, '-m', 'esptool', '--chip', 'esp32', 'merge-bin', '--output', flash,
+                     '--flash-mode', 'dio', '--flash-size', '4MB', '--flash-freq', '40m']
+            for offset, path in sorted(flash_files): merge.extend([hex(offset), path])
+            execute(name + '-merge', merge + ['--pad-to-size', '4MB'])
+            raw_flash = flash.read_bytes()
+            assert len(raw_flash) == 0x400000 and all(raw_flash[offset:offset + path.stat().st_size] == path.read_bytes() for offset, path in flash_files)
+            proof['flash_sha256'] = sha(flash)
+            proof['artifacts_before_qemu'] = {path.relative_to(evidence).as_posix(): sha(path) for path in evidence.rglob('*') if path.is_file()}
+            write_json(evidence / 'execution-bundle.json', proof)
+            assert current() and all(sha(path) == digest for path, digest in closure.items())
+            print('Running actual SDK candidate ' + name, flush=True)
+            log = execute(name + '-qemu', [qemu, '-M', 'esp32', '-smp', '2', '-L', rom, '-display', 'none',
+                '-monitor', 'none', '-serial', 'stdio', '-no-reboot', '-snapshot', '-nic', 'none',
+                '-drive', 'file=' + str(flash).replace(',', ',,') + ',if=mtd,format=raw'], 150)
+            assert not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP|watchdog.*triggered', log, re.I)
+            expected = manifest['expected_failure']
+            if not reserve:
+                assert log.count('TLS_RX_DISABLED_ENTRY ordinary_sdk=1') == 1
+                assert log.count('TLS_RX_DISABLED_COMPLETE reserve=0 reclaim=' + str(int(reclaim)) + ' cycles=16 ordinary_sdk=1') == 1
+                assert 'TLS_RX_TARGET_ENTRY' not in log and 'TLS_RX_TARGET_FAILURE' not in log and 'TLS_RX_TARGET_CONTROLLED_STOP' not in log
+                result = {'passed': True, 'reserve_enabled': False, 'reclaim_enabled': reclaim,
+                          'original_sdk_ssl_source_compiled': True, 'reserve_module_static_slot_and_rx_wraps_absent': True,
+                          'ordinary_callback_and_dispatcher': True, 'public_setup_reset_free_cycles': 16}
+            elif expected:
+                assert log.count('TLS_RX_TARGET_ENTRY registry_fixture=1') == 1
+                assert re.findall(r'^TLS_RX_TARGET_FAILURE (.+)$', log, re.M) == [expected]
+                assert log.count('TLS_RX_TARGET_CONTROLLED_STOP') == 1 and 'TLS_RX_TARGET_COMPLETE' not in log
+                result = {'passed': True, 'exact_semantic_failure': expected,
+                          'phase_scoped_mutation': name in ('early-publish-phase','forget-resets-loan')}
+            else:
+                assert log.count('TLS_RX_TARGET_ENTRY registry_fixture=1') == 1
+                assert 'TLS_RX_TARGET_FAILURE' not in log and 'TLS_RX_TARGET_CONTROLLED_STOP' not in log
+                assert log.count('TLS_RX_TARGET_COMPLETE registry_fixture=1 production_radio=0 physical_benefit=0') == 1
+                assert log.count('TLS_RX_TARGET_CASE ownership_rollback_reopen injected_nulls=4 real_oom_claim=0') == 1
+                assert log.count('TLS_RX_TARGET_CASE smp_ownership_handover_erase cores=0,1') == 1
+                assert log.count('TLS_RX_TARGET_CASE registry_userdata_init_free_live_reuse attach_return_injection=1 early_setup_actual=1')==1
+                assert log.count('TLS_RX_TARGET_CASE registry_capacity entries=8 clients=9 soft_fallback=1')==1
+                assert log.count('TLS_RX_TARGET_CASE actual_initializer_isr registry_revoked=1')==1
+                capacity = re.findall(r'^TLS_RX_TARGET_CAPACITY content=(\d+) storage=(\d+) pointer_alignment=(\d+)$', log, re.M)
+                assert len(capacity) == 1 and int(capacity[0][0]) == 16384 and int(capacity[0][1]) >= 16384
+                real_oom = re.findall(r'^TLS_RX_TARGET_CASE real_oom_reserved_rx blocks=(\d+) actual_backend_nulls=(\d+)$', log, re.M)
+                assert len(real_oom) == 1 and all(int(value) > 0 for value in real_oom[0])
+                recovered = re.findall(r'^TLS_RX_TARGET_CASE actual_reclaim_recovery real_nulls=(\d+) recoveries=(\d+) released=(\d+) min=4 target=8$', log, re.M)
+                assert (len(recovered) == 1 and all(int(value) > 0 for value in recovered[0])) if reclaim else not recovered
+                result = {'passed': True, 'capacity_observed': capacity[0], 'real_heap_observation': real_oom[0],
+                          'actual_reclaim_observation': recovered, 'injected_rollback_cases': 4,
+                          'injected_failures_not_real_oom_proof': True}
+            sdk_state(name + '-after-qemu')
+            assert current() and all(sha(path) == digest for path, digest in closure.items())
+            assert all(sha(campaign / path) == digest for path, digest in frozen.items())
+            assert sha(flash) == proof['flash_sha256']
+            result['execution_bundle_sha256'] = sha(evidence / 'execution-bundle.json')
+            report['variants'][name] = result
+            save()
+        report['all_current_inputs_match'] = current()
+        report['passed'] = not args.compile_only and len(report['variants']) == len(args.variants) and all(v['passed'] for v in report['variants'].values())
+        report['full_target_matrix_complete'] = report['passed'] and set(args.variants) == set(VARIANTS)
+        report['status'] = 'runtime_qualified_selected_variants' if report['passed'] else 'compiled_only_runtime_unrun'
+        report['still_pending'] = ['production integration', 'whole audio-service binding/cancellation',
+            'canonical lint/application profiles', 'physical protocol/resources/usefulness/default decision']
+        if not report['full_target_matrix_complete']:
+            report['still_pending'].insert(0, 'full twelve-variant isolated target matrix including all four option combinations')
+        save()
+        print(json.dumps({'passed': report['passed'], 'status': report['status'], 'variants': list(report['variants']),
+                          'report_sha256': sha(out / 'report.json')}))
+    except BaseException as error:
+        initialized = True
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        save()
+        raise
+
+
+if __name__ == '__main__':
+    main()
