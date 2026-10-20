@@ -48,6 +48,9 @@ faults/reuse и RV32 binding: [JPEG_DECODER.md](JPEG_DECODER.md).
 Новый API с actual NOR/packed backing проверен также в standalone C2 QEMU:
 [JPEG_BACKING.md](JPEG_BACKING.md). Это ещё не UI/upload/cache workflow или
 доказательство общего RAM/stack/time fit приложения с Wi-Fi и дисплеем.
+Persistent source/SHA/rows/journal workflow с реальным JPEG decoder, cold readonly
+cache и проверкой transient source reads: [JPEG_CACHE_PIPELINE.md](JPEG_CACHE_PIPELINE.md).
+Этот cache owner пока host/RV32-linked, не native UI/HTTP/ESP-IDF runtime.
 
 Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
 для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write

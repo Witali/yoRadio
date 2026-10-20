@@ -83,6 +83,13 @@ standalone C2 QEMU с real ESP-IDF flash calls.61host positives/827physical faul
 48global stops,15273unit assertions/6mutants и два fresh target processes pass.
 Target fullCMYK12 requested allocator peak45576, stack free1988/4096; это без
 UI/Wi-Fi и не whole-app fit. [Результаты](tests/JPEG_BACKING.md).
+Следующий checkpoint: persistent source/SHA/row cache/journal owner реализован
+и связан с реальным decoder на host.59images/5source limits/6negative,268fault
+recoveries/18stops;12120physical cuts/946SHA faults/2424stops и9mutants pass.
+Cold hit не вызывает decoder и не пишет flash. Исправлен подтверждённый silent
+source read bug, проверены все218input/readback points. RV32cache handle5600,
+полный cache/storage ET_REL9016code/16rodata; нового target cache runtime ещё нет.
+[Результаты](tests/JPEG_CACHE_PIPELINE.md).
 Далее — расширить sampling/capacity bounds, выбрать budgets; invalidation/source
 hash в upload/cache workflow, matching assets build/deployment с сохранением photos/settings.
 Полный HTTP/power-loss workflow и native UI decoder integration ещё открыты.
@@ -108,6 +115,8 @@ hash в upload/cache workflow, matching assets build/deployment с сохран�
    и серверную privacy validation. Запрет progressive менять после готовности codec.
    Объединить validation и заполнение RGB565 cache в один decode; готовые кадры
    читать из cache без повторного multi-scan decode/записи coefficient scratch.
+   При native integration не держать общий media mutex на всём slow decode:
+   owner/worker должен сохранять source serialization и отзывчивость UI/HTTP.
 5. Проверить полный RV32 link, размер app partition, общий peak heap/task stack,
    время decode и abort/reuse после реальных I/O/allocation faults. 64 KiB library
    pools не считать всей RAM приложения. Учесть output policy и большой quantizer stack.

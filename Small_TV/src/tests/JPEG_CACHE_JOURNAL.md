@@ -123,3 +123,8 @@ ESP-IDF [authorized transport/SHA/budgets](JPEG_TRANSPORT.md) теперь пр�
 отдельной target probe; journal пока не связан с ним в native UI. Далее bounded
 shared scratch subfiles, build/HTTP/source/cache workflow и libjpeg integration,
 затем final gates.
+
+Следующий checkpoint: journal связан с actual source/row cache и настоящим JPEG
+decoder на host через `storage/jpeg_cache`. См.
+[JPEG_CACHE_PIPELINE.md](JPEG_CACHE_PIPELINE.md). Native UI/ESP-IDF cache runtime
+и полный upload/settings/privacy workflow ещё не подключены.

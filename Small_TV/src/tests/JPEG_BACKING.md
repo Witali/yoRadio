@@ -97,3 +97,8 @@ python -B Small_TV/src/tests/jpeg_backing/qemu_probe.py --qemu-root FROZEN_QEMU_
 отрисовка готового кадра не должна повторять multi-scan decode и flash writes.
 Затем реальный UI link/shared heap/stack/time, HTTP/reset/power-loss и независимые
 LCD/network/full/24h/hardware gates. Новый decoder ещё не включён в UI.
+
+Следующий checkpoint: durable source/row cache/journal pipeline проверен с этим
+backing и actual decoder на host — [JPEG_CACHE_PIPELINE.md](JPEG_CACHE_PIPELINE.md).
+Один decode готовит кадр; cold hit больше не вызывает decoder и не пишет flash.
+Это ещё не production media/upload/HTTP integration или target cache execution.

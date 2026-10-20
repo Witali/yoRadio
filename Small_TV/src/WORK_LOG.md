@@ -3840,3 +3840,82 @@ hashes/positive issued writes/protected4MiB bytes проверены. Первы
 по original creation timestamps живы, SDK tracked clean, frozen47files exact.
 No old QMP/RSP/native board/other repository writes. Фактические outputs/history
 и current source snapshot включены в proof; base artifact/API inventory прежние.
+
+## 2026-10-20 — verified persistent source/RGB565 cache pipeline
+
+Previous69f138125 classified progress. Goal IMPROVEMENT_PLAN active; worktree
+проверена clean до продолжения. Добавлены storage/jpeg_cache.c/.h и build generator
+tools/jpeg_cache_layout.py. Новая категория storage owner, не изменение factory
+renderer или network. Borrowed scoped source/frame/metadata devices одного job,
+durable invalidation до first frame write/source upload, exact LE RGB565 rows,
+source/hash identity, physical full-frame flush/reopen/hash, journal publication
+последней. Abort не flush, не publish, не требует оставшегося бюджета.
+
+Cache hit заново хеширует actual persistent source и full physical frame, затем
+читает строки без decoder/program/erase. All slots/maps/aliases проверяются до
+metadata reads, unknown/failed state не разрешает drawing. Большой source — отдельный
+SOURCE_LIMIT с точными required/available. Это не damaged/unsupported JPEG.
+Code ID включает archiveSHA/3patches/codec+converter+storage sources/geometry;
+ownership resources не меняются при смене codec identity. Actual archive mismatch
+отвергается до создания output. Matching assets deployment не производится этим tool.
+
+В первом synthetic layout тесте ошибочно считался invalid сдвиг последнего readonly
+source на1byte, хотя он не пересекал следующий slot. Тест исправлен на реальное
+пересечение предпоследнего/последнего; argument gates не ослаблены. Начальные
+resource expectations также учитывают реальную102400byte source capacity: rich
+4x4 и некоторые lossless сначала не помещаются в slot. Flat4x4 сохраняет такую
+же padded geometry и проверяет backing524288/460800 или pool70760/65536, когда
+compressed source действительно помещается. Старый generatorargc5 output8/12
+побайтово совпадает; добавлен отдельный optional flat mode без смены geometry.
+
+Найдена и воспроизведена существенная ошибка нового cache protocol: silent physical
+read378 менял валидные decoder input bytes, pre/post source SHA оставались прежними,
+неверный RGB565 публиковался как READY и выдавался cold hit. Before source/header/
+model/driver snapshots сверены с BEFORE-compilation hashes, фактические wrong pixels
+и отчёт сохранены. FIXED_RECONSTRUCTION в jpeg_cache_read_source сверяет каждый
+полученный input block с fresh bounded256byte physical readbacks перед codec.
+Новая heap не нужна; дополнительные44402read bytes на full fixture. Исходная UI
+не использовала этот модуль и не затронута. Два хеша source не выдаются за защиту
+от transient decoder reads; tested single-callback fault scope указан явно.
+
+Final synthetic cache:12120fault/cut cases (2424callbacks×5modes),946SHAfaults,
+2424stops. Source/hash/row/invalidation/commit/cold recovery, all5slots, dangerous
+old-ready fallback и весь protected4MiB проверены. Independent observer считает
+physical frame reads внутри SHA, поэтому пропуск reopen/старый NOR RAM cache
+не проходит как physical verification.9compiled unsafe variants rejected runtime
+assertions/independent pixel oracle; crashes/compiler/loader failures не counted.
+Internal1.26billion CHECKs не являются числом независимых cases.
+
+Actual libjpeg/cache integration:59full240JPEG8/12lossy,2–16lossless predictor4,
+baseline/progressive/gray/RGB/CMYK/YCCK/arithmetic8;5source capacity refusals,
+6negative/resource cases,268fault recoveries (43physical/7SHA/218silent source
+reads+readbacks),18global time/quota/cancel stops. Persistent source реально
+читается через bounded role callbacks. Cold job сохраняет physical bytes, не
+повторяет decoder; failures могут rebuild только после invalidation/reopen.
+Final decoder requested heap0; independent upstream samples/Python RGB565 exact.
+
+FullCMYK12:52775calls/14471482reads/2703104program/144erases при1decode; cold
+lookup+display1135calls/276338reads/0program/0erase/0decode, BE98FC78…E4C8CF46.
+Первая запись:2582784scratch +118784frame/padding +1536metadata. Model starts
+nonFF; это issued traffic, не chip endurance/hardware timing. Decoder host heap
+peak47507 отдельно от cache/OS/model. Source44402bytes unchanged.
+
+Strict RV32 compile сначала указал misleading indentation — formatting исправлен,
+warning не подавлялся. Первый measurement ошибочно применял final picolibc linker
+script к ET_REL, исправлен driver на bare ld. Финальный all9roots cache+NOR+journal
+9016code/16rodata/static0, cache5600bytes (journal1032+frameNOR4352), layout156/
+devices72; maxcacheframe336/readsource304, maxjournal448. Unresolved только
+memcmp/memcpy/memset. Это не final SDK/UI link, runtime, whole heap/call-chain stack.
+
+10generator rejects/identity/resource-separation и6artifact/10inventory controls
+pass. Main3E03/TJpgd и storage6CB2/decoder0F63 target probes неизменны. Новые
+production firmware не собирались, новых VM/physical-device действий не было.
+SDK tracked clean, frozen47files/original6H10 owners readonly, no QMP/RSP.
+Proof qemu/parity/jpeg-cache-pipeline-validation-20261020.json.
+
+Далее production media owner/worker, actual RV32 cache runtime, build/vendor and
+matching deployment, privacy/HTTP typed errors и settings publication. Текущий
+photo_upload_finish удерживает общий media_mutex на всём validation: подставить
+туда slow decode напрямую нельзя, это заблокирует UI/media clients. Затем общий
+heap/stack/time и reset/power-loss, независимые network/LCD/full/24h/hardware;
+остальные factory/network/electrical audit пункты остаются. Goal не закрыт.

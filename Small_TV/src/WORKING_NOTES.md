@@ -2518,3 +2518,38 @@ multi-scan decode/flash writes. Затем UI link, реальный общий 
 reset/power-loss, независимые LCD/network/full/24h/hardware. Не закрывать цель.
 Старые H10/frozen46payloads+manifest/SDK readonly; ни QMP/RSP, ни stop для oldH10.
 Все новые процессы принадлежат только standalone probes; после tests reap owners.
+
+## 2026-10-20 — следующий checkpoint persistent cache
+
+Предыдущий goal turn69f138125 — progress; цель прежняя, не завершена. В этой же
+clean worktree добавлены storage/jpeg_cache и tools/jpeg_cache_layout. Полный
+source→decoder→rows→physical verify→journal→cold readonly cache workflow работает
+на host с actual libjpeg, не только synthetic producer. Native UI3E03/TJpgd и
+standalone target probe0F63 не менялись; новый cache на C2 ещё не исполнялся.
+
+Cache handle5600RV32 включает journal1032+frameNOR4352; borrowed layout156/devices72,
+scratchNOR/backing/decoder/SHA отдельно. All9roots cache+NOR+journal ET_REL9016code/
+16rodata/static0, maxcacheframe336/maxjournal448. Не whole UI heap/task stack fit.
+Source102400 limit — отдельный SOURCE_LIMIT с required/available, без decoder/
+source reads. Code identity генерируется из actual archive SHA, patches, codec/
+converter/storage sources и geometry. Codec change не требует изменения ownership
+resources, но matching assets/deployment и сохранение user photos/settings ещё нужны.
+
+Критическое: before/after source SHA не обнаруживала silent read внутри decoder.
+Реальный fault378 публиковал wrong pixels, cold hit их повторял. Исправлено
+FIXED_RECONSTRUCTION в jpeg_cache_read_source: fresh256byte readbacks до передачи
+данных decoder. Все218actual input/readback points теперь отвергаются без READY;
+before inputs/output и9runtime mutants сохранены. Cache readback SHA обязан читать
+весь PHYSICAL frame после flush/reopen; test observer проверяет этот объём отдельно.
+
+Final host:59JPEG240×240/5source refusals/6negative,268fault recoveries/18stops;
+12120physical cuts+946SHAfailures+2424stops,9mutants,10generatorrejects и старые
+sampling argc5 byte-identical8/12. FullCMYK12:1decode/2703104program/144erases;
+cold hit0decode/0program/0erase, exact BE98FC78 pixels. Всё ещё host only.
+Proof qemu/parity/jpeg-cache-pipeline-validation-20261020.json; tests/JPEG_CACHE_PIPELINE.md.
+
+Следом native media owner/build/deployment/privacy/HTTP+target runtime. Не вставлять
+40секундный decode под нынешний общий media_mutex: photo_upload_finish держит его,
+UI вызывает media API. Нужен owner/worker protocol без нарушения source serialization
+и отзывчивости UI/HTTP. После integration shared RAM/stack/time, reset/power-loss,
+independent network/LCD/full/24h/hardware. Старые SDK/H10/frozen read-only, no QMP/RSP.

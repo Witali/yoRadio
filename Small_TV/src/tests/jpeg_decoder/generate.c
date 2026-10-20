@@ -9,7 +9,9 @@ int main(int argc,char **argv)
     /* Each component has separate DC and AC scans, so4x4 factors do not violate
      * the interleaved10-block MCU limit. Actual padded coefficient arrays can
      * exceed460800 even though the native output is still240x240. */
-    if(argc!=5)return 2;unsigned factors=(unsigned)strtoul(argv[2],NULL,16),bits=(unsigned)atoi(argv[3]),components=(unsigned)atoi(argv[4]);
+    if(argc!=5 && argc!=6)return 2;
+    int flat=argc==6;if(flat && strcmp(argv[5],"flat"))return 2;
+    unsigned factors=(unsigned)strtoul(argv[2],NULL,16),bits=(unsigned)atoi(argv[3]),components=(unsigned)atoi(argv[4]);
     if(!factors || (bits!=8 && bits!=12) || (components!=1 && components!=3 && components!=4))return 2;
     struct jpeg_compress_struct codec={0};struct jpeg_error_mgr error;codec.err=jpeg_std_error(&error);
     jpeg_create_compress(&codec);FILE *file=fopen(argv[1],"wb");if(!file)return 2;jpeg_stdio_dest(&codec,file);
@@ -29,7 +31,9 @@ int main(int argc,char **argv)
     JSAMPLE row8[240*4];J12SAMPLE row12[240*4];
     while(codec.next_scanline<codec.image_height) {
         for(unsigned x=0;x<240;++x)for(unsigned c=0;c<components;++c) {
-            unsigned value=(x*17u+codec.next_scanline*31u+c*47u)&((1u<<bits)-1u);
+            /* Flat controls retain the SAME padded array geometry while fitting
+             * the real photo source slot; rich controls still test its limit. */
+            unsigned value=flat ? 1u<<(bits-1u):(x*17u+codec.next_scanline*31u+c*47u)&((1u<<bits)-1u);
             row8[x*components+c]=(JSAMPLE)value;row12[x*components+c]=(J12SAMPLE)value;
         }
         if(bits==8){JSAMPROW row=row8;jpeg_write_scanlines(&codec,&row,1);}

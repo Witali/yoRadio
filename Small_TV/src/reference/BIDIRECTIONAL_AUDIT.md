@@ -55,6 +55,10 @@ resource preflight и typed errors, пока вне UI inventory. Новая cod
 связывает их с настоящим shared NOR; полный pipeline исполнен в standalone C2 QEMU,
 не в UI. См. [JPEG_DECODER](../tests/JPEG_DECODER.md) и
 [JPEG_BACKING](../tests/JPEG_BACKING.md).
+Новый storage/jpeg_cache и build identity generator связывают source, rows,
+physical frame verification и journal; real decoder/cache workflow проверен на
+host, RV32 linked. В UI inventory ещё не входит. См.
+[JPEG_CACHE_PIPELINE](../tests/JPEG_CACHE_PIPELINE.md).
 При native UI integration их нужно включить в source inventory/сборочные inputs.
 Это REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 
