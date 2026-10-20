@@ -3699,3 +3699,64 @@ Proof qemu/parity/jpeg-coefficients-validation-20261020.json. Далее precise
 unsupported/invalid/resource/I/O errors и preflight с required/available, expanded
 sampling/capacity, actual native upload/source/journal/cache/codec integration
 и target link/heap/stack/time/HTTP/LCD/full/24h/hardware. Не объявлять цель закрытой.
+
+## 2026-10-20 — portable decoder API, resource preflight и точные отказы
+
+Предыдущий turn — progress, focused commit44f106cb5. Clean worktree проверен;
+продолжена полная цель IMPROVEMENT_PLAN. Вместо дальнейшего изменения CLI
+probe перенесён настоящий decoder binding в codec/jpeg_decoder.c/.h и jpeg_memory.c,
+private header отдельно. Input/read/check и provisional RGB565 row callbacks,
+per-instance capped allocator/backing; без network/LCD/ESP-IDF I/O. Existing
+RGB565 converter переиспользуется. Никаких mutable globals в binding.
+
+Actual virtual-array requests wrapped: padded rows/columns, sample precision и
+JBLOCK size. Min-window policy такая же, как qualified jmemsys. Whole sum проверяется
+в realize до любого backing open. При460799 вместо460800 точные required/available,
+opened/read/write/rows0. Legal noninterleaved4x4 CMYK на самом деле требует524288;
+при460800 отказ до backing. Positive rare-sampling oracle повышал host limits до
+262144pool/1MiBbacking; это не native fit и не исключение форматов ради зелёных тестов.
+
+Раздельные unsupported/invalid/truncated/dimensions/pool/allocation/backing/input/
+output/cancel/time/quota reasons; cause library enum/detail/value и callback code
+сохраняются отдельно. Allocation retry может успешно восстановиться; final fatal
+классифицируется по последнему отказу, pool cap не выдаётся за неизвестный free heap.
+Огромный declared dimension не помечается corrupt из-за internalIJG limit65500;
+height0/DNL отличается от invalid width0. Неприменимый msg_parm не становится
+параметром ошибки. Provisional rows нельзя publish до OK; настоящий HTTP/journal
+workflow здесь ещё не интегрирован, это остаётся отдельной обязательной работой.
+
+Mutable setjmp state/rows/source и16backing handles в owner context. Abort/reuse
+сохраняет успешно созданный JPEG object; recreate только после failed creation.
+Pre/post callback checkpoints. Post-open deadline может прервать библиотеку до
+b_s_open=true; после её abort loop explicit cleanup закрывает orphan без обращения
+к освобождённому owner/flush. Ошибка close тоже не превращает decode в успех.
+
+Final host contract:63positive RGB565 cases/7limits/10negative/1197callback failures
+и12format transitions. Все2–16lossless precisions, gray/RGB/CMYK/YCCK8/12,
+arithmetic8, fullCMYK12,411/440/410/4x4. Exact upstream samples +independent Python
+RGB565 arithmetic. Actual partial stdio transfers, same-object recovery после
+creation, no open handles/final requested heap0.6compiled unsafe mutants runtime-
+rejected, в том числе пропуск complete preflight, неверный размер, ложные bad-JPEG
+причины, stale job и post-open orphan leak. Compiler/loader errors/crashes не
+засчитываются как caught mutants.
+
+Generator first compile обнаружил J12SAMPROW signedness; исправлен настоящий
+J12SAMPLE, original source/log сохранены. Strict C11/RV32 first build обнаружил
+ненужный private jinclude/setenv dependency и misleading indentation. Подключены
+только нужные standard/private ABI headers, formatting исправлен без suppressions.
+Host build freeze включает private/generated JPEG headers ДО compilation.
+Финальные source hashes отдельно от всех промежуточных успешных/failed stages.
+
+Host context5232, fullCMYK12pool42275:47507requested allocator bytes, не actual
+malloc metadata/stdio/whole RAM. RV32 context4984, decoder2384code+311rodata,
+memory1870code/color586code; binding writable static0. Largest individual binding
+frame144/color96, не complete library/task stack. Real relocatable RV32 link
+148672code+120581rodata, JPEG symbols resolved; libc/libgcc/SDK/startup ещё external.
+Это не bootable firmware/target execution/final UI app delta или memory/time fit.
+
+Proof qemu/parity/jpeg-decoder-validation-20261020.json.6artifact/10map controls
+pass. Main app3E03/TJpgd и transport probe6cb не менялись. SDK tracked clean,
+frozen47files и6oldH10 original owners readonly checked; no QMP/RSP/physical board.
+Далее portable actual NOR/packed backend для нового API, target probe/runtime,
+source/upload/journal/physical hash/RGB565 cache/matching assets/native UI workflow,
+total heap/task stack/time/HTTP/LCD/network/full/24h/hardware. Вся цель активна.

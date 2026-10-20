@@ -49,6 +49,9 @@ Scratch/actual libjpeg пока исполнены на host NOR model, не в 
 Prepared codec/jpeg_coefficients — converter temporary JCOEF storage, не новая
 factory function или новый формат input JPEG; он также ещё вне UI inventory.
 Exact pixels/traffic/error evidence: [JPEG_COEFFICIENTS](../tests/JPEG_COEFFICIENTS.md).
+Portable jpeg_decoder/jpeg_memory — новый bounded library adapter с exact
+resource preflight и typed errors, пока вне UI inventory. Host executed/RV32 linked,
+не target execution. См. [JPEG_DECODER](../tests/JPEG_DECODER.md).
 При native UI integration их нужно включить в source inventory/сборочные inputs.
 Это REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 

@@ -72,6 +72,12 @@ sector initialization. На same-executable raw/packed richCMYK12 program3780608
 2582784(-31.68%), erase923→113(-87.76%); capacity/pool peak прежние. Flat tradeoff
 учтён.19726488native assertions/11compiled mutants, actual codec/fault gates pass;
 это пока host, не native UI. [Результаты](tests/JPEG_COEFFICIENTS.md).
+Следующий checkpoint: самостоятельный portable decoder API с bounded input/
+RGB565 output, per-instance pools/backing, exact whole-array preflight и typed
+errors реализован.63positive/7resource/10negative/1197callback failures/12format
+transitions и6compiled mutants pass. Legal4x4 требует524288; при460800 refusal
+до backing I/O. RV32 binding связан, context4984, но не исполнен на target.
+[Результаты](tests/JPEG_DECODER.md). Native UI3E03/TJpgd пока без изменений.
 Далее — расширить sampling/capacity bounds, выбрать budgets; invalidation/source
 hash в upload/cache workflow, matching assets build/deployment с сохранением photos/settings.
 Полный HTTP/power-loss workflow и native UI decoder integration ещё открыты.

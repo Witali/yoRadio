@@ -114,6 +114,25 @@ preflight и actual native source/upload/journal/cache/codec integration; вес
 
 ## Независимость проверок подсистем — 2026-10-18
 
+Native decoder checkpoint20Oct: codec/jpeg_decoder.c/.h +jpeg_memory.c отделены
+от CLI, public API без libjpeg типов для network/LCD. Bounded reader1024/oneRGB565
+row, mandatory pre/post checkpoints, per-context allocator cap/backing. Wrapped
+virtual requests считают actual padded rows; complete preflight before ANY open.
+Typed unsupported/invalid/truncated/pool/backing/dimension/I/O/cancel/time/quota
+diagnostics; required/available с known flag. Post-open deadline orphan очищается
+после library abort без dereference freed owner/flush. Mutable jmp state в heap;
+созданный JPEG object сохраняется после fail, recreate только если create failed.
+63positive/7limits/10negative/1197faults/12transitions/6compiled mutants pass.
+Rare legal4x4 CMYK needs524288 vsnative460800; positive oracle at262144pool/1MiB
+backing не считать C2 fit. Host context5232+poolpeak42275(fullCMYK12); RV32context
+4984, decoder2384code+311rodata/memory1870/color586, static writable0. Complete
+relocatable binding148672code+120581rodata, libc/libgcc unresolved by design;
+не runtime/full UI link/whole heap/stack/timing. Proof jpeg-decoder-validation-
+20261020.json; tests/JPEG_DECODER.md. Main3E03/TJpgd/probe6cb unchanged;6artifact/
+10map controls. Далее NOR/packed backend adapter для нового API, target execution,
+actual upload/source/journal/cache/physical hashes/matching assets/UI integration
+и full/final/hardware gates. Весь IMPROVEMENT_PLAN по-прежнему активен.
+
 ## План улучшений форматов изображений — 2026-10-19
 
 По уточнению пользователя текущая задача — подобрать свободную библиотеку и

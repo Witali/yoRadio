@@ -43,6 +43,9 @@ logical faults и 2238 partial physical error recoveries. Это host execution,
 не target UI integration. См. [JPEG_SHARED_SCRATCH.md](JPEG_SHARED_SCRATCH.md).
 Сокращение actual NOR traffic через reversible DC/AC temporary encoding, flat
 tradeoffs и независимые pixel/fault gates: [JPEG_COEFFICIENTS.md](JPEG_COEFFICIENTS.md).
+Portable decoder API, resource preflight/typed refusals, RGB565 pixels, callback
+faults/reuse и RV32 binding: [JPEG_DECODER.md](JPEG_DECODER.md). Это ещё не UI/NOR
+workflow или target runtime acceptance нового API.
 
 Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
 для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write
