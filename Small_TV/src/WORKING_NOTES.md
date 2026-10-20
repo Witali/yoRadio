@@ -118,6 +118,21 @@ withoutLCD HTTP/freshSNTP до/после reset pass (62/59inputs unchanged).
 Не переносить full/H10 B50D на C8FD. Далее libjpeg/NOR-aware scratch/износ,
 codec adapter/privacy и общий production RAM/stack, затем HTTP/LCD/full/soak.
 
+Storage capacity checkpoint20Oct: новый read-only tools/jpeg_storage_layout.py
+проверяет manifest/partition/header/frame ownership нашего sanitized assets.bin.
+Free:121gap+112animation tails+29media tail=262erase sectors. Measured backing
+460800(113sectors)+metadata2+пятьRGB565cache115200(145sectors)=260, spare2(8KiB).
+Все5полных photo slots, active animation sectors, weather/status slots и settings
+защищены.30unsafe cases/4controls pass; +2animation sectors fits, +3fails.
+Plan ID4508149b...51ad9ca6; exact sparse extents в proof. Это capacity/ownership,
+не NOR backend и не универсальный JPEG bound. Runtime должен проверить immutable
+resources перед writes, source/codec/layout invalidation, atomic publication,
+physical erase/write counters и no periodic decode writes. Нельзя исключать
+всю assets partition из integrity checks. См. tests/JPEG_STORAGE_LAYOUT.md и
+jpeg-storage-layout-validation-20261020.json. C8FD app/source/SDK и baseline
+full/H10 не менялись. Следующий implementation шаг —bounded sparse NOR store,
+затем codec/cache integration и фактический общий heap/stack/full link.
+
 Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
 groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
 24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.

@@ -12,6 +12,10 @@ Host libjpeg allocation/I/O faults и recovery после abort проверяю
 [JPEG_FAULT_RECOVERY.md](JPEG_FAULT_RECOVERY.md). Эти результаты не заменяют
 NOR/HTTP/LCD или полный/суточный прогон будущей firmware.
 
+Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
+для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write
+не выполняется. Это capacity/ownership plan, не готовый NOR backend.
+
 ## JPEG Huffman selectors
 
 Отдельный `jpeg_selector_oracle.py` проверяет136valid/32invalid входа с

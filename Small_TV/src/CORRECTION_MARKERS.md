@@ -36,6 +36,12 @@ RGB/CMYK row conversion до2–16бит. Два прежних RGB888↔RGB565 
 перенесены в этот модуль и не получают метку исправления: их результаты сохранены
 и сверены с original RV32 code. Новый row API ещё не используется media decoder.
 
+Read-only `jpeg_storage_layout.make_plan` использует `REQUESTED_CHANGE` для
+запрошенной оптимизации будущего JPEG storage. `FIXED_TEST` в его contract
+поясняет однобайтный owned-padding control: прежняя5-byte mutation пересекала
+границу photo slot, и payload-hash guard правильно её отвергал. Ни одна версия
+этого теста не записывала изменённый image на диск или устройство.
+
 ## Как ставить метку
 
 Метка находится в первом комментарии внутри исправленной функции, рядом с

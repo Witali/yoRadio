@@ -3318,3 +3318,23 @@ true. Это только начало нового прогона, не 24 ча
 - Read-only OS checkpoint10:23:31UTC подтверждает все5original B50D full/H10
   process identities; H10running149cycles/cleanup[], full безterminal footer.
   Собственных scoped display/network ВМ больше нет. Это checkpoint, не24h pass.
+
+## 2026-10-20 — read-only JPEG scratch/cache layout на4MiB
+
+- Проверены настоящие lengths пяти native animation containers и полные
+  protected upload/weather/status slots. Свободные erase-aligned области:
+  121сектор между app/assets,112в animation tails и29после icon banks. Всего262.
+  Measured backing113+metadata2+пять RGB565 caches145=260, spare2сектора8KiB.
+  Это позволяет проектировать decoding при upload/invalidation, без повторных
+  scratch writes накаждом slideshow pass. Runtime такого cache ещё не написан.
+- Добавлен отдельный read-only planner и contract: manifest/payload hashes,
+  partition ownership, header/frame bounds, FF tails после установления ownership,
+  sparse nonoverlapping allocation. Все1024сектора распределены protected/free.
+ 30unsafe cases/4controls pass, images unchanged. Удлинение animation0на2сектора
+  пересчитывается ивлезает,3сектора —refusal. CLI не заменяет output и не создаёт
+  его при unsafe layout. Первый positive padding test сам пересёк границуphoto;
+  payload guard отказал корректно, FIXED_TEST делает mutation однобайтной.
+- Plan4508149b...51ad9ca6 и raw reports/logs сохранены. Допуск460800относится
+  к measured matrix, не всемуT.81. Нужны NOR backend/RMW/fault/cold recovery,
+  atomic metadata, source/codec/layout keys, immutable resource guards и физические
+  erase counts. C8FD source/firmware, shared SDK и frozen B50D не менялись.
