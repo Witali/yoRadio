@@ -1,0 +1,328 @@
+{
+  "passed": true,
+  "scope": "Synthetic archival checks, no live campaign/SDK input reads or external commands",
+  "checks": [
+    {
+      "name": "python_syntax_all_tools",
+      "passed": true
+    },
+    {
+      "name": "synthetic_complete_terminal_shape",
+      "passed": true
+    },
+    {
+      "name": "terminal_nonzero_even_when_report_passes",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Explicit root-authoritative terminal0",
+      "actual_diagnostic": "Explicit root-authoritative terminal0 and exact final SHA receipt required"
+    },
+    {
+      "name": "wrong_terminal_report_sha",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Explicit root-authoritative terminal0",
+      "actual_diagnostic": "Explicit root-authoritative terminal0 and exact final SHA receipt required"
+    },
+    {
+      "name": "partial_matrix_never_collectable",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Exact12 final outcomes",
+      "actual_diagnostic": "Exact12 final outcomes"
+    },
+    {
+      "name": "compile_only_never_runtime",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Final fully completed runtime report required",
+      "actual_diagnostic": "Final fully completed runtime report required"
+    },
+    {
+      "name": "synthetic_named_control_shape",
+      "passed": true
+    },
+    {
+      "name": "named_control_followed_by_panic",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Panic never passes",
+      "actual_diagnostic": "Panic never passes, even after named marker"
+    },
+    {
+      "name": "named_control_followed_by_backtrace",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Panic never passes",
+      "actual_diagnostic": "Panic never passes, even after named marker"
+    },
+    {
+      "name": "duplicate_named_control",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Exact negative-control marker/stop/uniqueness",
+      "actual_diagnostic": "Exact negative-control marker/stop/uniqueness"
+    },
+    {
+      "name": "wrong_named_control",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Exact negative-control marker/stop/uniqueness",
+      "actual_diagnostic": "Exact negative-control marker/stop/uniqueness"
+    },
+    {
+      "name": "control_accidentally_completes",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Exact negative-control marker/stop/uniqueness",
+      "actual_diagnostic": "Exact negative-control marker/stop/uniqueness"
+    },
+    {
+      "name": "disabled_full_heap_separate_from_MFL_getter",
+      "passed": true
+    },
+    {
+      "name": "disabled_storage_not_hardcoded",
+      "passed": true
+    },
+    {
+      "name": "disabled_without_MFL_getter_uses_full_content",
+      "passed": true
+    },
+    {
+      "name": "disabled_capacity_marker_missing",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Exactly one disabled capacity marker required",
+      "actual_diagnostic": "Exactly one disabled capacity marker required"
+    },
+    {
+      "name": "disabled_capacity_marker_duplicate",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Exactly one disabled capacity marker required",
+      "actual_diagnostic": "Exactly one disabled capacity marker required"
+    },
+    {
+      "name": "disabled_short_content_rejected",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Disabled full RX storage/all32 allocations must be retained",
+      "actual_diagnostic": "Disabled full RX storage/all32 allocations must be retained"
+    },
+    {
+      "name": "disabled_short_storage_rejected",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Disabled full RX storage/all32 allocations must be retained",
+      "actual_diagnostic": "Disabled full RX storage/all32 allocations must be retained"
+    },
+    {
+      "name": "disabled_insufficient_actual_heap_rejected",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Disabled full RX storage/all32 allocations must be retained",
+      "actual_diagnostic": "Disabled full RX storage/all32 allocations must be retained"
+    },
+    {
+      "name": "disabled_not_all32_setups_rejected",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Disabled full RX storage/all32 allocations must be retained",
+      "actual_diagnostic": "Disabled full RX storage/all32 allocations must be retained"
+    },
+    {
+      "name": "disabled_full_content_is_wrong_MFL_getter",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Disabled pre-handshake getter must match actual pinned MFL profile",
+      "actual_diagnostic": "Disabled pre-handshake getter must match actual pinned MFL profile, independently of storage"
+    },
+    {
+      "name": "disabled_small_getter_without_MFL_rejected",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Disabled pre-handshake getter must match actual pinned MFL profile",
+      "actual_diagnostic": "Disabled pre-handshake getter must match actual pinned MFL profile, independently of storage"
+    },
+    {
+      "name": "disabled_actual_config_required",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Actual disabled configuration required",
+      "actual_diagnostic": "Actual disabled configuration required for capacity/getter separation"
+    },
+    {
+      "name": "disabled_valid_capacity_plus_panic_rejected",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Panic never passes",
+      "actual_diagnostic": "Panic never passes, even after named marker"
+    },
+    {
+      "name": "bounded_old_nonpass_shape_only",
+      "passed": true
+    },
+    {
+      "name": "old_nonpass_cannot_be_relabelled_pass",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Historical rxt01 remains10 reported accepted outcomes and overall nonpass",
+      "actual_diagnostic": "Historical rxt01 remains10 reported accepted outcomes and overall nonpass"
+    },
+    {
+      "name": "uniform_line_ending_relation",
+      "passed": true
+    },
+    {
+      "name": "windows_parent_components_same_source",
+      "passed": true
+    },
+    {
+      "name": "windows_mixed_slashes_case_dot_same_source",
+      "passed": true
+    },
+    {
+      "name": "windows_same_basename_wrong_directory_unequal",
+      "passed": true
+    },
+    {
+      "name": "windows_parent_escape_wrong_directory_unequal",
+      "passed": true
+    },
+    {
+      "name": "windows_distinct_drives_unequal",
+      "passed": true
+    },
+    {
+      "name": "mixed_raw_source_line_endings",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Uniform LF/CRLF required",
+      "actual_diagnostic": "Uniform LF/CRLF required"
+    },
+    {
+      "name": "exact200_command_labels",
+      "passed": true
+    },
+    {
+      "name": "complete_valid200_synthetic_commands",
+      "passed": true
+    },
+    {
+      "name": "timeout_never_control_pass",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Original command terminal/log identity; timeout/failure rejected",
+      "actual_diagnostic": "Original command terminal/log identity; timeout/failure rejected"
+    },
+    {
+      "name": "nonzero_command_never_control_pass",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Original command terminal/log identity; timeout/failure rejected",
+      "actual_diagnostic": "Original command terminal/log identity; timeout/failure rejected"
+    },
+    {
+      "name": "command_raw_log_hash_mismatch",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Original command terminal/log identity; timeout/failure rejected",
+      "actual_diagnostic": "Original command terminal/log identity; timeout/failure rejected"
+    },
+    {
+      "name": "wrong_actual_build_option",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Actual independent build option flags",
+      "actual_diagnostic": "Actual independent build option flags"
+    },
+    {
+      "name": "wrong_actual_qemu_core_count",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Actual isolated two-core no-NIC QEMU invocation",
+      "actual_diagnostic": "Actual isolated two-core no-NIC QEMU invocation"
+    },
+    {
+      "name": "exact_guarded_variant_build_headers_valid",
+      "passed": true
+    },
+    {
+      "name": "wrongdir_samebasename_cannot_satisfy_header",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Expected one exact compiled header path:",
+      "actual_diagnostic": "Expected one exact compiled header path: c:/sdk/components/mbedtls/mbedtls/library/ssl_misc.h"
+    },
+    {
+      "name": "shadow_good_hash_cannot_replace_wrong_intended_header",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Compiled guarded/frozen header hash mismatch:",
+      "actual_diagnostic": "Compiled guarded/frozen header hash mismatch: c:/sdk/components/mbedtls/mbedtls/library/ssl_misc.h"
+    },
+    {
+      "name": "canonical_header_cannot_replace_variant_header",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Expected one exact compiled header path:",
+      "actual_diagnostic": "Expected one exact compiled header path: c:/repo/.build/rxt02/campaigns/canonical/sources/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h"
+    },
+    {
+      "name": "other_build_sdkconfig_cannot_satisfy_current_build",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Expected one exact compiled header path:",
+      "actual_diagnostic": "Expected one exact compiled header path: c:/repo/.build/rxt02/campaigns/canonical/working-build/config/sdkconfig.h"
+    },
+    {
+      "name": "shadow_timer_cannot_replace_intended_sdk_timer",
+      "passed": true,
+      "expected_rejection": true,
+      "required_diagnostic": "Expected one exact compiled header path: components/esp_timer/include/esp_timer.h",
+      "actual_diagnostic": "Expected one exact compiled header path: components/esp_timer/include/esp_timer.h"
+    }
+  ],
+  "source_files": {
+    "archive_core.py": {
+      "sha256": "b6a4c762a320dd1a13a6570609f9f80df9753c564f9710a58e491b9fdfe63a95",
+      "bytes": 4108
+    },
+    "build_archive.py": {
+      "sha256": "0ceee889ea66032d21be1c25ee7b9afb4ddaa6747a89c03f33a71e9d7add92dd",
+      "bytes": 19816
+    },
+    "check-prep.py": {
+      "sha256": "23fecf2f1ad18f3d9c8afe046f87280338d194f36251222d2a8f98e0d19cdd4b",
+      "bytes": 16506
+    },
+    "copied-base.json": {
+      "sha256": "771a4990628af8dde3ebf0bf8710f65db3e9f2410f0eeea3503a2bc788f99b24",
+      "bytes": 1364
+    },
+    "evidence_rules.py": {
+      "sha256": "3772714c9584367670dc5fe4f69cb1173c8974cc7998ca905ee079f19e6ea922",
+      "bytes": 20014
+    },
+    "README.template.md": {
+      "sha256": "c5bda43c0d42066d75da9903350d33940ce7aef7de71eb40ad7c299a9aab2cb7",
+      "bytes": 2623
+    },
+    "SPEC.md": {
+      "sha256": "e47887498ceff64f00096de79c9ad02e77e0819d388284ce9efe9bd4ce5a10e0",
+      "bytes": 8680
+    },
+    "TARGET.template.md": {
+      "sha256": "29c0cb5262fed184b8c2178f32b22885634b63ae530bd2457876822237e116d0",
+      "bytes": 3463
+    },
+    "verify.py": {
+      "sha256": "e0a2c7efdfddd534234a02a5bc0132d38787dcf9d5a363d9e74b07ca9b633f0f",
+      "bytes": 17483
+    }
+  },
+  "check_count": 47,
+  "target_campaign_read": false,
+  "archive_written": false
+}

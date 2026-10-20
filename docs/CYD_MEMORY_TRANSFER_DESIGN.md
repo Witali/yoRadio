@@ -113,10 +113,12 @@ controls; forty-five configure-only cases include nineteen SDK guard mutations.
 The [immutable host archive](../tests/results/cyd-tls-static-rx-host-20261020/README.md)
 retains the original reports, sources and logs. Its standalone verifier checks
 the exact host/config/service predicates without invoking the original tools.
-The 34 canonical files match final preparation snapshots; the tests ran before
-their source commit, so this equality does not backdate a clean Git tree.
+The host archive records equality of its 34 canonical files with the original
+preparation snapshots; the tests ran before their source commit, so this does
+not backdate a clean Git tree. A later disabled-target fixture correction is
+versioned separately and does not change the production reserve module.
 These checks retain explicit host layout/crypto/RTOS/capacity seams. Actual
-Xtensa SDK/QEMU, the real ISR and two-core checks, full lint/application exports,
+Xtensa SDK/QEMU is qualified separately below. Full lint/application exports,
 TLS traffic and physical resource benefit still need qualification. The static
 slot permanently withholds general heap, so this remains a default-off resource
 tradeoff rather than a claim of memory savings.
@@ -136,9 +138,34 @@ evidence and the documented userdata API gap. The standalone offline verifier
 checks this exact partial history; archive integrity success leaves target
 qualification false and does not cover the replacement registry.
 
+## Isolated registry SDK/QEMU qualification
+
+The [canonical target archive](../tests/results/cyd-tls-static-rx-qemu-20261020/README.md)
+preserves the complete twelve-variant SDK6.0.2/Xtensa/QEMU campaign. The original
+runner returned zero; all 200 commands completed successfully and the current
+45 raw inputs and eleven tool identities matched their frozen values. Both
+canonical enabled profiles, eight exact semantic controls and both reserve-off profiles
+passed their respective oracles. Actual two-core, ISR, lifecycle/address reuse,
+exclusive loan/erase, real heap exhaustion and independently enabled reclaim
+observations are retained with source/configuration/header and execution logs.
+
+Reserve-off runs check all 32 setups against the actual SDK RX allocation.
+Full content capacity is 16384 bytes; storage is 16717 and the minimum observed
+heap allocation is 17396. The pre-handshake MFL getter returns 4096 for this
+unchanged RX/TX profile; it is checked independently of storage capacity.
+The earlier registry campaign remains nonpassing: ten recorded accepted
+outcomes, an eleventh rejected getter assertion and a twelfth unrun variant.
+Its bounded historical record is separate from the new full pass.
+
+The standalone archive verifier checks stored evidence without SDK/QEMU or
+network operations. Firmware/ELF/tool binaries are omitted with explicit
+identities; derived ELF metadata cannot reconstruct omitted bytes offline.
+This isolated fixture qualification does not close production application/lint,
+radio boot, TLS protocol/traffic or physical memory/playback benefit gates.
+
 ## Remaining work
 
-- Finish SDK/QEMU, lint/application and physical qualification of the
+- Finish lint/application and physical qualification of the
   CYD-specific TLS/full-record RX reservation against the
   [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
   CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity

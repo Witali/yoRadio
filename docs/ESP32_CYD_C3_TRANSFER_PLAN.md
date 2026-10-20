@@ -90,9 +90,11 @@ allocation и численные настройки C3 являются канд
   уже подключена к радио отдельной default-off опцией и не использует application
   userdata. [Текущие host-результаты](../tests/results/cyd-tls-static-rx-host-20261020/README.md)
   сохраняют unit, полную service-матрицу и CMake-проверки;
-  actual SDK/QEMU, lint/application exports и физическая польза ещё впереди.
+  [Actual SDK/QEMU](../tests/results/cyd-tls-static-rx-qemu-20261020/README.md)
+  проходит полную матрицу из 12 вариантов; lint/application exports и физическая
+  польза ещё впереди.
   Старый pointer prototype и первая registry target-матрица завершились nonpass;
-  полный target gate остаётся открытым. Новая матрица выполняется после исправления
+  их target gate остаётся nonpass. Новая полная матрица прошла после исправления
   ошибочного тестового отождествления pre-handshake MFL getter и размера RX storage.
   Освобождение HTTP GET TX и lifetime-safe reclaim уже реализованы;
   семь production exports reclaim проверены, физический выигрыш ещё не измерен.
@@ -648,6 +650,14 @@ Stream остаётся на core0, decode/output на core1 с прежними
   synthetic/fake теста, включая прерывания и primary/cleanup failures; независимое
   ревью завершено. Обеим платам сохранены прежние image rejection policy.
   Реальная сеть, flash/reboot, OTA во время playback и power-loss ещё не проверены.
+
+- 2026-10-20, CYD-C3-13: [полная registry SDK/QEMU матрица](../tests/results/cyd-tls-static-rx-qemu-20261020/README.md)
+  завершилась с exit0: 12 вариантов, 200 успешных команд, все 45 исходных файлов
+  и 11 инструментов совпадают по raw SHA. Сохранены реальные two-core/ISR,
+  lifecycle/loan/erase, heap exhaustion/reclaim, восемь exact semantic controls
+  и оба reserve-off профиля. Архив хранит 1847 файлов и 19368 hash bindings;
+  старый `rxt01` остаётся nonpass. Production application/lint, TLS traffic и
+  физический выигрыш памяти открыты; reserve по умолчанию выключен.
   Исходники зафиксированы в `affa3caf1` после выполнения тестов; чистота Git
   на момент тестов не заявляется. Actual SDK/QEMU, application и physical gates
   остаются отдельными проверками; старый nonpass prototype не переименован.

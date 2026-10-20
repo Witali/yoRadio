@@ -1,0 +1,102 @@
+"""Guarded CYD overlay: three RX ownership sites and exact config-init/free hooks plus declarations.
+
+The installed SDK is read-only. Whole-source hash and uniform line endings are
+required. The output must be build-local, outside the installed SDK tree.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+# Whole normalized source; captured CRLF input identity is
+# 0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3.
+SOURCE_SHA256 = "1beac5da2dd0f99f626c81651e9cecb921eb9725a9f17624851802b8c6259ddc"
+GUARDS_SHA256 = "81fc22bbd240f71cb664ab08490f4e79ae805b066f0d61dbe24299af47ab49bb"
+REPLACEMENTS = (
+    (b'#include "mbedtls/ssl.h"\n', b'#include "mbedtls/ssl.h"\n'
+     b'\n/* YoRadio: paired, exact static RX allocation/release entries. */\n'
+     b'extern void *yoradio_tls_static_rx_calloc(const mbedtls_ssl_config *, size_t, size_t);\n'
+     b'extern void yoradio_tls_static_rx_forget_configuration(const mbedtls_ssl_config *);\n'
+     b'extern void yoradio_tls_static_rx_free(void *);\n'
+     b'extern void yoradio_tls_static_rx_zeroize_free(void *, size_t);\n'),
+    (b'    ssl->in_buf = mbedtls_calloc(1, in_buf_len);\n',
+     b'    ssl->in_buf = yoradio_tls_static_rx_calloc(conf, 1, in_buf_len);\n'),
+    (b'    mbedtls_free(ssl->in_buf);\n',
+     b'    yoradio_tls_static_rx_free(ssl->in_buf);\n'),
+    (b'        mbedtls_zeroize_and_free(ssl->in_buf, in_buf_len);\n',
+     b'        yoradio_tls_static_rx_zeroize_free(ssl->in_buf, in_buf_len);\n'),
+    (b'void mbedtls_ssl_config_init(mbedtls_ssl_config *conf)\n{\n    memset(conf, 0, sizeof(mbedtls_ssl_config));\n}',
+     b'void mbedtls_ssl_config_init(mbedtls_ssl_config *conf)\n{\n    /* negative: omitted lifecycle forget */\n    memset(conf, 0, sizeof(mbedtls_ssl_config));\n}'),
+    (b'void mbedtls_ssl_config_free(mbedtls_ssl_config *conf)\n{\n    if (conf == NULL) {\n        return;\n    }\n',
+     b'void mbedtls_ssl_config_free(mbedtls_ssl_config *conf)\n{\n    if (conf == NULL) {\n        return;\n    }\n    yoradio_tls_static_rx_forget_configuration(conf);\n'),
+)
+
+
+def patch(source):
+    normalized = source.replace(b'\r\n', b'\n')
+    if hashlib.sha256(normalized).hexdigest() != SOURCE_SHA256:
+        raise ValueError('Unaudited CYD6.0.2 static RX ownership source')
+    if source == normalized:
+        newline = b'\n'
+    elif source == normalized.replace(b'\n', b'\r\n'):
+        newline = b'\r\n'
+    else:
+        raise ValueError('Mixed SDK line endings are not audited')
+    result = normalized
+    for original, replacement in REPLACEMENTS:
+        if result.count(original) != 1:
+            raise ValueError('Expected exactly one static RX lifetime anchor')
+        result = result.replace(original, replacement, 1)
+    return result.replace(b'\n', newline)
+
+
+def validate_sdk_guards(sdk_root, guards):
+    """Bind allocator, full-capacity, callback and public declaration sources.
+
+    Raw LF/CRLF variants are accepted only with uniform endings and the pinned
+    complete normalized content. Relative paths must resolve inside the SDK.
+    """
+    raw = Path(guards).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != GUARDS_SHA256:
+        raise ValueError('Unsupported static RX supporting-source guard manifest')
+    entries = json.loads(raw)
+    root = Path(sdk_root).resolve()
+    if len(entries) != 19:
+        raise ValueError('Expected all19 supporting registry RX source guards')
+    verified = {}
+    for relative, expected in entries.items():
+        path = (root / relative).resolve()
+        if not path.is_relative_to(root):
+            raise ValueError('Supporting-source path escapes SDK root')
+        data = path.read_bytes()
+        normalized = data.replace(b'\r\n', b'\n')
+        uniform = data == normalized or data == normalized.replace(b'\n', b'\r\n')
+        if not uniform or hashlib.sha256(normalized).hexdigest() != expected['normalized_lf_sha256']:
+            raise ValueError('Unaudited static RX supporting source: ' + relative)
+        verified[relative] = hashlib.sha256(data).hexdigest()
+    return verified
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--input', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--sdk-root', type=Path, required=True)
+    parser.add_argument('--guards', type=Path, required=True)
+    args = parser.parse_args()
+    if args.input.resolve() == args.output.resolve():
+        parser.error('The installed SDK must remain unchanged')
+    sdk_root = args.sdk_root.resolve()
+    if args.input.resolve() != sdk_root / 'components/mbedtls/mbedtls/library/ssl_tls.c':
+        parser.error('Input must be exact audited SDK ssl_tls.c inside sdk-root')
+    if args.output.resolve().is_relative_to(sdk_root):
+        parser.error('Output must be outside the installed SDK tree')
+    validate_sdk_guards(sdk_root, args.guards)
+    payload = patch(args.input.read_bytes())
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    if not args.output.exists() or args.output.read_bytes() != payload:
+        args.output.write_bytes(payload)
+
+
+if __name__ == '__main__':
+    main()

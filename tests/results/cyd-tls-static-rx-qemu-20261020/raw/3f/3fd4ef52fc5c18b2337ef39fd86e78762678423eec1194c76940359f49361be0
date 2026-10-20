@@ -1,0 +1,135 @@
+{
+  "status": "frozen_unbuilt_unrun_target_candidate",
+  "variant": "evict-full",
+  "expected_failure": "full_registry_does_not_evict",
+  "exact_changes": [
+    {
+      "file": "sources/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c",
+      "before": "if (empty != RX_CONFIGURATION_CAPACITY)\n        s_radio_configurations[empty] = identity;",
+      "after": "if (empty != RX_CONFIGURATION_CAPACITY)\n        s_radio_configurations[empty] = identity;\n    else s_radio_configurations[0] = identity;"
+    }
+  ],
+  "original_inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\project\\CMakeLists.txt": {
+      "sha256": "0ec4b31eb4a26330cf70a0ccc9afee075e5edff6f229ea4b582daa76d36beced",
+      "snapshot": "sources/project/CMakeLists.txt"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\project\\main\\CMakeLists.txt": {
+      "sha256": "4f0d451143ca8b98e0b734a401a6d9429888eef0c5b5374665706c08015075ba",
+      "snapshot": "sources/project/main/CMakeLists.txt"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\project\\main\\disabled.c": {
+      "sha256": "143630c2d2da23b14e104dd4d33a72fff8aff4b5bcebd063305b3a98b616a760",
+      "snapshot": "sources/project/main/disabled.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\project\\main\\Kconfig.projbuild": {
+      "sha256": "028c74db2297260365eda874610a9570a1a2c4d56973b2234156d08a23bc98d2",
+      "snapshot": "sources/project/main/Kconfig.projbuild"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\project\\main\\main.c": {
+      "sha256": "0a94ea54a52922abb6adcf84ddca2784b1fe66891094fa42730159a548931cc7",
+      "snapshot": "sources/project/main/main.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\project\\partitions.csv": {
+      "sha256": "216629fbad8f7ed028cd0d5f003f3ced7ad5287973220469ec6110b669705bc8",
+      "snapshot": "sources/project/partitions.csv"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\project\\sdkconfig.defaults": {
+      "sha256": "8dccc20b245f9985fca30593f08d95f9715d35100f724aeee8308635fc580d7b",
+      "snapshot": "sources/project/sdkconfig.defaults"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\sdk-build.ps1": {
+      "sha256": "0dd796c979d51176e258eba701a0cf85ae4b12a30d4715a4f3dcbe1090cc58d3",
+      "snapshot": "sources/sdk-build.ps1"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\target\\freeze-run.py": {
+      "sha256": "e11dec706f78e6b16aa701f5b36a098f1a00fe6b521dd5ef7c71217fee8d78fb",
+      "snapshot": "sources/freeze-run.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.c": {
+      "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.h": {
+      "sha256": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\tls_static_rx\\enable.cmake": {
+      "sha256": "a0d38149fea63311c75e6014a77b2bda8973bc1c30a3c35fd8f7d578d1aa4617",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/enable.cmake"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\tls_static_rx\\sdk-source-guards.json": {
+      "sha256": "81fc22bbd240f71cb664ab08490f4e79ae805b066f0d61dbe24299af47ab49bb",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/sdk-source-guards.json"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c": {
+      "sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/native_input_reclaim.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.h": {
+      "sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/native_input_reclaim.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\input_reclaim\\enable.cmake": {
+      "sha256": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/compat/input_reclaim/enable.cmake"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": {
+      "sha256": "858c4e6d40dfc28d7063f329dd9d6275a31829aaa367747959b93a1c128e3723",
+      "snapshot": "sources/repository/idf/esp32-cyd2usb-native/main/Kconfig.projbuild"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\patch_cyd_tls_static_rx.py": {
+      "sha256": "c22a827a099ffdbec8fcbf07ea11bb91db79ce73cdf7783e83ef678764b72e22",
+      "snapshot": "sources/repository/tools/patch_cyd_tls_static_rx.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\cyd_tls_static_rx\\source_contract.py": {
+      "sha256": "1a89b1276e0687375f20df4db6e5b8d10659d4b2c9ff56159469392a3496f29f",
+      "snapshot": "sources/repository/tests/native/cyd_tls_static_rx/source_contract.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_stream\\adaptive_input.c": {
+      "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca",
+      "snapshot": "sources/repository/idf/components/native_stream/adaptive_input.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_stream\\include\\adaptive_input.h": {
+      "sha256": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "snapshot": "sources/repository/idf/components/native_stream/include/adaptive_input.h"
+    }
+  },
+  "frozen_sources": {
+    "sources/freeze-run.py": "e11dec706f78e6b16aa701f5b36a098f1a00fe6b521dd5ef7c71217fee8d78fb",
+    "sources/sdk-build.ps1": "0dd796c979d51176e258eba701a0cf85ae4b12a30d4715a4f3dcbe1090cc58d3",
+    "sources/project/CMakeLists.txt": "0ec4b31eb4a26330cf70a0ccc9afee075e5edff6f229ea4b582daa76d36beced",
+    "sources/project/partitions.csv": "216629fbad8f7ed028cd0d5f003f3ced7ad5287973220469ec6110b669705bc8",
+    "sources/project/sdkconfig.defaults": "8dccc20b245f9985fca30593f08d95f9715d35100f724aeee8308635fc580d7b",
+    "sources/project/main/CMakeLists.txt": "4f0d451143ca8b98e0b734a401a6d9429888eef0c5b5374665706c08015075ba",
+    "sources/project/main/disabled.c": "143630c2d2da23b14e104dd4d33a72fff8aff4b5bcebd063305b3a98b616a760",
+    "sources/project/main/Kconfig.projbuild": "028c74db2297260365eda874610a9570a1a2c4d56973b2234156d08a23bc98d2",
+    "sources/project/main/main.c": "0a94ea54a52922abb6adcf84ddca2784b1fe66891094fa42730159a548931cc7",
+    "sources/repository/tools/patch_cyd_tls_static_rx.py": "c22a827a099ffdbec8fcbf07ea11bb91db79ce73cdf7783e83ef678764b72e22",
+    "sources/repository/idf/components/native_stream/adaptive_input.c": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca",
+    "sources/repository/idf/components/native_stream/include/adaptive_input.h": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+    "sources/repository/idf/esp32-cyd2usb-native/main/Kconfig.projbuild": "858c4e6d40dfc28d7063f329dd9d6275a31829aaa367747959b93a1c128e3723",
+    "sources/repository/idf/esp32-cyd2usb-native/main/native_input_reclaim.c": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "sources/repository/idf/esp32-cyd2usb-native/main/native_input_reclaim.h": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+    "sources/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c": "b906d594f82bc10e1fc9e8baef0d8c85af264e0753a35dbf3379b994cd50957f",
+    "sources/repository/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+    "sources/repository/idf/esp32-cyd2usb-native/main/compat/input_reclaim/enable.cmake": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+    "sources/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/enable.cmake": "a0d38149fea63311c75e6014a77b2bda8973bc1c30a3c35fd8f7d578d1aa4617",
+    "sources/repository/idf/esp32-cyd2usb-native/main/compat/tls_static_rx/sdk-source-guards.json": "81fc22bbd240f71cb664ab08490f4e79ae805b066f0d61dbe24299af47ab49bb",
+    "sources/repository/tests/native/cyd_tls_static_rx/source_contract.py": "1a89b1276e0687375f20df4db6e5b8d10659d4b2c9ff56159469392a3496f29f"
+  },
+  "SDK_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "scoped_injection_is_not_real_oom_proof": true,
+  "canonical_module_contract": {
+    "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+    "normalized_lf_sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555",
+    "bytes": 6424,
+    "line_endings": "LF",
+    "userdata_api_used": false,
+    "integer_identity_keys": true,
+    "semantic_change_from_prior_registry": true
+  },
+  "early_publish_mutation_phase_scoped": false,
+  "forget_loan_mutation_phase_scoped": false,
+  "phase_scoped_mutation": false
+}
