@@ -1,0 +1,160 @@
+"""Isolated actual SDK mutex observations; no fixture crypto calculation/network."""
+import hashlib,json,os,pathlib,re,shutil,struct,subprocess,sys,time
+ROOT=pathlib.Path(__file__).resolve().parents[1]
+SDK_COMMIT='7101770dc6db2667b3c477cc31365dd1acd6db4e'
+import argparse
+parser=argparse.ArgumentParser(description=__doc__)
+default_sdk=next((parent/'.idf/v6.0.2' for parent in [ROOT,*ROOT.parents] if (parent/'.idf/v6.0.2/tools/idf.py').is_file()),None)
+parser.add_argument('--output',type=pathlib.Path,default=ROOT/'.build/cyd-early-mpi-qemu-01')
+parser.add_argument('--sdk',type=pathlib.Path,default=default_sdk)
+parser.add_argument('--tools',type=pathlib.Path)
+parser.add_argument('--qemu',type=pathlib.Path,default=pathlib.Path('C:/Work/QEMU-ESP32/bin/qemu-system-xtensa.exe'))
+parser.add_argument('--powershell',type=pathlib.Path,default=pathlib.Path('C:/Users/rudol/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe'))
+parser.add_argument('--preflight-only',action='store_true')
+options=parser.parse_args()
+if not options.sdk:parser.error('pinned SDK6.0.2 unavailable; use --sdk')
+SDK=options.sdk.resolve();TOOLS=(options.tools or SDK.parent/'tools-v6.0.2').resolve()
+PY=TOOLS/'python_env/idf6.0_py3.12_env/Scripts/python.exe'
+PS=options.powershell.resolve();QEMU=options.qemu.resolve();ROM=QEMU.parent.parent/'pc-bios'
+OUT=options.output.resolve()
+if not OUT.is_relative_to((ROOT/'.build').resolve()):parser.error('output must be a new directory inside repository .build')
+if OUT.exists():parser.error('Output already exists; choose a fresh campaign directory')
+if any((parent/'report.json').exists() for parent in OUT.parents):parser.error('Output must not be nested in an evidence campaign')
+if options.preflight_only:
+ print(json.dumps({'preflight_passed':True,'output_created':False,'output':str(OUT)}));sys.exit(0)
+OUT.mkdir(parents=True,exist_ok=False)
+MAIN=pathlib.Path('idf/esp32-cyd2usb-native/main')
+FIXTURE=pathlib.Path('tests/target/cyd_early_mpi_qemu')
+report={'passed':False,'scope':__doc__,'commands':[],'variants':{},'inputs':{},'tools':{},
+ 'production_pre_app_status':'Not observed in actual radio firmware; pending later integration. Minimal SDK fixture observations are separately labeled.',
+ 'sdk_boot_initialization':'Unchanged ordinary SDK startup may run its existing PSA/RNG initialization; fixture invokes no crypto algorithm.',
+ 'production_integration':False,'private_mutex_writes':False,'network_or_device':False}
+def sha(p):return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()
+def save():(OUT/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+temporary=OUT/'tool-temp';temporary.mkdir()
+env=os.environ.copy();env.update(PYTHONDONTWRITEBYTECODE='1',PYTHONNOUSERSITE='1',PYTHONUTF8='1',PYTHONIOENCODING='utf-8',GIT_OPTIONAL_LOCKS='0',TEMP=str(temporary),TMP=str(temporary))
+def execute(label,args,timeout=60):
+ started=time.monotonic();p=subprocess.Popen(list(map(str,args)),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env=env,creationflags=subprocess.CREATE_NO_WINDOW)
+ try:data,_=p.communicate(timeout=timeout)
+ except subprocess.TimeoutExpired:
+  subprocess.run(['taskkill.exe','/PID',str(p.pid),'/T','/F'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=15,creationflags=subprocess.CREATE_NO_WINDOW)
+  data,_=p.communicate(timeout=15);(OUT/(label+'.log')).write_bytes(data);raise RuntimeError(label+' timeout (not pass)')
+ (OUT/(label+'.log')).write_bytes(data);report['commands'].append({'label':label,'argv':list(map(str,args)),'exit_status':p.returncode,'seconds':time.monotonic()-started,'sha256':hashlib.sha256(data).hexdigest()});save()
+ if p.returncode:raise RuntimeError(label+' failed: '+data.decode(errors='replace')[-6000:])
+ return data.decode(errors='replace').replace('\r\n','\n')
+def freeze(p,relative,role):
+ raw=p.read_bytes();target=OUT/relative;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
+ report['inputs'][str(p.resolve())]={'sha256':hashlib.sha256(raw).hexdigest(),'snapshot':str(relative),'role':role}
+def verify_sdk(label):
+ command=['git','-c','core.longpaths=true','-C',SDK]
+ head=execute('sdk-head-'+label,command+['rev-parse','HEAD']).strip()
+ assert head==SDK_COMMIT,'Unsupported SDK commit: '+head
+ dirty=execute('sdk-state-'+label,command+['status','--porcelain','--untracked-files=no']).strip()
+ assert not dirty,'SDK tracked files are not clean'
+ report['sdk_commit']=head;report['sdk_tracked_clean']=True;save()
+def current():
+ return all(sha(p)==v['sha256'] and sha(OUT/v['snapshot'])==v['sha256'] for p,v in report['inputs'].items()) and all(sha(p)==s for p,s in report['tools'].items())
+try:
+ paths=[*[ROOT/MAIN/name for name in ['native_tls_early_mpi.c','native_tls_early_mpi.h','compat/early_mpi/enable.cmake','app_main.c','board_config.h','CMakeLists.txt','Kconfig.projbuild']],*[p for p in (ROOT/FIXTURE).rglob('*') if p.is_file()],pathlib.Path(__file__).resolve()]
+ for p in paths:freeze(p,pathlib.Path('sources/repo')/p.relative_to(ROOT),'whole canonical production/fixture input frozen before SDK build')
+ sdk_files=['tools/cmake/version.cmake','tools/idf.py','export.ps1','components/esp_security/src/esp_crypto_lock.c','components/esp_security/include/esp_crypto_lock.h','components/esp_security/CMakeLists.txt','components/esp_security/src/init.c','components/esp_security/src/esp32/esp_crypto_clk.h','components/esp_libc/src/locks.c','components/esp_libc/platform_include/sys/lock.h','components/esp_libc/src/init.c','components/esp_libc/src/picolibc/picolibc_init.c','components/freertos/FreeRTOS-Kernel/queue.c','components/freertos/FreeRTOS-Kernel/include/freertos/queue.h','components/freertos/FreeRTOS-Kernel/include/freertos/semphr.h','components/freertos/app_startup.c','components/mbedtls/port/esp_psa_crypto_init.c']
+ pins=json.loads((ROOT/FIXTURE/'sdk-pins.json').read_text())
+ assert pins['sdk']=='ESP-IDF v6.0.2' and set(sdk_files)==set(pins['inputs'])
+ for name in sdk_files:
+  assert sha(SDK/name)==pins['inputs'][name],'Unsupported SDK source: '+name
+  freeze(SDK/name,pathlib.Path('sources/sdk')/name,'actual pinned SDK6.0.2 source/header before SDK build')
+ for p in [PY,PS,QEMU,ROM/'esp32-v3-rom.bin',ROM/'esp32-v3-rom-app.bin',SDK/'tools/tools.json']:
+  report['tools'][str(p)]=sha(p)
+ toolbin=TOOLS/'tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin'
+ for p in [TOOLS/'tools/ninja/1.12.1/ninja.exe',TOOLS/'tools/cmake/4.0.3/bin/cmake.exe',*[toolbin/('xtensa-esp32-elf-'+name+'.exe') for name in ['gcc','nm','objdump','addr2line']]]:
+  report['tools'][str(p)]=sha(p)
+ canonical=(OUT/'sources/repo'/MAIN/'native_tls_early_mpi.c').read_bytes()
+ recipes={}
+ for name,old in [('canonical',None),('skip-acquire','    esp_crypto_mpi_lock_acquire();'),('skip-release','    esp_crypto_mpi_lock_release();'),('void-oom',None)]:
+  variant=OUT/'sources/variants'/name;variant.mkdir(parents=True)
+  for relative in ['native_tls_early_mpi.c','native_tls_early_mpi.h','compat/early_mpi/enable.cmake']:
+   dest=variant/relative;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(OUT/'sources/repo'/MAIN/relative,dest)
+  source=canonical
+  if old:assert source.count(old.encode())==1;source=source.replace(old.encode(),b'    (void)0; /* exact semantic control */')
+  (variant/'native_tls_early_mpi.c').write_bytes(source)
+  recipes[name]={'canonical_sha256':hashlib.sha256(canonical).hexdigest(),'source_sha256':sha(variant/'native_tls_early_mpi.c'),'omitted_exact_statement':old}
+ frozen_files={str(p.relative_to(OUT)):sha(p) for p in (OUT/'sources').rglob('*') if p.is_file()}
+ (OUT/'source-manifest.json').write_text(json.dumps({'inputs':report['inputs'],'frozen_sources':frozen_files,'variant_recipes':recipes},indent=2)+'\n')
+ report['source_manifest_sha256']=sha(OUT/'source-manifest.json');save();assert current()
+ verify_sdk('before')
+ for name in recipes:
+  print('Building isolated SDK MPI variant '+name,flush=True)
+  command=[PS,'-NoLogo','-NoProfile','-NonInteractive','-File',OUT/'sources/repo'/FIXTURE/'sdk-build.ps1','-RepositoryDirectory',ROOT,'-CampaignDirectory',OUT,'-SourceDirectory',OUT/'sources/variants'/name,'-SdkDirectory',SDK,'-ToolsDirectory',TOOLS]
+  if name=='skip-acquire':command+=['-SkipAcquireControl']
+  if name=='void-oom':command+=['-OomGate']
+  execute(name+'-build',command,1200)
+  verify_sdk(name+'-after-build')
+  assert current() and all(sha(OUT/p)==s for p,s in frozen_files.items())
+  B=OUT/'working-build'; desc=json.loads((B/'project_description.json').read_text());cfg=json.loads((B/'config/sdkconfig.json').read_text())
+  assert desc['target']=='esp32' and pathlib.Path(desc['idf_path']).resolve()==SDK.resolve()
+  for key in ['YORADIO_TLS_EARLY_MPI_LOCK','SOC_MPI_SUPPORTED','MBEDTLS_HARDWARE_MPI','ESP_TLS_USING_MBEDTLS','COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE']:assert cfg[key],key
+  assert not cfg.get('FREERTOS_UNICORE',False) and not cfg.get('HEAP_ABORT_WHEN_ALLOCATION_FAILS',False)
+  directory=OUT/'variants'/name;directory.mkdir(parents=True)
+  compiler=pathlib.Path(desc['c_compiler']);nm=compiler.with_name('xtensa-esp32-elf-nm.exe');objdump=compiler.with_name('xtensa-esp32-elf-objdump.exe');addr=compiler.with_name('xtensa-esp32-elf-addr2line.exe')
+  for tool in [compiler,nm,objdump,addr]:report['tools'][str(tool)]=sha(tool)
+  elf=B/desc['app_elf'];data=elf.read_bytes();assert data[:4]==b'\x7fELF' and struct.unpack_from('<H',data,18)[0]==94
+  symbols=execute(name+'-nm',[nm,'-n','-S',elf]);required=['native_tls_early_mpi_prepare','esp_crypto_mpi_lock_acquire','esp_crypto_mpi_lock_release','__wrap__lock_acquire','__wrap__lock_release','__wrap_xQueueCreateMutex']
+  for symbol in required:assert re.search(r'\b'+symbol+'$',symbols,re.M),symbol
+  proof={}
+  for symbol in ['native_tls_early_mpi_prepare','esp_crypto_mpi_lock_acquire','esp_crypto_mpi_lock_release']:
+   proof[symbol]=execute(name+'-asm-'+symbol,[objdump,'-dwC','--disassemble='+symbol,elf])
+  assert '__wrap__lock_acquire' in proof['esp_crypto_mpi_lock_acquire'] and '__wrap__lock_release' in proof['esp_crypto_mpi_lock_release']
+  if name!='skip-acquire':assert 'esp_crypto_mpi_lock_acquire' in proof['native_tls_early_mpi_prepare']
+  if name!='skip-release':assert 'esp_crypto_mpi_lock_release' in proof['native_tls_early_mpi_prepare']
+  commands=json.loads((B/'compile_commands.json').read_text());chosen=[c for c in commands if pathlib.Path(c['file']).resolve()==(OUT/'sources/variants'/name/'native_tls_early_mpi.c').resolve()];assert len(chosen)==1
+  (directory/'actual-module-command.json').write_text(json.dumps(chosen[0],indent=2)+'\n')
+  cache=(B/'CMakeCache.txt').read_text();ninja=pathlib.Path(re.search(r'^CMAKE_MAKE_PROGRAM:FILEPATH=(.+)$',cache,re.M)[1].strip());report['tools'][str(ninja)]=sha(ninja)
+  deps=execute(name+'-dependencies',[ninja,'-C',B,'-t','deps']);closure={}
+  for line in deps.splitlines():
+   value=line.strip();p=pathlib.Path(value)
+   if p.is_absolute() and p.is_file() and not p.is_relative_to(OUT):closure[str(p)]=sha(p)
+  (directory/'compiled-external-header-closure.json').write_text(json.dumps({'captured_before_qemu':True,'sha256':closure},indent=2)+'\n')
+  recipe=json.loads((B/'flasher_args.json').read_text());flash_files=[(int(offset,0),B/path) for offset,path in recipe['flash_files'].items()];flash=directory/'qemu-flash.bin'
+  merge=[PY,'-m','esptool','--chip','esp32','merge-bin','--output',flash,'--flash-mode','dio','--flash-size','4MB','--flash-freq','40m']
+  for offset,p in sorted(flash_files):merge += [hex(offset),p]
+  execute(name+'-merge',merge+['--pad-to-size','4MB']);merged=flash.read_bytes();assert len(merged)==0x400000 and all(merged[offset:offset+p.stat().st_size]==p.read_bytes() for offset,p in flash_files)
+  for p in [elf,B/desc['app_bin'],B/'project_description.json',B/'compile_commands.json',B/'config/sdkconfig.json',OUT/'working-sdkconfig',B/'flasher_args.json',B/'CMakeCache.txt',*[p for _,p in flash_files]]:
+   dest=directory/'artifacts'/(p.relative_to(B) if p.is_relative_to(B) else pathlib.Path(p.name));dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,dest)
+  artifacts={str(p.relative_to(OUT)):sha(p) for p in directory.rglob('*') if p.is_file()}
+  bundle={'variant':name,'elf_machine':94,'frozen_sources':frozen_files,'sdk_input_sha256':report['inputs'],'tools':report['tools'],'artifacts':artifacts,'external_header_closure':closure,'module_compile_row':chosen[0]}
+  (directory/'execution-bundle.json').write_text(json.dumps(bundle,indent=2)+'\n');assert current()
+  print('Running actual two-core SDK/QEMU MPI '+name,flush=True)
+  log=execute(name+'-qemu',[QEMU,'-M','esp32','-smp','2','-L',ROM,'-display','none','-monitor','none','-serial','stdio','-no-reboot','-snapshot','-nic','none','-drive','file='+str(flash).replace(',', ',,')+',if=mtd,format=raw'],90)
+  assert log.count('EARLY_MPI_APP_ENTRY scheduler=2 core=0')==1
+  assert log.count('ESP-IDF:          v6.0.2')==1
+  assert not re.search(r'CORRUPT HEAP|watchdog.*triggered',log,re.I)
+  if name=='canonical':
+   assert not re.search(r'EARLY_MPI_FAILURE|EARLY_MPI_CONTROLLED_STOP|EARLY_MPI_OOM_',log)
+   assert not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP|watchdog.*triggered',log,re.I)
+   assert log.count('EARLY_MPI_COMPLETE warm_pairs=17 dualcore=1 increments=2000 public_api=1 crypto_calculations=0')==1
+   matches=re.findall(r'^EARLY_MPI_BOOT_OBSERVATION pre_app_acquires=(\d+) initial_handle=(\S+) final_handle=(\S+) classification=(\S+) trace_events=(\d+)$',log,re.M);assert len(matches)==1,matches
+   result={'passed':True,'fixture_boot_observation':matches[0],'radio_pre_app_status':'pending actual integration boot, not inferred from this minimal fixture'}
+  elif name.startswith('skip-'):
+   expected={'skip-acquire':'warm_acquire_once','skip-release':'warm_release_once'}[name]
+   assert re.findall(r'^EARLY_MPI_FAILURE (.+)$',log,re.M)==[expected] and log.count('EARLY_MPI_CONTROLLED_STOP')==1 and 'EARLY_MPI_COMPLETE' not in log
+   assert not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed',log,re.I)
+   result={'passed':True,'exact_semantic_failure':expected,'fixture_control_only_public_prewarm':name=='skip-acquire'}
+  else:
+   assert len(re.findall(r'^EARLY_MPI_OOM_QUEUE_NULL phase=1 lock=0x[0-9a-f]+$',log,re.M))==1,log[-4000:]
+   pcs=re.findall(r'abort\(\) was called at PC (0x[0-9a-fA-F]+)',log);assert len(pcs)==1,log[-4000:]
+   decoded=execute(name+'-abort-site',[addr,'-e',directory/'artifacts'/desc['app_elf'],'-pfia',pcs[0]])
+   assert 'lock_init_generic' in decoded and 'locks.c:' in decoded,decoded
+   lock=re.findall(r'^([0-9a-f]+)\s+[0-9a-f]+\s+[bB]\s+s_crypto_mpi_lock$',symbols,re.M);assert len(lock)==1
+   observed=re.findall(r'^EARLY_MPI_OOM_QUEUE_NULL phase=1 lock=(0x[0-9a-f]+)$',log,re.M);assert observed==['0x'+lock[0]],observed
+   stack=re.search(r'^Backtrace:\s*(.+)$',log,re.M);assert stack
+   pcs_stack=re.findall(r'(0x[0-9a-f]+):0x[0-9a-f]+',stack[1]);assert pcs_stack
+   full=execute(name+'-whole-backtrace',[addr,'-e',directory/'artifacts'/desc['app_elf'],'-pfia',*pcs_stack])
+   for item in ['lock_init_generic','lock_acquire_generic','__wrap__lock_acquire','esp_crypto_mpi_lock_acquire','native_tls_early_mpi_prepare','app_main']:assert item in full,(item,full)
+   assert 'EARLY_MPI_COMPLETE' not in log and 'EARLY_MPI_CONTROLLED_STOP' not in log and 'oom_did_not_abort' not in log
+   result={'passed':True,'gate':'void API actual allocator exhaustion then exact SDK lock constructor abort','abort_pc':pcs[0],'resolved_site':decoded,'actual_sdk_lock_address':observed[0],'resolved_whole_stack':full,'generic_panic_is_not_success':True}
+  assert current() and all(sha(OUT/p)==s for p,s in frozen_files.items()) and all(sha(OUT/p)==s for p,s in artifacts.items()) and all(sha(p)==s for p,s in closure.items())
+  result['execution_bundle_sha256']=sha(directory/'execution-bundle.json');result['sources_unchanged_after']=True;report['variants'][name]=result;save()
+  verify_sdk(name+'-after-qemu')
+ report['passed']=True;report['all_bound_inputs_current']=current();assert report['all_bound_inputs_current'];save();print('PASS isolated actual SDK MPI observations and exact controls',flush=True)
+except BaseException as error:
+ report['error']=type(error).__name__+': '+str(error);save();raise

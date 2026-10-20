@@ -80,7 +80,7 @@ idf_component_register(
     custom_legacy_codecs
     custom_flac
     esp_audio_codec
-  PRIV_REQUIRES esp-tls)
+  PRIV_REQUIRES esp-tls esp_security)
 
 include("${CMAKE_CURRENT_LIST_DIR}/compat/httpd_rfc6455/enable.cmake")
 native_enable_httpd_rfc6455()
@@ -90,6 +90,9 @@ native_enable_http_request_buffer_release()
 
 include("${CMAKE_CURRENT_LIST_DIR}/compat/input_reclaim/enable.cmake")
 native_enable_tls_input_reclaim()
+
+include("${CMAKE_CURRENT_LIST_DIR}/compat/early_mpi/enable.cmake")
+native_enable_tls_early_mpi()
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
 

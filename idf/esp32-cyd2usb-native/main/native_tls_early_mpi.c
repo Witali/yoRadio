@@ -1,0 +1,17 @@
+#include "native_tls_early_mpi.h"
+
+#if defined(CONFIG_YORADIO_TLS_EARLY_MPI_LOCK) && CONFIG_YORADIO_TLS_EARLY_MPI_LOCK
+#if !defined(CONFIG_IDF_TARGET_ESP32) || !CONFIG_IDF_TARGET_ESP32 || \
+    !defined(CONFIG_SOC_MPI_SUPPORTED) || !CONFIG_SOC_MPI_SUPPORTED || \
+    !defined(CONFIG_MBEDTLS_HARDWARE_MPI) || !CONFIG_MBEDTLS_HARDWARE_MPI || \
+    !defined(CONFIG_ESP_TLS_USING_MBEDTLS) || !CONFIG_ESP_TLS_USING_MBEDTLS
+#error "Early MPI requires ESP32, SOC MPI and the mbedTLS hardware MPI profile"
+#endif
+
+#include "esp_crypto_lock.h"
+
+void native_tls_early_mpi_prepare(void) {
+    esp_crypto_mpi_lock_acquire();
+    esp_crypto_mpi_lock_release();
+}
+#endif

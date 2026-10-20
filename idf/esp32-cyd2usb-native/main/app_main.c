@@ -11,6 +11,7 @@
 #include "native_audio_settings.h"
 #include "native_state.h"
 #include "native_health.h"
+#include "native_tls_early_mpi.h"
 #include "network_service.h"
 #include "network_settings.h"
 #include "radio_control.h"
@@ -96,6 +97,7 @@ static void network_task(void *argument) {
 }
 
 void app_main(void) {
+    native_tls_early_mpi_prepare();
     ESP_LOGI(TAG, "Starting pure ESP-IDF yoRadio (Arduino-free)");
     if (!native_health_start()) ESP_LOGW(TAG, "Health sampler initialization failed");
     native_state_init(&s_state);
