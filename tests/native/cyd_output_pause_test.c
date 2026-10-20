@@ -10,6 +10,7 @@
 #include <string.h>
 
 typedef int esp_err_t;
+#include "cyd_output_metrics_noop.h"
 enum { ESP_OK, ESP_FAIL, ESP_ERR_INVALID_ARG, ESP_ERR_INVALID_STATE,
        ESP_ERR_NOT_SUPPORTED, ESP_ERR_NO_MEM, ESP_ERR_TIMEOUT };
 #define ESP_RETURN_ON_ERROR(expr, ...) do { int e=(expr); if(e) return e; } while(0)
@@ -54,6 +55,12 @@ static int write_driver(void *h,const void *p,size_t n,size_t *done,unsigned tim
     ++writes;*done=fail_prime ? 0:n;return fail_prime ? ESP_FAIL:ESP_OK;
 }
 typedef void *i2s_chan_handle_t;
+typedef struct { unsigned unused; } i2s_event_data_t;
+typedef struct { bool (*on_send_q_ovf)(i2s_chan_handle_t, i2s_event_data_t *, void *); } i2s_event_callbacks_t;
+static int i2s_channel_register_event_callback(void *h, const i2s_event_callbacks_t *c, void *context) {
+    assert(h==&driver && c && c->on_send_q_ovf && !context); return ESP_OK;
+}
+
 typedef struct {unsigned dma_desc_num,dma_frame_num;bool auto_clear_after_cb,auto_clear_before_cb;} i2s_chan_config_t;
 typedef struct {int clk_cfg,slot_cfg;struct {int clk,dout;struct {bool clk_inv;} invert_flags;} gpio_cfg;} i2s_pdm_tx_config_t;
 typedef struct {unsigned bclk_hz;} i2s_chan_info_t;

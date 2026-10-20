@@ -31,6 +31,7 @@ bool native_health_format_json(char *body, size_t capacity,
     const native_health_faults_t *f=&snapshot->faults;
     const native_health_cpu_t *cpu=&snapshot->cpu;
     const native_input_health_t *input=&runtime->input;
+    const native_output_metrics_t *driver=&runtime->output_driver;
     append_numbers(&out,"{\"schema\":1,\"boot_id\":\"%016" PRIx64 "\",\"uptime_ms\":%" PRIu64
         ",\"reset_reason\":%" PRIu32 ",\"cores\":%" PRIu32,
         runtime->boot_id,runtime->uptime_ms,runtime->reset_reason,runtime->cores);
@@ -56,6 +57,24 @@ bool native_health_format_json(char *body, size_t capacity,
         f->output_failures,f->output_write_errors,f->output_configure_errors,f->output_flush_errors);
     append_numbers(&out,",\"generation\":%" PRIu32 ",\"stage\":%" PRIu32 ",\"result\":%" PRId32 "}",
         f->output_generation,f->output_stage,f->output_result);
+    append_numbers(&out,",\"output_driver\":{\"writes\":%" PRIu32 ",\"requested_bytes\":%" PRIu64
+        ",\"written_bytes\":%" PRIu64 ",\"errors\":%" PRIu32,
+        driver->writes,driver->requested_bytes,driver->written_bytes,driver->errors);
+    append_numbers(&out,",\"timeouts\":%" PRIu32 ",\"short_writes\":%" PRIu32
+        ",\"saturated\":%s,\"completion_queue_drops\":",
+        driver->timeouts,driver->short_writes,driver->saturated?"true":"false");
+    if (driver->queue_drops_available) append_numbers(&out,"%" PRIu32,driver->completion_queue_drops);
+    else json_buffer_raw(&out,"null");
+    append_numbers(&out,",\"timing_enabled\":%s,\"timing_samples\":%" PRIu32
+        ",\"invalid_time_samples\":%" PRIu32 ",\"write_us\":",
+        driver->timing_enabled?"true":"false",driver->timing_samples,driver->invalid_time_samples);
+    bool timed=driver->timing_enabled && driver->timing_samples;
+    if (timed) append_numbers(&out,"%" PRIu64,driver->write_us);
+    else json_buffer_raw(&out,"null");
+    json_buffer_raw(&out,",\"max_write_us\":");
+    if (timed) append_numbers(&out,"%" PRIu64,driver->max_write_us);
+    else json_buffer_raw(&out,"null");
+    json_buffer_raw(&out,"}");
     append_numbers(&out,",\"input\":{\"available\":%s,\"leased\":%s,\"resident\":%" PRIu32
         ",\"minimum\":%" PRIu32 ",\"target\":%" PRIu32 ",\"limit\":%" PRIu32,
         input->available?"true":"false",input->leased?"true":"false",

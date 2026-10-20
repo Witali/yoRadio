@@ -66,6 +66,8 @@ def main():
         shared_objects.append(host(obj))
     for backend, branch in branches.items():
         generated = constants + common
+        if backend == 'dac':
+            generated += gain.function(branch, 'dac_write_block')
         if backend == 'legacy':
             generated += '\n'.join(gain.function(branch, name) for name in (
                 'legacy_pack_dac_code', 'legacy_fractional_dac_step',
@@ -73,6 +75,8 @@ def main():
         generated += '\n'.join(gain.function(branch, name) for name in (
             'native_audio_output_configure', 'native_audio_output_write_pcm',
             'native_audio_output_discard_pcm', 'native_audio_output_flush_pcm'))
+        if backend == 'dac':
+            generated += gain.function(branch, 'native_audio_output_pause')
         (out / (backend + '.inc')).write_text(generated)
         unit = out / (backend + '.c')
         unit.write_text(case_path.read_text().replace('/* PRODUCTION */', generated))
@@ -81,7 +85,7 @@ def main():
             (out / (backend + '-build.log')).write_bytes(run([
                 'gcc', '-std=c11', *common_flags,
                 '-Wno-unused-function', '-Wno-unused-variable',
-                '-DTEST_' + backend.upper() + '=1', '-I' + host(adapter),
+                '-DTEST_' + backend.upper() + '=1', '-I' + host(ROOT / 'tests/native'), '-I' + host(adapter),
                 '-c', host(unit), '-o', host(obj)]))
             (out / (backend + '-link.log')).write_bytes(run([
                 'g++', *common_flags, '-no-pie', host(obj), *shared_objects,
@@ -107,6 +111,7 @@ def main():
              ROOT / 'idf/esp32-cyd2usb-native/main/CMakeLists.txt',
              ROOT / 'idf/esp32-cyd2usb-native/main/native_audio_output.h',
              ROOT / 'idf/esp32-cyd2usb-native/main/radio_control_platform.h']
+    files.append(ROOT / 'tests/native/cyd_output_metrics_noop.h')
     hashes = {}
     for path in files:
         relative = path.relative_to(ROOT)

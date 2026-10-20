@@ -12,10 +12,12 @@
 #include "native_audio_normalizer.h"
 
 typedef int esp_err_t;
+#include "cyd_output_metrics_noop.h"
 #define ESP_OK 0
 #define ESP_FAIL -1
 #define ESP_ERR_NOT_SUPPORTED -2
 #define ESP_ERR_INVALID_ARG -3
+#define ESP_ERR_INVALID_STATE -4
 #define pdMS_TO_TICKS(t) (t)
 #define ESP_RETURN_ON_ERROR(call, tag, message) do { \
     esp_err_t result_ = (call); if (result_ != ESP_OK) return result_; \
@@ -32,6 +34,8 @@ static size_t captured_size, expected_size;
 static uint8_t dac_storage[3072];
 static uint8_t *s_dac_data = dac_storage;
 static void *s_dac;
+static bool s_dac_enabled;
+esp_err_t native_audio_output_pause(void);
 static uint32_t s_dac_sample_rate;
 static bool s_legacy_installed;
 static uint32_t s_legacy_sample_rate, s_legacy_output_sample_rate;

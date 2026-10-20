@@ -7,6 +7,7 @@
 #include <string.h>
 
 typedef int esp_err_t;
+#include "cyd_output_metrics_noop.h"
 #define ESP_OK 0
 #define ESP_FAIL -1
 #define ESP_ERR_NOT_SUPPORTED -2

@@ -23,7 +23,8 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     main = ROOT / 'idf/esp32-cyd2usb-native/main'
     files = [main/'native_audio_output.c', main/'native_audio_output.h',
-             ROOT/'tests/native/cyd_output_pause_test.c', Path(__file__).resolve()]
+             ROOT/'tests/native/cyd_output_pause_test.c', Path(__file__).resolve(),
+             ROOT/'tests/native/cyd_output_metrics_noop.h']
     for p in files:
         target = out/'sources'/p.relative_to(ROOT)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -39,7 +40,7 @@ def main():
                    '-Wno-unused-function', '-Wno-unused-variable',
                    '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
                    '-fno-pie', '-no-pie', '-DCONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_'+define+'=1',
-                   '-I'+host(work), host(files[2]), '-o', host(work/'test')]
+                   '-I'+host(work), '-I'+host(ROOT/'tests/native'), host(files[2]), '-o', host(work/'test')]
         try:
             build = run(command)
         except subprocess.CalledProcessError as e:

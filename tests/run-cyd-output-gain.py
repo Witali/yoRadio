@@ -16,7 +16,7 @@ from run_output_dma_host import host, run
 
 
 def function(source, name):
-    match = re.search(r'^(?:static )?[^\n]*\b' + name + r'\(', source, re.M)
+    match = re.search(r'^(?:static )?[^\n;{}()]*\b' + name + r'\(', source, re.M)
     assert match, name
     end = source.index('{', match.start()) + 1
     depth = 1
@@ -61,6 +61,8 @@ static pcm_gains_t pcm_channel_gains(''', 1)
     results = {}
     for backend, branch in branches.items():
         generated = constants + common
+        if backend == 'dac':
+            generated += function(branch, 'dac_write_block')
         if backend == 'legacy':
             generated += '\n'.join(function(branch, name) for name in (
                 'legacy_pack_dac_code', 'legacy_fractional_dac_step', 'legacy_write_frames'))
@@ -75,7 +77,7 @@ static pcm_gains_t pcm_channel_gains(''', 1)
                 'gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra', '-Werror',
                 '-Wno-unused-function', '-Wno-unused-variable',
                 '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
-                '-fno-pie', '-no-pie', '-DTEST_' + backend.upper() + '=1',
+                '-fno-pie', '-no-pie', '-DTEST_' + backend.upper() + '=1', '-I' + host(ROOT / 'tests/native'),
                 host(unit), '-o', host(binary)]))
             log = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                        'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
@@ -87,6 +89,7 @@ static pcm_gains_t pcm_channel_gains(''', 1)
         results[backend] = log.decode().strip()
         print(backend + ': ' + results[backend])
     files = [source_path, case_path, Path(__file__).resolve()]
+    files.append(ROOT / 'tests/native/cyd_output_metrics_noop.h')
     hashes = {}
     for path in files:
         relative = path.relative_to(ROOT)

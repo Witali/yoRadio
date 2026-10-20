@@ -69,6 +69,7 @@ static atomic_uint s_generation;
 static uint64_t s_health_boot_id=UINT64_C(0x0123456789abcdef);
 static native_health_snapshot_t health_snapshot;
 static unsigned health_track_calls;
+static unsigned output_snapshot_calls;
 static bool fail_health_format;
 static unsigned radio_actions;
 static uint16_t radio_station;
@@ -129,6 +130,13 @@ void native_health_track_task(native_health_task_t role,void *task) {
     assert(role==NATIVE_HEALTH_HTTP && task==(void *)1234);++health_track_calls;
 }
 native_health_snapshot_t native_health_snapshot(void) {return health_snapshot;}
+native_output_metrics_t native_output_metrics_snapshot(void) {
+    ++output_snapshot_calls;
+    return (native_output_metrics_t){.writes=19,.requested_bytes=2048,.written_bytes=1024,
+        .errors=3,.timeouts=2,.short_writes=1,.write_us=123456,.max_write_us=6543,
+        .timing_samples=17,.invalid_time_samples=2,.completion_queue_drops=11,
+        .timing_enabled=true,.queue_drops_available=true,.saturated=false};
+}
 static bool format_health_for_test(char *body,size_t capacity,const native_health_snapshot_t *health,
                                    const native_health_runtime_t *runtime) {
     return !fail_health_format && native_health_format_json(body,capacity,health,runtime);
@@ -148,6 +156,14 @@ static void *buffer_malloc(size_t size) {
     assert(!task_buffer); task_buffer=malloc(size); assert(task_buffer); return task_buffer;
 }
 static int xQueueReceive(void *,void *,unsigned);
+// This suite never requests maintenance; those owner paths have a separate
+// real-task gate. Fail if a stream/handler regression unexpectedly enters them.
+static int xQueueOverwrite(void *queue,const void *item) {
+    (void)queue;(void)item;assert(false);return 0;
+}
+static void native_audio_output_request_pause(bool pause) {
+    (void)pause;assert(false);
+}
 static int xRingbufferSendAcquire(void *ring,void **p,size_t size,unsigned wait) {
     (void)wait; assert(ring==(void *)1); *p=malloc(size); assert(*p); return pdTRUE;
 }
@@ -262,7 +278,7 @@ size_t strlcpy(char *to,const char *from,size_t capacity) {
 #undef malloc
 
 static int xQueueReceive(void *queue,void *destination,unsigned wait) {
-    assert(queue==(void *)2 && wait==portMAX_DELAY);
+    assert(queue==(void *)2 && wait==pdMS_TO_TICKS(50));
     if(queued++)longjmp(task_exit,1);
     play_command_t *command=destination;memset(command,0,sizeof(*command));
     command->generation=atomic_load(&s_generation);command->requested_codec=(native_codec_t)selected_codec;
@@ -492,9 +508,9 @@ int main(void) {
     clock_us=12345000;
     health_snapshot=(native_health_snapshot_t){.faults={.allocation_failures=3,.decoder_failures=2}};
     assert(health_handler(&request)==ESP_OK && response_status==200);printf("HEALTH=%s\n",response);
-    assert(health_track_calls==1 && health_snapshot.faults.allocation_failures==3);
+    assert(health_track_calls==1 && output_snapshot_calls==1 && health_snapshot.faults.allocation_failures==3);
     fail_health_format=true;
-    assert(health_handler(&request)==ESP_FAIL && response_status==500 && health_track_calls==2);
+    assert(health_handler(&request)==ESP_FAIL && response_status==500 && health_track_calls==2 && output_snapshot_calls==2);
     assert(health_snapshot.faults.decoder_failures==2 && state.audio_generation==1001);
     native_state_set_pending(&state,1001,true);
     assert(radio_handler(&request)==ESP_OK && !radio_actions);printf("RADIO=%s\n",response);

@@ -127,19 +127,26 @@ static void test_json(void) {
         .output_failures=UINT32_MAX,.output_generation=UINT32_MAX,.output_result=INT32_MIN,
         .output_stage=UINT32_MAX,.output_write_errors=UINT32_MAX,.output_configure_errors=UINT32_MAX,.output_flush_errors=UINT32_MAX},
         .cpu={.enabled=true,.available=true,.sampled_us=UINT64_MAX,.snapshot_failures=UINT32_MAX,
-              .overall_tenths=500,.core_tenths={0,1000}}};
+              .overall_tenths=1000,.core_tenths={1000,1000}}};
     for(unsigned role=0;role<NATIVE_HEALTH_TASKS;++role)
         snapshot.cpu.task[role]=(native_health_task_cpu_t){.present=true,.available=true,
-            .percent_tenths=600,.stack_free_min=UINT32_MAX};
+            .percent_tenths=1000,.stack_free_min=UINT32_MAX};
     native_health_runtime_t runtime={.boot_id=UINT64_MAX,.uptime_ms=UINT64_MAX,.reset_reason=UINT32_MAX,
         .heap_free=UINT32_MAX,.heap_largest=UINT32_MAX,.heap_minimum=UINT32_MAX,.tasks=UINT32_MAX,.cores=2,
         .internal_free=UINT32_MAX,.internal_largest=UINT32_MAX,.dma_free=UINT32_MAX,.dma_largest=UINT32_MAX,
         .input={.available=true,.leased=true,.resident=UINT32_MAX,.minimum=UINT32_MAX,.target=UINT32_MAX,
             .limit=UINT32_MAX,.ready=UINT32_MAX,.reading=UINT32_MAX,.writing=UINT32_MAX,.released=UINT32_MAX,
-            .ready_payload_bytes=UINT32_MAX,.reading_payload_bytes=UINT32_MAX}};
+            .ready_payload_bytes=UINT32_MAX,.reading_payload_bytes=UINT32_MAX},
+        .output_driver={.requested_bytes=UINT64_MAX,.written_bytes=UINT64_MAX,
+            .write_us=UINT64_MAX,.max_write_us=UINT64_MAX,
+            .writes=UINT32_MAX,.errors=UINT32_MAX,.timeouts=UINT32_MAX,.short_writes=UINT32_MAX,
+            .timing_samples=UINT32_MAX,.invalid_time_samples=UINT32_MAX,
+            .completion_queue_drops=UINT32_MAX,.timing_enabled=true,
+            .queue_drops_available=true,.saturated=true}};
     char complete[4096];assert(native_health_format_json(complete,sizeof(complete),&snapshot,&runtime));
     size_t bytes=strlen(complete);assert(bytes<2304);
     printf("HEALTH_MAX=%s\n",complete);
+    printf("HEALTH_MAX_BYTES=%zu\n",bytes);
     for(size_t capacity=0;capacity<=bytes+1;++capacity) {
         char guarded[4096];memset(guarded,0x7e,sizeof(guarded));
         bool ok=native_health_format_json(guarded,capacity,&snapshot,&runtime);
@@ -148,13 +155,29 @@ static void test_json(void) {
         if(ok)assert(!strcmp(guarded,complete));
     }
     snapshot.cpu=(native_health_cpu_t){0};
+    runtime.output_driver=(native_output_metrics_t){0};
     assert(native_health_format_json(complete,sizeof(complete),&snapshot,&runtime));
     assert(strstr(complete,"\"overall_percent\":null") && strstr(complete,"\"stack_free_min\":null"));
+    assert(strstr(complete,"\"completion_queue_drops\":null") &&
+           strstr(complete,"\"timing_enabled\":false") &&
+           strstr(complete,"\"write_us\":null") && strstr(complete,"\"max_write_us\":null") &&
+           strstr(complete,"\"saturated\":false"));
+    puts("HEALTH_UNAVAILABLE_OK");
+    runtime.output_driver.timing_enabled=true;
+    assert(native_health_format_json(complete,sizeof(complete),&snapshot,&runtime));
+    assert(strstr(complete,"\"timing_enabled\":true") && strstr(complete,"\"write_us\":null"));
+    puts("HEALTH_NO_TIMING_SAMPLES_OK");
+    runtime.output_driver.timing_samples=1;
+    runtime.output_driver.queue_drops_available=true;
+    assert(native_health_format_json(complete,sizeof(complete),&snapshot,&runtime));
+    assert(strstr(complete,"\"write_us\":0,") && strstr(complete,"\"max_write_us\":0") &&
+           strstr(complete,"\"completion_queue_drops\":0"));
+    puts("HEALTH_MEASURED_ZERO_OK");
     runtime.cores=1;assert(native_health_format_json(complete,sizeof(complete),&snapshot,&runtime));
     assert(strstr(complete,"\"core_percent\":[null]"));
     runtime.cores=3;assert(!native_health_format_json(complete,sizeof(complete),&snapshot,&runtime));
     assert(!native_health_format_json(NULL,0,&snapshot,&runtime));
-    puts("PASS CYD health JSON: uint32/uint64/int32 limits fit 2304 bytes; every capacity preserves canaries; unavailable CPU/stack remain null");
+    puts("PASS CYD health JSON: worst-width CPU/output counters fit 2304 bytes; every capacity preserves canaries; unavailable CPU/stack/queue/time remain null; measured zero remains numeric");
 }
 int main(void) {
     fail_registration=true;assert(!native_health_start());fail_registration=false;

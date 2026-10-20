@@ -1,4 +1,5 @@
-"""Exercise actual SMP fault snapshots and optional two-core CPU sampling."""
+"""Exercise actual SMP fault snapshots, two-core CPU sampling and bounded health JSON."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -13,7 +14,23 @@ from run_output_dma_host import host,run
 
 
 def main():
-    OUT.mkdir(parents=True,exist_ok=True);(OUT/'freertos').mkdir(exist_ok=True)
+    global OUT
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output',type=Path,default=OUT)
+    OUT=parser.parse_args().output.resolve()
+    OUT.mkdir(parents=True,exist_ok=False);(OUT/'freertos').mkdir()
+    sources=[Path(__file__),ROOT/'tests/native/cyd_health_test.c',
+        *[MAIN/name for name in ('native_health.c','native_health.h','native_health_json.c','native_output_metrics.h')],
+        ROOT/'idf/components/native_stream/include/json_buffer.h',ROOT/'tools/codec_benchmark/run_output_dma_host.py']
+    hashes={}
+    for path in sources:
+        relative=path.relative_to(ROOT)
+        target=OUT/'sources'/relative
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_bytes(path.read_bytes())
+        hashes[relative.as_posix()]=hashlib.sha256(target.read_bytes()).hexdigest()
+    frozen=OUT/'sources'
+    frozen_main=frozen/MAIN.relative_to(ROOT)
     stubs={
         'sdkconfig.h':'''#pragma once
 #ifdef TEST_DIAGNOSTIC
@@ -79,8 +96,8 @@ void vTaskDelay(TickType_t);
             build=run(['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
                 '-Wno-unused-function','-Wno-unused-variable','-pthread',*flags,
                 '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
-                '-I'+host(OUT),'-I'+host(MAIN),'-I'+host(ROOT/'idf/components/native_stream/include'),
-                host(ROOT/'tests/native/cyd_health_test.c'),host(MAIN/'native_health_json.c'),
+                '-I'+host(OUT),'-I'+host(frozen_main),'-I'+host(frozen/'idf/components/native_stream/include'),
+                host(frozen/'tests/native/cyd_health_test.c'),host(frozen_main/'native_health_json.c'),
                 '-o',host(binary)])
             log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                 'UBSAN_OPTIONS=halt_on_error=1','timeout','30',host(binary)])
@@ -92,14 +109,25 @@ void vTaskDelay(TickType_t);
                 row=json.loads(line.split('=',1)[1])
                 assert row['boot_id']=='f'*16 and row['uptime_ms']==2**64-1
                 assert row['allocation_failures']==2**32-1 and row['decoder_failure']['result']==-(2**31)
-                assert row['cpu']['overall_percent']==50.0 and row['cpu']['core_percent']==[0.0,100.0]
-                assert row['cpu']['tasks']['decode']['percent_of_one_core']==60.0
+                assert row['cpu']['overall_percent']==100.0 and row['cpu']['core_percent']==[100.0,100.0]
+                assert row['cpu']['tasks']['decode']['percent_of_one_core']==100.0
+                driver=row['output_driver']
+                for field in ('requested_bytes','written_bytes','write_us','max_write_us'):
+                    assert driver[field]==2**64-1
+                for field in ('writes','errors','timeouts','short_writes','timing_samples',
+                              'invalid_time_samples','completion_queue_drops'):
+                    assert driver[field]==2**32-1
+                assert driver['saturated'] is True and driver['timing_enabled'] is True
+            elif line.startswith('HEALTH_MAX_BYTES='):
+                assert int(line.split('=',1)[1])<2304
+        assert all(marker in log.decode().splitlines() for marker in
+                   ('HEALTH_UNAVAILABLE_OK','HEALTH_NO_TIMING_SAMPLES_OK','HEALTH_MEASURED_ZERO_OK'))
         variants[name]=log.decode();print(name+': '+log.decode(),end='')
-    sources=[Path(__file__),ROOT/'tests/native/cyd_health_test.c',MAIN/'native_health.c',MAIN/'native_health.h',
-             MAIN/'native_health_json.c',ROOT/'idf/components/native_stream/include/json_buffer.h']
+    matches={name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==expected for name,expected in hashes.items()}
+    assert all(matches.values()),matches
     (OUT/'report.json').write_text(json.dumps(dict(passed=True,variants=variants,
-        source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources},
-        scope='Actual fault/sampler implementation with real host mutexes, scripted SDK task snapshots and IPC; no kernel, ISR latency or physical CPU qualification.'),indent=2)+'\n')
+        source_sha256=hashes,live_inputs_match_snapshot=matches,physical_hardware=False,
+        scope='Actual fault/sampler implementation and complete bounded JSON serializer with real host mutexes, scripted SDK task snapshots and IPC. Driver snapshot values are serializer inputs; no backend, kernel, ISR latency or physical CPU qualification.'),indent=2)+'\n')
 
 
 if __name__=='__main__':main()

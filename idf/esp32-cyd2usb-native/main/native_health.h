@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include "native_output_metrics.h"
 
 typedef enum {
     NATIVE_HEALTH_STREAM = 0,
@@ -68,6 +69,7 @@ typedef struct {
     uint32_t reset_reason, heap_free, heap_largest, heap_minimum, tasks, cores;
     uint32_t internal_free, internal_largest, dma_free, dma_largest;
     native_input_health_t input;
+    native_output_metrics_t output_driver;
 } native_health_runtime_t;
 
 bool native_health_format_json(char *body, size_t capacity,

@@ -8,6 +8,7 @@ set(NATIVE_SRCS
   "radio_control.c"
   "cyd_display.c"
   "native_audio_output.c"
+  "native_output_metrics.c"
   "native_state.c"
   "native_health.c"
   "native_health_json.c"

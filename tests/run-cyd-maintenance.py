@@ -34,7 +34,7 @@ def main():
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     main=ROOT/'idf/esp32-cyd2usb-native/main';shared=ROOT/'idf/components/native_stream'
     harness=ROOT/'tests/native/cyd_maintenance_test.c'
-    files=[Path(__file__).resolve(),harness,ROOT/'tests/native/cyd_maintenance_platform.h',ROOT/'tests/native/cyd_output_pause_test.c',ROOT/'tests/native/audio_power_seam.h',
+    files=[Path(__file__).resolve(),harness,ROOT/'tests/native/cyd_maintenance_platform.h',ROOT/'tests/native/cyd_output_pause_test.c',ROOT/'tests/native/cyd_output_metrics_noop.h',ROOT/'tests/native/audio_power_seam.h',
            *[main/n for n in ('audio_service.c','audio_service.h','native_audio_output.c','native_audio_output.h','native_state.c','native_state.h','native_health.h','input_prefill.h')],
            shared/'adaptive_input.c',shared/'icy_title.c',*sorted((shared/'include').glob('*.h'))]
     power=ROOT/'idf/components/native_network_power'

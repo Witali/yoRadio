@@ -1,4 +1,5 @@
 #include "native_audio_output.h"
+#include "native_output_metrics.h"
 
 #include <limits.h>
 #include <stdbool.h>
@@ -9,6 +10,7 @@
 #include "board_config.h"
 #include "driver/gpio.h"
 #include "esp_check.h"
+#include "esp_attr.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -261,6 +263,15 @@ static bool s_resampler_has_previous;
 static int16_t s_resampler_previous;
 static uint32_t s_resampler_next_phase;
 
+static bool IRAM_ATTR pdm_completion_queue_drop(i2s_chan_handle_t channel,
+        i2s_event_data_t *event, void *context) {
+    (void)channel;
+    (void)event;
+    (void)context;
+    native_output_metrics_queue_drop();
+    return false;
+}
+
 static void hold_pdm_low(void) {
     gpio_reset_pin(BOARD_AUDIO_DATA);
     gpio_set_direction(BOARD_AUDIO_DATA, GPIO_MODE_OUTPUT);
@@ -287,8 +298,10 @@ static esp_err_t pdm_write_block(const int16_t *samples, size_t count) {
     if (!s_pdm || !s_pdm_running) return ESP_ERR_INVALID_STATE;
     size_t written = 0;
     size_t bytes = count * sizeof(*samples);
+    int64_t started = native_output_metrics_begin_write();
     esp_err_t result = i2s_channel_write(s_pdm, samples, bytes, &written,
                                          1000);
+    native_output_metrics_end_write(bytes, written, result, started);
     if (result != ESP_OK) return result;
     return written == bytes ? ESP_OK : ESP_FAIL;
 }
@@ -384,6 +397,14 @@ static esp_err_t pdm_begin(void) {
         pdm_release(false);
         return result;
     }
+
+    const i2s_event_callbacks_t callbacks = {.on_send_q_ovf = pdm_completion_queue_drop};
+    result = i2s_channel_register_event_callback(s_pdm, &callbacks, NULL);
+    if (result != ESP_OK) {
+        pdm_release(false);
+        return result;
+    }
+    native_output_metrics_observe_queue();
 
     s_buffered_samples = 0;
     reset_resampler();
@@ -541,6 +562,13 @@ static bool s_dac_enabled;
 static uint32_t s_dac_sample_rate;
 static uint8_t *s_dac_data;
 
+static esp_err_t dac_write_block(uint8_t *data, size_t bytes, size_t *written, int timeout_ms) {
+    int64_t started = native_output_metrics_begin_write();
+    esp_err_t result = dac_continuous_write(s_dac, data, bytes, written, timeout_ms);
+    native_output_metrics_end_write(bytes, *written, result, started);
+    return result;
+}
+
 esp_err_t native_audio_output_init(void) {
     s_dac_data = malloc(OUTPUT_PACKET_BYTES);
     return s_dac_data ? ESP_OK : ESP_ERR_NO_MEM;
@@ -570,7 +598,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
     s_dac_enabled = true;
     memset(s_dac_data, 0x80, 1024);
     size_t written = 0;
-    esp_err_t result = dac_continuous_write(s_dac, s_dac_data, 1024, &written, 1000);
+    esp_err_t result = dac_write_block(s_dac_data, 1024, &written, 1000);
     if (result == ESP_OK && written != 1024) result = ESP_FAIL;
     if (result == ESP_OK) {
         s_dac_sample_rate = input_sample_rate;
@@ -598,8 +626,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         if (buffered == OUTPUT_PACKET_BYTES) {
             if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
             size_t written = 0;
-            esp_err_t result = dac_continuous_write(s_dac, s_dac_data, buffered,
-                                                    &written, 1000);
+            esp_err_t result = dac_write_block(s_dac_data, buffered, &written, 1000);
             if (result != ESP_OK) return result;
             if (written != buffered) return ESP_FAIL;
             buffered = 0;
@@ -608,8 +635,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     if (!buffered) return ESP_OK;
     if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     size_t written = 0;
-    esp_err_t result = dac_continuous_write(s_dac, s_dac_data, buffered,
-                                            &written, 1000);
+    esp_err_t result = dac_write_block(s_dac_data, buffered, &written, 1000);
     if (result != ESP_OK) return result;
     return written == buffered ? ESP_OK : ESP_FAIL;
 }
@@ -618,7 +644,7 @@ void native_audio_output_idle(void) {
     if (!s_dac || atomic_load(&s_pause_requested)) return;
     memset(s_dac_data, 0x80, 256);
     size_t written = 0;
-    dac_continuous_write(s_dac, s_dac_data, 256, &written, 100);
+    dac_write_block(s_dac_data, 256, &written, 100);
 }
 
 const char *native_audio_output_name(void) {
@@ -697,9 +723,11 @@ static esp_err_t legacy_write_frames(size_t frames) {
     if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!frames) return ESP_OK;
     size_t written = 0;
+    int64_t started = native_output_metrics_begin_write();
     esp_err_t result = idf6_dac_output_write(
         s_legacy_frames, frames * sizeof(uint32_t), &written,
         pdMS_TO_TICKS(1000));
+    native_output_metrics_end_write(frames * sizeof(uint32_t), written, result, started);
     if (result != ESP_OK) return result;
     return written == frames * sizeof(uint32_t) ? ESP_OK : ESP_FAIL;
 }

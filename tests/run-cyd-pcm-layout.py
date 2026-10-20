@@ -83,6 +83,8 @@ static int dac_continuous_write(void *handle, const void *data, size_t size,
             generated += '\n'.join(gain.function(branch, name) for name in (
                 'reset_resampler', 'pdm_write_block', 'pdm_flush',
                 'pdm_queue_sample', 'pdm_write_resampled'))
+        if backend == 'dac':
+            generated += gain.function(branch, 'dac_write_block')
         if backend == 'legacy':
             generated += '\n'.join(gain.function(branch, name) for name in (
                 'legacy_pack_dac_code', 'legacy_fractional_dac_step',
@@ -90,6 +92,8 @@ static int dac_continuous_write(void *handle, const void *data, size_t size,
         generated += '\n'.join(gain.function(branch, name) for name in (
             'native_audio_output_configure', 'native_audio_output_write_pcm',
             'native_audio_output_discard_pcm', 'native_audio_output_flush_pcm'))
+        if backend == 'dac':
+            generated += gain.function(branch, 'native_audio_output_pause')
         (out / (backend + '.inc')).write_text(generated)
         unit, obj, binary = out / (backend + '.c'), out / (backend + '.o'), out / backend
         unit.write_text(case_path.read_text().replace('/* PLATFORM */', platform_variant)
@@ -98,7 +102,7 @@ static int dac_continuous_write(void *handle, const void *data, size_t size,
             (out / (backend + '-build.log')).write_bytes(run([
                 'gcc', '-std=c11', *common_flags,
                 '-Wno-unused-function', '-Wno-unused-variable',
-                '-DTEST_' + backend.upper() + '=1', '-I' + host(adapter),
+                '-DTEST_' + backend.upper() + '=1', '-I' + host(ROOT / 'tests/native'), '-I' + host(adapter),
                 '-c', host(unit), '-o', host(obj)]))
             (out / (backend + '-link.log')).write_bytes(run([
                 'g++', *common_flags, '-no-pie', host(obj), *shared_objects,
@@ -120,6 +124,7 @@ static int dac_continuous_write(void *handle, const void *data, size_t size,
              ROOT / 'idf/esp32-cyd2usb-native/main/native_audio_output.h',
              adapter / 'native_audio_normalizer.cpp', adapter / 'native_audio_normalizer.h',
              algorithm / 'AudioNormalizer.cpp', algorithm / 'AudioNormalizer.h']
+    files.append(ROOT / 'tests/native/cyd_output_metrics_noop.h')
     hashes = {}
     for path in files:
         relative = path.relative_to(ROOT)

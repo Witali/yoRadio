@@ -50,6 +50,7 @@ static esp_err_t health_handler(httpd_req_t *request) {
         .dma_free=(uint32_t)heap_caps_get_free_size(MALLOC_CAP_DMA),
         .dma_largest=(uint32_t)heap_caps_get_largest_free_block(MALLOC_CAP_DMA),
         .input=audio_service_input_health(),
+        .output_driver=native_output_metrics_snapshot(),
     };
     char body[2304];
     if (!native_health_format_json(body,sizeof(body),&health,&runtime))

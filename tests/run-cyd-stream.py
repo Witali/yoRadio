@@ -23,12 +23,36 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,default=OUT)
     OUT=parser.parse_args().output.resolve()
-    OUT.mkdir(parents=True,exist_ok=True);(OUT/'freertos').mkdir(exist_ok=True)
+    OUT.mkdir(parents=True,exist_ok=False);(OUT/'freertos').mkdir()
+    sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/native/audio_power_seam.h',
+        ROOT/'tests/run-cyd-lifecycle.py',ROOT/'tools/codec_benchmark/run_output_dma_host.py',
+        *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h',
+                                'native_health.h','native_health_json.c','native_output_metrics.h','radio_control.h')],
+        SHARED/'icy_title.c',*sorted((SHARED/'include').glob('*.h')),
+        ROOT/'idf/components/native_storage/include/radio_control.h',
+        ROOT/'idf/components/native_audio_settings/native_audio_settings.h']
+    hashes={}
+    for path in sources:
+        relative=path.relative_to(ROOT)
+        target=OUT/'sources'/relative
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_bytes(path.read_bytes())
+        hashes[relative.as_posix()]=hashlib.sha256(target.read_bytes()).hexdigest()
+    frozen=OUT/'sources'
+    frozen_main=frozen/MAIN.relative_to(ROOT)
+    frozen_shared=frozen/SHARED.relative_to(ROOT)
     (OUT/'freertos/FreeRTOS.h').write_text('''#pragma once
 #include <stddef.h>
 #include <stdint.h>
+#include <assert.h>
+#include <pthread.h>
 typedef void *SemaphoreHandle_t;
 typedef int BaseType_t;
+typedef unsigned TickType_t;
+typedef pthread_mutex_t portMUX_TYPE;
+#define portMUX_INITIALIZER_UNLOCKED PTHREAD_MUTEX_INITIALIZER
+#define portENTER_CRITICAL(p) assert(!pthread_mutex_lock(p))
+#define portEXIT_CRITICAL(p) assert(!pthread_mutex_unlock(p))
 #define pdTRUE 1
 #define pdMS_TO_TICKS(x) (x)
 #define portMAX_DELAY UINT32_MAX
@@ -39,7 +63,7 @@ size_t strlcpy(char *, const char *, size_t);
 ''')
     (OUT/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
     (OUT/'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
-    source=(MAIN/'audio_service.c').read_text()
+    source=(frozen_main/'audio_service.c').read_text()
     unit=source[source.index('#define STREAM_CHUNK_SIZE'):source.index('static esp_audio_simple_dec_type_t')]
     for name in ('codec_name','state_set_audio','stream_header_event','open_stream',
                  'read_stream','send_encoded','stream_transport_reset',
@@ -47,27 +71,28 @@ size_t strlcpy(char *, const char *, size_t);
                  'send_stream_audio','finish_stream_audio','stream_audio',
                  'stream_title','stream_task'):
         unit+=helpers.function(source,name)
-    unit+=helpers.function((MAIN/'web_service.c').read_text(),'status_handler')
+    unit+=helpers.function((frozen_main/'web_service.c').read_text(),'status_handler')
     unit+=helpers.function(source,'audio_service_input_health')
-    unit+=helpers.function((MAIN/'web_service.c').read_text(),'health_handler')
-    unit+=helpers.function((MAIN/'web_service.c').read_text(),'parse_station_number')
-    unit+=helpers.function((MAIN/'web_service.c').read_text(),'radio_handler')
-    unit+=helpers.function((MAIN/'web_service.c').read_text(),'stop_handler')
-    unit+=helpers.function((MAIN/'web_service.c').read_text(),'parse_setting_integer')
-    unit+=helpers.function((MAIN/'web_service.c').read_text(),'settings_handler')
+    unit+=helpers.function((frozen_main/'web_service.c').read_text(),'health_handler')
+    unit+=helpers.function((frozen_main/'web_service.c').read_text(),'parse_station_number')
+    unit+=helpers.function((frozen_main/'web_service.c').read_text(),'radio_handler')
+    unit+=helpers.function((frozen_main/'web_service.c').read_text(),'stop_handler')
+    unit+=helpers.function((frozen_main/'web_service.c').read_text(),'parse_setting_integer')
+    unit+=helpers.function((frozen_main/'web_service.c').read_text(),'settings_handler')
     (OUT/'production.inc').write_text(unit)
     binary=OUT/'test'
     try:
         build=run(['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
-            '-Wno-unused-variable','-Wno-unused-function','-fsanitize=address,undefined',
+            '-Wno-unused-variable','-Wno-unused-function','-pthread','-fsanitize=address,undefined',
             '-fno-omit-frame-pointer','-fno-pie','-no-pie','-I'+host(OUT),
-            '-I'+host(MAIN),'-I'+host(SHARED/'include'),
-            '-I'+host(ROOT/'idf/components/native_audio_settings'),
-            host(ROOT/'tests/native/cyd_stream_test.c'),host(MAIN/'native_state.c'),
-            host(MAIN/'native_health_json.c'),host(SHARED/'icy_title.c'),'-o',host(binary)])
+            '-I'+host(frozen_main),'-I'+host(frozen_shared/'include'),
+            '-I'+host(frozen/'idf/components/native_audio_settings'),
+            host(frozen/'tests/native/cyd_stream_test.c'),host(frozen_main/'native_state.c'),
+            host(frozen_main/'native_health_json.c'),host(frozen_shared/'icy_title.c'),'-o',host(binary)])
         log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                  'UBSAN_OPTIONS=halt_on_error=1',host(binary)])
     except subprocess.CalledProcessError as error:
+        (OUT/'failed-command.log').write_bytes(error.output)
         print(error.output.decode(errors='replace'),file=sys.stderr);raise
     rows={}
     for line in log.decode().splitlines():
@@ -91,6 +116,10 @@ size_t strlcpy(char *, const char *, size_t);
     assert health['allocation_failures']==3 and health['decoder_failure']['sequence']==2
     assert health['cpu']['overall_percent'] is None and health['cpu']['tasks']['decode']['stack_free_min'] is None
     assert not health['input']['available'] and not health['input']['leased']
+    assert health['output_driver']==dict(writes=19,requested_bytes=2048,written_bytes=1024,
+        errors=3,timeouts=2,short_writes=1,write_us=123456,max_write_us=6543,
+        timing_samples=17,invalid_time_samples=2,completion_queue_drops=11,
+        timing_enabled=True,saturated=False)
     radio=rows['RADIO']
     assert radio['current']==65535 and radio['count']==65535 and radio['smartstart'] is True
     assert radio['station']=='\1'*143 and radio['connecting'] is True and radio['playing'] is False
@@ -98,15 +127,11 @@ size_t strlcpy(char *, const char *, size_t);
     assert rows['SETTINGS_MIN']==dict(volume=0,balance=-16,normalization=False,normgain=0,normtarget=-20,normtime=100)
     assert rows['SETTINGS_MAX']==dict(volume=254,balance=16,normalization=True,normgain=20,normtarget=0,normtime=10000)
     (OUT/'build.log').write_bytes(build);(OUT/'test.log').write_bytes(log)
-    sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/native/audio_power_seam.h',ROOT/'tests/run-cyd-lifecycle.py',
-        *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h','native_health.h','native_health_json.c')],
-        SHARED/'icy_title.c',*[SHARED/'include'/name for name in
-        ('audio_completion.h','icy_title.h','stream_body.h','stream_bitrate.h','stream_probe.h','stream_tags.h','json_buffer.h')]]
-    sources += [MAIN/'radio_control.h',ROOT/'idf/components/native_storage/include/radio_control.h']
-    sources += [ROOT/'idf/components/native_audio_settings/native_audio_settings.h']
+    matches={name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==expected for name,expected in hashes.items()}
+    assert all(matches.values()),matches
     (OUT/'report.json').write_text(json.dumps(dict(passed=True,physical_hardware=False,
-        scope='Actual HTTP/ICY/probe stream task, status/radio/health/settings handlers and strict settings parser. SDK I/O and audio-settings persistence APIs are host seams; no NVS transaction or hardware timing claim.',
-        source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}),indent=2)+'\n')
+        scope='Actual HTTP/ICY/probe stream task, status/radio/health/settings handlers and strict settings parser. SDK I/O, output-driver snapshot and audio-settings persistence APIs are host seams; HTTP TX release is disabled here and qualified separately; no NVS transaction, backend or hardware timing claim.',
+        source_sha256=hashes,live_inputs_match_snapshot=matches),indent=2)+'\n')
     print('\n'.join(line for line in log.decode().splitlines() if line.startswith('PASS')))
 
 
