@@ -1,5 +1,6 @@
 /* Canonical-source reserve-off controls. No reserve module/header/RX wrappers. */
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include "sdkconfig.h"
 #include "esp_crt_bundle.h"
@@ -13,6 +14,11 @@
 #if CONFIG_YORADIO_TLS_INPUT_RECLAIM
 #include "native_input_reclaim.h"
 #endif
+
+_Static_assert(MBEDTLS_SSL_IN_CONTENT_LEN == 16384,
+               "Disabled controls retain the full RX content capacity");
+_Static_assert(MBEDTLS_SSL_IN_BUFFER_LEN >= MBEDTLS_SSL_IN_CONTENT_LEN,
+               "Disabled controls retain complete SDK RX storage");
 
 static void require(bool condition, const char *name) {
     if (condition) return;
@@ -37,13 +43,30 @@ void app_main(void) {
     adaptive_input_t *input = adaptive_input_create(8U * 256U, 4U * 256U, 256U);
     require(input && native_input_reclaim_bind(input), "disabled_control_reclaim_bind");
 #endif
+    size_t minimum_rx_allocation = SIZE_MAX;
+    int pre_handshake_payload = -1;
     for (unsigned cycle = 0; cycle < 16; ++cycle) {
         mbedtls_ssl_context contexts[2];
         for (unsigned index = 0; index < 2; ++index) {
             mbedtls_ssl_init(&contexts[index]);
             require(mbedtls_ssl_setup(&contexts[index], &configurations[index]) == 0, "disabled_original_sdk_setup");
-            require(mbedtls_ssl_get_max_in_record_payload(&contexts[index]) == 16384,
-                "disabled_original_full_record_payload");
+            /* This public getter includes the pre-handshake MFL limit. In the
+             * pinned SDK, MFL_NONE maps to min(RX, TX), not allocated RX bytes.
+             * Check the actual heap block independently without RX wrappers. */
+#if defined(MBEDTLS_SSL_MAX_FRAGMENT_LENGTH)
+            const int expected_payload = MBEDTLS_TLS_EXT_ADV_CONTENT_LEN;
+#else
+            const int expected_payload = MBEDTLS_SSL_IN_CONTENT_LEN;
+#endif
+            pre_handshake_payload = mbedtls_ssl_get_max_in_record_payload(&contexts[index]);
+            require(pre_handshake_payload == expected_payload,
+                "disabled_pre_handshake_payload_limit");
+            void *rx = contexts[index].MBEDTLS_PRIVATE(in_buf);
+            require(rx != NULL, "disabled_original_rx_buffer");
+            size_t allocated = heap_caps_get_allocated_size(rx);
+            require(allocated >= MBEDTLS_SSL_IN_BUFFER_LEN,
+                "disabled_original_full_record_storage");
+            if (allocated < minimum_rx_allocation) minimum_rx_allocation = allocated;
             require(mbedtls_ssl_session_reset(&contexts[index]) == 0, "disabled_original_session_reset");
         }
         for (unsigned index = 0; index < 2; ++index) {
@@ -51,6 +74,10 @@ void app_main(void) {
             mbedtls_ssl_free(&contexts[index]);
         }
     }
+    printf("TLS_RX_DISABLED_CAPACITY content=%u storage=%zu allocated_min=%zu "
+           "pre_handshake_payload=%d setups=32\n",
+           (unsigned)MBEDTLS_SSL_IN_CONTENT_LEN, (size_t)MBEDTLS_SSL_IN_BUFFER_LEN,
+           minimum_rx_allocation, pre_handshake_payload);
     void *ordinary = mbedtls_calloc(1, MBEDTLS_SSL_IN_BUFFER_LEN);
     require(ordinary != NULL, "disabled_ordinary_public_calloc");
     mbedtls_free(ordinary);

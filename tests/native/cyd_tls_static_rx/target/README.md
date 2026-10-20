@@ -20,6 +20,14 @@ original SDK TLS source without the reserve module/static slot/RX or diagnostic
 wrappers. The ISR task-lock mutation stays host-only because an SDK panic cannot
 count as a named target failure.
 
+Reserve-off controls check the full 16384-byte RX content configuration and the
+actual SDK heap allocation against `MBEDTLS_SSL_IN_BUFFER_LEN` for all32 setups.
+The public maximum-input-payload getter is checked separately: before a handshake,
+the pinned SDK maps unnegotiated MFL_NONE to `min(RX, TX)`, which is4096 for this
+unchanged profile. That value does not measure the allocated RX storage. The
+capacity marker records both observations; no SDK/configuration change is made
+to force the getter to return16384. A failed older assertion remains nonpass.
+
 Enabled profiles exercise real public config/init/defaults/setup/reset/free,
 numeric/pointer userdata, cleanup/address reuse while an old loan lives, full
 registry fallback, two pinned cores sharing/distinct configs, erase handover,

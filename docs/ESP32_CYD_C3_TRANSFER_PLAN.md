@@ -91,7 +91,9 @@ allocation и численные настройки C3 являются канд
   userdata. [Текущие host-результаты](../tests/results/cyd-tls-static-rx-host-20261020/README.md)
   сохраняют unit, полную service-матрицу и CMake-проверки;
   actual SDK/QEMU, lint/application exports и физическая польза ещё впереди.
-  Первая target-матрица завершилась nonpass; полный target gate остаётся открытым.
+  Старый pointer prototype и первая registry target-матрица завершились nonpass;
+  полный target gate остаётся открытым. Новая матрица выполняется после исправления
+  ошибочного тестового отождествления pre-handshake MFL getter и размера RX storage.
   Освобождение HTTP GET TX и lifetime-safe reclaim уже реализованы;
   семь production exports reclaim проверены, физический выигрыш ещё не измерен.
 - **Этап 14, Vorbis/Ogg:** завершить [изолированный ESP32 bridge](CYD_VORBIS_TRANSFER_DESIGN.md)
@@ -619,6 +621,17 @@ Stream остаётся на core0, decode/output на core1 с прежними
   и CMake45. Самостоятельный verifier и независимый запуск из другого каталога
   проходят: raw sources/logs/config, точное воспроизведение SDK overlay и host
   predicates, 34 applied/preparation равенства и явные binary/tool omissions.
+
+- 2026-10-20, CYD-C3-13: первая registry SDK/QEMU матрица `rxt01` завершилась
+  с exit1: десять принятых вариантов, одиннадцатый reserve-off/reclaim-on отвергнут
+  по `disabled_original_full_record_payload`, двенадцатый не запускался.
+  Причина — ошибка теста: pinned SDK до handshake возвращает через MFL getter
+  `min(RX, TX)=4096`, что не является размером выделенного RX-буфера.
+  Исправлена только проверка: полная RX content capacity 16384 и реальный heap
+  allocation проверяются отдельно от getter на всех 32 setup. Production module,
+  SDK, record sizes и привязки задач сохранены. В новом полном прогоне `rxt02`
+  оба reserve-off профиля прошли: storage16717, minimum allocation17396,
+  getter4096. Остальные варианты выполняются; общий PASS ещё не заявлен.
   Исходники зафиксированы в `affa3caf1` после выполнения тестов; чистота Git
   на момент тестов не заявляется. Actual SDK/QEMU, application и physical gates
   остаются отдельными проверками; старый nonpass prototype не переименован.
