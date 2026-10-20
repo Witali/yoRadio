@@ -8,6 +8,14 @@
 Она проверяет инвентаризацию, не семантическую эквивалентность; найденные
 непроверенные переходы перечислены в документе.
 
+`http_captive.inc` проверяет неизвестные маршруты отдельно: локальный/отсутствующий
+Host, порт, чужое/AP-похожее имя и STA. `captive_qemu.py` исполняет factory AP,
+native AP и native STA в отдельных ВМ без LCD/debugger, с настоящими HTTP
+ответами. Для `--qemu-root` нужен pinned snapshot с `frozen-inputs.json`;
+остальные аргументы — `--dependency-root` и новый `--output`.
+[54F4 scoped proof](../../qemu/parity/captive-portal-validation-20261020.json)
+не заменяет полный suite/24h новой версии.
+
 ## Цвета и подготовка нового JPEG
 
 Pure color module имеет отдельные host/RV32 проверки grayscale/RGB/CMYK2–16бит

@@ -56,7 +56,7 @@
     "src/app/text/text.c": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa",
     "src/app/web/photo_api.c": "f5935dfe63bd1679855791c58f92e023b36bfba61e6dba995b7259e25eee0400",
     "src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
-    "src/app/web/server.c": "8cb1a4ede2558c05abe825c1046b205b0d039a0ecad13bfed6962c91812e56b4",
+    "src/app/web/server.c": "f9dc5eecac2e34579bc79e23e1d5c70ea6d1eae67fc086a70da4b21ad85e7663",
     "src/app/web/settings_api.c": "2c1b9db64dd8f8ae66883e35a106c8f731d6505691ba006ec4327a3a99ddbb0a",
     "src/build.ps1": "5354a100ff2f761810bda4a337b6b5d0198b492e7adc6dd264d6ce1c12bedff3",
     "src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
@@ -1204,7 +1204,7 @@
       "native": [
         "app/web/server.c#captive_redirect"
       ],
-      "note": "HTTP registration, template substitution, parsers and error callback reviewed. See finding HTTP-404: native relative redirect differs from factory Host-dependent root/absolute redirect."
+      "note": "AP Host/missing Host -> exact root; foreign Host -> fixed absolute AP redirect. Complete authority validation fixes confirmed factory substring bug. STA retains local redirect because AP is inactive. Factory/native AP and native STA real HTTP passed in separate VMs without LCD; see captive-portal-validation-20261020.json."
     },
     {
       "address": "0x4200d54c",
@@ -4696,11 +4696,16 @@
     {
       "symbol": "app/web/server.c#captive_redirect",
       "line": 221,
-      "sha256": "d0413b47df5a624f9214597ee9e26b8fc8018568e372d605400f59e42468429f",
+      "sha256": "e9499bcb78293b07c9dac7c647ac0eb675a68c7a4b09d06a2e4f5d1613205a7b",
       "calls": [
+        "httpd_req_get_hdr_value_str",
         "httpd_resp_send",
         "httpd_resp_set_hdr",
-        "httpd_resp_set_status"
+        "httpd_resp_set_status",
+        "network_ap_active",
+        "page",
+        "strcmp",
+        "strncmp"
       ],
       "factory": [
         "0x4200d4be"
@@ -4712,7 +4717,7 @@
     },
     {
       "symbol": "app/web/server.c#web_start",
-      "line": 275,
+      "line": 318,
       "sha256": "5c72b687d4e48819bfc6eeb44cde969da2a00eecda593b7d984ec1bb9406a031",
       "calls": [
         "HTTPD_DEFAULT_CONFIG",
@@ -7035,14 +7040,14 @@
   "findings": [
     {
       "id": "HTTP-404",
-      "status": "confirmed_gap",
+      "status": "fixed_host_and_qemu",
       "factory": [
         "0x4200d4be"
       ],
       "native": [
         "app/web/server.c#captive_redirect"
       ],
-      "detail": "Factory: AP Host -> root body; other Host -> absolute http://192.168.43.1/. Native: unconditional relative /. Existing http_targets.inc enforces native behavior, not factory contract."
+      "detail": "Restored factory AP Host/missing Host -> root and foreign Host -> absolute AP Location. Native authority matching fixes confirmed factory lookalike-host bug. 5608 host checks and 15 real HTTP cases in factory AP/native AP/native STA passed; test inputs unchanged and owned VMs stopped. See ../qemu/parity/captive-portal-validation-20261020.json."
     },
     {
       "id": "CITY-REINIT",

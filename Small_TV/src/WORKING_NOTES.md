@@ -2315,3 +2315,24 @@ passed, hardware_browser_soak not_run, controller exit0/terminal_passed
 qemu/parity/b50d-full-terminal-20261020.json. Это результат B50D, неC8FD/54F4
 и не24h H10. Frozen tree/snapshot не редактировались. H10 supervisor11:56UTC
 всё ещё running,396cycles,cleanup_errors[]; наблюдение только через его файлы.
+
+
+## 2026-10-20 — исправлен найденный HTTP-404
+
+Factory0x4200d4be: AP Host/нетHost ->root200, foreignHost ->absoluteAP302.
+Наш unconditional relative redirect исправлен; factory substring bug с именем
+192.168.43.1.example.invalid подтверждён в реальной factory VM и исправлен.
+STA сохраняет local redirect, поскольку setup AP там не активна. Два старых
+теста закрепляли неверное поведение, исправлены с FIXED_TEST. Новый тест
+до изменения кода падает; после —5608native checks и10audit controls pass.
+Новый network-only captive_qemu.py:factoryAP/nativeAP/nativeSTA,15HTTP cases,
+59inputs unchanged, noLCD/noRSP, all3owned VMs stopped. Proof+before/failure/
+after logs+matchingELF: qemu/parity/captive-portal-validation-20261020.json.
+Production archive:app54f441af...,1170240bytes/free365760; ELF83ed2a7a...,
+source9c16c56a...; DEBUGoff, oldTJpgd, libjpeg notlinked. Physical board,
+full suite и24h новой54F4 не запускались. B50D full/H10 ей не приписывать.
+Карта refreshed только для повторно просмотренного server.c; source-only
+coverage не превращается вsemantic proof. Далее CITY-REINIT, AP multi-peer
+HTTP lifetime и RESET/DC pulls; остальные оговорки вBIDIRECTIONAL_AUDIT.md.
+
+Archive integrity:6tests pass; image checksums/partition MD5/current compiled sources/media/34routes/original dump unchanged. Report preserved with captive proof.

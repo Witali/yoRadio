@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "HTTP captive callback parity and intended authority/STA corrections. No LCD, whole-suite/24h or physical-board acceptance.",
+  "app_sha256": "54f441afa6294236f2ac711df56a5558ac5830eb5e6f80779fe046b333559137",
+  "native_elf_sha256": "83ed2a7a15348519b2044e3c0c56d6e7f705a47f7b7d8b7d5632d4d38f7e2cd5",
+  "source_sha256": "9c16c56a5ec25a533fe4e93b0add2fb819c794b68fd7c4f803fdb91c9473b36d",
+  "app_bytes": 1170240,
+  "app_partition_free_bytes": 365760,
+  "native_checks": 5608,
+  "qemu_requests": 15,
+  "qemu_flows": [
+    "original-setup",
+    "reconstructed-setup",
+    "reconstructed-clock"
+  ],
+  "qemu_inputs_unchanged": true,
+  "qemu_inputs": 59,
+  "owned_vm_cleanup": "vm.ensure_stopped returned for all three flows",
+  "display": {
+    "executed": false,
+    "passed": null
+  },
+  "negative_control": "New AP Host/root assertion failed on pre-fix C8FD. First after run also exposed another old native redirect expectation; both original expectations were corrected with FIXED_TEST markers.",
+  "test_inputs": {
+    "Small_TV/src/tests/captive_qemu.py": "e78abf98ba871714f7ec3776ca964e96fc088d897635a47bdcfb91d0e54775e7",
+    "Small_TV/src/tests/http_captive.inc": "22973d66e17da483fe693a3be7a32a9e522c0dcdbc3421ec8188d0ee4090714c",
+    "Small_TV/src/tests/http_contracts.inc": "65a0fd19fff858873d498b17b33b55e77ae46db6a166df4c183b91f702c4a786",
+    "Small_TV/src/tests/http_targets.inc": "fba37d76cc921e000bf1fab36a823e35f617da5b7570b55b9a3d08f41b63da7b",
+    "Small_TV/src/tests/native_test.c": "3432604c9a113de11dbb64956215ec414e70196f73af02077c8519a2906830eb",
+    "Small_TV/src/tests/run.ps1": "183d9452232ca72798f197e04e759f8d15cae9a04180dff83681b571c5de8c6b",
+    "Small_TV/src/tools/audit_correspondence.py": "313a25afbe8cd5ce1a204d98773acb4b575c102c605407976e6fb9b6632475f6",
+    "Small_TV/src/tests/correspondence_test.py": "fcdcb64e782af6afefc24ea49e93a19eb2fee73cc5f2dc4d98d9aeb4d3a4a71f",
+    "Small_TV/src/tests/artifact_test.py": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc"
+  },
+  "raw": [
+    {
+      "file": "raw/captive-portal-20261020/qemu-report.json.gz",
+      "sha256": "7646ccd1ba2ae6ede12a1835713d46179509db52e9aa6017d878a14871bdb0a2",
+      "bytes": 4811,
+      "uncompressed_sha256": "85aebde2c60c75886454b3ad71912cbe4c4782b4b4574b16d83238fffa5bb590",
+      "uncompressed_bytes": 23687
+    },
+    {
+      "file": "raw/captive-portal-20261020/native-report.json",
+      "sha256": "ba3782929530666d84a34789d59f2b6448eccae3d55d497da254dcd6668bb1dc",
+      "bytes": 2792
+    },
+    {
+      "file": "raw/captive-portal-20261020/small_tv_reconstructed.elf.gz",
+      "sha256": "3ceed4bdd70e980769312bdc4359b1cf32857676a4b181a80684dd222718cede",
+      "bytes": 3875004,
+      "uncompressed_sha256": "83ed2a7a15348519b2044e3c0c56d6e7f705a47f7b7d8b7d5632d4d38f7e2cd5",
+      "uncompressed_bytes": 11230956
+    },
+    {
+      "file": "raw/captive-portal-20261020/native-baseline.log.gz",
+      "sha256": "d1e631d4768a354de189d33863f9d1c964e366b0fb596857936989a7332a2ea3",
+      "bytes": 653,
+      "uncompressed_sha256": "b2c234bb0b6cb8c3abeb84f0607bc6409e160d9514628a2b2daabace33dd6572",
+      "uncompressed_bytes": 1486
+    },
+    {
+      "file": "raw/captive-portal-20261020/captive-before.log.gz",
+      "sha256": "4bc230822a96e2ebc9df23c60d31aeef23c9e3cb4525874ece34a598cc87ddf8",
+      "bytes": 714,
+      "uncompressed_sha256": "44e9455279681e706caaf19f7e7052962f2380e24c8283a567a5ecda9f484fcd",
+      "uncompressed_bytes": 1755
+    },
+    {
+      "file": "raw/captive-portal-20261020/captive-after.log.gz",
+      "sha256": "257af793316aa3a4bcd0b90367eeb733c82d178d73850e68765004816e7e953d",
+      "bytes": 739,
+      "uncompressed_sha256": "195fcb32991055adf2c6f7039372da4872729f9ff1e69536eb8cfe425d7e38dd",
+      "uncompressed_bytes": 1795
+    },
+    {
+      "file": "raw/captive-portal-20261020/captive-after-v2.log.gz",
+      "sha256": "c333e8426f829d2beddce226b145730927977a8cec33b77c95fec07f08079c91",
+      "bytes": 653,
+      "uncompressed_sha256": "4a9b8a22ff60c1b87d730e452c0daa4990bf3cf2b93f47c62eae74054ca7bf35",
+      "uncompressed_bytes": 1486
+    },
+    {
+      "file": "raw/captive-portal-20261020/build-captive.log.gz",
+      "sha256": "78816d75a6bcb2f6f0e3708fc64196cf6ff61d58fd20e34444ba094438b0afb6",
+      "bytes": 1404,
+      "uncompressed_sha256": "aa4be1311053cdd0e6a1688e7b1e526936d24f787d034492bb2ddce3e10c0183",
+      "uncompressed_bytes": 4184
+    },
+    {
+      "file": "raw/captive-portal-20261020/captive-qemu.log.gz",
+      "sha256": "7d3d3da5c4008655b3419cfc57d6a52eb132339f97ed5f7fc613df960e445ae3",
+      "bytes": 83,
+      "uncompressed_sha256": "60c9aa9c0d574d2fdbad406f45c97487b5a374dc07b4cb8e727e536ad8b690c9",
+      "uncompressed_bytes": 124
+    },
+    {
+      "file": "raw/captive-portal-20261020/original-setup-uart.log.gz",
+      "sha256": "a6ef962da4a3b18813d1ba81f969b1da3d4aca30ce4da526d834dce7b5a823e1",
+      "bytes": 927,
+      "uncompressed_sha256": "67b0e84fd4e9aa492a68b7a805bf7044b9b192a49a43ae751f1a24c849f1b84e",
+      "uncompressed_bytes": 2292
+    },
+    {
+      "file": "raw/captive-portal-20261020/reconstructed-setup-uart.log.gz",
+      "sha256": "3cd1b39effd1ac19c40756401ceb71bd8b7f6f901fc19d0b61bd8cdbba000516",
+      "bytes": 372,
+      "uncompressed_sha256": "9348e12f3c79fc1034480625b72d3ee0c4c09946997b538f80ccf71f4ae88fb8",
+      "uncompressed_bytes": 767
+    },
+    {
+      "file": "raw/captive-portal-20261020/reconstructed-clock-uart.log.gz",
+      "sha256": "fd3a2f172e0fe843e05888c4302c0495645633af9e8834d0009c04d3682d5592",
+      "bytes": 474,
+      "uncompressed_sha256": "ed2e06cf456be3a0a5d48fcf361e145470139618b3a044b0ba8e7d0caf041701",
+      "uncompressed_bytes": 1131
+    },
+    {
+      "file": "raw/captive-portal-20261020/integrity.json",
+      "sha256": "aa472424550168c32233d5524c8acf7758fdf62f926e3ad32f084af3fdc91c78",
+      "bytes": 341
+    }
+  ],
+  "artifact_integrity_cases": 6
+}
