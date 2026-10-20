@@ -76,7 +76,13 @@ are synthetic pressure stimuli; allocator NULL/success results are real.
 All five ELF allocator/free pointer initializers and 246 frozen source inputs
 were checked independently. This is not a full TLS handshake or radio workload.
 
-Full opt-in Clang passes; actual production application links remain necessary.
+The [seven production application exports](../tests/results/cyd-input-reclaim-20261020/SDK.md)
+pass from clean source `a1b9d5a1`: vendor/custom FLAC across all three output
+backends and one disabled PDM control. Actual ELF allocator initializers point
+to the wrapper in six enabled images and the original SDK allocator in the
+control; all seven retain ordinary SDK free. The only normalized configuration
+change from each matching baseline is the new reclaim bool. Hardware settings
+and task cores, priorities and stacks are preserved. Full opt-in Clang passes.
 Physical HTTP/HTTPS, radio/WebUI/OTA contention, largest blocks, stack margins
 and prolonged audio tests remain distinct. No requested-byte count, static
 map delta or emulator result is a claim of measured CYD heap savings.
@@ -85,5 +91,5 @@ The [host checkpoint](../tests/results/cyd-input-reclaim-20261020/README.md)
 passes 21 service/queue cases and 17 exact semantic controls, 12 startup
 configurations with four publication controls, and eight actual CMake helper
 configurations. The full opt-in Clang run covers 54 units, with 86 baseline
-warnings and no errors; the new service has no diagnostics. Production
-application exports remain the next separate gate.
+warnings and no errors; the new service has no diagnostics. Application links
+and saved firmware are qualified separately from physical acceptance.

@@ -49,8 +49,11 @@ publication, SMP pin/retirement and an immutable retry budget. The option stays
 default off. Host/service, actual startup and CMake guards pass; full opt-in
 Clang adds no warnings. The actual SDK/QEMU gate passes five cases and four
 exact semantic controls, including real allocator NULL/recovery and dual-core
-retirement/refill. Production application exports remain in progress, followed
-by physical qualification.
+retirement/refill. The [seven production exports](../tests/results/cyd-input-reclaim-20261020/SDK.md)
+pass from clean `a1b9d5a1`, including all vendor/custom output combinations and
+a disabled PDM control. ELF allocator/free words, configuration deltas, saved
+images, OTA capacity and unchanged task bindings were checked. Physical
+qualification remains open.
 
 The earlier [frozen proposal](../tests/results/cyd-http-request-buffer-20261020/plan/idle-input-reclaim/README.md)
 is retained as historical evidence from before implementation. Its status must
@@ -58,12 +61,13 @@ not be read as the current implementation checkpoint.
 
 ## Remaining work
 
-- Finish production application qualification for opt-in reclaim. The donor
-  bind-before-allocation order was not copied across
-  CYD startup rollback; runtime pool teardown is not introduced.
-- Audit and qualify any dynamic TLS/full-record RX reservation or early MPI
-  allocation policy against the pinned CYD SDK. Preserve complete TLS record
-  capacity and verify cleanup, OOM, reconnect and codec replacement.
+- Implement and qualify a CYD-specific TLS/full-record RX reservation and early
+  MPI policy after the [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
+  CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity
+  formula do not apply. Preserve the SDK full-record capacity expression,
+  ordinary allocator/free pairing and input reclaim; verify cleanup, OOM,
+  reconnect and concurrent clients. Early MPI requires actual first-use and
+  public-lock observations; the SDK void API does not offer recoverable OOM.
 - Measure internal/DMA heap, largest blocks, TLS peaks, stack margins and
   scheduler latency on CYD with TFT, network and audio active. Select input
   pool sizes, IRAM placement and stack changes from those results.
