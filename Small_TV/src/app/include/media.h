@@ -11,6 +11,7 @@ esp_err_t media_draw_photo(unsigned slot);
 esp_err_t media_draw_photo_cached(unsigned slot);
 void media_request_photo(unsigned slot);
 uint32_t media_photo_ready_mask(void);
+uint32_t media_photo_failed_mask(void);
 bool media_photo_idle(void);
 esp_err_t photo_upload_start_detailed(unsigned slot,uint32_t length,unsigned chunks,
                                     photo_diagnostic_t *diagnostic);

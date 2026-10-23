@@ -13,4 +13,5 @@ void photo_worker_forget(unsigned slot);
 void photo_worker_publish(unsigned slot,uint32_t length);
 void photo_worker_request(unsigned slot);
 uint32_t photo_worker_ready_mask(void);
+uint32_t photo_worker_failed_mask(void);
 bool photo_worker_idle(void);

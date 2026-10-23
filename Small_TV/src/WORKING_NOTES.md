@@ -2722,3 +2722,45 @@ durable-cache0write tests. Existing source/app/ELF hashes remain034287/BB7FD7/1D
 Then independent classic/simple/dial clock continuity under foreground decode,
 full target RAM/stack/time/format/fault, reset/power-cut, lifecycle/churn,
 whole-image/full/24h/hardware. Goal active; no physical actions, no push.
+
+## 2026-10-23 — next-photo prefetch complete
+
+Current source prepares only the next eligible round-robin slot at fade0/2;
+no unrelated decode starts in phases1/3/4/5. Initial request only for photo theme.
+Shared bounded next_photo helper preserves valid stock selection; stable failed
+current lengths skip, transient I/O/memory/cancel retry. No new sleeps. Native
+failure getter exposed through media; GUI waits for valid pending target rather
+than jumping to a ready later source. Same-length upload still clears failure.
+
+FINAL6077 native +privacy,12inventory controls,6unsafe compiled policy mutants,
+13440literal factory/current RV32 fade/selection traces and6artifact pass.
+Audit217app/532total. New target AppABF14143 /ELF896558F5 /source64EDEEF9,
+1466800bytes/69200free,DEBUGoff; saved firmware/development archive. Assets1032119B,
+layout44268211/codecB33BC0A1/libraryD690 unchanged. Old timing fails isolated new
+criterion before correction (retained23.389901 >stock20.565822).
+
+Five final owned cold QEMU processes stopped/reaped: all28frames, night22/4cycles,
+none4, damaged-first22, true durable cold28.104frames/5990400pixels exact,
+17report negative controls. First5.560901guest sec (pilot5.619954), present1;
+cold2.251859,0JPEG program/erase attempts. Z1 traps actual unique flash_program/
+flash_erase addresses, checked against exact ELF by machine model; whole4MiB
+also unchanged in cold fixture. Cold before EXACT warm after, no NVS/settings
+reseed. Damaged source0 SOI byte intentionally0, valid slots1..4 continue in order.
+All warm runs preserve photos/boot/immutable/protected, only declared NVS/prefs/
+generated candidates may differ. This is LCD/storage/timing, NOT network/RF gate.
+
+Proof qemu/parity/photo-prefetch-validation-20261023.json, tests/PHOTO_PREFETCH.md;
+verify_photo_prefetch_evidence.py reconstructs10full images and104RGB surfaces.
+Only~0.8MB new compressed evidence,184old payloads reused. Source/app/ELF/QEMU/
+raw hashes pinned. All exec handles55183/38683/1272/98601/28063/74933/61342 terminal0;
+no owned VM remains. Production unchanged after successful target build.
+
+NEXT: classic/simple/dial clock continuity during actual foreground decode,
+complete CURRENT target JPEG memory/stack/format/fault/refusal matrix. Existing
+photo_owner_qemu workflow can requalify current HTTP/resource policy, but its
+simple WeatherHTTP1.0 fixture caused timeouts earlier: use actual persistent
+weather_qemu WeatherFixture, keep network/display gates separate. Then real
+upload/decode/journal reset/power-cut, clients/reconnect/churn, whole-image
+indirect-call audit/full/24h/hardware. Earlier HTTP proofs belong to earlier app
+hashes, do not relabel. SDK/frozen QEMU unchanged, no physical actions/no push.
+Goal remains active. Finish focused commit of this checkpoint, then continue.

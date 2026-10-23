@@ -215,3 +215,14 @@ bool photo_worker_idle(void)
     if(!enabled || media_upload_active() || xSemaphoreTake(codec_mutex,0)!=pdTRUE)return false;
     xSemaphoreGive(codec_mutex);return true;
 }
+
+uint32_t photo_worker_failed_mask(void)
+{
+    /* Never make an old failed length hide a newly committed source. Retryable
+     * I/O, allocator pressure and cancellation do not enter failed_lengths. */
+    tv_settings_t settings;settings_snapshot(&settings);uint32_t mask=0;
+    portENTER_CRITICAL(&state_lock);
+    for(unsigned slot=0;slot<PHOTO_COUNT;++slot)
+        if(settings.photo_size[slot] && failed_lengths[slot]==settings.photo_size[slot])mask|=1u<<slot;
+    portEXIT_CRITICAL(&state_lock);return mask;
+}

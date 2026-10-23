@@ -205,6 +205,12 @@ bool media_photo_idle(void)
     return photo_worker_idle();
 }
 
+uint32_t media_photo_failed_mask(void)
+{
+    /* Only stable refusals for the still-current source may be skipped by UI. */
+    return photo_worker_failed_mask();
+}
+
 static uint16_t little16(const uint8_t *data)
 {
     /* Read a little-endian 16-bit asset-header field. */

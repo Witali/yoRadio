@@ -28,6 +28,7 @@
 #include "freertos/FreeRTOS.h"
 #include "lwip/sockets.h"
 #include "../app/media/photo_worker.h"
+#include "factory_photo.h"
 
 static unsigned checks;
 #define CHECK(condition) do {++checks;if (!(condition)) {fprintf(stderr,"Check failed at %s:%d: %s\n",__FILE__,__LINE__,#condition);exit(1);}} while (0)
@@ -662,6 +663,7 @@ static void test_advanced_page(void)
 #include "http_captive.inc"
 #include "city_theme.inc"
 #include "photo_owner.inc"
+#include "photo_prefetch.inc"
 
 static void digest(const void *data,size_t bytes,char output[65])
 {
@@ -742,7 +744,9 @@ int main(int argc,char **argv)
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
     test_settings();test_theme_requests();test_city_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_advanced_page();test_uploads();test_multipart();test_dns();test_http_captive();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
-    test_photo_owner_lifetime();test_photo_owner_stale();test_photo_owner_retry();test_extended_photos(argv[3]);
+    test_photo_owner_lifetime();test_photo_owner_stale();test_photo_owner_retry();
+    test_photo_prefetch_policy();test_photo_prefetch_failed_source();test_photo_prefetch_cancel_retry();
+    test_extended_photos(argv[3]);
     CHECK(async_open==0);
     if(argc>=3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);

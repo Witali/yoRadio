@@ -4089,3 +4089,44 @@ Production firmware/SDK/frozen QEMU не менялись; на плате де�
 tests/PHOTO_CACHE_FRAMES.md, proof qemu/parity/photo-cache-frames-validation-20261023.json.
 Полный target JPEG memory/stack/format/fault, clock continuity, actual power-cut,
 network lifecycle/churn, whole-image audit/full/24h/hardware остаются открытыми.
+
+## 2026-10-23 — следующий кеш без задержки первого фото
+
+Исправлена измеренная задержка23.389901guest sec: раньше worker готовил все5slots,
+renderer ждал всю очередь. Теперь display/factory_photo_prefetch выбирает только
+следующий eligible source; photo_prepare_next запрашивает его при fade0/2.
+В фазах1/3/4/5 новая обработка не начинается. После последней фазы готовим
+следующий снимок в паузе до timer event. Валидный pending target не пропускается
+ради готового более позднего; invalid/empty источники можно пропустить. Worker
+публикует stable failure только для current length, transient read/memory/cancel
+остаются retryable. Same-length upload инвалидирует readiness/failure как прежде.
+Новых sleeps/software delays нет. Общий selector сохранён в display module.
+
+6077native +privacy/12inventory controls pass; real worker damaged/current-length/
+read-retry/cancel-no-writes/retry cases.6compiled unsafe policies падают на assertions,
+normal control проходит.13440literal factory/current RV32 transitions совпали по
+outputs/state/duty/completion across32masks/6phases/5slots.6artifact pass.217app/
+532total inventory не доказывает full-image equivalence.
+
+Actual current main:5owned/reaped cold processes,104wholeframes/5990400pixels exact.
+All-photo first5.560901sec (pilot5.619954), presentmask1 — другие cache ещё не готовы.
+Stock reference20.565822; old timing отдельно падает на новом критерии. Mask10
+включает настоящий unsynced→night sync; source0 с испорченным SOI пропускается,
+slots1..4 сохраняют порядок.17negative report controls pass.
+
+Durable cold process получает EXACT flash после warm process без reseed/NVS reset.
+First2.251859sec; hardware breakpoints на уникальных actual JPEG flash_program/
+flash_erase не сработали,0attempts. Все candidate bytes и весь4MiB unchanged.
+Во всех warm случаях source photos/boot/immutable/protected сохранены. Это
+LCD/storage/timing gate, не HTTP/RF/physical или clock continuity остальных тем.
+
+AppABF14143 /ELF896558F5 /source64EDEEF9,1466800bytes/69200free,DEBUGoff. Production
+archive сохранён; assets1032119B/layout44268211/codecB33BC0A1/libraryD690 прежние.
+tests/PHOTO_PREFETCH.md; qemu/parity/photo-prefetch-validation-20261023.json.
+Independent verifier восстанавливает104RGB surfaces и10physical images, проверяет
+hashes/protected/cold identity. Около0.8MB новых compressed данных,184payloads reuse.
+
+Далее current classic/simple/dial continuity при foreground decode, полный target
+JPEG memory/stack/format/fault, HTTP resource/lifecycle/churn, actual publication
+power cuts, whole-image/full/24h/hardware. Старые HTTP результаты на новую app
+не переносить. Physical/SDK/frozen QEMU действий нет; цель остаётся активной.

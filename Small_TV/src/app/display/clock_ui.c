@@ -105,6 +105,20 @@ static struct tm factory_local_time(const char *country, time_t now, bool *valid
     return local;
 }
 
+static bool photo_prepare_next(const tv_settings_t *settings,const factory_photo_t *slideshow,uint32_t *present)
+{
+    /* FIXED_RECONSTRUCTION: preload only the next round-robin source while
+     * idle. Do not let valid-but-unprepared photos be skipped at selection or
+     * let unrelated warm-up jobs stall an already visible fade. */
+    uint32_t configured=0,failed=media_photo_failed_mask();
+    for(unsigned slot=0;slot<PHOTO_COUNT;++slot)
+        if(settings->photo_size[slot])configured|=1u<<slot;
+    *present=media_photo_ready_mask()&~failed;
+    int slot=factory_photo_prefetch(slideshow,settings->photo_mask,configured,*present,failed);
+    if(slot<0)return false;
+    media_request_photo((unsigned)slot);return true;
+}
+
 static void clock_task(void *unused)
 {
     /* Run the startup/setup/theme state machine and factory animation/fade timers.
@@ -260,13 +274,12 @@ static void clock_task(void *unused)
             }
             else if (settings.theme == 2)
             {
-                for (unsigned slot = 0; slot < PHOTO_COUNT; ++slot)
-                    if (settings.photo_size[slot] && (settings.photo_mask & (1u << slot)))
-                        media_request_photo(slot);
-                uint32_t present = media_photo_ready_mask();
+                uint32_t present;
+                bool preparing=photo_prepare_next(&settings,&slideshow,&present);
                 factory_photo_action_t action;
                 factory_photo_step(&slideshow, settings.photo_mask, present,
-                                   (ticks.pending & TV_TIMER_PHOTO) || reset_theme, !media_photo_idle(), &action);
+                                   (ticks.pending & TV_TIMER_PHOTO) || reset_theme,
+                                   preparing || !media_photo_idle(), &action);
                 if (action.set_duty)
                     backlight_set_level(action.duty);
                 if (action.photo >= -1)
@@ -315,7 +328,9 @@ void clock_ui_start(void)
     /* Start the sole task that owns normal clock rendering. */
 
     tv_settings_t initial; settings_snapshot(&initial);
-    for (unsigned slot = 0; slot < PHOTO_COUNT; ++slot)
-        if (initial.photo_mask & (1u << slot)) media_request_photo(slot);
+    if(initial.theme==2) {
+        factory_photo_t first={0};uint32_t present;
+        photo_prepare_next(&initial,&first,&present);
+    }
     configASSERT(xTaskCreate(clock_task, "clock_display", 4096, NULL, 2, NULL) == pdPASS);
 }

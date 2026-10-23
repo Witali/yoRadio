@@ -5,6 +5,7 @@ Network fixtures only permit ordinary startup; HTTP/RF acceptance is separate.
 """
 import argparse
 import datetime as dt
+import gzip
 import json
 from pathlib import Path
 import socket
@@ -25,7 +26,8 @@ import weather_qemu as weather
 
 CASES = [dict(name='all-photos', mask=31, cycles=5, day=0, night_mode=0, night=500),
          dict(name='masked-night', mask=10, cycles=2, day=100, night_mode=1, night=500),
-         dict(name='none-dark', mask=0, cycles=1, day=1000, night_mode=0, night=500)]
+         dict(name='none-dark', mask=0, cycles=1, day=1000, night_mode=0, night=500),
+         dict(name='bad-first', mask=31, cycles=4, day=0, night_mode=0, night=500, bad_slots=1)]
 
 
 def native_entries():
@@ -58,7 +60,7 @@ def native_entries():
         return {name: symbol['st_value'] for name, symbol in symbols.items()}, max(calls)
 
 
-def exercise(options, output, case, symbols, loop_end):
+def exercise(options, output, case, symbols, loop_end, cold_from=None):
     """Observe complete steps without modifying running guest code, RAM, PC or time.
 
     FIXED_TEST: fast photo startup may finish two fades before the SDK's first
@@ -75,10 +77,12 @@ def exercise(options, output, case, symbols, loop_end):
 
     def seed(data, firmware, state, yoradio, station_ssid=None):
         """Set only the disposable flash copy's synthetic factory-format preferences."""
+        if cold_from is not None:return cold_from.read_bytes()
         data = bytearray(compare.seed_settings(data, firmware, state, yoradio, station_ssid))
         for offset, value in ((0x180, case['day']), (0x190, case['night_mode']),
                               (0x19c, case['night']), (0x1a0, 5)):
             struct.pack_into('<I', data, 0x3e7000+offset, value)
+        if case.get('bad_slots'):data[0x200000]=0 # Deliberate invalid source, excluded from immutable guard.
         return data
 
     vm.seed_clock_network = seed
@@ -89,6 +93,7 @@ def exercise(options, output, case, symbols, loop_end):
                                 'persistent': True, 'paused': True, 'gdb_port': port})
     output.mkdir(parents=True, exist_ok=False)
     report = {'passed': False, 'samples': [], 'checks': {}, 'case': case, 'waiting_samples': []}
+    report['cold_from_sha256'] = vm.digest(cold_from.read_bytes()) if cold_from is not None else None
     session = observer = None
     kernel = handle = None
     immutable = None
@@ -111,6 +116,12 @@ def exercise(options, output, case, symbols, loop_end):
         reference = PhotoMachine('factory', dump, assets, dependency_root=Path(options.dependency_root))
         observer = Observer(port)
         observer.socket.settimeout(90)
+        if cold_from is not None:
+            # These are the JPEG platform's actual raw program/erase callbacks,
+            # not NVS writes. Any attempt is an unexpected breakpoint stop and
+            # fails the test BEFORE the operation can be issued to flash.
+            for name in ('flash_program','flash_erase'):observer.breakpoint(symbols[name])
+            report['cold_write_traps'] = {name:symbols[name] for name in ('flash_program','flash_erase')}
         entry = symbols['factory_photo_step']
         expected_state = None
         remaining = 4+(case['cycles']-1)*6
@@ -137,8 +148,11 @@ def exercise(options, output, case, symbols, loop_end):
                 state = list(observer.memory(state_pointer, 2))
                 mask, present = observer.register(11), observer.register(12)
                 event, blocked = bool(observer.register(13)), bool(observer.register(14))
-                if event and not blocked and state[0] == 2 and present & mask != mask:
-                    raise AssertionError('A valid enabled photo is being skipped before its cache is ready')
+                reference_mask = mask & ~case.get('bad_slots',0)
+                order = [(state[1]+step)%5 for step in range(5)]
+                wanted = next((slot for slot in order if reference_mask & (1<<slot)),None)
+                if event and not blocked and state[0] == 2 and wanted is not None and not present & (1<<wanted):
+                    raise AssertionError('The next valid photo is being skipped before its cache is ready')
                 address = socket.inet_ntoa(observer.memory(symbols['last_station_address'], 4))
                 target = loop_end
                 synced = bool(observer.memory(symbols['time_synced'], 1)[0])
@@ -179,7 +193,9 @@ def exercise(options, output, case, symbols, loop_end):
                     raise AssertionError('Actual fade/selection sequence differs from literal factory state')
                 if mask != case['mask']:
                     raise AssertionError('Guest did not load the requested photo mask')
-                replay = reference.advance(*state, mask, address)
+                # Invalid input is a declared factory correction: skip the
+                # synthetic damaged source, not a pixel/difference mask.
+                replay = reference.advance(*state, reference_mask, address)
                 expected_state = [replay['fade'], replay['next_slot']]
                 actual_state = list(observer.memory(state_pointer, 2))
                 if actual_state != expected_state:
@@ -204,6 +220,7 @@ def exercise(options, output, case, symbols, loop_end):
                        'restore_calendar': restoration, 'time_synced_at_entry': synced,
                        'compared_pixels': 57600, 'guest_seconds': weather.virtual_seconds(qmp),
                        'present_mask': present,
+                       'intentional_bad_slots': case.get('bad_slots',0),
                        'code_unchanged': True, 'qemu_rgb_sha256': vm.digest(actual),
                        'replayed_rgb_sha256': vm.digest(expected),
                        'passed': not different and light['high_duty'] == expected_duty and
@@ -231,7 +248,7 @@ def exercise(options, output, case, symbols, loop_end):
                             ({2, 3, 4, 5} if case['cycles'] == 1 else set(range(6))),
                             'hardware_breakpoints_only': True, 'no_guest_state_writes': True})
         selected = [slot for row in report['samples'] for slot in row['selected']]
-        enabled = [slot for slot in range(5) if case['mask'] & (1 << slot)]
+        enabled = [slot for slot in range(5) if case['mask'] & ~case.get('bad_slots',0) & (1 << slot)]
         expected_order = [enabled[index % len(enabled)] for index in range(observed_cycles)] if enabled else []
         report['checks']['photo_order'] = selected == expected_order
         report['cycles_observed'] = observed_cycles
@@ -258,6 +275,12 @@ def exercise(options, output, case, symbols, loop_end):
             report['checks']['executable_media_unchanged'] = immutable is not None and all(
                 vm.digest(flash[a:b]) == sha for (a, b), sha in zip(ranges, immutable))
             report['checks']['no_panic'] = clean_uart(output)
+            if cold_from is not None:
+                before = cold_from.read_bytes()
+                report['checks']['cold_cache_no_program_or_erase_attempts'] = True
+                report['checks']['cold_cache_candidates_exact'] = all(
+                    before[r['offset']:r['offset']+r['bytes']] == flash[r['offset']:r['offset']+r['bytes']]
+                    for r in plan['candidate_extents'])
             report['passed'] &= all(report['checks'].values())
         vm.seed_clock_network = previous_seed
         compare.CURRENT_THEME, compare.CURRENT_PHOTO_MASK = previous_theme, previous_mask
@@ -305,6 +328,15 @@ def main():
                                         'manifest.json', 'source-manifest.json', 'assets-manifest.json', 'jpeg-cache-plan.json')]
     paths += [ROOT/'Small_TV/assets/manifest.json']
     paths += [ROOT/'Small_TV/full-flash.bin']
+    timing_proof = ROOT/'Small_TV/qemu/parity/photo-cache-frames-validation-20261023.json'
+    timing = json.loads(timing_proof.read_text())
+    timing_raw = next(r for r in timing['raw'] if r['source'].endswith('/factory-first/photo-frames-report.json'))
+    timing_blob = next(r for r in timing['blobs'] if r['sha256'] == timing_raw['sha256'])
+    timing_path = timing_proof.parent/timing_blob['file']
+    factory_data = gzip.decompress(timing_path.read_bytes())
+    assert vm.digest(factory_data) == timing_raw['sha256']
+    factory = json.loads(factory_data);assert factory['passed']
+    paths += [timing_proof, timing_path]
     paths += sorted((ROOT/'Small_TV/assets/photos').glob('*.jpg'))
     fingerprints = [{'file': path.relative_to(ROOT).as_posix(), 'sha256': vm.digest(path.read_bytes())} for path in paths]
     helpers = {name: vm.digest((args.qemu_root/'tools'/name).read_bytes()) for name in
@@ -317,12 +349,16 @@ def main():
         'profile_sha256': vm.digest(Path(options.hardware_profile).read_bytes()), 'test_inputs': fingerprints,
         'frozen_inputs': frozen, 'flows': {}, 'scope': __doc__, 'all_functionality_verified': False,
         'complete_display_matrix': len(cases) == len(CASES),
+        'factory_first_photo_seconds': factory['samples'][0]['guest_seconds'],
         'network_acceptance': False, 'rf_tested': False, 'hardware_tested': False}
     try:
         report['flows']['reconstructed'] = {}
         for case in cases:
             report['flows']['reconstructed'][case['name']] = exercise(options,
                 args.output/('reconstructed-'+case['name']), case, symbols, loop_end)
+        if report['complete_display_matrix']:
+            warm = args.output/'reconstructed-all-photos/flash.bin'
+            report['cold'] = exercise(options,args.output/'reconstructed-cold',CASES[0],symbols,loop_end,cold_from=warm)
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

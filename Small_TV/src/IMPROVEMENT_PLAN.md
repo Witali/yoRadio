@@ -88,6 +88,19 @@ immutable flash сохранены. Это не clock continuity других т
 Pixel gate pass не закрывает этот timing gap, полный JPEG target matrix,
 clock continuity, power-cut/network lifecycle/whole-image/full/24h/hardware.
 
+Следующий checkpoint: [next-photo prefetch](tests/PHOTO_PREFETCH.md) закрывает
+измеренный startup gap. Первый native кадр теперь5.560901guest sec (pilot5.619954)
+вместо23.389901; готовится только следующий eligible source между fades, damaged
+source пропускается, transient I/O/cancel/memory retry сохраняется.6077native/
+privacy,12inventory controls,6compiled unsafe policies,13440executed RV32 selector/
+fade transitions и6artifact pass. Actual appABF14143:5owned/reaped processes,
+104полныхкадра/5990400pixels exact, включая damaged-first и настоящий cold cache.
+Cold first2.251859sec, ни одной попытки JPEG program/erase, весь4MiB unchanged.
+App/ELF/source/runs привязаны к новому proof. Это photo LCD/storage/timing gate;
+другие clock themes during foreground decode, полный target RAM/stack/format/
+fault matrix, HTTP/network lifecycle/churn, power cuts, whole-image/full/24h/
+hardware остаются открытыми. Старые HTTP/decoder проверки не переносить на новую app.
+
 Checkpoint 2026-10-20: реализован portable NOR core с 4 KiB cache, sparse mapping,
 sector RMW и read-back verification. 3000 random operations, 83 injected partial
 failures, 7 реальных layout stores и 6 compiled mutation controls прошли.

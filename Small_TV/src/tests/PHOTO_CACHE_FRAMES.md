@@ -1,5 +1,8 @@
 # Current main: cache-backed photo LCD
 
+Historical image checkpoint below. The measured startup delay is fixed and
+qualified by the newer [next-photo prefetch checkpoint](PHOTO_PREFETCH.md).
+
 Checkpoint 2026-10-23, app `034287C7`, production source unchanged from
 `f2909c553`. This is an independent LCD gate. Local station/weather/SNTP fixtures
 permit normal boot; their availability is not a network or RF acceptance claim.

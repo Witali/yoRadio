@@ -99,6 +99,7 @@ static void test_photo_owner_retry(void)
     CHECK(source_read_faults==faults+1 && source_read_fault_after==0);
     CHECK(!(media_photo_ready_mask()&1));
     received=InterlockedCompareExchange(&photo_test_queue->receive_entered,0,0);
+    CHECK(!(media_photo_failed_mask()&1));
     photo_worker_request(0);photo_test_drain(received+1);
     CHECK(media_photo_ready_mask()&1);
 }

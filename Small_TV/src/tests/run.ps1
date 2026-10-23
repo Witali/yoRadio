@@ -26,6 +26,7 @@ $hostLibrary=(Get-Content -LiteralPath (Join-Path $jpegRoot 'selection.json') -R
 & $PythonPath -B (Join-Path $project 'tools/prepare_resources.py') --output $resources --jpeg-library-build $hostLibrary
 if ($LASTEXITCODE) {throw "Resource generation failed"}
 $sources=@("tests/native_test.c","app/settings/settings.c","app/settings/factory_settings.c","app/services/weather_parser.c","app/text/text.c","app/media/assets.c","app/media/photo_upload.c","app/media/photo_codec.c","app/media/photo_worker.c","tests/native_photo_platform.c","app/media/color_convert.c","codec/jpeg_privacy.c","codec/jpeg_baseline.c","codec/jpeg_decoder.c","codec/jpeg_memory.c","codec/jpeg_backing.c","codec/jpeg_coefficients.c","storage/jpeg_nor.c","storage/jpeg_guard.c","storage/jpeg_provision.c","storage/jpeg_transport.c","storage/jpeg_scratch.c","storage/jpeg_journal.c","storage/jpeg_cache.c","app/network/dns_packet.c","app/web/server.c","app/web/request_body.c","app/web/settings_api.c","app/web/photo_api.c","app/web/photo_async.c","third_party/tjpgd/tjpgd.c","third_party/cjson/cJSON.c")
+$sources+="app/display/factory_photo.c"
 $arguments=@("/nologo","/std:c11","/W3","/D_CRT_SECURE_NO_WARNINGS","/DCJSON_NESTING_LIMIT=16","/DJPEG_STATIC")
 foreach($include in @("tests/stubs","app/include","codec","storage","third_party/tjpgd","third_party/cjson")) {$arguments+='/I"'+(Join-Path $project $include)+'"'}
 $arguments+='/I"'+$resources+'"'
