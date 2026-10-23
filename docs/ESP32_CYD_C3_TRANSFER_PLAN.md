@@ -174,6 +174,10 @@ allocation и численные настройки C3 являются канд
   а не полная квалификация стандарта. Остальные gaps: численная корректность
   D16 sequence1/floor0/wide и прочие форматы.
   Полное G6 открыто; bridge в radio не подключён.
+  [Public consumer zero guards отложены](CYD_PUBLIC_BOOK_ZERO_GUARD_DEFERRED_20261023.md):
+  исходный SDK unit даёт365 точных векторов, host UBSan фиксирует34 недопустимых
+  zero-magnitude сдвига. Автоматическая проверка остановила подготовку отдельной
+  правки; ноль guarded runtime случаев квалифицировано, обход не предпринимался.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
   Затем полный Clang, три backend exports и физическая приёмка.
@@ -1076,3 +1080,14 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Manifest `85ba3fc45f3a8892f22601b3b6b9adf696e47d518c432a6f41015af8234fb57e`.
   Source/ABI/stream core0 и decode/output core1 сохранены. Полные G1–G8,
   floor0/wide/sequence1 numerical gaps, radio/resource/physical gates открыты.
+
+- 2026-10-23, CYD-C3-14/G6: [public zero-guard successor отложен](CYD_PUBLIC_BOOK_ZERO_GUARD_DEFERRED_20261023.md).
+  После законченного исходного baseline (SDK36/365/439 exact, host331 exact
+  и34 UBSan NONPASS) автоматическая проверка остановила подготовку отдельной
+  копии с двумя zero-magnitude guards: «This content was flagged for possible
+  cybersecurity risk». Конкретное основание не сообщено. Root остановил peer
+  review этого шага; запрос не переформулирован и не передан другому агенту
+  для обхода. Draft не подключён к firmware; guarded controls/materialization/
+  host/SDK не запускались root и ноль новых guarded runtime случаев принято.
+  Уже выполненные baseline отчёты сохраняются независимо, без переоценки
+  host34 как ожидаемого PASS. Причина vendor PCM этим не установлена.
