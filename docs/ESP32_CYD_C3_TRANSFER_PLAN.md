@@ -174,9 +174,11 @@ allocation и численные настройки C3 являются канд
   а не полная квалификация стандарта. Остальные gaps: численная корректность
   D16 sequence1/floor0/wide и прочие форматы.
   Полное G6 открыто; bridge в radio не подключён.
+  [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
+  сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
+  Xtensa векторов; host331 точный вектор и34 UBSan NONPASS остаются отдельно.
   [Public consumer zero guards отложены](CYD_PUBLIC_BOOK_ZERO_GUARD_DEFERRED_20261023.md):
-  исходный SDK unit даёт365 точных векторов, host UBSan фиксирует34 недопустимых
-  zero-magnitude сдвига. Автоматическая проверка остановила подготовку отдельной
+  автоматическая проверка остановила подготовку отдельной
   правки; ноль guarded runtime случаев квалифицировано, обход не предпринимался.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
@@ -1091,3 +1093,21 @@ Stream остаётся на core0, decode/output на core1 с прежними
   host/SDK не запускались root и ноль новых guarded runtime случаев принято.
   Уже выполненные baseline отчёты сохраняются независимо, без переоценки
   host34 как ожидаемого PASS. Причина vendor PCM этим не установлена.
+
+- 2026-10-23, CYD-C3-14/G6: [public owned-book consumer baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
+  полностью сохранён.26 source controls и materialization проходят; SDK6.0.2/
+  Xtensa завершил14 команд,36 canonical publications,365 точных Fraction
+  векторов и439 protocol events, compiler diagnostics0. Отдельный host ASan/
+  UBSan прогон выполнил365 вызовов:331 доступный вектор точен,34 завершились
+  oversized-shift диагностикой в исходном публичном C. Полный host результат
+  остаётся NONPASS; точность target не доказывает переносимость C или причину
+  прежних vendor PCM расхождений. Исходник Tremor/лицензия/неизменённая арифметика,
+  две явно выделенные unit-only zero-float пробы и все реальные отказы сохранены.
+  [Offline проверка](../tests/results/cyd-vorbis-public-book-consumer-baseline-verification-20261023/README.md)
+  проходит до/после create-only promotion, повторно из другого cwd. Standalone
+  архив1739 файлов/9221016 байт,1738 identity rows,20 binary omissions;
+  manifest `a9d1e10fea01b75c5df0f0880dfafc26c2a69f941064420ccb7f19cf782c67d4`.
+  Старые numerical reports и законченный guard proposal — record-only;
+  отложенный guarded draft не включён, не применён и не квалифицирован.
+  Production source/ABI/stream core0/decode-output core1 сохранены; fullG6,
+  radio/resource/physical gates и прежние отложенные пункты остаются открытыми.

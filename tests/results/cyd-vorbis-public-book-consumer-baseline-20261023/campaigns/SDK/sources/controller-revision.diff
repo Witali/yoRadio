@@ -1,0 +1,228 @@
+--- predecessor/run-owned-book-unit.py
++++ run-public-book-consumer.py
+@@ -1,4 +1,4 @@
+-"""Run the exact owned parser/vector unit, never the vendor decoder or radio."""
++"""Run only exact canonical owned publication plus the retained public consumer baseline."""
+ import argparse
+ import hashlib
+ import json
+@@ -12,19 +12,26 @@
+ 
+ sys.dont_write_bytecode = True
+ from owned_qmp import capture
+-from protocol import load_contract, validate_log
++from protocol import validate_sdk
+ from windows_compile_command import macro_command, check_macro_inputs
+ 
+ SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+-CONTRACT_SHA = '394b82d8c21b1e895e74e51cd56d13e547ef0790b9df226a70f24656035be1ce'
++CONTRACT_FILE_SHA = 'a50a9350ac681f58d18774455127714b8d2ce195430b873c746d7b2b79374c48'
++MODEL_SHA = '92a9c6ba03892f6e6637b5e6cf5889e5cf0defe92e6d5357e40120acad66d8ff'
++RUNTIME_READINESS_SHA = 'c5b554bc0df7c566742c0d9ceeb157fdf81116d93426c22e73adf04af9d8cc77'
++SOURCE_READINESS_SHA = '6d009ae122974c4993ab88e8befc350f40077d9095d14e85f784c8a9ef40e6bc'
+ PINS = {
+-    'project/main/book_unit.c': '84db13b6965bdb17e25454338fa09c03823431e3cc8bc04bfe279bc814c7185c',
+-    'project/main/unit_data.h': '53ba437570aba1b930b15a7b80d95ac7b1c8e26781aa75374b4de414443d1f64',
+-    'project/main/pinned/production/vorbis_repair/setup.c': '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c',
+-    'project/main/pinned/production/vorbis_repair_abi.h': 'e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60',
+-    'protocol.py': 'c87b344b9ad84af3434e8e13f82560e988490c85edcdc53cbc8888553f5ce21c',
+-    'fixture-contract.json': CONTRACT_SHA,
+-    'windows_compile_command.py': '1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d',
++    "project/main/consumer_unit.c": "728b46c501d26c70ac8de37374e6b1d98a34bd62035c01e8a257030cbad88471",
++    "project/main/consumer_data.h": "0e7fe555d413f82419a7688e549cb6d153cf5867fc67a0e2ec5c394a5735ce67",
++    "project/main/consumer_port.inc": "2660e256f14857b0aaa0f7104071796bc8095fa01c8eb1f87da82bdd116b696f",
++    "project/main/pinned/production/vorbis_repair/setup.c": "6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c",
++    "project/main/pinned/production/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
++    "protocol.py": "a28abe38bf7f8f757073dd9d56d6c1f41679d23dca0125a1f61dc090ac1d9f72",
++    "oracle.py": "38ed33532e8cf0e4f7a76aad6650ab144b72e7df4d54168c807e39f2f9ea97d5",
++    "contract.json": "a50a9350ac681f58d18774455127714b8d2ce195430b873c746d7b2b79374c48",
++    "generated-runtime-readiness.json": "c5b554bc0df7c566742c0d9ceeb157fdf81116d93426c22e73adf04af9d8cc77",
++    "unit-source/readiness.json": "6d009ae122974c4993ab88e8befc350f40077d9095d14e85f784c8a9ef40e6bc",
++    "windows_compile_command.py": "1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d"
+ }
+ TOOL_PINS = {
+     'host_python': '4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a',
+@@ -38,8 +45,8 @@
+     'compiler': '20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5',
+     'nm': '20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5',
+ }
+-FORBIDDEN_LINK = re.compile(r'libesp_audio_(?:codec|simple_dec)\.a|esp-adf-libs|--wrap[=, ]+esp_vorbis', re.I)
+-FORBIDDEN_SYMBOL = re.compile(r'(?:__wrap_|__real_)?(?:esp_vorbis_dec_\w+|esp_audio_(?:simple_)?dec_\w+)|repair_(?:vorbis_open|vorbis_register)')
++FORBIDDEN_LINK = re.compile(r'libesp_audio_(?:codec|simple_dec)\.a|esp-adf-libs|--wrap[=, ]+esp_vorbis|lib(?:i?vorbis(?:file)?|ogg)\.a', re.I)
++FORBIDDEN_SYMBOL = re.compile(r'(?:__wrap_|__real_)?(?:esp_vorbis_dec_\w+|esp_audio_(?:simple_)?dec_\w+)|repair_(?:vorbis_open|vorbis_register)|vorbis_synthesis_\w+|ov_\w+')
+ 
+ 
+ def need(value, reason):
+@@ -49,6 +56,19 @@
+ 
+ def sha(path):
+     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
++
++
++def load_contract(path):
++    need(sha(path) == CONTRACT_FILE_SHA, 'Exact generated contract file bytes')
++    value = json.loads(Path(path).read_bytes())
++    digest = hashlib.sha256(json.dumps(value['model'], sort_keys=True, separators=(',', ':')).encode()).hexdigest()
++    need(value['contract_sha256'] == digest == MODEL_SHA, 'Exact canonical model digest separate from raw contract file SHA')
++    model = value['model']
++    need(model['schema'] == 'public-owned-book-consumer-model-v1' and
++         (model['case_count'], model['codeword_probes'], model['vector_calls']) == (36, 123, 365) and
++         all(model[k] is False for k in ('physical_device', 'vendor_decoder', 'PCM', 'full_G6_qualified')),
++         'Exact finite36/123/365 owned public consumer model')
++    return value
+ 
+ 
+ def dependency_paths(raw, cwd):
+@@ -105,7 +125,7 @@
+     readiness = here / 'readiness.json'
+     need(sha(readiness) == args.readiness_sha256, 'Independently reviewed source readiness differs')
+     manifest = json.loads(readiness.read_bytes())
+-    need(manifest['schema'] == 'owned-book-runtime-source-only-readiness-v1'
++    need(manifest['schema'] == 'public-book-consumer-runtime-source-only-readiness-v1'
+          and manifest['runtime_executed'] is False, 'Require the reviewed source-only readiness')
+     actual_files = {p.relative_to(here).as_posix() for p in here.rglob('*') if p.is_file()}
+     need(actual_files == set(manifest['files']) | {'readiness.json'}, 'Complete source preparation file set changed')
+@@ -122,10 +142,15 @@
+     for name, path in runtime_tools.items():
+         need(path.is_file() and sha(path) == TOOL_PINS[name], 'Reviewed public tool identity differs: ' + name)
+     out.mkdir(parents=True, exist_ok=False)
+-    report = dict(schema='owned-book-runtime-v1', result='INCOMPLETE', passed=False, completed=False,
+-        source_compile_link_qualified=False, owned_parser_public_vector_qualified=False,
++    report = dict(schema='public-book-consumer-SDK-runtime-v1', result='INCOMPLETE', completed=False,
++        source_compile_link_qualified=False, actual_canonical_SDK_publication_completed=False,
++        complete_Fraction_comparison=False, all_Fraction_vectors_equal=False,
++        host_sanitizers_qualified=False, host_sanitizer_facts='NOT_EVALUATED_BY_THIS_SDK_CONTROLLER',
++        public_arithmetic_portability_qualified=False, full_standard_qualified=False, vendor_cause_diagnosed=False,
+         vendor_backend_qualified=False, PCM_qualified=False, full_G6_qualified=False,
+         physical_qualified=False, production_radio_integration=False,
++        source_readiness_sha256=SOURCE_READINESS_SHA, generated_runtime_readiness_sha256=RUNTIME_READINESS_SHA,
++        contract_file_sha256=CONTRACT_FILE_SHA, canonical_model_sha256=MODEL_SHA,
+         readiness_sha256=args.readiness_sha256, inputs={}, tools={}, commands=[], build_outputs={})
+     env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1',
+                PYTHONNOUSERSITE='1', GIT_OPTIONAL_LOCKS='0')
+@@ -235,14 +260,28 @@
+                 freeze(path, rel)
+         for path in runtime_tools.values():
+             report['tools'][str(path.resolve())] = sha(path)
+-        contract = load_contract(out / 'sources/fixture-contract.json', expected_sha256=CONTRACT_SHA)
+-        need(contract['model']['case_count'] == 16 and contract['model']['probe_count'] == 61,
+-             'Exact reviewed full unit contract')
++        contract = load_contract(out / 'sources/contract.json')
++        runtime_readiness = json.loads((out / 'sources/generated-runtime-readiness.json').read_bytes())
++        need(sha(out / 'sources/generated-runtime-readiness.json') == RUNTIME_READINESS_SHA and
++             runtime_readiness['schema'] == 'public-book-consumer-generated-runtime-readiness-v1' and
++             runtime_readiness['source_readiness_sha256'] == SOURCE_READINESS_SHA and
++             all(runtime_readiness[k] is False for k in ('compiled', 'target_executed', 'host_executed')),
++             'Exact source-only generated runtime readiness')
++        for item in runtime_readiness['files']:
++            path = out / 'sources' / item['path']
++            need(path.resolve().is_relative_to(out / 'sources') and sha(path) == item['sha256'] and
++                 path.stat().st_size == item['bytes'], 'Every frozen actual generated-runtime member')
+         origins = json.loads((out / 'sources/source-origins.json').read_bytes())
+-        for item in origins['inputs']:
++        for index, item in enumerate(origins['inputs']):
+             path = out / 'sources' / item['snapshot']
+             need(path.resolve().is_relative_to(out / 'sources') and sha(path) == item['sha256']
+                  and path.stat().st_size == item['bytes'], 'Frozen source origin identity differs')
++            original_path = Path(item['source']).resolve()
++            need(original_path.is_relative_to(repo) and original_path.is_file() and
++                 sha(original_path) == item['sha256'] and original_path.stat().st_size == item['bytes'],
++                 'Pinned immutable original source origin differs')
++            if str(original_path) not in report['inputs']:
++                freeze(original_path, Path('original-origins') / f'{index:04d}' / original_path.name)
+         for name in ('export.ps1', 'tools/idf.py', 'tools/cmake/version.cmake', 'tools/cmake/toolchain-esp32.cmake',
+                      'tools/cmake/toolchain.cmake', 'components/freertos/Kconfig', 'components/freertos/CMakeLists.txt'):
+             freeze(sdk / name, Path('sdk') / name)
+@@ -272,7 +311,7 @@
+             need(sha(path) == expected and (name == 'ninja' or expected == TOOL_PINS[name]), 'Actual pre-build tool identity')
+             report['tools'][str(path)] = expected
+         rows = json.loads((build / 'compile_commands.json').read_bytes())
+-        source = out / 'sources/project/main/book_unit.c'
++        source = out / 'sources/project/main/consumer_unit.c'
+         source_for = lambda row: (Path(row['directory']) / row['file']).resolve()
+         own = [row for row in rows if source_for(row).is_relative_to(out / 'sources/project')]
+         need(len(own) == 1 and source_for(own[0]) == source, 'Only our frozen unit TU may compile in the project')
+@@ -299,7 +338,7 @@
+         dependency_argv = argv[:-2] + ['-M']
+         dep_text = execute('unit-dependencies-before', dependency_argv, cwd=cwd)
+         dependencies = dependency_paths(dep_text, cwd)
+-        needed = {source, out / 'sources/project/main/unit_data.h',
++        needed = {source, out / 'sources/project/main/consumer_data.h', out / 'sources/project/main/consumer_port.inc',
+             out / 'sources/project/main/pinned/production/vorbis_repair/setup.c',
+             out / 'sources/project/main/pinned/production/vorbis_repair_abi.h', build / 'config/sdkconfig.h'}
+         needed.update((out / 'sources/project/main/pinned/codec/include' / name).resolve() for name in
+@@ -325,19 +364,23 @@
+         need(raw_elf[:7] == b'\x7fELF\x01\x01\x01' and struct.unpack_from('<H', raw_elf, 18)[0] == 94,
+              'Actual ELF32 little-endian Xtensa machine94 required')
+         symbols = execute('symbols', [nm, '-n', '-S', elf])
+-        for symbol in ('repair_vorbis_book_unpack', 'repair_vorbis_book_clear', 'app_main'):
++        for symbol in ('repair_vorbis_book_unpack', 'repair_vorbis_book_clear', 'decode_packed_entry_number', 'public_decode_map', 'app_main'):
+             need(re.search(r'^[0-9a-f]+\s+[0-9a-f]+\s+[tT]\s+' + symbol + r'$', symbols, re.M), 'Actual retained unit/parser symbol: ' + symbol)
+         actual_names = [line.split()[-1] for line in symbols.splitlines() if line.split()]
+         need(not any(FORBIDDEN_SYMBOL.fullmatch(name) for name in actual_names), 'Vendor decoder/register/wrapper symbol entered linked ELF')
+         map_path = elf.with_suffix('.map')
+         map_text = map_path.read_text(encoding='utf-8', errors='replace')
+-        need('book_unit.c.obj' in map_text and not FORBIDDEN_LINK.search(map_text), 'Actual map must bind our TU without vendor archives/link wraps')
++        need('consumer_unit.c.obj' in map_text and 'public_decode_map' in map_text and
++             'repair_vorbis_book_unpack' in map_text and not FORBIDDEN_LINK.search(map_text), 'Actual map must bind our TU without vendor archives/link wraps')
+         commands = execute('ninja-commands', [ninja, '-C', build, '-t', 'commands', desc['app_elf']])
+         need(not FORBIDDEN_LINK.search(commands) and '--gc-sections' in commands
+-             and 'book_unit.c' in commands and desc['app_elf'] in commands, 'Actual generated compile/link command closure')
++             and 'consumer_unit.c' in commands and desc['app_elf'] in commands, 'Actual generated compile/link command closure')
+         verbose = (out / 'sdk-build.stdout.log').read_text(encoding='utf-8', errors='replace')
+-        need('book_unit.c' in verbose and desc['app_elf'] in verbose and '--gc-sections' in verbose
++        need('consumer_unit.c' in verbose and desc['app_elf'] in verbose and '--gc-sections' in verbose
+              and not FORBIDDEN_LINK.search(verbose), 'Verbose actual build must retain unit compile and link execution commands')
++        report['compiler_diagnostics'] = {
++            stream: re.findall(r'^.*(?:warning:|error:).*$' , (out / ('sdk-build.' + stream + '.log')).read_text(encoding='utf-8', errors='replace'), re.M)
++            for stream in ('stdout', 'stderr')}
+         for path in (elf, app, map_path, build / 'flasher_args.json'):
+             bind_output(path)
+         recipe = json.loads((build / 'flasher_args.json').read_bytes())
+@@ -367,26 +410,35 @@
+         need(row['lifecycle_qualified'] is True and row['exit_status'] == 0 and not row['force_stopped'],
+              'Real QMP shutdown/owned terminal closure required before any full unit validation')
+         stderr = (out / 'qemu.stderr.log').read_text(encoding='utf-8', errors='replace')
+-        observed = validate_log(serial + '\n' + stderr, contract,
+-            returncode=row['exit_status'], timed_out=row['timed_out'], interrupted=row['interrupted'])
+-        need(observed['cases'] == 16 and observed['active_codewords'] == 59 and observed['vector_probes'] == 61
+-             and observed['protocol_lines'] == 97 and observed['owned_parser_public_vector_qualified'] is True,
+-             'Exact16 books/61 probes/97events required after actual terminal0')
++        observed = validate_sdk(serial + '\n' + stderr, contract)
++        need(observed['actual_canonical_SDK_publication_completed'] is True and
++             observed['complete_Fraction_comparison'] is True and len(observed['fields']) == 36 and
++             len(observed['vectors']) == 365 and observed['protocol_events'] == 439 and
++             observed['host_sanitizers_qualified'] is False and observed['vendor_cause_diagnosed'] is False,
++             'Exact36 publications/123 probes/365 Fraction calls/439records after actual QMP terminal0')
+         report['observed'] = observed
+         need(execute('sdk-head-after', [git, '-C', sdk, 'rev-parse', 'HEAD']).strip() == SDK_HEAD, 'SDK revision changed')
+         need(not execute('sdk-clean-after', [git, '-C', sdk, 'status', '--porcelain', '--untracked-files=no']).strip(), 'SDK changed')
+         current()
+         need(all(c['exit_status'] == 0 and not c['timed_out'] and not c['interrupted'] and not c['force_stopped']
+                  for c in report['commands']), 'Every owned actual command must finish normally')
+-        report.update(result='OWNED_BOOK_PUBLIC_VECTOR_UNIT_PASSED', passed=True, completed=True,
+-                      owned_parser_public_vector_qualified=True, declared_inputs_tools_configs_unchanged=True)
++        equal = observed['all_Fraction_vectors_equal']
++        need(type(equal) is bool, 'Actual complete numerical equality classification')
++        report.update(result='PUBLIC_BOOK_CONSUMER_SDK_DIAGNOSTICS_RECORDED', completed=True,
++            actual_canonical_SDK_publication_completed=True, complete_Fraction_comparison=True,
++            all_Fraction_vectors_equal=equal, unequal_calls=observed['unequal_calls'],
++            numerical_result='EXACT_FRACTION_EQUAL' if equal else 'EXACT_FRACTION_NONPASS',
++            declared_inputs_tools_configs_unchanged=True)
+         save()
+-        print(json.dumps({k:report[k] for k in ('result', 'passed', 'completed', 'source_compile_link_qualified',
+-            'owned_parser_public_vector_qualified', 'vendor_backend_qualified', 'PCM_qualified', 'full_G6_qualified', 'physical_qualified')}))
+-        return 0
++        print(json.dumps({k:report[k] for k in ('result', 'completed', 'source_compile_link_qualified',
++            'actual_canonical_SDK_publication_completed', 'complete_Fraction_comparison', 'all_Fraction_vectors_equal',
++            'host_sanitizers_qualified', 'public_arithmetic_portability_qualified', 'vendor_backend_qualified',
++            'PCM_qualified', 'full_G6_qualified', 'physical_qualified')}))
++        return 0 if equal else 1
+     except BaseException as exc:
+         report.update(result='INTERRUPTED' if isinstance(exc, KeyboardInterrupt) else 'NONPASS',
+-            passed=False, completed=False, owned_parser_public_vector_qualified=False, error=repr(exc))
++            completed=False, actual_canonical_SDK_publication_completed=False, complete_Fraction_comparison=False,
++            all_Fraction_vectors_equal=False, error=repr(exc))
+         try:
+             current()
+             report['declared_inputs_tools_configs_unchanged'] = True

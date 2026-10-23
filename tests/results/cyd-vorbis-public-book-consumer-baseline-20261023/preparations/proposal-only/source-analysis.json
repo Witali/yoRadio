@@ -1,0 +1,152 @@
+{
+  "schema": "public-book-consumer-zero-sentinel-source-diagnosis-v1",
+  "source_only": true,
+  "inputs": [
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-prep-02/consumer_port.inc",
+      "bytes": 3221,
+      "sha256": "2660e256f14857b0aaa0f7104071796bc8095fa01c8eb1f87da82bdd116b696f"
+    },
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-prep-02/readiness.json",
+      "bytes": 36956,
+      "sha256": "6d009ae122974c4993ab88e8befc350f40077d9095d14e85f784c8a9ef40e6bc"
+    },
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-prep-02/oracle.py",
+      "bytes": 9106,
+      "sha256": "38ed33532e8cf0e4f7a76aad6650ab144b72e7df4d54168c807e39f2f9ea97d5"
+    },
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-prep-02/public-original/codebook.c",
+      "bytes": 21321,
+      "sha256": "0cfcbdadd7a491bc6bb7c24a2e7d3ed6ce9fb9360122b93631d205fcdf5ac749"
+    },
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-prep-02/public-original/codebook.h",
+      "bytes": 2408,
+      "sha256": "88c0cffdfaf4ad0e9143f6c9e99ee9e6d69703ac544655c91e01ae12afcb4172"
+    },
+    {
+      "path": "idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c",
+      "bytes": 37508,
+      "sha256": "6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c"
+    },
+    {
+      "path": "idf/esp32-cyd2usb-native/main/vorbis_repair_abi.h",
+      "bytes": 19182,
+      "sha256": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60"
+    },
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-host-01/report.json",
+      "bytes": 566172,
+      "sha256": "8289faff1ab23e749035ba912feefc58263c39b06f26f87689dd04fcb528c999"
+    },
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-runtime-01/contract.json",
+      "bytes": 242639,
+      "sha256": "a50a9350ac681f58d18774455127714b8d2ce195430b873c746d7b2b79374c48"
+    },
+    {
+      "path": ".build/cyd-vorbis-public-book-consumer-host-01-command.json",
+      "bytes": 1691,
+      "sha256": "79adf7db0e86d0c5ae78e084143ad37746b1277ea0aa3237f759b946e48be22f"
+    }
+  ],
+  "actual_baseline": {
+    "root_terminal_chunk": "708824",
+    "exit_code": 1,
+    "commands": 366,
+    "codeword_point_calls": 365,
+    "sanitizer_clean_and_Fraction_equal": 331,
+    "UBSan_missing_vectors": 34
+  },
+  "trace": [
+    {
+      "case": 32,
+      "id": "floor0-even6-r0-s64-l256",
+      "q_bits": 5,
+      "q_min": 0,
+      "q_minp": -9999,
+      "q_del": 33554432,
+      "q_delp": -29,
+      "sequence": 0,
+      "declared_points": [
+        -8,
+        -24
+      ],
+      "minimum_point_differences": [
+        9991,
+        9975
+      ],
+      "delta_point_differences": [
+        21,
+        5
+      ],
+      "missing_vectors": 4
+    },
+    {
+      "case": 34,
+      "id": "ordered_lattice_d2_seq0-unit-delta0",
+      "q_bits": 2,
+      "q_min": -1073741824,
+      "q_minp": -30,
+      "q_del": 0,
+      "q_delp": -9997,
+      "sequence": 0,
+      "declared_points": [
+        0,
+        -8,
+        -24
+      ],
+      "minimum_point_differences": [
+        30,
+        22,
+        6
+      ],
+      "delta_point_differences": [
+        9997,
+        9989,
+        9973
+      ],
+      "missing_vectors": 15
+    },
+    {
+      "case": 35,
+      "id": "ordered_lattice_d2_seq0-unit-min0-delta0",
+      "q_bits": 2,
+      "q_min": 0,
+      "q_minp": -9999,
+      "q_del": 0,
+      "q_delp": -9997,
+      "sequence": 0,
+      "declared_points": [
+        0,
+        -8,
+        -24
+      ],
+      "minimum_point_differences": [
+        9999,
+        9991,
+        9975
+      ],
+      "delta_point_differences": [
+        9997,
+        9989,
+        9973
+      ],
+      "missing_vectors": 15
+    }
+  ],
+  "diagnosis": "zero magnitude point sentinel used as a signed32 shift count in retained public consumer",
+  "independent_PUBLIC_C_bug_diagnosed": true,
+  "opaque_vendor_effect_or_cause_known": false,
+  "actual_SDK_baseline_completed": false,
+  "proposed_diff_only": true,
+  "guarded_C_source_or_runtime_written": false,
+  "production_or_ABI_changed": false,
+  "baseline_results_rewritten": false,
+  "missing_vectors_treated_as_expected_PASS": false,
+  "source_agent_prepared_code_or_compiler_execution": false,
+  "source_agent_PCM_or_reference_decoder_execution": false
+}

@@ -1,0 +1,11 @@
+--- .build/cyd-vorbis-public-book-consumer-prep-01/run_host.py
++++ .build/cyd-vorbis-public-book-consumer-prep-02/run_host.py
+@@ -58,7 +58,7 @@
+             path=output/(name+'.'+stream+'.log');path.write_bytes(data);row[stream]=dict(path=path.name,bytes=len(data),sha256=sha(data))
+         row['elapsed_seconds']=time.monotonic()-start;save();return row,stdout,stderr
+     save();main=runtime/'project/main';binary=output/('consumer-baseline.exe' if os.name=='nt' else 'consumer-baseline')
+-    flags=['-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer']
++    flags=['-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer','-fno-pie','-no-pie']
+     build,_,_=child('compile',[str(compiler),*flags,'-I',str(main),str(main/'consumer_unit.c'),'-o',str(binary)],120)
+     result['compile_flags']=flags
+     if not build['terminal'] or build.get('returncode')!=0:

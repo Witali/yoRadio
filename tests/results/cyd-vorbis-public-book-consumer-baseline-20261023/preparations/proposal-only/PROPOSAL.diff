@@ -1,0 +1,22 @@
+--- .build/cyd-vorbis-public-book-consumer-prep-02/consumer_port.inc
++++ PROPOSAL-ONLY/consumer_port.inc
+@@ -135,12 +135,17 @@
+   {
+     int shiftM=point-s->q_delp;
+     ogg_int32_t add=point-s->q_minp;
+-    if(add>0)
++    if(s->q_min==0)
++      add=0;
++    else if(add>0)
+       add= s->q_min >> add;
+     else
+       add= s->q_min << -add;
+ 
+-    if(shiftM>0)
++    if(s->q_del==0)
++      for(i=0;i<s->dim;i++)
++        v[i]=add;
++    else if(shiftM>0)
+       for(i=0;i<s->dim;i++)
+ 	v[i]= add + ((v[i] * s->q_del) >> shiftM);
+     else

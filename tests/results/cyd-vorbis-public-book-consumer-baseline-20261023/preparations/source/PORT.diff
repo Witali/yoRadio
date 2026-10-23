@@ -1,0 +1,20 @@
+--- .build/cyd-vorbis-public-book-consumer-prep-01/public-original/consumer-fragment.inc
++++ .build/cyd-vorbis-public-book-consumer-prep-01/consumer_port.inc
+@@ -86,7 +86,7 @@
+   return(-1);
+ }
+ 
+-int decode_map(codebook *s, oggpack_buffer *b, ogg_int32_t *v, int point){
++static int public_decode_map(codebook *s, oggpack_buffer *b, ogg_int32_t *v, int point){
+   ogg_uint32_t entry = decode_packed_entry_number(s,b);
+   int i;
+   if(oggpack_eop(b))return(-1);
+@@ -116,7 +116,7 @@
+   }
+   case 3:{
+     /* offset into array */
+-    void *ptr=s->q_val+entry*s->q_pack;
++    void *ptr=(unsigned char *)s->q_val+entry*s->q_pack;
+ 
+     if(s->q_bits<=8){
+       for(i=0;i<s->dim;i++)
