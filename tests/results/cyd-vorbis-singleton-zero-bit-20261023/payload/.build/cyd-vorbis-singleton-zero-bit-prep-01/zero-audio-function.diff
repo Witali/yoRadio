@@ -1,0 +1,44 @@
+--- prior-independent-witness:parse_audio-original-only
++++ independent-zero-witness:parse_zero_audio
+@@ -1,24 +1,25 @@
+-def parse_audio(raw, book, packet, check_wire_pattern=True):
+-    r = Reader(raw); r.exact(1, 0, 'audio_packet_type'); r.exact(1, MODES[packet], 'audio_mode')
+-    if MODES[packet]:
+-        r.exact(1, MODES[packet - 1], 'previous_window'); r.exact(1, MODES[packet + 1], 'next_window')
++def parse_zero_audio(raw, book, packet):
++    """Adapted explicit-zero parser; original parse_audio stays unchanged/original-only."""
++    r = prior.Reader(raw); r.exact(1, 0, 'audio_packet_type'); r.exact(1, prior.MODES[packet], 'audio_mode')
++    if prior.MODES[packet]:
++        r.exact(1, prior.MODES[packet - 1], 'previous_window'); r.exact(1, prior.MODES[packet + 1], 'next_window')
+     for _ in range(2):
+         r.exact(1, 1, 'floor_present'); r.exact(8, 255, 'floor_y0'); r.exact(8, 255, 'floor_y1')
+     classes = [r.take(1) for _ in range(2)]
+-    need(classes == [(packet + channel) % 2 for channel in range(2)], 'both_classwords_before_tokens')
+-    entry = singleton_id(book['lengths']); step = 16 // book['dimensions']; token_first = r.position
+-    wires, selected, residues = [], [], []
+-    values = table(book)
+-    for channel in range(2):
+-        wire = [r.take(1) for _ in range(step)]  # Both branches map to the sole ORIGINAL entry.
+-        if check_wire_pattern:
+-            need(wire == [(packet + channel + vector) % 2 for vector in range(step)], 'actual_singleton_wire_pattern')
+-        wires.append(wire); selected.append([entry] * step)
+-        residues.append(interleave0([values[entry] for _ in range(step)], book['dimensions']))
++    need(classes == [(packet + c) % 2 for c in range(2)], 'both_classwords_before_tokens')
++    need(book['lookup_type'] == 1 and book['dimensions'] == 16, 'exact_zero_control_map1_shape')
++    entry = prior.singleton_id(book['lengths']); token_first = r.position
++    wires, selected, residues, positions = [], [], [], []
++    values = prior.table(book)
++    for _ in range(2):
++        positions.append(r.position)
++        wire = r.exact(1, 0, 'preferred_singleton_token_must_be_zero')
++        wires.append([wire]); selected.append([entry])
++        residues.append(prior.interleave0([values[entry]], 16))
+     used = r.position
+-    need(used == 38 + 2 * MODES[packet] + 2 * step, 'one_bit_per_singleton_token')
++    need(used == 40 + 2 * prior.MODES[packet], 'one_bit_per_singleton_token')
+     report = r.finish()
+     need(all(any(v) and max(map(abs, v)) <= 16 for v in residues), 'actual_bounded_nonzero_spectrum')
+     return dict(classwords=classes, vector_entry_ids=selected, residue_vectors=residues,
+-        one_bit_per_single_entry=True, used_bits=used, token_bits=used - token_first, token_count=2 * step,
+-        padding_bits=report['padding_bits'], single_entry_wire_bits=wires), report+        one_bit_per_single_entry=True, used_bits=used, token_bits=used - token_first, token_count=2,
++        padding_bits=report['padding_bits'], single_entry_wire_bits=wires), report, positions

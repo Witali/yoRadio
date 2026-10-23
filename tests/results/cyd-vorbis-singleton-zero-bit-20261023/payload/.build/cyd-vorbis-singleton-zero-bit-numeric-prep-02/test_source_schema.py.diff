@@ -1,0 +1,86 @@
+--- /dev/null
++++ .build/cyd-vorbis-singleton-zero-bit-numeric-prep-02/test_source_schema.py
+@@ -0,0 +1,83 @@
++"""Real zero8 source metadata shape and rejection controls; no PCM or raw I/O."""
++import copy
++import json
++from pathlib import Path
++import unittest
++
++from source_schema import FILE_KINDS, RAW_KINDS, source_file_fact
++
++HERE = Path(__file__).resolve().parent
++
++
++class SourceSchemaControls(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.cases = json.loads((HERE / 'source-schema-cases.json').read_bytes())['cases']
++
++    def case(self): return copy.deepcopy(self.cases[0])
++
++    def test_all8_real_source_shapes_return_all40_exact_size_hash_facts(self):
++        self.assertEqual(len(self.cases), 8)
++        for case in self.cases:
++            before = copy.deepcopy(case)
++            for kind in FILE_KINDS:
++                with self.subTest(case=case['id'], kind=kind):
++                    self.assertEqual(source_file_fact(case, kind), case['files'][kind])
++            self.assertEqual(case, before)
++
++    def test_actual_ogg_uses_file_fact_without_separate_ogg_hash(self):
++        for case in self.cases:
++            self.assertNotIn('ogg_sha256', case)
++            self.assertNotIn('ogg', case['raw_sha256'])
++            self.assertEqual(source_file_fact(case, 'ogg'), case['files']['ogg'])
++
++    def test_all_four_raw_hash_mismatches_rejected_even_when_asking_for_ogg(self):
++        for kind in RAW_KINDS:
++            case = self.case(); case['raw_sha256'][kind] = '0' * 64
++            with self.subTest(kind=kind):
++                with self.assertRaisesRegex(RuntimeError, 'raw SHA256 identity must agree'):
++                    source_file_fact(case, 'ogg')
++
++    def test_missing_file_fact_not_recovered_from_other_hash_fields(self):
++        case = self.case(); del case['files']['ogg']; case['ogg_sha256'] = 'a' * 64
++        with self.assertRaises(RuntimeError): source_file_fact(case, 'ogg')
++
++    def test_missing_or_invented_raw_hash_kind_rejected(self):
++        for missing in (True, False):
++            case = self.case()
++            if missing: del case['raw_sha256']['comment']
++            else: case['raw_sha256']['ogg'] = case['files']['ogg']['sha256']
++            with self.assertRaises(RuntimeError): source_file_fact(case, 'ogg')
++
++    def test_zero_negative_noninteger_and_boolean_sizes_rejected(self):
++        for value in (0, -1, 717.0, True, '717', None):
++            case = self.case(); case['files']['ogg']['bytes'] = value
++            with self.subTest(value=value):
++                with self.assertRaises(RuntimeError): source_file_fact(case, 'ogg')
++
++    def test_invalid_hashes_rejected_without_case_or_length_repair(self):
++        for value in ('', 'a' * 63, 'A' * 64, 'g' * 64, None, 1):
++            case = self.case(); case['files']['ogg']['sha256'] = value
++            with self.subTest(value=value):
++                with self.assertRaises(RuntimeError): source_file_fact(case, 'ogg')
++
++    def test_missing_extra_and_malformed_file_fact_fields_rejected(self):
++        for fact in ({'sha256': 'a' * 64}, {'bytes': 717},
++                     {'bytes': 717, 'sha256': 'a' * 64, 'path': 'elsewhere.ogg'}, [], None):
++            case = self.case(); case['files']['ogg'] = fact
++            with self.assertRaises(RuntimeError): source_file_fact(case, 'ogg')
++
++    def test_unsupported_kind_and_missing_maps_rejected(self):
++        for kind in ('wav', 'pcm', 'OGG', '', None):
++            with self.assertRaises(RuntimeError): source_file_fact(self.case(), kind)
++        for field in ('files', 'raw_sha256'):
++            case = self.case(); del case[field]
++            with self.assertRaises(RuntimeError): source_file_fact(case, 'ogg')
++
++    def test_fact_return_is_copy_and_does_not_change_pinned_metadata(self):
++        case = self.case(); before = copy.deepcopy(case)
++        actual = source_file_fact(case, 'ogg'); actual['bytes'] += 1
++        self.assertEqual(case, before)
++
++
++if __name__ == '__main__': unittest.main()

@@ -1,0 +1,20 @@
+--- .build/cyd-vorbis-more-singletons-runtime-prep-01/materialize.py
++++ .build/cyd-vorbis-singleton-zero-bit-runtime-prep-01/materialize.py
+@@ -21,7 +21,7 @@
+ 
+ def base_module():
+     need(digest(BASE_PATH.read_bytes()) == BASE_SHA, "corrected25_materializer_pin")
+-    spec = importlib.util.spec_from_file_location("more_singletons8_corrected25_materializer", BASE_PATH)
++    spec = importlib.util.spec_from_file_location("singleton_zero8_corrected25_materializer", BASE_PATH)
+     module = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(module)  # Definitions only; original guarded main never runs.
+     return module
+@@ -144,7 +144,7 @@
+             observed.append(dict(name=name, rejected=True, exact_reason=reason))
+         else:
+             raise RuntimeError("control_accepted:" + name)
+-    report = dict(schema="more_singletons8-pure-materialization-v1", completed=True, source_verified=True,
++    report = dict(schema="singleton_zero8-pure-materialization-v1", completed=True, source_verified=True,
+         counts=dict(cases=cases, arrays=cases * 5, full_raw_payload_arrays=cases * 3,
+             packets=contract["model"]["total_packets"], expected_pcm_bytes=pcm,
+             descriptor_capacity=cases, case_mask=contract["model"]["case_mask"]),

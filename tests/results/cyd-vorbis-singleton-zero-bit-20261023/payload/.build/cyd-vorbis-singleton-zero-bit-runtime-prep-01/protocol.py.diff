@@ -1,0 +1,35 @@
+--- .build/cyd-vorbis-more-singletons-runtime-prep-01/protocol.py
++++ .build/cyd-vorbis-singleton-zero-bit-runtime-prep-01/protocol.py
+@@ -6,6 +6,7 @@
+ 
+ PREFIX = "CYD_VORBIS_CHECKED_CORPUS_"
+ MAX_CASES, PACKETS = 31, 14
++CASE_IDS = ('map1_dense_single_d16_seq0', 'map1_dense_single_d16_seq1', 'map1_sparse_single_d16_seq0', 'map1_sparse_single_d16_seq1', 'map1_dense_single_d16_seq0_wire0', 'map1_dense_single_d16_seq1_wire0', 'map1_sparse_single_d16_seq0_wire0', 'map1_sparse_single_d16_seq1_wire0')
+ 
+ 
+ def need(condition, message):
+@@ -49,8 +50,8 @@
+     frames = [0] + [(a + b) // 4 for a, b in zip(blocks, blocks[1:])]
+     pcm = [n * channels * 2 for n in frames]
+     need(max(pcm) <= 16384 and sum(pcm) == case["expected_s16le_bytes"] and sum(frames) == case["expected_raw_samples"], "overlap totals")
+-    declared = case.get("expected_packet_samples", case.get("expected_packet_frames"))
+-    need(declared == frames, "declared frame counts")
++    need(case["expected_packet_samples"] == case["expected_packet_frames"] == frames and
++         case["expected_packet_s16le_bytes"] == case["expected_packet_pcm_bytes"] == pcm, "declared frame/PCM counts")
+     transitions = [4] + [a * 2 + b for a, b in zip(modes, modes[1:])]
+     need(set(transitions[1:]) == {0, 1, 2, 3}, "all four transitions")
+     return dict(id=case["id"], source_index=source_index, rate=rate, channels=channels,
+@@ -70,10 +71,12 @@
+         pins.append(dict(path=str(path), sha256=source["sha256"]))
+         facts.append(dict(path=str(path), bytes=len(data), sha256=sha(data)))
+         matrix = json.loads(data)
++        need(len(matrix["cases"]) == 4, "four unchanged cases in each original/zero selection required")
+         for case in matrix["cases"]:
+             item, raw_facts = inspect_case(case, path.parent, source_index)
+             cases.append(item); facts.extend(raw_facts)
+-    need(1 <= len(cases) <= MAX_CASES and len({c["id"] for c in cases}) == len(cases), "bounded distinct named cases")
++    need(len(cases) == 8 <= MAX_CASES and tuple(c["id"] for c in cases) == CASE_IDS and
++         [c["source_index"] for c in cases] == [0] * 4 + [1] * 4, "exact complete8 original4 then zero4 required")
+     model = dict(schema="public-vorbis-corpus-contract-v1", manifest_sha256=[p["sha256"] for p in pins],
+                  cases=cases, total_packets=len(cases) * PACKETS,
+                  total_pcm=sum(c["total_pcm"] for c in cases), case_mask=(1 << len(cases)) - 1)

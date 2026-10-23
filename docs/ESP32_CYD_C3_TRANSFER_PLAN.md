@@ -162,15 +162,17 @@ allocation и численные настройки C3 являются канд
   sequence0/1 и D16 sequence0, dense/sparse map1 D16 sequence0 имеют max1;
   все три D16 sequence1 дают max65535. Полное численное сравнение8 — NONPASS,
   хотя обе equal triples и все4 sequence-difference пары проходят на CYD/Xiph.
-  Четыре дополнительных zero-bit контроля подтверждены Xiph и FFmpeg native
-  с max1; исходные bit1 map1 случаи FFmpeg по-прежнему отклоняет. Target этих
-  zero-контролей не запускался; исходные случаи и NONPASS сохранены.
+  [Исходные4/preferred-zero4 на CYD](../tests/results/cyd-vorbis-singleton-zero-bit-20261023/CHECKPOINT.md)
+  теперь проверены полным raw8 прогоном:112 пакетов/225280 PCM байт. Все4 target
+  и4 Xiph пары совпадают побайтно. Численное сравнение12 доступных эталонов
+  остаётся NONPASS: sequence0 max1, sequence1 max65535; смена кодового бита
+  ошибку не устраняет. Native принимает новые4, исходные4 по-прежнему отклоняет.
   [Полный mono/stereo/mapping21 checkpoint](../tests/results/cyd-vorbis-mono-mapping-20261023/CHECKPOINT.md)
   проходит на Xtensa/core1:294 пакета/464640 PCM байт, все42 сравнения с двумя
   эталонами имеют max1 при прежнем проектном пределе2. Проверены9 mono/12 stereo
   случаев, девять частот, coupling, два submap и residue2. Это конечный корпус,
   а не полная квалификация стандарта. Остальные gaps: численная корректность
-  D16 sequence1/floor0/wide, preferred-zero target и прочие форматы.
+  D16 sequence1/floor0/wide и прочие форматы.
   Полное G6 открыто; bridge в radio не подключён.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
@@ -999,7 +1001,8 @@ Stream остаётся на core0, decode/output на core1 с прежними
   всех4 original/zero пар совпадает, включая прежние qualified original4.
   Native принимает новые4 zero случая с max1; исходные4 map1 отказывает как
   прежде. Исходный/совместный dual NONPASS сохранён; текст Operation not permitted
-  не устанавливает OS/security причину. Zero target не запускался.
+  не устанавливает OS/security причину. В рамках этого checkpoint zero target
+  ещё не запускался; отдельный полный target8 результат записан ниже.
   [Offline проверка](../tests/results/cyd-vorbis-more-singletons-verification-20261023/README.md)
   прошла до/после byte-exact promotion. Архив1969 файлов/9925574 байта требует
   только явно закреплённые8 shared entries committed CYD map2; прежние25/wide/
@@ -1048,3 +1051,28 @@ Stream остаётся на core0, decode/output на core1 с прежними
   выбирает prebuilt archives отдельно по IDF_TARGET; исходный патч алгоритмов
   для этих случаев не найден. Версии библиотек и точные ABI/archive guards
   сохранены; замена версии не считается готовым исправлением.
+
+- 2026-10-23, CYD-C3-14/G6: [полный исходный4/preferred-zero4 target](../tests/results/cyd-vorbis-singleton-zero-bit-20261023/CHECKPOINT.md)
+  завершил9 SDK/QEMU команд на Xtensa/core1:8 случаев/112 пакетов/225280 PCM
+  байт/251 events/mask255, compiler warnings0. Все исходные raw/header/carrier
+  байты и56 заменённых bits/224 token observations сохранены. Все4 target
+  и4 Xiph original/zero пары совпадают побайтно. Полные12 сравнений измерены:
+  Xiph maxima1/65535/1/65535/1/65535/1/65535, native новых4 —1/65535/1/65535.
+  Фиксированный проектный предел2 не изменён; measurement02 завершён1 как
+  complete numerical NONPASS. Смена бита не устраняет D16 sequence1; причина
+  opaque backend этим не установлена. Исходные4 native packet refusals и пустые
+  WAV сохранены, полного8 dual pass нет. Controls28/30/44/54 проходят отдельно.
+  Первая numerical schema ошибка (`ogg_sha256` вместо `files.ogg.sha256`) сохранена
+  как input rejection; immutable successor02 меняет только file-fact reader
+  и добавляет10 содержательных проверок схемы, сохраняя metric/policy.
+  [Offline проверка](../tests/results/cyd-vorbis-singleton-zero-bit-verification-20261023/README.md)
+  проходит до/после byte-exact promotion, второй раз из другого cwd. Первая
+  упаковка ошибочно требовала отсутствующий OLD construction.json; successor02
+  исправил план, successor03 удалил ту же ссылку из verifier metadata tuple.
+  Обе actual ошибки/исходники/журналы и stage02 manifest сохранены отдельно;
+  новые source gates проверяют63 пути и реальные поля исходного manifest.
+  Архив1926 файлов/13063045 байт требует только8 явно закреплённых shared
+  entries committed CYD map2; прежние numerical кампании не переигрывались.
+  Manifest `85ba3fc45f3a8892f22601b3b6b9adf696e47d518c432a6f41015af8234fb57e`.
+  Source/ABI/stream core0 и decode/output core1 сохранены. Полные G1–G8,
+  floor0/wide/sequence1 numerical gaps, radio/resource/physical gates открыты.

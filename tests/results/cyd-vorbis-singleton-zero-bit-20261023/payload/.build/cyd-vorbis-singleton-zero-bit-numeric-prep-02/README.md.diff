@@ -1,0 +1,35 @@
+--- .build/cyd-vorbis-singleton-zero-bit-numeric-prep-01/README.md
++++ .build/cyd-vorbis-singleton-zero-bit-numeric-prep-02/README.md
+@@ -1,4 +1,8 @@
+-# Source-only singleton zero8 numerical preparation
++# Source-only singleton zero8 numerical preparation 02
++
++Preparation 01 and its actual failure remain immutable under `provenance/prep01` and `provenance/actual01`. All 44 original controls actually passed (exit 0, chunk c230da; receipt `c85a1a77650b1eb1f82d2a267bee8aec7f95f4a795fd4eb364f780ec96360c32`). Numerical attempt01 ended with exit 1 / chunk b93b2c / `INPUT_OR_MEASUREMENT_REJECTED`, `KeyError: ogg_sha256`, empty case results and measurement false (report `1bb67ee06ccb018ae99dc86798b3a0f22936ae97095611e8df5570f914efc5fc`). It failed before the first target/reference metric comparison. It had already validated target PCM and normally replayed reference PCM inside the binder; this is not a claim that the attempt read no PCM.
++
++The sole functional correction uses the exact existing zero8 `source.files[kind]` fact for all five raw/carrier files, binding both SHA256 and byte count. `source_schema.py` requires exactly five `{bytes,sha256}` facts, positive integer sizes, lowercase SHA256, and the exact four raw hashes agreeing with the corresponding file facts. It has no alternate-schema fallback. `source-schema-cases.json` is the exact all-eight source metadata projection; ten added controls cover that real shape and malformed facts/raw mismatches. The policy, metrics, capture gate, binding, classifications, original 44 controls and all numerical equations remain byte-identical to01. `metadata-audit.json` records source-only validation of every remaining adapter literal projection across all eight actual cases; only the intentionally skipped old-native cross-reference field remains absent. No original native field/output is invented.
+ 
+ This immutable source preparation measures all eight unchanged stereo public-RAW target cases against the already recorded references. Xiph provides eight complete streams; native provides only the four preferred-zero streams. The original four native packet-decode failures and empty outputs remain failures with unknown cause. There is no full-eight dual-reference pass.
+ 
+@@ -14,18 +18,18 @@
+ 
+ `capture8.py` derives from corrected mono numeric02 capture validation. It retains safe Windows path normalization with duplicate/unsafe-path rejection. It requires the actual complete report/direct-terminal/runtime identities before protocol/PCM access, seals the exact reviewed controller source, checks canonical setup `6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c`, the unchanged caller and core0 coordinator/core1 worker profile, all original/zero raw matrices, complete protocol replay, every persisted PCM byte, packet offset and the exact eight-file inventory. Existing preps/captures/production are untouched.
+ 
+-Only source reads/assembly, metadata JSON checks, raw SHA256 and AST/symtable checks were performed by the preparing agent. Actual target/reference PCM/WAV or protocol-log payloads were not read; prepared imports, tests, binder replay, numerical measurement, decoders, SDK/compiler/QEMU and Git were not executed by that agent. Both parent and independent peer reviewed the source. Tests below remain pending until the root executes them.
++Only source reads/assembly, metadata JSON checks, raw SHA256 and AST/symtable checks were performed by the preparing agent. Actual target/reference PCM/WAV or protocol-log payloads were not read; prepared imports, tests, binder replay, numerical measurement, decoders, SDK/compiler/QEMU and Git were not executed by that agent. Parent and independent peer review the immutable correction before execution. The active 54 controls below remain pending until the root executes them; the preserved predecessor 44 controls already passed.
+ 
+-Root-owned controls, from this preparation directory (44 methods: 34 synthetic policy/mixed-classification/full-data/relocation/transition controls plus ten Windows-path controls):
++Root-owned controls, from this preparation directory (54 methods: the unchanged 44 controls plus ten exact zero8 source-file-schema controls):
+ 
+ ```powershell
+-& 'C:/Work/yoRadio/.idf/python-3.12.10/tools/python.exe' -B -X utf8 -m unittest -v test_numeric8 test_capture_paths
++& 'C:/Work/yoRadio/.idf/python-3.12.10/tools/python.exe' -B -X utf8 -m unittest -v test_numeric8 test_capture_paths test_source_schema
+ ```
+ 
+ Root-owned measurement, from the worktree root, after controls/review and with a fresh output directory:
+ 
+ ```powershell
+-& 'C:/Work/yoRadio/.idf/python-3.12.10/tools/python.exe' -B -X utf8 .build/cyd-vorbis-singleton-zero-bit-numeric-prep-01/compare_capture8.py --repository . --runtime .build/cyd-vorbis-singleton-zero-bit-runtime-01 --target .build/cyd-vorbis-singleton-zero-bit-capture-01 --target-terminal .build/cyd-vorbis-singleton-zero-bit-capture-01-terminal.json --target-report-sha256 4bdb28f03892daf71af06093b48fc5127ab242e0c8413f791799fdc8953d3e3f --target-terminal-sha256 430466c998e15fa0878930d8527b7d2e2c757e506fab9386b7dd6b5e9a2cf6ad --runtime-preparation-sha256 2730c7db7c6843f2ef3d2e2ce6d395e11a6fcef58e38e1dd84eeb880cb7f38e4 --output .build/cyd-vorbis-singleton-zero-bit-numeric-measurement-01 --max-abs-error 2
++& 'C:/Work/yoRadio/.idf/python-3.12.10/tools/python.exe' -B -X utf8 .build/cyd-vorbis-singleton-zero-bit-numeric-prep-02/compare_capture8.py --repository . --runtime .build/cyd-vorbis-singleton-zero-bit-runtime-01 --target .build/cyd-vorbis-singleton-zero-bit-capture-01 --target-terminal .build/cyd-vorbis-singleton-zero-bit-capture-01-terminal.json --target-report-sha256 4bdb28f03892daf71af06093b48fc5127ab242e0c8413f791799fdc8953d3e3f --target-terminal-sha256 430466c998e15fa0878930d8527b7d2e2c757e506fab9386b7dd6b5e9a2cf6ad --runtime-preparation-sha256 2730c7db7c6843f2ef3d2e2ce6d395e11a6fcef58e38e1dd84eeb880cb7f38e4 --output .build/cyd-vorbis-singleton-zero-bit-numeric-measurement-02 --max-abs-error 2
+ ```
+ 
+ Use a distinct numeric-controls receipt role so the original generator-controls receipt remains unchanged. Exit 0 means only the declared complete finite criterion passed; exit 1 may mean a complete numerical NONPASS or a rejected input, distinguished by `measurement_completed` and `result`. Every failure and partial report remains preserved. Deferred physical-device, integration, Ogg streaming, EOF/reset/OOM, private codec/binary and AAC scopes are excluded.

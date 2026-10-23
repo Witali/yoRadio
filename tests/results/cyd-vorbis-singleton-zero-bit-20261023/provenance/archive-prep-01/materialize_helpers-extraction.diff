@@ -1,0 +1,103 @@
+--- provenance/zero8-materialize.py
++++ materialize_helpers.py
+@@ -1,14 +1,7 @@
+-"""Root-owned pure8 materialization; imports pinned corrected25 formatting helpers."""
++"""Exact restricted40-array reader; no formatter/generator startup."""
+ import hashlib
+-import importlib.util
+ import json
+-from pathlib import Path
+ import re
+-
+-ROOT = Path(__file__).resolve().parents[2]
+-BASE_PATH = ROOT / ".build/cyd-vorbis-format-expanded25-prep-02/materialize.py"
+-BASE_SHA = "740be8723dea9938bb834e7eec098916476807fdf82eb056b7b5f63ac763acf5"
+-
+ 
+ def need(condition, reason):
+     if not condition:
+@@ -17,40 +10,6 @@
+ 
+ def digest(data):
+     return hashlib.sha256(data).hexdigest()
+-
+-
+-def base_module():
+-    need(digest(BASE_PATH.read_bytes()) == BASE_SHA, "corrected25_materializer_pin")
+-    spec = importlib.util.spec_from_file_location("singleton_zero8_corrected25_materializer", BASE_PATH)
+-    module = importlib.util.module_from_spec(spec)
+-    spec.loader.exec_module(module)  # Definitions only; original guarded main never runs.
+-    return module
+-
+-
+-def render(contract, raw_cases, contract_file_sha):
+-    base = base_module()
+-    model = contract["model"]
+-    count = len(model["cases"])
+-    need(count == len(raw_cases) == 8 and model["case_mask"] == (1 << count) - 1 and count <= 31,
+-         "complete8_bounded_model")
+-    text = ("// Complete public raw8 data; materialization is not target qualification.\n"
+-        "#pragma once\n#include \"corpus_case.h\"\n\n"
+-        f"#define CORPUS_CASE_COUNT {count}U\n"
+-        f"#define CORPUS_CONTRACT_SHA256 \"{contract['contract_sha256']}\"\n"
+-        f"#define CORPUS_CONTRACT_FILE_SHA256 \"{contract_file_sha}\"\n"
+-        f"#define CORPUS_EXPECTED_PCM_BYTES {model['total_pcm']}U\n\n")
+-    descriptors = []
+-    for index, (case, raw) in enumerate(zip(model["cases"], raw_cases)):
+-        names = base.symbols(index)
+-        for kind in ("identification", "setup", "audio"):
+-            need(digest(raw[kind]) == case["raw_sha256"][kind], "model_raw_identity")
+-            text += base.array(names[kind], "uint8_t", raw[kind])
+-        text += base.array(names["offsets"], "uint32_t", case["offsets"])
+-        text += base.array(names["modes"], "uint8_t", case["modes"])
+-        descriptors.append("    {\n" + "".join(f"        .{key} = {value},\n"
+-            for key, value in base.descriptor_fields(index, case).items()) + "    },\n")
+-    text += "static const corpus_case_t corpus_cases[CORPUS_CASE_COUNT] = {\n" + "".join(descriptors) + "};\n"
+-    return text, descriptors
+ 
+ 
+ def recover(text, contract, raw_cases, contract_file_sha):
+@@ -115,43 +74,3 @@
+     need(not remaining.strip(), "unsupported_C_outside_bounded_grammar")
+     return rows
+ 
+-
+-def materialize(contract_path, raw_cases, output):
+-    need(not output.exists(), "fresh_materialization_output")
+-    contract_data = contract_path.read_bytes()
+-    contract, file_sha = json.loads(contract_data), digest(contract_data)
+-    text, descriptors = render(contract, raw_cases, file_sha)
+-    output.mkdir()
+-    header = output / "data.h"
+-    with header.open("xb") as stream:
+-        stream.write(text.encode("ascii"))
+-    recovered = recover(header.read_text(encoding="ascii"), contract, raw_cases, file_sha)
+-    cases, pcm = len(contract["model"]["cases"]), contract["model"]["total_pcm"]
+-    controls = [
+-        ("old25_capacity", text.replace(f"#define CORPUS_CASE_COUNT {cases}U", "#define CORPUS_CASE_COUNT 25U", 1), "identity_macro:CORPUS_CASE_COUNT"),
+-        ("old25_PCM", text.replace(f"#define CORPUS_EXPECTED_PCM_BYTES {pcm}U", "#define CORPUS_EXPECTED_PCM_BYTES 623360U", 1), "identity_macro:CORPUS_EXPECTED_PCM_BYTES"),
+-        ("raw_identification", text.replace("0x01", "0x02", 1), "raw_array_bytes:identification"),
+-        ("first_offset", text.replace("    0U,", "    1U,", 1), "model_array_values:offsets"),
+-        ("descriptor_order", text.replace(descriptors[0] + descriptors[1], descriptors[1] + descriptors[0], 1), "ordered_descriptor_fields"),
+-    ]
+-    observed = []
+-    for name, damaged, reason in controls:
+-        need(damaged != text, "control_not_applied:" + name)
+-        try:
+-            recover(damaged, contract, raw_cases, file_sha)
+-        except RuntimeError as error:
+-            need(str(error) == reason, "control_wrong_rejection:" + name + ":" + str(error))
+-            observed.append(dict(name=name, rejected=True, exact_reason=reason))
+-        else:
+-            raise RuntimeError("control_accepted:" + name)
+-    report = dict(schema="singleton_zero8-pure-materialization-v1", completed=True, source_verified=True,
+-        counts=dict(cases=cases, arrays=cases * 5, full_raw_payload_arrays=cases * 3,
+-            packets=contract["model"]["total_packets"], expected_pcm_bytes=pcm,
+-            descriptor_capacity=cases, case_mask=contract["model"]["case_mask"]),
+-        header=dict(path=str(header.resolve()), bytes=header.stat().st_size, sha256=digest(header.read_bytes())),
+-        cases=recovered, controls=observed, contract_file_sha256=file_sha,
+-        contract_sha256=contract["contract_sha256"], codec_compiler_SDK_QEMU_reference_Git_executed=False,
+-        target_qualified=False, actual_PCM_synthesized=False)
+-    with (output / "report.json").open("xb") as stream:
+-        stream.write((json.dumps(report, indent=2) + "\n").encode())
+-    return report

@@ -1,0 +1,50 @@
+--- provenance/archive-prep-02/plan.template.json
++++ plan.template.json
+@@ -71,7 +71,15 @@
+     ".build/cyd-vorbis-singleton-zero-bit-archive-pack-01-command.json",
+     ".build/cyd-vorbis-singleton-zero-bit-archive-pack-01-command.stdout.log",
+     ".build/cyd-vorbis-singleton-zero-bit-archive-pack-01-command.stderr.log",
+-    ".build/cyd-vorbis-singleton-zero-bit-root-archive-plan-01.json"
++    ".build/cyd-vorbis-singleton-zero-bit-root-archive-plan-01.json",
++    ".build/cyd-vorbis-singleton-zero-bit-archive-pack-02-command.json",
++    ".build/cyd-vorbis-singleton-zero-bit-archive-pack-02-command.stdout.log",
++    ".build/cyd-vorbis-singleton-zero-bit-archive-pack-02-command.stderr.log",
++    ".build/cyd-vorbis-singleton-zero-bit-archive-stage-verify-02-command.json",
++    ".build/cyd-vorbis-singleton-zero-bit-archive-stage-verify-02-command.stdout.log",
++    ".build/cyd-vorbis-singleton-zero-bit-archive-stage-verify-02-command.stderr.log",
++    ".build/cyd-vorbis-singleton-zero-bit-archive-stage-02/manifest.json",
++    ".build/cyd-vorbis-singleton-zero-bit-root-archive-plan-02.json"
+   ],
+   "checkpoint": {
+     "path": ".build/cyd-vorbis-singleton-zero-bit-root-checkpoint-01.md",
+@@ -93,5 +101,30 @@
+     "prior_preparation_snapshot": "provenance/archive-prep-01",
+     "root_checkpoint_unchanged": true,
+     "prior_partial_stage_payload_replayed": false
++  },
++  "archive_verifier_failure_history": {
++    "schema": "zero8-archive-verifier-input-failure-history-v1",
++    "prior_preparation_snapshot": "provenance/archive-prep-02",
++    "prior_readiness_sha256": "77e0a939203bc4f87094472f651f41905e83cce3b5c827422f44dcc17f70283a",
++    "actual_commands": [
++      {
++        "receipt": ".build/cyd-vorbis-singleton-zero-bit-archive-pack-02-command.json",
++        "sha256": "5b87f4fba64a9f4797f131ab24370656757d198d7fd3259a0cc1f59d95641278",
++        "actual_exit": 0
++      },
++      {
++        "receipt": ".build/cyd-vorbis-singleton-zero-bit-archive-stage-verify-02-command.json",
++        "sha256": "01631a0d03cc43db614dcc82a9f8a28740986ea373297ad46cd44f6d099246f1",
++        "actual_exit": 1
++      }
++    ],
++    "stage_manifest": ".build/cyd-vorbis-singleton-zero-bit-archive-stage-02/manifest.json",
++    "stage_manifest_sha256": "88d053ee19d773e01107d64446c2ca4848d8e60b4f8cc81eb808863044edb9db",
++    "stage_manifest_rows": 1830,
++    "stage_payload_record_only_not_replayed": true,
++    "prior_plan": ".build/cyd-vorbis-singleton-zero-bit-root-archive-plan-02.json",
++    "prior_plan_sha256": "73c2b17ac207e0ae393cab543ce2b6e8b6d577d4f9ab64b184c865131b28c803",
++    "old_metadata_tuple_removed_member": "construction.json",
++    "root_checkpoint_unchanged": true
+   }
+ }

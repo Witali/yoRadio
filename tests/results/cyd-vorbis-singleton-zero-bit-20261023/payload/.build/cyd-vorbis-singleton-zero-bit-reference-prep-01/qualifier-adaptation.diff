@@ -1,0 +1,198 @@
+--- singletons8/qualify.py
++++ zero8/qualify.py
+@@ -110,20 +110,46 @@
+          report['cross_reference_pcm16_max_error_allowed'] == 2, 'Pinned driver/scope/policy differs')
+     for row in pins['supporting_source_inputs']:
+         inputs.read('supporting/' + row['path'], repo / relative(row['path']), row['sha256'], row['bytes'])
++    previous = pins['predecessor']
++    def predecessor(name):
++        row = previous[name]
++        return json.loads(inputs.read('predecessor/' + name, repo / relative(row['path']), row['sha256'], row['bytes']))
++    old_qualified, old_host, old_matrix = (predecessor(name) for name in ('qualification', 'host', 'matrix'))
++    old_terminal = predecessor('qualification_outer')
++    terminal(old_terminal, 0)
++    need(old_terminal['runner_sha256'] == pins['capture_sha256'] and
++         old_qualified['completed'] is True and old_qualified['reference_corpus_qualified'] is True and
++         old_qualified['xiph_reference_qualified'] is True and old_qualified['dual_reference_qualified'] is False and
++         old_qualified['original_dual_reference_passed'] is False and old_qualified['profile'] == 'singletons8' and
++         old_qualified['original_report_sha256'] == previous['host']['sha256'] and
++         old_qualified['validated_inputs']['qualifier/script']['sha256'] == previous['qualifier']['sha256'] and
++         (old_qualified['xiph_cases'], old_qualified['native_compared'], old_qualified['native_lookup2_refusals'],
++          old_qualified['native_packet_decode_failures']) == (8, 0, 4, 4) and
++         old_host['completed'] is True and old_host['xiph_reference_qualified'] is True and old_host['dual_reference_qualified'] is False,
++         'Actual prior complete singleton Xiph qualification and original dual NONPASS retained')
++    for origin, row in old_terminal['logs'].items():
++        inputs.read('predecessor-terminal-log/' + PureWindowsPath(origin).name, Path(origin), row['sha256'], row['bytes'])
++    original_map1 = old_matrix['cases'][4:8]
++    need(len(old_matrix['cases']) == 8 and len(original_map1) == 4 and
++         all(case['id'].startswith('map1_') for case in original_map1), 'Exact historical original4 map1 cases')
+     for phase in ('generation', 'witness', 'controls'):
+         receipt = json.loads(inputs.read('construction/' + phase,
+-            repo / ('.build/cyd-vorbis-more-singletons-' + phase + '-01-command.json')))
++            repo / ('.build/cyd-vorbis-singleton-zero-bit-' + phase + '-01-command.json')))
+         terminal(receipt, 0)
+         need(receipt['runner_sha256'] == pins['capture_sha256'], 'Actual construction receipt runner identity')
+         for origin, row in receipt['logs'].items():
+             inputs.read('construction-log/' + phase + '/' + PureWindowsPath(origin).name,
+                 Path(origin), row['sha256'], row['bytes'])
+-    witness = json.loads(inputs.read('construction/witness-result', repo / '.build/cyd-vorbis-more-singletons-witness-01.json',
+-        '62c524c25bcd7c824c54ede13f5f9f0af1b6899d6658c2f6ac2e8756124f2e12'))
+-    need(witness['result'] == 'FINITE_RAW_SINGLETONS_WITNESSED' and
+-         (witness['cases'], witness['packets'], witness['Ogg_pages']) == (8, 112, 136) and
+-         witness['generated_manifest_sha256'] == '3ad3a1f9b466d92b2c701c787bdec42ed708cfa9146a3804dcf3d5cc766aeadf' and
+-         witness['readiness_sha256'] == '6d1594750ce87da91d9901196b76a7e5c88aad99a9f43fbadedb27fca422dd48' and
++    witness = json.loads(inputs.read('construction/witness-result', repo / '.build/cyd-vorbis-singleton-zero-bit-witness-01.json',
++        '445b0e31707b27192cdb32d8f640e7f6b77fefac9970e9a8620860324f953bfd'))
++    need(witness['result'] == 'FINITE_ZERO_BIT_COMPARISON_WITNESSED' and
++         (witness['cases'], witness['old_map1_cases'], witness['new_zero_cases'], witness['audio_packets'],
++          witness['zero_tokens'], witness['comparison_tokens'], witness['cleared_original_one_bits']) == (8, 4, 4, 112, 112, 224, 56)
++         and witness['all_non_token_bits_fields_offsets_and_padding_unchanged'] is True
++         and witness['independent_CRC_and_full_carrier_fields_checked'] is True
++         and witness['native_outcome_or_cause_assumed'] is False and witness['original_both_bit_tolerance_cases_replaced'] is False and
++         witness['generated_manifest_sha256'] == 'c300a312f36abff95e9219479c7d0edd59b47ce09cf6a6dcd6af25f304e45858' and
++         witness['readiness_sha256'] == '8555802913d96b6e4c25599a8cf60e122700783004d74bee52da2e7e23a1cb03' and
+          witness['source_inputs_before'] == witness['source_inputs_after'] and
+          witness['actual_PCM_equality_verified'] is False and witness['actual_nonzero_PCM_observed'] is False and
+          witness['target_qualified'] is False and witness['full_G6_qualified'] is False,
+@@ -160,13 +186,27 @@
+          [row['id'] for row in report['cases']] == profile['case_ids'], 'Exact case set/order')
+     commands = {row['name']: row for row in report['commands']}
+     need(len(commands) == len(report['commands']) == profile['case_count'] * 2, 'All actual owned reference receipts required')
+-    pcm_by_case, rows_out, native_compared, refused, packet_rejected = {}, [], 0, 0, 0
++    pcm_by_case, rows_out, native_compared, refused, packet_rejected, preserved_originals = {}, [], 0, 0, 0, []
+     for (mi, origin, case), recorded in zip(expected, report['cases']):
+         case_id = str(mi) + '-' + case['id']
+         need(recorded['id'] == case_id and recorded['input'] == case and recorded['source_matrix'] == origin and
+              recorded['source_matrix_sha256'] == profile['source_matrices'][origin], 'Named case/source identity')
+         parts = {kind: source(str(PureWindowsPath(origin).parent / case[kind]))
+                  for kind in ('identification', 'comment', 'setup', 'audio', 'ogg')}
++        old_case = next((row for row in original_map1 if row['id'] == case['id']), None)
++        old_recorded = old_accepted = None
++        if old_case is not None:
++            need(case == old_case, 'All original map1 fields unchanged from the prior complete matrix')
++            old_recorded = next(row for row in old_host['cases'] if row['id'] == case_id)
++            old_accepted = next(row for row in old_qualified['cases'] if row['id'] == case_id)
++            need(old_recorded['input'] == old_case and old_accepted['xiph_qualified'] is True and
++                 old_accepted['native_packet_decode_failure'] is True and old_accepted['native_compared'] is False,
++                 'Exact previous original map1 reference identities and failure scope')
++            old_root = (repo / previous['matrix']['path']).parent
++            for kind, raw in parts.items():
++                prior_raw = inputs.read('predecessor-raw/' + case_id + '/' + kind,
++                    old_root / relative(old_case[kind]), old_case['files'][kind]['sha256'], old_case['files'][kind]['bytes'])
++                need(raw == prior_raw, 'Every original map1 header/setup/audio/carrier byte preserved')
+         info = parts['identification']
+         need(len(info) == 30 and info[:7] == b'\x01vorbis' and info[7:11] == bytes(4) and info[29] & 1 and
+              parts['setup'][:7] == b'\x05vorbis' and parts['comment'][:7] == b'\x03vorbis', 'Full public headers')
+@@ -199,9 +239,9 @@
+             need(command['receipt'] == name + '.json', 'Owned command role/path')
+             receipt = json.loads(inputs.read('receipt/' + name, root / relative(command['receipt']), command['sha256']))
+             native_outcome = profile['native_outcomes'][case_id] if decoder == 'vorbis' else None
+-            refused_case = native_outcome is not None
++            refused_case = native_outcome is not None and native_outcome['kind'] != 'accepted'
+             need(native_outcome is None or command['sha256'] == native_outcome['receipt_sha256'], 'Exact per-case native receipt pin')
+-            terminal(receipt, native_outcome['returncode'] if refused_case else 0)
++            terminal(receipt, native_outcome['returncode'] if native_outcome is not None else 0)
+             need(receipt['runner_sha256'] == pins['capture_sha256'] and
+                  receipt['executable_sha256'] == report['tools'][receipt['argv'][0]], 'Actual owned reference tool/capture identity')
+             argv = receipt['argv']
+@@ -226,27 +266,36 @@
+                      'Exact original failed native command without decoded PCM')
+                 native_wav = folder / 'vorbis.wav'
+                 need(native_wav.exists() == native_outcome['wav_exists'], 'Actual failed native WAV presence')
+-                if native_outcome['kind'] == 'lookup2_setup_refusal':
+-                    need(native_outcome['returncode'] == 3199971767 and not native_outcome['wav_exists']
+-                         and b'Codebook lookup type not supported.' in stderr and b'Setup header corrupt.' in stderr,
+-                         'Only first4 exact native lookup2 setup refusals')
+-                    refused += 1
+-                else:
+-                    need(native_outcome['kind'] == 'packet_decode_failure_no_PCM' and native_outcome['returncode'] == 4294967295
+-                         and b'Error submitting packet to decoder: Operation not permitted' in stderr
+-                         and b'Error processing packet in decoder: Operation not permitted' in stderr
+-                         and b'Nothing was written into output file' in stderr
+-                         and b'Codebook lookup type not supported.' not in stderr and b'Setup header corrupt.' not in stderr
+-                         and native_outcome['wav_exists'] is True and native_outcome['wav_bytes'] == 0,
+-                         'Last4 recorded native packet failures; no unsupported-lookup or OS/security cause inference')
+-                    need(inputs.read('failed-native-empty-WAV/' + case_id, native_wav, size=0) == b'', 'No native PCM bytes produced')
+-                    packet_rejected += 1
++                need(native_outcome['kind'] == 'packet_decode_failure_no_PCM' and native_outcome['returncode'] == 4294967295
++                     and b'Error submitting packet to decoder: Operation not permitted' in stderr
++                     and b'Error processing packet in decoder: Operation not permitted' in stderr
++                     and b'Nothing was written into output file' in stderr
++                     and b'Codebook lookup type not supported.' not in stderr and b'Setup header corrupt.' not in stderr
++                     and native_outcome['wav_exists'] is True and native_outcome['wav_bytes'] == 0,
++                     'Original4 recorded native packet failures; no unsupported-lookup or OS/security cause inference')
++                need(inputs.read('failed-native-empty-WAV/' + case_id, native_wav, size=0) == b'', 'No native PCM bytes produced')
++                packet_rejected += 1
+                 continue
+             need(not stderr, 'Successful strict reference emitted error diagnostics')
+             wav = inputs.read('wav/' + case_id + '/' + decoder, folder / (decoder + '.wav'), recorded['decoded'][decoder]['wav_sha256'])
+             md5 = inputs.read('log/' + name + '/decode-' + decoder + '.stdout.log', folder / ('decode-' + decoder + '.stdout.log'))
+             pcm, observed = decoded_pcm(wav, md5, rate, channels, frames, modes)
+             need(observed == recorded['decoded'][decoder], 'Recomputed PCM evidence differs from report')
++            if decoder == 'libvorbis' and old_case is not None:
++                prior_folder = (repo / previous['host']['path']).parent / 'cases' / case_id
++                prior_wav = inputs.read('predecessor-Xiph-WAV/' + case_id, prior_folder / 'libvorbis.wav',
++                    old_recorded['decoded']['libvorbis']['wav_sha256'])
++                prior_md5_path = prior_folder / 'decode-libvorbis.stdout.log'
++                prior_fact = next(row for row in old_qualified['validated_inputs'].values()
++                    if PureWindowsPath(row['path']) == PureWindowsPath(prior_md5_path))
++                prior_md5 = inputs.read('predecessor-Xiph-framemd5/' + case_id, prior_md5_path,
++                    prior_fact['sha256'], prior_fact['bytes'])
++                prior_pcm, prior_observed = decoded_pcm(prior_wav, prior_md5, rate, channels, frames, modes)
++                need(prior_observed == old_recorded['decoded']['libvorbis'] and pcm == prior_pcm and
++                     sha(pcm) == old_accepted['pcm_sha256'] == observed['pcm_sha256'],
++                     'Full untruncated original Xiph PCM byte/hash equality to previously qualified case4..7')
++                preserved_originals.append(dict(id=case_id, all_raw_bytes_equal=True, full_Xiph_PCM_bytes_equal=True,
++                    pcm_bytes=len(pcm), pcm_sha256=sha(pcm), predecessor_qualification_sha256=previous['qualification']['sha256']))
+             actual_info[decoder] = observed
+             pcm_by_case[(mi, case['id'], decoder)] = pcm
+         cross_error = None
+@@ -261,7 +310,7 @@
+         rows_out.append(dict(id=case_id, xiph_qualified=True, native_compared='vorbis' in actual_info,
+             native_lookup2_refusal=profile['native_outcomes'][case_id]['kind'] == 'lookup2_setup_refusal',
+             native_packet_decode_failure=profile['native_outcomes'][case_id]['kind'] == 'packet_decode_failure_no_PCM',
+-            native_failure_kind=profile['native_outcomes'][case_id]['kind'],
++            native_outcome_kind=profile['native_outcomes'][case_id]['kind'],
+             native_actual_returncode=profile['native_outcomes'][case_id]['returncode'], native_cause_diagnosed=False,
+             cross_reference_max_abs_error=cross_error, **xiph))
+         result['cases'] = rows_out
+@@ -280,16 +329,20 @@
+     xiph_relations = [row for row in metamorphic if row['decoder'] == 'libvorbis']
+     need(len(xiph_relations) == profile['xiph_relations'] and all(row['passed'] for row in xiph_relations) and
+          (native_compared, refused, packet_rejected) == (profile['native_compared'], profile['native_lookup2_refusals'], profile['native_packet_decode_failures']) and
+-         len(report['failures']) == refused + packet_rejected == 8, 'Complete Xiph/support accounting')
++         len(report['failures']) == refused + packet_rejected == 4, 'Complete Xiph/support accounting')
+     dual = refused + packet_rejected == 0 and all(row['passed'] for row in metamorphic)
+     need(report['xiph_reference_qualified'] is True and report['dual_reference_qualified'] is dual and
+          dual == (profile['outer_returncode'] == 0), 'Derived classification differs; never rewrite original NONPASS')
++    need(len(preserved_originals) == 4 and [row['id'] for row in preserved_originals] == profile['case_ids'][:4],
++         'All four original raw/Xiph comparisons to prior qualified corpus must be complete')
+     inputs.current()
+     result.update(completed=True, reference_corpus_qualified=True, xiph_reference_qualified=True,
+         dual_reference_qualified=dual, original_dual_reference_passed=dual,
+         original_report_sha256=sha(raw_report), original_outer_receipt_sha256=profile['outer_sha256'],
+         xiph_cases=len(rows_out), native_compared=native_compared, native_lookup2_refusals=refused,
+         native_packet_decode_failures=packet_rejected, native_cause_diagnosed=False,
++        original_map1_preservation=preserved_originals,
++        predecessor_qualification_sha256=previous['qualification']['sha256'],
+         paired_raw_packets=sum(case['input']['packet_count'] for case in report['cases']),
+         expected_pcm_bytes=sum(row['pcm_bytes'] for row in rows_out), xiph_metamorphic_checks=xiph_relations,
+         original_metamorphic_checks=metamorphic, original_failures=report['failures'],
+@@ -299,7 +352,7 @@
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument('--profile', choices=('singletons8',), required=True)
++    parser.add_argument('--profile', choices=('zero8',), required=True)
+     for name in ('repository', 'campaign', 'outer', 'output'):
+         parser.add_argument('--' + name, type=Path, required=True)
+     args = parser.parse_args()
+@@ -326,7 +379,7 @@
+         save()
+         return 130 if isinstance(error, KeyboardInterrupt) else 1
+     print(json.dumps({key: result[key] for key in ('result', 'reference_corpus_qualified', 'dual_reference_qualified',
+-                     'xiph_cases', 'native_compared', 'native_lookup2_refusals', 'paired_raw_packets', 'expected_pcm_bytes')}))
++                     'xiph_cases', 'native_compared', 'native_lookup2_refusals', 'native_packet_decode_failures', 'paired_raw_packets', 'expected_pcm_bytes')}))
+     return 0
+ 
+ 

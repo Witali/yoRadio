@@ -1,0 +1,202 @@
+--- provenance/archive-prep-01/source_checks.py
++++ source_checks.py
+@@ -30,6 +30,62 @@
+ def literal(tree, name):
+     node = next(n for n in tree.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in n.targets))
+     return ast.literal_eval(node.value)
++
++
++def validate_plan_paths(root, plan):
++    """Read JSON metadata and filesystem entries only, before any payload packing."""
++    selected = []
++    for role, row in plan['roles'].items():
++        selected += [('role-root/' + role, row['path'], True),
++                     ('role-report/' + role, row['path'] + '/report.json', False),
++                     ('role-terminal/' + role, row['terminal'], False)]
++    selected += [('tree', name, True) for name in plan['trees']]
++    selected += [('extra', name, False) for name in plan['extras']]
++    for name in plan['extra_receipts']:
++        selected.append(('receipt', name, False))
++        receipt = root / name
++        if not receipt.is_file():
++            raise FileNotFoundError('receipt: ' + name)
++        for log in json.loads(receipt.read_bytes()).get('logs', {}):
++            selected.append(('receipt-log', log, False))
++    selected.append(('checkpoint', plan['checkpoint']['path'], False))
++    for kind, name, directory in selected:
++        path = (root / name).resolve()
++        assert path.is_relative_to(root), ('Selected path outside task worktree', kind, name)
++        if not (path.is_dir() if directory else path.is_file()):
++            raise FileNotFoundError(kind + ': ' + name)
++    return [{'kind': kind, 'path': name, 'directory': directory} for kind, name, directory in selected]
++
++
++def original_metadata_members(tree):
++    """Audit actual AST consumers; do not import or execute the verifier."""
++    body = function(tree, 'verify')
++    indexed = [node for node in ast.walk(body) if isinstance(node, ast.Subscript)
++               and isinstance(node.value, ast.Name) and node.value.id == 'old_index']
++    assert len(indexed) == 1 and ast.literal_eval(indexed[0].slice) == 'files'
++    loops = [node for node in ast.walk(body) if isinstance(node, ast.For)
++             and any(child is indexed[0] for child in ast.walk(node))]
++    assert len(loops) == 1 and isinstance(loops[0].target, ast.Name) and loops[0].target.id == 'name'
++    names = ast.literal_eval(loops[0].iter)
++    assert isinstance(names, tuple) and all(isinstance(name, str) for name in names)
++    direct, dynamic = set(), []
++    for node in ast.walk(body):
++        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add) and isinstance(node.left, ast.Name) and node.left.id == 'original_root':
++            if isinstance(node.right, ast.Constant):
++                direct.add(node.right.value)
++            else:
++                assert isinstance(node.right, ast.Name) and node.right.id == 'name'
++                dynamic.append(node)
++    assert direct == {'manifest.json', 'matrix.json', 'bitfields.json'} and len(dynamic) == 2
++    assert all(any(child is node for child in ast.walk(loops[0])) for node in dynamic)
++    return names, sorted(direct - {'manifest.json'})
++
++
++def require_manifest_members(names, manifest):
++    members = {row['path'] for row in manifest['files']}
++    missing = sorted(set(names) - members)
++    if missing:
++        raise ValueError('Original manifest missing: ' + ','.join(missing))
+ 
+ 
+ def main():
+@@ -83,6 +139,111 @@
+                 scan(child)
+         scan(table)
+     plan = json.loads((HERE / 'plan.template.json').read_bytes())
++    selected_paths = validate_plan_paths(ROOT, plan)
++    history = plan['archive_input_failure_history']
++    prior = HERE / history['prior_preparation_snapshot']
++    old_readiness = json.loads((prior / 'readiness.json').read_bytes())
++    assert sha(prior / 'readiness.json') == history['prior_readiness_sha256'] == '84e4d9771e31fbf16e0c27ff8863ff5dc812c69e78265e94052951372496ee46'
++    assert {p.relative_to(prior).as_posix() for p in prior.rglob('*') if p.is_file()} == set(old_readiness['files']) | {'readiness.json'}
++    for name, row in old_readiness['files'].items():
++        assert (prior / name).stat().st_size == row['bytes'] and sha(prior / name) == row['sha256']
++    for name in ('pack.py', 'dependency.py', 'archive_protocol.py', 'materialize_helpers.py',
++                 'reference_helpers.py', 'reference_gate.py', 'raw_helpers.py', 'zero_helpers.py', 'numeric_helpers.py'):
++        assert (HERE / name).read_bytes() == (prior / name).read_bytes()
++    failure = ROOT / history['failed_pack_receipt']
++    actual = json.loads(failure.read_bytes())
++    assert sha(failure) == history['failed_pack_receipt_sha256'] == '1c6b393483dc8fe95f441c10af64bd028ed952cea2dd978e3af483c4b77b70b4'
++    assert actual['status'] == 'TERMINAL' and actual['returncode'] == history['actual_exit'] == 1
++    assert actual['elapsed_seconds'] == 16.75 and actual['owned_pid'] > 0
++    for path in [failure] + [Path(name) for name in actual['logs']]:
++        assert path.read_bytes() == (HERE / 'provenance/failed-pack-01' / path.name).read_bytes()
++    for name, row in actual['logs'].items():
++        assert Path(name).stat().st_size == row['bytes'] and sha(Path(name)) == row['sha256']
++    failed_plan = ROOT / history['failed_plan']
++    assert sha(failed_plan) == history['failed_plan_sha256']
++    assert failed_plan.read_bytes() == (HERE / 'provenance/failed-pack-01' / failed_plan.name).read_bytes()
++    old_plan = json.loads(failed_plan.read_bytes())
++    missing = history['missing_old_extra_removed']
++    assert old_plan['extras'].count(missing) == 1 and missing not in plan['extras'] and not (ROOT / missing).exists()
++    try:
++        validate_plan_paths(ROOT, old_plan)
++    except FileNotFoundError as error:
++        assert str(error) == 'extra: ' + missing
++    else:
++        raise AssertionError('Original missing-extra plan must fail the metadata-only preflight')
++    assert plan['checkpoint'] == old_plan['checkpoint']
++    assert history['partial_stage_manifest_present'] is False and history['partial_stage_manifest_sha256'] is None
++    assert not (ROOT / '.build/cyd-vorbis-singleton-zero-bit-archive-stage-01/manifest.json').exists()
++    assert history['root_checkpoint_unchanged'] is True and history['prior_partial_stage_payload_replayed'] is False
++    first_history_extras = [name for name in old_plan['extras'] if name != missing] + [
++        history['failed_pack_receipt'], *[Path(name).relative_to(ROOT).as_posix() for name in actual['logs']], history['failed_plan']]
++    assert plan['extras'][:len(first_history_extras)] == first_history_extras
++    assert {k: v for k, v in plan.items() if k not in ('extras', 'archive_input_failure_history', 'archive_verifier_failure_history')} == {k: v for k, v in old_plan.items() if k != 'extras'}
++    verifier_history = plan['archive_verifier_failure_history']
++    prior02 = HERE / verifier_history['prior_preparation_snapshot']
++    prior02_readiness = json.loads((prior02 / 'readiness.json').read_bytes())
++    assert sha(prior02 / 'readiness.json') == verifier_history['prior_readiness_sha256'] == '77e0a939203bc4f87094472f651f41905e83cce3b5c827422f44dcc17f70283a'
++    assert {p.relative_to(prior02).as_posix() for p in prior02.rglob('*') if p.is_file()} == set(prior02_readiness['files']) | {'readiness.json'}
++    for name, row in prior02_readiness['files'].items():
++        assert (prior02 / name).stat().st_size == row['bytes'] and sha(prior02 / name) == row['sha256']
++    old_verify = (prior02 / 'verify.py').read_bytes()
++    before = b"for name in ('matrix.json', 'bitfields.json', 'construction.json'):"
++    after = b"for name in ('matrix.json', 'bitfields.json'):"
++    assert old_verify.count(before) == 1 and (HERE / 'verify.py').read_bytes() == old_verify.replace(before, after, 1)
++    assert old_verify == (prior / 'verify.py').read_bytes()
++    original_manifest_path = ROOT / '.build/cyd-vorbis-more-singletons-generated-01/manifest.json'
++    assert sha(original_manifest_path) == '3ad3a1f9b466d92b2c701c787bdec42ed708cfa9146a3804dcf3d5cc766aeadf'
++    original_manifest = json.loads(original_manifest_path.read_bytes())
++    indexed_metadata, direct_metadata = original_metadata_members(trees['verify.py'])
++    require_manifest_members(indexed_metadata + tuple(direct_metadata), original_manifest)
++    old_indexed, old_direct = original_metadata_members(ast.parse(old_verify))
++    try:
++        require_manifest_members(old_indexed + tuple(old_direct), original_manifest)
++    except ValueError as error:
++        assert str(error) == 'Original manifest missing: construction.json'
++    else:
++        raise AssertionError('Previous bad original metadata consumer tuple must be rejected')
++    original_matrix_path = ROOT / '.build/cyd-vorbis-more-singletons-generated-01/matrix.json'
++    original_matrix = json.loads(original_matrix_path.read_bytes())
++    member_rows = {row['path']: row for row in original_manifest['files']}
++    raw_members = []
++    for case in original_matrix['cases'][4:]:
++        for kind in ('identification', 'comment', 'setup', 'audio', 'ogg'):
++            member = case[kind]
++            row = member_rows[member]
++            assert (row['bytes'], row['sha256']) == (case['files'][kind]['bytes'], case['files'][kind]['sha256'])
++            raw_members.append(dict(case=case['id'], kind=kind, path=member, bytes=row['bytes'], sha256=row['sha256']))
++    assert len(raw_members) == 20 and len({row['path'] for row in raw_members}) == 20
++    (HERE / 'original-manifest-consumers.json').write_text(json.dumps(dict(
++        schema='zero8-original-manifest-source-consumer-audit-v1', source_only=True,
++        verifier_imported_or_executed=False, payload_read_or_hashed=False, original_manifest_sha256=sha(original_manifest_path),
++        indexed_metadata=list(indexed_metadata), direct_metadata=direct_metadata, manifest_file_itself='manifest.json',
++        raw_member_metadata=raw_members, previous_bad_tuple_negative_control_rejected=True,
++        current_zero_construction_check_unchanged=True), indent=2) + '\n', encoding='utf-8', newline='\n')
++    additional_history_extras = []
++    for row, expected_code in zip(verifier_history['actual_commands'], (0, 1)):
++        path = ROOT / row['receipt']
++        assert sha(path) == row['sha256']
++        command = json.loads(path.read_bytes())
++        assert command['status'] == 'TERMINAL' and command['returncode'] == row['actual_exit'] == expected_code and command['owned_pid'] > 0
++        for source in [path] + [Path(name) for name in command['logs']]:
++            assert source.read_bytes() == (HERE / 'provenance/pack02-verify02' / source.name).read_bytes()
++            additional_history_extras.append(source.relative_to(ROOT).as_posix())
++        for name, log_row in command['logs'].items():
++            assert Path(name).stat().st_size == log_row['bytes'] and sha(Path(name)) == log_row['sha256']
++    stage02_manifest = ROOT / verifier_history['stage_manifest']
++    assert sha(stage02_manifest) == verifier_history['stage_manifest_sha256'] == '88d053ee19d773e01107d64446c2ca4848d8e60b4f8cc81eb808863044edb9db'
++    assert len(json.loads(stage02_manifest.read_bytes())['files']) == verifier_history['stage_manifest_rows'] == 1830
++    assert stage02_manifest.read_bytes() == (HERE / 'provenance/pack02-verify02/stage02-manifest.json').read_bytes()
++    prior02_plan = ROOT / verifier_history['prior_plan']
++    assert sha(prior02_plan) == verifier_history['prior_plan_sha256']
++    assert prior02_plan.read_bytes() == (HERE / 'provenance/pack02-verify02' / prior02_plan.name).read_bytes() == (prior02 / 'plan.template.json').read_bytes()
++    assert plan['extras'] == first_history_extras + additional_history_extras + [verifier_history['stage_manifest'], verifier_history['prior_plan']]
++    assert plan['archive_input_failure_history'] == json.loads(prior02_plan.read_bytes())['archive_input_failure_history']
++    assert verifier_history['stage_payload_record_only_not_replayed'] is verifier_history['root_checkpoint_unchanged'] is True
++    (HERE / 'plan-path-checks.json').write_text(json.dumps(dict(schema='zero8-archive-selected-path-preflight-v1',
++        source_only=True, payload_read_or_hashed=False, all_current_selected_entries_exist=True,
++        original_missing_extra_negative_control_rejected=True, entries=selected_paths), indent=2) + '\n', encoding='utf-8', newline='\n')
+     assert plan['schema'] == 'cyd-singleton-zero-bit-selection-v1' and set(plan['roles']) == {'capture8', 'numeric8', 'numeric-input-failure01', 'host-zero8'}
+     for name, row in plan['roles'].items():
+         assert sha(ROOT / row['path'] / 'report.json') == row['report_sha256']
+@@ -100,6 +261,10 @@
+                   ('provenance/mono02-verify.py', 'verify.py', 'verify-adaptation.diff'),
+                   ('provenance/zero8-protocol.py', 'archive_protocol.py', 'archive-protocol-adaptation.diff')]
+     diff_pairs += [('provenance/' + old, new, new.removesuffix('.py') + '-extraction.diff') for new, (old, unused) in HELPERS.items()]
++    diff_pairs += [('provenance/archive-prep-01/' + name, name, 'successor02-' + name.replace('.', '-') + '.diff')
++                   for name in ('source_checks.py', 'plan.template.json', 'README.md')]
++    diff_pairs += [('provenance/archive-prep-02/' + name, name, 'successor03-' + name.replace('.', '-') + '.diff')
++                   for name in ('verify.py', 'source_checks.py', 'plan.template.json', 'README.md')]
+     for old, new, diff in diff_pairs:
+         (HERE / diff).write_text(''.join(difflib.unified_diff((HERE / old).read_text().splitlines(True), (HERE / new).read_text().splitlines(True),
+             fromfile=old, tofile=new)), encoding='utf-8', newline='\n')
+@@ -112,6 +277,13 @@
+         original_native_packet_refusals=4, new_native_acceptances=4, predecessor_original_Xiph_streams=4,
+         fixed_bound=2, complete_mixed12_required=True, no_full8_dual_pass=True,
+         actual_input_rejection_history_preserved=True, numerical_NONPASS_preserved=True,
++        complete_prior_archive_preparation_files=38, actual_failed_pack_exit=1, failed_pack_history_preserved=True,
++        metadata_only_selected_paths_exist=True, selected_path_count=len(selected_paths), original_missing_extra_negative_control_rejected=True,
++        pack_protocol_metrics_helpers_unchanged=True, prior_pack01_partial_stage_manifest_present=False, partial_stage_payload_replayed=False,
++        complete_prior_archive02_preparation_files=85, actual_pack02_exit=0, actual_stageverify02_exit=1,
++        stage02_manifest_record_only=True, verifier_only_original_metadata_tuple_member_removed='construction.json',
++        original_metadata_consumers_checked_against_actual_manifest=True, original_raw_manifest_members=20,
++        previous_bad_metadata_tuple_negative_control_rejected=True,
+         prior_other_numeric_NONPASS_replayed=False, source_only=True, proposed_code_imported_or_executed=False,
+         pack_or_verify_or_PCM_or_test_or_decoder_reference_SDK_QEMU_Git_executed=False, canonical_destination_modified=False)
+     checks.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8', newline='\n')

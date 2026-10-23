@@ -1,0 +1,7 @@
+# Exact original-manifest consumer correction after actual stageverify02
+
+Root-owned pack02 completed0 in actual terminal chunk `6861b2` and retained1830 manifest rows, including8 exact borrowed entries. Root-owned stageverify02 then exited1 in actual terminal chunk `9ffe88`: `StopIteration` at verifier line229 while seeking the nonexistent OLD `construction.json` manifest member. Both actual receipts/logs, selection plan02 and stage02 manifest are retained byte-exact as record-only history. No previous stage payload tree is copied or replayed. The full immutable source preparation02 is preserved, including preparation01 and its actual pack01 failure.
+
+The only executable change in successor03 removes `construction.json` from the old-source metadata tuple. Matrix and bitfields are still checked against the pinned old manifest. The separate current zero8 construction proof remains unchanged. Source closure now derives every hardcoded original metadata member from the verifier AST and checks membership against that actual manifest. It also checks all20 old original4 raw/header/carrier members against their manifest metadata. The previous bad tuple must fail this metadata-only gate.
+
+Packer, protocol, numerical metrics/policy and all pure helpers are unchanged. Root checkpoint01 and all source, target, reference and complete mixed12 numerical NONPASS records remain unchanged. This source-only correction makes no claim about a future pack or verifier result.

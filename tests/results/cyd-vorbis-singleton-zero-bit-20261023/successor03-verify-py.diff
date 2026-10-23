@@ -1,0 +1,11 @@
+--- provenance/archive-prep-02/verify.py
++++ verify.py
+@@ -225,7 +225,7 @@
+     old_index = obj(raw[original_root + 'manifest.json'])
+     need(sha(raw[original_root + 'manifest.json']) == '3ad3a1f9b466d92b2c701c787bdec42ed708cfa9146a3804dcf3d5cc766aeadf',
+          'Original source-generation manifest identity remains recorded')
+-    for name in ('matrix.json', 'bitfields.json', 'construction.json'):
++    for name in ('matrix.json', 'bitfields.json'):
+         row = next(row for row in old_index['files'] if row['path'] == name)
+         need(len(raw[original_root + name]) == row['bytes'] and sha(raw[original_root + name]) == row['sha256'], 'Finite original source metadata exact')
+     matrix, bitfields = obj(raw[original_root + 'matrix.json']), obj(raw[original_root + 'bitfields.json'])

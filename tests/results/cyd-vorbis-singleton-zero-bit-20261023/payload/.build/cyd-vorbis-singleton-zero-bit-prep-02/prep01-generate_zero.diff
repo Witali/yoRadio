@@ -1,0 +1,14 @@
+--- prep01/generate_zero.py
++++ prep02/generate_zero.py
+@@ -45,7 +45,10 @@
+     pages = prior.base.read_pages(payloads[case['ogg']]); full = [data['identification'], data['comment'], data['setup']] + packets
+     need(len(pages) == 17, 'original_seventeen_page_carrier')
+     data['ogg'] = b''.join(prior.base.page(raw, p['serial'], i, p['granule'], p['flags']) for i, (p, raw) in enumerate(zip(pages, full)))
+-    copied['id'] = new; copied['wire_zero_control_for'] = old; copied['features'].append('preferred_zero_singleton_tokens')
++    copied['id'] = new; copied['wire_zero_control_for'] = old
++    need(copied['features'].count('both_singleton_wire_bits') == 1, 'exact_original_both_bit_feature')
++    copied['features'] = ['singleton_wire_bits_all_zero' if f == 'both_singleton_wire_bits' else f for f in copied['features']]
++    copied['features'].append('preferred_zero_singleton_tokens')
+     for k in ('identification', 'comment', 'setup', 'audio', 'ogg'):
+         copied[k] = f'cases/{new}/' + ('reference.ogg' if k == 'ogg' else k + '.bin')
+     copied['files'] = {k: dict(bytes=len(raw), sha256=sha(raw)) for k, raw in data.items()}

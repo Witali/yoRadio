@@ -1,0 +1,22 @@
+--- .build/cyd-vorbis-singleton-zero-bit-numeric-prep-01/compare_capture8.py
++++ .build/cyd-vorbis-singleton-zero-bit-numeric-prep-02/compare_capture8.py
+@@ -12,6 +12,7 @@
+ from capture8 import Inputs, capture, relative
+ from policy8 import CASE_IDS, MAX_ABS_ERROR, bounded_policy, relations
+ from pcm_metrics import need
++from source_schema import source_file_fact
+ 
+ HERE = Path(__file__).resolve().parent
+ 
+@@ -94,9 +95,10 @@
+              bound['qualification_sha256'] == refs['qualification']['sha256'] and bound['original_host_returncode'] == 1 and
+              bound['original_reference_id'] == rid, 'All8 unchanged raw/header/frame/mixed classification identities required')
+         for kind in ('identification', 'setup', 'audio', 'comment', 'ogg'):
++            source_fact = source_file_fact(source, kind)
+             raw = inputs.read('reference/original-raw/' + rid + '/' + kind,
+                 (repo / refs['comparison']['path']).parent / source[kind],
+-                source['ogg_sha256'] if kind == 'ogg' else source['raw_sha256'][kind])
++                source_fact['sha256'], source_fact['bytes'])
+             for role in ('original', 'selected'):
+                 fact = origin['files'][kind][role]
+                 need(inputs.read('reference/mapped-raw/' + rid + '/' + kind + '/' + role,

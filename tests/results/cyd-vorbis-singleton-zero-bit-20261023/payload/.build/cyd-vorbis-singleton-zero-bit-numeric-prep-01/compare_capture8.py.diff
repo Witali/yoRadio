@@ -1,0 +1,269 @@
+--- .build/cyd-vorbis-mono-mapping-numeric-prep-02/compare_capture21.py
++++ .build/cyd-vorbis-singleton-zero-bit-numeric-prep-01/compare_capture8.py
+@@ -1,107 +1,98 @@
+-"""Complete21 raw-channel numerical measurement against both recorded references; no processes."""
++"""Complete singleton8 mixed-reference12 measurement, fixed2; recorded I/O only."""
+ import argparse
+ import json
+ from pathlib import Path
+ import re
+ import sys
+ 
+-import mono_metrics
+ import pcm_metrics
+ import recorded_qualification as recorded
+-from capture21 import Inputs, capture, relative, sha
+-from policy21 import CASE_IDS, DECODERS, MAX_ABS_ERROR, bounded_policy, whole
++import reference_binding
++from binding_identity import verify_relocated_binding
++from capture8 import Inputs, capture, relative
++from policy8 import CASE_IDS, MAX_ABS_ERROR, bounded_policy, relations
+ from pcm_metrics import need
+ 
+ HERE = Path(__file__).resolve().parent
+ 
+ 
+ def transition_counts(pcm, case, offsets):
+-    channels = case['channels']
+-    need(channels in (1, 2) and len(offsets) == 15 and offsets[0] == 0 and offsets[-1] == len(pcm) and
+-         [b - a for a, b in zip(offsets, offsets[1:])] == case['pcm'], 'Full real-channel packet offsets required')
+-    result = {name: [0] * channels for name in ('SS', 'SL', 'LS', 'LL')}
++    need(case['channels'] == 2 and len(offsets) == 15 and offsets[0] == 0 and offsets[-1] == len(pcm) and
++         [b - a for a, b in zip(offsets, offsets[1:])] == case['pcm'], 'Full stereo packet offsets required')
++    result = {name: [0, 0] for name in ('SS', 'SL', 'LS', 'LL')}
+     for packet in range(1, 14):
+         name = 'SL'[case['modes'][packet - 1]] + 'SL'[case['modes'][packet]]
+         first, stop = offsets[packet:packet + 2]
+-        for channel in range(channels):
+-            result[name][channel] += sum(pcm[i:i + 2] != b'\0\0' for i in range(first + 2 * channel, stop, channels * 2))
++        for channel in (0, 1):
++            result[name][channel] += sum(pcm[i:i + 2] != b'\0\0' for i in range(first + 2 * channel, stop, 4))
+     return result
+ 
+ 
+ def run(args, result, save):
+     inputs = Inputs()
+     result['inputs'] = inputs.rows
+-    pins = json.loads(inputs.read('adapter/pins', HERE / 'pins.json'))
++    pins = json.loads(inputs.read('adapter/numeric-pins', HERE / 'numeric-pins.json'))
+     for name, digest in pins['adapter_helpers'].items():
+         inputs.read('adapter/' + name, HERE / name, digest)
+     inputs.read('adapter/entrypoint', Path(__file__))
++    repo = args.repository.resolve()
+     prep_pin = pins['frozen_runtime_prep_readiness']
+-    inputs.read('runtime-prep/readiness', args.repository.resolve() / prep_pin['path'], prep_pin['sha256'])
++    inputs.read('runtime-prep/readiness', repo / prep_pin['path'], prep_pin['sha256'])
++    for name, row in pins['runtime_actual_receipts'].items():
++        receipt = json.loads(inputs.read('runtime-prep/actual-' + name, repo / row['path'], row['sha256'], row['bytes']))
++        recorded.terminal(receipt, 0)
++        need(receipt['runner_sha256'] == pins['command_wrapper_sha256'], 'Exact actual runtime preparation wrapper')
++        for path, fact in receipt['logs'].items():
++            inputs.read('runtime-prep/actual-log/' + name + '/' + path, path, fact['sha256'], fact['bytes'])
+     report, contract, captured, binding, mapping = capture(inputs, args, pins)
+-    repo = args.repository.resolve()
++    # Normal unchanged binder replay validates all16 child terminals/logs,
++    # current12 complete WAV/framemd5, nativeold4 empty failures, original4
++    # preserved raw+prior-Xiph PCM, and four current Xiph equality pairs.
++    replayed = reference_binding.derive(contract, mapping)
++    verify_relocated_binding(binding, replayed, args.runtime.resolve(), HERE, pins['runtime_helpers'])
++    for label, value in (('runtime', binding), ('numeric', replayed)):
++        for index, row in enumerate(value['proof_facts'] + value['external_reference_tool_identities']):
++            inputs.read('reference/binding-fact/' + label + '/' + str(index), row['path'], row['sha256'], row['bytes'])
+     refs = pins['reference']
+-    for name, row in refs.items():
+-        inputs.read('reference/proof/' + name, repo / row['path'], row['sha256'], row['bytes'])
+-    q = json.loads((repo / refs['qualification']['path']).read_bytes())
+-    host = json.loads((repo / refs['host']['path']).read_bytes())
+-    outer = json.loads((repo / refs['host_outer']['path']).read_bytes())
+-    qterminal = json.loads((repo / refs['qualification_terminal']['path']).read_bytes())
+-    matrix_raw = (repo / refs['comparison']['path']).read_bytes()
+-    matrix = json.loads(matrix_raw)
+-    need(matrix_raw == (repo / refs['host_matrix']['path']).read_bytes(), 'Canonical matrix must equal actual host origin bytes')
+-    recorded.terminal(outer, 0)
+-    recorded.terminal(qterminal, 0)
+-    need(q['profile'] == 'mono21' and q['result'] == 'DUAL_REFERENCE_QUALIFIED' and
+-         all(q[k] is True for k in ('completed', 'reference_corpus_qualified', 'xiph_reference_qualified',
+-             'dual_reference_qualified', 'original_dual_reference_passed')) and
+-         all(q[k] is False for k in ('target_executed', 'production_changed', 'standard_conformance_qualified',
+-                                    'full_G6_qualified', 'physical_device')) and
+-         q['original_report_sha256'] == refs['host']['sha256'] and
+-         q['original_outer_receipt_sha256'] == refs['host_outer']['sha256'] and
+-         (q['xiph_cases'], q['native_compared'], q['native_lookup2_refusals'], q['paired_raw_packets'], q['expected_pcm_bytes']) ==
+-         (21, 21, 0, 294, 464640) and len(host['cases']) == len(q['cases']) == 21 and len(host['commands']) == 42 and
+-         host['completed'] is host['xiph_reference_qualified'] is host['dual_reference_qualified'] is True and
+-         host['failures'] == q['original_failures'] == [] and
+-         q['policy'] == dict(max_abs_error=2, predeclared=True, purpose='bounded-reference-crosscheck-not-standard-conformance'),
+-         'Exact existing21 dual-reference scope/policy/actual terminals required')
+-    need(q['validated_inputs']['qualifier/script']['sha256'] == pins['adapter_helpers']['recorded_qualification.py'] and
+-         outer['runner_sha256'] == qterminal['runner_sha256'] == pins['command_wrapper_sha256'], 'Recorded qualifier/wrapper identities')
+-    for role, row in q['validated_inputs'].items():
+-        inputs.read('reference/qualified/' + role, row['path'], row['sha256'], row['bytes'])
+-    for name, receipt in (('host', outer), ('qualifier', qterminal)):
+-        for path, row in receipt['logs'].items():
+-            inputs.read('reference/log/' + name + '/' + path, path, row['sha256'], row['bytes'])
+-    need(binding['schema'] == 'mono21-recorded-dual-reference-binding-v1' and binding['completed'] is True and
++    q = json.loads(inputs.read('reference/qualification', repo / refs['qualification']['path'], refs['qualification']['sha256']))
++    host = json.loads(inputs.read('reference/host', repo / refs['host']['path'], refs['host']['sha256']))
++    matrix = json.loads(inputs.read('reference/matrix', repo / refs['comparison']['path'], refs['comparison']['sha256']))
++    reference_binding.qualification_gate(q)
++    need(binding['schema'] == 'singleton-zero8-recorded-reference-binding-v1' and binding['completed'] is True and
+          binding['contract_sha256'] == contract['contract_sha256'] and
+-         len(binding['cases']) == len(mapping['cases']) == len(matrix['cases']) == 21 and
+-         binding['dual_reference_passed'] is binding['actual_single_scope_reference_campaign_exists'] is True and
+-         binding['dual_reference_scope'] == 'only-existing-mono21-campaign' and
+-         binding['previous_unrelated_dual_NONPASS_reinterpreted'] is binding['target_executed'] is
+-         binding['target_numeric_comparison_performed'] is binding['full_G6_qualified'] is False and
+-         binding['new_reference_commands_executed'] is binding['aggregate_reference_campaign_exists'] is False and
+-         tuple(c['id'] for c in matrix['cases']) == CASE_IDS and
+-         mapping['original_cases_rewritten'] is False, 'Actual full21 raw/reference binding only')
++         len(binding['cases']) == len(mapping['cases']) == len(matrix['cases']) == 8 and
++         binding['expected_equal_groups'] == [list(pair) for pair in pins['expected_equal_groups']] and
++         binding['expected_different_pairs'] == [] and mapping['original_cases_rewritten'] is False and
++         binding['actual_single_scope_reference_campaign_exists'] is True and
++         binding['dual_reference_passed'] is binding['native_cause_diagnosed'] is False and
++         binding['prior_original_singletons_numeric_record_only'] is True and
++         binding['prior_numeric_NONPASS_requalified'] is binding['target_executed'] is
++         binding['target_numeric_comparison_performed'] is binding['full_G6_qualified'] is False,
++         'Exact full8 existing mixed reference binding required; original NONPASS preserved')
+     host_root = (repo / refs['host']['path']).parent
+     commands = {row['name']: row for row in host['commands']}
+-    need(len(commands) == 42, 'Distinct complete42 reference child commands required')
+-    rows = []
++    need(len(commands) == 16, 'Distinct all16 actual reference children required')
++    rows, xiph_pcm, target_pcm = [], {}, {}
+     for index, (case, item, original, accepted, bound, origin, source) in enumerate(zip(
+             contract['model']['cases'], captured, host['cases'], q['cases'], binding['cases'], mapping['cases'], matrix['cases'])):
+-        rid = '0-' + case['id']
++        rid, native = '0-' + case['id'], index >= 4
+         need(original['id'] == accepted['id'] == rid and original['input'] == source and
+-             original['source_matrix_sha256'] == refs['host_matrix']['sha256'] and
+-             Path(original['source_matrix']).resolve() == repo / refs['host_matrix']['path'] and
++             original['source_matrix_sha256'] == refs['comparison']['sha256'] and
++             Path(original['source_matrix']).resolve() == repo / refs['comparison']['path'] and
+              origin['case'] == bound['case'] == index and origin['id'] == bound['id'] == source['id'] == case['id'] and
+              origin['original_case_fields'] == origin['selected_case_fields'] == source and origin['fields_changed'] == [] and
+              bound['raw_sha256'] == case['raw_sha256'] == {k: source['raw_sha256'][k] for k in ('identification', 'setup', 'audio')} and
+-             bound['channels'] == accepted['channels'] == source['channels'] == case['channels'] and
+-             bound['rate'] == accepted['rate'] == source['rate'] == case['rate'] and
++             bound['channels'] == accepted['channels'] == source['channels'] == case['channels'] == 2 and
++             bound['rate'] == accepted['rate'] == source['rate'] == case['rate'] == 192000 and
+              bound['frames'] == case['frames'] and bound['pcm_bytes'] == accepted['pcm_bytes'] == case['total_pcm'] and
+              accepted['frames'] == case['frames'][1:] and accepted['bits'] == 16 and
+-             accepted['xiph_qualified'] is accepted['native_compared'] is True and accepted['native_lookup2_refusal'] is False and
+-             bound['qualification_sha256'] == refs['qualification']['sha256'] and bound['original_host_returncode'] == 0 and
+-             bound['original_reference_id'] == rid and bound['native_compared'] is True,
+-             'Every original raw/header/frame/actual-channel reference field must remain unchanged')
++             accepted['xiph_qualified'] is True and bound['native_compared'] is accepted['native_compared'] is native and
++             bound['native_packet_decode_failure'] is accepted['native_packet_decode_failure'] is (not native) and
++             bound['native_lookup2_refusal'] is accepted['native_lookup2_refusal'] is False and
++             bound['native_cause_diagnosed'] is accepted['native_cause_diagnosed'] is False and
++             bound['native_actual_returncode'] == accepted['native_actual_returncode'] == (0 if native else 4294967295) and
++             bound['qualification_sha256'] == refs['qualification']['sha256'] and bound['original_host_returncode'] == 1 and
++             bound['original_reference_id'] == rid, 'All8 unchanged raw/header/frame/mixed classification identities required')
+         for kind in ('identification', 'setup', 'audio', 'comment', 'ogg'):
+             raw = inputs.read('reference/original-raw/' + rid + '/' + kind,
+                 (repo / refs['comparison']['path']).parent / source[kind],
+@@ -110,52 +101,64 @@
+                 fact = origin['files'][kind][role]
+                 need(inputs.read('reference/mapped-raw/' + rid + '/' + kind + '/' + role,
+                     fact['path'], fact['sha256'], fact['bytes']) == raw, 'Mapped original/selected raw bytes changed')
+-        metrics = mono_metrics if case['channels'] == 1 else pcm_metrics
+         pcms, details, references = {}, {}, {}
+         target_counts = transition_counts(item['pcm'], case, item['packet_offsets'])
+-        for decoder in DECODERS:
++        for decoder in (('libvorbis', 'vorbis') if native else ('libvorbis',)):
+             command = commands['cases/' + rid + '/decode-' + decoder]
+             receipt_path = host_root / relative(command['receipt'])
+             receipt = json.loads(inputs.read('reference/child/' + rid + '/' + decoder, receipt_path, command['sha256']))
+             recorded.terminal(receipt, 0)
+             need(inputs.rows['reference/child/' + rid + '/' + decoder] == q['validated_inputs']['receipt/cases/' + rid + '/decode-' + decoder],
+-                 'Actual reference child receipt binding')
++                 'Actual successful reference child receipt binding')
+             wav = inputs.read('reference/WAV/' + rid + '/' + decoder, host_root / 'cases' / rid / (decoder + '.wav'),
+                              original['decoded'][decoder]['wav_sha256'])
+             md5path = host_root / 'cases' / rid / ('decode-' + decoder + '.stdout.log')
+             md5fact = q['validated_inputs']['log/cases/' + rid + '/decode-' + decoder + '/decode-' + decoder + '.stdout.log']
+             md5 = inputs.read('reference/framemd5/' + rid + '/' + decoder, md5path, md5fact['sha256'], md5fact['bytes'])
+             pcm, info = recorded.decoded_pcm(wav, md5, case['rate'], case['channels'], case['frames'], case['modes'])
+-            need(info == original['decoded'][decoder] == bound['actual_reference_decoders'][decoder] and
+-                 len(pcm) == len(item['pcm']) == case['total_pcm'], 'Complete42 recorded WAV/framemd5 real-channel reference streams required')
++            need(info == original['decoded'][decoder] and len(pcm) == len(item['pcm']) == case['total_pcm'],
++                 'All12 complete recorded stereo WAV/framemd5 reference streams required')
+             pcms[decoder], details[decoder] = pcm, info
+-            references[decoder] = dict(comparison=metrics.compare(pcm, item['pcm'], case['pcm']),
+-                alignment_diagnostic=metrics.alignment(pcm, item['pcm'], 8),
++            references[decoder] = dict(comparison=pcm_metrics.compare(pcm, item['pcm'], case['pcm']),
++                alignment_diagnostic=pcm_metrics.alignment(pcm, item['pcm'], 8),
+                 reference_transition_nonzero=transition_counts(pcm, case, item['packet_offsets']),
+                 target_transition_nonzero=target_counts)
+-        cross = metrics.compare(pcms['vorbis'], pcms['libvorbis'], case['pcm'])
+-        need(whole(cross, case['channels'])['max_abs_error'] == accepted['cross_reference_max_abs_error'] ==
+-             original['cross_reference_max_abs_error'] == bound['cross_reference_max_abs_error'] and
+-             whole(cross, case['channels'])['max_abs_error'] <= 2 and
+-             accepted['pcm_sha256'] == details['libvorbis']['pcm_sha256'] == bound['reference_pcm_sha256'],
+-             'Actual full reference crosscheck/recorded qualification changed')
+-        rows.append(dict(case=index, id=case['id'], rate=case['rate'], channels=case['channels'], bits=16,
++        need(accepted['pcm_sha256'] == details['libvorbis']['pcm_sha256'] == bound['reference_pcm_sha256'] and
++             accepted['wav_sha256'] == details['libvorbis']['wav_sha256'] == bound['reference_wav_sha256'],
++             'Every full Xiph reference binding required')
++        cross = None
++        if native:
++            cross = pcm_metrics.compare(pcms['vorbis'], pcms['libvorbis'], case['pcm'])
++            need(cross['zero_lag_direct_LR']['max_abs_error'] == accepted['cross_reference_max_abs_error'] ==
++                 original['cross_reference_max_abs_error'] == bound['cross_reference_max_abs_error'] and
++                 cross['zero_lag_direct_LR']['max_abs_error'] <= 2, 'Four available native/Xiph full crosschecks unchanged')
++        else:
++            need(accepted['cross_reference_max_abs_error'] is bound['cross_reference_max_abs_error'] is None,
++                 'No native original4 PCM or cross comparison may be invented')
++        xiph_pcm[case['id']], target_pcm[case['id']] = pcms['libvorbis'], item['pcm']
++        rows.append(dict(case=index, id=case['id'], rate=case['rate'], channels=2, bits=16,
+             frames=case['frames'], packet_bytes=case['pcm'], pcm_bytes=len(item['pcm']),
+             packet_offsets=item['packet_offsets'], reference_id=rid, references=references,
++            native_compared=native, native_packet_decode_failure=not native, native_lookup2_refusal=False,
++            native_actual_returncode=accepted['native_actual_returncode'], native_cause_diagnosed=False,
+             original_reference_cross_comparison=cross, original_reference_metadata=details))
+         result['cases'] = rows
+         save()
+-    policy, bounded = bounded_policy(rows, args.max_abs_error)
++    metamorphic = dict(xiph=relations(xiph_pcm), target=relations(target_pcm))
++    policy, bounded = bounded_policy(rows, metamorphic, args.max_abs_error)
+     inputs.current()
+     result.update(result='BOUNDED_CORPUS_PCM_QUALIFIED' if bounded else 'BOUNDED_CORPUS_PCM_REJECTED',
+         measurement_completed=True, actual_reference_compared=True, target_platform_verified=True,
+-        complete_target_cases=21, complete_target_packets=294, complete_target_PCM_bytes=464640,
+-        complete_reference_streams_verified=42, complete_target_reference_comparisons=42,
+-        policy=policy, bounded_corpus_pcm_qualified=bounded,
+-        bounded_by_reference=policy['bounded_by_reference'], original_dual_reference_passed=True,
+-        original_dual_reference_scope='only-existing-mono21-campaign',
+-        original_reference_report_sha256=refs['host']['sha256'], original_reference_failures=host['failures'],
+-        previous_unrelated_NONPASS_reinterpreted=False, no_predeclared_metamorphic_groups=True,
++        complete_target_cases=8, complete_target_packets=112, complete_target_PCM_bytes=225280,
++        complete_reference_streams_verified=12, complete_target_reference_comparisons=12,
++        actual_reference_child_receipts_checked=16, native_original4_packet_refusals_retained=4,
++        native_compared_new_zero4=4, native_cause_diagnosed=False, metamorphic=metamorphic,
++        policy=policy, bounded_corpus_pcm_qualified=bounded, bounded_by_reference=policy['bounded_by_reference'],
++        bounded_original4_Xiph=policy['bounded_original4_Xiph'],
++        bounded_new_zero4_both_references=policy['bounded_new_zero4_both_references'],
++        original_dual_reference_passed=False, original_reference_report_sha256=refs['host']['sha256'],
++        original_reference_failures=host['failures'], prior_other_numeric_NONPASS_record_only=True,
++        prior_numeric_NONPASS_requalified=False, new_reference_commands_executed=False,
+         target_report_sha256=args.target_report_sha256, target_terminal_sha256=args.target_terminal_sha256,
+         actual_runtime_preparation_sha256=args.runtime_preparation_sha256)
+     save()
+@@ -181,7 +184,8 @@
+         bounded_corpus_pcm_qualified=False, passed=False, numeric_reference_qualified=False, format_corpus_qualified=False,
+         format_conformance_qualified=False, checked_only=True, vendor_comparison_available=False,
+         full_G6_qualified=False, physical_device=False, production_radio_integration=False,
+-        policy_predeclared_max_abs_error=2, policy_requires_both_existing_references=True, cases=[])
++        original_dual_reference_passed=False, native_cause_diagnosed=False,
++        policy_predeclared_max_abs_error=2, policy_requires_all12_available_references=True, cases=[])
+ 
+     def save():
+         temp = output / 'report.json.tmp'
+@@ -202,5 +206,4 @@
+     return code
+ 
+ 
+-if __name__ == '__main__':
+-    sys.exit(main())
++if __name__ == '__main__': sys.exit(main())
