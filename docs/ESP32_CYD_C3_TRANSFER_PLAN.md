@@ -132,9 +132,15 @@ allocation и численные настройки C3 являются канд
   Полный численный результат и подгруппа books16 остаются NONPASS.
   [Отдельный Xtensa unit-тест](../tests/results/cyd-vorbis-owned-book-20261023/CHECKPOINT.md)
   подтверждает публикацию16 наших книг и61 векторную пробу, включая обе
-  wide sparse/dense пары, без vendor-декодера. Следом проверить floor0 поля,
-  публичную кривую Tremor и эквивалентное представление LSP с ненулевым
-  минимумом; подтверждённой причины широкого/floor0 PCM пока нет.
+  wide sparse/dense пары, без vendor-декодера.
+  [Шесть эквивалентных floor0 представлений](../tests/results/cyd-vorbis-floor0-equivalent-20261023/CHECKPOINT.md)
+  с ненулевым минимумом прошли полный raw31 прогон:434 пакета/738560 PCM байт.
+  Их target PCM совпадает с исходными шестью, прежние25 результатов сохранены;
+  полное численное сравнение31 остаётся NONPASS с прежним пределом2.
+  Отдельный расчёт публичной формулы нашёл147 положительных ideal-dB значений
+  среди2688 активных bins; integer Tremor/PCM этим расчётом не проверялись.
+  Следом проверить публикацию floor0 полей и actual публичную integer-кривую;
+  подтверждённой причины широкого/floor0 PCM пока нет.
   [C3/RV32 checkpoint](../tests/results/c3-vorbis-map2-20261023/CHECKPOINT.md)
   подтверждает ту же setup правку на SDK6.1/core0: все25 случаев/350 пакетов
   декодируются; исходный отказ case6 воспроизведён до исправления.
@@ -880,6 +886,23 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Это квалификация нашей публикации и данного public consumer при point0,
   не vendor backend/PCM/floor0/G6. Production source, ABI и task affinity
   этим unit-тестом не менялись; wide PCM и все остальные gates остаются.
+
+- 2026-10-23, CYD-C3-14/G6: [floor0 equivalent checkpoint](../tests/results/cyd-vorbis-floor0-equivalent-20261023/CHECKPOINT.md)
+  сохраняет шесть новых представлений lookup2 с минимумом1/16 и уменьшенными
+  multiplicands. Независимый raw/Fraction/CRC witness и Xiph12 подтверждают
+  прежние LSP/PCM; native12 lookup2 отказы и host exit1 сохранены.
+  Actual SDK6.0.2/Xtensa/core1 raw31 завершён:434 пакета/738560 PCM байт/964 events,
+  все9 команд0. Прежние25 PCM и775 case events совпадают побайтно; все6 новых
+  target PCM совпадают с исходными floor0. Maxima новых even6:40664/1649/40664,
+  odd5:65535×3; полное31 и проекция25 остаются NONPASS с пределом2 S16 LSB.
+  Отдельная own binary64 формула6/84/168/2688 и5 algebra controls завершена:
+  147 bins требуют положительный ideal dB; это не integer Tremor/PCM и не
+  установленная причина backend ошибки. Историческая README опечатка734464
+  сохранена; actual model/materializer/target требуют738560. [Архив и canonical
+  offline replay](../tests/results/cyd-vorbis-floor0-equivalent-verification-20261023/README.md)
+  проверены отдельно, включая полный31 и все14 relations. Публикация floor0
+  полей, публичная integer-кривая, остальные форматы/G1–G8, radio integration
+  и физические gates остаются открытыми; задачи и аппаратные настройки сохранены.
   Архив746 файлов/7535253 байт сохраняет27 hash-only binary omissions и
   фактический ELF header64. Manifest SHA256:
   `4126c63d4fa6c9699d094b965961055ed9ea4c112bcc9d7b2cfdf5c84d7ad237`.

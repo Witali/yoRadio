@@ -1,0 +1,127 @@
+--- c3-vorbis-map2-archive-prep-01/pack.py
++++ cyd-vorbis-floor0-equivalent-archive-prep-01/pack.py
+@@ -1,34 +1,33 @@
+-"""Focused C3 source/evidence packer; no SDK, compiler, codec, emulator, or Git calls."""
++"""Focused CYD floor0-equivalent31 source/evidence packer; no SDK, compiler, codec, emulator, or Git calls."""
+ import argparse
+ import gzip
+ import json
+ from pathlib import Path
+ from dependency import Dependency, MANIFEST_SHA, need, norm, obj, rel, sha
+ 
+-ROLES = {'baseline', 'acceptance', 'numeric'}
++ROLES = {'capture31', 'numeric31', 'host-new12'}
+ CONTEXT = ('compile_commands.json', 'project_description.json', 'flasher_args.json',
+            'build.ninja', 'CMakeCache.txt', 'config/sdkconfig.h', 'toolchain/cflags', 'specs/picolibc.specs')
+ SELF = ('pack.py', 'verify.py', 'dependency.py', 'README.md', 'plan.template.json',
+-        'source-relation.json', 'readiness.json', 'pack-adaptation.diff', 'verify-adaptation.diff',
+-        'check_source.py', 'source-closure.json')
++        'source-relation.json', 'readiness.json', 'pack-from-c3.diff', 'source-checks.json')
+ 
+ 
+ def pack(repo, out, plan_path):
+     repo, out, plan_path = repo.resolve(), out.resolve(), plan_path.resolve()
+     plan = obj(plan_path.read_bytes())
+-    need(plan['schema'] == 'c3-map2-selection-v1' and set(plan['roles']) == ROLES and
+-         plan['dependency_manifest_sha256'] == MANIFEST_SHA, 'Exact C3/dependency role selection required')
++    need(plan['schema'] == 'cyd-floor0-equivalent31-selection-v1' and set(plan['roles']) == ROLES and
++         plan['dependency_manifest_sha256'] == MANIFEST_SHA, 'Exact CYD31/dependency role selection required')
+     need(out.is_relative_to(repo / '.build') and out != repo / '.build' and not out.exists(),
+          'Use a fresh independent .build stage')
+     roots = [(repo / rel(item['path'])).resolve() for item in plan['roles'].values()]
+     roots += [(repo / rel(path)).resolve() for path in plan['trees']]
+     need(all(p.is_relative_to(repo) and p.is_dir() and not (p.is_relative_to(out) or out.is_relative_to(p))
+-             for p in roots), 'Missing or overlapping C3 input roots')
++             for p in roots), 'Missing or overlapping CYD31 input roots')
+     dep = Dependency(repo)
+-    manifest = dict(schema='c3-map2-checkpoint-v1', repository=norm(repo), plan=plan, files={},
++    manifest = dict(schema='cyd-floor0-equivalent31-checkpoint-v1', repository=norm(repo), plan=plan, files={},
+         aliases={}, roles={}, external_omitted={}, generated={}, verified=False,
+         dependency_archive=dict(path='tests/results/cyd-vorbis-map2-20261020', manifest_sha256=MANIFEST_SHA,
+-            required=True, standalone=False), intended_destination='tests/results/c3-vorbis-map2-20261023',
++            required=True, standalone=False), intended_destination='tests/results/cyd-vorbis-floor0-equivalent-20261023',
+         full_G6_qualified=False, physical_device=False, production_firmware=False)
+     out.mkdir(parents=True, exist_ok=False)
+     originals = {}
+@@ -90,9 +89,9 @@
+         need(sha(data) == expected, 'Installed historical tool/archive identity changed')
+         row = dict(raw_bytes=len(data), raw_sha256=expected, omitted='Actual tool/archive/ROM bytes hashed, not copied')
+         key = norm(path)
+-        need(key not in manifest['external_omitted'] or manifest['external_omitted'][key] == row,
++        need(key not in manifest['external_omitted'] or all(manifest['external_omitted'][key][field] == value for field, value in row.items()),
+              'Conflicting tool/archive identity')
+-        manifest['external_omitted'][key] = row
++        manifest['external_omitted'].setdefault(key, {}).update(row)
+ 
+     def receipt(path):
+         path = (repo / rel(path)).resolve()
+@@ -108,22 +107,33 @@
+         root = (repo / rel(item['path'])).resolve()
+         report = obj((root / 'report.json').read_bytes())
+         need(sha((root / 'report.json').read_bytes()) == item['report_sha256'], 'Reviewed actual report identity differs')
+-        manifest['roles'][role] = dict(root=root.relative_to(repo).as_posix(), kind='numeric' if role == 'numeric' else 'target',
++        need(sha((repo / rel(item['terminal'])).read_bytes()) == item['terminal_sha256'], 'Reviewed actual outer receipt identity differs')
++        manifest['roles'][role] = dict(root=root.relative_to(repo).as_posix(), kind='numeric' if role == 'numeric31' else 'host' if role == 'host-new12' else 'target',
+             terminal=receipt(item['terminal']), expected_outer_exit=item['expected_outer_exit'])
+         selected = [p for p in root.iterdir() if p.is_file()]
+-        for folder in ('sources', 'variant', 'observed-pcm'):
++        for folder in ('sources', 'variant', 'observed-pcm', 'cases'):
+             selected += [p for p in (root / folder).rglob('*') if p.is_file()]
+         selected += [root / 'build' / path for path in CONTEXT if (root / 'build' / path).is_file()]
+         selected += list((root / 'build').glob('*.map'))
+         for field in ('build_outputs', 'variant_sources'):
+             selected += [root / rel(path) for path in report.get(field, {})]
+         for path in sorted(set(selected)):
+-            add(path, allow_borrow=False)  # Preserve actual C3 snapshots locally, even when bytes match CYD.
++            add(path, allow_borrow=False)  # Preserve actual31/full12 snapshot copies locally, including matching dependency bytes.
+         aliases = manifest['aliases'][role] = {}
+         for original, row in report.get('inputs', {}).items():
+             path = root / rel(row['snapshot']) if 'snapshot' in row else Path(row['path'])
+-            key = add(path, row['sha256'], allow_borrow='snapshot' not in row)
+-            aliases[norm(original if 'snapshot' in row else row['path'])] = key
++            original_path = norm(original if 'snapshot' in row else row['path'])
++            if path.resolve().is_relative_to(repo):
++                key = add(path, row['sha256'], allow_borrow='snapshot' not in row)
++                aliases[original_path] = key
++            else:
++                need(role == 'numeric31' and 'snapshot' not in row and path.name in {'ffmpeg.exe', 'python.exe'},
++                     'Only explicitly identified external numeric reference tools may be hash-only inputs')
++                tool(path, row['sha256'])
++                external = manifest['external_omitted'][norm(path.resolve())]
++                need('bytes' not in row or external['raw_bytes'] == row['bytes'], 'External numeric input size differs')
++                external['external_numeric_input'] = True
++                manifest.setdefault('external_numeric_aliases', {}).setdefault(role, {})[original_path] = norm(path.resolve())
+         for path, digest in report.get('tools', {}).items():
+             tool(path, digest)
+ 
+@@ -140,12 +150,30 @@
+         for key in sorted(set(keys)):
+             borrow(key)
+ 
++    # Exact committed25 report/PCM/native events are a dependency, not recopied.
++    old25 = dep.manifest['roles']['capture25']
++    manifest['roles']['old25'] = dict(old25, dependency_role=True, expected_outer_exit=0)
++    manifest['aliases']['old25'] = {}
++    old_report_key = old25['root'] + '/report.json'
++    old_report = obj(dep.read(old_report_key))
++    keys = [old_report_key, old25['terminal'], old25['root'] + '/qemu.stdout.log', old25['root'] + '/qemu.stderr.log',
++            old25['root'] + '/sources/corpus/contract.json']
++    keys += [old25['root'] + '/' + row['path'] for row in old_report['observed_pcm']]
++    keys.append(dep.manifest['roles']['numeric-expanded25']['root'] + '/report.json')
++    for key in keys:
++        borrow(key)
++    for path in plan['extra_receipts']:
++        need(sha((repo / rel(path)).read_bytes()) == plan['extra_receipt_pins'][path], 'Exact actual extra receipt identity')
++        receipt(path)
++
+     for path in plan['trees']:
+         for source in sorted((repo / rel(path)).rglob('*')):
+             if source.is_file():
+                 add(source, allow_borrow=False)
+     for path in plan['extras']:
+         add(repo / rel(path))
++    checkpoint = repo / rel(plan['checkpoint']['path'])
++    add(checkpoint, plan['checkpoint']['sha256'], stored='CHECKPOINT.md', allow_borrow=False)
+     for name in SELF:
+         add(Path(__file__).with_name(name), stored=name, allow_borrow=False)
+     add(plan_path, stored='selection.json', allow_borrow=False)
