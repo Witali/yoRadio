@@ -130,9 +130,11 @@ allocation и численные настройки C3 являются канд
   Все шесть floor0 случаев также нарушают заранее выбранный проектный предел2:
   максимумы even6:40664/1649/40664; odd5:65535 во всех трёх парах блоков.
   Полный численный результат и подгруппа books16 остаются NONPASS.
-  Следом проверить публикацию наших book/floor0 полей отдельным unit-тестом,
-  публичные decode_map/кривую Tremor и эквивалентное представление LSP с
-  ненулевым минимумом; подтверждённой причины широкого/floor0 PCM пока нет.
+  [Отдельный Xtensa unit-тест](../tests/results/cyd-vorbis-owned-book-20261023/CHECKPOINT.md)
+  подтверждает публикацию16 наших книг и61 векторную пробу, включая обе
+  wide sparse/dense пары, без vendor-декодера. Следом проверить floor0 поля,
+  публичную кривую Tremor и эквивалентное представление LSP с ненулевым
+  минимумом; подтверждённой причины широкого/floor0 PCM пока нет.
   [C3/RV32 checkpoint](../tests/results/c3-vorbis-map2-20261023/CHECKPOINT.md)
   подтверждает ту же setup правку на SDK6.1/core0: все25 случаев/350 пакетов
   декодируются; исходный отказ case6 воспроизведён до исправления.
@@ -860,3 +862,29 @@ Stream остаётся на core0, decode/output на core1 с прежними
   [Повторная автономная проверка](../tests/results/c3-vorbis-map2-verification-20261023/README.md)
   staged и окончательного canonical каталога из другого cwd завершена0;
   baseline и полный численный NONPASS сохранены.
+- 2026-10-23, CYD-C3-14 G6: [owned-book unit](../tests/results/cyd-vorbis-owned-book-20261023/CHECKPOINT.md)
+  исполняет точный production setup parser с контролируемым public bit-reader
+  и отдельным ограниченным public vector consumer. Actual SDK6.0.2/Xtensa/
+  ILP32/240MHz/двухъядерный ESP32/main core0 подтверждены macro/include
+  зависимостями; ELF94, nm, map и реальные link commands подтверждают отсутствие
+  vendor codec/decode/register/wrapper linkage. Все16 книг/59 active codewords/
+  61 probes/2 wide-пары/97 native events проходят, после clear live allocations0.
+  Все14 owned commands завершены0. Настоящие QMP greeting/capabilities/quit
+  acknowledgements, host-qmp-quit SHUTDOWN и terminal0 сохранены; EOF проверен
+  точным captured helper, отдельное EOF поле в исходный receipt не добавлялось.
+  Первый запуск сохранил NONPASS до build/QEMU из-за ошибочного требования
+  уникальности109 GCC dependency строк: пять SDK headers законно повторяются.
+  Successor сохраняет все109 строк/104 paths и повторно сравнивает raw macros
+  и dependencies после build. Исправление outer/child log-name collision
+  отдельно сохранено как source-only история до runtime.
+  Это квалификация нашей публикации и данного public consumer при point0,
+  не vendor backend/PCM/floor0/G6. Production source, ABI и task affinity
+  этим unit-тестом не менялись; wide PCM и все остальные gates остаются.
+  Архив746 файлов/7535253 байт сохраняет27 hash-only binary omissions и
+  фактический ELF header64. Manifest SHA256:
+  `4126c63d4fa6c9699d094b965961055ed9ea4c112bcc9d7b2cfdf5c84d7ad237`.
+  [Автономная проверка](../tests/results/cyd-vorbis-owned-book-verification-20261023/README.md)
+  staged и конечного canonical каталога из другого cwd завершена0.
+  Первый offline verifier ошибочно считал разные headers с одинаковым
+  basename одним повторённым путём; его NONPASS и исправление на полные пути
+  сохранены отдельно от actual unit PASS и успешного повторного verifier.

@@ -1,0 +1,344 @@
+"""Read-only stdlib verification of the finite owned-book archive, from any cwd."""
+import argparse
+from collections import Counter
+import gzip
+import hashlib
+import json
+from pathlib import Path, PurePosixPath, PureWindowsPath
+import re
+import struct
+import sys
+import types
+
+sys.dont_write_bytecode = True
+PLAN = '49540a8a0ce0667c88c68b044e36e5b43cb6f4dbf2caf4326416d5e5122acdd8'
+PROTOCOL = 'c87b344b9ad84af3434e8e13f82560e988490c85edcdc53cbc8888553f5ce21c'
+CONTRACT = '394b82d8c21b1e895e74e51cd56d13e547ef0790b9df226a70f24656035be1ce'
+SETUP = '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c'
+ABI = 'e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60'
+UNIT = '84db13b6965bdb17e25454338fa09c03823431e3cc8bc04bfe279bc814c7185c'
+QMP_HELPER = '955afd02ec32813f169b301832afb87b322701bd5fe879e6bd390f9cfbcd631e'
+SDK = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+COMMANDS = ('sdk-head', 'sdk-clean', 'sdk-configure-launcher', 'unit-macros-before', 'unit-dependencies-before',
+            'sdk-build-launcher', 'unit-macros-after', 'unit-dependencies-after', 'symbols', 'ninja-commands',
+            'merge', 'qemu', 'sdk-head-after', 'sdk-clean-after')
+FALSE_SCOPE = ('vendor_backend_qualified', 'PCM_qualified', 'full_G6_qualified', 'physical_qualified', 'production_radio_integration')
+BAD_LINK = re.compile(r'libesp_audio_(?:codec|simple_dec)\.a|esp-adf-libs|--wrap[=, ]+esp_vorbis', re.I)
+BAD_SYMBOL = re.compile(r'(?:__wrap_|__real_)?(?:esp_vorbis_dec_\w+|esp_audio_(?:simple_)?dec_\w+)|repair_(?:vorbis_open|vorbis_register)')
+MACROS = dict(__SIZEOF_INT__='4', __SIZEOF_LONG__='4', __SIZEOF_POINTER__='4', __XTENSA__='1',
+    __BYTE_ORDER__='__ORDER_LITTLE_ENDIAN__', CONFIG_IDF_TARGET_ESP32='1', CONFIG_IDF_TARGET_ARCH_XTENSA='1',
+    CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ='240', CONFIG_FREERTOS_NUMBER_OF_CORES='2', CONFIG_ESP_MAIN_TASK_AFFINITY_CPU0='1',
+    CONFIG_ESP_MAIN_TASK_AFFINITY='0x0', CONFIG_ESP_MAIN_TASK_STACK_SIZE='16384')
+
+
+def need(ok, reason):
+    if not ok:
+        raise RuntimeError(reason)
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def norm(value):
+    return str(value).replace('\\', '/')
+
+
+def safe(value):
+    value = norm(value)
+    path = PurePosixPath(value)
+    need(value and not path.is_absolute() and '..' not in path.parts and ':' not in value, 'Unsafe relative evidence path')
+    return path.as_posix()
+
+
+def windows_args(command):
+    """Pure Windows quoting parser, adapted from the reviewed rate verifier."""
+    out, i = [], 0
+    while i < len(command):
+        while i < len(command) and command[i] in ' \t':
+            i += 1
+        if i == len(command):
+            break
+        word, quoted = '', False
+        while i < len(command) and (quoted or command[i] not in ' \t'):
+            count = 0
+            while i < len(command) and command[i] == '\\':
+                count += 1; i += 1
+            if i < len(command) and command[i] == '"':
+                word += '\\' * (count // 2)
+                if count % 2:
+                    word += '"'
+                elif quoted and i + 1 < len(command) and command[i + 1] == '"':
+                    word += '"'; i += 1
+                else:
+                    quoted = not quoted
+                i += 1
+            else:
+                word += '\\' * count
+                if i < len(command) and (quoted or command[i] not in ' \t'):
+                    word += command[i]; i += 1
+        need(not quoted, 'Unclosed actual compilation quote')
+        out.append(word)
+    return out
+
+
+def dependency_rows(raw, cwd):
+    raw = raw.replace('\\\r\n', '').replace('\\\n', '')
+    need(': ' in raw and '$' not in raw and '\x00' not in raw, 'Unsupported actual GCC dependency spelling')
+    body, parts, word, i = raw.split(': ', 1)[1], [], [], 0
+    while i < len(body):
+        char = body[i]
+        if char == '\\' and i + 1 < len(body) and body[i + 1] in ' \t\\#:':
+            word.append(body[i + 1]); i += 2
+        elif char.isspace():
+            if word:
+                parts.append(''.join(word)); word = []
+            i += 1
+        else:
+            word.append(char); i += 1
+    if word:
+        parts.append(''.join(word))
+    need(parts, 'Empty dependency evidence')
+    return [PureWindowsPath(cwd) / path for path in parts]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parent)
+    parser.add_argument('--manifest-sha256', required=True)
+    args = parser.parse_args()
+    root = args.root.resolve()
+    manifest_raw = (root / 'manifest.json').read_bytes()
+    need(re.fullmatch('[0-9a-f]{64}', args.manifest_sha256) and sha(manifest_raw) == args.manifest_sha256,
+         'Independently reviewed raw manifest SHA256 required')
+    m = json.loads(manifest_raw)
+    need(m['schema'] == 'cyd-owned-book-evidence-archive-v1' and m['plan_sha256'] == PLAN
+         and all(m[key] is False for key in FALSE_SCOPE) and m['omitted_binary_bytes_replayable'] is False,
+         'Finite unit scope and binary omission limits required')
+    expected_stored = {safe(row['stored']) for row in m['files'].values()} | {'manifest.json'}
+    actual_stored = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()}
+    need(actual_stored == expected_stored and len(expected_stored) == len(m['files']) + 1,
+         'Exact complete archive file set required')
+    cache = {}
+
+    def raw(key):
+        key = safe(key)
+        if key not in cache:
+            row = m['files'][key]
+            path = root / safe(row['stored'])
+            need(path.is_file() and not path.is_symlink(), 'Regular archived file required')
+            encoded = path.read_bytes()
+            need(len(encoded) == row['stored_bytes'] and sha(encoded) == row['stored_sha256'], 'Stored bytes differ: ' + key)
+            need(row['compression'] in ('none', 'gzip'), 'Unsupported compression')
+            data = gzip.decompress(encoded) if row['compression'] == 'gzip' else encoded
+            need(len(data) == row['bytes'] and sha(data) == row['sha256'], 'Raw original bytes differ: ' + key)
+            cache[key] = data
+        return cache[key]
+
+    def obj(key):
+        return json.loads(raw(key).decode('utf-8-sig'))
+
+    def text(key):
+        return raw(key).decode('utf-8', errors='replace').replace('\r\n', '\n')
+
+    def identity(key, expected):
+        if key in m['files']:
+            need(sha(raw(key)) == expected, 'Bound file identity: ' + key)
+        else:
+            need(key in m['omitted'] and m['omitted'][key]['sha256'] == expected
+                 and m['omitted'][key]['bytes'] > 0, 'Bound omitted binary identity: ' + key)
+
+    for key in m['files']:
+        raw(key)
+    need(sha(raw('plan.json')) == PLAN, 'Pinned historical role plan')
+    plan = obj('plan.json')
+    need(plan['state'] == 'ACTUAL_PARENT_TERMINALS_PINNED' and [r['role'] for r in plan['roles']] == ['failed01', 'acceptance02'],
+         'Both original history and actual acceptance required')
+    need(set(m['campaigns']) == {'failed01', 'acceptance02'} and set(m['preparations']) == {p['name'] for p in plan['preparations']},
+         'Exact campaign and preparation roles')
+    for prep in plan['preparations']:
+        row = m['preparations'][prep['name']]
+        prefix = 'preparations/' + prep['name']
+        need(row == dict(prefix=prefix, index=prep['index'], index_sha256=prep['index_sha256']), 'Preparation role metadata')
+        index_key = prefix + '/' + prep['index']
+        need(sha(raw(index_key)) == prep['index_sha256'], 'Exact source-only preparation index')
+        index = obj(index_key)
+        actual = {key[len(prefix) + 1:] for key in m['files'] if key.startswith(prefix + '/')}
+        need(actual == set(index['files']) | {prep['index']}, 'Full historical preparation file set')
+        for name, item in index['files'].items():
+            data = raw(prefix + '/' + safe(name))
+            need(len(data) == item['bytes'] and sha(data) == item['sha256'], 'Preparation raw bytes')
+
+    observed_acceptance = None
+    for role in plan['roles']:
+        name, info = role['role'], m['campaigns'][role['role']]
+        prefix = 'campaigns/' + name
+        report_raw, terminal_raw = raw(prefix + '/report.json'), raw(prefix + '/parent-terminal.json')
+        r, terminal = json.loads(report_raw), json.loads(terminal_raw)
+        need(sha(report_raw) == role['report_sha256'] == info['report_sha256']
+             and sha(terminal_raw) == role['terminal_sha256'] == info['terminal_sha256'], 'Actual pinned reports/parent receipts')
+        prep = m['preparations'][role['prep']]
+        controller = raw(prep['prefix'] + '/run-owned-book-unit.py')
+        need(terminal['schema'] == 'direct-exec-tool-terminal-v1' and type(terminal['session_id']) is int
+             and terminal['session_id'] > 0 and bool(terminal['terminal_chunk_id'])
+             and terminal['report_sha256'] == sha(report_raw) and terminal['entrypoint_sha256'] == sha(controller)
+             and terminal['exit_code'] == role['expected_exit_code'] and r['result'] == role['expected_result'],
+             'Real parent terminal and exact executed controller binding')
+        need(all(r[key] is False for key in FALSE_SCOPE) and r['declared_inputs_tools_configs_unchanged'] is True,
+             'Original finite-scope result/integrity flags')
+        need(r['readiness_sha256'] == prep['index_sha256'] and sha(raw(prefix + '/sources/run-owned-book-unit.py')) == sha(controller),
+             'Actual campaign used exact reviewed controller/readiness')
+        for origin, item in r['inputs'].items():
+            data = raw(prefix + '/' + safe(item['snapshot']))
+            need(len(data) == item['bytes'] and sha(data) == item['sha256'], 'Actual frozen source/include/config input')
+        for path, digest in r['tools'].items():
+            key = info['tool_keys'][path]
+            need(key in m['omitted'] and m['omitted'][key]['sha256'] == digest
+                 and norm(m['omitted'][key]['origin']) == norm(path), 'Actual tool identity omission')
+        need(set(info['tool_keys']) == set(r['tools']), 'All actual tool aliases retained')
+        for rel, digest in r['build_outputs'].items():
+            identity(prefix + '/' + safe(rel), digest)
+        commands = r['commands']
+        expected = COMMANDS if name == 'acceptance02' else COMMANDS[:5]
+        need(tuple(c['name'] for c in commands) == expected, 'Exact actual owned command sequence')
+        for c in commands:
+            need(type(c['pid']) is int and c['pid'] > 0 and c['state'] == 'complete' and c['exit_status'] == 0
+                 and c['timed_out'] is False and c['interrupted'] is False and c['force_stopped'] is False,
+                 'Every actual owned command terminal0 without cleanup/timeout/interruption')
+            if c['name'] != 'qemu':
+                for stream in ('stdout', 'stderr'):
+                    need(sha(raw(prefix + '/' + c['name'] + '.' + stream + '.log')) == c[stream + '_sha256'], 'Actual command raw log binding')
+        for action in (('configure', 'build') if name == 'acceptance02' else ('configure',)):
+            receipt = obj(prefix + '/sdk-' + action + '-process.json')
+            launcher = next(c for c in commands if c['name'] == 'sdk-' + action + '-launcher')
+            need(receipt['action'] == action and receipt['terminal'] is True and type(receipt['pid']) is int
+                 and receipt['pid'] > 0 and receipt['pid'] != launcher['pid'] and receipt['exit_status'] == 0
+                 and PureWindowsPath(receipt['cwd']) == PureWindowsPath(role['path']), 'Actual separate SDK child terminal receipt')
+        for suffix in ('', '-after') if name == 'acceptance02' else ('',):
+            need(text(prefix + '/sdk-head' + suffix + '.stdout.log').strip() == SDK
+                 and text(prefix + '/sdk-clean' + suffix + '.stdout.log').strip() == '', 'Actual clean pinned SDK identity')
+        macro_raw = raw(prefix + '/unit-macros-before.stdout.log')
+        macro_values = dict(re.findall(r'^#define ([A-Za-z_0-9]+)(?: (.*))?$', macro_raw.decode().replace('\r\n', '\n'), re.M))
+        need(all(macro_values.get(k) == v for k,v in MACROS.items()) and 'CONFIG_FREERTOS_UNICORE' not in macro_values,
+             'Actual ILP32/little-endian/ESP32/240MHz/dual-core/maincore0 macros')
+        context = r['compile_context']
+        row = context['actual_row']
+        argv = row.get('arguments') or windows_args(row['command'])
+        need(argv == context['original_argv'] and all(flag in argv for flag in ('-fno-inline', '-ffunction-sections', '-fdata-sections')),
+             'Actual direct compilation command and isolated test flags')
+        transformed, i = [argv[0]], 1
+        while i < len(argv):
+            if argv[i] == '-c': i += 1
+            elif argv[i] == '-o': i += 2
+            else: transformed.append(argv[i]); i += 1
+        need(transformed + ['-E', '-dM'] == context['macro_argv']
+             and context['macro_argv'] == commands[3]['argv'], 'Macro probe preserves the actual TU compile context')
+        dependencies_raw = raw(prefix + '/unit-dependencies-before.stdout.log')
+        deps = dependency_rows(dependencies_raw.decode(), context['cwd'])
+        repeated = Counter(p.name for p in deps)
+        need(len(deps) == 109 and len(set(deps)) == 104
+             and {p for p,n in repeated.items() if n > 1} == {'xtruntime.h', 'esp_assert.h', 'task.h', 'queue.h', 'stream_buffer.h'},
+             'All109 actual GCC rows and five legal repetitions must remain')
+        if name == 'failed01':
+            need(r['passed'] is False and r['completed'] is False and r['source_compile_link_qualified'] is False
+                 and r['owned_parser_public_vector_qualified'] is False and 'nonempty and unique' in r['error']
+                 and 'actual_dependencies' not in context and not any(c['name'] in ('sdk-build-launcher', 'qemu') for c in commands),
+                 'Preserve original prebuild uniqueness-gate NONPASS; no invented execution')
+            continue
+        need(raw(prefix + '/unit-macros-after.stdout.log') == macro_raw
+             and raw(prefix + '/unit-dependencies-after.stdout.log') == dependencies_raw, 'Actual raw macros/dependencies stable across compile')
+        actual_deps = context['actual_dependencies']
+        need([PureWindowsPath(item['path']) for item in actual_deps] == deps and len(actual_deps) == 109,
+             'Every actual dependency row retained in original order')
+        input_by_path = {PureWindowsPath(path):item for path,item in r['inputs'].items()}
+        for item in actual_deps:
+            frozen = input_by_path[PureWindowsPath(item['path'])]
+            need(item['sha256'] == frozen['sha256'] and item['bytes'] == frozen['bytes'], 'Each dependency row has actual frozen hash/bytes')
+        for rel,digest in (('main/book_unit.c', UNIT), ('main/pinned/production/vorbis_repair/setup.c', SETUP),
+                           ('main/pinned/production/vorbis_repair_abi.h', ABI)):
+            source_key = prefix + '/sources/project/' + rel
+            need(sha(raw(source_key)) == digest and PureWindowsPath(role['path']) / 'sources/project' / rel in set(deps),
+                 'Actual compiler consumed unchanged real parser/ABI/unit sources')
+        desc = obj(prefix + '/build/project_description.json')
+        need(desc['project_name'] == 'cyd_vorbis_owned_book_unit' and not any('esp_audio' in n for n in desc['build_components'])
+             and not BAD_LINK.search(json.dumps(desc)), 'Actual isolated project description without vendor components')
+        compile_rows = obj(prefix + '/build/compile_commands.json')
+        need(row in compile_rows and not BAD_LINK.search(json.dumps(compile_rows)), 'Actual compilation database binds exact unit row')
+        config_before = obj(prefix + '/configure-compiler-identity.json')
+        need(config_before == obj(prefix + '/build-compiler-identity.json'), 'Actual compiler/nm/ninja identities stable')
+        symbols = text(prefix + '/symbols.stdout.log')
+        for symbol in ('repair_vorbis_book_unpack', 'repair_vorbis_book_clear', 'app_main'):
+            need(re.search(r'^[0-9a-f]+\s+[0-9a-f]+\s+[tT]\s+' + symbol + '$', symbols, re.M), 'Actual linked unit/parser symbol')
+        need(not any(BAD_SYMBOL.fullmatch(line.split()[-1]) for line in symbols.splitlines() if line.split()),
+             'Vendor decoder/register/wrapper absent from actual linked symbols')
+        for key in ('build/cyd_vorbis_owned_book_unit.map', 'ninja-commands.stdout.log', 'sdk-build.stdout.log'):
+            value = text(prefix + '/' + key)
+            need('book_unit.c' in value and not BAD_LINK.search(value), 'Actual source/link closure without vendor archives')
+            if not key.endswith('.map'):
+                need('--gc-sections' in value and desc['app_elf'] in value, 'Actual generated/verbose link commands retain section GC')
+        elf = m['omitted'][prefix + '/build/' + desc['app_elf']]
+        header = raw(elf['elf_header_key'])
+        need(len(header) == 64 and header[:7] == b'\x7fELF\x01\x01\x01' and struct.unpack_from('<H',header,18)[0] == 94
+             and m['files'][elf['elf_header_key']]['derived_from_full_sha256'] == elf['sha256'], 'Actual ELF64 header slice/machine94 bound to omitted ELF')
+        recipe = obj(prefix + '/build/flasher_args.json')
+        need({k:recipe.get('flash_settings',{}).get(k) for k in ('flash_mode','flash_size','flash_freq')}
+             == dict(flash_mode='dio',flash_size='4MB',flash_freq='40m'), 'Actual DIO/40MHz/4MB recipe')
+        flash = {int(offset,0):norm(path) for offset,path in recipe['flash_files'].items()}
+        need(flash == {0x1000:'bootloader/bootloader.bin',0x8000:'partition_table/partition-table.bin',0x10000:desc['app_bin']},
+             'Actual three fixed ESP32 flash offsets/files')
+        q = next(c for c in commands if c['name'] == 'qemu')
+        hroot = PureWindowsPath(role['path'])
+        expected_qemu = [q['argv'][0], '-audiodev','none,id=quiet','-M','esp32,audiodev=quiet','-smp','2','-L',q['argv'][8],
+            '-display','none','-monitor','none','-serial','file:' + str(hroot / 'qemu.serial.log'),'-qmp','stdio',
+            '-no-reboot','-snapshot','-nic','none','-drive','file=' + str(hroot / 'qemu-flash.bin') + ',if=mtd,format=raw']
+        need(q['argv'] == expected_qemu and PureWindowsPath(q['cwd']) == hroot, 'Owned scoped QMP stdio/serial file, no NIC/audio, snapshot flash')
+        for flag in ('complete_observed','qmp_capabilities_acknowledged','qmp_quit_acknowledged','owned_shutdown_observed','lifecycle_qualified'):
+            need(q[flag] is True, 'Actual terminal lifecycle flag: ' + flag)
+        for filename in ('qemu.serial.log','qemu.stderr.log','qemu.qmp.stdout.log','qemu.qmp.requests.jsonl'):
+            data = raw(prefix + '/' + filename)
+            need(len(data) == q[filename]['bytes'] and sha(data) == q[filename]['sha256'], 'Actual QMP/serial raw output binding')
+        messages = [json.loads(line) for line in raw(prefix + '/qemu.qmp.stdout.log').splitlines() if line]
+        requests = [json.loads(line) for line in raw(prefix + '/qemu.qmp.requests.jsonl').splitlines() if line]
+        need(messages == [x['message'] for x in q['qmp_messages']] and len(messages) == 4 and 'QMP' in messages[0]
+             and requests == q['qmp_requests'] and [x['message'] for x in requests] ==
+             [dict(execute='qmp_capabilities',id='owned-capabilities'),dict(execute='quit',id='owned-quit')],
+             'Actual greeting/requests and all four raw QMP messages')
+        returns = [x for x in messages if 'return' in x]
+        shutdown = [x for x in messages if x.get('event') == 'SHUTDOWN']
+        need(returns == [{'return':{},'id':'owned-capabilities'},{'return':{},'id':'owned-quit'}],
+             'Both actual QMP acknowledgement IDs')
+        need(len(shutdown) == 1 and shutdown[0]['data'] == dict(guest=False,reason='host-qmp-quit')
+             and all('error' not in x and x.get('event') not in ('RESET','GUEST_PANICKED') for x in messages),
+             'Actual owned host quit SHUTDOWN; no guest/error/reset substitute')
+        need(q['actual_started_time_ns'] < requests[0]['actual_sent_time_ns'] < requests[1]['actual_sent_time_ns'] < q['actual_terminal_time_ns'],
+             'Actual owned lifecycle request/terminal order')
+        serial = raw(prefix + '/qemu.serial.log')
+        need(sha(serial[:q['serial_bytes_at_complete']]) == q['serial_sha256_at_complete'], 'Actual COMPLETE observation bound to complete serial prefix')
+        need(sha(raw(prefix + '/sources/owned_qmp.py')) == QMP_HELPER
+             and m['QMP_EOF_direct_boolean_recorded'] is False and m['QMP_EOF_enforced_by_exact_captured_helper'] is True,
+             'EOF enforced by the exact captured helper, never fabricated as a separate receipt')
+        need(sha(raw('protocol.py')) == PROTOCOL and sha(raw(prefix + '/sources/protocol.py')) == PROTOCOL
+             and sha(raw(prefix + '/sources/fixture-contract.json')) == CONTRACT, 'Exact trusted finite protocol and fixture contract')
+        module = types.ModuleType('owned_book_strict_protocol')
+        exec(compile(raw('protocol.py'), '<sha256-pinned pure finite protocol>', 'exec'), module.__dict__)
+        contract = obj(prefix + '/sources/fixture-contract.json')
+        observed = module.validate_log(serial.decode('utf-8') + '\n' + text(prefix + '/qemu.stderr.log'), contract,
+            returncode=q['exit_status'], timed_out=q['timed_out'], interrupted=q['interrupted'])
+        need(observed == r['observed'] and observed['protocol_lines'] == 97 and observed['cases'] == 16
+             and observed['active_codewords'] == 59 and observed['vector_probes'] == 61 and observed['wide_pairs'] == 2,
+             'Revalidated exact97 events/all16 books/all61 probes after full actual terminal closure')
+        need(r['passed'] is True and r['completed'] is True and r['source_compile_link_qualified'] is True
+             and r['owned_parser_public_vector_qualified'] is True and terminal['exit_code'] == 0, 'Actual finite acceptance only')
+        observed_acceptance = observed
+    need(observed_acceptance is not None, 'Actual acceptance cannot be omitted')
+    print(json.dumps(dict(result='OWNED_BOOK_ARCHIVE_VERIFIED', files=len(m['files']), omitted=len(m['omitted']),
+        historical_failed01_preserved=True, cases=16, active_codewords=59, vector_probes=61, wide_pairs=2,
+        protocol_lines=97, actual_dependency_rows=109, unique_dependency_paths=104,
+        owned_parser_public_vector_qualified=True, vendor_backend_qualified=False, PCM_qualified=False,
+        full_G6_qualified=False, physical_qualified=False, production_radio_integration=False,
+        omitted_binary_bytes_replayable=False, QMP_EOF_direct_boolean_recorded=False,
+        QMP_EOF_enforced_by_exact_captured_helper=True)))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,104 @@
+--- predecessor/sdk-build.ps1
++++ project/sdk-build.ps1
+@@ -1,20 +1,18 @@
+-param([Parameter(Mandatory)][string]$Campaign,
++param([Parameter(Mandatory)][ValidateSet('configure','build')][string]$Action,
++      [Parameter(Mandatory)][string]$Campaign,
+       [Parameter(Mandatory)][string]$Repository,
+       [Parameter(Mandatory)][string]$SdkDirectory,
+-      [Parameter(Mandatory)][string]$ToolsDirectory,
+-      [Parameter(Mandatory)][string]$CodecDirectory)
++      [Parameter(Mandatory)][string]$ToolsDirectory)
+ $ErrorActionPreference = 'Stop'
+ $Campaign = [IO.Path]::GetFullPath($Campaign)
+ $draftRoot = Join-Path ([IO.Path]::GetFullPath($Repository)) '.build'
+ if (!$Campaign.StartsWith($draftRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+     !(Test-Path -LiteralPath (Join-Path $Campaign 'report.json') -PathType Leaf) -or
+-    !(Test-Path -LiteralPath (Join-Path $Campaign 'variant/vorbis_repair_abi.h') -PathType Leaf)) {
+-    throw 'Only a runner-prepared fresh campaign inside repository .build is supported'
++    !(Test-Path -LiteralPath (Join-Path $Campaign 'sources/project/main/pinned/production/vorbis_repair/setup.c') -PathType Leaf)) {
++    throw 'Only a runner-prepared fresh owned-book campaign inside repository .build is supported'
+ }
+ $env:IDF_PATH = [IO.Path]::GetFullPath($SdkDirectory)
+ $env:IDF_TOOLS_PATH = [IO.Path]::GetFullPath($ToolsDirectory)
+-$env:YORADIO_AUDIO_CODEC_COMPONENT = [IO.Path]::GetFullPath($CodecDirectory)
+-$env:CYD_VORBIS_CANDIDATE = (Join-Path $Campaign 'variant').Replace('\', '/')
+ $env:IDF_COMPONENT_MANAGER = '0'
+ $env:PYTHONNOUSERSITE = '1'
+ $env:PYTHONUTF8 = '1'
+@@ -23,49 +21,66 @@
+ $env:GIT_CONFIG_KEY_0 = 'core.longpaths'
+ $env:GIT_CONFIG_VALUE_0 = 'true'
+ $env:GIT_OPTIONAL_LOCKS = '0'
++# These application integration variables have no role in this isolated unit.
++Remove-Item Env:YORADIO_AUDIO_CODEC_COMPONENT -ErrorAction SilentlyContinue
++Remove-Item Env:CYD_VORBIS_CANDIDATE -ErrorAction SilentlyContinue
++Remove-Item Env:EXTRA_COMPONENT_DIRS -ErrorAction SilentlyContinue
+ $python = Join-Path $env:IDF_TOOLS_PATH 'python_env/idf6.0_py3.12_env/Scripts/python.exe'
+ $env:IDF_PYTHON_ENV_PATH = Split-Path (Split-Path $python)
+ $env:Path = (Split-Path $python) + ';' + $env:Path
+ . (Join-Path $env:IDF_PATH 'export.ps1')
+ if ($LASTEXITCODE -ne 0) { throw 'SDK activation failed' }
+-$argsForIdf = @((Join-Path $env:IDF_PATH 'tools/idf.py'), '-C', (Join-Path $Campaign 'sources/project'),
++$idfAction = if ($Action -eq 'configure') { 'reconfigure' } else { 'build' }
++$argsForIdf = @((Join-Path $env:IDF_PATH 'tools/idf.py'), '-v', '-C', (Join-Path $Campaign 'sources/project'),
+  '-B', (Join-Path $Campaign 'build'), '--no-ccache', '-D', 'IDF_TARGET=esp32',
+  '-D', "SDKCONFIG=$Campaign/sdkconfig", '-D', "SDKCONFIG_DEFAULTS=$Campaign/sources/project/sdkconfig.defaults",
+- '-D', 'CMAKE_JOB_POOLS=compile=2;link=1', '-D', 'CMAKE_JOB_POOL_COMPILE=compile', '-D', 'CMAKE_JOB_POOL_LINK=link', 'build')
++ '-D', 'CMAKE_JOB_POOLS=compile=2;link=1', '-D', 'CMAKE_JOB_POOL_COMPILE=compile', '-D', 'CMAKE_JOB_POOL_LINK=link', $idfAction)
+ $toolPaths = @(Get-ChildItem Env: | Where-Object { $_.Name -imatch '^path$' -and $_.Value.Contains('tools\ninja') } | Select-Object -ExpandProperty Value)
+ if ($toolPaths.Count -ne 1) { throw 'Activated toolchain PATH missing' }
+ $compiler = (Get-Command xtensa-esp32-elf-gcc.exe -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+ $nm = Join-Path (Split-Path $compiler) 'xtensa-esp32-elf-nm.exe'
++$ninja = (Get-Command ninja.exe -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+ [ordered]@{ compiler=$compiler; compiler_sha256=(Get-FileHash -LiteralPath $compiler -Algorithm SHA256).Hash.ToLowerInvariant();
+- nm=$nm; nm_sha256=(Get-FileHash -LiteralPath $nm -Algorithm SHA256).Hash.ToLowerInvariant() } | ConvertTo-Json |
+- Set-Content -LiteralPath (Join-Path $Campaign 'compiler-identity-before-build.json') -Encoding utf8
++ nm=$nm; nm_sha256=(Get-FileHash -LiteralPath $nm -Algorithm SHA256).Hash.ToLowerInvariant();
++ ninja=$ninja; ninja_sha256=(Get-FileHash -LiteralPath $ninja -Algorithm SHA256).Hash.ToLowerInvariant() } | ConvertTo-Json |
++ Set-Content -LiteralPath (Join-Path $Campaign "$Action-compiler-identity.json") -Encoding utf8
+ [ordered]@{ PATH=$toolPaths[0]; IDF_PATH=$env:IDF_PATH; IDF_TOOLS_PATH=$env:IDF_TOOLS_PATH;
+  IDF_PYTHON_ENV_PATH=$env:IDF_PYTHON_ENV_PATH } | ConvertTo-Json |
+- Set-Content -LiteralPath (Join-Path $Campaign 'compiler-environment.json') -Encoding utf8
++ Set-Content -LiteralPath (Join-Path $Campaign "$Action-compiler-environment.json") -Encoding utf8
+ $start = [Diagnostics.ProcessStartInfo]::new()
+ $start.FileName = $python
++$start.WorkingDirectory = $Campaign
+ $start.UseShellExecute = $false
+ $start.CreateNoWindow = $true
+ $start.RedirectStandardOutput = $true
+ $start.RedirectStandardError = $true
+ $start.Environment['PATH'] = $toolPaths[0]
+ foreach ($arg in $argsForIdf) { [void]$start.ArgumentList.Add($arg) }
+-$sdkStdout = [IO.File]::Open((Join-Path $Campaign 'sdk-build.stdout.log'), [IO.FileMode]::CreateNew,
++$sdkStdout = [IO.File]::Open((Join-Path $Campaign "sdk-$Action.stdout.log"), [IO.FileMode]::CreateNew,
+  [IO.FileAccess]::Write, [IO.FileShare]::Read)
+ $sdkStderr = $null
+ $process = $null
++$receipt = [ordered]@{ action=$Action; argv=@($python) + $argsForIdf; cwd=$Campaign; pid=$null; exit_status=$null; terminal=$false }
+ try {
+-    $sdkStderr = [IO.File]::Open((Join-Path $Campaign 'sdk-build.stderr.log'), [IO.FileMode]::CreateNew,
++    $sdkStderr = [IO.File]::Open((Join-Path $Campaign "sdk-$Action.stderr.log"), [IO.FileMode]::CreateNew,
+      [IO.FileAccess]::Write, [IO.FileShare]::Read)
+     $process = [Diagnostics.Process]::Start($start)
++    $receipt.pid = $process.Id
+     $stdoutCopy = $process.StandardOutput.BaseStream.CopyToAsync($sdkStdout)
+     $stderrCopy = $process.StandardError.BaseStream.CopyToAsync($sdkStderr)
+     $process.WaitForExit()
+     $copies = [Threading.Tasks.Task]::WhenAll([Threading.Tasks.Task[]]@($stdoutCopy, $stderrCopy))
+     $copies.GetAwaiter().GetResult()
+-    if ($process.ExitCode -ne 0) { throw "SDK build failed: $($process.ExitCode)" }
++    $receipt.exit_status = $process.ExitCode
++    $receipt.terminal = $true
++    if ($process.ExitCode -ne 0) { throw "SDK $Action failed: $($process.ExitCode)" }
+ } finally {
+-    if ($process) { $process.Dispose() }
++    if ($process) {
++        if ($process.HasExited) { $receipt.exit_status = $process.ExitCode; $receipt.terminal = $true }
++        $process.Dispose()
++    }
+     if ($sdkStderr) { $sdkStderr.Dispose() }
+     $sdkStdout.Dispose()
++    $receipt | ConvertTo-Json -Depth 5 |
++      Set-Content -LiteralPath (Join-Path $Campaign "sdk-$Action-process.json") -Encoding utf8
+ }

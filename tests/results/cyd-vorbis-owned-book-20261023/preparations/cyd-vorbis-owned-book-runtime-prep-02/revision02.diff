@@ -1,0 +1,11 @@
+--- runtime01/run-owned-book-unit.py
++++ runtime02/run-owned-book-unit.py
+@@ -209,7 +209,7 @@
+         report['build_outputs'][path.relative_to(out).as_posix()] = sha(path)
+ 
+     def sdk_action(action):
+-        execute('sdk-' + action, [ps, '-NoProfile', '-NonInteractive', '-File', out / 'sources/project/sdk-build.ps1',
++        execute('sdk-' + action + '-launcher', [ps, '-NoProfile', '-NonInteractive', '-File', out / 'sources/project/sdk-build.ps1',
+             '-Action', action, '-Campaign', out, '-Repository', repo, '-SdkDirectory', sdk, '-ToolsDirectory', tools], 1200)
+         receipt = json.loads((out / ('sdk-' + action + '-process.json')).read_text(encoding='utf-8-sig'))
+         need(receipt['action'] == action and receipt['terminal'] is True and type(receipt['pid']) is int

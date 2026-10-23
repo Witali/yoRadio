@@ -1,0 +1,6 @@
+idf_component_register(SRCS "book_unit.c"
+    INCLUDE_DIRS "." "pinned/codec/include" "pinned/codec/include/decoder"
+                 "pinned/codec/include/decoder/impl"
+    REQUIRES freertos esp_system)
+target_compile_options(${COMPONENT_LIB} PRIVATE -ffunction-sections -fdata-sections)
+target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--gc-sections")

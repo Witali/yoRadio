@@ -1,0 +1,11 @@
+--- runtime02/run-owned-book-unit.py
++++ runtime03/run-owned-book-unit.py
+@@ -70,7 +70,7 @@
+             token.append(char); i += 1
+     if token:
+         parts.append(''.join(token))
+-    need(parts and len(set(parts)) == len(parts), 'Actual dependency list must be nonempty and unique')
++    need(parts, 'Actual dependency list must be nonempty')
+     return [(Path(cwd) / p).resolve() for p in parts]
+ 
+ 
