@@ -1,0 +1,48 @@
+--- wide12/materialize.py
++++ singletons8/materialize.py
+@@ -1,4 +1,4 @@
+-"""Root-owned pure12 materialization; imports pinned corrected25 formatting helpers."""
++"""Root-owned pure8 materialization; imports pinned corrected25 formatting helpers."""
+ import hashlib
+ import importlib.util
+ import json
+@@ -21,7 +21,7 @@
+ 
+ def base_module():
+     need(digest(BASE_PATH.read_bytes()) == BASE_SHA, "corrected25_materializer_pin")
+-    spec = importlib.util.spec_from_file_location("wide_width12_corrected25_materializer", BASE_PATH)
++    spec = importlib.util.spec_from_file_location("more_singletons8_corrected25_materializer", BASE_PATH)
+     module = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(module)  # Definitions only; original guarded main never runs.
+     return module
+@@ -31,9 +31,9 @@
+     base = base_module()
+     model = contract["model"]
+     count = len(model["cases"])
+-    need(count == len(raw_cases) == 12 and model["case_mask"] == (1 << count) - 1 and count <= 31,
+-         "complete12_bounded_model")
+-    text = ("// Complete public raw12 data; materialization is not target qualification.\n"
++    need(count == len(raw_cases) == 8 and model["case_mask"] == (1 << count) - 1 and count <= 31,
++         "complete8_bounded_model")
++    text = ("// Complete public raw8 data; materialization is not target qualification.\n"
+         "#pragma once\n#include \"corpus_case.h\"\n\n"
+         f"#define CORPUS_CASE_COUNT {count}U\n"
+         f"#define CORPUS_CONTRACT_SHA256 \"{contract['contract_sha256']}\"\n"
+@@ -57,7 +57,7 @@
+     """Independent restricted C parser: no compiler, formatter or generator calls."""
+     model, cases = contract["model"], contract["model"]["cases"]
+     count = len(cases)
+-    need(count == len(raw_cases) == 12 and count <= 31, "recovery_complete12")
++    need(count == len(raw_cases) == 8 and count <= 31, "recovery_complete8")
+     for name, expected in (("CORPUS_CASE_COUNT", f"{count}U"),
+         ("CORPUS_EXPECTED_PCM_BYTES", f"{model['total_pcm']}U"),
+         ("CORPUS_CONTRACT_SHA256", json.dumps(contract["contract_sha256"])),
+@@ -144,7 +144,7 @@
+             observed.append(dict(name=name, rejected=True, exact_reason=reason))
+         else:
+             raise RuntimeError("control_accepted:" + name)
+-    report = dict(schema="wide_width12-pure-materialization-v1", completed=True, source_verified=True,
++    report = dict(schema="more_singletons8-pure-materialization-v1", completed=True, source_verified=True,
+         counts=dict(cases=cases, arrays=cases * 5, full_raw_payload_arrays=cases * 3,
+             packets=contract["model"]["total_packets"], expected_pcm_bytes=pcm,
+             descriptor_capacity=cases, case_mask=contract["model"]["case_mask"]),

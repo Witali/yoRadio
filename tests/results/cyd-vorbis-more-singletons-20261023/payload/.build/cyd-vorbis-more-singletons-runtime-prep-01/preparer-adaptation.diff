@@ -1,0 +1,152 @@
+--- wide12/prepare_runtime.py
++++ singletons8/prepare_runtime.py
+@@ -1,4 +1,4 @@
+-"""Phase B: root-owned full12 materialization after a reviewed actual qualifier terminal0."""
++"""Phase B: root-owned full8 materialization after a reviewed actual qualifier terminal0."""
+ import argparse
+ import ast
+ import copy
+@@ -11,9 +11,9 @@
+ 
+ HERE = Path(__file__).resolve().parent
+ ROOT = HERE.parents[1]
+-PROJECT = 'target/cyd_vorbis_wide_width12_qemu'
+-QUALIFIER_SHA = '4549ae75b4ef127504425dfe936997c53cb428de2fced6bf2e555bcdda4b8ebc'
+-QUALIFIER_PINS_SHA = '4da23aa4fe0810c9cc4dbd0d896e42cc3025863f14bafd558e9d7702f7bcc3f5'
++PROJECT = 'target/cyd_vorbis_more_singletons8_qemu'
++QUALIFIER_SHA = '92b0035f3350a4b167eeec10eab0491d1c89f2fe4a5ebd471a5b01041e91985f'
++QUALIFIER_PINS_SHA = '0868de27f33ec5705590b7054855e13742b2a648732f80b190bbb2b3fdc3d530'
+ FIXED_SETUP = '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c'
+ 
+ 
+@@ -67,9 +67,9 @@
+         def option(name):
+             need(argv.count(name) == 1, 'qualifier_unique_actual_option:' + name)
+             return argv[argv.index(name) + 1]
+-        need(option('--profile') == 'wide12' and (cwd / option('--output')).resolve() == args.qualification.resolve().parent and
+-             (cwd / option('--campaign')).resolve() == ROOT / '.build/cyd-vorbis-wide-width-host-01' and
+-             (cwd / option('--outer')).resolve() == ROOT / '.build/cyd-vorbis-wide-width-host-01-command.json', 'qualifier_actual_bound_operands')
++        need(option('--profile') == 'singletons8' and (cwd / option('--output')).resolve() == args.qualification.resolve().parent and
++             (cwd / option('--campaign')).resolve() == ROOT / '.build/cyd-vorbis-more-singletons-host-01' and
++             (cwd / option('--outer')).resolve() == ROOT / '.build/cyd-vorbis-more-singletons-host-01-command.json', 'qualifier_actual_bound_operands')
+     for origin, row in value.get('logs', {}).items():
+         data = Path(origin).read_bytes()
+         need(len(data) == row['bytes'] and sha(data) == row['sha256'], 'actual_qualifier_terminal_log_identity')
+@@ -85,10 +85,10 @@
+     need(sha(qraw) == args.qualification_sha256, 'reviewed_qualification_identity')
+     q = json.loads(qraw)
+     need(q['completed'] is True and q['reference_corpus_qualified'] is True and q['result'] == 'XIPH_QUALIFIED_DUAL_NONPASS' and
+-         q['profile'] == 'wide12' and q['original_dual_reference_passed'] is False and
+-         (q['xiph_cases'], q['native_compared'], q['native_lookup2_refusals'], q['paired_raw_packets'], q['expected_pcm_bytes']) ==
+-         (12, 0, 12, 168, 337920) and q['validated_inputs']['qualifier/script']['sha256'] == QUALIFIER_SHA and
+-         q['validated_inputs']['qualifier/pins']['sha256'] == QUALIFIER_PINS_SHA, 'actual_full12_reviewed_qualification_before_materialization')
++         q['profile'] == 'singletons8' and q['original_dual_reference_passed'] is False and
++         (q['xiph_cases'], q['native_compared'], q['native_lookup2_refusals'], q['native_packet_decode_failures'], q['paired_raw_packets'], q['expected_pcm_bytes']) ==
++         (8, 0, 4, 4, 112, 225280) and q['validated_inputs']['qualifier/script']['sha256'] == QUALIFIER_SHA and
++         q['validated_inputs']['qualifier/pins']['sha256'] == QUALIFIER_PINS_SHA, 'actual_full8_reviewed_qualification_before_materialization')
+     qterminal = terminal_gate(args, sha(qraw))  # No output directory/controller exists before this gate.
+     readiness = json.loads((HERE / 'readiness.json').read_bytes())
+     before = []
+@@ -103,19 +103,21 @@
+         before.append(observed)
+     need(sha((HERE / 'qualify.py').read_bytes()) == QUALIFIER_SHA and sha((HERE / 'pins.json').read_bytes()) == QUALIFIER_PINS_SHA and
+          sha((ROOT / 'idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c').read_bytes()) == FIXED_SETUP, 'reviewed_qualifier_and_CYD_setup_pins')
+-    comparison = ROOT / '.build/cyd-vorbis-wide-width-generated-01/comparison12/matrix.json'
++    comparison = ROOT / '.build/cyd-vorbis-more-singletons-generated-01/matrix.json'
+     source = json.loads(comparison.read_bytes())
+     ids = inputs['expected_case_ids']
+-    need([row['id'] for row in source['cases']] == ids and len(ids) == 12 and
+-         q['xiph_metamorphic_checks'] == [dict(decoder='libvorbis', kind='equal', cases=group, passed=True)
+-                                          for group in source['expected_same_decoder_pcm_equal_groups']], 'actual_four_width_groups')
++    need([row['id'] for row in source['cases']] == ids and len(ids) == 8 and
++         q['xiph_metamorphic_checks'] == [dict(decoder='libvorbis', kind=kind, cases=group, passed=True)
++             for kind, field in (('equal','expected_same_decoder_pcm_equal_groups'),('different','expected_same_decoder_pcm_different_pairs'))
++             for group in source[field]], 'actual_two_equal_groups_and_four_different_pairs')
+     references = dict(inputs['reference'])
+     references['qualification'] = dict(path=qpath.relative_to(ROOT).as_posix(), bytes=len(qraw), sha256=sha(qraw))
+     references['qualification_terminal'] = dict(path=Path(qterminal['path']).relative_to(ROOT).as_posix(),
+                                               bytes=qterminal['bytes'], sha256=qterminal['sha256'])
+-    pins = dict(schema='wide-width12-sealed-runtime-inputs-v1', reference=references,
++    pins = dict(schema='more-singletons8-sealed-runtime-inputs-v1', reference=references,
+         qualifier_sha256=QUALIFIER_SHA, qualifier_pins_sha256=QUALIFIER_PINS_SHA,
+         expected_case_ids=ids, expected_equal_groups=source['expected_same_decoder_pcm_equal_groups'],
++        expected_different_pairs=source['expected_same_decoder_pcm_different_pairs'],
+         qualified_reviewed_report_sha256=args.qualification_sha256, actual_qualifier_terminal0_required=True)
+     output.mkdir()
+     for name in ('protocol.py', 'windows_compile_command.py', 'materialize.py', 'reference_binding.py'):
+@@ -124,7 +126,7 @@
+     for path in sorted((HERE / PROJECT).rglob('*')):
+         if path.is_file(): put(output / PROJECT / path.relative_to(HERE / PROJECT), path.read_bytes())
+     mapping, manifests, raw_cases = [], [], []
+-    for group, selected in (('original4', source['cases'][:4]), ('additions8', source['cases'][4:])):
++    for group, selected in (('map2four', source['cases'][:4]), ('map1four', source['cases'][4:])):
+         for case in selected:
+             pairs = {}
+             for kind in ('identification', 'comment', 'setup', 'audio', 'ogg'):
+@@ -136,35 +138,35 @@
+                 need(destination.read_bytes() == data, 'raw_selection_exact_copy')
+                 pairs[kind] = dict(original=fact(original), selected=fact(destination))
+             index = len(mapping)
+-            mapping.append(dict(case=index, id=case['id'], original_group='width2' if index < 4 else 'width9' if index < 8 else 'width16',
++            mapping.append(dict(case=index, id=case['id'], original_group='map2' if index < 4 else 'map1',
+                 original_matrix=fact(comparison), original_case_fields=case, selected_case_fields=copy.deepcopy(case), fields_changed=[], files=pairs))
+             raw_cases.append({kind: (comparison.parent / case[kind]).read_bytes() for kind in ('identification', 'setup', 'audio')})
+         matrix = output / 'inputs' / group / 'matrix.json'
+-        document(matrix, dict(schema='explicit-wide-width12-selection-v1', cases=selected, source_matrix=fact(comparison), case_fields_changed=False))
++        document(matrix, dict(schema='explicit-more-singletons8-selection-v1', cases=selected, source_matrix=fact(comparison), case_fields_changed=False))
+         manifests.append(dict(path=str(matrix.resolve()), sha256=sha(matrix.read_bytes())))
+-    mapping = dict(schema='wide-width12-original-source-map-v1', cases=mapping, original_cases_rewritten=False,
+-                   order='original4,width9four,width16four', new_reference_commands_executed=False)
++    mapping = dict(schema='more-singletons8-original-source-map-v1', cases=mapping, original_cases_rewritten=False,
++                   order='map2four,map1four', new_reference_commands_executed=False)
+     document(output / 'source-map.json', mapping)
+-    protocol = module('pinned_wide_width12_protocol', output / 'protocol.py')
++    protocol = module('pinned_more_singletons8_protocol', output / 'protocol.py')
+     contract = protocol.load_contract(manifests)
+     model = contract['model']
+     counts = dict(cases=len(model['cases']), packets=model['total_packets'], expected_pcm_bytes=model['total_pcm'],
+         protocol_events=3 + len(model['cases']) * (2 * protocol.PACKETS + 3), case_mask=model['case_mask'],
+         arrays=len(model['cases']) * 5, full_raw_arrays=len(model['cases']) * 3)
+-    need(list(counts.values()) == [12, 168, 337920, 375, 4095, 60, 36] and
+-         [case['id'] for case in model['cases']] == ids, 'complete_full12_derived_model_counts_and_order')
++    need(list(counts.values()) == [8, 112, 225280, 251, 255, 40, 24] and
++         [case['id'] for case in model['cases']] == ids, 'complete_full8_derived_model_counts_and_order')
+     document(output / 'contract.json', contract)
+-    formatter = module('wide_width12_source_formatter', output / 'materialize.py')
++    formatter = module('more_singletons8_source_formatter', output / 'materialize.py')
+     materialized = formatter.materialize(output / 'contract.json', raw_cases, output / 'materialized01')
+-    binder = module('wide_width12_recorded_reference_binding', output / 'reference_binding.py')
++    binder = module('more_singletons8_recorded_reference_binding', output / 'reference_binding.py')
+     binding = binder.derive(contract, mapping)
+-    document(output / 'reference-binding12.json', binding)
++    document(output / 'reference-binding8.json', binding)
+     replacements = {'__FIRST_MATRIX_PATH__': Path(manifests[0]['path']).relative_to(ROOT).as_posix(), '__FIRST_MATRIX_SHA__': manifests[0]['sha256'],
+         '__SECOND_MATRIX_PATH__': Path(manifests[1]['path']).relative_to(ROOT).as_posix(), '__SECOND_MATRIX_SHA__': manifests[1]['sha256'],
+         '__REFERENCE_PROOFS__': repr({row['path']: row['sha256'] for row in references.values()}),
+         '__CONTRACT_ID__': contract['contract_sha256'], '__CONTRACT_FILE_SHA__': sha((output / 'contract.json').read_bytes()),
+         '__DATA_HEADER_SHA__': materialized['header']['sha256'], '__SOURCE_MAP_SHA__': sha((output / 'source-map.json').read_bytes()),
+-        '__REFERENCE_BINDING_SHA__': sha((output / 'reference-binding12.json').read_bytes()),
++        '__REFERENCE_BINDING_SHA__': sha((output / 'reference-binding8.json').read_bytes()),
+         '__REFERENCE_HELPER_SHA__': sha((output / 'reference_binding.py').read_bytes()), '__SOURCE_PINS_SHA__': sha((output / 'source-pins.json').read_bytes()),
+         '__QUALIFICATION_ROOT__': qpath.parent.relative_to(ROOT).as_posix(),
+         '__CASE_COUNT__': str(counts['cases']), '__TOTAL_PACKETS__': str(counts['packets']), '__TOTAL_PCM__': str(counts['expected_pcm_bytes']),
+@@ -175,16 +177,16 @@
+         template = template.replace(marker, value)
+     need(not any(marker in template for marker in replacements), 'unsealed_controller_placeholder')
+     ast.parse(template)
+-    controller = output / 'run-cyd-vorbis-wide-width12-qemu.py'
++    controller = output / 'run-cyd-vorbis-more-singletons8-qemu.py'
+     # This is the first runnable controller publication, after qualification,
+     # complete source/reference binding, and independent C header recovery.
+     put(controller, template.encode())
+     for row in before:
+         need(fact(row['path']) == row, 'input_changed_during_materialization')
+-    document(output / 'preparation.json', dict(schema='wide-width12-root-materialization-v1', completed=True,
++    document(output / 'preparation.json', dict(schema='more-singletons8-root-materialization-v1', completed=True,
+         counts=counts, actual_qualification_terminal0_verified=True, qualification=fact(qpath),
+         contract=fact(output / 'contract.json'), header=materialized['header'], controller=fact(controller),
+-        original_four_bytes_unchanged=True, target_executed=False, numeric_qualified=False, full_G6_qualified=False))
++        all_eight_original_bytes_unchanged=True, target_executed=False, numeric_qualified=False, full_G6_qualified=False))
+     print(json.dumps(dict(output=str(output), counts=counts, controller=fact(controller), target_executed=False)))
+ 
+ 

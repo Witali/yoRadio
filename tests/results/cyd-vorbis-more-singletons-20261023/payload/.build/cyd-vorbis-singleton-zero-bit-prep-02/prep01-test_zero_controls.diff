@@ -1,0 +1,32 @@
+--- prep01/test_zero_controls.py
++++ prep02/test_zero_controls.py
+@@ -143,6 +143,29 @@
+         carrier = data[new['ogg']]
+         self.reject('ogg_crc', lambda: w.prior.carrier(flip(carrier, len(carrier) * 8 - 1), full, [0, 0, 0] + old['packet_granules'], 0x53470005))
+ 
++    def test_changed_matrix_status_rejected(self):
++        self.reject('exact_pending_construction_status', lambda: w.validate_matrix_status({'status': 'REFERENCE_PASSED'}))
++
++    def test_extra_new_field_report_key_rejected(self):
++        old = dict(identification={}, comment={}, setup={}, audio=[])
++        changed = dict(old, extra_unchecked_claim=True)
++        self.reject('exact_new_case_field_report_keys', lambda: w.validate_field_report_keys(changed, old))
++
++    def test_missing_new_field_report_key_rejected(self):
++        old = dict(identification={}, comment={}, setup={}, audio=[])
++        changed = dict(old); del changed['comment']
++        self.reject('exact_new_case_field_report_keys', lambda: w.validate_field_report_keys(changed, old))
++
++    def test_new_zero_wire_feature_and_original_feature_preserved(self):
++        for index in range(4):
++            old, old_reports, _, new, new_reports, _, _ = fixture(index)
++            self.assertIn('both_singleton_wire_bits', old['features'])
++            self.assertNotIn('both_singleton_wire_bits', new['features'])
++            expected = ['singleton_wire_bits_all_zero' if f == 'both_singleton_wire_bits' else f for f in old['features']]
++            self.assertEqual(new['features'], expected + ['preferred_zero_singleton_tokens'])
++            w.validate_matrix_status({'status': 'CONSTRUCTED_INDEPENDENT_WITNESS_AND_REFERENCE_PENDING'})
++            w.validate_field_report_keys(new_reports, old_reports)
++
+ 
+ if __name__ == '__main__':
+     unittest.main()

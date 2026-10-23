@@ -157,8 +157,17 @@ allocation и численные настройки C3 являются канд
   max65535; все4 target width-группы и6 sparse/dense пар нарушают равенство,
   Xiph подтверждает все10 relations. Исходные4 PCM совпадают с прежним25.
   Одна лишь смена ширины эту ошибку не устраняет; общий wide формат не квалифицирован.
-  Остальные gaps: sparse-single/map1-single, остальные wide widths/dimensions
-  и mapping/format случаи.
+  [Дополнительные singleton-регрессии](../tests/results/cyd-vorbis-more-singletons-20261023/CHECKPOINT.md)
+  проходят полный raw8 прогон:112 пакетов/225280 PCM байт. Sparse lookup2 D4
+  sequence0/1 и D16 sequence0, dense/sparse map1 D16 sequence0 имеют max1;
+  все три D16 sequence1 дают max65535. Полное численное сравнение8 — NONPASS,
+  хотя обе equal triples и все4 sequence-difference пары проходят на CYD/Xiph.
+  Четыре дополнительных zero-bit контроля подтверждены Xiph и FFmpeg native
+  с max1; исходные bit1 map1 случаи FFmpeg по-прежнему отклоняет. Target этих
+  zero-контролей не запускался; исходные случаи и NONPASS сохранены.
+  Остальные gaps: численная корректность D16 sequence1, прочие wide widths/
+  dimensions и target mapping/format случаи. Для21 mono/stereo/mapping случая
+  уже есть42 успешных reference children; полный CYD target ещё не квалифицирован.
   Полное G6 открыто; bridge в radio не подключён.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
@@ -971,3 +980,27 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Публичный integer experiment для этих шести fixtures завершён; floor0/wide
   PCM NONPASS, остальные G1–G8, radio/resource/physical gates остаются.
   Production source, ABI, hardware settings и core0/core1 bindings не менялись.
+
+- 2026-10-23, CYD-C3-14/G6: [дополнительные singleton8 и preferred-zero controls](../tests/results/cyd-vorbis-more-singletons-20261023/CHECKPOINT.md)
+  проверены с сохранением всех исходных данных.31 host controls/raw witness8/112/
+  136 Ogg carrier pages проходят; Xiph принимает8, native отказывает4 lookup2
+  на setup и4 map1 при обработке пакета. Независимый qualifier сохраняет оба
+  класса и dual NONPASS. Полный Xtensa/core1 capture проходит9 команд/251 events/
+  112 пакетов/225280 байт; compiler warnings0. Численное сравнение завершается1
+  без input error: maxima1/1/1/65535/1/65535/1/65535, прежний предел2 сохранён.
+  Все2 equal triples и4 different pairs проходят на Xiph и target; ошибка D16
+  sequence1 повторяется для lookup2/dense map1/sparse map1, причина не установлена.
+  Отдельные28 host controls и witness preferred-zero сравнения подтверждают
+  ровно56 заменённых bits/224 token observations с сохранением остальных bits,
+  headers/setup/offsets/padding/metadata и необходимыми carrier CRC. Xiph PCM
+  всех4 original/zero пар совпадает, включая прежние qualified original4.
+  Native принимает новые4 zero случая с max1; исходные4 map1 отказывает как
+  прежде. Исходный/совместный dual NONPASS сохранён; текст Operation not permitted
+  не устанавливает OS/security причину. Zero target не запускался.
+  [Offline проверка](../tests/results/cyd-vorbis-more-singletons-verification-20261023/README.md)
+  прошла до/после byte-exact promotion. Архив1969 файлов/9925574 байта требует
+  только явно закреплённые8 shared entries committed CYD map2; прежние25/wide/
+  floor0 кампании не переигрывались. Manifest
+  `020f11d42d79b45dc4c7a5f5d639b03cfa9a8a451c277389325d5caf45bca2d8`.
+  Production source/ABI/hardware/task affinities не менялись; numerical gaps,
+  остальные G1–G8, radio/resource/physical gates остаются.

@@ -1,0 +1,42 @@
+--- prep01/independent_zero_witness.py
++++ prep02/independent_zero_witness.py
+@@ -63,6 +63,14 @@
+     return expected
+ 
+ 
++def validate_matrix_status(matrix):
++    need(matrix['status'] == 'CONSTRUCTED_INDEPENDENT_WITNESS_AND_REFERENCE_PENDING', 'exact_pending_construction_status')
++
++
++def validate_field_report_keys(new, old):
++    need(set(old) == {'identification', 'comment', 'setup', 'audio'} and set(new) == set(old), 'exact_new_case_field_report_keys')
++
++
+ def witness(generated, manifest_sha, readiness):
+     before = source_closure(readiness); old_cases, old_fields, original_raw = originals()
+     generated = generated.resolve()
+@@ -80,6 +88,7 @@
+         raw = p.read_bytes(); need(len(raw) == x['bytes'] and sha(raw) == x['sha256'], 'comparison_raw_manifest_identity')
+         raw_files[x['path']] = raw
+     matrix = json.loads(raw_files['matrix.json']); fields = json.loads(raw_files['bitfields.json'])
++    validate_matrix_status(matrix)
+     need(matrix['schema'] == 'vorbis-singleton-zero-bit-comparison-v1' and matrix['case_count'] == 8 and matrix['raw_packet_count'] == 112
+          and [c['id'] for c in matrix['cases']] == list(IDS) + [n + '_wire0' for n in IDS], 'exact_eight_comparison_cases')
+     pairs = [[n, n + '_wire0'] for n in IDS]
+@@ -96,6 +105,7 @@
+     for index, original in enumerate(old_cases):
+         old, new = matrix['cases'][index], matrix['cases'][index + 4]
+         name = original['id']; new_name = name + '_wire0'
++        validate_field_report_keys(fields[new_name], fields[name])
+         need(old == original and fields[name] == old_fields[name], 'all_original_case_metadata_unchanged')
+         old_data, new_data = {}, {}
+         for k in ('identification', 'comment', 'setup', 'audio', 'ogg'):
+@@ -132,6 +142,8 @@
+         need(old['packet_syntax'] == old_syntax, 'all_original_packet_metadata_matches_actual')
+         prior.compare_audit(book, old['vector_book'], old_syntax)
+         expected = copy.deepcopy(original); expected['id'] = new_name; expected['wire_zero_control_for'] = name
++        need(expected['features'].count('both_singleton_wire_bits') == 1, 'exact_original_both_bit_feature')
++        expected['features'] = ['singleton_wire_bits_all_zero' if f == 'both_singleton_wire_bits' else f for f in expected['features']]
+         expected['features'].append('preferred_zero_singleton_tokens'); expected['packet_syntax'] = new_syntax
+         for k in old_data:
+             expected[k] = f'cases/{new_name}/' + ('reference.ogg' if k == 'ogg' else k + '.bin')
