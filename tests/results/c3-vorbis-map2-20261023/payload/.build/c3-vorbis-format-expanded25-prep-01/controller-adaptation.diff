@@ -1,0 +1,210 @@
+--- .build/cyd-vorbis-format-expanded25-prep-01/run-cyd-vorbis-format-expanded25-qemu02.py
++++ .build/c3-vorbis-format-expanded25-prep-01/run-c3-vorbis-format-expanded25-qemu.py
+@@ -13,8 +13,7 @@
+ from protocol import load_contract, validate_log
+ from reference_binding02 import verify as verify_source_binding
+ 
+-ARCHIVES = {'libesp_audio_codec.a': '92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58',
+-            'libesp_audio_simple_dec.a': 'ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6'}
++ARCHIVES = {'libesp_audio_codec.a': '311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909', 'libesp_audio_simple_dec.a': '232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f'}
+ MATRIX_INPUTS = (
+     ('.build/cyd-vorbis-format-expanded25-prep-01/inputs/books16/matrix.json',
+      '16b087d4462f2ef481cb479f3730dc24f17bf195be83812d68819831799c7239'),
+@@ -25,17 +24,18 @@
+ CONTRACT_FILE_SHA = '717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d'
+ DATA_HEADER_SHA = '4cba27844a6a9018c103e06ac8e505590ae0549ef2dfe6238ebd933b4dfb9757'
+ # Filled only with the independent caller owner's final reviewed source bytes.
+-CALLER_SHA = '37eaeb25a272ceadaafe36d6309449d31895b7019523333ed0e4c48226d0d065'
+-PROTOCOL_SHA = '547655c4fa31a100f29f52b3a142a54442578393b860723b2b1147732578700e'
++CALLER_SHA = '8c6aff4bb6d43c6b034db799477653e89fff4c9e65ac0b805d99f257672e9f03'
++PROTOCOL_SHA = '961b0050f5881e5000116cbf7a598a122407420b0a52da0805d060c7b7e3f7ba'
+ CASE_HEADER_SHA = '91a040d89f3bc2b7740fa2f175f36d64cebcd92653cd4c2014149bbb11219be3'
+-RAW_HELPER_SHA = '5731c1022c8f6ecdb6c03d833f9d2208c675b22e20f71ac7327b3941af8822c5'
++RAW_HELPER_SHA = 'b0dfa7bf6c8a01e3082ce58495ae7f0b3c565873d2054b5c2fa427bdb9871b5e'
+ SOURCE_MAP_SHA = '63f0eccf40044fabcc8d2b31c0a2094859258856e4948fe53a57cf8a9358301a'
+ REFERENCE_BINDING_SHA = '802d0fe193991cfc40d388ad27594d8d0b632112f223cb6dee68226c07585f2c'
+ REFERENCE_HELPER_SHA = '3961e32fc5abb5a883260b2932a570908367c46ad2058a210a123336db7638ce'
+-SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+-MODULES = ('vorbis_repair/setup.c', 'vorbis_repair/output.c',
+-           'vorbis_repair/COPYING', 'vorbis_repair_abi.h', 'compat/vorbis_repair/enable.cmake')
+-
++SDK_HEAD = '9a97f6c54ec638111ce55cd36581b3c192f15207'
++MODULES = ('vorbis_repair/setup.c', 'vorbis_repair/output.c', 'vorbis_repair/COPYING', 'vorbis_repair_abi.h')
++
++
++TOOL_SHA = {'python': '0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14', 'compiler': '9a96e8e77c263d4f7f16c084e8a2dfe89dfa8598c31fd3f9b152db35ccbb2a74', 'nm': '3962a7c898d8dc17c3f0e846ee3b5f5e5c00c2c395d2ae7084dfe57464f75d4e', 'cmake': '392ab4d6c3c91543fd297ed6c7e7354bf62edcd26fdf2706ad8613ad620cc45e', 'ninja': '68865c3276d449d746cea5065fdec2baf755d7813e161ab04205b0907b2629b8', 'qemu': 'a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b', 'rom': '0de1e65020e803bea0d7443dca149d61895e01fca3bb9c82d073234eebd73f99'}
+ 
+ def need(condition, message):
+     if not condition: raise RuntimeError(message)
+@@ -46,7 +46,7 @@
+ 
+ 
+ def main():
+-    repo = next(p for p in Path(__file__).resolve().parents if (p / 'idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c').is_file())
++    repo = next(p for p in Path(__file__).resolve().parents if (p / 'idf/esp32c3-oled-native/main/vorbis_repair/setup.c').is_file())
+     nearest = lambda rel: next((p / rel for p in (repo, *repo.parents) if (p / rel).exists()), None)
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--output', type=Path, required=True)
+@@ -54,11 +54,11 @@
+     parser.add_argument('--contract-sha256', required=True)
+     parser.add_argument('--data-header', type=Path, required=True)
+     parser.add_argument('--data-sha256', required=True)
+-    parser.add_argument('--candidate', type=Path, default=repo / 'idf/esp32-cyd2usb-native/main')
+-    parser.add_argument('--idf', type=Path, default=nearest('.idf/v6.0.2'))
++    parser.add_argument('--candidate', type=Path, default=repo / 'idf/esp32c3-oled-native/main')
++    parser.add_argument('--idf', type=Path, default=nearest('.idf/v6.1-9a97f6c54ec6'))
+     parser.add_argument('--idf-tools', type=Path)
+     parser.add_argument('--codec', type=Path)
+-    parser.add_argument('--qemu', type=Path, default=shutil.which('qemu-system-xtensa.exe'))
++    parser.add_argument('--qemu', type=Path, default=shutil.which('qemu-system-riscv32.exe') or 'C:/Work/QEMU-ESP32/bin/qemu-system-riscv32.exe')
+     parser.add_argument('--powershell', type=Path, default=shutil.which('pwsh.exe') or shutil.which('pwsh'))
+     args = parser.parse_args()
+     if not all(re.fullmatch(r'[0-9a-f]{64}',value) for value in (args.contract_sha256,args.data_sha256)):
+@@ -70,14 +70,18 @@
+     if sys.platform != 'win32': parser.error('Pinned Windows SDK launcher required')
+     if not all((args.idf, args.qemu, args.powershell)): parser.error('Specify missing SDK/QEMU/PowerShell paths')
+     out, candidate, sdk = args.output.resolve(), args.candidate.resolve(), args.idf.resolve()
+-    tools = (args.idf_tools or sdk.parent / 'tools-v6.0.2').resolve()
++    tools = (args.idf_tools or sdk.parent / 'tools-v6.1').resolve()
+     codec = (args.codec or sdk.parent / 'esp-adf-libs/esp_audio_codec').resolve()
+-    py, ps, qemu = tools / 'python_env/idf6.0_py3.12_env/Scripts/python.exe', args.powershell.resolve(), args.qemu.resolve()
++    py, ps, qemu = tools / 'python_env/idf6.1_py3.12_env/Scripts/python.exe', args.powershell.resolve(), args.qemu.resolve()
+     git = Path(shutil.which('git.exe') or shutil.which('git') or '')
+     taskkill = Path(os.environ['SystemRoot']) / 'System32/taskkill.exe'
+-    rom = qemu.parent.parent / 'pc-bios'
++    rom = qemu.parent.parent / 'share/qemu'
++    cc_expected = tools/'tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf/bin/riscv32-esp-elf-gcc.exe'
++    selected_tools = dict(python=py,compiler=cc_expected,nm=cc_expected.with_name('riscv32-esp-elf-nm.exe'),
++        cmake=tools/'tools/cmake/4.0.3/bin/cmake.exe',ninja=tools/'tools/ninja/1.12.1/ninja.exe',
++        qemu=qemu,rom=rom/'esp32c3-rom.bin')
+     # The sibling layout permits review from this scratch prep before promotion.
+-    harness = Path(__file__).resolve().parent / 'target/cyd_vorbis_format_expanded25_qemu'
++    harness = Path(__file__).resolve().parent / 'target/c3_vorbis_format_expanded25_qemu'
+     source_map_path = Path(__file__).with_name('source-map.json')
+     binding_path = Path(__file__).with_name('reference-binding02.json')
+     binding_helper = Path(__file__).with_name('reference_binding02.py')
+@@ -90,17 +94,18 @@
+         or out.exists() or any((p / 'report.json').is_file() for p in out.parents if p != repo)
+         or any(out == p or out.is_relative_to(p) or p.is_relative_to(out) for p in protected)):
+         parser.error('Use a fresh .build campaign, separate from source/runtime directories and previous reports')
+-    required = [py, ps, qemu, git, taskkill, rom/'esp32-v3-rom.bin', rom/'esp32-v3-rom-app.bin',
++    required = [py, ps, qemu, git, taskkill, rom/'esp32c3-rom.bin',
+                 sdk/'export.ps1', sdk/'tools/idf.py', *[candidate/x for x in MODULES],
+-                *[codec/'lib/esp32'/x for x in ARCHIVES], contract_path, data_header,
++                *[codec/'lib/esp32c3'/x for x in ARCHIVES], contract_path, data_header,
+                 *[repo/name for name in REFERENCE_PROOFS], source_map_path, binding_path, binding_helper, harness/'main/main.c',
+-                harness/'main/corpus_case.h', Path(__file__).with_name('protocol.py')]
++                harness/'main/corpus_case.h', Path(__file__).with_name('protocol.py'), *selected_tools.values()]
+     if any(not p.is_file() for p in required): parser.error('Missing required pinned source/runtime')
+     out.mkdir(parents=True, exist_ok=False)
+     report = dict(passed=False, completed=False, target_capture_completed=False,checked_decode_completed=False,
+                   vendor_checked_pcm_equal=False,vendor_comparison_available=False,
+                   independent_reference_compared=False,numeric_reference_qualified=False,format_corpus_qualified=False,
+                   full_G6_qualified=False,physical_device=False,production_radio_integration=False,
++                  platform='esp32c3',sdk_revision=SDK_HEAD,elf_machine=243,coordinator_core=0,worker_core=0,
+                   commands=[],inputs={},tools={},observed_pcm=[])
+     env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1', GIT_OPTIONAL_LOCKS='0')
+     def save():
+@@ -187,14 +192,16 @@
+         freeze(Path(__file__).resolve(), Path('helpers/run.py'))
+         freeze(Path(__file__).with_name('windows_compile_command.py'), Path('helpers/windows_compile_command.py'))
+         freeze(Path(__file__).with_name('protocol.py'), Path('helpers/protocol.py'))
+-        for name in ('tools/cmake/version.cmake','tools/cmake/toolchain-esp32.cmake','tools/cmake/toolchain.cmake','export.ps1','tools/idf.py'):
++        for name in ('tools/cmake/version.cmake','tools/cmake/toolchain-esp32c3.cmake','tools/cmake/toolchain.cmake','export.ps1','tools/idf.py'):
+             freeze(sdk/name,Path('sdk')/name)
+         for path in sorted((codec/'include').rglob('*.h')): freeze(path,Path('codec/include')/path.relative_to(codec/'include'))
+         for name in ('CMakeLists.txt','Kconfig'):
+             if (codec/name).is_file(): freeze(codec/name,Path('codec')/name)
+-        for path in (Path(sys.executable),py,ps,qemu,git,taskkill,rom/'esp32-v3-rom.bin',rom/'esp32-v3-rom-app.bin',
+-                     *[codec/'lib/esp32'/x for x in ARCHIVES]): report['tools'][str(path.resolve())] = sha(path)
+-        need({name:sha(codec/'lib/esp32'/name) for name in ARCHIVES} == ARCHIVES, 'Wrong installed vendor archives')
++        for path in (Path(sys.executable),py,ps,qemu,git,taskkill,rom/'esp32c3-rom.bin',
++                     *[codec/'lib/esp32c3'/x for x in ARCHIVES]): report['tools'][str(path.resolve())] = sha(path)
++        need({name:sha(codec/'lib/esp32c3'/name) for name in ARCHIVES} == ARCHIVES, 'Wrong installed vendor archives')
++        need(all(sha(path)==TOOL_SHA[name] for name,path in selected_tools.items()),'Wrong independently pinned C3 tool/ROM')
++        report['tools'].update({str(path.resolve()):TOOL_SHA[name] for name,path in selected_tools.items()})
+         need(sha(out/'sources/project/main/main.c')==CALLER_SHA and
+              sha(out/'sources/project/main/corpus_case.h')==CASE_HEADER_SHA and
+              sha(out/'sources/helpers/protocol.py')==PROTOCOL_SHA and
+@@ -221,7 +228,8 @@
+             source_reference_scopes=binding['source_scopes'],new_reference_commands_executed=False,
+             aggregate_reference_campaign_exists=False,dual_reference_passed=False)
+         shutil.copytree(out/'sources/candidate',out/'variant')
+-        shutil.copyfile(out/'sources/project/raw-enable.cmake',out/'variant/compat/vorbis_repair/enable.cmake')
++        report['selected_setup_sha256'] = sha(out/'variant/vorbis_repair/setup.c')
++        # Standalone C3 project owns its raw helper; no full-application hook is copied.
+         report['variant_sources'] = {str(p.relative_to(out)):sha(p) for p in (out/'variant').rglob('*') if p.is_file()}
+         need(execute('sdk-head',[git,'-C',sdk,'rev-parse','HEAD']).strip() == SDK_HEAD,'Wrong SDK commit')
+         need(not execute('sdk-clean',[git,'-C',sdk,'status','--porcelain','--untracked-files=no']).strip(),'Dirty SDK')
+@@ -244,13 +252,17 @@
+         elf, app, cc = build/desc['app_elf'], build/desc['app_bin'], Path(desc['c_compiler'])
+         nm = cc.with_name(cc.name.replace('gcc','nm'))
+         before = json.loads((out/'compiler-identity-before-build.json').read_text(encoding='utf-8-sig'))
+-        need(Path(before['compiler']).resolve() == cc.resolve() and Path(before['nm']).resolve() == nm.resolve(), 'Actual compiler differs from pre-build identity')
++        need(Path(before['compiler']).resolve()==cc.resolve()==cc_expected.resolve() and
++             Path(before['nm']).resolve()==nm.resolve(),'Actual RV32 compiler differs from pinned/pre-build identity')
++        for name in ('cmake','ninja'):
++            need(Path(before[name]).resolve()==selected_tools[name].resolve() and
++                 before[name+'_sha256']==sha(selected_tools[name])==TOOL_SHA[name],'Activated C3 build tool differs '+name)
+         for path,key in ((cc,'compiler_sha256'),(nm,'nm_sha256')):
+             need(sha(path) == before[key], 'Compiler tool changed during build')
+             report['tools'][str(path)] = before[key]
+         report['build_outputs'] = {str(p.relative_to(out)):sha(p) for p in (elf,app,out/'sdkconfig',build/'compile_commands.json',out/'compiler-environment.json',out/'compiler-identity-before-build.json')}
+         report['build_outputs'].update({name:row['sha256'] for name,row in report['sdk_build_logs'].items()})
+-        need(struct.unpack_from('<H',elf.read_bytes(),18)[0] == 94,'Wrong ELF machine')
++        need(struct.unpack_from('<H',elf.read_bytes(),18)[0] == 243,'Wrong ELF machine')
+         rows = json.loads((build/'compile_commands.json').read_text())
+         row_source = lambda row: (Path(row['directory'])/row['file']).resolve()
+         caller_rows = [row for row in rows if row_source(row).is_relative_to(out/'sources/project')]
+@@ -261,7 +273,7 @@
+         setup = next(r for r in actual if Path(r['file']).name == 'setup.c')
+         argv,cwd,original,generated = macro_command(setup,cc,out/'variant/vorbis_repair/setup.c')
+         need(len(generated)==2 and sum(arg.startswith('@') for arg in original)==1,
+-             'Require actual preserved six-line generated @cflags and picolibc.specs')
++             'Require actual preserved four-line RV32 @cflags and picolibc.specs')
+         report['setup_macro_context'] = dict(row=setup,original_argv=original,probe_argv=argv,cwd=str(cwd))
+         report['setup_macro_context']['generated_inputs'] = {}
+         for path,data in generated.items():
+@@ -280,25 +292,28 @@
+             save()
+             check_macro_inputs(generated); current()
+         need(not re.search(r'^#define LIMIT_TO_64kHz\b',macros,re.M),'Corpus requires unrestricted actual setup context')
+-        need(re.search(r'^#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ 240$',macros,re.M),'Actual setup must consume240MHz config')
+-        need(not re.search(r'^#define CONFIG_FREERTOS_UNICORE\b',macros,re.M),'Actual setup must consume two-core config')
+-        for name in ('CONFIG_IDF_TARGET_ESP32','CONFIG_YORADIO_VORBIS_REPAIR'):
++        for name,value in (('CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ',160),
++                           ('CONFIG_FREERTOS_UNICORE',1),('__riscv_xlen',32),
++                           ('__SIZEOF_LONG__',4),('__SIZEOF_POINTER__',4)):
++            need(re.search(r'^#define '+name+' '+str(value)+'$',macros,re.M),'Actual C3 setup ABI/config macro '+name)
++        for name in ('CONFIG_IDF_TARGET_ESP32C3','ESP_PLATFORM'):
+             need(re.search(r'^#define '+name+r' 1$',macros,re.M),'Expected setup compile context '+name)
+         symbols = execute('symbols',[nm,'-n','-S',elf])
+         for symbol in ('__wrap_esp_vorbis_dec_open','__wrap_esp_vorbis_dec_decode','esp_vorbis_dec_decode'):
+             need(re.search(r'\b'+symbol+'$',symbols,re.M),'Missing symbol '+symbol)
+         recipe = json.loads((build/'flasher_args.json').read_text())
+         settings = recipe.get('flash_settings',{})
++        need(recipe.get('extra_esptool_args',{}).get('chip')=='esp32c3','Wrong isolated flash recipe chip')
+         need({k:settings.get(k) for k in ('flash_mode','flash_size','flash_freq')} ==
+              {'flash_mode':'dio','flash_size':'4MB','flash_freq':'40m'}, 'Unexpected isolated flash settings')
+-        expected_flash = {0x1000:build/'bootloader/bootloader.bin',
++        expected_flash = {0x0:build/'bootloader/bootloader.bin',
+                           0x8000:build/'partition_table/partition-table.bin',0x10000:app}
+         need(len(recipe['flash_files']) == 3 and
+              {int(offset,0):(build/name).resolve() for offset,name in recipe['flash_files'].items()} ==
+              {offset:path.resolve() for offset,path in expected_flash.items()}, 'Unexpected isolated flash offsets/files')
+         report['build_outputs']['build/flasher_args.json'] = sha(build/'flasher_args.json')
+         flash = out/'qemu-flash.bin'
+-        merge = [py,'-m','esptool','--chip','esp32','merge-bin','--output',flash,'--flash-mode','dio','--flash-size','4MB','--flash-freq','40m']
++        merge = [py,'-m','esptool','--chip','esp32c3','merge-bin','--output',flash,'--flash-mode','dio','--flash-size','4MB','--flash-freq','40m']
+         for offset,name in sorted(recipe['flash_files'].items(),key=lambda x:int(x[0],0)):
+             path = (build/name).resolve(); need(path.is_relative_to(build),'Flash recipe escaped build')
+             report['build_outputs'][str(path.relative_to(out))] = sha(path)
+@@ -306,7 +321,7 @@
+         execute('merge',merge+['--pad-to-size','4MB'])
+         report['build_outputs'][str(flash.relative_to(out))] = sha(flash)
+         current(); save()
+-        log = execute('qemu',[qemu,'-audiodev','none,id=quiet','-M','esp32,audiodev=quiet','-smp','2','-L',rom,
++        log = execute('qemu',[qemu,'-audiodev','none,id=quiet','-M','esp32c3,audiodev=quiet','-smp','1','-L',rom,
+             '-display','none','-monitor','none','-serial','stdio','-no-reboot','-snapshot','-nic','none',
+             '-drive','file='+str(flash)+',if=mtd,format=raw'],300)
+         stderr = (out/'qemu.stderr.log').read_text(errors='replace')

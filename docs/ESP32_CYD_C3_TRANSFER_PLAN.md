@@ -133,8 +133,13 @@ allocation и численные настройки C3 являются канд
   Следом проверить публикацию наших book/floor0 полей отдельным unit-тестом,
   публичные decode_map/кривую Tremor и эквивалентное представление LSP с
   ненулевым минимумом; подтверждённой причины широкого/floor0 PCM пока нет.
-  Остальные gaps: sparse-single/map1-single, wide9–16-bit и C3/RV32 проверка
-  новой setup правки. Полное G6 открыто; bridge в radio не подключён.
+  [C3/RV32 checkpoint](../tests/results/c3-vorbis-map2-20261023/CHECKPOINT.md)
+  подтверждает ту же setup правку на SDK6.1/core0: все25 случаев/350 пакетов
+  декодируются; исходный отказ case6 воспроизведён до исправления.
+  Полное численное сравнение C3 также завершено и остаётся NONPASS:
+  те же wide4/floor0×6 нарушают предел2, остальные15 имеют max1.
+  Остальные gaps: sparse-single/map1-single и wide9–16-bit.
+  Полное G6 открыто; bridge в radio не подключён.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
   Затем полный Clang, три backend exports и физическая приёмка.
@@ -832,3 +837,26 @@ Stream остаётся на core0, decode/output на core1 с прежними
   [Автономная проверка](../tests/results/cyd-vorbis-map2-verification-20261020/README.md)
   конечного canonical каталога из другого cwd завершена с exit0; она подтверждает
   целостность свидетельств, сохраняя полный численный NONPASS.
+- 2026-10-23, CYD-C3-14 G6, донор C3: [lookup2/single-entry checkpoint](../tests/results/c3-vorbis-map2-20261023/CHECKPOINT.md)
+  переносит те же две setup ветки с сохранением CRLF и всех остальных исходных
+  байтов. Actual SDK6.1/RV32/ELF243/160MHz/unicore/core0 baseline воспроизводит
+  open отказ case6 после6 случаев/84 пакетов; все7 owned commands завершены0,
+  panic нет. После правки полный25 capture даёт350 пакетов/623360 PCM байт,
+  778 native events и9 actual terminal0 commands. Предшествующие188 native
+  events/168960 PCM байт совпадают до и после правки.
+  Независимое измерение всех25 случаев выполнено с прежним пределом2:
+  исходные books8, single/twin4 и floor1 controls3 имеют max1; wideD16×4
+  имеют max65535 и нарушают обе sparse/dense PCM пары; floor0 even6 имеет
+  max40664/1649/40664, odd5 — max65535 во всех трёх парах блоков.
+  Полный25 и books16 остаются NONPASS. При прямом сравнении actual C3/CYD
+  PCM совпадает21 случай; различаются ровно четыре wideD16 случая. Это
+  наблюдение не устанавливает причину расхождения и не квалифицирует формат.
+  Полное C3 приложение/AAC hooks не конфигурировались. Production task affinity,
+  ABI, synthesis/MDCT/output и CYD stream core0/decoder core1 не менялись.
+  Архив1247 файлов/6507191 байт сохраняет1621 исходную identity запись,
+  включая367 точных ссылок на общий committed CYD reference-архив и10
+  hash-only omissions целевых бинарников. Manifest SHA256:
+  `005c3e29ae2392c20f872656baba13e5ea2e7ad361e2b57efcdf717579182066`.
+  [Повторная автономная проверка](../tests/results/c3-vorbis-map2-verification-20261023/README.md)
+  staged и окончательного canonical каталога из другого cwd завершена0;
+  baseline и полный численный NONPASS сохранены.

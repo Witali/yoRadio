@@ -1,0 +1,11 @@
+--- c3-numeric-prep01/compare_capture25.py
++++ c3-numeric-prep02/compare_capture25.py
+@@ -111,7 +111,7 @@
+          'Macro proof must describe the actual selected C3 setup compile row')
+     command = next(row for row in target['commands'] if row['name'] == 'setup-macros')
+     macros = inputs.read('target/platform/setup-macros', target_root / 'setup-macros.stdout.log',
+-                         command['stdout_sha256']).decode()
++                         command['stdout_sha256']).decode().replace('\r\n', '\n')
+     for name, value in (('CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ', 160), ('CONFIG_FREERTOS_UNICORE', 1),
+                         ('__riscv_xlen', 32), ('__SIZEOF_LONG__', 4), ('__SIZEOF_POINTER__', 4),
+                         ('CONFIG_IDF_TARGET_ESP32C3', 1), ('ESP_PLATFORM', 1)):

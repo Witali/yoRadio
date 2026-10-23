@@ -1,0 +1,36 @@
+--- .build/cyd-vorbis-format-expanded25-prep-01/target/cyd_vorbis_format_expanded25_qemu/main/main.c
++++ .build/c3-vorbis-format-expanded25-prep-01/target/c3_vorbis_format_expanded25_qemu/main/main.c
+@@ -15,7 +15,7 @@
+ #endif
+ _Static_assert(CORPUS_CASE_COUNT >= 1 && CORPUS_CASE_COUNT <= 31, "Bounded named corpus cases");
+ 
+-#define P "CYD_VORBIS_CHECKED_CORPUS_"
++#define P "C3_VORBIS_CHECKED_CORPUS_"
+ #define PACKETS 14U
+ #define PCM_CAPACITY 16384U
+ #define INPUT_CAPACITY 512U
+@@ -130,7 +130,7 @@
+             " checked_channels=%u checked_bits=%u checked_canary=%u transition=%u nz_l=%" PRIu32 " nz_r=%" PRIu32 " core=%d\n",
+             index, packet, size, cr, b.consumed, expected, bo.decoded_size, ci.sample_rate,
+             (unsigned)ci.channel, (unsigned)ci.bits_per_sample, cg, transition, nl, nr, core);
+-        need(core == 1 && cr == ESP_AUDIO_ERR_OK && b.consumed == size,
++        need(core == 0 && cr == ESP_AUDIO_ERR_OK && b.consumed == size,
+              "checked_result_full_consumption_core");
+         need(bounded && bo.decoded_size == expected && cg, "checked_pcm_size_and_canaries");
+         need(ci.sample_rate == c->rate && ci.channel == 2 && ci.bits_per_sample == 16,
+@@ -161,7 +161,7 @@
+     (void)unused;
+     int core = xPortGetCoreID(); unsigned priority = (unsigned)uxTaskPriorityGet(NULL);
+     printf(P "WORKER core=%d priority=%u configured_stack=16384\n", core, priority);
+-    need(core == 1 && priority == 3, "worker_core_priority");
++    need(core == 0 && priority == 3, "worker_core_priority");
+     uint64_t total = 0; uint32_t mask = 0;
+     for (unsigned i = 0; i < CORPUS_CASE_COUNT; ++i) { total += run_case(corpus_cases + i, i); mask |= 1U << i; }
+     need(total == CORPUS_EXPECTED_PCM_BYTES && mask == ((UINT32_C(1) << CORPUS_CASE_COUNT) - 1U), "complete_corpus_total");
+@@ -174,5 +174,5 @@
+     need(strlen(CORPUS_CONTRACT_SHA256) == 64, "contract_hash_length");
+     printf(P "BEGIN contract=%s cases=%u packets=%u coordinator=%d\n", CORPUS_CONTRACT_SHA256,
+         CORPUS_CASE_COUNT, CORPUS_CASE_COUNT * PACKETS, xPortGetCoreID());
+-    need(xTaskCreatePinnedToCore(task, "public_corpus", 16384, NULL, 3, NULL, 1) == pdPASS, "create_worker_core1");
++    need(xTaskCreatePinnedToCore(task, "public_corpus", 16384, NULL, 3, NULL, 0) == pdPASS, "create_worker_core0");
+ }

@@ -1,0 +1,159 @@
+{
+  "schema": "c3-expanded25-corrected-data-successor-source-readiness-v1",
+  "status": "READY_FOR_ROOT_SOURCE_REVIEW",
+  "source_only": true,
+  "runtime_controller_executed": false,
+  "SDK_compiler_QEMU_reference_protocol_tests_PCM_Git_executed": false,
+  "prior_readiness_sha256": "73cf6cc976a7300cd23ca1f47fcc778da9e67bfd277dd0b7cc842c2bee362003",
+  "prior_controller_sha256": "7a7ba50fd01656c7e3a29e9d2e72a8d75f6d15a105e57f0f25bdfc638a4270f4",
+  "prior_files_and_external_inputs_unchanged": true,
+  "sole_functional_runtime_change": "DATA_HEADER_SHA literal",
+  "contract_sha256": "660ac01523d3336ccb103f1443e51b870edf1a3d3f50321c5666969b1da634cc",
+  "contract_file_sha256": "717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d",
+  "cases": 25,
+  "actual_descriptor_entries": 25,
+  "recovered_C_arrays": 125,
+  "packets": 350,
+  "expected_pcm_bytes": 623360,
+  "events": 778,
+  "case_mask": 33554431,
+  "negative_controls": [
+    {
+      "name": "original17_data",
+      "input_sha256": "4cba27844a6a9018c103e06ac8e505590ae0549ef2dfe6238ebd933b4dfb9757",
+      "rejection": "CAPACITY_MODEL_MISMATCH",
+      "source_only": true
+    },
+    {
+      "name": "forced_capacity17",
+      "input_sha256": "63b3bd78975da2e2e19361910eedab463842e9f470803ecdebf14606455c5604",
+      "rejection": "CAPACITY_MODEL_MISMATCH",
+      "source_only": true
+    },
+    {
+      "name": "obsolete_pcm_macro398080",
+      "input_sha256": "5c4b139e98e85b7e717e3c55cc0638e65dd05d2b9bf0fca41d66c7e381ec0e1c",
+      "rejection": "EXPECTED_PCM_MODEL_MISMATCH",
+      "source_only": true
+    },
+    {
+      "name": "one_descriptor_removed",
+      "input_sha256": "a1365c35b9c08fcdb01376f7bddd150abf95e3f409ba3bc4c51c95376df16a8c",
+      "rejection": "DESCRIPTOR_MODEL_MISMATCH",
+      "source_only": true
+    }
+  ],
+  "platform": {
+    "target": "esp32c3",
+    "SDK_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+    "ELF_machine": 243,
+    "worker_core": 0,
+    "coordinator_core": 0
+  },
+  "files": {
+    "check_successor.py": {
+      "bytes": 12179,
+      "sha256": "acf4104bbddbd5841d3f6191cf52bde7c8e2bbb418f0f7c755c15d36fedb36ad"
+    },
+    "contract.json": {
+      "bytes": 69649,
+      "sha256": "717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d"
+    },
+    "controller-revision02.diff": {
+      "bytes": 1504,
+      "sha256": "fc91d702718dca001f4eb4e8226e28c3e7004e36886d1500b34d7f7ea5f6510f"
+    },
+    "materialized01/data.h": {
+      "bytes": 66510,
+      "sha256": "97b1a62287dc048603eaaed239cf294a19a4c887ecc97d2fe2d887e7d8b8b6dc"
+    },
+    "platform-facts.json": {
+      "bytes": 3735,
+      "sha256": "2b30c40614625ff3155e83aee29c9d497c618975ffb2510a2d882b1b1bc8d680"
+    },
+    "prepare_successor.py": {
+      "bytes": 7468,
+      "sha256": "2817fe2f8ef51d91fc4d8cd550efb54fa0c1a54a55aecc0ee6de4d6582baa4f2"
+    },
+    "protocol.py": {
+      "bytes": 10268,
+      "sha256": "961b0050f5881e5000116cbf7a598a122407420b0a52da0805d060c7b7e3f7ba"
+    },
+    "README-revision02.diff": {
+      "bytes": 4633,
+      "sha256": "403ae4ee0cbd87fd362bb9695ece9fea03658de9ebf787997c1dfa6ea27a9900"
+    },
+    "README.md": {
+      "bytes": 8943,
+      "sha256": "c647eb537f6ddb3a269ec6fbb9cb77e041135e96b8fbb4a55858483671e48839"
+    },
+    "reference-binding02.json": {
+      "bytes": 151906,
+      "sha256": "802d0fe193991cfc40d388ad27594d8d0b632112f223cb6dee68226c07585f2c"
+    },
+    "reference_binding02.py": {
+      "bytes": 8503,
+      "sha256": "3961e32fc5abb5a883260b2932a570908367c46ad2058a210a123336db7638ce"
+    },
+    "run-c3-vorbis-format-expanded25-qemu.py": {
+      "bytes": 29887,
+      "sha256": "e00a30172c3b4291f080b2eee937214108adda7b6a03178e2f9833cb44d92034"
+    },
+    "source-closure02.json": {
+      "bytes": 25741,
+      "sha256": "329ea51946b8f512467a36ccf1f3f72257206bcbd65e6dbc8e95efc15b78b15b"
+    },
+    "source-map.json": {
+      "bytes": 913441,
+      "sha256": "63f0eccf40044fabcc8d2b31c0a2094859258856e4948fe53a57cf8a9358301a"
+    },
+    "source-relation.json": {
+      "bytes": 7140,
+      "sha256": "1bb6dd8e05f49ee7c83d057dd290ed1c3146300ea27c8fa3e41611553c889953"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/CMakeLists.txt": {
+      "bytes": 209,
+      "sha256": "ad9cb404317d938acd400702039434de0d48a95bcf7c2a8eb7f4d9844564c4e3"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/main/CMakeLists.txt": {
+      "bytes": 201,
+      "sha256": "bf00f9468d01c897ebd4722a1a44d550799ffd21ab8e6b14d44e8274a283bfe4"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/main/corpus_case.h": {
+      "bytes": 476,
+      "sha256": "91a040d89f3bc2b7740fa2f175f36d64cebcd92653cd4c2014149bbb11219be3"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/main/data.h": {
+      "bytes": 605,
+      "sha256": "5fcda40718f55fbb62e50ef4ca648a00ab4be685dc86b1dd5fa9b4b82fcd1728"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/main/main.c": {
+      "bytes": 9810,
+      "sha256": "8c6aff4bb6d43c6b034db799477653e89fff4c9e65ac0b805d99f257672e9f03"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/partitions.csv": {
+      "bytes": 96,
+      "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/raw-enable.cmake": {
+      "bytes": 2935,
+      "sha256": "b0dfa7bf6c8a01e3082ce58495ae7f0b3c565873d2054b5c2fa427bdb9871b5e"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/sdk-build.ps1": {
+      "bytes": 5776,
+      "sha256": "f722918dd7cb28574721d7d899ba960823917166830b0abdec94090fcfca34b9"
+    },
+    "target/c3_vorbis_format_expanded25_qemu/sdkconfig.defaults": {
+      "bytes": 969,
+      "sha256": "6ae9a568666bee77759e6333d83169d6aa545366efc7b7f2fd154fcf5f23479a"
+    },
+    "terminal-records.json": {
+      "bytes": 1146,
+      "sha256": "ac90887ef9163da8d7219e1184ce06547f87266bab6d67a2ee002b7ea5143b92"
+    },
+    "windows_compile_command.py": {
+      "bytes": 4257,
+      "sha256": "4b82300e6217a8c311ca8016d17e0da7a62cf4499509ae304624c46648005e35"
+    }
+  }
+}

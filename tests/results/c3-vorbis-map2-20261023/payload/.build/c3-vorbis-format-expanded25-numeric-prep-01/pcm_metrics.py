@@ -1,0 +1,118 @@
+"""Pure signed-S16 measurement; no decoder, file access or tolerance default."""
+from collections import Counter
+import math
+import struct
+
+
+def need(ok, message):
+    if not ok:
+        raise RuntimeError(message)
+
+
+def samples(data):
+    need(type(data) is bytes and len(data) % 4 == 0, 'Complete stereo S16LE frames required')
+    return struct.unpack('<' + 'h' * (len(data) // 2), data)
+
+
+def errors(reference, target, *, histogram=False):
+    need(len(reference) == len(target), 'Equal sample counts required; no truncation')
+    delta = [b - a for a, b in zip(reference, target)]
+    count = len(delta)
+    square = sum(x * x for x in delta)
+    result = dict(samples=count, different_samples=sum(x != 0 for x in delta),
+        min_signed_error=min(delta) if count else None, max_signed_error=max(delta) if count else None,
+        max_abs_error=max(map(abs, delta)) if count else None,
+        sum_signed_error=sum(delta), sum_squared_error=square,
+        mean_signed_error=sum(delta) / count if count else None,
+        rms_error=math.sqrt(square / count) if count else None,
+        reference_sum_squares=sum(x * x for x in reference), target_sum_squares=sum(x * x for x in target),
+        reference_nonzero_samples=sum(x != 0 for x in reference), target_nonzero_samples=sum(x != 0 for x in target),
+        reference_clipped_samples=sum(x in (-32768, 32767) for x in reference),
+        target_clipped_samples=sum(x in (-32768, 32767) for x in target))
+    mismatch = next((i for i, x in enumerate(delta) if x), None)
+    result['first_mismatch'] = None if mismatch is None else dict(sample=mismatch,
+        reference=reference[mismatch], target=target[mismatch], signed_error=delta[mismatch])
+    if histogram:
+        result['signed_error_histogram'] = {str(k): v for k, v in sorted(Counter(delta).items())}
+    return result
+
+
+def compare(reference, target, packet_bytes):
+    need(type(reference) is bytes and type(target) is bytes and len(reference) == len(target),
+         'Exact full PCM byte counts required')
+    need(len(packet_bytes) == 14 and all(type(n) is int and n >= 0 and n % 4 == 0 for n in packet_bytes) and
+         packet_bytes[0] == 0 and all(n > 0 for n in packet_bytes[1:]) and sum(packet_bytes) == len(reference),
+         'Fourteen complete packet boundaries including zero primer required')
+    a, b = samples(reference), samples(target)
+    whole = errors(a, b, histogram=True)
+    if whole['first_mismatch']:
+        item = whole['first_mismatch']
+        item.update(frame=item['sample'] // 2, channel=item['sample'] % 2)
+    channels = [errors(a[channel::2], b[channel::2]) for channel in (0, 1)]
+    packets, cursor = [], 0
+    for index, size in enumerate(packet_bytes):
+        first, stop = cursor // 2, (cursor + size) // 2
+        aa, bb = a[first:stop], b[first:stop]
+        packets.append(dict(packet=index, byte_offset=cursor, bytes=size, frames=size // 4,
+            all_samples=errors(aa, bb), channels=[errors(aa[ch::2], bb[ch::2]) for ch in (0, 1)]))
+        cursor += size
+    return dict(byte_equal=reference == target, frames=len(reference) // 4,
+        unit='signed S16 integer LSB; error=target-reference', zero_lag_direct_LR=whole,
+        channels=channels, packets=packets)
+
+
+def alignment(reference, target, max_lag=8):
+    """Diagnostics only. Every lag uses the SAME interior frame range."""
+    need(type(max_lag) is int and 0 <= max_lag <= 64, 'Diagnostic lag window 0..64 required')
+    a, b = samples(reference), samples(target)
+    need(len(a) == len(b) and len(a) // 2 > 2 * max_lag, 'Alignment frame shape')
+    first, last = max_lag, len(a) // 2 - max_lag
+    rows = []
+    for rc in (0, 1):
+        for tc in (0, 1):
+            candidates = []
+            for lag in range(-max_lag, max_lag + 1):
+                squared = sum((b[(i + lag) * 2 + tc] - a[i * 2 + rc]) ** 2 for i in range(first, last))
+                candidates.append(dict(target_lag_frames=lag, samples=last - first, sum_squared_error=squared,
+                                       rms_error=math.sqrt(squared / (last - first))))
+            minimum = min(item['sum_squared_error'] for item in candidates)
+            rows.append(dict(reference_channel=rc, target_channel=tc, candidates=candidates,
+                minimum_error_lags=[item['target_lag_frames'] for item in candidates if item['sum_squared_error'] == minimum]))
+    return dict(diagnostic_only=True, applied_shift_frames=0, applied_channel_swap=False,
+        fixed_reference_frame_range=[first, last], channel_pairs=rows,
+        limitation='Finite/periodic or equal-channel signals may give ambiguous ties; no alignment correction is applied')
+
+
+def relations(pcm_by_id, declared):
+    need(len(declared) == 4, 'All four books relations required')
+    out = []
+    for row in declared:
+        ids = row['cases']
+        need(row['kind'] in ('equal', 'different') and len(ids) >= 2 and all(name in pcm_by_id for name in ids),
+             'Complete named metamorphic relation required')
+        values = [pcm_by_id[name] for name in ids]
+        equal = all(value == values[0] for value in values[1:])
+        out.append(dict(kind=row['kind'], cases=ids, observed_byte_equal=equal,
+            expected_relation_observed=equal if row['kind'] == 'equal' else not equal,
+            comparisons=[dict(first=ids[0], second=name, **errors(samples(values[0]), samples(value)))
+                         for name, value in zip(ids[1:], values[1:])]))
+    return out
+
+
+def bounded_policy(cases, metamorphic, max_abs_error):
+    need(max_abs_error is None or type(max_abs_error) is int and max_abs_error == 2,
+         'Only the separately predeclared project threshold2 is supported')
+    if max_abs_error is None:
+        return None, False
+    need(len(cases) == 17 and set(metamorphic) == {'xiph', 'target'} and
+         all(len(rows) == 4 for rows in metamorphic.values()), 'Complete nonvacuous seventeen-case policy inputs required')
+    numeric = all(row['comparison']['zero_lag_direct_LR']['max_abs_error'] <= max_abs_error for row in cases)
+    nonzero = all(all(channel['reference_nonzero_samples'] > 0 and channel['target_nonzero_samples'] > 0
+                      for channel in row['comparison']['channels']) for row in cases)
+    relation_ok = all(row['expected_relation_observed'] for rows in metamorphic.values() for row in rows)
+    policy = dict(purpose='bounded-corpus-regression-not-standard-conformance', max_abs_error=max_abs_error,
+        selected_before_target_measurement=True, threshold_fitted_to_output=False,
+        alignment='Every original zero-lag L/R sample and packet; no trim, gain fit, shift, swap or resampling',
+        max_abs_error_within_bound=numeric, both_channels_nonzero=nonzero,
+        all_four_relations_per_decoder=relation_ok)
+    return policy, numeric and nonzero and relation_ok

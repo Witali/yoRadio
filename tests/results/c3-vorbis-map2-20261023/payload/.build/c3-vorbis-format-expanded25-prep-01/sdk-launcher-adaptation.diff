@@ -1,0 +1,32 @@
+--- .build/c3-vorbis-uint32-rate-sdk-prep-01/target/c3_vorbis_uint32_rate_qemu/sdk-build.ps1
++++ .build/c3-vorbis-format-expanded25-prep-01/target/c3_vorbis_format_expanded25_qemu/sdk-build.ps1
+@@ -2,8 +2,7 @@
+       [Parameter(Mandatory)][string]$Repository,
+       [Parameter(Mandatory)][string]$SdkDirectory,
+       [Parameter(Mandatory)][string]$ToolsDirectory,
+-      [Parameter(Mandatory)][string]$CodecDirectory,
+-      [Parameter(Mandatory)][ValidateSet("baseline","acceptance","limited")][string]$RateMode)
++      [Parameter(Mandatory)][string]$CodecDirectory)
+ $ErrorActionPreference = 'Stop'
+ $Campaign = [IO.Path]::GetFullPath($Campaign)
+ $draftRoot = Join-Path ([IO.Path]::GetFullPath($Repository)) '.build'
+@@ -31,15 +30,15 @@
+ . (Join-Path $env:IDF_PATH 'export.ps1')
+ if ($LASTEXITCODE -ne 0) { throw 'SDK activation failed' }
+ $report = Get-Content -LiteralPath (Join-Path $Campaign 'report.json') -Raw | ConvertFrom-Json
+-$setupSha = $report.guard_variant.selected_sha256
+-if ($report.mode -ne $RateMode -or $setupSha -notmatch '^[0-9a-f]{64}$' -or
++$setupSha = $report.selected_setup_sha256
++if ($setupSha -notmatch '^[0-9a-f]{64}$' -or
+     (Get-FileHash -LiteralPath (Join-Path $Campaign 'variant/vorbis_repair/setup.c') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $setupSha) {
+-    throw 'Controller-selected frozen setup/mode differs'
++    throw 'Controller-selected frozen setup differs'
+ }
+ $argsForIdf = @((Join-Path $env:IDF_PATH 'tools/idf.py'), '-C', (Join-Path $Campaign 'sources/project'),
+  '-B', (Join-Path $Campaign 'build'), '--no-ccache', '-D', 'IDF_TARGET=esp32c3', '-D', 'IDF_TOOLCHAIN=gcc',
+  '-D', "SDKCONFIG=$Campaign/sdkconfig", '-D', "SDKCONFIG_DEFAULTS=$Campaign/sources/project/sdkconfig.defaults",
+- '-D', "RATE_MODE=$RateMode", '-D', "RATE_SETUP_SHA256=$setupSha",
++ '-D', "CORPUS_SETUP_SHA256=$setupSha",
+  '-D', 'CMAKE_JOB_POOLS=compile=2;link=1', '-D', 'CMAKE_JOB_POOL_COMPILE=compile', '-D', 'CMAKE_JOB_POOL_LINK=link', 'build')
+ $toolPaths = @(Get-ChildItem Env: | Where-Object { $_.Name -imatch '^path$' -and $_.Value.Contains('tools\ninja') } | Select-Object -ExpandProperty Value)
+ if ($toolPaths.Count -ne 1) { throw 'Activated toolchain PATH missing' }

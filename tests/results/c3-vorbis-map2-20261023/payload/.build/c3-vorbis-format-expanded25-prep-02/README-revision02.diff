@@ -1,0 +1,71 @@
+--- frozen01/README.md
++++ successor02/README.md
+@@ -1,4 +1,4 @@
+-# Standalone C3 public raw expanded25 capture proposal
++# Standalone C3 public raw expanded25 capture successor02
+ 
+ This is a source-only C3/RV32 adaptation. It has not been built, run in QEMU,
+ decoded or tested. Canonical files, previous preps, existing campaigns and all
+@@ -25,7 +25,7 @@
+ 
+ - Contract file: `717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d`.
+ - Contract model: `660ac01523d3336ccb103f1443e51b870edf1a3d3f50321c5666969b1da634cc`.
+-- Actual materialized data: `4cba27844a6a9018c103e06ac8e505590ae0549ef2dfe6238ebd933b4dfb9757`.
++- Actual materialized data: `97b1a62287dc048603eaaed239cf294a19a4c887ecc97d2fe2d887e7d8b8b6dc`.
+ - Source map: `63f0eccf40044fabcc8d2b31c0a2094859258856e4948fe53a57cf8a9358301a`.
+ - Reference binding02: `802d0fe193991cfc40d388ad27594d8d0b632112f223cb6dee68226c07585f2c`.
+ - Reference helper02: `3961e32fc5abb5a883260b2932a570908367c46ad2058a210a123336db7638ce`.
+@@ -86,10 +86,10 @@
+ standalone infrastructure. For example, the required corpus arguments are:
+ 
+ ```text
+---contract <repository>/.build/c3-vorbis-format-expanded25-prep-01/contract.json
++--contract <repository>/.build/c3-vorbis-format-expanded25-prep-02/contract.json
+ --contract-sha256 717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d
+---data-header <repository>/.build/cyd-vorbis-format-expanded25-prep-01/materialized01/data.h
+---data-sha256 4cba27844a6a9018c103e06ac8e505590ae0549ef2dfe6238ebd933b4dfb9757
++--data-header <repository>/.build/c3-vorbis-format-expanded25-prep-02/materialized01/data.h
++--data-sha256 97b1a62287dc048603eaaed239cf294a19a4c887ecc97d2fe2d887e7d8b8b6dc
+ --candidate <repository>/idf/esp32c3-oled-native/main
+ --output <repository>/.build/<fresh-root-selected-c3-campaign>
+ ```
+@@ -101,3 +101,39 @@
+ linker, macro dump, ROM, QEMU, public decoding or host protocol behavior. No
+ Ogg/EOF/reset, OOM/fault injection, private state, AAC, network, device or full
+ production work is included.
++
++## Corrected source-only successor relationship
++
++Frozen C3prep01 is preserved. Its readiness identity is
++`73cf6cc976a7300cd23ca1f47fcc778da9e67bfd277dd0b7cc842c2bee362003`;
++its controller identity is
++`7a7ba50fd01656c7e3a29e9d2e72a8d75f6d15a105e57f0f25bdfc638a4270f4`.
++The only functional runtime-source change here is DATA_HEADER_SHA from the old
++`4cba27844a6a9018c103e06ac8e505590ae0549ef2dfe6238ebd933b4dfb9757`
++to the corrected full25 data identity above. The new materialized01/data.h is
++copied byte-for-byte from CYDprep02/materialized01/data.h; it is not regenerated.
++All other runtime files are byte-identical to C3prep01 (including the deliberately
++unusable project data.h template); corrected input is supplied explicitly by CLI.
++The unchanged contract still names its original frozen matrices/raw paths. They
++are source provenance, not a request to rerun old generators or references.
++
++The prior CYD capture01 failed compilation because the supplied materialized
++header had capacity17 with25 descriptors and an obsolete expected PCM macro.
++No prior source-only check is treated as compile/target proof. The independent
++restricted C reader in check_successor.py parses numeric macros, all raw arrays
++and actual descriptor entries separately; it compares them to the unchanged25
++model and actual raw SHA values. It rejects original17 data and independent count,
++PCM-total and descriptor-omission corruptions. These are source construction
++checks, not protocol tests or decoding. No SDK/compiler/QEMU/reference/PCM/Git
++operation is executed by this preparation.
++
++Full root-owned entrypoint (all runtime options and candidate selection remain
++unchanged):
++
++```powershell
++& 'C:/Users/rudol/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B .build/c3-vorbis-format-expanded25-prep-02/run-c3-vorbis-format-expanded25-qemu.py --contract .build/c3-vorbis-format-expanded25-prep-02/contract.json --contract-sha256 717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d --data-header .build/c3-vorbis-format-expanded25-prep-02/materialized01/data.h --data-sha256 97b1a62287dc048603eaaed239cf294a19a4c887ecc97d2fe2d887e7d8b8b6dc --candidate '<repository/idf/esp32c3-oled-native/main or separately reviewed ce2e candidate main>' --output '<fresh root-selected checkout .build C3 campaign>'
++```
++
++This command is documentation only; it has not been executed here. C3 baseline
++f3d8 and acceptance candidate ce2e each require distinct actual target/numerical
++evidence. The source-only successor does not inherit any CYD target result.

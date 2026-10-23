@@ -1,0 +1,116 @@
+--- cyd-numeric-prep01/compare_capture25.py
++++ c3-numeric-prep01/compare_capture25.py
+@@ -6,18 +6,20 @@
+ import json
+ from pathlib import Path, PurePosixPath, PureWindowsPath
+ import re
++import struct
+ import sys
+ import wave
+ from pcm_metrics import alignment, compare, need
+ from policy25 import CASE_IDS, relations8, bounded_policy25, bounded_policy_books16
+ 
+ sys.dont_write_bytecode = True
+-RUNNER = '74ab64118cd8cd29e5fb376bc687a2b9eba703140c98b45474de7202d50e409f'
+-PROTOCOL = '547655c4fa31a100f29f52b3a142a54442578393b860723b2b1147732578700e'
++SDK_REVISION = '9a97f6c54ec638111ce55cd36581b3c192f15207'
++RUNNER = 'e00a30172c3b4291f080b2eee937214108adda7b6a03178e2f9833cb44d92034'
++PROTOCOL = '961b0050f5881e5000116cbf7a598a122407420b0a52da0805d060c7b7e3f7ba'
+ CONTRACT = '660ac01523d3336ccb103f1443e51b870edf1a3d3f50321c5666969b1da634cc'
+ CONTRACT_FILE = '717ec7f703295f9851fd9241877cf249ff6f203c436786300a36247f2805218d'
+ DATA_HEADER = '97b1a62287dc048603eaaed239cf294a19a4c887ecc97d2fe2d887e7d8b8b6dc'
+-CALLER = '37eaeb25a272ceadaafe36d6309449d31895b7019523333ed0e4c48226d0d065'
++CALLER = '8c6aff4bb6d43c6b034db799477653e89fff4c9e65ac0b805d99f257672e9f03'
+ CASE_HEADER = '91a040d89f3bc2b7740fa2f175f36d64cebcd92653cd4c2014149bbb11219be3'
+ SOURCE_MAP = '63f0eccf40044fabcc8d2b31c0a2094859258856e4948fe53a57cf8a9358301a'
+ BINDING = '802d0fe193991cfc40d388ad27594d8d0b632112f223cb6dee68226c07585f2c'
+@@ -72,6 +74,61 @@
+         need(row.get('state') == 'complete' and type(row.get('exit_status')) is int and row['exit_status'] == 0 and
+              row.get('timed_out') is False and row.get('interrupted') is False and type(row.get('pid')) is int and
+              row['pid'] > 0 and row.get('argv') and row.get('cwd'), 'Incomplete target process facts')
++
++
++def c3_platform(inputs, target_root, target):
++    need(target.get('platform') == 'esp32c3' and target.get('sdk_revision') == SDK_REVISION and
++         type(target.get('elf_machine')) is int and target['elf_machine'] == 243 and
++         type(target.get('coordinator_core')) is int and target['coordinator_core'] == 0 and
++         type(target.get('worker_core')) is int and target['worker_core'] == 0,
++         'Exact C3 SDK/RV32/unicore report facts required')
++    for name in ('sdk-head', 'sdk-head-after'):
++        row = next(row for row in target['commands'] if row['name'] == name)
++        need(inputs.read('target/platform/' + name, target_root / (name + '.stdout.log'),
++             row['stdout_sha256']).decode().strip() == SDK_REVISION, 'Actual C3 SDK terminal revision differs')
++    setup_sha = target.get('selected_setup_sha256')
++    need(isinstance(setup_sha, str) and re.fullmatch('[0-9a-f]{64}', setup_sha),
++         'Actual C3 selected setup SHA256 required')
++    source_name = 'sources/candidate/vorbis_repair/setup.c'
++    source_rows = [row for row in target['inputs'].values() if relative(row['snapshot']) == source_name]
++    need(len(source_rows) == 1 and source_rows[0]['sha256'] == setup_sha,
++         'Selected C3 setup must bind exactly one frozen candidate source')
++    inputs.read('target/platform/candidate-setup', target_root / source_name, setup_sha)
++    variant_name = 'variant/vorbis_repair/setup.c'
++    variants = {relative(name): value for name, value in target.get('variant_sources', {}).items()}
++    need(len(variants) == len(target.get('variant_sources', {})) and variants.get(variant_name) == setup_sha,
++         'Actual compiled C3 variant setup differs from selected snapshot')
++    inputs.read('target/platform/variant-setup', target_root / variant_name, setup_sha)
++    outputs = {relative(name): value for name, value in target.get('build_outputs', {}).items()}
++    need(len(outputs) == len(target.get('build_outputs', {})), 'Duplicate normalized C3 build output paths')
++    compile_name = 'build/compile_commands.json'
++    need(compile_name in outputs, 'Actual C3 compile rows required')
++    rows = json.loads(inputs.read('target/platform/compile-commands', target_root / compile_name,
++                                 outputs[compile_name]))
++    row_source = lambda row: (Path(row['directory']) / row['file']).resolve()
++    setup_rows = [row for row in rows if row_source(row) == target_root / variant_name]
++    need(len(setup_rows) == 1 and setup_rows[0] == target['setup_macro_context']['row'],
++         'Macro proof must describe the actual selected C3 setup compile row')
++    command = next(row for row in target['commands'] if row['name'] == 'setup-macros')
++    macros = inputs.read('target/platform/setup-macros', target_root / 'setup-macros.stdout.log',
++                         command['stdout_sha256']).decode()
++    for name, value in (('CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ', 160), ('CONFIG_FREERTOS_UNICORE', 1),
++                        ('__riscv_xlen', 32), ('__SIZEOF_LONG__', 4), ('__SIZEOF_POINTER__', 4),
++                        ('CONFIG_IDF_TARGET_ESP32C3', 1), ('ESP_PLATFORM', 1)):
++        need(re.search(r'^#define ' + name + ' ' + str(value) + '$', macros, re.M),
++             'Actual C3 compile macro differs: ' + name)
++    need(not re.search(r'^#define LIMIT_TO_64kHz\b', macros, re.M),
++         'Actual C3 setup must retain unrestricted reviewed rate context')
++    elf_names = [relative(name) for name in outputs if name.endswith('.elf')]
++    need(len(elf_names) == 1 and elf_names[0].startswith('build/'), 'One actual C3 build ELF required')
++    elf = inputs.read('target/platform/elf', target_root / elf_names[0], outputs[elf_names[0]])
++    need(len(elf) >= 20 and elf[:6] == b'\x7fELF\x01\x01' and
++         struct.unpack_from('<H', elf, 18)[0] == 243, 'Actual build must be little-endian ELF32/RISC-V')
++    return dict(platform='esp32c3', sdk_revision=SDK_REVISION, elf_machine=243, riscv_bits=32,
++                coordinator_core=0, worker_core=0, cpu_mhz=160, unicore=True,
++                selected_setup_sha256=setup_sha, setup_snapshot=source_name, compiled_setup=variant_name,
++                actual_build_elf=elf_names[0], actual_build_elf_sha256=sha(elf),
++                setup_identity_from_actual_report=True, assumed_CYD_binary_equivalence=False)
+ 
+ 
+ def wav_pcm(data, rate, frames):
+@@ -114,6 +171,9 @@
+     target_bytes = inputs.read('target/report', target_root / 'report.json', args.target_report_sha256)
+     target = json.loads(target_bytes)
+     complete_capture(target)
++    need((target.get('platform'), target.get('sdk_revision'), target.get('elf_machine'),
++          target.get('coordinator_core'), target.get('worker_core')) ==
++         ('esp32c3', SDK_REVISION, 243, 0, 0), 'Only reviewed C3 capture platform supported')
+     terminal = json.loads(inputs.read('target/outer-terminal', args.target_terminal))
+     need(terminal.get('schema') == 'direct-exec-tool-terminal-v1' and
+          type(terminal.get('exit_code')) is int and terminal['exit_code'] == 0 and
+@@ -131,6 +191,8 @@
+         row = target['inputs'][str(Path(original).resolve())]
+         need(row['sha256'] == expected, 'Frozen original-path identity differs: ' + role)
+         return inputs.read(role, target_root / relative(row['snapshot']), expected, size)
++    result['target_platform'] = c3_platform(inputs, target_root, target)
++    result['target_platform_verified'] = True
+     inputs.read('target/controller', target_root / 'sources/helpers/run.py', RUNNER)
+     protocol_path = target_root / 'sources/helpers/protocol.py'
+     inputs.read('target/protocol', protocol_path, PROTOCOL)
+@@ -321,7 +383,7 @@
+     need(build_root.parent == repo and out.is_relative_to(build_root) and out != build_root and not out.exists() and
+          all(not out.is_relative_to(p) and not p.is_relative_to(out) for p in protected),'Fresh independent .build output required')
+     out.mkdir(parents=True,exist_ok=False)
+-    result = dict(result='INCOMPLETE',checked_only=True,vendor_comparison_available=False,vendor_checked_pcm_equal=False,
++    result = dict(result='INCOMPLETE',target_platform_verified=False,checked_only=True,vendor_comparison_available=False,vendor_checked_pcm_equal=False,
+         measurement_completed=False,actual_reference_compared=False,bounded_corpus_pcm_qualified=False,policy=None,
+         passed=False,numeric_reference_qualified=False,format_conformance_qualified=False,format_corpus_qualified=False,
+         full_G6_qualified=False,physical_device=False,production_radio_integration=False,cases=[])
