@@ -2764,3 +2764,32 @@ upload/decode/journal reset/power-cut, clients/reconnect/churn, whole-image
 indirect-call audit/full/24h/hardware. Earlier HTTP proofs belong to earlier app
 hashes, do not relabel. SDK/frozen QEMU unchanged, no physical actions/no push.
 Goal remains active. Finish focused commit of this checkpoint, then continue.
+
+## 2026-10-23 — foreground clocks/HTTP/recovery completed scope
+
+AppABF14143 /ELF896558F5 /source64EDEEF9 unchanged. New test-only checkpoint:
+tests/JPEG_CLOCK_CONTINUITY.md and jpeg-clock-continuity-validation-20261023.json.
+Classic/simple/dial actual foreground gray8 progressive:13wholeframes; separate
+start/chunk-only control47.60frames/3456000pixels exact clean native/factory RV32,
+real minute rollover,16+12report rejects, hardware breakpoints/no guest writes.
+Actual main complete; only isolated native renderer skips non-pixel RTOS startup.
+
+HTTP requalified current app with persistent WeatherFixture, not one-shot HTTP1.0.
+First240host timeout retained; diagnostics show ongoing CMYK12 flash progress,
+not mutex deadlock. Explicit900host run completed:CMYK12 305s, RGBprogressive146.438s,
+gray37.25s.862GET/0errors/max.875; separate160GET/0errors/max.5. Two sampling44
+precise resource refusals, GET10s/guest I/O-time budgets unchanged. Host icount
+seconds NOT hardware timing. Actual cold source HTTP bytes exact.
+
+Independent wire reader/newest journal/full physical frame matches unmodified
+upstream gray RGB565A3EC07B0. Actual stopped first interrupted flash15F0392B,
+NOT live failure-flash copy, ordinary new boot/replacement works journal1→2.
+Before size0/notready, after full source/frame SHA correct, protected preserved.
+This is not bit-level power-cut/brownout. All11accepted processes stopped/reaped.
+No current firmware changes/new build. Coefficient packing and durable cache
+remain enabled; prior cold-photo proof0program/erase remains separate evidence.
+
+NEXT: current target format/RAM/stack/fault matrix; expand LCD load to accepted
+fullCMYK12/richRGB progressive; publication/program/erase cuts, network lifecycle/
+churn, whole-image/full/24h/hardware. Keep network/display acceptance separate.
+SDK/frozen QEMU unchanged; no physical actions/no push. Goal remains active.

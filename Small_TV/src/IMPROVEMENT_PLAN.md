@@ -101,6 +101,20 @@ App/ELF/source/runs привязаны к новому proof. Это photo LCD/s
 fault matrix, HTTP/network lifecycle/churn, power cuts, whole-image/full/24h/
 hardware остаются открытыми. Старые HTTP/decoder проверки не переносить на новую app.
 
+Следующий checkpoint: [clock continuity](tests/JPEG_CLOCK_CONTINUITY.md) той же
+appABF14143 проверена отдельно от HTTP. Classic/simple/dial продолжают показывать
+точные целые кадры при foreground progressive gray8:13workload+47control,
+3456000actual pixels, native/factory references, minute rollover,16+12negative
+controls. HTTP requalification: fullCMYK12/richRGBprogressive/gray приняты, два
+sampling44 refusals с required/available;862GET/0errors(max0.875host s), отдельно
+160controlGET/0errors(max0.5). Прежней host границы240s не хватило на CMYK12;
+explicit900s наблюдение завершилось за305host s при прежних guest budgets/GET10s.
+Actual stopped pre-publication VM восстановлена обычным boot/upload:journal1→2,
+source/frame SHA exact. Это не physical brownout. Все11accepted processes reaped.
+Открыты CURRENT target format/RAM/stack/fault, LCD под CMYK12/richRGB, publication
+powercuts, lifecycle/churn/whole-image/full/24h/hardware. Progressive coefficient
+write optimization и cache сохраняются; повторный показ не повторяет decode.
+
 Checkpoint 2026-10-20: реализован portable NOR core с 4 KiB cache, sparse mapping,
 sector RMW и read-back verification. 3000 random operations, 83 injected partial
 failures, 7 реальных layout stores и 6 compiled mutation controls прошли.

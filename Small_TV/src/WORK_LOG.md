@@ -4130,3 +4130,38 @@ hashes/protected/cold identity. Около0.8MB новых compressed данны
 JPEG memory/stack/format/fault, HTTP resource/lifecycle/churn, actual publication
 power cuts, whole-image/full/24h/hardware. Старые HTTP результаты на новую app
 не переносить. Physical/SDK/frozen QEMU действий нет; цель остаётся активной.
+
+## 2026-10-23 — часы при foreground JPEG, HTTP и interrupted recovery
+
+AppABF14143/ELF896558F5/source64EDEEF9 без production изменений. Classic/simple/dial
+сверены с clean native +corrected literal factory RV32 во время настоящего gray8
+progressive decode:13frames, maxgap1.069112/1.101215/1.116249guest s. Отдельный
+start/chunk-only control:47frames. Все3456000pixels точны, real minute rollover,
+active foreground/source4, no RAM/PC/time writes.16+12report negatives. Только
+isolated native renderer reference пропускает RTOS owner startup; actual main
+выполняется целиком. Полные clean surfaces без masks/actual-panel copying.
+
+HTTP fixture исправлен на persistent WeatherFixture. Старый240host s timeout
+CMYK12 сохранён; passive counters показывают progress, mutex deadlock не найден.
+Explicit900host s повтор:CMYK12 200OK за305s, richRGBprogressive146.438s, gray37.25s;
+sampling44-8 backing-capacity524288/460800, sampling44-12 heap-headroom15379/6692.
+862GET/0errors/max0.875s; отдельный no-upload160GET/0errors/max0.5s. GET10s,
+firmware180guest s/200k calls/64MiB read/16MiB program не ослаблялись. Host time
+под icount не является скоростью физического C2. Cold source readback точен.
+
+Independent canonical journal reader проверяет CRC/footer/newest identity и
+physical source/frame SHA. Upstream gray samples57600×128 →RGB565 frameA3EC07B0
+совпал послеLCD/HTTP/cold/recovery.3offline damage controls — не powercuts.
+Actual stopped pre-publication CMYK image(slot5size0/notready) загружен в новуюVM;
+ordinary gray replacement OK, journal1→2, protected bytes unchanged. Это restart
+до publication, не brownout внутри page/erase. Все11accepted owned VM reaped.
+
+Сохранены test helpers, отдельные gates, raw proof/sector deltas и independent
+verifier:tests/JPEG_CLOCK_CONTINUITY.md, qemu/parity/jpeg-clock-continuity-validation-
+20261023.json. FactoryELF/ROM archival checks отдельно от runtime pins. Старые
+coefficient optimization и persistent cache включены: не повторять scratch decode
+при показе. Их прежние traffic/cold0write результаты не подменяются новыми tests.
+
+NEXT: current target format/RAM/stack/fault, LCD под CMYK12/richRGB, publication
+powercuts, lifecycle/churn, whole-image/full/24h/hardware. Shared SDK/frozen QEMU
+не менялись, физических действий и push нет. Цель всего плана остаётся активной.
