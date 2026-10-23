@@ -431,6 +431,27 @@ static void capture_status_key(webui_status_key_t *key) {
             sizeof(key->stream_format));
 }
 
+static bool status_keys_equal(const webui_status_key_t *left,
+                              const webui_status_key_t *right) {
+    // Structure assignments need not preserve padding. Compare the logical
+    // strings too, so bytes beyond their terminating NUL do not trigger work.
+    return left->audio_running == right->audio_running &&
+           left->volume == right->volume &&
+           left->balance == right->balance &&
+           left->bitrate_kbps == right->bitrate_kbps &&
+           left->sample_rate_hz == right->sample_rate_hz &&
+           left->channels == right->channels &&
+           left->bits_per_sample == right->bits_per_sample &&
+           left->pcm_sample_rate_hz == right->pcm_sample_rate_hz &&
+           left->pcm_channels == right->pcm_channels &&
+           left->current_item == right->current_item &&
+           left->station_uppercase == right->station_uppercase &&
+           strcmp(left->station, right->station) == 0 &&
+           strcmp(left->title, right->title) == 0 &&
+           strcmp(left->codec, right->codec) == 0 &&
+           strcmp(left->stream_format, right->stream_format) == 0;
+}
+
 static esp_err_t send_initial_state(httpd_req_t *request) {
     char status[1280];
     char current[48];
@@ -1017,8 +1038,8 @@ static void status_task(void *argument) {
         capture_status_key(&s_current_status_key);
         TickType_t now = xTaskGetTickCount();
         bool changed = !have_previous ||
-                       memcmp(&s_current_status_key, &s_previous_status_key,
-                              sizeof(s_current_status_key)) != 0;
+                       !status_keys_equal(&s_current_status_key,
+                                          &s_previous_status_key);
         bool heartbeat = !last_sent ||
                          now - last_sent >=
                              pdMS_TO_TICKS(WS_STATUS_HEARTBEAT_MS);

@@ -1,0 +1,104 @@
+{
+  "cyd": {
+    "earlier_report_path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\lint-cyd-input-reclaim-01\\report.json",
+    "earlier_report_fact": {
+      "bytes": 52661,
+      "sha256": "5c82da391056d11e1b9a070e1e6cf3112dc781159abc0243dc259b2c2de6007e"
+    },
+    "earlier_selected_unit": {
+      "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+      "source_sha256": "5e1a308e3a3422882bf62a3db56cd1687a6611225051280399855d9b48d5ef06",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+          "line": 266,
+          "column": 39,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+          "line": 338,
+          "column": 29,
+          "severity": "warning",
+          "message": "comparing object representation of type 'ws_status_key_t' which does not have a unique object representation; consider comparing the members of the object manually",
+          "check": "bugprone-suspicious-memory-comparison"
+        }
+      ]
+    },
+    "current_diagnostics": [
+      {
+        "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+        "line": 266,
+        "column": 39,
+        "severity": "warning",
+        "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+        "check": "bugprone-narrowing-conversions"
+      }
+    ],
+    "new_warnings": 0,
+    "removed_check": "bugprone-suspicious-memory-comparison"
+  },
+  "c3": {
+    "earlier_report_path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\lint-c3-ap-timeout-01\\report.json",
+    "earlier_report_fact": {
+      "bytes": 72931,
+      "sha256": "ae44d3fe6a2274e1dea4a09ff3d81084164e3f633ba96ec00ca81f57743d1bc4"
+    },
+    "earlier_selected_unit": {
+      "file": "idf/esp32c3-oled-native/main/websocket_service.c",
+      "source_sha256": "7b65e3c60a76fd3c9a670a5aff6101813d1ba00f0c454fcd33ec1d2e668cb26a",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 672,
+          "column": 56,
+          "severity": "warning",
+          "message": "repeated branch body in conditional chain",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 989,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'tenths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 1020,
+          "column": 24,
+          "severity": "warning",
+          "message": "comparing object representation of type 'webui_status_key_t' which does not have a unique object representation; consider comparing the members of the object manually",
+          "check": "bugprone-suspicious-memory-comparison"
+        }
+      ]
+    },
+    "current_diagnostics": [
+      {
+        "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+        "line": 693,
+        "column": 56,
+        "severity": "warning",
+        "message": "repeated branch body in conditional chain",
+        "check": "bugprone-branch-clone"
+      },
+      {
+        "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+        "line": 1010,
+        "column": 14,
+        "severity": "warning",
+        "message": "Value stored to 'tenths' during its initialization is never read",
+        "check": "clang-analyzer-deadcode.DeadStores"
+      }
+    ],
+    "new_warnings": 0,
+    "removed_check": "bugprone-suspicious-memory-comparison"
+  }
+}

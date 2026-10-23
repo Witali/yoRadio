@@ -29,6 +29,106 @@ static void station(unsigned item){fixture_item=(uint16_t)item;snprintf(fixture_
 static void previous(unsigned item){assert(s_previous_status_key.current_item==item&&"previous key advances only after both admissions");}
 static void reset_client(void){s_clients[0].closing=false;session_replaced=false;}
 
+enum {
+    KEY_AUDIO_RUNNING, KEY_VOLUME, KEY_BALANCE, KEY_BITRATE, KEY_SAMPLE_RATE,
+    KEY_CHANNELS, KEY_BITS, KEY_PCM_RATE, KEY_PCM_CHANNELS, KEY_CURRENT_ITEM,
+    KEY_UPPERCASE, KEY_STATION, KEY_TITLE, KEY_CODEC, KEY_STREAM_FORMAT,
+    KEY_FIELDS
+};
+static const char *const key_field_names[KEY_FIELDS] = {
+    "audio_running", "volume", "balance", "bitrate_kbps", "sample_rate_hz",
+    "channels", "bits_per_sample", "pcm_sample_rate_hz", "pcm_channels",
+    "current_item", "station_uppercase", "station", "title", "codec",
+    "stream_format"
+};
+static unsigned key_field;
+
+static void mutate_previous_field(void) {
+    webui_status_key_t *key = &s_previous_status_key;
+    switch (key_field) {
+    case KEY_AUDIO_RUNNING: key->audio_running = !key->audio_running; break;
+    case KEY_VOLUME: key->volume ^= 1U; break;
+    case KEY_BALANCE: key->balance = key->balance ? 0 : 1; break;
+    case KEY_BITRATE: key->bitrate_kbps ^= 1U; break;
+    case KEY_SAMPLE_RATE: key->sample_rate_hz ^= 1U; break;
+    case KEY_CHANNELS: key->channels ^= 1U; break;
+    case KEY_BITS: key->bits_per_sample ^= 1U; break;
+    case KEY_PCM_RATE: key->pcm_sample_rate_hz ^= 1U; break;
+    case KEY_PCM_CHANNELS: key->pcm_channels ^= 1U; break;
+    case KEY_CURRENT_ITEM: key->current_item ^= 1U; break;
+    case KEY_UPPERCASE: key->station_uppercase = !key->station_uppercase; break;
+    case KEY_STATION: key->station[0] = 'X'; break;
+    case KEY_TITLE: key->title[0] = 'X'; break;
+    case KEY_CODEC: key->codec[0] = 'X'; break;
+    case KEY_STREAM_FORMAT: key->stream_format[0] = 'X'; break;
+    default: assert(!"unknown key field");
+    }
+}
+
+static void key_field_hook(unsigned step) {
+    if (step == 2) { drain_all(); mutate_previous_field(); }
+    if (step == 3) {
+        assert(accepted[STATUS] == 2 && "every key field triggers status publication");
+        previous(1);
+        drain_all();
+    }
+}
+
+static void poison_previous_padding(void) {
+    unsigned char members[sizeof(webui_status_key_t)] = {0};
+#define MARK_KEY_MEMBER(member) \
+    memset(members + offsetof(webui_status_key_t, member), 1, \
+           sizeof(((webui_status_key_t *)0)->member))
+    MARK_KEY_MEMBER(audio_running); MARK_KEY_MEMBER(volume);
+    MARK_KEY_MEMBER(balance); MARK_KEY_MEMBER(bitrate_kbps);
+    MARK_KEY_MEMBER(sample_rate_hz); MARK_KEY_MEMBER(channels);
+    MARK_KEY_MEMBER(bits_per_sample); MARK_KEY_MEMBER(pcm_sample_rate_hz);
+    MARK_KEY_MEMBER(pcm_channels); MARK_KEY_MEMBER(current_item);
+    MARK_KEY_MEMBER(station_uppercase); MARK_KEY_MEMBER(station);
+    MARK_KEY_MEMBER(title); MARK_KEY_MEMBER(codec); MARK_KEY_MEMBER(stream_format);
+#undef MARK_KEY_MEMBER
+    unsigned char before[sizeof(webui_status_key_t)];
+    memcpy(before, &s_previous_status_key, sizeof(before));
+    unsigned char *bytes = (unsigned char *)&s_previous_status_key;
+    unsigned padding = 0;
+    for (size_t i = 0; i < sizeof(members); ++i) {
+        if (members[i]) assert(bytes[i] == before[i]);
+        else { bytes[i] = 0xa5U; ++padding; }
+    }
+    assert(padding && "host status key must exercise real padding bytes");
+    for (size_t i = 0; i < sizeof(members); ++i)
+        if (members[i]) assert(bytes[i] == before[i]);
+}
+
+static void key_padding_hook(unsigned step) {
+    if (step == 2) { drain_all(); poison_previous_padding(); }
+    if (step == 3)
+        assert(accepted[STATUS] == 1 && "padding-only changes must not publish status");
+}
+
+static void key_tail_hook(unsigned step) {
+    if (step == 2) {
+        drain_all();
+        char *value = NULL;
+        size_t capacity = 0;
+#define KEY_TAIL(member) value = s_previous_status_key.member; \
+    capacity = sizeof(s_previous_status_key.member)
+        switch (key_field) {
+        case KEY_STATION: KEY_TAIL(station); break;
+        case KEY_TITLE: KEY_TAIL(title); break;
+        case KEY_CODEC: KEY_TAIL(codec); break;
+        case KEY_STREAM_FORMAT: KEY_TAIL(stream_format); break;
+        default: assert(!"unknown string key field");
+        }
+#undef KEY_TAIL
+        size_t after_nul = strlen(value) + 1U;
+        assert(after_nul < capacity && "test has bytes after the logical string");
+        value[after_nul] = 'X';
+    }
+    if (step == 3)
+        assert(accepted[STATUS] == 1 && "bytes after NUL must not publish status");
+}
+
 static void idle_hook(unsigned step){if(step==2){previous(1);drain_all();}}
 static void heartbeat_hook(unsigned step){if(step==2){drain_all();ticks=2099;}if(step==3){assert(accepted[STATUS]==1);ticks=2100;}if(step==4){assert(accepted[STATUS]==2);drain_all();ticks=4099;}}
 static void tickwrap_hook(unsigned step){if(step==1)ticks=UINT32_MAX-999U;if(step==2){drain_all();ticks=999U;}if(step==3){assert(accepted[STATUS]==1);ticks=1000U;}}
@@ -48,7 +148,17 @@ static void deadline_hook(unsigned step){if(step==2){assert(accepted[DEADLINE]==
 static void deadline_retry_hook(unsigned step){if(step==2){assert(attempts[DEADLINE]==1&&!atomic_load(&s_message_poll_pending));}if(step==3){assert(attempts[DEADLINE]==2&&!atomic_load(&s_message_poll_pending));reject_mask=0;}if(step==4){assert(accepted[DEADLINE]==1);monotonic_us=5000000;drain(DEADLINE);assert(shutdowns==1);drain_all();}}
 
 int main(int argc,char **argv){assert(argc==2);const char *test=argv[1];s_server=(void*)(uintptr_t)1;s_state=&fixture_state;fixture_state.audio_running=true;fixture_state.wifi_rssi=-40;fixture_state.sample_rate_hz=48000;fixture_state.channels=2;fixture_state.bits_per_sample=16;fixture_state.bitrate_kbps=128;strcpy(fixture_state.title,"title one");strcpy(fixture_state.codec,"MP3");strcpy(fixture_state.stream_format,"MP3 48 kHz");s_clients[0]=(ws_client_t){.used=true,.socket=3};session_context=&s_clients[0];
- if(!strcmp(test,"initial")){run(1,NULL);previous(1);assert(accepted[STATUS]==1&&accepted[CURRENT]==1&&!frames);drain_all();assert(frames==2&&strstr(sent_text[0],"\"meta\",\"value\":\"title one\"")&&strstr(sent_text[0],"\"heap\",\"value\":37")&&!strcmp(sent_text[1],"{\"current\":1}"));}
+ if(!strcmp(test,"key_padding")){run(3,key_padding_hook);assert(accepted[STATUS]==1&&accepted[CURRENT]==1&&frames==2);}
+ else if(!strncmp(test,"key_",4)){
+     bool tail=!strncmp(test,"key_tail_",9);
+     const char *field=test+(tail?9:4);
+     for(key_field=0;key_field<KEY_FIELDS;++key_field)if(!strcmp(field,key_field_names[key_field]))break;
+     assert(key_field<KEY_FIELDS);
+     run(3,tail?key_tail_hook:key_field_hook);
+     assert(accepted[STATUS]==(tail?1U:2U));
+     assert(accepted[CURRENT]==(!tail&&key_field==KEY_CURRENT_ITEM?2U:1U));
+ }
+ else if(!strcmp(test,"initial")){run(1,NULL);previous(1);assert(accepted[STATUS]==1&&accepted[CURRENT]==1&&!frames);drain_all();assert(frames==2&&strstr(sent_text[0],"\"meta\",\"value\":\"title one\"")&&strstr(sent_text[0],"\"heap\",\"value\":37")&&!strcmp(sent_text[1],"{\"current\":1}"));}
  else if(!strcmp(test,"unchanged")){run(10,idle_hook);assert(accepted[STATUS]==1&&accepted[CURRENT]==1);}
  else if(!strcmp(test,"heartbeat")){run(4,heartbeat_hook);assert(accepted[STATUS]==2&&accepted[CURRENT]==1);}
  else if(!strcmp(test,"tick_wrap")){run(3,tickwrap_hook);assert(accepted[STATUS]==2&&accepted[CURRENT]==1);}

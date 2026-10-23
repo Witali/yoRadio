@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <pthread.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -313,7 +314,79 @@ static void *producer(void *argument) {
     return NULL;
 }
 
+static void status_key_comparison_regressions(void) {
+    reset(); start(); open_socket(7, true); cycle();
+    unsigned char members[sizeof(ws_status_key_t)] = {0};
+#define MARK_MEMBER(member) memset(members + offsetof(ws_status_key_t, member), 1, sizeof(s_previous.member))
+    MARK_MEMBER(generation); MARK_MEMBER(bitrate);
+    MARK_MEMBER(item); MARK_MEMBER(count);
+    MARK_MEMBER(volume); MARK_MEMBER(fill); MARK_MEMBER(balance); MARK_MEMBER(rssi);
+    MARK_MEMBER(running); MARK_MEMBER(pending); MARK_MEMBER(smartstart); MARK_MEMBER(normalization);
+    MARK_MEMBER(rssi_valid); MARK_MEMBER(network_online); MARK_MEMBER(ap_enabled);
+    MARK_MEMBER(normgain); MARK_MEMBER(normtarget); MARK_MEMBER(normtime);
+    MARK_MEMBER(station); MARK_MEMBER(name); MARK_MEMBER(title); MARK_MEMBER(format);
+#undef MARK_MEMBER
+    unsigned padding = 0;
+    unsigned char *bytes = (unsigned char *)&s_previous;
+    for (size_t i = 0; i < sizeof(members); ++i) {
+        if (!members[i]) { bytes[i] ^= 0xffU; ++padding; }
+    }
+    assert(padding && "fixture must exercise real status-key padding");
+    uint32_t revision = s_status_revision;
+    unsigned delivered = delivery_count;
+    cycle();
+    assert(s_status_revision == revision && "padding alone must not publish status");
+    assert(delivery_count == delivered && "padding alone must not send status");
+#define CHANGE_STRING_TAIL(member) do { \
+    size_t end = strlen(s_previous.member); \
+    assert(end + 1U < sizeof(s_previous.member)); \
+    s_previous.member[end + 1U] = 'x'; \
+} while (0)
+    CHANGE_STRING_TAIL(station); CHANGE_STRING_TAIL(name);
+    CHANGE_STRING_TAIL(title); CHANGE_STRING_TAIL(format);
+#undef CHANGE_STRING_TAIL
+    cycle();
+    assert(s_status_revision == revision && "string tails must not publish status");
+    assert(delivery_count == delivered && "string tails must not send status");
+
+#define CHECK_MEMBER(member, value) do { \
+    s_previous.member = (value); \
+    revision = s_status_revision; \
+    assert(prepare_status()); \
+    assert(s_status_revision == revision + 1U && "each status-key member must trigger revision"); \
+} while (0)
+    CHECK_MEMBER(generation, s_previous.generation + 1U);
+    CHECK_MEMBER(bitrate, s_previous.bitrate + 1U);
+    CHECK_MEMBER(item, s_previous.item + 1U);
+    CHECK_MEMBER(count, s_previous.count + 1U);
+    CHECK_MEMBER(volume, s_previous.volume + 1U);
+    CHECK_MEMBER(fill, s_previous.fill + 1U);
+    CHECK_MEMBER(balance, s_previous.balance + 1);
+    CHECK_MEMBER(rssi, s_previous.rssi + 1);
+    CHECK_MEMBER(running, !s_previous.running);
+    CHECK_MEMBER(pending, !s_previous.pending);
+    CHECK_MEMBER(smartstart, !s_previous.smartstart);
+    CHECK_MEMBER(normalization, !s_previous.normalization);
+    CHECK_MEMBER(rssi_valid, !s_previous.rssi_valid);
+    CHECK_MEMBER(network_online, !s_previous.network_online);
+    CHECK_MEMBER(ap_enabled, !s_previous.ap_enabled);
+    CHECK_MEMBER(normgain, s_previous.normgain + 1U);
+    CHECK_MEMBER(normtarget, s_previous.normtarget + 1);
+    CHECK_MEMBER(normtime, s_previous.normtime + 1U);
+#undef CHECK_MEMBER
+#define CHECK_STRING(member) do { \
+    s_previous.member[0] ^= 1; \
+    revision = s_status_revision; \
+    assert(prepare_status()); \
+    assert(s_status_revision == revision + 1U && "each status-key string must trigger revision"); \
+} while (0)
+    CHECK_STRING(station); CHECK_STRING(name); CHECK_STRING(title); CHECK_STRING(format);
+#undef CHECK_STRING
+    printf("PASS status key: %u padding bytes ignored, 18 scalar and 4 string changes detected\n", padding);
+}
+
 int main(void) {
+    status_key_comparison_regressions();
     reset(); start(); open_socket(7, false);
     httpd_req_t ordinary_get = {.socket = 7, .method = HTTP_GET};
     assert(registered_route.handler(&ordinary_get) == ESP_OK && http_errors == 1);

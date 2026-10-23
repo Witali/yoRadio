@@ -1,0 +1,15 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:693:56: warning: repeated branch body in conditional chain [bugprone-branch-clone]
+  693 |     } else if (strcmp(command, "submitplaylist") == 0) {
+      |                                                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:696:6: note: end of the original
+  696 |     } else if (strcmp(command, "submitplaylistdone") == 0) {
+      |      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:696:60: note: clone 1 starts here
+  696 |     } else if (strcmp(command, "submitplaylistdone") == 0) {
+      |                                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:1010:14: warning: Value stored to 'tenths' during its initialization is never read [clang-analyzer-deadcode.DeadStores]
+ 1010 |     uint64_t tenths = profile->active_us * 1000ULL / window_us;
+      |              ^~~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:1010:14: note: Value stored to 'tenths' during its initialization is never read
+ 1010 |     uint64_t tenths = profile->active_us * 1000ULL / window_us;
+      |              ^~~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

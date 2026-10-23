@@ -77,6 +77,11 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-14 | В работе | [Аудит и план Vorbis/Ogg](CYD_VORBIS_TRANSFER_DESIGN.md) подтверждают шесть проблем в реальных Xtensa archives2.6.2. Изолированный ESP32 bridge добавлен в `cbb69fdad`, в основной radio runtime пока не подключён. [Квалификация](../tests/results/cyd-vorbis-bridge-20261020/README.md): actual SDK6.0.2/Xtensa, три canonical translation units, 535 raw packets/2,112,000 byte-exact PCM bytes и 1602 undersized retries; bypass-preflight variant даёт точный ожидаемый отказ, 21 CMake configuration проверена. Private layout подтверждён частично. [Raw8192 format regression](../tests/results/cyd-vorbis-format-20261020/README.md) закрывает одно ограничение G6: разрешены блоки 8192 при 48 000/63 999 Гц; пять пар дают 340 сравнений пакетов и 4 631 808 точных PCM байт, четыре bad-header controls и восстановление старого guard проходят. Полное G6 и radio integration остаются открыты. [Расширение Ogg target-проверок отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после автоматической проверки безопасности: SDK compile завершён, observer-selection отказал до QEMU; ноль новых runtime случаев квалифицировано. Ogg EOF/reset, allocation failure/reopen, concurrent scopes, format/conformance, полная callback ABI и audio-task интеграция остаются. AAC compact owners требуют отдельной адаптации; ранее отложенный private owner-view не исследовался и остаётся отложенным. |
 | CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; 42 host tests проходят, 1 symlink case пропущен. Изолированный sdkconfig сохраняет аппаратные настройки и обеспечивает минимум два SNTP servers. [Шесть CYD сборок после N5](../tests/results/cyd-network-settings-20261020/SDK.md) проверены: vendor/custom FLAC во всех трёх backend; [C3 N4 image](../tests/results/network-power-transfer-20261019/SDK.md) сохраняет отдельный baseline; конфигурации, image/ELF/compiler hashes, task affinity и запас OTA сохранены. Фактические DWARF размеры структур и static symbols зафиксированы без заявления об экономии heap. Единая физическая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend ещё впереди. |
 
+Дополнительная [проверка status keys](../tests/results/ws-status-key-20261023/README.md)
+устранила зависимость публикации WebSocket от padding структуры в CYD и C3.
+CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang обеих целей проходят;
+это исправление переносимости, физическая приёмка и остальные gates ниже остаются.
+
 ## Что осталось по переносу
 
 - **Этап 13, память:** завершить radio-boot/board и сетевую приёмку
@@ -1111,3 +1116,27 @@ Stream остаётся на core0, decode/output на core1 с прежними
   отложенный guarded draft не включён, не применён и не квалифицирован.
   Production source/ABI/stream core0/decode-output core1 сохранены; fullG6,
   radio/resource/physical gates и прежние отложенные пункты остаются открытыми.
+
+- 2026-10-23, CYD-C3-07/00: [переносимое сравнение WS status keys](../tests/results/ws-status-key-20261023/README.md)
+  исправлено в CYD и C3: явные18/11 scalar fields и по4 логические строки
+  заменяют whole-struct memcmp. Padding и байты после NUL больше не вызывают
+  лишних revision/publication. Типы/layout/capture/heartbeat/admission и owner
+  задачи сохранены. Это P3 переносимость, а не воспроизведённый production crash.
+  Старые реализации обеих целей реально отклоняют padding-only regression;
+  финальный CYD before использует те же harness/runner байты, что и successful after.
+  CYD: 59 fixture groups; C3: 42 status-loop cases/7 semantic controls проходят
+  ASan/UBSan. Каждый scalar/видимая строка и отдельные padding/string-tail случаи
+  покрыты. Focused GCC компилирует реальные ELF32 relocatable units для Xtensa94
+  и RISC-V243 без diagnostics; Clang сохраняет только1/2 прежних warning,0 errors,
+  новых warning0, suspicious-memory-comparison исчезает в обеих целях.
+  Исходные target preflight ошибки имени compiler/Windows path parser сохранены;
+  промежуточный успешный прогон с неполным input capture остаётся history.
+  Финальный прогон фиксирует и перепроверяет headers/config/DB/compiler/response/
+  specs/actual tidy; independent review замечаний не имеет. Полные приложения,
+  новые firmware images и физическая плата в этом focused прогоне не запускались.
+  Архив335 файлов/2319760 байт проверен отдельно из другого cwd;
+  manifest `1930fdfbb6c1e33207e0ce74981952002f106a4e795c3998e2f606d86b3dcbab`.
+  HTTPD NULL trace исключён реальным SDK caller flow; signed timezone promotion
+  корректна для отрицательных значений — эти пути без доказанного дефекта не менялись.
+  CYD stream core0/decode-output core1, приоритеты/стеки и C3 unicore сохранены.
+  Codec deferrals и fullG6/radio/resource/physical gates остаются открытыми.

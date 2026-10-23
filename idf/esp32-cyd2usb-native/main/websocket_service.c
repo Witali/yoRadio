@@ -287,6 +287,21 @@ static bool capture_status(ws_status_key_t *key) {
     return false;
 }
 
+static bool same_status(const ws_status_key_t *left, const ws_status_key_t *right) {
+    // Padding and bytes after a string's terminator are not published state.
+    return left->generation == right->generation && left->bitrate == right->bitrate &&
+        left->item == right->item && left->count == right->count &&
+        left->volume == right->volume && left->fill == right->fill &&
+        left->balance == right->balance && left->rssi == right->rssi &&
+        left->running == right->running && left->pending == right->pending &&
+        left->smartstart == right->smartstart && left->normalization == right->normalization &&
+        left->rssi_valid == right->rssi_valid && left->network_online == right->network_online &&
+        left->ap_enabled == right->ap_enabled && left->normgain == right->normgain &&
+        left->normtarget == right->normtarget && left->normtime == right->normtime &&
+        strcmp(left->station, right->station) == 0 && strcmp(left->name, right->name) == 0 &&
+        strcmp(left->title, right->title) == 0 && strcmp(left->format, right->format) == 0;
+}
+
 static void payload_string(json_buffer_t *out, const char *id, const char *value) {
     json_buffer_raw(out, "{\"id\":"); json_buffer_string(out, id);
     json_buffer_raw(out, ",\"value\":"); json_buffer_string(out, value); json_buffer_raw(out, "}");
@@ -335,7 +350,7 @@ static bool format_status(const ws_status_key_t *key) {
 
 static bool prepare_status(void) {
     if (!capture_status(&s_current)) return false;
-    if (!s_have_previous || memcmp(&s_current, &s_previous, sizeof(s_current)) != 0) {
+    if (!s_have_previous || !same_status(&s_current, &s_previous)) {
         if (!format_status(&s_current)) return false;
         ++s_status_revision;
         s_previous = s_current;

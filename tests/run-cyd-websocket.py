@@ -165,7 +165,9 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
         else:
             print(line)
     assert maximum is not None
+    assert b'18 scalar and 4 string changes detected' in log
     report = {'passed': True, 'sanitizers': ['ASan', 'UBSan'], 'maximum_json_bytes': maximum_bytes,
+              'status_key_comparison': {'padding_ignored': True, 'string_tails_ignored': True, 'scalar_fields': 18, 'string_fields': 4},
               'source_ref': args.source_ref, 'qualified_implementation_sha256': hashlib.sha256(source).hexdigest(),
               'status_capacity': 5120, 'websocket_client_limit': 2, 'queued_status_work_limit': 1,
               'application_send_frame_budget_us': 1000000, 'application_receive_handler_budget_us': 1000000,
