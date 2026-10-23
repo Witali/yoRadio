@@ -1,5 +1,6 @@
 #include "photo_storage.h"
 #include "jpeg_espidf.h"
+#include "jpeg_layout.h"
 #include "esp_heap_caps.h"
 
 static jpeg_espidf_t storage;
@@ -28,11 +29,14 @@ size_t photo_storage_allocation_available(void)
 esp_err_t photo_storage_authorize(const jpeg_guard_layout_t *layout,
                                  jpeg_transport_t **transport,jpeg_guard_sha256_t *hash)
 {
-    /* REQUESTED_CHANGE: verify exact partitions, immutable assets and stamp once
-     * before allowing the worker to use cache/scratch capabilities. No erases. */
+    /* REQUESTED_CHANGE: verify partitions/assets before granting capabilities.
+     * A matching legacy layout may receive only its canonical stamp (32+8bytes),
+     * after full vacant-candidate checks, with no erases/photos/settings writes. */
     esp_err_t error=jpeg_espidf_init(&storage);
     if(error!=ESP_OK)return error;
-    const jpeg_transport_limits_t limits={10000,0x400000,0,0,30000000};
-    if(jpeg_espidf_authorize(&storage,layout,&limits)!=JPEG_TRANSPORT_OK)return ESP_ERR_INVALID_STATE;
+    const jpeg_transport_limits_t limits={30000,0x800000,JPEG_PROVISION_PROGRAM_BYTES,0,60000000};
+    jpeg_provision_diagnostic_t diagnostic;
+    if(jpeg_espidf_provision(&storage,layout,&jpeg_layout_stamp,&diagnostic,&limits)!=JPEG_TRANSPORT_OK)
+        return ESP_ERR_INVALID_STATE;
     *transport=&storage.transport;*hash=jpeg_espidf_hash_provider(&storage);return ESP_OK;
 }

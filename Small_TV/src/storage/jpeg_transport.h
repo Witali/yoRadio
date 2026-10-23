@@ -2,6 +2,7 @@
 #define SMALL_TV_JPEG_TRANSPORT_H
 
 #include "jpeg_guard.h"
+#include "jpeg_provision.h"
 
 typedef enum {
     JPEG_TRANSPORT_OK=0, JPEG_TRANSPORT_STATE, JPEG_TRANSPORT_ARGUMENT,
@@ -51,6 +52,14 @@ jpeg_transport_result_t jpeg_transport_init(jpeg_transport_t *transport,
 jpeg_transport_result_t jpeg_transport_authorize(jpeg_transport_t *transport,
     const jpeg_guard_layout_t *layout,const jpeg_guard_partition_t *observed,unsigned count,
     const jpeg_guard_sha256_t *sha256,const jpeg_transport_limits_t *limits);
+/* Startup-only legacy adoption under ONE budget/epoch, followed by the full
+ * physical guard. Only the generated32-byte identity and8-byte header within
+ * the64-byte stamp may be programmed; erases/ordinary ports remain forbidden. Existing stamps take
+ * the same read-only guard path. Old ports are revoked on every outcome. */
+jpeg_transport_result_t jpeg_transport_provision(jpeg_transport_t *transport,
+    const jpeg_guard_layout_t *layout,const jpeg_guard_partition_t *observed,unsigned count,
+    const jpeg_guard_sha256_t *sha256,const jpeg_provision_stamp_t *stamp,
+    jpeg_provision_diagnostic_t *diagnostic,const jpeg_transport_limits_t *limits);
 /* One shared budget for every scratch/cache/journal/source port of one decode.
  * Every begin invalidates prior handles; owner aborts/reopens NOR/journal state.
  * Limits are inclusive counts; zero denies that operation, duration must be>0.

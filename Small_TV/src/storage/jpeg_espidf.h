@@ -26,5 +26,12 @@ jpeg_guard_sha256_t jpeg_espidf_hash_provider(jpeg_espidf_t *storage);
  * Owner must serialize with all media/resource/partition replacement. */
 jpeg_transport_result_t jpeg_espidf_authorize(jpeg_espidf_t *storage,
     const jpeg_guard_layout_t *layout,const jpeg_transport_limits_t *startup_limits);
+/* Same raw-table/SDK/geometry verification and one startup budget; additionally
+ * permit erase-free legacy stamp provisioning before physical authorization.
+ * The diagnostic describes the provisioning phase; discovery_error separately
+ * reports raw/SDK table failures before that phase can begin. */
+jpeg_transport_result_t jpeg_espidf_provision(jpeg_espidf_t *storage,
+    const jpeg_guard_layout_t *layout,const jpeg_provision_stamp_t *stamp,
+    jpeg_provision_diagnostic_t *diagnostic,const jpeg_transport_limits_t *startup_limits);
 
 #endif

@@ -62,7 +62,8 @@ def prepare_image(assets, manifest, board_text, partitions_text):
         raise ValueError('Expected five animations and twenty-two immutable icons')
     # A hash of known payloads alone cannot distinguish a future allocation in
     # their old unused tails. All builds enabling this storage must carry the
-    # ownership identity below. Legacy/unmarked assets must fail the guard.
+    # ownership identity below. Legacy/unmarked assets still fail the ordinary
+    # guard; a separate erase-free bootstrap may verify/adopt a vacant layout.
     # The stamp occupies existing protected final-sector padding, not new space.
     stamp_bytes = 64
     stamp_offset = None
@@ -100,7 +101,8 @@ def prepare_image(assets, manifest, board_text, partitions_text):
                        key=lambda row: int(row['offset'], 0))
     lines = ['/* Generated from matching sanitized native assets/board/partition map. */',
              '#ifndef SMALL_TV_GENERATED_JPEG_LAYOUT_H', '#define SMALL_TV_GENERATED_JPEG_LAYOUT_H',
-             '#include "jpeg_guard.h"', f'#define JPEG_LAYOUT_OWNERSHIP_STAMP_ADDRESS 0x{stamp_offset:x}u',
+             '#include "jpeg_guard.h"', '#include "jpeg_provision.h"',
+             f'#define JPEG_LAYOUT_OWNERSHIP_STAMP_ADDRESS 0x{stamp_offset:x}u',
              'static const jpeg_guard_partition_t jpeg_layout_partitions[] = {']
     for row in partitions:
         lines.append('    {"%s",0x%xu,0x%xu,%du,%du,%du},' % (
@@ -112,7 +114,10 @@ def prepare_image(assets, manifest, board_text, partitions_text):
         lines.append('};')
     lines.append('static const jpeg_guard_resource_t jpeg_layout_resources[] = {')
     lines.extend('    {0x%xu,%du,%s},' % (int(row['offset'], 0), row['size'], c_bytes(row['sha256'])) for row in resources)
-    lines.extend(['};', 'static const jpeg_guard_layout_t jpeg_layout = {',
+    stamp_index = next(i for i, row in enumerate(resources) if int(row['offset'], 0) == stamp_offset)
+    lines.extend(['};', 'static const jpeg_provision_stamp_t jpeg_layout_stamp = {',
+                  '    %du,%s' % (stamp_index, c_bytes(stamp.hex())), '};',
+                  'static const jpeg_guard_layout_t jpeg_layout = {',
                   '    0x400000u,jpeg_layout_partitions,%du,%du,' % (
                       len(partitions), next(i for i, row in enumerate(partitions) if row['label'] == 'assets')),
                   '    jpeg_layout_allowed,jpeg_layout_protected,%du,%du,' % (

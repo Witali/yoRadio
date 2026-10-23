@@ -93,6 +93,42 @@ static int guard_read(void *context,uint32_t address,void *data,size_t bytes)
     return result==JPEG_TRANSPORT_OK ? complete(t,t->raw.read(t->raw.context,address,data,bytes)) : -(int)result;
 }
 
+typedef struct {
+    jpeg_transport_t *transport;
+    const jpeg_guard_layout_t *layout;
+    const jpeg_provision_stamp_t *stamp;
+} provision_io_t;
+
+static int provision_read(void *context,uint32_t address,void *data,size_t bytes)
+{
+    /* Guard/provision validates all descriptors before its first read. Bootstrap
+     * additionally scans only the generated candidate sectors, never photos or
+     * settings. Every physical read shares the SAME startup count/time budget. */
+    provision_io_t *io=context;jpeg_transport_t *t=io->transport;
+    if(!bytes || !data || address>t->raw.flash_bytes || bytes>t->raw.flash_bytes-address)
+        return -(int)stop(t,JPEG_TRANSPORT_RANGE);
+    if(!covered(address,bytes,io->layout->allowed,io->layout->allowed_count))
+        return guard_read(t,address,data,bytes);
+    jpeg_transport_result_t result=charge(t,'R',bytes);
+    return result==JPEG_TRANSPORT_OK ? complete(t,t->raw.read(t->raw.context,address,data,bytes)) : -(int)result;
+}
+
+static int provision_program(void *context,uint32_t address,const void *data,size_t bytes)
+{
+    /* Independent bootstrap capabilities: canonical32-byte identity and8-byte
+     * commit header only, never a writable page/sector or user-supplied data. */
+    provision_io_t *io=context;jpeg_transport_t *t=io->transport;
+    if(!t->verifying || t->authorized || io->stamp->resource_index>=io->layout->resource_count || !data)
+        return -(int)stop(t,JPEG_TRANSPORT_RANGE);
+    uint32_t base=io->layout->resources[io->stamp->resource_index].offset;
+    bool header=address==base && bytes==JPEG_PROVISION_HEADER_BYTES && !memcmp(data,io->stamp->bytes,bytes);
+    bool identity=address==base+JPEG_PROVISION_HEADER_BYTES && bytes==JPEG_PROVISION_ID_BYTES &&
+        !memcmp(data,io->stamp->bytes+JPEG_PROVISION_HEADER_BYTES,bytes);
+    if(!header && !identity)return -(int)stop(t,JPEG_TRANSPORT_RANGE);
+    jpeg_transport_result_t result=charge(t,'P',bytes);
+    return result==JPEG_TRANSPORT_OK ? complete(t,t->raw.program(t->raw.context,address,data,bytes)) : -(int)result;
+}
+
 static jpeg_transport_result_t request(jpeg_transport_port_t *port,uint32_t address,size_t bytes,char operation,const void *data)
 {
     /* No read/write/erase can outlive authorization or escape the port's scope. */
@@ -147,11 +183,24 @@ jpeg_transport_result_t jpeg_transport_init(jpeg_transport_t *t,const jpeg_nor_d
     return JPEG_TRANSPORT_OK;
 }
 
+static jpeg_transport_result_t grant(jpeg_transport_t *t,const jpeg_guard_layout_t *layout)
+{
+    /* Shared publication after a complete physical guard, including its last
+     * hash callback. No partial layout or live bootstrap permission escapes. */
+    jpeg_transport_result_t result=deadline(t);t->verifying=NULL;t->active=false;
+    if(result!=JPEG_TRANSPORT_OK)return result;
+    memcpy(t->allowed,layout->allowed,layout->allowed_count*sizeof(t->allowed[0]));
+    t->allowed_count=layout->allowed_count;
+    const jpeg_guard_partition_t *assets=&layout->partitions[layout->assets_partition];
+    t->readable=(jpeg_nor_extent_t){assets->offset,assets->bytes};t->authorized=true;
+    return JPEG_TRANSPORT_OK;
+}
+
 jpeg_transport_result_t jpeg_transport_authorize(jpeg_transport_t *t,const jpeg_guard_layout_t *layout,
     const jpeg_guard_partition_t *observed,unsigned count,const jpeg_guard_sha256_t *sha256,
     const jpeg_transport_limits_t *limits)
 {
-    /* Authorization is all-or-nothing and every attempt revokes prior jobs. */
+    /* Ordinary authorization remains strictly read-only, on every outcome. */
     if(!t || !t->initialized)return JPEG_TRANSPORT_STATE;
     jpeg_transport_revoke(t);
     jpeg_transport_result_t result=start(t,limits);if(result!=JPEG_TRANSPORT_OK)return result;
@@ -162,13 +211,28 @@ jpeg_transport_result_t jpeg_transport_authorize(jpeg_transport_t *t,const jpeg_
         t->verifying=NULL;
         return stop(t,t->last_error==JPEG_TRANSPORT_OK ? JPEG_TRANSPORT_GUARD : t->last_error);
     }
-    result=deadline(t);t->verifying=NULL;t->active=false;
-    if(result!=JPEG_TRANSPORT_OK)return result;
-    memcpy(t->allowed,layout->allowed,layout->allowed_count*sizeof(t->allowed[0]));
-    t->allowed_count=layout->allowed_count;
-    const jpeg_guard_partition_t *assets=&layout->partitions[layout->assets_partition];
-    t->readable=(jpeg_nor_extent_t){assets->offset,assets->bytes};t->authorized=true;
-    return JPEG_TRANSPORT_OK;
+    return grant(t,layout);
+}
+
+jpeg_transport_result_t jpeg_transport_provision(jpeg_transport_t *t,const jpeg_guard_layout_t *layout,
+    const jpeg_guard_partition_t *observed,unsigned count,const jpeg_guard_sha256_t *sha256,
+    const jpeg_provision_stamp_t *stamp,jpeg_provision_diagnostic_t *diagnostic,
+    const jpeg_transport_limits_t *limits)
+{
+    /* Revoke all ordinary ports BEFORE looking at legacy data. The core must
+     * finish a physical guard after provisioning; only then publish capabilities. */
+    if(!t || !t->initialized)return JPEG_TRANSPORT_STATE;
+    jpeg_transport_revoke(t);
+    jpeg_transport_result_t result=start(t,limits);if(result!=JPEG_TRANSPORT_OK)return result;
+    t->verifying=layout;
+    provision_io_t io={t,layout,stamp};
+    jpeg_nor_device_t scoped={&io,t->raw.flash_bytes,t->raw.page_bytes,provision_read,provision_program,NULL};
+    jpeg_provision_result_t checked=jpeg_provision_legacy(layout,observed,count,&scoped,sha256,stamp,diagnostic);
+    if(checked!=JPEG_PROVISION_ALREADY && checked!=JPEG_PROVISION_INSTALLED) {
+        t->verifying=NULL;
+        return stop(t,t->last_error==JPEG_TRANSPORT_OK ? JPEG_TRANSPORT_GUARD : t->last_error);
+    }
+    return grant(t,layout);
 }
 
 jpeg_transport_result_t jpeg_transport_begin(jpeg_transport_t *t,const jpeg_transport_limits_t *limits)

@@ -1,5 +1,12 @@
 # Защита областей JPEG flash
 
+Актуализация 2026-10-23: ниже сохранён исторический standalone checkpoint.
+Обычный guard теперь подключён к main через ESP-IDF; он по-прежнему read-only.
+Отдельный ограниченный [legacy bootstrap](JPEG_LEGACY_PROVISION.md) может дописать
+только 32 байта ID и затем 8 байт заголовка canonical stamp после проверки ресурсов
+и полностью пустых candidate областей; затем требует physical guard. Между этапами
+обязателен readback. Чужие/занятые области не исправляются.
+
 Checkpoint 2026-10-20: `storage/jpeg_guard.c/.h` и
 `tools/jpeg_guard_layout.py` подготовлены и проверены отдельно. Они **ещё не
 подключены к production CMake, ESP-IDF transport или работающему decoder**.

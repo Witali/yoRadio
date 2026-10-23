@@ -3383,6 +3383,58 @@
     "app/media/photo_storage.c#photo_storage_service_memory": {
       "kind": "reconstruction_fix",
       "note": "Recheck16KiB service RAM floor during CPU/buffered decode work; other tasks may consume memory after malloc. Abort releases decoder pools and reports exact reserve/free observation instead of starving HTTP."
+    },
+    "storage/jpeg_espidf.c#authorize": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_espidf.c#jpeg_espidf_provision": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_provision.c#overlay_read": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_provision.c#stamp_identity": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_provision.c#read_twice": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_provision.c#compatible_stamp": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_provision.c#vacant": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_provision.c#jpeg_provision_legacy": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_transport.c#provision_read": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_transport.c#provision_program": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_transport.c#grant": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_transport.c#jpeg_transport_provision": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
+    },
+    "storage/jpeg_provision.c#write_part": {
+      "kind": "requested_legacy_provisioning",
+      "note": "Ordered erase-free ownership bootstrap: full raw/SDK partition and27payload checks; double-read vacant candidates; write/verify32-byte ID before8-byte commit header; refuse complete foreign IDs and unsupported torn ordering. Shared startup budget, final physical guard and revoked old ports; no photo/settings writes."
     }
   },
   "assembly_only": {
@@ -3469,7 +3521,7 @@
     "local_site/pages/settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
     "local_site/pages/setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
     "src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
-    "src/app/CMakeLists.txt": "9122729bff12e893c1e3552ccf4af89df3298e373e5213db3e0bcc236566bc89",
+    "src/app/CMakeLists.txt": "1d7fcd0069d1c05cf968c5c5d0c78ed991216b412112c1dac1c58dbcc0325142",
     "src/app/display/backlight.c": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03",
     "src/app/display/clock_ui.c": "1b6726a12aadb3933840286736f76e5dd89dbe788367b66db417deb4f7da1037",
     "src/app/display/factory_animation.c": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09",
@@ -3499,7 +3551,7 @@
     "src/app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
     "src/app/media/media_internal.h": "fb1ff7747a5dc46df6425b5fc80eb5c24133948615c5b91b0ebc36e54c40e8c2",
     "src/app/media/photo_codec.c": "b04c763dfe9dc9e33ea6e6b6db2e6f36c75a40ded98f2a6949057d06f5ff0417",
-    "src/app/media/photo_storage.c": "53dfe5b16f53afae9a599119071e8b05d5c58df98577538e29e56167a55b0b4f",
+    "src/app/media/photo_storage.c": "0e3948311dfcbe3d8e85b6dfe25ba8b6e59e0fbc526ab37358a86aa68b7c879a",
     "src/app/media/photo_storage.h": "99d462c31f577ebecd09e88f3338e021cee2f3a61c3149c65fd380ab459ee89e",
     "src/app/media/photo_upload.c": "ffd2578c31d3ee19af0c4a47287ffa0b7859658c13ca8025cf9b8956273a1d76",
     "src/app/media/photo_worker.c": "b8d25986a92427edf84836ac694d2c012df31e601e011b172628c7de21759b46",
@@ -3749,18 +3801,20 @@
     "src/sdkconfig.defaults": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
     "src/storage/jpeg_cache.c": "699df917e16f2ea888729429200d5df080358dcc7993ed50116733a2bba13f31",
     "src/storage/jpeg_cache.h": "3d6a632304d42eeb2b7e9fc6575e6dce4a87979f16310c45718d81fc34fbb3cd",
-    "src/storage/jpeg_espidf.c": "212b25d7522d6a067ac234528bbf742055054ad484a2ad6cfb8cdb2c66c8c5dd",
-    "src/storage/jpeg_espidf.h": "bdb6de1a4cebc0cbb4f29ccf49fbf26049c060d396aa2acc34fe9ca34a0cc0e5",
+    "src/storage/jpeg_espidf.c": "5aedbd9904e1f52a5dbfa569b7e686ac64d1d63b48e647a251d83a5fce57a974",
+    "src/storage/jpeg_espidf.h": "b5227d23bb8dfeeb8ef1e642cc6f661b9cbacd4784d963cee4e2d9f1c51dae34",
     "src/storage/jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
     "src/storage/jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
     "src/storage/jpeg_journal.c": "46351feee7d61e410e53a43213b815a3b6c5029e48121b7382a2a6e8da2a6b54",
     "src/storage/jpeg_journal.h": "42e7dc58b4e3e8058a2ba989061367a130cf1d31ca8e434a0789689f6e631743",
     "src/storage/jpeg_nor.c": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
     "src/storage/jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+    "src/storage/jpeg_provision.c": "7f7528901370a53f18ef131e9484495486917482504aee4ba6d382f7d6450775",
+    "src/storage/jpeg_provision.h": "83d559b40ab251512413f7d850b65785d6fe1b73fddf7542e8098aaa7eda2146",
     "src/storage/jpeg_scratch.c": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb",
     "src/storage/jpeg_scratch.h": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49",
-    "src/storage/jpeg_transport.c": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
-    "src/storage/jpeg_transport.h": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c",
+    "src/storage/jpeg_transport.c": "6ccb423708032f06d5fc1ca42f8f6384396d5671af8b791a1261178f60d7272d",
+    "src/storage/jpeg_transport.h": "9507e6f9ca4efd2a62a666589dd7656c5d1481c722f357cc0304aebb9a40b7ea",
     "src/symbol-map.json": "2e3c397f083e025536d5461ed226372f11cdf8d6acdbf7f8961fd372f16a0e4f",
     "src/third_party/cjson/cJSON.c": "298581a04a36c0165da4b0aade235c23088cb2faa58651d720ea2f3706ed0b0d",
     "src/third_party/cjson/cJSON.h": "25b0145150d500498e4d209cec69c18c42cf818bffcc54690be3b895a2a16dee",
@@ -3784,7 +3838,7 @@
     "src/third_party/tjpgd/UPSTREAM.json": "2cdbf82b21d79701d3d125ffc420f21fb1f22dab44785f00ee8e29cb8023be7b",
     "src/tools/build_jpeg_library.py": "cccef6c732e52f600445fd005817aebf4b24be7e9f7d3583f7952c1018343c29",
     "src/tools/jpeg_cache_layout.py": "c9a0a8459f126b2565b65433a14577517bc8567c1e25e9ecc08d57cb06c456b9",
-    "src/tools/jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+    "src/tools/jpeg_guard_layout.py": "55ac1487f391ff99dbd5d0ca29155969aef0171f8d05621a3cf5bc9edfadef2d",
     "src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
     "src/tools/prepare_resources.py": "10edd9d175331fbf461b13925c91c042318ce736a4cd50ef42492295bf9258f7",
     "src/tools/prepare_timezones.py": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148"

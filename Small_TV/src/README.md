@@ -204,19 +204,29 @@ it has no flash operation.
 | Unallocated tail / original settings sector | `0x3e7000` | 102,400 |
 | **Total** | | **4,194,304** |
 
-The application image uses approximately 1 MiB of its 1.465 MiB partition;
-the exact size is in the build manifest. The media partition includes the
+The application image includes the extended JPEG decoder; its exact size and
+remaining app-partition capacity are in the build manifest. The media partition includes the
 five 100 KiB photo slots, five 200 KiB animation slots, weather/status slots
-and their unused padding. About 1 MiB is spare application capacity plus
-the gap/tail, not a missing three megabytes. Keeping original absolute media
+and their padding. Verified gaps/tails now provide coefficient scratch and five
+RGB565 caches; `jpeg-cache-plan.json` records their allocation. Keeping original absolute media
 offsets makes comparison with the dump straightforward. No SPIFFS/LittleFS
 filesystem or second OTA application partition is created.
 
-If manually installing the archived images later, their offsets are
+For a fresh installation, the archived image offsets are
 `bootloader.bin` → `0x0`, `partition-table.bin` → `0x8000`, `app.bin` →
 `0x10000`, and **`assets.bin` → `0x200000`**. Plain `idf.py flash` does not
 include the separately packed media, so it alone is insufficient for a fresh
 installation. Board installation was not performed as part of this task.
+
+For an existing matching native installation, update only the application:
+startup can adopt the old unstamped resources without erasing photos/settings.
+It verifies the full partition map, all 27 immutable payloads, vacant candidate
+areas and reachable interrupted stamp states. It writes/verifies the 32-byte
+identity first and the 8-byte commit header last; the 24-byte FF tail stays untouched. A valid
+existing stamp retains its cache data. Foreign resources/stamps or occupied
+unclaimed areas fail closed. **The full `assets.bin` contains default photos;
+writing it during an ordinary update would replace user uploads.** See
+[legacy migration checks](tests/JPEG_LEGACY_PROVISION.md). No flashing was done here.
 
 ## Restored behavior and deliberate differences
 
@@ -298,7 +308,7 @@ inside it and resized by dragging any corner, with zoom and position sliders.
 Browser Canvas resamples the chosen region to 240×240 JPEG, and
 JavaScript strips APP/COM metadata before sending chunks to the board.
 Cancel/Escape sends no upload and preserves the slot. Native JPEG dimensions,
-baseline/scan completeness and privacy validation still apply. Original HTML
+full decode and multi-scan privacy validation still apply. Original HTML
 bytes remain preserved under `../local_site/source/`.
 
 The reconstruction corrects unsafe DNS bounds, image-buffer overlap,
@@ -306,9 +316,12 @@ unbounded/misordered chunks, the `/wifireset` credential-copy defect, and
 the panel's inclusive end-coordinate literal of 240 (now 239). Photo uploads
 use ordered 4096-byte chunks, idempotent last-block retries, a 100 KiB slot
 limit and a 120-second abandoned-session timeout. A partial slot is marked
-absent in NVS before erase. Finish validates a complete baseline 240×240 JPEG
-and rejects EXIF, other private metadata, progressive images and appended
-data. All stock JPEGs are the already sanitized exports. DNS replies fit a
+absent in NVS before erase. Finish validates metadata and decodes one complete
+240×240 JPEG into a verified durable cache. Extended modes, including progressive,
+are subject to the device's measured memory/backing/service budgets, with precise
+resource refusal reasons. EXIF, other private metadata and appended data remain
+rejected. Factory baseline pixels retain their existing producer policy. All stock
+JPEGs are the already sanitized exports. DNS replies fit a
 bounded packet and only serve peers on the setup AP subnet. Cross-origin
 browser writes are rejected. Local HTTP management and the setup AP retain
 the original unauthenticated access model.

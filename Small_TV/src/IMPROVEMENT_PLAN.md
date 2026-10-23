@@ -53,9 +53,25 @@ read fault. Реальный C2 workflow выявил нехватку обще�
 checkpoints; точные required/available в HTTP. Проверки текущего target workflow
 и дальнейшие ограничения — [JPEG_MAIN_INTEGRATION.md](tests/JPEG_MAIN_INTEGRATION.md).
 Это не приёмка всех JPEG на target: host support не означает, что конкретный
-файл помещается в рабочую C2 с Wi-Fi/UI. Safe migration старого assets без stamp,
-полный RAM/stack/time/abort matrix, отдельный LCD, power-cut/full/24h/hardware
-остаются открытыми. Предыдущие checkpoint ниже — история, не текущий статус UI.
+файл помещается в рабочую C2 с Wi-Fi/UI. Полный RAM/stack/time/abort matrix,
+отдельный LCD, power-cut/full/24h/hardware остаются открытыми. Safe migration
+matching native assets проверена следующим checkpoint. Предыдущие checkpoint
+ниже — история, не текущий статус UI.
+
+Следующий checkpoint 2026-10-23: matching unstamped native assets теперь принимаются
+отдельным erase-free bootstrap. Raw/SDK partitions, 27 physical payloads, каждый
+candidate byte (fresh double-read), допустимое состояние stamp и final physical
+guard обязательны. ID32 записывается и проверяется первым, commit header8 — последним;
+FF tail24 не записывается. Это исправляет найденное ошибочное принятие чужого
+заголовка с недописанным ID. Без erase/photo/settings writes; один startup budget
+и отзыв всех старых портов. 23409 host scenarios/8 new +14 old compiled mutants,
+31 transport cases, 5995 native/direct privacy, 6 artifact и 12 owned main C2 processes pass.
+Проверен app update поверх реального сохранённого old-main образа с его NVS/photos/
+cache; layout/codec IDs не меняются. Чужие/занятые области не стираются. Подробности
+[JPEG_LEGACY_PROVISION.md](tests/JPEG_LEGACY_PROVISION.md). Это закрывает matching
+legacy migration в host/QEMU, не аппаратную или произвольную factory-layout миграцию.
+Target memory/stack/fault/format matrix, отдельный LCD, upload/decode power-cut,
+network lifecycle/full/24h/hardware по-прежнему открыты.
 
 Checkpoint 2026-10-20: реализован portable NOR core с 4 KiB cache, sparse mapping,
 sector RMW и read-back verification. 3000 random operations, 83 injected partial

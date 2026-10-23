@@ -4021,3 +4021,45 @@ final proof qemu/parity/jpeg-main-integration-validation-20261023.json.
 target memory/stack/fault/format matrix, independent LCD/clock continuity, actual
 upload/decode power-cut, network lifecycle/churn, whole image audit/full/24h/hardware.
 Old frozen QEMU/SDK не менять; на физической плате действий не было. Goal active.
+
+## 2026-10-23 — безопасное принятие matching legacy assets
+
+Добавлен отдельный startup bootstrap jpeg_provision; обычный guard остался
+read-only. Raw/SDK partition map/MD5/flags/geometry, 27 immutable payloads,
+compiled stamp digest, все candidate bytes (включая spare sectors, fresh double
+read) проверяются до записи. Один общий count/byte/time budget, старые порты
+отозваны; выдача новых — только после последнего physical guard/deadline.
+Photo/settings/protected capabilities не выдаются bootstrap. Erase отсутствует.
+
+Новый negative test выявил ошибку первоначального незакоммиченного прототипа:
+полный чужой header с неправильным, но монотонно совместимым ID принимался как
+недописанная запись. Исправлен протокол: ID32 + exact readback первым, header8 +
+readback последним; tail24 FF не записывается. Partial header требует полного ID.
+Обычный complete stamp сохраняет существующий cache без scan/reinitialization.
+Неизвестные write orderings/чужие или занятые области отклоняются без erase.
+
+23409 host scenarios, 452 torn recoveries, 786 occupied, 524 hidden-read,
+14599 read faults, 6325 hash faults и quota/revocation checks pass. Все 8 новых
+и 14 transport compiled mutants падают на assertions; 31 transport cases,
+5995 native + direct privacy, 12 inventory controls и 6 artifact checks pass.
+Inventory: 176 factory /212 app /527 total, не proof полной эквивалентности.
+
+Actual main: 12 owned/reaped cold QEMU processes. Erased/torn ID — 40 SDK program
+bytes, complete ID/torn header — 8, следующий persistent boot — 0. Foreign/header,
+occupied last byte, corrupt payload и unknown raw flags — 0, access revoked.
+Valid nonempty owned cache и application update поверх реального retained
+old-main NVS/photos/cache — 0 writes. Полное сравнение flash вне NVS/stamp;
+в persistent cold/upgrade также NVS exact. Preboot dial/mask fixture объявлен,
+guest RAM/PC/code не изменялись. Отдельный storage gate, не LCD/network/RF приёмка.
+
+App034287C7 /ELFBB7FD7A1 /source1D1F52CE, 1466576 bytes /69424 free, DEBUG off.
+Production archive сохранён; assets1032119B и layout/codec IDs прежние.
+RV32 core1331 text/readonly,0 data/bss; largest individual frame464 (не whole-stack).
+Подробности tests/JPEG_LEGACY_PROVISION.md; proof/raw в
+qemu/parity/jpeg-legacy-provision-validation-20261023.json. Полные flash images
+хранятся losslessly как common base + deduplicated sector deltas, с full SHA.
+
+Далее: independent LCD/clock continuity текущей app, полный target RAM/stack/
+format/fault matrix, actual upload/decode/journal reset/power-cut, network lifecycle/
+churn, whole-image audit/full/24h/hardware. На физическом устройстве действий нет;
+SDK/frozen QEMU не менялись. Цель остаётся активной; push отдельно не выполнялся.

@@ -138,8 +138,9 @@ esp_err_t jpeg_espidf_init(jpeg_espidf_t *s)
     return jpeg_transport_init(&s->transport,&raw,clock_us,NULL)==JPEG_TRANSPORT_OK ? ESP_OK : ESP_ERR_INVALID_STATE;
 }
 
-jpeg_transport_result_t jpeg_espidf_authorize(jpeg_espidf_t *s,const jpeg_guard_layout_t *layout,
-                                             const jpeg_transport_limits_t *limits)
+static jpeg_transport_result_t authorize(jpeg_espidf_t *s,const jpeg_guard_layout_t *layout,
+    const jpeg_provision_stamp_t *stamp,jpeg_provision_diagnostic_t *diagnostic,
+    const jpeg_transport_limits_t *limits)
 {
     /* Any discovery failure leaves every old port revoked, including retries. */
     if(!s || !s->transport.initialized)return JPEG_TRANSPORT_STATE;
@@ -157,5 +158,24 @@ jpeg_transport_result_t jpeg_espidf_authorize(jpeg_espidf_t *s,const jpeg_guard_
     jpeg_transport_limits_t remaining=*limits;
     --remaining.calls;remaining.read_bytes-=ESP_PARTITION_TABLE_MAX_LEN;remaining.duration_us-=s->discovery_us;
     jpeg_guard_sha256_t hash={s,hash_begin,hash_update,hash_finish,hash_reset};
-    return jpeg_transport_authorize(&s->transport,layout,parts,count,&hash,&remaining);
+    return stamp ? jpeg_transport_provision(&s->transport,layout,parts,count,&hash,stamp,diagnostic,&remaining):
+                   jpeg_transport_authorize(&s->transport,layout,parts,count,&hash,&remaining);
+}
+
+jpeg_transport_result_t jpeg_espidf_authorize(jpeg_espidf_t *s,const jpeg_guard_layout_t *layout,
+                                             const jpeg_transport_limits_t *limits)
+{
+    /* Ordinary callers retain strictly read-only startup authorization. */
+    return authorize(s,layout,NULL,NULL,limits);
+}
+
+jpeg_transport_result_t jpeg_espidf_provision(jpeg_espidf_t *s,const jpeg_guard_layout_t *layout,
+    const jpeg_provision_stamp_t *stamp,jpeg_provision_diagnostic_t *diagnostic,
+    const jpeg_transport_limits_t *limits)
+{
+    /* Fail/revoke even for an absent provision descriptor; never fall through
+     * to an ordinary authorization path that could retain stale capabilities. */
+    if(diagnostic){memset(diagnostic,0,sizeof(*diagnostic));diagnostic->status=JPEG_PROVISION_GUARD;}
+    if(!stamp){if(s)jpeg_transport_revoke(&s->transport);return JPEG_TRANSPORT_ARGUMENT;}
+    return authorize(s,layout,stamp,diagnostic,limits);
 }

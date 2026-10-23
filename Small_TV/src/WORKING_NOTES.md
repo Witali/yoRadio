@@ -2668,3 +2668,36 @@ factory differences. Continue upload/decode power-cut, network reconnect/client/
 connection-churn gates, whole-image indirect-call audit, full/24h/hardware.
 No physical flashing/reset, no edits to frozen bundle or shared SDK. Goal active;
 commit completed change, do not push without the user's next push instruction.
+
+## 2026-10-23 — ordered legacy adoption checkpoint
+
+Matching native unstamped assets migration implemented in jpeg_provision and
+real ESP-IDF main, ordinary guard still read-only. Verify raw/SDK table/flags,
+geometry,27 payloads, compiled stamp, every candidate byte twice, then ID32 FIRST
++ exact readback, header8 LAST + readback, final64 read + full physical guard and
+deadline. One startup budget,40 program bytes max,0 erase, no photo/settings I/O.
+Valid stamp skips vacancy scan and keeps used cache. Unknown/occupied stays intact.
+
+Important regression: single-program prototype could adopt full foreign header
+with wrong compatible ID; negative failed before correction. Nonerased header
+NOW requires exact ID. Recover only torn subsets within supported phase ordering.
+Historical failure preserved separately; never committed/pushed/deployed.
+
+23409 host cases/8 provision +14 transport mutants/31 transport/5995 native/privacy/
+12 inventory controls/6 artifact pass.527 total inventory,212 app unchanged.
+12 actual main QEMU processes passed/stopped/reaped: fresh40, IDdone8, cold0,
+foreign/occupied0, real retained old-main app update0. Full physical comparison
+outside expected stamp/NVS, and NVS exact for cold/upgrade. This is bootstrap
+storage acceptance, not general JPEG/LCD/network/RF/power-cut acceptance.
+App034287C7 /ELFBB7FD7A1 /source1D1F52CE,1466576bytes/69424free,DEBUGoff.
+Assets1032119B/layout44268211/codecB33BC0A1 unchanged. Firmware archive saved.
+tests/JPEG_LEGACY_PROVISION.md + qemu/parity/jpeg-legacy-provision-validation-20261023.json;
+lossless deduplicated sector evidence, independently reconstruct/verify fullSHA.
+
+NEXT: separate full LCD and clock-continuity gate of CURRENT image. Existing
+photo_frames_qemu assumes two clock delays/present31 before asynchronous warm-up;
+observe genuine cache readiness, no RAM/PC patches or masks hiding differences.
+Then complete target heap/stack/time/format/fault/refusal matrix; real upload/
+decode/journal reset/power-cut; network clients/reconnect/churn; full-image
+indirect-call audit/full/24h/hardware. Do not re-open solved standalone core work.
+Frozen QEMU/SDK unchanged, no physical actions, no push. Goal active.

@@ -39,7 +39,7 @@ def main():
         'ignore_io_error':('if(io_error)return -(int)stop(t,JPEG_TRANSPORT_IO);','if(false)return -(int)stop(t,JPEG_TRANSPORT_IO);'),
         'skip_cooperative_check':('    return deadline(t);','    return JPEG_TRANSPORT_OK;'),
     }
-    inputs=[source,PROJECT/'storage/jpeg_transport.h',PROJECT/'storage/jpeg_guard.c',PROJECT/'storage/jpeg_guard.h',
+    inputs=[source,PROJECT/'storage/jpeg_transport.h',PROJECT/'storage/jpeg_guard.c',PROJECT/'storage/jpeg_guard.h',PROJECT/'storage/jpeg_provision.c',PROJECT/'storage/jpeg_provision.h',
             PROJECT/'storage/jpeg_nor.h',test,Path(__file__),args.fixtures/'jpeg_layout.h',args.fixtures/'probe_map.h',
             args.fixtures/'assets.bin',args.vs_dev_cmd]
     report=dict(passed=False,cases=[],inputs_sha256={str(p.resolve()):sha(p) for p in inputs})
@@ -51,7 +51,7 @@ def main():
             batch.write_text('@echo off\ncall "'+str(args.vs_dev_cmd.resolve())+'" -arch=x64 -host_arch=x64 >nul\n'
                 'if errorlevel 1 exit /b 1\ncd /d "'+str(folder)+'"\nwhere cl > compiler-path.txt\n'
                 'cl /nologo /std:c11 /O2 /W3 /D_CRT_SECURE_NO_WARNINGS /I"'+str(args.fixtures.resolve())+'" '
-                '/I"'+str(PROJECT/'storage')+'" "'+str(test)+'" "'+str(changed)+'" "'+str(PROJECT/'storage/jpeg_guard.c')+'" '
+                '/I"'+str(PROJECT/'storage')+'" "'+str(test)+'" "'+str(changed)+'" "'+str(PROJECT/'storage/jpeg_guard.c')+'" "'+str(PROJECT/'storage/jpeg_provision.c')+'" '
                 '/Fe"'+str(executable)+'" /link bcrypt.lib\nexit /b %errorlevel%\n',encoding='utf-8',newline='\r\n')
             compiled=subprocess.run(['cmd.exe','/d','/c',str(batch)],capture_output=True,timeout=60)
             (folder/'compile.log').write_bytes(compiled.stdout+compiled.stderr)

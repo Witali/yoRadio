@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS probe.c ../../../../storage/jpeg_transport.c ../../../../storage/jpeg_guard.c
+    SRCS probe.c ../../../../storage/jpeg_transport.c ../../../../storage/jpeg_guard.c ../../../../storage/jpeg_provision.c
          ../../../../storage/jpeg_nor.c ../../../../storage/jpeg_espidf.c
     INCLUDE_DIRS ../../../../storage "${JPEG_PROBE_GENERATED}"
     REQUIRES spi_flash esp_partition bootloader_support esp_timer mbedtls

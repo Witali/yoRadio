@@ -2,7 +2,7 @@ idf_component_register(
     SRCS probe.c ../../../../codec/jpeg_decoder.c ../../../../codec/jpeg_memory.c
          ../../../../codec/jpeg_backing.c ../../../../codec/jpeg_coefficients.c
          ../../../../storage/jpeg_scratch.c ../../../../storage/jpeg_nor.c
-         ../../../../storage/jpeg_guard.c ../../../../storage/jpeg_transport.c
+         ../../../../storage/jpeg_guard.c ../../../../storage/jpeg_provision.c ../../../../storage/jpeg_transport.c
          ../../../../storage/jpeg_espidf.c ../../../../app/media/color_convert.c
     INCLUDE_DIRS ../../../../codec ../../../../storage ../../../../app/include
                  "${JPEG_PROBE_GENERATED}" "${JPEG_PROBE_LIBRARY}/source/src"

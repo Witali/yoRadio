@@ -11,7 +11,7 @@ idf_component_register(
          web/request_body.c web/settings_api.c web/photo_api.c web/photo_async.c text/text.c
          ../third_party/tjpgd/tjpgd.c ../third_party/cjson/cJSON.c
          ../codec/jpeg_privacy.c ../codec/jpeg_baseline.c ../codec/jpeg_decoder.c ../codec/jpeg_memory.c ../codec/jpeg_backing.c ../codec/jpeg_coefficients.c
-         ../storage/jpeg_nor.c ../storage/jpeg_guard.c ../storage/jpeg_transport.c ../storage/jpeg_espidf.c
+         ../storage/jpeg_nor.c ../storage/jpeg_guard.c ../storage/jpeg_provision.c ../storage/jpeg_transport.c ../storage/jpeg_espidf.c
          ../storage/jpeg_scratch.c ../storage/jpeg_journal.c ../storage/jpeg_cache.c
          "${CMAKE_BINARY_DIR}/resources/web_pages.c"
          "${CMAKE_BINARY_DIR}/resources/factory_bitmaps.c"
