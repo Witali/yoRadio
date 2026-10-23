@@ -1,0 +1,32 @@
+--- .build/cyd-vorbis-map2-regression-prep-01/generate02.py
++++ tests/vorbis_format_corpus/generate_map2_regression.py
+@@ -214,8 +214,12 @@
+ 
+ 
+ def generate(output):
+-    output = output.resolve(); need(output.parent == HERE and not output.exists(), "fresh_direct_child_output")
+-    inputs = [Path(__file__).resolve(), HERE / "README02.md", BOOKS, MINIMAL]
++    output = output.resolve()
++    build_root = (ROOT / ".build").resolve()
++    need(build_root.parent == ROOT and output != build_root
++         and output.is_relative_to(build_root) and not output.exists(),
++         "fresh output beneath this checkout's .build required")
++    inputs = [Path(__file__).resolve(), HERE / "README.md", BOOKS, MINIMAL]
+     before = [fact(p) for p in inputs]
+     configs = configurations(); need(len(configs) == 8, "exact_8_cases")
+     equal_groups = [[configs[i]["id"], configs[i + 1]["id"]] for i in (0, 2, 4, 6)]
+@@ -288,6 +292,7 @@
+     manifest = dict(schema="map2-regression-source-manifest-v1", source_inputs=before, references=REFERENCES,
+         files=[dict(path=p, bytes=len(v), sha256=sha(v)) for p, v in sorted(payloads.items())])
+     payloads["manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
++    output.parent.mkdir(parents=True, exist_ok=True)
+     output.mkdir()
+     for name, data in payloads.items():
+         path = output / name; path.parent.mkdir(parents=True, exist_ok=True)
+@@ -298,5 +303,5 @@
+ 
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--output", type=Path, required=True)
++    parser.add_argument("--output", type=Path, default=ROOT / ".build/vorbis-map2-regression-corpus-01")
+     generate(parser.parse_args().output)

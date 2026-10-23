@@ -1,0 +1,91 @@
+{
+  "schema": "vorbis-mono-mapping-pure-checks-v1",
+  "completed": true,
+  "cases": 21,
+  "base_cases": 18,
+  "supplements": 3,
+  "packets": 294,
+  "actual_byte_field_roundtrip": true,
+  "setup_and_audio_bounded_grammar_checked": true,
+  "spectra_are_integer_symbol_models_not_PCM": true,
+  "all_channels_mixed_nonzero_distinct_bounded_in_symbol_model": true,
+  "all_ogg_crc_packet_granule_flags_roundtrip": true,
+  "exact_rejection_controls": [
+    {
+      "name": "stereo_audio_cannot_be_relabelled_mono",
+      "exact_reason": "classword",
+      "rejected": true
+    },
+    {
+      "name": "mono_audio_cannot_be_relabelled_stereo",
+      "exact_reason": "floor_present",
+      "rejected": true
+    },
+    {
+      "name": "residue_channel_order_instead_of_submap_order",
+      "exact_reason": "spectral_values",
+      "rejected": true
+    },
+    {
+      "name": "residue2_per_channel_extra_classword",
+      "exact_reason": "spectral_values",
+      "rejected": true
+    },
+    {
+      "name": "coupled_vq_code_corruption",
+      "exact_reason": "spectral_values",
+      "rejected": true
+    },
+    {
+      "name": "ogg_crc_corruption",
+      "exact_reason": "CRC mismatch",
+      "rejected": true
+    }
+  ],
+  "inputs_before": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-mono-mapping-prep-01\\generate.py",
+      "bytes": 21136,
+      "sha256": "4e26ccfb00298c869f15761db00ef6a77ed33b6092cb9f106d3cd8fdd18e4e01"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_block_matrix\\generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\setup.c",
+      "bytes": 36527,
+      "sha256": "d23fd5cb2ad7d8c3a87ebcda2197421245f571dea5724de3d328058264e491c2"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-mono-mapping-prep-01\\README.md",
+      "bytes": 5559,
+      "sha256": "b580a6a90468be6a720b1133b27eff637be9a2e0e43d1a1b848dd504e457bf37"
+    }
+  ],
+  "inputs_after": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-mono-mapping-prep-01\\generate.py",
+      "bytes": 21136,
+      "sha256": "4e26ccfb00298c869f15761db00ef6a77ed33b6092cb9f106d3cd8fdd18e4e01"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_block_matrix\\generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\setup.c",
+      "bytes": 36527,
+      "sha256": "d23fd5cb2ad7d8c3a87ebcda2197421245f571dea5724de3d328058264e491c2"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-mono-mapping-prep-01\\README.md",
+      "bytes": 5559,
+      "sha256": "b580a6a90468be6a720b1133b27eff637be9a2e0e43d1a1b848dd504e457bf37"
+    }
+  ],
+  "helper_copied_or_globals_monkeypatched": false,
+  "decoder_SDK_compiler_QEMU_Git_device_executed": false
+}

@@ -1,0 +1,44 @@
+--- provenance/archive01-verify.py
++++ verify.py
+@@ -333,7 +333,8 @@
+             rid = '0-' + case['id']; folder = 'cases/' + rid + '/'
+             need(original_case['id'] == accepted['id'] == rid and original_case['input'] == source and
+                  original_case['source_matrix_sha256'] == sha(raw[original_root + 'matrix.json']) and
+-                 address(original_case['source_matrix'], 'host21') == original_root + 'matrix.json' and
++                 norm(ntpath.normpath(original_case['source_matrix'])) == base + '/' + original_root + 'matrix.json' and
++                 frozen('host21', original_case['source_matrix'], sha(raw[original_root + 'matrix.json'])) == raw[original_root + 'matrix.json'] and
+                  origin['case'] == index and origin['id'] == case['id'] == source['id'] and
+                  origin['original_case_fields'] == origin['selected_case_fields'] == source and origin['fields_changed'] == [] and
+                  (accepted['rate'], accepted['channels'], accepted['bits']) == (case['rate'], case['channels'], 16) and
+@@ -411,7 +412,30 @@
+                 sys.modules[name] = previous
+     for receipt_key in manifest['plan']['extra_receipts']:
+         need(sha(raw[receipt_key]) == manifest['plan']['extra_receipt_pins'][receipt_key], 'Exact actual extra receipt identity')
+-        receipt(obj(raw[receipt_key]), 0)
++        receipt(obj(raw[receipt_key]), 1 if receipt_key == manifest['plan']['archive_history']['failed_stage_verify_receipt'] else 0)
++    history = manifest['plan']['archive_history']
++    need(history['schema'] == 'mono21-archive-input-history-v1' and
++         history['pack_receipt'] == '.build/cyd-vorbis-mono-mapping-archive-pack-01-command.json' and
++         history['failed_stage_verify_receipt'] == '.build/cyd-vorbis-mono-mapping-archive-stage-verify-01-command.json' and
++         history['pack_receipt'] in manifest['plan']['extra_receipts'] and history['failed_stage_verify_receipt'] in manifest['plan']['extra_receipts'] and
++         history['prior_stage_verified'] is history['reference_comparisons_completed_by_failed_verifier'] is False,
++         'Actual first pack/failed archive verifier history only; no prior stage qualification')
++    for field in ('stage_manifest', 'root_plan', 'checkpoint'):
++        need(sha(raw[history[field]['path']]) == history[field]['sha256'], 'Exact prior manifest/selection/checkpoint history')
++    need(history['stage_manifest']['sha256'] == '5bf6dbd5e305dca3fcb64cd22b064f767734d79068135c6cb4ed55203114c016' and
++         history['root_plan']['sha256'] == '0ae7244a2d9cca5ae443ebbc001229e9ad27b01ad6010298ca5916b85a1bbee8' and
++         history['checkpoint']['sha256'] == '501226e5e7bf08fd3be3f302663280bfe584f502181d66c0e05aa8c2ce27a974', 'Original source-stage history identities')
++    failure_receipt = obj(raw[history['failed_stage_verify_receipt']])
++    failure_stderr = next(path for path in failure_receipt['logs'] if path.endswith('stderr.log'))
++    need(b'Every actual original raw/channel/frame classification' in
++         frozen(None, failure_stderr, failure_receipt['logs'][failure_stderr]['sha256']), 'Original snapshot-alias verifier failure diagnostic preserved')
++    prior = '.build/cyd-vorbis-mono-mapping-archive-prep-01/'
++    prior_readiness = obj(raw[prior + 'readiness.json'])
++    need(sha(raw[prior + 'readiness.json']) == 'ff50314e18419f42fce9971c7b2463ff41e170d3e881e3ad63af16e75eec0dd8' and
++         {key[len(prior):] for key in raw if key.startswith(prior)} == set(prior_readiness['files']) | {'readiness.json'},
++         'Complete immutable prior archive source preparation; no recursive prior payload')
++    for name, row in prior_readiness['files'].items():
++        need(len(raw[prior + name]) == row['bytes'] and sha(raw[prior + name]) == row['sha256'], 'Each immutable prior archive source byte')
+     for name, count in (('cyd-vorbis-mono-mapping-controls-01-command.json', 30),
+                         ('cyd-vorbis-mono-mapping-numeric-controls-01-command.json', 29),
+                         ('cyd-vorbis-mono-mapping-numeric-controls-02-command.json', 39)):

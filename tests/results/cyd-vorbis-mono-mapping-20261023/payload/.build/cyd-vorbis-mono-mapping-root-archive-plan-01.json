@@ -1,0 +1,71 @@
+{
+  "schema": "cyd-mono-mapping-selection-v1",
+  "dependency_manifest_sha256": "c3e1fa16adb85d25f90339a9d4c74b6c0cbc9feac3d4097624bbe1d6553bd11c",
+  "roles": {
+    "capture21": {
+      "path": ".build/cyd-vorbis-mono-mapping-capture-01",
+      "terminal": ".build/cyd-vorbis-mono-mapping-capture-01-terminal.json",
+      "expected_outer_exit": 0,
+      "report_sha256": "06bd8a60cef8d2f49bc4df839630a405e49823061be02f831d36ef5fd0655daf",
+      "terminal_sha256": "fa2bfd189ac1b20882c2c31d57ec1b0b866f2141db978cd08a6783bbdc2cec29"
+    },
+    "numeric21": {
+      "path": ".build/cyd-vorbis-mono-mapping-numeric-measurement-02",
+      "terminal": ".build/cyd-vorbis-mono-mapping-numeric-measurement-02-command.json",
+      "expected_outer_exit": 0,
+      "report_sha256": "aeb88a8c01a10170880c33fd21142f48839920c30f28f3746293e501eceada9e",
+      "terminal_sha256": "1155ac190a896fdff9220ad0ca295e360af98da8d9f6d3b7cd8384c5c93a6d09"
+    },
+    "host21": {
+      "path": ".build/cyd-vorbis-mono-mapping-host-01",
+      "terminal": ".build/cyd-vorbis-mono-mapping-host-01-command.json",
+      "expected_outer_exit": 0,
+      "report_sha256": "ab80560ca5a1a6d01acdac07508122125bbb7f6597eafb5a94f1a454b31b7abd",
+      "terminal_sha256": "81cec2a19aee33119a52e94a2fc0d1af273fc2b741ace13e183c467dd23f2a0c"
+    },
+    "numeric-input-failure01": {
+      "path": ".build/cyd-vorbis-mono-mapping-numeric-measurement-01",
+      "terminal": ".build/cyd-vorbis-mono-mapping-numeric-measurement-01-command.json",
+      "expected_outer_exit": 1,
+      "report_sha256": "b87fd1d02fdf2fd532dd5edce71d3bc311cfe57fc4849a8937e3d690a1daad18",
+      "terminal_sha256": "974cad4589ef65d8e5a490277f9e5b6f0deecebb3983d57e9f53751dcf179185"
+    }
+  },
+  "trees": [
+    ".build/cyd-vorbis-mono-mapping-prep-01",
+    ".build/vorbis-mono-mapping-canonical-check-01",
+    ".build/cyd-vorbis-mono-mapping-runtime-prep-01",
+    ".build/cyd-vorbis-mono-mapping-runtime-prep-02",
+    ".build/cyd-vorbis-mono-mapping-qualified-01",
+    ".build/cyd-vorbis-mono-mapping-runtime-01",
+    ".build/cyd-vorbis-mono-mapping-numeric-prep-01",
+    "tests/results/vorbis-more-generators-20261020",
+    ".build/cyd-vorbis-mono-mapping-numeric-prep-02"
+  ],
+  "extra_receipts": [
+    ".build/cyd-vorbis-mono-mapping-controls-01-command.json",
+    ".build/cyd-vorbis-mono-mapping-materialize-01-command.json",
+    ".build/cyd-vorbis-mono-mapping-qualified-01-command.json",
+    ".build/vorbis-mono-mapping-canonical-check-01-command.json",
+    ".build/cyd-vorbis-mono-mapping-numeric-controls-01-command.json",
+    ".build/cyd-vorbis-mono-mapping-numeric-controls-02-command.json"
+  ],
+  "extra_receipt_pins": {
+    ".build/cyd-vorbis-mono-mapping-controls-01-command.json": "f2e5907403cc821d0747ed24b09935dc90a03bdd1083289a75dcfed77ffa98d9",
+    ".build/cyd-vorbis-mono-mapping-materialize-01-command.json": "67be3178cd38aee8c00922f5ee487fb5ff72fd964b6518f6c5fff646f5c8c3a0",
+    ".build/cyd-vorbis-mono-mapping-qualified-01-command.json": "73dddcd8fc1c80c230b30e583b09ff770603897c9b77c61d3213048d97414e0f",
+    ".build/vorbis-mono-mapping-canonical-check-01-command.json": "0bad505978af7e1e994b3ba53c995fcabb49cc9b0a90a62aa83f623adc31848d",
+    ".build/cyd-vorbis-mono-mapping-numeric-controls-01-command.json": "ffe8241afd1ead5619f986ad7ac69355aa65bc7a85e9be465306e7a07009ef93",
+    ".build/cyd-vorbis-mono-mapping-numeric-controls-02-command.json": "85b52654053c5a75b40bb75587d8fe14b606bd012211a5d7d47f3ce4fee60657"
+  },
+  "extras": [
+    "tests/vorbis_format_corpus/generate_mono_mapping.py",
+    "tests/vorbis_block_matrix/generate_minimal.py",
+    ".build/cyd-vorbis-format-command-01.py"
+  ],
+  "checkpoint": {
+    "path": ".build/cyd-vorbis-mono-mapping-root-checkpoint-01.md",
+    "sha256": "501226e5e7bf08fd3be3f302663280bfe584f502181d66c0e05aa8c2ce27a974"
+  },
+  "prior8_floor0_wide_record_only_not_replayed": true
+}

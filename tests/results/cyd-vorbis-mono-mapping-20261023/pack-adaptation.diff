@@ -1,0 +1,75 @@
+--- provenance/singleton-pack.py
++++ pack.py
+@@ -1,11 +1,11 @@
+-"""Focused CYD singleton8 plus preferred-zero comparison source/evidence packer; no SDK, compiler, codec, emulator, or Git calls."""
++"""Focused CYD mono/mapping21 source/evidence packer; no SDK, compiler, codec, emulator, or Git calls."""
+ import argparse
+ import gzip
+ import json
+ from pathlib import Path
+ from dependency import Dependency, MANIFEST_SHA, need, norm, obj, rel, sha
+ 
+-ROLES = {'capture8', 'numeric8', 'host-original8', 'host-zero8'}
++ROLES = {'capture21', 'numeric21', 'numeric-input-failure01', 'host21'}
+ CONTEXT = ('compile_commands.json', 'project_description.json', 'flasher_args.json',
+            'build.ninja', 'CMakeCache.txt', 'config/sdkconfig.h', 'toolchain/cflags', 'specs/picolibc.specs')
+ 
+@@ -15,25 +15,25 @@
+     here = Path(__file__).resolve().parent
+     need(sha((here / 'readiness.json').read_bytes()) == readiness_sha256, 'Root-reviewed archive source readiness')
+     readiness = obj((here / 'readiness.json').read_bytes())
+-    need(readiness['schema'] == 'more-singletons-archive-source-only-readiness-v1' and readiness['runtime_executed'] is False, 'Source-only archive readiness')
++    need(readiness['schema'] == 'mono-mapping-archive-source-only-readiness-v1' and readiness['runtime_executed'] is False, 'Source-only archive readiness')
+     need({p.relative_to(here).as_posix() for p in here.rglob('*') if p.is_file()} == set(readiness['files']) | {'readiness.json'}, 'Exact archive-preparation inventory')
+     for name, row in readiness['files'].items():
+         raw = (here / rel(name)).read_bytes()
+         need(len(raw) == row['bytes'] and sha(raw) == row['sha256'], 'Archive-preparation source identity')
+-    need(plan['schema'] == 'cyd-more-singletons-selection-v1' and set(plan['roles']) == ROLES and
+-         plan['dependency_manifest_sha256'] == MANIFEST_SHA, 'Exact CYD singleton/dependency role selection required')
++    need(plan['schema'] == 'cyd-mono-mapping-selection-v1' and set(plan['roles']) == ROLES and
++         plan['dependency_manifest_sha256'] == MANIFEST_SHA, 'Exact CYD mono/mapping dependency role selection required')
+     need(out.is_relative_to(repo / '.build') and out != repo / '.build' and not out.exists(),
+          'Use a fresh independent .build stage')
+     need(not (out == here or out.is_relative_to(here) or here.is_relative_to(out)), 'Archive stage must not overlap immutable preparation')
+     roots = [(repo / rel(item['path'])).resolve() for item in plan['roles'].values()]
+     roots += [(repo / rel(path)).resolve() for path in plan['trees']]
+     need(all(p.is_relative_to(repo) and p.is_dir() and not (p.is_relative_to(out) or out.is_relative_to(p))
+-             for p in roots), 'Missing or overlapping CYD singleton input roots')
++             for p in roots), 'Missing or overlapping CYD mono/mapping input roots')
+     dep = Dependency(repo)
+-    manifest = dict(schema='cyd-more-singletons-checkpoint-v1', repository=norm(repo), plan=plan, files={},
++    manifest = dict(schema='cyd-mono-mapping-checkpoint-v1', repository=norm(repo), plan=plan, files={},
+         aliases={}, roles={}, external_omitted={}, generated={}, verified=False,
+         dependency_archive=dict(path='tests/results/cyd-vorbis-map2-20261020', manifest_sha256=MANIFEST_SHA,
+-            required=True, standalone=False, scope='exact-shared-entries-only-no-prior-campaign-replay'), intended_destination='tests/results/cyd-vorbis-more-singletons-20261023',
++            required=True, standalone=False, scope='exact-shared-entries-only-no-prior-campaign-replay'), intended_destination='tests/results/cyd-vorbis-mono-mapping-20261023',
+         full_G6_qualified=False, physical_device=False, production_firmware=False)
+     out.mkdir(parents=True, exist_ok=False)
+     originals = {}
+@@ -114,7 +114,7 @@
+         report = obj((root / 'report.json').read_bytes())
+         need(sha((root / 'report.json').read_bytes()) == item['report_sha256'], 'Reviewed actual report identity differs')
+         need(sha((repo / rel(item['terminal'])).read_bytes()) == item['terminal_sha256'], 'Reviewed actual outer receipt identity differs')
+-        manifest['roles'][role] = dict(root=root.relative_to(repo).as_posix(), kind='numeric' if role == 'numeric8' else 'host' if role.startswith('host-') else 'target',
++        manifest['roles'][role] = dict(root=root.relative_to(repo).as_posix(), kind='numeric' if role.startswith('numeric') else 'host' if role == 'host21' else 'target',
+             terminal=receipt(item['terminal']), expected_outer_exit=item['expected_outer_exit'])
+         selected = [p for p in root.iterdir() if p.is_file()]
+         for folder in ('sources', 'variant', 'observed-pcm', 'cases'):
+@@ -124,7 +124,7 @@
+         for field in ('build_outputs', 'variant_sources'):
+             selected += [root / rel(path) for path in report.get(field, {})]
+         for path in sorted(set(selected)):
+-            add(path, allow_borrow=False)  # Preserve actual target8/host8 snapshot copies locally, including matching dependency bytes.
++            add(path, allow_borrow=False)  # Preserve actual target21/host21 snapshot copies locally, including matching dependency bytes.
+         aliases = manifest['aliases'][role] = {}
+         for original, row in report.get('inputs', {}).items():
+             path = root / rel(row['snapshot']) if 'snapshot' in row else Path(row['path'])
+@@ -133,7 +133,7 @@
+                 key = add(path, row['sha256'], allow_borrow='snapshot' not in row)
+                 aliases[original_path] = key
+             else:
+-                need(role == 'numeric8' and 'snapshot' not in row and path.name in {'ffmpeg.exe', 'python.exe'},
++                need(role.startswith('numeric') and 'snapshot' not in row and path.name in {'ffmpeg.exe', 'python.exe'},
+                      'Only explicitly identified external numeric reference tools may be hash-only inputs')
+                 tool(path, row['sha256'])
+                 external = manifest['external_omitted'][norm(path.resolve())]

@@ -1,6 +1,6 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-10-20. Ветка: `codex/esp32-cyd-c3-review`.
+Обновлено: 2026-10-23. Ветка: `codex/esp32-cyd-c3-review`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
@@ -165,9 +165,12 @@ allocation и численные настройки C3 являются канд
   Четыре дополнительных zero-bit контроля подтверждены Xiph и FFmpeg native
   с max1; исходные bit1 map1 случаи FFmpeg по-прежнему отклоняет. Target этих
   zero-контролей не запускался; исходные случаи и NONPASS сохранены.
-  Остальные gaps: численная корректность D16 sequence1, прочие wide widths/
-  dimensions и target mapping/format случаи. Для21 mono/stereo/mapping случая
-  уже есть42 успешных reference children; полный CYD target ещё не квалифицирован.
+  [Полный mono/stereo/mapping21 checkpoint](../tests/results/cyd-vorbis-mono-mapping-20261023/CHECKPOINT.md)
+  проходит на Xtensa/core1:294 пакета/464640 PCM байт, все42 сравнения с двумя
+  эталонами имеют max1 при прежнем проектном пределе2. Проверены9 mono/12 stereo
+  случаев, девять частот, coupling, два submap и residue2. Это конечный корпус,
+  а не полная квалификация стандарта. Остальные gaps: численная корректность
+  D16 sequence1/floor0/wide, preferred-zero target и прочие форматы.
   Полное G6 открыто; bridge в radio не подключён.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
@@ -1004,3 +1007,30 @@ Stream остаётся на core0, decode/output на core1 с прежними
   `020f11d42d79b45dc4c7a5f5d639b03cfa9a8a451c277389325d5caf45bca2d8`.
   Production source/ABI/hardware/task affinities не менялись; numerical gaps,
   остальные G1–G8, radio/resource/physical gates остаются.
+
+- 2026-10-23, CYD-C3-14/G6: [mono/stereo и mapping21](../tests/results/cyd-vorbis-mono-mapping-20261023/CHECKPOINT.md)
+  прошли полный raw target и независимое сравнение PCM. Исходные21 случая
+  сохраняют все105 raw/header/carrier файлов и109-file inventories;42 ранее
+  выполненных reference children и все WAV/framemd5/metadata перепроверены.
+  SDK6.0.2/Xtensa/240MHz/SMP выполняет9 команд с terminal0, coordinator core0,
+  worker core1/priority3/stack16384;294 пакета/464640 PCM байт/654 events,
+  mask2097151, compiler warnings0. Mono остаётся одним каналом без дублирования.
+  Все21 случая имеют max1 относительно каждого из двух эталонов, включая
+  полные packet boundaries и все short/long transitions; фиксированный предел2
+  выбран до измерения и не является нормативным допуском Vorbis.
+  Actual30 protocol controls и39 metric/path/policy controls проходят.
+  Первая numerical попытка сохранена как input rejection: Windows backslash
+  key вызвал KeyError до сравнения PCM, после чтения command logs с PCM_HEX.
+  Successor02 исправляет только нормализацию ключей, добавляет10 path controls
+  и сохраняет точные SHA/metrics/policy. Исходные29 controls, prep01 и ошибочный
+  запуск сохранены без переоценки как decoder NONPASS. Финальное полное
+  measurement02 завершается0 с42 сравнениями и обеими reference bounds=true.
+  [Offline проверка](../tests/results/cyd-vorbis-mono-mapping-verification-20261023/README.md)
+  проходит до/после byte-exact promotion, второй раз из другого cwd. Первая
+  проверка архива сохранена отдельно: она неверно отождествляла original path
+  и storage key замороженной копии; successor02 сверяет исходный путь, SHA и
+  все байты без fallback. Архив1775 файлов/8202645 байт требует только8 явно
+  закреплённых shared entries committed CYD map2; прежние кампании не переиграны.
+  Manifest `3e88fda7fab1bd42d8b40e5c9de637e06050199451e54840271eeb5b3fb4e0d0`.
+  Старые floor0/wide/D16 sequence1 NONPASS и отложенные Ogg/AAC пункты остаются;
+  bridge в radio не подключён, production source/ABI/core bindings не менялись.

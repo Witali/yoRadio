@@ -1,0 +1,36 @@
+--- .build/cyd-vorbis-mono-mapping-numeric-prep-01/capture21.py
++++ .build/cyd-vorbis-mono-mapping-numeric-prep-02/capture21.py
+@@ -20,6 +20,23 @@
+     path = PurePosixPath(str(value).replace('\\', '/'))
+     need(str(value) and not path.is_absolute() and '..' not in path.parts and ':' not in str(path), 'Safe relative path required')
+     return path.as_posix()
++
++
++def canonical_variant_sources(values):
++    """Canonical Windows/forward-slash report keys; never change identity hashes."""
++    need(type(values) is dict and values, 'Nonempty variant source path/hash map required')
++    result, seen_windows_paths = {}, set()
++    for name, digest in values.items():
++        need(type(name) is str, 'Variant source path must be text')
++        key = relative(name)
++        need(key == name.replace('\\', '/') and key.startswith('variant/'),
++             'Canonical relative variant source path required')
++        need(key not in result and key.casefold() not in seen_windows_paths,
++             'Duplicate canonical Windows variant source path')
++        need(type(digest) is str and re.fullmatch('[0-9a-f]{64}', digest), 'Exact lowercase variant source SHA256 required')
++        result[key] = digest
++        seen_windows_paths.add(key.casefold())
++    return result
+ 
+ 
+ class Inputs:
+@@ -128,7 +145,8 @@
+     inputs.read('target/caller', root / 'sources/project/main/main.c', pins['caller_sha256'])
+     for role, path in (('candidate-setup', 'sources/candidate/vorbis_repair/setup.c'), ('variant-setup', 'variant/vorbis_repair/setup.c')):
+         inputs.read('target/' + role, root / path, pins['setup_sha256'])
+-    need(report['variant_sources']['variant/vorbis_repair/setup.c'] == pins['setup_sha256'], 'Actual variant setup identity')
++    variants = canonical_variant_sources(report['variant_sources'])
++    need(variants.get('variant/vorbis_repair/setup.c') == pins['setup_sha256'], 'Actual variant setup identity')
+     macros = (root / 'setup-macros.stdout.log').read_bytes().decode().replace('\r\n', '\n')
+     for pattern in (r'^#define CONFIG_IDF_TARGET_ESP32 1$', r'^#define CONFIG_YORADIO_VORBIS_REPAIR 1$',
+                     r'^#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ 240$'):

@@ -1,0 +1,58 @@
+--- .build/cyd-vorbis-format-expanded25-prep-02/target/cyd_vorbis_format_expanded25_qemu/main/main.c
++++ .build/cyd-vorbis-mono-mapping-runtime-prep-02/target/cyd_vorbis_mono21_qemu/main/main.c
+@@ -13,7 +13,7 @@
+ #ifdef LIMIT_TO_64kHz
+ #error This corpus requires the normal unrestricted format profile
+ #endif
+-_Static_assert(CORPUS_CASE_COUNT >= 1 && CORPUS_CASE_COUNT <= 31, "Bounded named corpus cases");
++_Static_assert(CORPUS_CASE_COUNT == 21, "Complete mono21 corpus required");
+ 
+ #define P "CYD_VORBIS_CHECKED_CORPUS_"
+ #define PACKETS 14U
+@@ -64,7 +64,7 @@
+     need(c->identification_size == 30 && !memcmp(c->identification, "\x01vorbis", 7), "identification_prefix");
+     need(c->setup_size > 7 && c->setup_size <= UINT32_MAX && !memcmp(c->setup, "\x05vorbis", 7), "setup_prefix");
+     const uint8_t *id = c->identification;
+-    need(le32(id + 7) == 0 && c->channels == 2 && id[11] == c->channels && c->rate &&
++    need(le32(id + 7) == 0 && (c->channels == 1 || c->channels == 2) && id[11] == c->channels && c->rate &&
+          le32(id + 12) == c->rate && (id[29] & 1U), "identification_fields");
+     need(block_ok(c->short_block) && block_ok(c->long_block) && c->short_block <= c->long_block &&
+          (1U << (id[28] & 15U)) == c->short_block && (1U << (id[28] >> 4)) == c->long_block,
+@@ -93,11 +93,11 @@
+         .setup_header = (uint8_t *)c->setup + 7, .setup_size = c->setup_size - 7,
+     };
+ }
+-static void nonzero(const uint8_t *pcm, uint32_t bytes, uint32_t *left, uint32_t *right) {
++static void nonzero(const uint8_t *pcm, uint32_t bytes, unsigned channels, uint32_t *left, uint32_t *right) {
+     *left = *right = 0;
+-    for (uint32_t i = 0; i < bytes; i += 4) {
++    for (uint32_t i = 0; i < bytes; i += 2U * channels) {
+         *left += (pcm[i] | pcm[i + 1]) != 0;
+-        *right += (pcm[i + 2] | pcm[i + 3]) != 0;
++        if (channels == 2) *right += (pcm[i + 2] | pcm[i + 3]) != 0;
+     }
+ }
+ static uint32_t run_case(const corpus_case_t *c, unsigned index) {
+@@ -122,7 +122,8 @@
+         cr = esp_vorbis_dec_decode(checked, &b, &bo, &ci);
+         bool cg = guards(&checked_pcm), bounded = bo.decoded_size <= PCM_CAPACITY;
+         uint32_t nl = 0, nr = 0;
+-        if (bounded && !(bo.decoded_size % 4U)) nonzero(checked_pcm.data, bo.decoded_size, &nl, &nr);
++        if (bounded && !(bo.decoded_size % (2U * c->channels)))
++            nonzero(checked_pcm.data, bo.decoded_size, c->channels, &nl, &nr);
+         unsigned transition = packet ? c->modes[packet - 1] * 2U + c->modes[packet] : 4U;
+         int core = xPortGetCoreID();
+         printf(P "PACKET case=%u packet=%u size=%" PRIu32 " checked_rc=%d checked_consumed=%" PRIu32
+@@ -133,9 +134,10 @@
+         need(core == 1 && cr == ESP_AUDIO_ERR_OK && b.consumed == size,
+              "checked_result_full_consumption_core");
+         need(bounded && bo.decoded_size == expected && cg, "checked_pcm_size_and_canaries");
+-        need(ci.sample_rate == c->rate && ci.channel == 2 && ci.bits_per_sample == 16,
++        need(ci.sample_rate == c->rate && ci.channel == c->channels && ci.bits_per_sample == 16,
+              "checked_retained_public_metadata");
+-        need(!packet ? !nl && !nr : nl && nr, "checked_nonzero_each_channel_transition");
++        need(!packet ? !nl && !nr : nl && (c->channels == 1 ? !nr : nr != 0),
++             "checked_nonzero_each_actual_channel_transition");
+         static const char digits[] = "0123456789abcdef";
+         for (uint32_t i = 0; i < bo.decoded_size; ++i) {
+             pcm_hex[2U * i] = digits[checked_pcm.data[i] >> 4];

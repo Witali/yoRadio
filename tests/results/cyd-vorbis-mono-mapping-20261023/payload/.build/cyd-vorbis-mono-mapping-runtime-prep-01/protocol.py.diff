@@ -1,0 +1,80 @@
+--- .build/cyd-vorbis-format-expanded25-prep-02/protocol.py
++++ .build/cyd-vorbis-mono-mapping-runtime-prep-01/protocol.py
+@@ -31,7 +31,7 @@
+     need(len(info) == 30 and info[:7] == b"\x01vorbis" and len(setup) > 7 and setup[:7] == b"\x05vorbis", "full prefixed headers")
+     rate, channels, short, long = (case[k] for k in ("rate", "channels", "short", "long"))
+     need(all(type(x) is int for x in (rate, channels, short, long)), "typed descriptor values")
+-    need(0 < rate <= 0xffffffff and channels == 2, "rate/channels")
++    need(0 < rate <= 0xffffffff and channels in (1, 2), "rate/channels")
+     need(all(64 <= x <= 8192 and not x & (x - 1) for x in (short, long)) and short <= long, "block sizes")
+     need(info[7:11] == bytes(4) and info[11] == channels and int.from_bytes(info[12:16], "little") == rate and info[29] & 1, "identification fields")
+     need(1 << (info[28] & 15) == short and 1 << (info[28] >> 4) == long, "identification block fields")
+@@ -49,8 +49,8 @@
+     frames = [0] + [(a + b) // 4 for a, b in zip(blocks, blocks[1:])]
+     pcm = [n * channels * 2 for n in frames]
+     need(max(pcm) <= 16384 and sum(pcm) == case["expected_s16le_bytes"] and sum(frames) == case["expected_raw_samples"], "overlap totals")
+-    declared = case.get("expected_packet_samples", case.get("expected_packet_frames"))
+-    need(declared == frames, "declared frame counts")
++    need(case["expected_packet_samples"] == case["expected_packet_frames"] == frames and
++         case["expected_packet_s16le_bytes"] == pcm, "declared frame/PCM counts")
+     transitions = [4] + [a * 2 + b for a, b in zip(modes, modes[1:])]
+     need(set(transitions[1:]) == {0, 1, 2, 3}, "all four transitions")
+     return dict(id=case["id"], source_index=source_index, rate=rate, channels=channels,
+@@ -61,7 +61,7 @@
+ 
+ def load_contract(manifest_inputs):
+     """Inputs are explicit {path, sha256} pairs; caller supplies independently pinned SHAs."""
+-    need(len(manifest_inputs) == 2, "two source matrices required")
++    need(len(manifest_inputs) == 1, "one complete mono21 source matrix required")
+     cases, facts, pins = [], [], []
+     for source_index, source in enumerate(manifest_inputs):
+         path = Path(source["path"]).resolve()
+@@ -70,15 +70,25 @@
+         pins.append(dict(path=str(path), sha256=source["sha256"]))
+         facts.append(dict(path=str(path), bytes=len(data), sha256=sha(data)))
+         matrix = json.loads(data)
++        need(len(matrix["cases"]) == 21, "complete21 source cases required")
+         for case in matrix["cases"]:
+             item, raw_facts = inspect_case(case, path.parent, source_index)
+             cases.append(item); facts.extend(raw_facts)
+-    need(1 <= len(cases) <= MAX_CASES and len({c["id"] for c in cases}) == len(cases), "bounded distinct named cases")
++    need(len(cases) == 21 <= MAX_CASES and len({c["id"] for c in cases}) == len(cases), "complete21 distinct named cases")
+     model = dict(schema="public-vorbis-corpus-contract-v1", manifest_sha256=[p["sha256"] for p in pins],
+                  cases=cases, total_packets=len(cases) * PACKETS,
+                  total_pcm=sum(c["total_pcm"] for c in cases), case_mask=(1 << len(cases)) - 1)
+     identity = sha(json.dumps(model, sort_keys=True, separators=(",", ":")).encode())
+     return dict(contract_sha256=identity, manifest_inputs=pins, model=model, source_facts=facts)
++
++
++def channel_nonzero(pcm, channels):
++    """Complete little-endian PCM16 frames; mono has no synthetic second channel."""
++    need(type(channels) is int and channels in (1, 2) and len(pcm) % (2 * channels) == 0,
++         "complete mono/stereo PCM16 frames")
++    values = [sum(pcm[pos:pos + 2] != b"\0\0" for pos in range(channel * 2, len(pcm), channels * 2))
++              for channel in range(channels)]
++    return dict(nz_l=values[0], nz_r=values[1] if channels == 2 else 0)
+ 
+ 
+ def validate_log(log, contract, *, returncode, timed_out, interrupted, manifest_hashes):
+@@ -125,15 +135,16 @@
+         for packet, (size, pcm, frames, transition) in enumerate(zip(case["sizes"], case["pcm"], case["frames"], case["transitions"])):
+             result = take("PACKET", dict(case=index, packet=packet, size=size, checked_rc=0,
+                 checked_consumed=size, expected_pcm=pcm, checked_pcm=pcm, checked_rate=case["rate"],
+-                checked_channels=2, checked_bits=16, checked_canary=1, transition=transition, core=1), ("nz_l", "nz_r"))
+-            need(all((count == 0 if not packet else 1 <= count <= frames) for count in result.values()),
+-                 "nonzero each output channel/transition or primer counts")
++                checked_channels=case["channels"], checked_bits=16, checked_canary=1, transition=transition, core=1), ("nz_l", "nz_r"))
++            need((result["nz_l"] == result["nz_r"] == 0) if not packet else
++                 (1 <= result["nz_l"] <= frames and
++                  (result["nz_r"] == 0 if case["channels"] == 1 else 1 <= result["nz_r"] <= frames)),
++                 "nonzero each actual channel/transition; absent mono right channel stays zero")
+             emitted = take("PCM_HEX", dict(case=index, packet=packet, bytes=pcm, core=1), strings=("hex",))["hex"]
+             need(len(emitted) == 2 * pcm and re.fullmatch(r"(?:[0-9a-f]{2})*", emitted) is not None,
+                  "PCM hex length/alphabet")
+             packet_pcm = bytes.fromhex(emitted)
+-            observed = {"nz_l": sum(packet_pcm[i:i + 2] != b"\0\0" for i in range(0, len(packet_pcm), 4)),
+-                        "nz_r": sum(packet_pcm[i:i + 2] != b"\0\0" for i in range(2, len(packet_pcm), 4))}
++            observed = channel_nonzero(packet_pcm, case["channels"])
+             need(observed == result, "PCM bytes/nonzero observations disagree")
+             case_pcm.extend(packet_pcm); packet_offsets.append(len(case_pcm))
+             nl += result["nz_l"]; nr += result["nz_r"]

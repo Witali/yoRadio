@@ -1,0 +1,11 @@
+--- .build/cyd-vorbis-mono-mapping-runtime-prep-01/prepare_runtime.py
++++ .build/cyd-vorbis-mono-mapping-runtime-prep-02/prepare_runtime.py
+@@ -162,7 +162,7 @@
+     for marker, value in replacements.items():
+         need(marker in template, 'controller_marker_missing:' + marker)
+         template = template.replace(marker, value)
+-    need('__' not in template.replace('__file__', '').replace('__name__', '').replace('__main__', '')
++    need('__' not in template.replace('__file__', '').replace('__name__', '').replace('__main__', '').replace('__doc__', '')
+          .replace('__wrap_esp_vorbis_dec_open', '').replace('__wrap_esp_vorbis_dec_decode', ''), 'unsealed_controller_marker')
+     ast.parse(template)
+     controller = output / 'run-cyd-vorbis-mono21-qemu.py'
