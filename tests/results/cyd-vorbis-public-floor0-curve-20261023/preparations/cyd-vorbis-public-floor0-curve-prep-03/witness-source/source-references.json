@@ -1,0 +1,38 @@
+{
+  "schema": "floor0-primary-formula-references-v1",
+  "web_raw_bytes_downloaded": false,
+  "web_SHA256_assigned": false,
+  "sources": [
+    {
+      "name": "Vorbis I6.2.3 floor0 and Bark erratum20150227",
+      "revision": "July4 2020 published specification",
+      "url": "https://xiph.org/vorbis/doc/Vorbis_I_spec.html",
+      "supports": "Bark/bin map, parity products, amplitude normalization, exp gain"
+    },
+    {
+      "name": "Xiph libvorbis floor0",
+      "revision": "v1.3.7",
+      "url": "https://github.com/xiph/vorbis/blob/v1.3.7/lib/floor0.c",
+      "supports": "half-block spectral bins, rate-based Bark mapping, floor amplitude and LSP accumulation"
+    },
+    {
+      "name": "Xiph libvorbis lsp",
+      "revision": "v1.3.7",
+      "url": "https://github.com/xiph/vorbis/blob/v1.3.7/lib/lsp.c",
+      "supports": "simple nonoptimized LSP curve parity normalization and requested dB"
+    },
+    {
+      "name": "Xiph libvorbis scales",
+      "revision": "v1.3.7",
+      "url": "https://github.com/xiph/vorbis/blob/v1.3.7/lib/scales.h",
+      "supports": "toBARK constants and fromdB coefficient"
+    },
+    {
+      "name": "Public Tremor floor0",
+      "revision": "0ad0141e864cfbb130db4f22e279d421832e7336",
+      "Gitiles_blob": "864af70bdaf05d4e65ccde227a17277b675d592c",
+      "url": "https://android.googlesource.com/platform/external/tremor/+/0ad0141e864cfbb130db4f22e279d421832e7336/Tremor/floor0.c",
+      "supports": "positive-dB Q31 unity clamp; Q4 amplitude; integer Bark/frequency/cosine path distinct from own formula"
+    }
+  ]
+}

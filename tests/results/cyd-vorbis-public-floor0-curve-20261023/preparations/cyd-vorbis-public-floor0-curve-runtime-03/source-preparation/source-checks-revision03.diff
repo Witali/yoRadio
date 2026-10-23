@@ -1,0 +1,24 @@
+--- prep02/source_checks.py
++++ prep03/source_checks.py
+@@ -26,10 +26,19 @@
+          sha((HERE/'provenance/public-download/Tremor.tar.gz').read_bytes())==source['archive']['sha256'],'Public download source/archive identity')
+     published={row['path']:row for row in source['files']}
+     public=[]
++    port=json.loads((HERE/'public-portability.json').read_bytes())
++    need(sha((HERE/'public-floor0-portability.diff').read_bytes())==port['exact_diff_sha256'],'Explicit public-C portability diff bytes')
+     for path in sorted((HERE/'project/main/public').iterdir()):
+         row=published['source/'+path.name];raw=path.read_bytes()
+-        need(len(raw)==row['bytes'] and sha(raw)==row['sha256'],'Unchanged public C/header/COPYING source')
+-        public.append(dict(path=path.relative_to(HERE).as_posix(),bytes=len(raw),sha256=sha(raw)))
++        if path.name=='floor0.c':
++            original=(HERE/'provenance/public-port/floor0.original.c').read_bytes()
++            need(len(original)==row['bytes'] and sha(original)==row['sha256']==port['original_floor0_sha256'] and
++                 sha(raw)==port['ported_floor0_sha256'],'Explicit original and ported public floor0 identities')
++            expected=original.replace(b'(-140<<12)',b'-(140<<12)').replace(b'  ogg_uint32_t inyq= (1UL<<31) / toBARK(nyq);\n',b'')
++            need(expected==raw,'Only approved public-C portability changes')
++        else:
++            need(len(raw)==row['bytes'] and sha(raw)==row['sha256'],'Unchanged other public C/header/COPYING source')
++        public.append(dict(path=path.relative_to(HERE).as_posix(),bytes=len(raw),sha256=sha(raw),ported=path.name=='floor0.c'))
+     AST=[]
+     for path in sorted(HERE.rglob('*.py')):
+         raw=path.read_bytes();tree=ast.parse(raw,filename=path.as_posix())

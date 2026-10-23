@@ -1,0 +1,44 @@
+{
+  "schema": "public-floor0-curve-portability-revision03-v1",
+  "variant": "PORTED_PUBLIC_TREMOR_FLOOR0",
+  "original_revision": "0ad0141e864cfbb130db4f22e279d421832e7336",
+  "original_floor0_sha256": "d0372c1dbf4c95231927619a7a1a660bdf421d63b332966f5fe33b9572c002f2",
+  "ported_floor0_sha256": "e1836251d072154691f87a74ea6cdae88d2cf2dd106fbc99908ec71f1f1a8e5a",
+  "original_source": "provenance/public-port/floor0.original.c",
+  "compiled_source": "project/main/public/floor0.c",
+  "exact_diff": "public-floor0-portability.diff",
+  "exact_diff_sha256": "32ea414dedfd4ebe90d3b5d6a78752aeb6049eae25ba9353de73297d8c8b8cfd",
+  "changes": [
+    {
+      "kind": "negative_constant_shift_portability",
+      "original_expression": "(-140<<12)",
+      "replacement_expression": "-(140<<12)",
+      "occurrences": 2,
+      "intended_signed32_threshold": -573440,
+      "scope": "Positive 140 is shifted within int range, followed by unary negation; no negative left shift is evaluated"
+    },
+    {
+      "kind": "remove_unused_local",
+      "original_declaration": "ogg_uint32_t inyq= (1UL<<31) / toBARK(nyq);",
+      "original_identifier_occurrences": 1,
+      "remaining_identifier_occurrences": 0,
+      "scope": "No reference to the local exists beyond its own declaration; toBARK has no side effects for the unchanged valid nyq24000 input"
+    }
+  ],
+  "other_public_files_byte_exact_original": true,
+  "owned_unit_unchanged": true,
+  "compile_flags_unchanged": true,
+  "warnings_suppressed": false,
+  "source_original_bit_identity_claimed": false,
+  "original_public_curve_execution_claimed": false,
+  "ported_public_curve_executed": false,
+  "semantic_controls_executed": false,
+  "SDK_executed": false,
+  "QEMU_executed": false,
+  "PCM_computed": false,
+  "target_codec_executed": false,
+  "reference_decoder_executed": false,
+  "vendor_behavior_attributed": false,
+  "numeric_qualified": false,
+  "full_G6_qualified": false
+}

@@ -1,0 +1,331 @@
+"""Offline standalone public-curve archive verifier; no process/SDK/codec/Git calls."""
+import argparse
+from fractions import Fraction
+import gzip
+import hashlib
+import importlib.util
+import json
+import ntpath
+from pathlib import Path, PurePosixPath, PureWindowsPath
+import re
+import struct
+import sys
+
+sys.dont_write_bytecode=True
+SDK='7101770dc6db2667b3c477cc31365dd1acd6db4e'
+ORIGINAL='d0372c1dbf4c95231927619a7a1a660bdf421d63b332966f5fe33b9572c002f2'
+PORTED='e1836251d072154691f87a74ea6cdae88d2cf2dd106fbc99908ec71f1f1a8e5a'
+PROTOCOL='9b1abe4fa383976291157d6d1991feafda69fa63cfaf312c5c4f588f46279dc8'
+FIELDS='b3c377a86040410add2ed7bedfd26aac6dcef26b59fc1bc2dabbc45c1c2fd345'
+READBACK='3b5dc11e94b85a825dbde0c3e8edbbe9ea621468508ed4212c01db5fcf82d0e5'
+QMP='9e48796aba1dd8bef63b5e3f4beff4a2f042c3e180dabff40c9904fcdabe9416'
+UNIT='81f7cb860d3da4442c3bac924de1dda125e1be5c6022d8761e3e36fc3b6f908b'
+CONTRACT='1f8817117df942c4d6564614e71a90147a9faa6e782ff945830dc11d5b9f6e3d'
+CONTEXT='62b11beb77f6eb4550d3c878249ac77df48bd55eb6dfbcc42abdd2aa15553f21'
+REPORTS={'failed01':'c03ae8a54e6cd7afedebd22ce3d7d3095da9f7d2edf0cd48674fe2c15575a384',
+    'failed02':'aa4af04873094d63d0d39bbeeb00e4b924712f0bcf65f01c1f9b81c9f7e52080',
+    'capture03':'d00a30f91d37f998af97f63cd9433e140e8d72f6c9a126de58ee260c929354cd'}
+CONTROLLERS={'failed01':'39a109075df7ef640df440297351e82bfadccd5747f99133292dc66eb386cb40',
+    'failed02':'13ba8fe6433c0726d00d4aab0ef021f2449b12bc8f4f7d1f3c294cca3821df3c',
+    'capture03':'a31f9dbf5e19d292d3cd5cf04def819d8470ea4b1747d6678e8c8e707157bb56'}
+TERMINALS={'failed01':(77107,'fe6be8',1),'failed02':(44903,'b249f5',1),'capture03':(43646,'f26f66',0)}
+BEFORE=['sdk-head','sdk-clean','sdk-configure-launcher']+[stem+suffix for stem in ('curve_unit','floor0','floor_lookup') for suffix in ('-macros-before','-dependencies-before')]
+COMMANDS=BEFORE+['sdk-build-launcher']+[stem+suffix for stem in ('curve_unit','floor0','floor_lookup') for suffix in ('-macros-after','-dependencies-after')]+['symbols','ninja-commands','merge','qemu','sdk-head-after','sdk-clean-after']
+FALSE=('target_codec_executed','reference_decoder_executed','vendor_backend_qualified','PCM_computed','PCM_qualified','full_G6_qualified','physical_qualified','production_radio_integration')
+MACROS=dict(__SIZEOF_INT__='4',__SIZEOF_LONG__='4',__SIZEOF_POINTER__='4',__XTENSA__='1',__BYTE_ORDER__='__ORDER_LITTLE_ENDIAN__',
+    CONFIG_IDF_TARGET_ESP32='1',CONFIG_IDF_TARGET_ARCH_XTENSA='1',CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ='240',CONFIG_FREERTOS_NUMBER_OF_CORES='2',
+    CONFIG_ESP_MAIN_TASK_AFFINITY_CPU0='1',CONFIG_ESP_MAIN_TASK_AFFINITY='0x0',CONFIG_ESP_MAIN_TASK_STACK_SIZE='16384')
+BAD_LINK=re.compile(r'libesp_audio_(?:codec|simple_dec)\.a|esp-adf-libs|--wrap[=, ]+esp_vorbis',re.I)
+BAD_SYMBOL=re.compile(r'(?:__wrap_|__real_)?(?:esp_vorbis_dec_\w+|esp_audio_(?:simple_)?dec_\w+)|repair_(?:vorbis_open|vorbis_register)|floor0_(?:inverse1|inverse2|info_unpack|free_info|memosize)|vorbis_book_decodev_set|oggpack_read')
+
+
+def need(ok,reason):
+    if not ok:raise RuntimeError(reason)
+
+
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+
+
+def norm(value):return str(value).replace('\\','/')
+
+
+def safe(value):
+    value=norm(value);p=PurePosixPath(value)
+    need(value and not p.is_absolute() and '..' not in p.parts and ':' not in value,'Safe relative archived key required')
+    return p.as_posix()
+
+
+def win(value):return PureWindowsPath(ntpath.normpath(str(value)))
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path(__file__).resolve().parent)
+    parser.add_argument('--manifest-sha256',required=True);args=parser.parse_args();root=args.root.resolve()
+    manifest_raw=(root/'manifest.json').read_bytes();need(sha(manifest_raw)==args.manifest_sha256,'Independently reviewed actual archive manifest SHA')
+    m=json.loads(manifest_raw)
+    need(m['schema']=='cyd-public-floor0-curve-archive-v1' and m['archive_data_dependencies']==[] and m['standalone'] is True and
+         all(m[key] is False for key in FALSE) and m['omitted_binary_bytes_replayable'] is False and
+         m['QMP_EOF_direct_boolean_recorded'] is False and m['QMP_EOF_enforced_by_exact_captured_helper'] is True,'Standalone finite ported-curve scope')
+    expected={safe(row['stored']) for row in m['files'].values()}|{'manifest.json'}
+    need(expected=={p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()} and len(expected)==len(m['files'])+1,'Every stored archive file exactly once')
+    cache={}
+    def raw(key):
+        key=safe(key)
+        if key not in cache:
+            row=m['files'][key];path=root/safe(row['stored']);need(path.is_file() and not path.is_symlink(),'Regular archived file')
+            encoded=path.read_bytes();need(len(encoded)==row['stored_bytes'] and sha(encoded)==row['stored_sha256'],'Exact stored bytes')
+            need(row['compression'] in ('none','gzip'),'Declared lossless compression')
+            value=gzip.decompress(encoded) if row['compression']=='gzip' else encoded
+            need(len(value)==row['bytes'] and sha(value)==row['sha256'],'Exact original archived bytes');cache[key]=value
+        return cache[key]
+    def obj(key):return json.loads(raw(key).decode('utf-8-sig'))
+    def text(key):return raw(key).decode('utf-8',errors='replace').replace('\r\n','\n')
+    def identity(key,digest,size=None):
+        row=m['files'].get(key,m['omitted'].get(key));need(row is not None and row['sha256']==digest and (size is None or row['bytes']==size),'All retained/omitted identity metadata')
+        if key in m['files']:need(sha(raw(key))==digest,'Retained actual identity')
+        else:need(row['bytes']>0 and row.get('reason'),'Explicit nonempty binary-body omission')
+    def module(name,key,digest):
+        need(sha(raw(key))==digest and m['files'][key]['compression']=='none','Exact plain helper source before import')
+        spec=importlib.util.spec_from_file_location(name,root/m['files'][key]['stored']);value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value);return value
+    for key in m['files']:raw(key)
+    need(sha(raw('plan.json'))==m['plan_sha256'],'Exact root-reviewed actual plan')
+    plan=obj('plan.json');need(plan['schema']=='public-floor0-curve-archive-plan-v1' and plan['state']=='ACTUAL_PARENT_TERMINALS_PINNED' and
+        plan['archive_data_dependencies']==[] and plan['canonical_destination']=='tests/results/cyd-vorbis-public-floor0-curve-20261023','Actual standalone root plan')
+    need(sha(raw('CHECKPOINT.md'))==plan['checkpoint']['sha256'],'Root factual checkpoint frozen before manifest')
+    need(raw('.gitattributes')==b'* -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol,-space-before-tab\n','Raw captured Git byte policy')
+    need([row['role'] for row in plan['roles']]==['failed01','failed02','capture03'] and set(m['campaigns'])==set(REPORTS),'All original failure/ported-capture histories')
+    mandatory={f'cyd-vorbis-public-floor0-curve-{kind}-{number}' for kind in ('prep','runtime') for number in ('01','02','03')}
+    need(mandatory<=set(m['preparations']) and set(m['preparations'])=={row['name'] for row in plan['preparations']},'All complete01/02/03 preparation/runtime inventories')
+    for row in plan['preparations']:
+        entry=m['preparations'][row['name']];prefix='preparations/'+safe(row['name'])
+        need(entry==dict(prefix=prefix,index=row['index'],index_sha256=row['index_sha256']),'Exact preparation role metadata')
+        index_key=prefix+'/'+row['index'];need(sha(raw(index_key))==row['index_sha256'],'Pinned preparation/runtime index')
+        index=obj(index_key);names={k[len(prefix)+1:] for k in (*m['files'],*m['omitted']) if k.startswith(prefix+'/')}
+        need(names==set(index['files'])|{row['index']},'Complete historical index, including nested readiness files')
+        for name,fact in index['files'].items():identity(prefix+'/'+safe(name),fact['sha256'],fact['bytes'])
+    public=m['public_download'];need(public==dict(prefix='public-download',index=plan['public_download']['index'],index_sha256=plan['public_download']['index_sha256']),'Exact public download binding')
+    source=obj('public-download/'+public['index']);need(sha(raw('public-download/'+public['index']))==public['index_sha256'] and
+        source['revision']=='0ad0141e864cfbb130db4f22e279d421832e7336' and source['transport']['status']==200 and
+        len(source['files'])==87 and source['archive']['sha256']=='d5e655ab1ad537049ade9703477200a6ec15d7919cae11678ea841f018936743','Actual complete87-file public provenance')
+    identity('public-download/'+safe(source['archive']['path']),source['archive']['sha256'],source['archive']['bytes'])
+    need({k[len('public-download/'):] for k in m['files'] if k.startswith('public-download/')}==
+        {public['index'],source['archive']['path']}|{x['path'] for x in source['files']},'Exact complete public source/archive inventory')
+    for row in source['files']:identity('public-download/'+safe(row['path']),row['sha256'],row['bytes'])
+    need(sha(raw('public-download/source/COPYING'))=='d2ab5758336489da61c12cc5bb757da5339c4ae9001f9bb0562b4370249af814','Original public license retained')
+    context=module('public_curve_exact_compile_context_helpers','compile_context_base.py',CONTEXT)
+    fields=module('public_curve_exact_raw_fields_formula','curve_fields_formula.py',FIELDS)
+    readback=module('public_curve_independent_C_arrays','readback.py',READBACK)
+    protocol=module('public_curve_strict_full_protocol','protocol.py',PROTOCOL)
+    def receipt(entry,code):
+        value=obj(entry['key']);actual=value.get('exit_code',value.get('returncode'))
+        need(type(actual) is int and actual==code and (value.get('schema')=='direct-exec-tool-terminal-v1' or value.get('status')=='TERMINAL'),'Actual root terminal status')
+        if value.get('status')=='TERMINAL':
+            need(type(value['owned_pid']) is int and value['owned_pid']>0 and not value.get('timed_out',False) and not value.get('interrupted',False),'Actual outer owned PID and normal terminal')
+        need(set(entry['log_keys'])==set(value.get('logs',{})),'All actual outer streams')
+        for origin,fact in value.get('logs',{}).items():identity(entry['log_keys'][origin],fact['sha256'],fact['bytes'])
+        if 'executable_sha256' in value:identity(entry['tool_key'],value['executable_sha256'])
+        return value
+    need(len(m['extra_receipts'])==len(plan['extra_receipts']),'All root materialize/fetch receipts retained')
+    for selected,entry in zip(plan['extra_receipts'],m['extra_receipts']):
+        identity(entry['key'],selected['sha256']);receipt(entry,selected['expected_exit_code'])
+    need(len(m['extra_files'])==len(plan['extra_files']),'Root fetch/capture sources retained')
+    for selected,key in zip(plan['extra_files'],m['extra_files']):identity(key,selected['sha256'])
+
+    # Actual original01/02 contracts are byte-identical;03 changes explicit source provenance only.
+    prep=lambda kind,n:'preparations/cyd-vorbis-public-floor0-curve-'+kind+'-'+n+'/'
+    old_contract=raw(prep('runtime','01')+'contract.json')
+    need(sha(old_contract)=='bf0af784b74881770781738cba30966e9f72893fd4d93f89e93df93d61eaeae3' and
+         raw(prep('runtime','02')+'contract.json')==old_contract,'Original-public generated contracts exact')
+    new_contract_raw=raw(prep('runtime','03')+'contract.json');need(sha(new_contract_raw)==CONTRACT,'Exact actual03 ported contract')
+    contract=json.loads(new_contract_raw);model=contract['model'];previous=json.loads(old_contract)['model']
+    need(sha(json.dumps(model,sort_keys=True,separators=(',',':')).encode())==contract['model_sha256'],'Actual complete model canonical hash')
+    need(all(model[key]==previous[key] for key in ('counts','cases','calls')) and contract['previous_raw_descriptors_unchanged'] is True and
+         contract['previous_contract_sha256']==sha(old_contract),'Every original case/call/checksum/count preserved through port')
+    need(model['public_floor0_sha256']==PORTED and model['public_floor0_original_sha256']==ORIGINAL and
+         model['public_floor0_variant']=='PORTED_PUBLIC_TREMOR_FLOOR0','Explicit original/ported distinction')
+    original=raw(prep('prep','03')+'provenance/public-port/floor0.original.c');ported=raw(prep('prep','03')+'project/main/public/floor0.c')
+    need(sha(original)==ORIGINAL and sha(ported)==PORTED and len(re.findall(rb'\binyq\b',original))==1 and original.count(b'(-140<<12)')==2 and
+         ported==original.replace(b'(-140<<12)',b'-(140<<12)').replace(b'  ogg_uint32_t inyq= (1UL<<31) / toBARK(nyq);\n',b''),'Exact three public-C portability edits, no algorithm/table/clamp change')
+    need(sha(raw(prep('prep','03')+'public-floor0-portability.diff'))==model['public_floor0_portability_diff_sha256']==
+         '32ea414dedfd4ebe90d3b5d6a78752aeb6049eae25ba9353de73297d8c8b8cfd','Exact source portability diff retained')
+    for n in ('01','02','03'):
+        need(sha(raw(prep('prep',n)+'project/main/curve_unit.c'))==UNIT and raw(prep('prep',n)+'protocol.py')==raw('protocol.py') and
+             raw(prep('prep',n)+'owned_qmp.py')==raw(prep('prep','03')+'owned_qmp.py'),'Owned C/protocol/QMP unchanged across attempts')
+        for name in ('floor_lookup.c','ogg.h','ivorbiscodec.h','codec_internal.h','codebook.h','misc.h','os.h','os_types.h','config_types.h','asm_arm.h','lsp_lookup.h','COPYING'):
+            need(raw(prep('prep',n)+'project/main/public/'+name)==raw('public-download/source/'+name),'All other public sources/license exact')
+    need(sha(raw(prep('prep','03')+'owned_qmp.py'))==QMP,'Exact EOF/join-enforcing captured helper')
+    own=prep('prep','03')+'witness-source/inputs/corpus/'
+    matrix=obj(own+'matrix.json');construction=obj(own+'construction-fields.json')
+    selected=[row for row in matrix['cases'] if row['id'] in fields.EXPECTED_IDS]
+    need(tuple(row['id'] for row in selected)==fields.EXPECTED_IDS and len(matrix['cases'])==9,'Exact six original raw cases')
+    rebuilt_cases=[];rebuilt_calls=[];bins=0
+    for index,case in enumerate(selected):
+        declaration=construction['variants'][case['variant']]
+        config=fields.configuration(fields.read_layout(raw(own+case['setup']),declaration['setup']))
+        header=raw(own+case['identification']);need(len(header)==30 and header[:7]==b'\x01vorbis' and header[11]==2 and int.from_bytes(header[12:16],'little')==48000,'Actual ID rate/channels')
+        short,long=1<<(header[28]&15),1<<(header[28]>>4)
+        rebuilt_cases.append(dict(id=case['id'],order=config['order'],short=short,long=long,rate=config['rate'],bark=config['bark'],
+            raw_sha256={kind:sha(raw(own+case[kind])) for kind in ('identification','setup','audio','packet_metadata')}))
+        audio=raw(own+case['audio']);metadata=obj(own+case['packet_metadata'])
+        need(len(metadata)==len(declaration['audio'])==14 and len(case['offsets'])==15 and case['offsets'][0]==0 and case['offsets'][-1]==len(audio),'All84 raw packets and offsets')
+        for packet,(meta,layout) in enumerate(zip(metadata,declaration['audio'])):
+            first,last=case['offsets'][packet:packet+2];payload=audio[first:last];parsed=fields.read_layout(payload,layout);mode=fields.field(parsed,'audio.mode',1)
+            need(first==meta['offset'] and last-first==meta['bytes'] and mode==case['mode_flags'][packet] and fields.field(parsed,'audio.type',1)==0,'Actual raw packet type/mode/span')
+            if mode:need(fields.field(parsed,'audio.previous_window',1)==case['mode_flags'][packet-1] and fields.field(parsed,'audio.next_window',1)==case['mode_flags'][packet+1],'Actual neighbors')
+            n=(long if mode else short)//2
+            for channel in (0,1):
+                decoded=fields.floor_and_residue(parsed,config,channel,meta)
+                lsp=[value*(1<<24) for value in decoded['coefficients']];residue=[value*256 for value in decoded['residue']]
+                need(all(value.denominator==1 for value in lsp+residue),'Exact raw Q24/Q8 fractions')
+                words=[index,packet,channel,n,config['order'],config['bark'],decoded['public_Tremor_amplitude_Q4'],config['offset'],config['rate']//2]
+                words+=list(map(int,lsp))+[0]*(6-len(lsp))+list(map(int,residue))
+                rebuilt_calls.append(dict(call=len(rebuilt_calls),words=words,input_fnv32=protocol.fnv(struct.pack('<31i',*words)),
+                    lsp_radians_exact=list(map(str,decoded['coefficients'])),amplitude_exact=str(decoded['amplitude']),amplitude_raw=decoded['raw_amplitude'],
+                    amplitude_bits=config['amplitude_bits'],original_packet_sha256=sha(payload)));bins+=n
+    need(rebuilt_cases==model['cases'] and rebuilt_calls==model['calls'] and model['counts']==dict(cases=6,packets=84,calls=168,bins=bins) and bins==58368,'Independent full raw-to-Q24/Q4/Q8 descriptor recovery')
+    for number,current in (('01',json.loads(old_contract)),('02',json.loads(old_contract)),('03',contract)):
+        header=raw(prep('runtime',number)+'project/main/data.h')
+        need(sha(header)==current['header_sha256'] and readback.readback(header.decode(),current['model'])==current['readback'],'All5208 numeric C words/168 descriptors independently read back in every runtime')
+    actual_curves=None;actual_capture=None
+    for role in plan['roles']:
+        name=role['role'];info=m['campaigns'][name];prefix=info['prefix'];r=obj(prefix+'/report.json')
+        need(sha(raw(prefix+'/report.json'))==info['report_sha256']==role['report_sha256']==REPORTS[name] and all(r[key] is False for key in FALSE),'Exact actual report/scope')
+        terminal=receipt(info['outer'],role['expected_exit_code']);need(terminal['schema']=='direct-exec-tool-terminal-v1' and
+            sha(raw(info['outer']['key']))==role['terminal_sha256']==info['terminal_sha256'] and
+            (terminal['session_id'],terminal['terminal_chunk_id'],terminal['exit_code'])==TERMINALS[name] and terminal['report_sha256']==REPORTS[name] and
+            terminal['entrypoint_sha256']==CONTROLLERS[name] and sha(raw(prefix+'/sources/run-public-curve.py'))==CONTROLLERS[name],'Exact actual direct tool terminal/controller')
+        need(set(info['input_keys'])==set(r['inputs']) and set(info['tool_keys'])==set(r['tools']),'All declared input/tool aliases')
+        for origin,fact in r['inputs'].items():
+            need(info['input_keys'][origin]==prefix+'/'+safe(fact['snapshot']),'Exact historical original-to-snapshot association')
+            identity(info['input_keys'][origin],fact['sha256'],fact['bytes'])
+        for origin,digest in r['tools'].items():
+            identity(info['tool_keys'][origin],digest)
+            need(norm(m['omitted'][info['tool_keys'][origin]]['origin'])==norm(origin),'Exact historical tool path metadata')
+        for path,digest in r['build_outputs'].items():identity(prefix+'/'+safe(path),digest)
+        commands=r['commands'];expected=BEFORE if name=='failed01' else BEFORE+['sdk-build-launcher'] if name=='failed02' else COMMANDS
+        need([row['name'] for row in commands]==expected,'Exact9/10/22 command histories')
+        by_name={row['name']:row for row in commands}
+        for row in commands:
+            need(type(row['pid']) is int and row['pid']>0 and row['state']=='complete' and row['exit_status']==(1 if name=='failed02' and row['name']=='sdk-build-launcher' else 0)
+                 and all(row[key] is False for key in ('timed_out','interrupted','force_stopped')),'Actual owned command terminal status without cleanup')
+            if row['name']!='qemu':
+                for stream in ('stdout','stderr'):identity(prefix+'/'+row['name']+'.'+stream+'.log',row[stream+'_sha256'])
+        for action in ('configure',) if name=='failed01' else ('configure','build'):
+            child=obj(prefix+'/sdk-'+action+'-process.json');launcher=by_name['sdk-'+action+'-launcher']
+            need(child['action']==action and child['terminal'] is True and type(child['pid']) is int and child['pid']>0 and child['pid']!=launcher['pid'] and
+                child['exit_status']==(2 if name=='failed02' and action=='build' else 0) and win(child['cwd'])==win(role['path']),'Separate SDK Python child terminal, including strict compile2')
+            idf=next(path for path,digest in r['tools'].items() if digest=='0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14')
+            need(win(child['argv'][0])==win(idf),'Actual pinned SDK child executable')
+        for suffix in ('','-after') if name=='capture03' else ('',):
+            need(text(prefix+'/sdk-head'+suffix+'.stdout.log').strip()==SDK and not text(prefix+'/sdk-clean'+suffix+'.stdout.log').strip(),'Actual clean pinned SDK')
+        desc=obj(prefix+'/build/project_description.json');rows=obj(prefix+'/build/compile_commands.json')
+        need(desc['project_name']=='cyd_public_tremor_floor0_curve' and not any('esp_audio' in item for item in desc['build_components']) and
+             not BAD_LINK.search(json.dumps(rows)) and not BAD_LINK.search(json.dumps(desc)),'Actual isolated project without codec archive/component')
+        need([item['label'] for item in r['compile_contexts']]==['curve_unit','floor0','floor_lookup'],'All three actual TU contexts')
+        all_deps=set()
+        for item in r['compile_contexts']:
+            label=item['label'];row=item['actual_row'];argv=row.get('arguments') or context.windows_args(row['command'])
+            expected_source=win(role['path'])/'sources/project/main'/('curve_unit.c' if label=='curve_unit' else 'public/'+label+'.c')
+            need(row in rows and argv==item['original_argv'] and all(flag in argv for flag in ('-fno-inline','-ffunction-sections','-fdata-sections','-std=gnu23')),'Actual direct GNU23 compile row/flags')
+            need(win(win(row['directory'])/row['file'])==expected_source,'Exact actual owned/public TU file association')
+            transformed=[argv[0]];i=1
+            while i<len(argv):
+                if argv[i]=='-c':i+=1
+                elif argv[i]=='-o':i+=2
+                else:transformed.append(argv[i]);i+=1
+            need(transformed+['-E','-dM']==item['macro_argv']==by_name[label+'-macros-before']['argv'] and
+                item['dependency_argv']==item['macro_argv'][:-2]+['-M']==by_name[label+'-dependencies-before']['argv'],'Actual macro/GCC probes preserve exact compiler context')
+            macros=raw(prefix+'/'+label+'-macros-before.stdout.log');values=dict(re.findall(r'^#define ([A-Za-z_0-9]+)(?: (.*))?$',macros.decode().replace('\r\n','\n'),re.M))
+            need(all(values.get(key)==value for key,value in MACROS.items()) and not any(key in values for key in ('CONFIG_FREERTOS_UNICORE','_LOW_ACCURACY_','_ARM_ASSEM_','_V_LSP_MATH_ASM')),'Actual full-accuracy C/ILP32/240MHz/SMP/maincore0 macro profile')
+            dep_bytes=raw(prefix+'/'+label+'-dependencies-before.stdout.log');deps=[win(value) for value in context.dependency_rows(dep_bytes.decode(),item['cwd'])]
+            need([win(fact['path']) for fact in item['actual_dependencies']]==deps and len(deps)=={'curve_unit':117,'floor0':44,'floor_lookup':28}[label],'All189 dependency rows retained in original order, no dedup')
+            need(expected_source in deps,'Actual GCC included each exact compiled TU');all_deps.update(deps)
+            aliases={win(origin):key for origin,key in info['input_keys'].items()}
+            for fact in item['actual_dependencies']:identity(aliases[win(fact['path'])],fact['sha256'],fact['bytes'])
+            if name=='capture03':need(raw(prefix+'/'+label+'-macros-after.stdout.log')==macros and raw(prefix+'/'+label+'-dependencies-after.stdout.log')==dep_bytes,'Actual macro/dependency bytes stable across build')
+        required={win(role['path'])/'sources/project/main/data.h',win(role['path'])/'build/config/sdkconfig.h'}
+        required.update(win(role['path'])/'sources/project/main/public'/name for name in ('ogg.h','ivorbiscodec.h','codec_internal.h','codebook.h','misc.h','os.h','os_types.h','config_types.h','asm_arm.h','lsp_lookup.h'))
+        need(required<=all_deps,'Actual full public-header/derived-data/config dependency closure')
+        need(sha(raw(prefix+'/sources/project/main/curve_unit.c'))==UNIT and sha(raw(prefix+'/sources/project/main/public/floor0.c'))==(PORTED if name=='capture03' else ORIGINAL),'Actual compiler inputs use explicit source variant')
+        if name=='failed01':
+            need(r['result']=='NONPASS' and r['passed'] is False and r['completed'] is False and r['source_compile_link_qualified'] is False and
+                r['public_function_evaluated'] is False and r['error']=="RuntimeError('Changed input or duplicate snapshot binding')" and 'observed' not in r,'Original collector-order NONPASS before build/QEMU')
+            continue
+        if name=='failed02':
+            failure=text(prefix+'/sdk-build.stdout.log')
+            need(r['result']=='NONPASS' and r['passed'] is False and r['completed'] is False and r['source_compile_link_qualified'] is False and r['public_function_evaluated'] is False and
+                'left shift of negative value [-Werror=shift-negative-value]' in failure and "unused variable 'inyq'" in failure and 'observed' not in r,'Original strict public-C compile NONPASS, no invented curve/QEMU')
+            continue
+        need(r['result']=='PUBLIC_TREMOR_FLOOR0_CURVES_CAPTURED' and r['passed'] is True and r['completed'] is True and r['source_compile_link_qualified'] is True and
+            r['public_function_evaluated'] is True and r['public_source_variant']=='PORTED_PUBLIC_TREMOR_FLOOR0' and r['public_floor0_sha256']==PORTED,'Actual finite PORTED public function capture')
+        need(obj(prefix+'/configure-compiler-identity.json')==obj(prefix+'/build-compiler-identity.json'),'Actual configure/build tools unchanged')
+        symbols=text(prefix+'/symbols.stdout.log')
+        for symbol in ('vorbis_lsp_to_curve','app_main'):need(re.search(r'^[0-9a-f]+\s+[0-9a-f]+\s+[tT]\s+'+symbol+r'$',symbols,re.M),'Real linked public function/unit')
+        need(not any(BAD_SYMBOL.fullmatch(line.split()[-1]) for line in symbols.splitlines() if line.split()),'No reachable decoder glue/vendor symbols')
+        for filename in ('build/cyd_public_tremor_floor0_curve.map','ninja-commands.stdout.log','sdk-build.stdout.log'):
+            value=text(prefix+'/'+filename);need(all(name in value for name in ('curve_unit.c','floor0.c','floor_lookup.c')) and not BAD_LINK.search(value),'Actual all-three TU link/map closure')
+            if not filename.endswith('.map'):need('--gc-sections' in value and desc['app_elf'] in value,'Actual section-GC link execution')
+        need(not re.search(r'\b(?:warning|error):',text(prefix+'/sdk-build.stdout.log')+'\n'+text(prefix+'/sdk-build.stderr.log'),re.I),'Actual03 strict build has no warning/error diagnostics')
+        elf=m['omitted'][prefix+'/build/'+desc['app_elf']];header=raw(elf['elf_header_key'])
+        need(header[:7]==b'\x7fELF\x01\x01\x01' and len(header)==64 and struct.unpack_from('<H',header,18)[0]==94 and m['files'][elf['elf_header_key']]['derived_from_full_sha256']==elf['sha256'],'Actual ELF64 slice bound to omitted ELF32/Xtensa')
+        recipe=obj(prefix+'/build/flasher_args.json');need({k:recipe.get('flash_settings',{}).get(k) for k in ('flash_mode','flash_size','flash_freq')}==dict(flash_mode='dio',flash_size='4MB',flash_freq='40m'),'Actual standalone flash settings')
+        need({int(offset,0):norm(path) for offset,path in recipe['flash_files'].items()}=={0x1000:'bootloader/bootloader.bin',0x8000:'partition_table/partition-table.bin',0x10000:desc['app_bin']},'Exact three local flash inputs')
+        q=by_name['qemu'];hroot=PureWindowsPath(role['path'])
+        expected_argv=[q['argv'][0],'-audiodev','none,id=quiet','-M','esp32,audiodev=quiet','-smp','2','-L',q['argv'][8],'-display','none','-monitor','none',
+            '-serial','file:'+str(hroot/'qemu.serial.log'),'-qmp','stdio','-no-reboot','-snapshot','-nic','none','-drive','file='+str(hroot/'qemu-flash.bin')+',if=mtd,format=raw']
+        need(q['argv']==expected_argv and win(q['cwd'])==win(role['path']),'Owned scoped QMP stdio/file serial/no NIC/audio/snapshot')
+        need(all(q[key] is True for key in ('complete_observed','qmp_capabilities_acknowledged','qmp_quit_acknowledged','owned_shutdown_observed','lifecycle_qualified')) and
+            'qmp_eof_observed' not in q and 'qmp_reader_joined' not in q and sha(raw(prefix+'/sources/owned_qmp.py'))==QMP,'Older helper enforces EOF/join; no direct Boolean invented')
+        for filename in ('qemu.serial.log','qemu.stderr.log','qemu.qmp.stdout.log','qemu.qmp.requests.jsonl'):identity(prefix+'/'+filename,q[filename]['sha256'],q[filename]['bytes'])
+        messages=[json.loads(line) for line in raw(prefix+'/qemu.qmp.stdout.log').splitlines() if line];requests=[json.loads(line) for line in raw(prefix+'/qemu.qmp.requests.jsonl').splitlines() if line]
+        need(messages==[row['message'] for row in q['qmp_messages']] and len(messages)==4 and 'QMP' in messages[0] and requests==q['qmp_requests'] and
+            [row['message'] for row in requests]==[dict(execute='qmp_capabilities',id='owned-capabilities'),dict(execute='quit',id='owned-quit')],'Actual four QMP messages and exact owned requests')
+        need([row for row in messages if 'return' in row]==[{'return':{},'id':'owned-capabilities'},{'return':{},'id':'owned-quit'}] and
+            [row['data'] for row in messages if row.get('event')=='SHUTDOWN']==[dict(guest=False,reason='host-qmp-quit')] and
+            all('error' not in row and row.get('event') not in ('RESET','GUEST_PANICKED') for row in messages),'Actual own quit acknowledgements/host SHUTDOWN without reset')
+        need(q['actual_started_time_ns']<requests[0]['actual_sent_time_ns']<requests[1]['actual_sent_time_ns']<q['actual_terminal_time_ns'],'Actual lifecycle request/terminal ordering')
+        serial=raw(prefix+'/qemu.serial.log');need(type(q['serial_bytes_at_complete']) is int and 0<q['serial_bytes_at_complete']<=len(serial) and
+            sha(serial[:q['serial_bytes_at_complete']])==q['serial_sha256_at_complete'] and
+            protocol.complete_marker(contract).encode() in serial[:q['serial_bytes_at_complete']].replace(b'\r\n',b'\n'),'Actual bounded COMPLETE serial observation prefix')
+        need(raw(prefix+'/sources/protocol.py')==raw('protocol.py') and sha(raw(prefix+'/sources/contract.json'))==CONTRACT,'Exact protocol/derived contract consumed')
+        observed=protocol.validate_log(serial.decode()+'\n'+text(prefix+'/qemu.stderr.log'),contract,returncode=q['exit_status'],timed_out=q['timed_out'],interrupted=q['interrupted'])
+        curves=observed.pop('curves');need(observed==r['observed'] and (observed['calls'],observed['bins'],observed['curve_bytes'],observed['protocol_lines'])==(168,58368,233472,3992),'Strict full168 public curves after actual terminal closure')
+        need(len(r['observed_curves'])==len(curves)==168,'All persisted call records')
+        for actual,persisted in zip(curves,r['observed_curves']):
+            value=actual['values'];need(raw(prefix+'/'+safe(persisted['path']))==value and {k:v for k,v in actual.items() if k!='values'}=={k:v for k,v in persisted.items() if k!='path'},'Every persisted full curve byte/metadata')
+        actual_curves=curves;actual_capture=r
+    need(actual_curves is not None,'Actual03 capture cannot be omitted')
+    need(set(m['diagnostics'])=={row['name'] for row in plan['diagnostics']},'Only explicitly selected independent diagnostics')
+    for row in plan['diagnostics']:
+        info=m['diagnostics'][row['name']];prefix=info['prefix'];d=obj(prefix+'/report.json')
+        identity(prefix+'/report.json',row['report_sha256']);identity(info['outer']['key'],row['terminal_sha256']);outer=receipt(info['outer'],0)
+        need(row['formula_sha256']==FIELDS and sha(raw(m['preparations'][row['prep']]['prefix']+'/curve_diagnostic.py'))==FIELDS and
+            sha(raw(m['preparations'][row['prep']]['prefix']+'/compare_analytic.py'))==row['comparator_sha256']==
+            '3b504c4045e0c85d43dac536b4cf1d58d2477c7ed3d96c3d90fb3ef523b5bab2','Actual reviewed separate comparator source')
+        need(d['result']=='PUBLIC_CURVE_OWN_BINARY64_DIAGNOSTIC_COMPLETED' and d['capture_report_sha256']==REPORTS['capture03'] and
+            (d['direct_terminal_session'],d['direct_terminal_chunk'],d['executed_controller_sha256'])==(43646,'f26f66',CONTROLLERS['capture03']) and
+            d['outer_receipt_sha256']==m['campaigns']['capture03']['terminal_sha256'] and d['source_readiness_sha256']==m['preparations'][row['prep']]['index_sha256'] and
+            d['public_source_variant']=='PORTED_PUBLIC_TREMOR_FLOOR0' and d['public_floor0_sha256']==PORTED and d['public_function_evaluated'] is True and
+            d['own_binary64_diagnostic_computed'] is True and all(d[key] is False for key in ('target_codec_executed','reference_decoder_executed','PCM_computed','vendor_behavior_attributed','numeric_qualified','full_G6_qualified','physical_qualified')),'Separate actual own-formula diagnostic-only scope')
+        need(set(info['input_keys'])==set(d['validated_inputs']),'All diagnostic input associations')
+        for origin,fact in d['validated_inputs'].items():identity(info['input_keys'][origin],fact['sha256'],fact['bytes'])
+        need(d['counts']==dict(cases=6,packets=84,calls=168,full_public_bins=58368,active_bin_comparisons=2688),'Full diagnostic counts')
+        recomputed=[];positive=0
+        for declaration,curve in zip(model['calls'],actual_curves):
+            w=declaration['words'];lsp=[float(Fraction(value)) for value in declaration['lsp_radians_exact']];values=struct.unpack('<'+'i'*w[3],curve['values']);active=[]
+            for index in range(16):
+                frequency=fields.frequency_point(index,w[3],w[8]*2,w[5]);exact=fields.requested_curve(lsp,Fraction(declaration['amplitude_exact']),w[7],frequency['mapped_angle_radians'])
+                quantized=fields.requested_curve(lsp,Fraction(w[6],16),w[7],frequency['mapped_angle_radians']);positive+=int(exact['requested_db']>0)
+                active.append(dict(bin=index,public_output_Q24=values[index],residue_Q8=w[15+index],public_gain_estimate=values[index]/(w[15+index]*65536),
+                    own_math_map=frequency,own_exact_amplitude_curve=exact,own_Q4_amplitude_curve=quantized))
+            recomputed.append(dict(call=declaration['call'],case=w[0],packet=w[1],channel=w[2],full_public_bins=w[3],full_public_curve_sha256=curve['sha256'],active_bins=active))
+        need(recomputed==d['cases'] and positive==d['own_ideal_positive_db_observations']==147,'All2688 own binary64 observations re-evaluated without PCM/tolerance/backend attribution')
+    print(json.dumps(dict(result='PORTED_PUBLIC_FLOOR0_CURVE_ARCHIVE_VERIFIED',files=len(m['files']),omitted=len(m['omitted']),
+        original_failed01_collector_and_failed02_strict_compile_preserved=True,cases=6,packets=84,calls=168,bins=58368,curve_bytes=233472,
+        protocol_events=3992,public_source_variant='PORTED_PUBLIC_TREMOR_FLOOR0',public_curve_capture_verified=True,
+        analytic_diagnostics=len(plan['diagnostics']),archive_data_dependencies=[],vendor_backend_qualified=False,PCM_qualified=False,
+        full_G6_qualified=False,physical_qualified=False,omitted_binary_bytes_replayable=False,QMP_EOF_direct_boolean_recorded=False,
+        QMP_EOF_enforced_by_exact_captured_helper=True)))
+
+
+if __name__=='__main__':main()

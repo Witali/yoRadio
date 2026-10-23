@@ -1,0 +1,259 @@
+--- provenance/runtime-base/run-owned-book-unit.py
++++ run-public-curve.py
+@@ -1,4 +1,4 @@
+-"""Run the exact owned parser/vector unit, never the vendor decoder or radio."""
++"""Run exact public Tremor floor0 on owned arrays; never target/vendor codec or PCM."""
+ import argparse
+ import hashlib
+ import json
+@@ -12,18 +12,13 @@
+ 
+ sys.dont_write_bytecode = True
+ from owned_qmp import capture
+-from protocol import load_contract, validate_log
++from protocol import load_contract, validate_log, complete_marker
+ from windows_compile_command import macro_command, check_macro_inputs
+ 
+ SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+-CONTRACT_SHA = '394b82d8c21b1e895e74e51cd56d13e547ef0790b9df226a70f24656035be1ce'
+ PINS = {
+-    'project/main/book_unit.c': '84db13b6965bdb17e25454338fa09c03823431e3cc8bc04bfe279bc814c7185c',
+-    'project/main/unit_data.h': '53ba437570aba1b930b15a7b80d95ac7b1c8e26781aa75374b4de414443d1f64',
+-    'project/main/pinned/production/vorbis_repair/setup.c': '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c',
+-    'project/main/pinned/production/vorbis_repair_abi.h': 'e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60',
+-    'protocol.py': 'c87b344b9ad84af3434e8e13f82560e988490c85edcdc53cbc8888553f5ce21c',
+-    'fixture-contract.json': CONTRACT_SHA,
++    'project/main/public/floor0.c': 'd0372c1dbf4c95231927619a7a1a660bdf421d63b332966f5fe33b9572c002f2',
++    'project/main/public/floor_lookup.c': 'dfc670f7648f94ae7beb25ca542380f42eba3dbf8e180e479648f20fb07bbaba',
+     'windows_compile_command.py': '1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d',
+ }
+ TOOL_PINS = {
+@@ -102,13 +97,13 @@
+         or any(out == p or out.is_relative_to(p) or p.is_relative_to(out) for p in protected)
+         or any((p / 'report.json').exists() for p in out.parents if p != repo)):
+         parser.error('Use a fresh, separate campaign directory under this worktree .build')
+-    readiness = here / 'readiness.json'
++    readiness = here / 'runtime-readiness.json'
+     need(sha(readiness) == args.readiness_sha256, 'Independently reviewed source readiness differs')
+     manifest = json.loads(readiness.read_bytes())
+-    need(manifest['schema'] == 'owned-book-runtime-source-only-readiness-v1'
++    need(manifest['schema'] == 'public-floor0-curve-runtime-readiness-v1'
+          and manifest['runtime_executed'] is False, 'Require the reviewed source-only readiness')
+     actual_files = {p.relative_to(here).as_posix() for p in here.rglob('*') if p.is_file()}
+-    need(actual_files == set(manifest['files']) | {'readiness.json'}, 'Complete source preparation file set changed')
++    need(actual_files == set(manifest['files']) | {'runtime-readiness.json'}, 'Complete source preparation file set changed')
+     for name, item in manifest['files'].items():
+         path = (here / name).resolve()
+         need(path.is_relative_to(here) and path.is_file() and sha(path) == item['sha256']
+@@ -122,9 +117,9 @@
+     for name, path in runtime_tools.items():
+         need(path.is_file() and sha(path) == TOOL_PINS[name], 'Reviewed public tool identity differs: ' + name)
+     out.mkdir(parents=True, exist_ok=False)
+-    report = dict(schema='owned-book-runtime-v1', result='INCOMPLETE', passed=False, completed=False,
+-        source_compile_link_qualified=False, owned_parser_public_vector_qualified=False,
+-        vendor_backend_qualified=False, PCM_qualified=False, full_G6_qualified=False,
++    report = dict(schema='public-floor0-curve-runtime-v1', result='INCOMPLETE', passed=False, completed=False,
++        source_compile_link_qualified=False, public_function_evaluated=False,
++        target_codec_executed=False, reference_decoder_executed=False, vendor_backend_qualified=False, PCM_computed=False, PCM_qualified=False, full_G6_qualified=False,
+         physical_qualified=False, production_radio_integration=False,
+         readiness_sha256=args.readiness_sha256, inputs={}, tools={}, commands=[], build_outputs={})
+     env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1',
+@@ -235,12 +230,12 @@
+                 freeze(path, rel)
+         for path in runtime_tools.values():
+             report['tools'][str(path.resolve())] = sha(path)
+-        contract = load_contract(out / 'sources/fixture-contract.json', expected_sha256=CONTRACT_SHA)
+-        need(contract['model']['case_count'] == 16 and contract['model']['probe_count'] == 61,
+-             'Exact reviewed full unit contract')
+-        origins = json.loads((out / 'sources/source-origins.json').read_bytes())
++        contract = load_contract(out / 'sources/contract.json', expected_sha256=manifest['contract_sha256'])
++        need(contract['model']['counts'] == manifest['counts'] and contract['model']['counts']['calls'] == 168 and
++             sha(out / 'sources/project/main/data.h') == contract['header_sha256'], 'Exact full derived public curve contract/header')
++        origins = json.loads((out / 'sources/source-preparation/source-origins.json').read_bytes())
+         for item in origins['inputs']:
+-            path = out / 'sources' / item['snapshot']
++            path = out / 'sources/source-preparation' / item['snapshot']
+             need(path.resolve().is_relative_to(out / 'sources') and sha(path) == item['sha256']
+                  and path.stat().st_size == item['bytes'], 'Frozen source origin identity differs')
+         for name in ('export.ps1', 'tools/idf.py', 'tools/cmake/version.cmake', 'tools/cmake/toolchain-esp32.cmake',
+@@ -259,7 +254,7 @@
+         build = out / 'build'
+         description = build / 'project_description.json'
+         desc = json.loads(description.read_bytes())
+-        need(desc['project_name'] == 'cyd_vorbis_owned_book_unit'
++        need(desc['project_name'] == 'cyd_public_tremor_floor0_curve'
+              and Path(desc['project_path']).resolve() == out / 'sources/project', 'Wrong isolated configured project')
+         need(not any('esp_audio' in name for name in desc['build_components'])
+              and all(not p or Path(p).resolve().is_relative_to(sdk) or Path(p).resolve().is_relative_to(out / 'sources/project')
+@@ -272,71 +267,79 @@
+             need(sha(path) == expected and (name == 'ninja' or expected == TOOL_PINS[name]), 'Actual pre-build tool identity')
+             report['tools'][str(path)] = expected
+         rows = json.loads((build / 'compile_commands.json').read_bytes())
+-        source = out / 'sources/project/main/book_unit.c'
+         source_for = lambda row: (Path(row['directory']) / row['file']).resolve()
+         own = [row for row in rows if source_for(row).is_relative_to(out / 'sources/project')]
+-        need(len(own) == 1 and source_for(own[0]) == source, 'Only our frozen unit TU may compile in the project')
++        expected_sources = {out / 'sources/project/main/curve_unit.c', out / 'sources/project/main/public/floor0.c',
++                            out / 'sources/project/main/public/floor_lookup.c'}
++        need(len(own) == 3 and set(map(source_for, own)) == expected_sources, 'Only owned unit and two unchanged public source TUs may compile')
+         need(not FORBIDDEN_LINK.search(json.dumps(rows)), 'Unexpected vendor archive/decode compile dependency')
+-        argv, cwd, original, generated = macro_command(own[0], cc, source)
+-        need('-fno-inline' in original and '-ffunction-sections' in original and '-fdata-sections' in original
+-             and len(generated) == 2 and sum(p.startswith('@') for p in original) == 1,
+-             'Actual unit compile flags and reviewed generated cflags/specs required')
+-        report['compile_context'] = dict(actual_row=own[0], original_argv=original, macro_argv=argv, cwd=str(cwd))
+-        for path, data in generated.items():
+-            need(path.is_relative_to(build) and path.read_bytes() == data, 'Generated compiler input identity')
+-            freeze(path, Path('generated') / path.relative_to(build))
+-        for name in ('sdkconfig', 'build/config/sdkconfig.h', 'build/compile_commands.json', 'build/project_description.json',
+-                     'build/CMakeCache.txt', 'build/build.ninja'):
+-            freeze(out / name, Path('configured') / name)
+-        macros = execute('unit-macros-before', argv, cwd=cwd)
+-        macro_values = dict(re.findall(r'^#define ([A-Za-z_0-9]+)(?: (.*))?$', macros, re.M))
+         expected_macros = dict(__SIZEOF_INT__='4', __SIZEOF_LONG__='4', __SIZEOF_POINTER__='4', __XTENSA__='1',
+             __BYTE_ORDER__='__ORDER_LITTLE_ENDIAN__', CONFIG_IDF_TARGET_ESP32='1', CONFIG_IDF_TARGET_ARCH_XTENSA='1',
+             CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ='240', CONFIG_FREERTOS_NUMBER_OF_CORES='2',
+             CONFIG_ESP_MAIN_TASK_AFFINITY_CPU0='1', CONFIG_ESP_MAIN_TASK_AFFINITY='0x0', CONFIG_ESP_MAIN_TASK_STACK_SIZE='16384')
+-        need(all(macro_values.get(k) == v for k, v in expected_macros.items())
+-             and 'CONFIG_FREERTOS_UNICORE' not in macro_values, 'Actual ILP32/ESP32/240MHz/dual-core/maincore0 macro context')
+-        dependency_argv = argv[:-2] + ['-M']
+-        dep_text = execute('unit-dependencies-before', dependency_argv, cwd=cwd)
+-        dependencies = dependency_paths(dep_text, cwd)
+-        needed = {source, out / 'sources/project/main/unit_data.h',
+-            out / 'sources/project/main/pinned/production/vorbis_repair/setup.c',
+-            out / 'sources/project/main/pinned/production/vorbis_repair_abi.h', build / 'config/sdkconfig.h'}
+-        needed.update((out / 'sources/project/main/pinned/codec/include' / name).resolve() for name in
+-            ('esp_audio_types.h', 'decoder/esp_audio_dec.h', 'decoder/esp_audio_dec_reg.h', 'decoder/impl/esp_vorbis_dec.h'))
+-        need(needed <= set(dependencies), 'Actual GCC include dependency proof must consume parser/ABI/unit/data/all public headers')
+-        allowed = (sdk, tools, out / 'sources/project', build)
+-        for index, path in enumerate(dependencies):
+-            need(path.is_file() and any(path.is_relative_to(base) for base in allowed), 'Unexpected compiler input outside isolated closure')
+-            if str(path) not in report['inputs']:
+-                freeze(path, Path('compile-dependencies') / f'{index:04d}' / path.name)
+-        report['compile_context'].update(dependency_argv=dependency_argv,
+-            actual_dependencies=[dict(path=str(p), bytes=p.stat().st_size, sha256=sha(p)) for p in dependencies],
+-            expected_macros=expected_macros, macros_before_sha256=sha(out / 'unit-macros-before.stdout.log'))
+-        check_macro_inputs(generated); current(); save()
++        contexts = []
++        all_dependencies = set()
++        for compile_row in own:
++            source = source_for(compile_row)
++            label = source.stem
++            argv, cwd, original, generated = macro_command(compile_row, cc, source)
++            need('-fno-inline' in original and '-ffunction-sections' in original and '-fdata-sections' in original
++                 and len(generated) == 2 and sum(p.startswith('@') for p in original) == 1,
++                 'Actual public compile flags and reviewed generated cflags/specs required')
++            for path, data in generated.items():
++                need(path.is_relative_to(build) and path.read_bytes() == data, 'Generated compiler input identity')
++                if str(path.resolve()) not in report['inputs']:
++                    freeze(path, Path('generated') / path.relative_to(build))
++            macros = execute(label + '-macros-before', argv, cwd=cwd)
++            macro_values = dict(re.findall(r'^#define ([A-Za-z_0-9]+)(?: (.*))?$', macros, re.M))
++            need(all(macro_values.get(k) == v for k, v in expected_macros.items()) and
++                 not any(k in macro_values for k in ('CONFIG_FREERTOS_UNICORE','_LOW_ACCURACY_','_ARM_ASSEM_','_V_LSP_MATH_ASM')),
++                 'Actual full-accuracy public C/ILP32/ESP32/240MHz/dual-core/maincore0 context')
++            dependency_argv = argv[:-2] + ['-M']
++            dep_text = execute(label + '-dependencies-before', dependency_argv, cwd=cwd)
++            dependencies = dependency_paths(dep_text, cwd)
++            all_dependencies.update(dependencies)
++            allowed = (sdk, tools, out / 'sources/project', build)
++            for index, path in enumerate(dependencies):
++                need(path.is_file() and any(path.is_relative_to(base) for base in allowed), 'Unexpected compiler input outside isolated closure')
++                if str(path) not in report['inputs']:
++                    freeze(path, Path('compile-dependencies') / label / f'{index:04d}' / path.name)
++            contexts.append(dict(actual_row=compile_row,original_argv=original,macro_argv=argv,cwd=str(cwd),
++                dependency_argv=dependency_argv,actual_dependencies=[dict(path=str(p),bytes=p.stat().st_size,sha256=sha(p)) for p in dependencies],
++                expected_macros=expected_macros,label=label,macros=macros,dependencies=dep_text,generated=generated))
++            check_macro_inputs(generated)
++        needed = expected_sources | {out / 'sources/project/main/data.h',build / 'config/sdkconfig.h'}
++        needed.update(p for p in (out / 'sources/project/main/public').glob('*.h'))
++        need(needed <= all_dependencies, 'Actual GCC proof must consume complete public header closure plus owned derived data')
++        report['compile_contexts'] = [{k:v for k,v in item.items() if k not in ('generated','macros','dependencies')} for item in contexts]
++        for name in ('sdkconfig', 'build/config/sdkconfig.h', 'build/compile_commands.json', 'build/project_description.json',
++                     'build/CMakeCache.txt', 'build/build.ninja'):
++            freeze(out / name, Path('configured') / name)
++        current(); save()
+         after = sdk_action('build')
+         need(after == before, 'Activated build compiler/nm/ninja changed after configure')
+-        check_macro_inputs(generated); current()
+-        need(execute('unit-macros-after', argv, cwd=cwd) == macros, 'Actual unit macros changed during build')
+-        need(execute('unit-dependencies-after', dependency_argv, cwd=cwd) == dep_text, 'Actual include dependencies changed during build')
+-        check_macro_inputs(generated); current()
++        for item in contexts:
++            check_macro_inputs(item['generated']); current()
++            need(execute(item['label']+'-macros-after',item['macro_argv'],cwd=Path(item['cwd'])) == item['macros'], 'Actual public macros changed during build')
++            need(execute(item['label']+'-dependencies-after',item['dependency_argv'],cwd=Path(item['cwd'])) == item['dependencies'], 'Actual include dependencies changed during build')
++        current()
+         elf, app = build / desc['app_elf'], build / desc['app_bin']
+         raw_elf = elf.read_bytes()
+         need(raw_elf[:7] == b'\x7fELF\x01\x01\x01' and struct.unpack_from('<H', raw_elf, 18)[0] == 94,
+              'Actual ELF32 little-endian Xtensa machine94 required')
+         symbols = execute('symbols', [nm, '-n', '-S', elf])
+-        for symbol in ('repair_vorbis_book_unpack', 'repair_vorbis_book_clear', 'app_main'):
++        for symbol in ('vorbis_lsp_to_curve', 'app_main'):
+             need(re.search(r'^[0-9a-f]+\s+[0-9a-f]+\s+[tT]\s+' + symbol + r'$', symbols, re.M), 'Actual retained unit/parser symbol: ' + symbol)
+         actual_names = [line.split()[-1] for line in symbols.splitlines() if line.split()]
+-        need(not any(FORBIDDEN_SYMBOL.fullmatch(name) for name in actual_names), 'Vendor decoder/register/wrapper symbol entered linked ELF')
++        need(not any(FORBIDDEN_SYMBOL.fullmatch(name) or re.fullmatch(r'floor0_(?:inverse1|inverse2|info_unpack|free_info|memosize)|vorbis_book_decodev_set|oggpack_read', name) for name in actual_names), 'Vendor decoder/register/wrapper symbol entered linked ELF')
+         map_path = elf.with_suffix('.map')
+         map_text = map_path.read_text(encoding='utf-8', errors='replace')
+-        need('book_unit.c.obj' in map_text and not FORBIDDEN_LINK.search(map_text), 'Actual map must bind our TU without vendor archives/link wraps')
++        need(all(name in map_text for name in ('curve_unit.c.obj','floor0.c.obj','floor_lookup.c.obj')) and not FORBIDDEN_LINK.search(map_text), 'Actual map must bind our TU without vendor archives/link wraps')
+         commands = execute('ninja-commands', [ninja, '-C', build, '-t', 'commands', desc['app_elf']])
+         need(not FORBIDDEN_LINK.search(commands) and '--gc-sections' in commands
+-             and 'book_unit.c' in commands and desc['app_elf'] in commands, 'Actual generated compile/link command closure')
++             and all(name in commands for name in ('curve_unit.c','floor0.c','floor_lookup.c')) and desc['app_elf'] in commands, 'Actual generated compile/link command closure')
+         verbose = (out / 'sdk-build.stdout.log').read_text(encoding='utf-8', errors='replace')
+-        need('book_unit.c' in verbose and desc['app_elf'] in verbose and '--gc-sections' in verbose
++        need(all(name in verbose for name in ('curve_unit.c','floor0.c','floor_lookup.c')) and desc['app_elf'] in verbose and '--gc-sections' in verbose
+              and not FORBIDDEN_LINK.search(verbose), 'Verbose actual build must retain unit compile and link execution commands')
+         for path in (elf, app, map_path, build / 'flasher_args.json'):
+             bind_output(path)
+@@ -363,30 +366,39 @@
+         serial, row = capture(argv=[qemu, '-audiodev', 'none,id=quiet', '-M', 'esp32,audiodev=quiet', '-smp', '2', '-L', rom,
+             '-display', 'none', '-monitor', 'none', '-serial', 'file:' + str(out / 'qemu.serial.log'), '-qmp', 'stdio',
+             '-no-reboot', '-snapshot', '-nic', 'none', '-drive', 'file=' + str(flash) + ',if=mtd,format=raw'],
+-            cwd=out, env=env, report=report, save=save, taskkill=taskkill)
++            cwd=out, env=env, report=report, save=save, taskkill=taskkill, complete_marker=complete_marker(contract))
+         need(row['lifecycle_qualified'] is True and row['exit_status'] == 0 and not row['force_stopped'],
+              'Real QMP shutdown/owned terminal closure required before any full unit validation')
+         stderr = (out / 'qemu.stderr.log').read_text(encoding='utf-8', errors='replace')
+         observed = validate_log(serial + '\n' + stderr, contract,
+             returncode=row['exit_status'], timed_out=row['timed_out'], interrupted=row['interrupted'])
+-        need(observed['cases'] == 16 and observed['active_codewords'] == 59 and observed['vector_probes'] == 61
+-             and observed['protocol_lines'] == 97 and observed['owned_parser_public_vector_qualified'] is True,
+-             'Exact16 books/61 probes/97events required after actual terminal0')
++        curves = observed.pop('curves')
++        need((observed['cases'],observed['packets'],observed['calls'],observed['bins']) ==
++             (6,84,168,contract['model']['counts']['bins']) and observed['public_function_evaluated'] is True,
++             'Full original6/84/168 and every curve bin required after actual terminal0')
++        report['observed_curves'] = []
++        folder=out/'observed-curves';folder.mkdir()
++        for item in curves:
++            value=item.pop('values')
++            path=folder/f'{item["call"]:03d}.i32le'
++            path.write_bytes(value)
++            need(sha(path)==item['sha256'] and path.stat().st_size==item['bytes'],'Every persisted full curve byte')
++            report['observed_curves'].append(dict(item,path=path.relative_to(out).as_posix()))
+         report['observed'] = observed
+         need(execute('sdk-head-after', [git, '-C', sdk, 'rev-parse', 'HEAD']).strip() == SDK_HEAD, 'SDK revision changed')
+         need(not execute('sdk-clean-after', [git, '-C', sdk, 'status', '--porcelain', '--untracked-files=no']).strip(), 'SDK changed')
+         current()
+         need(all(c['exit_status'] == 0 and not c['timed_out'] and not c['interrupted'] and not c['force_stopped']
+                  for c in report['commands']), 'Every owned actual command must finish normally')
+-        report.update(result='OWNED_BOOK_PUBLIC_VECTOR_UNIT_PASSED', passed=True, completed=True,
+-                      owned_parser_public_vector_qualified=True, declared_inputs_tools_configs_unchanged=True)
++        report.update(result='PUBLIC_TREMOR_FLOOR0_CURVES_CAPTURED', passed=True, completed=True,
++                      public_function_evaluated=True, declared_inputs_tools_configs_unchanged=True)
+         save()
+         print(json.dumps({k:report[k] for k in ('result', 'passed', 'completed', 'source_compile_link_qualified',
+-            'owned_parser_public_vector_qualified', 'vendor_backend_qualified', 'PCM_qualified', 'full_G6_qualified', 'physical_qualified')}))
++            'public_function_evaluated', 'vendor_backend_qualified', 'PCM_qualified', 'full_G6_qualified', 'physical_qualified')}))
+         return 0
+     except BaseException as exc:
+         report.update(result='INTERRUPTED' if isinstance(exc, KeyboardInterrupt) else 'NONPASS',
+-            passed=False, completed=False, owned_parser_public_vector_qualified=False, error=repr(exc))
++            passed=False, completed=False, public_function_evaluated=False, error=repr(exc))
+         try:
+             current()
+             report['declared_inputs_tools_configs_unchanged'] = True

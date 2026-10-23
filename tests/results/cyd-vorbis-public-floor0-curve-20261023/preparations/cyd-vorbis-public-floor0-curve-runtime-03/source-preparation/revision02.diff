@@ -1,0 +1,22 @@
+--- public-floor0-curve-prep-01/run-public-curve.py
++++ public-floor0-curve-prep-02/run-public-curve.py
+@@ -277,6 +277,9 @@
+             __BYTE_ORDER__='__ORDER_LITTLE_ENDIAN__', CONFIG_IDF_TARGET_ESP32='1', CONFIG_IDF_TARGET_ARCH_XTENSA='1',
+             CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ='240', CONFIG_FREERTOS_NUMBER_OF_CORES='2',
+             CONFIG_ESP_MAIN_TASK_AFFINITY_CPU0='1', CONFIG_ESP_MAIN_TASK_AFFINITY='0x0', CONFIG_ESP_MAIN_TASK_STACK_SIZE='16384')
++        for name in ('sdkconfig', 'build/config/sdkconfig.h', 'build/compile_commands.json', 'build/project_description.json',
++                     'build/CMakeCache.txt', 'build/build.ninja'):
++            freeze(out / name, Path('configured') / name)
+         contexts = []
+         all_dependencies = set()
+         for compile_row in own:
+@@ -312,9 +315,6 @@
+         needed.update(p for p in (out / 'sources/project/main/public').glob('*.h'))
+         need(needed <= all_dependencies, 'Actual GCC proof must consume complete public header closure plus owned derived data')
+         report['compile_contexts'] = [{k:v for k,v in item.items() if k not in ('generated','macros','dependencies')} for item in contexts]
+-        for name in ('sdkconfig', 'build/config/sdkconfig.h', 'build/compile_commands.json', 'build/project_description.json',
+-                     'build/CMakeCache.txt', 'build/build.ninja'):
+-            freeze(out / name, Path('configured') / name)
+         current(); save()
+         after = sdk_action('build')
+         need(after == before, 'Activated build compiler/nm/ninja changed after configure')

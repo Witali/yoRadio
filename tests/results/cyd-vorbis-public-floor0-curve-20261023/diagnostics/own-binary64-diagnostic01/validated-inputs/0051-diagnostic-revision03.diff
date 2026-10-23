@@ -1,0 +1,25 @@
+--- prep02/compare_analytic.py
++++ prep03/compare_analytic.py
+@@ -48,6 +48,12 @@
+     need(qemu['lifecycle_qualified'] is True and qemu['qmp_quit_acknowledged'] is True and qemu['owned_shutdown_observed'] is True,'Actual QMP lifecycle required')
+     contract_fact=next(row for row in report['inputs'].values() if row['snapshot']=='sources/contract.json')
+     contract=load_contract(capture/'sources/contract.json',contract_fact['sha256'])
++    port=json.loads((HERE/'public-portability.json').read_bytes())
++    need(contract['model']['public_floor0_sha256']==port['ported_floor0_sha256'] and
++         contract['model']['public_floor0_variant']==report['public_source_variant']=='PORTED_PUBLIC_TREMOR_FLOOR0' and
++         report['public_floor0_sha256']==port['ported_floor0_sha256'] and
++         sha((capture/'sources/project/main/public/floor0.c').read_bytes())==port['ported_floor0_sha256'],
++         'Actual explicitly ported public function source; original-public execution is not claimed')
+     serial=(capture/'qemu.serial.log').read_bytes();stderr=(capture/'qemu.stderr.log').read_bytes()
+     need(sha(serial)==qemu['qemu.serial.log']['sha256'] and sha(stderr)==qemu['qemu.stderr.log']['sha256'],'Actual complete curve streams')
+     observed=validate_log((serial+b'\n'+stderr).decode(errors='replace'),contract,returncode=qemu['exit_status'],timed_out=qemu['timed_out'],interrupted=qemu['interrupted'])
+@@ -78,7 +84,8 @@
+         counts=dict(cases=6,packets=84,calls=168,full_public_bins=observed['bins'],active_bin_comparisons=len(rows)*16),
+         own_ideal_positive_db_observations=positive,cases=rows,
+         interpretation='Own mathematical Bark map and binary64 equations; public integer Bark/rounding/lookup/clamp differ. No equality or tolerance policy, PCM or backend attribution.',
+-        public_function_evaluated=True,own_binary64_diagnostic_computed=True,target_codec_executed=False,reference_decoder_executed=False,
++        public_function_evaluated=True,public_source_variant='PORTED_PUBLIC_TREMOR_FLOOR0',
++        public_floor0_sha256=port['ported_floor0_sha256'],own_binary64_diagnostic_computed=True,target_codec_executed=False,reference_decoder_executed=False,
+         PCM_computed=False,vendor_behavior_attributed=False,numeric_qualified=False,full_G6_qualified=False,physical_qualified=False)
+     out.parent.mkdir(parents=True,exist_ok=True)
+     with out.open('x',encoding='utf-8',newline='\n') as stream:stream.write(json.dumps(result,indent=2,allow_nan=False)+'\n')

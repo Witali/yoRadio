@@ -1,0 +1,31 @@
+--- provenance/runtime-base/owned_qmp.py
++++ owned_qmp.py
+@@ -22,7 +22,7 @@
+     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+ 
+ 
+-def capture(*, argv, cwd, env, report, save, taskkill, timeout=180):
++def capture(*, argv, cwd, env, report, save, taskkill, complete_marker, timeout=180):
+     """Require greeting/capabilities/COMPLETE/quit ack/SHUTDOWN/owned exit0.
+ 
+     QMP stdout is consumed by one bounded reader thread. Only this newly created
+@@ -30,6 +30,7 @@
+     to the controller's fresh campaign file supplied in the immutable argv.
+     Every exceptional path remains NONPASS, even after a clean diagnostic quit.
+     """
++    need(isinstance(complete_marker, str) and complete_marker.startswith('CYD_PUBLIC_TREMOR_CURVE_COMPLETE ') and complete_marker.endswith('\n') and complete_marker.count('\n') == 1, 'Exact reviewed bounded COMPLETE marker')
+     out = Path(cwd)
+     serial = out / 'qemu.serial.log'
+     row = dict(name='qemu', argv=list(map(str, argv)), cwd=str(out), state='starting',
+@@ -169,9 +170,9 @@
+                          'Owned unit serial log exceeded its declared2MiB bound')
+                     raw = serial.read_bytes() if serial.is_file() else b''
+                     text = raw.decode('utf-8', errors='replace').replace('\r\n', '\n')
+-                    need(not re.search(r'CYD_VORBIS_OWNED_BOOK_FAILURE|Guru Meditation|CORRUPT\s*HEAP|assert failed|abort\(\)|Brownout|Rebooting', text, re.I),
++                    need(not re.search(r'CYD_PUBLIC_TREMOR_CURVE_FAILURE|Guru Meditation|CORRUPT\s*HEAP|assert failed|abort\(\)|Brownout|Rebooting', text, re.I),
+                          'Actual unit failure/panic/reset before terminal closure')
+-                    marker = 'CYD_VORBIS_OWNED_BOOK_COMPLETE cases=16 probes=61 live=0 pairs=2 core=0\n'
++                    marker = complete_marker
+                     if marker in text:
+                         row.update(complete_observed=True, serial_bytes_at_complete=len(raw),
+                                    serial_sha256_at_complete=hashlib.sha256(raw).hexdigest())

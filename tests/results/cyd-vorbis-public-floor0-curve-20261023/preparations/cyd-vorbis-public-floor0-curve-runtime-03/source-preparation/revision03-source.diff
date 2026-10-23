@@ -1,0 +1,138 @@
+--- prep02/run-public-curve.py
++++ prep03/run-public-curve.py
+@@ -17,7 +17,7 @@
+ 
+ SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+ PINS = {
+-    'project/main/public/floor0.c': 'd0372c1dbf4c95231927619a7a1a660bdf421d63b332966f5fe33b9572c002f2',
++    'project/main/public/floor0.c': 'e1836251d072154691f87a74ea6cdae88d2cf2dd106fbc99908ec71f1f1a8e5a',
+     'project/main/public/floor_lookup.c': 'dfc670f7648f94ae7beb25ca542380f42eba3dbf8e180e479648f20fb07bbaba',
+     'windows_compile_command.py': '1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d',
+ }
+@@ -118,6 +118,7 @@
+         need(path.is_file() and sha(path) == TOOL_PINS[name], 'Reviewed public tool identity differs: ' + name)
+     out.mkdir(parents=True, exist_ok=False)
+     report = dict(schema='public-floor0-curve-runtime-v1', result='INCOMPLETE', passed=False, completed=False,
++        public_source_variant='PORTED_PUBLIC_TREMOR_FLOOR0',public_floor0_sha256=PINS['project/main/public/floor0.c'],
+         source_compile_link_qualified=False, public_function_evaluated=False,
+         target_codec_executed=False, reference_decoder_executed=False, vendor_backend_qualified=False, PCM_computed=False, PCM_qualified=False, full_G6_qualified=False,
+         physical_qualified=False, production_radio_integration=False,
+@@ -232,7 +233,9 @@
+             report['tools'][str(path.resolve())] = sha(path)
+         contract = load_contract(out / 'sources/contract.json', expected_sha256=manifest['contract_sha256'])
+         need(contract['model']['counts'] == manifest['counts'] and contract['model']['counts']['calls'] == 168 and
+-             sha(out / 'sources/project/main/data.h') == contract['header_sha256'], 'Exact full derived public curve contract/header')
++             sha(out / 'sources/project/main/data.h') == contract['header_sha256'] and
++             contract['model']['public_floor0_sha256'] == PINS['project/main/public/floor0.c'] and
++             contract['model']['public_floor0_variant'] == 'PORTED_PUBLIC_TREMOR_FLOOR0', 'Exact full derived ported-public curve contract/header/source')
+         origins = json.loads((out / 'sources/source-preparation/source-origins.json').read_bytes())
+         for item in origins['inputs']:
+             path = out / 'sources/source-preparation' / item['snapshot']
+@@ -271,7 +274,7 @@
+         own = [row for row in rows if source_for(row).is_relative_to(out / 'sources/project')]
+         expected_sources = {out / 'sources/project/main/curve_unit.c', out / 'sources/project/main/public/floor0.c',
+                             out / 'sources/project/main/public/floor_lookup.c'}
+-        need(len(own) == 3 and set(map(source_for, own)) == expected_sources, 'Only owned unit and two unchanged public source TUs may compile')
++        need(len(own) == 3 and set(map(source_for, own)) == expected_sources, 'Only owned unit, pinned ported floor0 and unchanged public lookup TUs may compile')
+         need(not FORBIDDEN_LINK.search(json.dumps(rows)), 'Unexpected vendor archive/decode compile dependency')
+         expected_macros = dict(__SIZEOF_INT__='4', __SIZEOF_LONG__='4', __SIZEOF_POINTER__='4', __XTENSA__='1',
+             __BYTE_ORDER__='__ORDER_LITTLE_ENDIAN__', CONFIG_IDF_TARGET_ESP32='1', CONFIG_IDF_TARGET_ARCH_XTENSA='1',
+--- prep02/materialize.py
++++ prep03/materialize.py
+@@ -13,7 +13,8 @@
+ sys.dont_write_bytecode = True
+ HERE = Path(__file__).resolve().parent
+ WITNESS_SHA = 'b3c377a86040410add2ed7bedfd26aac6dcef26b59fc1bc2dabbc45c1c2fd345'
+-PUBLIC_SHA = 'd0372c1dbf4c95231927619a7a1a660bdf421d63b332966f5fe33b9572c002f2'
++PUBLIC_SHA = 'e1836251d072154691f87a74ea6cdae88d2cf2dd106fbc99908ec71f1f1a8e5a'
++ORIGINAL_PUBLIC_SHA = 'd0372c1dbf4c95231927619a7a1a660bdf421d63b332966f5fe33b9572c002f2'
+ 
+ 
+ def need(ok, reason):
+@@ -49,11 +50,14 @@
+     cases = [row for row in matrix['cases'] if row['id'] in witness.EXPECTED_IDS]
+     need(tuple(row['id'] for row in cases) == witness.EXPECTED_IDS and len(matrix['cases']) == 9, 'Exact six original cases')
+     model = dict(schema='public-tremor-floor0-curve-model-v1', counts=dict(cases=6,packets=84,calls=168,bins=0),
+-        public_floor0_sha256=PUBLIC_SHA, witness_sha256=WITNESS_SHA, cases=[], calls=[],
++        public_floor0_sha256=PUBLIC_SHA, public_floor0_variant='PORTED_PUBLIC_TREMOR_FLOOR0',
++        public_floor0_original_sha256=ORIGINAL_PUBLIC_SHA,
++        public_floor0_portability_diff_sha256=sha((HERE/'public-floor0-portability.diff').read_bytes()),
++        witness_sha256=WITNESS_SHA, cases=[], calls=[],
+         semantics=dict(LSP='signed Q24 radians', amplitude='floor((raw*offset*16)/((1<<bits)-1)) Q4',
+             residue='exact residue0 first16 in Q8; every later half-block bin zero',
+             output='signed32 public MULT31_SHIFT15 output in Q24; never PCM',
+-            integer_context='Xtensa ILP32, little-endian, arithmetic signed right shift; public C unchanged',
++            integer_context='Xtensa ILP32, little-endian, arithmetic signed right shift; explicitly ported public C threshold shifts and unused local only',
+             comparison='Public integer Bark/cosine/lookup/rounding/clamp path; own binary64 math is diagnostic only'))
+     for case_index,case in enumerate(cases):
+         declaration = construction['variants'][case['variant']]
+@@ -126,6 +130,12 @@
+     for name,row in readiness['files'].items():
+         raw=(HERE/name).read_bytes();need(len(raw)==row['bytes'] and sha(raw)==row['sha256'],'Frozen preparation identity')
+     model=build_model()
++    previous_raw=(HERE/'provenance/actual02/runtime/contract.json').read_bytes()
++    need(sha(previous_raw)=='bf0af784b74881770781738cba30966e9f72893fd4d93f89e93df93d61eaeae3','Exact previous original-public contract')
++    previous=json.loads(previous_raw)['model']
++    need(all(model[key]==previous[key] for key in ('counts','cases','calls')),'All168 original raw descriptors/checksums/counts must remain unchanged by C portability')
++    need(sha((HERE/'project/main/public/floor0.c').read_bytes())==PUBLIC_SHA and
++         sha((HERE/'provenance/public-port/floor0.original.c').read_bytes())==ORIGINAL_PUBLIC_SHA,'Explicit compiled port/original public source identities')
+     model_raw=json.dumps(model,sort_keys=True,separators=(',',':')).encode()
+     text=header(model,sha(model_raw))
+     recovered=readback(text,model)
+@@ -138,6 +148,7 @@
+         shutil.copyfile(HERE/name,out/name)
+     (out/'project/main/data.h').write_text(text,encoding='utf-8',newline='\n')
+     contract=dict(schema='public-floor0-curve-contract-v1',model=model,model_sha256=sha(model_raw),header_sha256=sha(text.encode()),readback=recovered,
++        previous_raw_descriptors_unchanged=True,previous_contract_sha256=sha(previous_raw),
+         public_function_evaluated=False,target_codec_executed=False,reference_decoder_executed=False,PCM_computed=False,numeric_qualified=False,full_G6_qualified=False)
+     (out/'contract.json').write_text(json.dumps(contract,indent=2)+'\n',encoding='utf-8',newline='\n')
+     for name,row in readiness['files'].items():
+--- prep02/compare_analytic.py
++++ prep03/compare_analytic.py
+@@ -48,6 +48,12 @@
+     need(qemu['lifecycle_qualified'] is True and qemu['qmp_quit_acknowledged'] is True and qemu['owned_shutdown_observed'] is True,'Actual QMP lifecycle required')
+     contract_fact=next(row for row in report['inputs'].values() if row['snapshot']=='sources/contract.json')
+     contract=load_contract(capture/'sources/contract.json',contract_fact['sha256'])
++    port=json.loads((HERE/'public-portability.json').read_bytes())
++    need(contract['model']['public_floor0_sha256']==port['ported_floor0_sha256'] and
++         contract['model']['public_floor0_variant']==report['public_source_variant']=='PORTED_PUBLIC_TREMOR_FLOOR0' and
++         report['public_floor0_sha256']==port['ported_floor0_sha256'] and
++         sha((capture/'sources/project/main/public/floor0.c').read_bytes())==port['ported_floor0_sha256'],
++         'Actual explicitly ported public function source; original-public execution is not claimed')
+     serial=(capture/'qemu.serial.log').read_bytes();stderr=(capture/'qemu.stderr.log').read_bytes()
+     need(sha(serial)==qemu['qemu.serial.log']['sha256'] and sha(stderr)==qemu['qemu.stderr.log']['sha256'],'Actual complete curve streams')
+     observed=validate_log((serial+b'\n'+stderr).decode(errors='replace'),contract,returncode=qemu['exit_status'],timed_out=qemu['timed_out'],interrupted=qemu['interrupted'])
+@@ -78,7 +84,8 @@
+         counts=dict(cases=6,packets=84,calls=168,full_public_bins=observed['bins'],active_bin_comparisons=len(rows)*16),
+         own_ideal_positive_db_observations=positive,cases=rows,
+         interpretation='Own mathematical Bark map and binary64 equations; public integer Bark/rounding/lookup/clamp differ. No equality or tolerance policy, PCM or backend attribution.',
+-        public_function_evaluated=True,own_binary64_diagnostic_computed=True,target_codec_executed=False,reference_decoder_executed=False,
++        public_function_evaluated=True,public_source_variant='PORTED_PUBLIC_TREMOR_FLOOR0',
++        public_floor0_sha256=port['ported_floor0_sha256'],own_binary64_diagnostic_computed=True,target_codec_executed=False,reference_decoder_executed=False,
+         PCM_computed=False,vendor_behavior_attributed=False,numeric_qualified=False,full_G6_qualified=False,physical_qualified=False)
+     out.parent.mkdir(parents=True,exist_ok=True)
+     with out.open('x',encoding='utf-8',newline='\n') as stream:stream.write(json.dumps(result,indent=2,allow_nan=False)+'\n')
+--- prep02/source_checks.py
++++ prep03/source_checks.py
+@@ -26,10 +26,19 @@
+          sha((HERE/'provenance/public-download/Tremor.tar.gz').read_bytes())==source['archive']['sha256'],'Public download source/archive identity')
+     published={row['path']:row for row in source['files']}
+     public=[]
++    port=json.loads((HERE/'public-portability.json').read_bytes())
++    need(sha((HERE/'public-floor0-portability.diff').read_bytes())==port['exact_diff_sha256'],'Explicit public-C portability diff bytes')
+     for path in sorted((HERE/'project/main/public').iterdir()):
+         row=published['source/'+path.name];raw=path.read_bytes()
+-        need(len(raw)==row['bytes'] and sha(raw)==row['sha256'],'Unchanged public C/header/COPYING source')
+-        public.append(dict(path=path.relative_to(HERE).as_posix(),bytes=len(raw),sha256=sha(raw)))
++        if path.name=='floor0.c':
++            original=(HERE/'provenance/public-port/floor0.original.c').read_bytes()
++            need(len(original)==row['bytes'] and sha(original)==row['sha256']==port['original_floor0_sha256'] and
++                 sha(raw)==port['ported_floor0_sha256'],'Explicit original and ported public floor0 identities')
++            expected=original.replace(b'(-140<<12)',b'-(140<<12)').replace(b'  ogg_uint32_t inyq= (1UL<<31) / toBARK(nyq);\n',b'')
++            need(expected==raw,'Only approved public-C portability changes')
++        else:
++            need(len(raw)==row['bytes'] and sha(raw)==row['sha256'],'Unchanged other public C/header/COPYING source')
++        public.append(dict(path=path.relative_to(HERE).as_posix(),bytes=len(raw),sha256=sha(raw),ported=path.name=='floor0.c'))
+     AST=[]
+     for path in sorted(HERE.rglob('*.py')):
+         raw=path.read_bytes();tree=ast.parse(raw,filename=path.as_posix())

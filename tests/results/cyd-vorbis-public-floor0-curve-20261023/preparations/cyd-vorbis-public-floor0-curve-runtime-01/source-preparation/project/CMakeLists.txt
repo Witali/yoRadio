@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+set(IDF_TARGET "esp32" CACHE STRING "Public floor0 curve unit target" FORCE)
+set(COMPONENTS main)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(cyd_public_tremor_floor0_curve)

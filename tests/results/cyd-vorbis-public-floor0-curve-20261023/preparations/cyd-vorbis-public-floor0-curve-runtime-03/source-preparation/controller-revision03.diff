@@ -1,0 +1,39 @@
+--- prep02/run-public-curve.py
++++ prep03/run-public-curve.py
+@@ -17,7 +17,7 @@
+ 
+ SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+ PINS = {
+-    'project/main/public/floor0.c': 'd0372c1dbf4c95231927619a7a1a660bdf421d63b332966f5fe33b9572c002f2',
++    'project/main/public/floor0.c': 'e1836251d072154691f87a74ea6cdae88d2cf2dd106fbc99908ec71f1f1a8e5a',
+     'project/main/public/floor_lookup.c': 'dfc670f7648f94ae7beb25ca542380f42eba3dbf8e180e479648f20fb07bbaba',
+     'windows_compile_command.py': '1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d',
+ }
+@@ -118,6 +118,7 @@
+         need(path.is_file() and sha(path) == TOOL_PINS[name], 'Reviewed public tool identity differs: ' + name)
+     out.mkdir(parents=True, exist_ok=False)
+     report = dict(schema='public-floor0-curve-runtime-v1', result='INCOMPLETE', passed=False, completed=False,
++        public_source_variant='PORTED_PUBLIC_TREMOR_FLOOR0',public_floor0_sha256=PINS['project/main/public/floor0.c'],
+         source_compile_link_qualified=False, public_function_evaluated=False,
+         target_codec_executed=False, reference_decoder_executed=False, vendor_backend_qualified=False, PCM_computed=False, PCM_qualified=False, full_G6_qualified=False,
+         physical_qualified=False, production_radio_integration=False,
+@@ -232,7 +233,9 @@
+             report['tools'][str(path.resolve())] = sha(path)
+         contract = load_contract(out / 'sources/contract.json', expected_sha256=manifest['contract_sha256'])
+         need(contract['model']['counts'] == manifest['counts'] and contract['model']['counts']['calls'] == 168 and
+-             sha(out / 'sources/project/main/data.h') == contract['header_sha256'], 'Exact full derived public curve contract/header')
++             sha(out / 'sources/project/main/data.h') == contract['header_sha256'] and
++             contract['model']['public_floor0_sha256'] == PINS['project/main/public/floor0.c'] and
++             contract['model']['public_floor0_variant'] == 'PORTED_PUBLIC_TREMOR_FLOOR0', 'Exact full derived ported-public curve contract/header/source')
+         origins = json.loads((out / 'sources/source-preparation/source-origins.json').read_bytes())
+         for item in origins['inputs']:
+             path = out / 'sources/source-preparation' / item['snapshot']
+@@ -271,7 +274,7 @@
+         own = [row for row in rows if source_for(row).is_relative_to(out / 'sources/project')]
+         expected_sources = {out / 'sources/project/main/curve_unit.c', out / 'sources/project/main/public/floor0.c',
+                             out / 'sources/project/main/public/floor_lookup.c'}
+-        need(len(own) == 3 and set(map(source_for, own)) == expected_sources, 'Only owned unit and two unchanged public source TUs may compile')
++        need(len(own) == 3 and set(map(source_for, own)) == expected_sources, 'Only owned unit, pinned ported floor0 and unchanged public lookup TUs may compile')
+         need(not FORBIDDEN_LINK.search(json.dumps(rows)), 'Unexpected vendor archive/decode compile dependency')
+         expected_macros = dict(__SIZEOF_INT__='4', __SIZEOF_LONG__='4', __SIZEOF_POINTER__='4', __XTENSA__='1',
+             __BYTE_ORDER__='__ORDER_LITTLE_ENDIAN__', CONFIG_IDF_TARGET_ESP32='1', CONFIG_IDF_TARGET_ARCH_XTENSA='1',

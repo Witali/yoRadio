@@ -1,0 +1,71 @@
+{
+  "schema": "public-floor0-curve-archive-source-relation-v1",
+  "source_only": true,
+  "base_pack": {
+    "path": "provenance/base-pack.py",
+    "bytes": 10982,
+    "sha256": "3717380a2ba6b8d08d339ff3b54fe179e05da30fa85c6f169d7b40e0fa2a9632"
+  },
+  "base_verify": {
+    "path": "compile_context_base.py",
+    "bytes": 30433,
+    "sha256": "62b11beb77f6eb4550d3c878249ac77df48bd55eb6dfbcc42abdd2aa15553f21"
+  },
+  "adaptations": [
+    {
+      "source": "pack.py",
+      "identity": {
+        "bytes": 12227,
+        "sha256": "be7e500d5606941dbb30c7d92a9f8e07fb1c8c5159446cfedab3e297e0f8d8ab"
+      },
+      "exact_diff": "pack-adaptation.diff",
+      "diff_identity": {
+        "bytes": 23295,
+        "sha256": "3987ec24b5413b1ac0e27906f46d3c403362609b214b751cc09caef0ecff7c30"
+      }
+    },
+    {
+      "source": "verify.py",
+      "identity": {
+        "bytes": 35535,
+        "sha256": "4967d940c10ba8061daa4434c155357ececa306a769dde792880639bf95abfae"
+      },
+      "exact_diff": "verify-adaptation.diff",
+      "diff_identity": {
+        "bytes": 66399,
+        "sha256": "214fcac505fc3a2d5884248840f4061dbc753c0bcfa084f480da28a6cdc117f9"
+      }
+    }
+  ],
+  "byte_identical_helpers": [
+    {
+      "path": "compile_context_base.py",
+      "bytes": 30433,
+      "sha256": "62b11beb77f6eb4550d3c878249ac77df48bd55eb6dfbcc42abdd2aa15553f21"
+    },
+    {
+      "path": "protocol.py",
+      "bytes": 5171,
+      "sha256": "9b1abe4fa383976291157d6d1991feafda69fa63cfaf312c5c4f588f46279dc8"
+    },
+    {
+      "path": "readback.py",
+      "bytes": 2074,
+      "sha256": "3b5dc11e94b85a825dbde0c3e8edbbe9ea621468508ed4212c01db5fcf82d0e5"
+    },
+    {
+      "path": "curve_fields_formula.py",
+      "bytes": 20259,
+      "sha256": "b3c377a86040410add2ed7bedfd26aac6dcef26b59fc1bc2dabbc45c1c2fd345"
+    }
+  ],
+  "imports": "Normal importlib source loading after exact plain archived helper SHA checks; no monkeypatch or vendor handle access",
+  "archive_data_dependencies": [],
+  "pending": [
+    "parent-owned pack",
+    "parent-owned stage offline verification",
+    "parent-owned exact promotion",
+    "parent-owned canonical offline verification from different cwd"
+  ],
+  "proposed_code_executed": false
+}

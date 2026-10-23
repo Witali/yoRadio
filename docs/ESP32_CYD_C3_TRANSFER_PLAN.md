@@ -141,8 +141,12 @@ allocation и численные настройки C3 являются канд
   среди2688 активных bins; integer Tremor/PCM этим расчётом не проверялись.
   [Собственный floor0 unit](../tests/results/cyd-vorbis-owned-floor0-20261023/CHECKPOINT.md)
   подтвердил все12 публикаций/6 пар/32 events, точные66/74 bits и normal free.
-  Actual публичная integer-кривая ещё не проверена; подтверждённой причины
-  широкого/floor0 PCM пока нет.
+  [Публичная integer-кривая](../tests/results/cyd-vorbis-public-floor0-curve-20261023/CHECKPOINT.md)
+  проверена отдельно на Xtensa:6 случаев/84 пакета/168 вызовов/58368 bins.
+  Явно помеченная PORTED копия Tremor содержит только три изменения
+  переносимости C; исходник и обе прежние неудачные попытки сохранены.
+  Отдельный математический расчёт2688 активных bins остаётся диагностикой;
+  подтверждённой причины широкого/floor0 PCM пока нет.
   [C3/RV32 checkpoint](../tests/results/c3-vorbis-map2-20261023/CHECKPOINT.md)
   подтверждает ту же setup правку на SDK6.1/core0: все25 случаев/350 пакетов
   декодируются; исходный отказ case6 воспроизведён до исправления.
@@ -947,3 +951,23 @@ Stream остаётся на core0, decode/output на core1 с прежними
   `43ef7d4dac52ab244be58a851ab2fee74fe02be04d34ee14a93f7400675cdea8`.
   [Автономная проверка](../tests/results/cyd-vorbis-owned-floor0-verification-20261023/README.md)
   staged и конечного canonical каталога из другого cwd завершена0.
+
+- 2026-10-23, CYD-C3-14/G6: [публичная floor0 integer-кривая](../tests/results/cyd-vorbis-public-floor0-curve-20261023/CHECKPOINT.md)
+  прошла отдельный owned-array SDK6.0.2/Xtensa/SMP/maincore0 тест:6 случаев,
+  84 пакета/168 вызовов/58368 полных bins/233472 signed32 байта и3992 events.
+  Все22 команды завершены0, compiler warnings0; исходные168 входов/5208 C words
+  сохранены. Actual QMP greeting/caps/COMPLETE/owner quit/host SHUTDOWN/ack/exit0
+  проверены; EOF/join обеспечены exact helper, отдельных booleans в старом
+  helper нет. Original collector01 и strict compile02 NONPASS сохранены.
+  PORTED public C исправляет два negative-constant shifts и удаляет unused local,
+  без suppression/изменения алгоритма; original87-file source/license сохранены.
+  Отдельная binary64 диагностика проверяет все2688 активных точек:147 ideal-dB
+  положительны, public gain в них0.9999999403953552..1.0. Это finite public-source
+  наблюдение, не объяснение opaque vendor PCM и не критерий conformance.
+  [Автономная проверка архива](../tests/results/cyd-vorbis-public-floor0-curve-verification-20261023/README.md)
+  прошла до и после точного копирования;4078 файлов/38530693 байта,
+  43 hash-only binary omissions, manifest
+  `ecd3133cb37dbd42bf2e3fee4715e06a26bc8d50d7a4e026654c5de72a1406d3`.
+  Публичный integer experiment для этих шести fixtures завершён; floor0/wide
+  PCM NONPASS, остальные G1–G8, radio/resource/physical gates остаются.
+  Production source, ABI, hardware settings и core0/core1 bindings не менялись.

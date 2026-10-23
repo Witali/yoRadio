@@ -1,0 +1,13 @@
+--- provenance/runtime-base/project/sdk-build.ps1
++++ project/sdk-build.ps1
+@@ -8,8 +8,8 @@
+ $draftRoot = Join-Path ([IO.Path]::GetFullPath($Repository)) '.build'
+ if (!$Campaign.StartsWith($draftRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+     !(Test-Path -LiteralPath (Join-Path $Campaign 'report.json') -PathType Leaf) -or
+-    !(Test-Path -LiteralPath (Join-Path $Campaign 'sources/project/main/pinned/production/vorbis_repair/setup.c') -PathType Leaf)) {
+-    throw 'Only a runner-prepared fresh owned-book campaign inside repository .build is supported'
++    !(Test-Path -LiteralPath (Join-Path $Campaign 'sources/project/main/public/floor0.c') -PathType Leaf)) {
++    throw 'Only a runner-prepared fresh public-curve campaign inside repository .build is supported'
+ }
+ $env:IDF_PATH = [IO.Path]::GetFullPath($SdkDirectory)
+ $env:IDF_TOOLS_PATH = [IO.Path]::GetFullPath($ToolsDirectory)
