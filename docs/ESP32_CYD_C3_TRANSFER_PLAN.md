@@ -1034,3 +1034,17 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Manifest `3e88fda7fab1bd42d8b40e5c9de637e06050199451e54840271eeb5b3fb4e0d0`.
   Старые floor0/wide/D16 sequence1 NONPASS и отложенные Ogg/AAC пункты остаются;
   bridge в radio не подключён, production source/ABI/core bindings не менялись.
+
+- 2026-10-23, CYD-C3-14/G6, публичные upstream releases: официальный
+  [Registry](https://components.espressif.com/components/espressif/esp_audio_codec/versions/2.6.2/versions?language=en)
+  отмечает2.6.2 как Latest; текущий
+  [manifest Espressif](https://raw.githubusercontent.com/espressif/esp-adf-libs/master/esp_audio_codec/idf_component.yml)
+  также содержит2.6.2. В опубликованном
+  [changelog](https://components.espressif.com/components/espressif/esp_audio_codec/versions/2.6.2/changelog?language=en)
+  не найдено документированного исправления floor0/wide-vector/sequence численных
+  расхождений. Это не доказывает отсутствие неопубликованных изменений и не
+  устанавливает причину наших PCM ошибок. Публичный
+  [CMake](https://raw.githubusercontent.com/espressif/esp-adf-libs/master/esp_audio_codec/CMakeLists.txt)
+  выбирает prebuilt archives отдельно по IDF_TARGET; исходный патч алгоритмов
+  для этих случаев не найден. Версии библиотек и точные ABI/archive guards
+  сохранены; замена версии не считается готовым исправлением.
