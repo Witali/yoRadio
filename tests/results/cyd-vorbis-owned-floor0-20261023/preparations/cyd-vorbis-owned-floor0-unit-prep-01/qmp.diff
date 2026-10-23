@@ -1,0 +1,50 @@
+--- provenance/book-owned_qmp.py
++++ owned_qmp.py
+@@ -36,7 +36,8 @@
+                exit_status=None, timed_out=False, interrupted=False, force_stopped=False,
+                qmp_messages=[], qmp_requests=[], complete_observed=False,
+                qmp_capabilities_acknowledged=False, qmp_quit_acknowledged=False,
+-               owned_shutdown_observed=False, lifecycle_qualified=False)
++               owned_shutdown_observed=False, qmp_eof_observed=False, qmp_reader_joined=False,
++               lifecycle_qualified=False)
+     report['commands'].append(row)
+     save()
+     proc = None
+@@ -107,6 +108,8 @@
+             return
+         if kind == 'eof':
+             eof = True
++            row['qmp_eof_observed'] = True
++            save()
+             return
+         need(kind == 'line', 'QMP reader failure: ' + str(value))
+         message = json.loads(value.decode('utf-8'))
+@@ -169,9 +172,9 @@
+                          'Owned unit serial log exceeded its declared2MiB bound')
+                     raw = serial.read_bytes() if serial.is_file() else b''
+                     text = raw.decode('utf-8', errors='replace').replace('\r\n', '\n')
+-                    need(not re.search(r'CYD_VORBIS_OWNED_BOOK_FAILURE|Guru Meditation|CORRUPT\s*HEAP|assert failed|abort\(\)|Brownout|Rebooting', text, re.I),
++                    need(not re.search(r'CYD_VORBIS_OWNED_FLOOR0_FAILURE|Guru Meditation|CORRUPT\s*HEAP|assert failed|abort\(\)|Brownout|Rebooting', text, re.I),
+                          'Actual unit failure/panic/reset before terminal closure')
+-                    marker = 'CYD_VORBIS_OWNED_BOOK_COMPLETE cases=16 probes=61 live=0 pairs=2 core=0\n'
++                    marker = 'CYD_VORBIS_OWNED_FLOOR0_COMPLETE cases=12 pairs=6 live=0 core=0\n'
+                     if marker in text:
+                         row.update(complete_observed=True, serial_bytes_at_complete=len(raw),
+                                    serial_sha256_at_complete=hashlib.sha256(raw).hexdigest())
+@@ -219,6 +222,8 @@
+                     reader.join(timeout=3)
+                     if reader.is_alive():
+                         problem(RuntimeError('Owned QMP reader did not reach EOF'))
++                    else:
++                        row['qmp_reader_joined'] = True
+                     while not received.empty():
+                         try:
+                             consume(wait=0)
+@@ -236,6 +241,7 @@
+         raise first_error
+     need(row['exit_status'] == 0 and row['complete_observed'] and not row['force_stopped']
+          and not row['timed_out'] and not row['interrupted'] and eof and greeting is not None
++         and row['qmp_eof_observed'] and row['qmp_reader_joined']
+          and flags == dict(caps=True, quit=True, shutdown=True),
+          'Require actual greeting, both acknowledgements, host shutdown and owned terminal0')
+     row['lifecycle_qualified'] = True

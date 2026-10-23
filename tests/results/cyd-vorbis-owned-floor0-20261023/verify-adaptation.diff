@@ -1,0 +1,338 @@
+--- owned-book-archive02/verify.py
++++ owned-floor0-archive01/verify.py
+@@ -1,4 +1,4 @@
+-"""Read-only stdlib verification of the finite owned-book archive, from any cwd."""
++"""Read-only stdlib verification of the finite owned-floor0 archive, from any cwd."""
+ import argparse
+ from collections import Counter
+ import gzip
+@@ -11,16 +11,15 @@
+ import types
+ 
+ sys.dont_write_bytecode = True
+-PLAN = '49540a8a0ce0667c88c68b044e36e5b43cb6f4dbf2caf4326416d5e5122acdd8'
+-HISTORY = 'f22e850dd5f07b579accc6c04ccfa4f41f6a35361de86ad21648cc16baa7aa7e'
+-PROTOCOL = 'c87b344b9ad84af3434e8e13f82560e988490c85edcdc53cbc8888553f5ce21c'
+-CONTRACT = '394b82d8c21b1e895e74e51cd56d13e547ef0790b9df226a70f24656035be1ce'
++PLAN = '1186712344a5e1c4abd0697abdd734e4655ad83b617aa639ff5c1de093de0d4a'
++PROTOCOL = '8d2f603a34333d6540b6ad8afc35fb288927ec9055e83ec6fe3143a5588f72eb'
++CONTRACT = '6cae2c909de32c57e2b6c137de67eb92338272063b6de40b44c08582bd8eb198'
+ SETUP = '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c'
+ ABI = 'e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60'
+-UNIT = '84db13b6965bdb17e25454338fa09c03823431e3cc8bc04bfe279bc814c7185c'
+-QMP_HELPER = '955afd02ec32813f169b301832afb87b322701bd5fe879e6bd390f9cfbcd631e'
++UNIT = '2920ace70198b9627ba71675d9ef9b5fd873e9bb499b90b633804b91a1853732'
++QMP_HELPER = 'a2d65c78e896323a4d3418d46c16470ba800ee1462b229e131cba4a9c2581619'
+ SDK = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+-COMMANDS = ('sdk-head', 'sdk-clean', 'sdk-configure-launcher', 'unit-macros-before', 'unit-dependencies-before',
++COMMANDS = ('host-semantics', 'sdk-head', 'sdk-clean', 'sdk-configure-launcher', 'unit-macros-before', 'unit-dependencies-before',
+             'sdk-build-launcher', 'unit-macros-after', 'unit-dependencies-after', 'symbols', 'ninja-commands',
+             'merge', 'qemu', 'sdk-head-after', 'sdk-clean-after')
+ FALSE_SCOPE = ('vendor_backend_qualified', 'PCM_qualified', 'full_G6_qualified', 'physical_qualified', 'production_radio_integration')
+@@ -113,7 +112,7 @@
+     need(re.fullmatch('[0-9a-f]{64}', args.manifest_sha256) and sha(manifest_raw) == args.manifest_sha256,
+          'Independently reviewed raw manifest SHA256 required')
+     m = json.loads(manifest_raw)
+-    need(m['schema'] == 'cyd-owned-book-evidence-archive-v1' and m['plan_sha256'] == PLAN
++    need(m['schema'] == 'cyd-owned-floor0-evidence-archive-v1' and m['plan_sha256'] == PLAN
+          and all(m[key] is False for key in FALSE_SCOPE) and m['omitted_binary_bytes_replayable'] is False,
+          'Finite unit scope and binary omission limits required')
+     expected_stored = {safe(row['stored']) for row in m['files'].values()} | {'manifest.json'}
+@@ -152,44 +151,10 @@
+     for key in m['files']:
+         raw(key)
+     need(sha(raw('plan.json')) == PLAN, 'Pinned historical role plan')
+-    need(m['history_plan_sha256'] == HISTORY and sha(raw('history-plan.json')) == HISTORY,
+-         'Pinned original pack/failed verifier history plan')
+-    history = obj('history-plan.json')
+-    old = history['old_preparation']
+-    old_prefix = old['prefix']
+-    need(sha(raw(old_prefix + '/readiness.json')) == old['readiness_sha256'], 'Original archive preparation readiness')
+-    old_index = obj(old_prefix + '/readiness.json')
+-    old_keys = {key[len(old_prefix)+1:] for key in m['files'] if key.startswith(old_prefix + '/')}
+-    need(old_keys == set(old_index['files']) | {'readiness.json'}, 'Complete original archive preparation retained')
+-    for key,item in old_index['files'].items():
+-        data = raw(old_prefix + '/' + safe(key))
+-        need(len(data) == item['bytes'] and sha(data) == item['sha256'], 'Original archive source byte identity')
+-    for item in history['files']:
+-        data = raw(item['key'])
+-        need(len(data) == item['bytes'] and sha(data) == item['sha256'], 'Original actual receipt/log/stage manifest identity')
+-    runner_sha = sha(raw('history/runner/command-capture.py'))
+-    for label, expected_exit in (('pack01', 0), ('stage-verify01', 1)):
+-        receipt = obj('history/' + label + '/receipt.json')
+-        need(receipt['status'] == 'TERMINAL' and receipt['returncode'] == expected_exit
+-             and type(receipt['owned_pid']) is int and receipt['owned_pid'] > 0 and receipt['runner_sha256'] == runner_sha,
+-             'Actual original pack/failed stage verification process receipt')
+-        need(len(receipt['logs']) == 2, 'Both actual history output streams required')
+-        for path,fact in receipt['logs'].items():
+-            suffix = 'stderr.log' if path.endswith('.stderr.log') else 'stdout.log'
+-            data = raw('history/' + label + '/' + suffix)
+-            need(len(data) == fact['bytes'] and sha(data) == fact['sha256'], 'Historical actual process log binding')
+-    old_manifest_raw = raw('history/stage01/manifest.json')
+-    old_manifest = json.loads(old_manifest_raw)
+-    old_verify = obj('history/stage-verify01/receipt.json')
+-    need(old_verify['argv'][-1] == sha(old_manifest_raw)
+-         and old_manifest['files']['verify.py']['sha256'] == sha(raw(old_prefix + '/verify.py'))
+-         and old_manifest['files']['CHECKPOINT.md']['sha256'] == sha(raw('history/stage01/CHECKPOINT.md')),
+-         'Actual failed stage manifest, executed verifier source and factual checkpoint binding')
+-    need('All109 actual GCC rows and five legal repetitions must remain' in text('history/stage-verify01/stderr.log')
+-         and obj('history/pack01/stdout.log')['result'] == 'OWNED_BOOK_EVIDENCE_MATERIALIZED_UNVERIFIED'
+-         and history['old_archive_verification'] == 'NONPASS' and history['old_unit_acceptance'] == 'PASSED',
+-         'Preserve archive verifier failure without reclassifying actual unit acceptance')
+     plan = obj('plan.json')
++    need(plan['archive_data_dependencies'] == m['archive_data_dependencies'] == [] and m['curve_qualified'] is False,
++         'Standalone publication-only archive without PCM/reference data dependency')
++    need(sha(raw('CHECKPOINT.md')) == plan['checkpoint']['sha256'], 'Exact root factual checkpoint retained')
+     need(plan['state'] == 'ACTUAL_PARENT_TERMINALS_PINNED' and [r['role'] for r in plan['roles']] == ['failed01', 'acceptance02'],
+          'Both original history and actual acceptance required')
+     need(set(m['campaigns']) == {'failed01', 'acceptance02'} and set(m['preparations']) == {p['name'] for p in plan['preparations']},
+@@ -207,6 +172,19 @@
+             data = raw(prefix + '/' + safe(name))
+             need(len(data) == item['bytes'] and sha(data) == item['sha256'], 'Preparation raw bytes')
+ 
++    old_source = 'preparations/cyd-vorbis-owned-floor0-unit-prep-01/'
++    new_source = 'preparations/cyd-vorbis-owned-floor0-unit-prep-02/'
++    old_unit = raw(old_source + 'project/main/floor_unit.c')
++    new_unit = raw(new_source + 'project/main/floor_unit.c')
++    old_arguments = b'index,c->id,c->group,c->first_bit,c->end_bit,'
++    new_arguments = b'index,c->id,c->group,(unsigned)c->first_bit,(unsigned)c->end_bit,'
++    need(old_unit.count(old_arguments) == 1 and old_unit.replace(old_arguments, new_arguments) == new_unit,
++         'Exact only-C successor delta is two diagnostic unsigned casts')
++    old_controller = raw(old_source + 'run-owned-floor0-unit.py')
++    new_controller = raw(new_source + 'run-owned-floor0-unit.py')
++    need(old_controller.count(sha(old_unit).encode()) == 1
++         and old_controller.replace(sha(old_unit).encode(), sha(new_unit).encode()) == new_controller,
++         'Exact controller successor delta is the changed unit source pin')
+     observed_acceptance = None
+     for role in plan['roles']:
+         name, info = role['role'], m['campaigns'][role['role']]
+@@ -216,15 +194,16 @@
+         need(sha(report_raw) == role['report_sha256'] == info['report_sha256']
+              and sha(terminal_raw) == role['terminal_sha256'] == info['terminal_sha256'], 'Actual pinned reports/parent receipts')
+         prep = m['preparations'][role['prep']]
+-        controller = raw(prep['prefix'] + '/run-owned-book-unit.py')
++        controller = raw(prep['prefix'] + '/run-owned-floor0-unit.py')
+         need(terminal['schema'] == 'direct-exec-tool-terminal-v1' and type(terminal['session_id']) is int
+-             and terminal['session_id'] > 0 and bool(terminal['terminal_chunk_id'])
++             and terminal['session_id'] == role['expected_session_id']
++             and terminal['terminal_chunk_id'] == role['expected_terminal_chunk']
+              and terminal['report_sha256'] == sha(report_raw) and terminal['entrypoint_sha256'] == sha(controller)
+              and terminal['exit_code'] == role['expected_exit_code'] and r['result'] == role['expected_result'],
+              'Real parent terminal and exact executed controller binding')
+         need(all(r[key] is False for key in FALSE_SCOPE) and r['declared_inputs_tools_configs_unchanged'] is True,
+              'Original finite-scope result/integrity flags')
+-        need(r['readiness_sha256'] == prep['index_sha256'] and sha(raw(prefix + '/sources/run-owned-book-unit.py')) == sha(controller),
++        need(r['readiness_sha256'] == prep['index_sha256'] and sha(raw(prefix + '/sources/run-owned-floor0-unit.py')) == sha(controller),
+              'Actual campaign used exact reviewed controller/readiness')
+         for origin, item in r['inputs'].items():
+             data = raw(prefix + '/' + safe(item['snapshot']))
+@@ -237,20 +216,20 @@
+         for rel, digest in r['build_outputs'].items():
+             identity(prefix + '/' + safe(rel), digest)
+         commands = r['commands']
+-        expected = COMMANDS if name == 'acceptance02' else COMMANDS[:5]
++        expected = COMMANDS if name == 'acceptance02' else COMMANDS[:7]
+         need(tuple(c['name'] for c in commands) == expected, 'Exact actual owned command sequence')
+         for c in commands:
+-            need(type(c['pid']) is int and c['pid'] > 0 and c['state'] == 'complete' and c['exit_status'] == 0
++            need(type(c['pid']) is int and c['pid'] > 0 and c['state'] == 'complete' and c['exit_status'] == (1 if name == 'failed01' and c['name'] == 'sdk-build-launcher' else 0)
+                  and c['timed_out'] is False and c['interrupted'] is False and c['force_stopped'] is False,
+-                 'Every actual owned command terminal0 without cleanup/timeout/interruption')
++                 'Exact actual owned command terminal statuses without cleanup/timeout/interruption')
+             if c['name'] != 'qemu':
+                 for stream in ('stdout', 'stderr'):
+                     need(sha(raw(prefix + '/' + c['name'] + '.' + stream + '.log')) == c[stream + '_sha256'], 'Actual command raw log binding')
+-        for action in (('configure', 'build') if name == 'acceptance02' else ('configure',)):
++        for action in ('configure', 'build'):
+             receipt = obj(prefix + '/sdk-' + action + '-process.json')
+             launcher = next(c for c in commands if c['name'] == 'sdk-' + action + '-launcher')
+             need(receipt['action'] == action and receipt['terminal'] is True and type(receipt['pid']) is int
+-                 and receipt['pid'] > 0 and receipt['pid'] != launcher['pid'] and receipt['exit_status'] == 0
++                 and receipt['pid'] > 0 and receipt['pid'] != launcher['pid'] and receipt['exit_status'] == (2 if name == 'failed01' and action == 'build' else 0)
+                  and PureWindowsPath(receipt['cwd']) == PureWindowsPath(role['path']), 'Actual separate SDK child terminal receipt')
+         for suffix in ('', '-after') if name == 'acceptance02' else ('',):
+             need(text(prefix + '/sdk-head' + suffix + '.stdout.log').strip() == SDK
+@@ -270,50 +249,112 @@
+             elif argv[i] == '-o': i += 2
+             else: transformed.append(argv[i]); i += 1
+         need(transformed + ['-E', '-dM'] == context['macro_argv']
+-             and context['macro_argv'] == commands[3]['argv'], 'Macro probe preserves the actual TU compile context')
++             and context['macro_argv'] == commands[4]['argv'], 'Macro probe preserves the actual TU compile context')
+         dependencies_raw = raw(prefix + '/unit-dependencies-before.stdout.log')
+         deps = dependency_rows(dependencies_raw.decode(), context['cwd'])
+         repeated = Counter(deps)
+-        need(len(deps) == 109 and len(set(deps)) == 104
++        need(len(deps) == 110 and len(set(deps)) == 105
+              and {p.name for p,n in repeated.items() if n > 1} == {'xtruntime.h', 'esp_assert.h', 'task.h', 'queue.h', 'stream_buffer.h'},
+-             'All109 actual GCC rows and five legal repetitions must remain')
+-        if name == 'failed01':
+-            need(r['passed'] is False and r['completed'] is False and r['source_compile_link_qualified'] is False
+-                 and r['owned_parser_public_vector_qualified'] is False and 'nonempty and unique' in r['error']
+-                 and 'actual_dependencies' not in context and not any(c['name'] in ('sdk-build-launcher', 'qemu') for c in commands),
+-                 'Preserve original prebuild uniqueness-gate NONPASS; no invented execution')
+-            continue
+-        need(raw(prefix + '/unit-macros-after.stdout.log') == macro_raw
+-             and raw(prefix + '/unit-dependencies-after.stdout.log') == dependencies_raw, 'Actual raw macros/dependencies stable across compile')
++             'All110 actual GCC rows and five legal repetitions must remain')
++        if name == 'acceptance02':
++            need(raw(prefix + '/unit-macros-after.stdout.log') == macro_raw
++                 and raw(prefix + '/unit-dependencies-after.stdout.log') == dependencies_raw, 'Actual raw macros/dependencies stable across compile')
+         actual_deps = context['actual_dependencies']
+-        need([PureWindowsPath(item['path']) for item in actual_deps] == deps and len(actual_deps) == 109,
++        need([PureWindowsPath(item['path']) for item in actual_deps] == deps and len(actual_deps) == 110,
+              'Every actual dependency row retained in original order')
+         input_by_path = {PureWindowsPath(path):item for path,item in r['inputs'].items()}
+         for item in actual_deps:
+             frozen = input_by_path[PureWindowsPath(item['path'])]
+             need(item['sha256'] == frozen['sha256'] and item['bytes'] == frozen['bytes'], 'Each dependency row has actual frozen hash/bytes')
+-        for rel,digest in (('main/book_unit.c', UNIT), ('main/pinned/production/vorbis_repair/setup.c', SETUP),
++        for rel,digest in (('main/floor_unit.c', UNIT if name == 'acceptance02' else 'd11b53ba2cde511eed70d92c9404bcbaa44c8bb17093e31acf1217ba63b7a41e'), ('main/pinned/production/vorbis_repair/setup.c', SETUP),
+                            ('main/pinned/production/vorbis_repair_abi.h', ABI)):
+             source_key = prefix + '/sources/project/' + rel
+             need(sha(raw(source_key)) == digest and PureWindowsPath(role['path']) / 'sources/project' / rel in set(deps),
+                  'Actual compiler consumed unchanged real parser/ABI/unit sources')
++        # The actual pre-SDK reader and 25 host controls remain separate from C acceptance.
++        need(r['host_semantic_controls'] == dict(methods=25, completed=True, C_unit_qualified=False),
++             'All25 recorded pure host controls passed without substituting for the C unit')
++        host = commands[0]
++        need(host['argv'] == [host['argv'][0], '-B', '-X', 'utf8', '-m', 'unittest', '-v', 'test_semantics']
++             and PureWindowsPath(host['cwd']) == PureWindowsPath(plan['repository']) / '.build' / role['prep']
++             and re.search(r'^Ran 25 tests in [0-9.]+s$', text(prefix + '/host-semantics.stderr.log'), re.M)
++             and text(prefix + '/host-semantics.stderr.log').rstrip().endswith('OK'), 'Actual host-control command and normal result log')
++        need(sha(raw(prefix + '/sources/fixture_reader.py')) == '93fc15e88574a351b87efe24141ad6ce50ea2afb2580ad25ef4a3a4d8ce4ceda'
++             and raw(prefix + '/sources/fixture_reader.py') == raw('fixture_reader.py')
++             and raw(prefix + '/sources/fixture_bits.py') == raw('fixture_bits.py')
++             and sha(raw('fixture_bits.py')) == 'e17587d5b96dc67db227d1106efbd8c99d90e67ec44cda01cc64bccae8563c2e', 'Exact independent finite raw reader and bitreader')
++        need(sha(raw(prefix + '/sources/fixture-contract.json')) == CONTRACT, 'Exact raw setup contract')
++        contract = obj(prefix + '/sources/fixture-contract.json')
++        protocol = types.ModuleType('owned_floor0_strict_protocol')
++        need(sha(raw('protocol.py')) == PROTOCOL and raw(prefix + '/sources/protocol.py') == raw('protocol.py'), 'Pinned strict32-event validator')
++        exec(compile(raw('protocol.py'), '<pinned finite protocol>', 'exec'), protocol.__dict__)
++        protocol.contract_shape(contract)
++        bits = types.ModuleType('fixture_bits')
++        reader = types.ModuleType('owned_floor0_independent_fixture_reader')
++        old_bits = sys.modules.get('fixture_bits')
++        try:
++            exec(compile(raw('fixture_bits.py'), '<pinned bounded raw bitreader>', 'exec'), bits.__dict__)
++            sys.modules['fixture_bits'] = bits
++            exec(compile(raw('fixture_reader.py'), '<pinned independent finite raw setup reader>', 'exec'), reader.__dict__)
++        finally:
++            if old_bits is None: sys.modules.pop('fixture_bits', None)
++            else: sys.modules['fixture_bits'] = old_bits
++        observations = []
++        model = contract['model']
++        for index, case in enumerate(model['cases']):
++            setup = raw(prefix + '/sources/' + safe(case['setup_snapshot']))
++            identification = raw(prefix + '/sources/' + safe(case['identification_snapshot']))
++            need(sha(setup) == case['setup_sha256'] and len(setup) == case['setup_bytes']
++                 and sha(identification) == case['identification_sha256'], 'All12 locally retained raw setup/ID identities')
++            actual = reader.floor_setup(setup)
++            need(all(actual[key] == case[key] for key in actual), 'Independent setup book walk and absolute floor0 fields')
++            need(len(identification) == 30 and identification[:7] == b'\x01vorbis'
++                 and identification[11] == case['channels'] == 2
++                 and int.from_bytes(identification[12:16], 'little') == case['rate']
++                 and (1 << (identification[28] & 15), 1 << (identification[28] >> 4)) == (case['short'], case['long']),
++                 'Actual ID establishes owned vi/ci context')
++            floor_bits = (int.from_bytes(setup, 'little') >> actual['first_bit']) & ((1 << actual['parse_bits']) - 1)
++            need(floor_bits.to_bytes((actual['parse_bits'] + 7) // 8, 'little').hex() == case['floor_bits_le_hex'], 'Exact66/74 raw floor bits')
++            observations.append(dict(case=index, id=case['id'], **actual))
++        for first, second in model['pairs']:
++            need(all(observations[first][key] == observations[second][key] for key in observations[first] if key not in ('case','id')),
++                 'All6 original/equivalent raw floor publication pairs')
++        witnessed = dict(schema='owned-floor0-independent-fixture-witness-v1', result='RAW_FLOOR0_CONTRACT_WITNESSED', cases=12, pairs=6,
++            floor_bitspans=[item['parse_bits'] for item in observations], observations=observations,
++            actual_production_parser_or_unit_executed=False, curve_or_PCM_computed=False, full_G6_qualified=False)
++        need(witnessed == r['fixture_witness'], 'Recomputed complete independent raw witness equals actual pre-SDK recorded witness')
+         desc = obj(prefix + '/build/project_description.json')
+-        need(desc['project_name'] == 'cyd_vorbis_owned_book_unit' and not any('esp_audio' in n for n in desc['build_components'])
++        compile_rows = obj(prefix + '/build/compile_commands.json')
++        need(row in compile_rows and desc['project_name'] == 'cyd_vorbis_owned_floor0_unit'
++             and not BAD_LINK.search(json.dumps(compile_rows)) and not BAD_LINK.search(json.dumps(desc)), 'Exact actual configured unit compile source and isolated project')
++        if name == 'failed01':
++            need(r['passed'] is False and r['completed'] is False and r['source_compile_link_qualified'] is False
++                 and r['owned_floor0_setup_publication_qualified'] is False and 'sdk-build-launcher' in r['error']
++                 and 'observed' not in r and not any(c['name'] == 'qemu' for c in commands), 'Original actual compile NONPASS without invented target execution')
++            failure = text(prefix + '/sdk-build.stdout.log')
++            need(failure.count("error: format '%u' expects argument of type 'unsigned int'") == 2
++                 and "'uint32_t' {aka 'long unsigned int'}" in failure and '-Werror=format=' in failure,
++                 'Preserve both actual SDK diagnostic type errors and strict warning policy')
++            continue
++        desc = obj(prefix + '/build/project_description.json')
++        need(desc['project_name'] == 'cyd_vorbis_owned_floor0_unit' and not any('esp_audio' in n for n in desc['build_components'])
+              and not BAD_LINK.search(json.dumps(desc)), 'Actual isolated project description without vendor components')
+         compile_rows = obj(prefix + '/build/compile_commands.json')
+         need(row in compile_rows and not BAD_LINK.search(json.dumps(compile_rows)), 'Actual compilation database binds exact unit row')
+         config_before = obj(prefix + '/configure-compiler-identity.json')
+         need(config_before == obj(prefix + '/build-compiler-identity.json'), 'Actual compiler/nm/ninja identities stable')
+         symbols = text(prefix + '/symbols.stdout.log')
+-        for symbol in ('repair_vorbis_book_unpack', 'repair_vorbis_book_clear', 'app_main'):
++        for symbol in ('repair_floor0_info_unpack', 'repair_floor0_free_info', 'app_main'):
+             need(re.search(r'^[0-9a-f]+\s+[0-9a-f]+\s+[tT]\s+' + symbol + '$', symbols, re.M), 'Actual linked unit/parser symbol')
+         need(not any(BAD_SYMBOL.fullmatch(line.split()[-1]) for line in symbols.splitlines() if line.split()),
+              'Vendor decoder/register/wrapper absent from actual linked symbols')
+-        for key in ('build/cyd_vorbis_owned_book_unit.map', 'ninja-commands.stdout.log', 'sdk-build.stdout.log'):
++        for key in ('build/cyd_vorbis_owned_floor0_unit.map', 'ninja-commands.stdout.log', 'sdk-build.stdout.log'):
+             value = text(prefix + '/' + key)
+-            need('book_unit.c' in value and not BAD_LINK.search(value), 'Actual source/link closure without vendor archives')
++            need('floor_unit.c' in value and not BAD_LINK.search(value), 'Actual source/link closure without vendor archives')
+             if not key.endswith('.map'):
+                 need('--gc-sections' in value and desc['app_elf'] in value, 'Actual generated/verbose link commands retain section GC')
++        need(not re.search(r'\b(?:warning|error):', text(prefix + '/sdk-build.stdout.log') + '\n'
++                           + text(prefix + '/sdk-build.stderr.log'), re.I), 'Actual successful compiler output has no warnings or errors')
+         elf = m['omitted'][prefix + '/build/' + desc['app_elf']]
+         header = raw(elf['elf_header_key'])
+         need(len(header) == 64 and header[:7] == b'\x7fELF\x01\x01\x01' and struct.unpack_from('<H',header,18)[0] == 94
+@@ -330,7 +371,7 @@
+             '-display','none','-monitor','none','-serial','file:' + str(hroot / 'qemu.serial.log'),'-qmp','stdio',
+             '-no-reboot','-snapshot','-nic','none','-drive','file=' + str(hroot / 'qemu-flash.bin') + ',if=mtd,format=raw']
+         need(q['argv'] == expected_qemu and PureWindowsPath(q['cwd']) == hroot, 'Owned scoped QMP stdio/serial file, no NIC/audio, snapshot flash')
+-        for flag in ('complete_observed','qmp_capabilities_acknowledged','qmp_quit_acknowledged','owned_shutdown_observed','lifecycle_qualified'):
++        for flag in ('complete_observed','qmp_capabilities_acknowledged','qmp_quit_acknowledged','owned_shutdown_observed','qmp_eof_observed','qmp_reader_joined','lifecycle_qualified'):
+             need(q[flag] is True, 'Actual terminal lifecycle flag: ' + flag)
+         for filename in ('qemu.serial.log','qemu.stderr.log','qemu.qmp.stdout.log','qemu.qmp.requests.jsonl'):
+             data = raw(prefix + '/' + filename)
+@@ -353,29 +394,30 @@
+         serial = raw(prefix + '/qemu.serial.log')
+         need(sha(serial[:q['serial_bytes_at_complete']]) == q['serial_sha256_at_complete'], 'Actual COMPLETE observation bound to complete serial prefix')
+         need(sha(raw(prefix + '/sources/owned_qmp.py')) == QMP_HELPER
+-             and m['QMP_EOF_direct_boolean_recorded'] is False and m['QMP_EOF_enforced_by_exact_captured_helper'] is True,
+-             'EOF enforced by the exact captured helper, never fabricated as a separate receipt')
++             and m['QMP_EOF_direct_boolean_recorded'] is True and m['QMP_EOF_enforced_by_exact_captured_helper'] is True,
++             'Actual EOF and reader join booleans are recorded and enforced by the exact captured helper')
+         need(sha(raw('protocol.py')) == PROTOCOL and sha(raw(prefix + '/sources/protocol.py')) == PROTOCOL
+              and sha(raw(prefix + '/sources/fixture-contract.json')) == CONTRACT, 'Exact trusted finite protocol and fixture contract')
+-        module = types.ModuleType('owned_book_strict_protocol')
++        module = types.ModuleType('owned_floor0_strict_protocol')
+         exec(compile(raw('protocol.py'), '<sha256-pinned pure finite protocol>', 'exec'), module.__dict__)
+         contract = obj(prefix + '/sources/fixture-contract.json')
+         observed = module.validate_log(serial.decode('utf-8') + '\n' + text(prefix + '/qemu.stderr.log'), contract,
+             returncode=q['exit_status'], timed_out=q['timed_out'], interrupted=q['interrupted'])
+-        need(observed == r['observed'] and observed['protocol_lines'] == 97 and observed['cases'] == 16
+-             and observed['active_codewords'] == 59 and observed['vector_probes'] == 61 and observed['wide_pairs'] == 2,
+-             'Revalidated exact97 events/all16 books/all61 probes after full actual terminal closure')
++        need(observed == r['observed'] and observed['protocol_lines'] == 32 and observed['cases'] == 12
++             and observed['pairs'] == 6 and observed['publication_bytes'] == 40
++             and observed['publication_fields_matched'] is True and observed['exact_consumption_matched'] is True
++             and observed['guards_and_normal_release_matched'] is True,
++             'Revalidated exact32 events/all12 publications/all6 pairs/40-byte guarded normal release after actual terminal closure')
+         need(r['passed'] is True and r['completed'] is True and r['source_compile_link_qualified'] is True
+-             and r['owned_parser_public_vector_qualified'] is True and terminal['exit_code'] == 0, 'Actual finite acceptance only')
++             and r['owned_floor0_setup_publication_qualified'] is True and terminal['exit_code'] == 0, 'Actual finite acceptance only')
+         observed_acceptance = observed
+     need(observed_acceptance is not None, 'Actual acceptance cannot be omitted')
+-    print(json.dumps(dict(result='OWNED_BOOK_ARCHIVE_VERIFIED', files=len(m['files']), omitted=len(m['omitted']),
+-        historical_failed01_preserved=True, cases=16, active_codewords=59, vector_probes=61, wide_pairs=2,
+-        historical_stage_verify01_NONPASS_preserved=True,
+-        protocol_lines=97, actual_dependency_rows=109, unique_dependency_paths=104,
+-        owned_parser_public_vector_qualified=True, vendor_backend_qualified=False, PCM_qualified=False,
+-        full_G6_qualified=False, physical_qualified=False, production_radio_integration=False,
+-        omitted_binary_bytes_replayable=False, QMP_EOF_direct_boolean_recorded=False,
++    print(json.dumps(dict(result='OWNED_FLOOR0_ARCHIVE_VERIFIED', files=len(m['files']), omitted=len(m['omitted']),
++        historical_failed01_compile_NONPASS_preserved=True, cases=12, pairs=6, protocol_lines=32, publication_bytes=40,
++        host_semantic_controls_per_campaign=25, actual_dependency_rows_per_campaign=110, unique_dependency_paths_per_campaign=105,
++        owned_floor0_setup_publication_qualified=True, curve_qualified=False, vendor_backend_qualified=False, PCM_qualified=False,
++        full_G6_qualified=False, physical_qualified=False, production_radio_integration=False, archive_data_dependencies=[],
++        omitted_binary_bytes_replayable=False, QMP_EOF_direct_boolean_recorded=True,
+         QMP_EOF_enforced_by_exact_captured_helper=True)))
+ 
+ 

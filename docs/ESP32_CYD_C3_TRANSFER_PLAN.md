@@ -139,8 +139,10 @@ allocation и численные настройки C3 являются канд
   полное численное сравнение31 остаётся NONPASS с прежним пределом2.
   Отдельный расчёт публичной формулы нашёл147 положительных ideal-dB значений
   среди2688 активных bins; integer Tremor/PCM этим расчётом не проверялись.
-  Следом проверить публикацию floor0 полей и actual публичную integer-кривую;
-  подтверждённой причины широкого/floor0 PCM пока нет.
+  [Собственный floor0 unit](../tests/results/cyd-vorbis-owned-floor0-20261023/CHECKPOINT.md)
+  подтвердил все12 публикаций/6 пар/32 events, точные66/74 bits и normal free.
+  Actual публичная integer-кривая ещё не проверена; подтверждённой причины
+  широкого/floor0 PCM пока нет.
   [C3/RV32 checkpoint](../tests/results/c3-vorbis-map2-20261023/CHECKPOINT.md)
   подтверждает ту же setup правку на SDK6.1/core0: все25 случаев/350 пакетов
   декодируются; исходный отказ case6 воспроизведён до исправления.
@@ -925,6 +927,21 @@ Stream остаётся на core0, decode/output на core1 с прежними
   relations и original25 dependency. Предел2 S16 LSB и NONPASS сохранены;
   причина backend ошибки не установлена. Production код/ABI/привязки задач
   не менялись, fullG6/radio/physical остаются открытыми.
+
+- 2026-10-23, CYD-C3-14/G6: [owned floor0 publication unit](../tests/results/cyd-vorbis-owned-floor0-20261023/CHECKPOINT.md)
+  вызывает exact production `repair_floor0_info_unpack`/normal free на собственных
+  vi/ci и12 исходных/эквивалентных raw setups. До SDK независимый syntax reader
+  подтверждает абсолютные66/74-bit spans, все25 semantic controls проходят.
+  Первая actual сборка остановилась на двух `%u`/`uint32_t` diagnostic errors;
+  QEMU не запускался. Successor исправляет только два printf casts, без suppression.
+  Actual SDK6.0.2/ILP32/Xtensa/SMP/maincore0 capture02 проходит все15 команд,
+  12 публикаций/6 пар/32 events,40-byte guards/unchanged vi-ci/normal free live0;
+  110 dependency rows сохранены, compiler warnings0. Actual QMP greeting/caps/
+  quit/host SHUTDOWN/ack/EOF/reader join/exit0 проверены до full protocol.
+  [Автономный архив и canonical offline replay](../tests/results/cyd-vorbis-owned-floor0-verification-20261023/README.md)
+  сохраняют failed01 и acceptance02 и не требуют PCM/reference архивов.
+  Это публикация наших полей; integer-кривая/vendor/PCM/fullG6/radio/physical
+  остаются открытыми. Production source, ABI и radio task affinities не менялись.
   Архив746 файлов/7535253 байт сохраняет27 hash-only binary omissions и
   фактический ELF header64. Manifest SHA256:
   `4126c63d4fa6c9699d094b965961055ed9ea4c112bcc9d7b2cfdf5c84d7ad237`.

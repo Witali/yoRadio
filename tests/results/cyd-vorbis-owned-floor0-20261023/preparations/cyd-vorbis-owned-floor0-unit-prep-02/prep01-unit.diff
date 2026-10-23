@@ -1,0 +1,11 @@
+--- provenance/prep01-floor_unit.c
++++ project/main/floor_unit.c
+@@ -41,7 +41,7 @@
+     all_guards();
+     memcpy(published+index,floor,sizeof(*floor));
+     printf(P "FIELDS case=%u id=%s group=%s first=%u end=%u consumed=%u total_books=%d order=%d rate=%ld barkmap=%ld"
+-           " ampbits=%d ampdb=%d numbooks=%d books=",index,c->id,c->group,c->first_bit,c->end_bit,
++           " ampbits=%d ampdb=%d numbooks=%d books=",index,c->id,c->group,(unsigned)c->first_bit,(unsigned)c->end_bit,
+            (unsigned)(view.position-c->first_bit),context.ci.books,floor->order,floor->rate,floor->barkmap,
+            floor->ampbits,floor->ampdB,floor->numbooks);
+     for (int i=0;i<floor->numbooks;++i) printf("%s%u",i?",":"",(unsigned)floor->books[i]);

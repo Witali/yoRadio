@@ -1,0 +1,174 @@
+--- provenance/book-runtime03-controller.py
++++ run-owned-floor0-unit.py
+@@ -1,4 +1,4 @@
+-"""Run the exact owned parser/vector unit, never the vendor decoder or radio."""
++"""Run exact owned floor0 setup publication, never a decoder or radio."""
+ import argparse
+ import hashlib
+ import json
+@@ -13,18 +13,24 @@
+ sys.dont_write_bytecode = True
+ from owned_qmp import capture
+ from protocol import load_contract, validate_log
++from fixture_reader import verify_contract
+ from windows_compile_command import macro_command, check_macro_inputs
+ 
+ SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+-CONTRACT_SHA = '394b82d8c21b1e895e74e51cd56d13e547ef0790b9df226a70f24656035be1ce'
++CONTRACT_SHA = '6cae2c909de32c57e2b6c137de67eb92338272063b6de40b44c08582bd8eb198'
+ PINS = {
+-    'project/main/book_unit.c': '84db13b6965bdb17e25454338fa09c03823431e3cc8bc04bfe279bc814c7185c',
+-    'project/main/unit_data.h': '53ba437570aba1b930b15a7b80d95ac7b1c8e26781aa75374b4de414443d1f64',
++    'project/main/floor_unit.c': '2920ace70198b9627ba71675d9ef9b5fd873e9bb499b90b633804b91a1853732',
++    'project/main/unit_support.h': 'e7a205dc99c2b793d5b2cb540a1b77b368a6584b32f783af0061145820ad17f7',
++    'project/main/unit_data.h': '14b62a6789a139e2778a7444530e03fd1e056488fbecf371193a1d26ecb0fe28',
+     'project/main/pinned/production/vorbis_repair/setup.c': '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c',
+     'project/main/pinned/production/vorbis_repair_abi.h': 'e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60',
+-    'protocol.py': 'c87b344b9ad84af3434e8e13f82560e988490c85edcdc53cbc8888553f5ce21c',
++    'protocol.py': '8d2f603a34333d6540b6ad8afc35fb288927ec9055e83ec6fe3143a5588f72eb',
++    'fixture_reader.py': '93fc15e88574a351b87efe24141ad6ce50ea2afb2580ad25ef4a3a4d8ce4ceda',
++    'fixture_bits.py': 'e17587d5b96dc67db227d1106efbd8c99d90e67ec44cda01cc64bccae8563c2e',
++    'test_semantics.py': '078ed94aa79de91eeb3c9f4ab63a68992d27fe2d4b281930103ecbba85fd707b',
++    'owned_qmp.py': 'a2d65c78e896323a4d3418d46c16470ba800ee1462b229e131cba4a9c2581619',
++    'windows_compile_command.py': '1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d',
+     'fixture-contract.json': CONTRACT_SHA,
+-    'windows_compile_command.py': '1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d',
+ }
+ TOOL_PINS = {
+     'host_python': '4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a',
+@@ -105,7 +111,7 @@
+     readiness = here / 'readiness.json'
+     need(sha(readiness) == args.readiness_sha256, 'Independently reviewed source readiness differs')
+     manifest = json.loads(readiness.read_bytes())
+-    need(manifest['schema'] == 'owned-book-runtime-source-only-readiness-v1'
++    need(manifest['schema'] == 'owned-floor0-unit-runtime-source-only-readiness-v1'
+          and manifest['runtime_executed'] is False, 'Require the reviewed source-only readiness')
+     actual_files = {p.relative_to(here).as_posix() for p in here.rglob('*') if p.is_file()}
+     need(actual_files == set(manifest['files']) | {'readiness.json'}, 'Complete source preparation file set changed')
+@@ -122,8 +128,8 @@
+     for name, path in runtime_tools.items():
+         need(path.is_file() and sha(path) == TOOL_PINS[name], 'Reviewed public tool identity differs: ' + name)
+     out.mkdir(parents=True, exist_ok=False)
+-    report = dict(schema='owned-book-runtime-v1', result='INCOMPLETE', passed=False, completed=False,
+-        source_compile_link_qualified=False, owned_parser_public_vector_qualified=False,
++    report = dict(schema='owned-floor0-runtime-v1', result='INCOMPLETE', passed=False, completed=False,
++        source_compile_link_qualified=False, owned_floor0_setup_publication_qualified=False,
+         vendor_backend_qualified=False, PCM_qualified=False, full_G6_qualified=False,
+         physical_qualified=False, production_radio_integration=False,
+         readiness_sha256=args.readiness_sha256, inputs={}, tools={}, commands=[], build_outputs={})
+@@ -236,9 +242,10 @@
+         for path in runtime_tools.values():
+             report['tools'][str(path.resolve())] = sha(path)
+         contract = load_contract(out / 'sources/fixture-contract.json', expected_sha256=CONTRACT_SHA)
+-        need(contract['model']['case_count'] == 16 and contract['model']['probe_count'] == 61,
+-             'Exact reviewed full unit contract')
+-        origins = json.loads((out / 'sources/source-origins.json').read_bytes())
++        need(contract['model']['case_count'] == 12 and len(contract['model']['pairs']) == 6 and contract['model']['protocol_lines'] == 32,
++             'Exact reviewed full floor0 publication contract')
++        report['fixture_witness'] = verify_contract(contract, out / 'sources')
++        origins = json.loads((out / 'sources/source-pins.json').read_bytes())
+         for item in origins['inputs']:
+             path = out / 'sources' / item['snapshot']
+             need(path.resolve().is_relative_to(out / 'sources') and sha(path) == item['sha256']
+@@ -251,6 +258,10 @@
+         need(esptool.is_dir(), 'Expected SDK environment esptool source package')
+         for path in sorted(esptool.rglob('*.py')):
+             freeze(path, Path('esptool') / path.relative_to(esptool))
++        execute('host-semantics', [sys.executable, '-B', '-X', 'utf8', '-m', 'unittest', '-v', 'test_semantics'], cwd=here)
++        host_log = (out / 'host-semantics.stderr.log').read_text(encoding='utf-8', errors='replace')
++        need(re.search(r'Ran 25 tests\b.*\bOK\b', host_log, re.S), 'All25 pure publication semantic controls required')
++        report['host_semantic_controls'] = dict(methods=25, completed=True, C_unit_qualified=False)
+         need(execute('sdk-head', [git, '-C', sdk, 'rev-parse', 'HEAD']).strip() == SDK_HEAD, 'Wrong SDK revision')
+         need(not execute('sdk-clean', [git, '-C', sdk, 'status', '--porcelain', '--untracked-files=no']).strip(), 'Dirty SDK')
+         current(); save()
+@@ -259,7 +270,7 @@
+         build = out / 'build'
+         description = build / 'project_description.json'
+         desc = json.loads(description.read_bytes())
+-        need(desc['project_name'] == 'cyd_vorbis_owned_book_unit'
++        need(desc['project_name'] == 'cyd_vorbis_owned_floor0_unit'
+              and Path(desc['project_path']).resolve() == out / 'sources/project', 'Wrong isolated configured project')
+         need(not any('esp_audio' in name for name in desc['build_components'])
+              and all(not p or Path(p).resolve().is_relative_to(sdk) or Path(p).resolve().is_relative_to(out / 'sources/project')
+@@ -272,7 +283,7 @@
+             need(sha(path) == expected and (name == 'ninja' or expected == TOOL_PINS[name]), 'Actual pre-build tool identity')
+             report['tools'][str(path)] = expected
+         rows = json.loads((build / 'compile_commands.json').read_bytes())
+-        source = out / 'sources/project/main/book_unit.c'
++        source = out / 'sources/project/main/floor_unit.c'
+         source_for = lambda row: (Path(row['directory']) / row['file']).resolve()
+         own = [row for row in rows if source_for(row).is_relative_to(out / 'sources/project')]
+         need(len(own) == 1 and source_for(own[0]) == source, 'Only our frozen unit TU may compile in the project')
+@@ -299,7 +310,7 @@
+         dependency_argv = argv[:-2] + ['-M']
+         dep_text = execute('unit-dependencies-before', dependency_argv, cwd=cwd)
+         dependencies = dependency_paths(dep_text, cwd)
+-        needed = {source, out / 'sources/project/main/unit_data.h',
++        needed = {source, out / 'sources/project/main/unit_data.h', out / 'sources/project/main/unit_support.h',
+             out / 'sources/project/main/pinned/production/vorbis_repair/setup.c',
+             out / 'sources/project/main/pinned/production/vorbis_repair_abi.h', build / 'config/sdkconfig.h'}
+         needed.update((out / 'sources/project/main/pinned/codec/include' / name).resolve() for name in
+@@ -325,18 +336,18 @@
+         need(raw_elf[:7] == b'\x7fELF\x01\x01\x01' and struct.unpack_from('<H', raw_elf, 18)[0] == 94,
+              'Actual ELF32 little-endian Xtensa machine94 required')
+         symbols = execute('symbols', [nm, '-n', '-S', elf])
+-        for symbol in ('repair_vorbis_book_unpack', 'repair_vorbis_book_clear', 'app_main'):
++        for symbol in ('repair_floor0_info_unpack', 'repair_floor0_free_info', 'app_main'):
+             need(re.search(r'^[0-9a-f]+\s+[0-9a-f]+\s+[tT]\s+' + symbol + r'$', symbols, re.M), 'Actual retained unit/parser symbol: ' + symbol)
+         actual_names = [line.split()[-1] for line in symbols.splitlines() if line.split()]
+         need(not any(FORBIDDEN_SYMBOL.fullmatch(name) for name in actual_names), 'Vendor decoder/register/wrapper symbol entered linked ELF')
+         map_path = elf.with_suffix('.map')
+         map_text = map_path.read_text(encoding='utf-8', errors='replace')
+-        need('book_unit.c.obj' in map_text and not FORBIDDEN_LINK.search(map_text), 'Actual map must bind our TU without vendor archives/link wraps')
++        need('floor_unit.c.obj' in map_text and not FORBIDDEN_LINK.search(map_text), 'Actual map must bind our TU without vendor archives/link wraps')
+         commands = execute('ninja-commands', [ninja, '-C', build, '-t', 'commands', desc['app_elf']])
+         need(not FORBIDDEN_LINK.search(commands) and '--gc-sections' in commands
+-             and 'book_unit.c' in commands and desc['app_elf'] in commands, 'Actual generated compile/link command closure')
++             and 'floor_unit.c' in commands and desc['app_elf'] in commands, 'Actual generated compile/link command closure')
+         verbose = (out / 'sdk-build.stdout.log').read_text(encoding='utf-8', errors='replace')
+-        need('book_unit.c' in verbose and desc['app_elf'] in verbose and '--gc-sections' in verbose
++        need('floor_unit.c' in verbose and desc['app_elf'] in verbose and '--gc-sections' in verbose
+              and not FORBIDDEN_LINK.search(verbose), 'Verbose actual build must retain unit compile and link execution commands')
+         for path in (elf, app, map_path, build / 'flasher_args.json'):
+             bind_output(path)
+@@ -364,29 +375,30 @@
+             '-display', 'none', '-monitor', 'none', '-serial', 'file:' + str(out / 'qemu.serial.log'), '-qmp', 'stdio',
+             '-no-reboot', '-snapshot', '-nic', 'none', '-drive', 'file=' + str(flash) + ',if=mtd,format=raw'],
+             cwd=out, env=env, report=report, save=save, taskkill=taskkill)
+-        need(row['lifecycle_qualified'] is True and row['exit_status'] == 0 and not row['force_stopped'],
+-             'Real QMP shutdown/owned terminal closure required before any full unit validation')
++        need(row['lifecycle_qualified'] is True and row['exit_status'] == 0 and not row['force_stopped'] and row['qmp_eof_observed'] is True and row['qmp_reader_joined'] is True,
++             'Real QMP shutdown/EOF/join/owned terminal closure required before any full unit validation')
+         stderr = (out / 'qemu.stderr.log').read_text(encoding='utf-8', errors='replace')
+         observed = validate_log(serial + '\n' + stderr, contract,
+-            returncode=row['exit_status'], timed_out=row['timed_out'], interrupted=row['interrupted'])
+-        need(observed['cases'] == 16 and observed['active_codewords'] == 59 and observed['vector_probes'] == 61
+-             and observed['protocol_lines'] == 97 and observed['owned_parser_public_vector_qualified'] is True,
+-             'Exact16 books/61 probes/97events required after actual terminal0')
++            returncode=row['exit_status'], timed_out=row['timed_out'], interrupted=row['interrupted'], force_stopped=row['force_stopped'])
++        need(observed['cases'] == 12 and observed['pairs'] == 6 and observed['protocol_lines'] == 32
++             and observed['publication_fields_matched'] is True and observed['exact_consumption_matched'] is True
++             and observed['guards_and_normal_release_matched'] is True,
++             'Exact12 floor0 publications/6pairs/32events required after actual terminal0')
+         report['observed'] = observed
+         need(execute('sdk-head-after', [git, '-C', sdk, 'rev-parse', 'HEAD']).strip() == SDK_HEAD, 'SDK revision changed')
+         need(not execute('sdk-clean-after', [git, '-C', sdk, 'status', '--porcelain', '--untracked-files=no']).strip(), 'SDK changed')
+         current()
+         need(all(c['exit_status'] == 0 and not c['timed_out'] and not c['interrupted'] and not c['force_stopped']
+                  for c in report['commands']), 'Every owned actual command must finish normally')
+-        report.update(result='OWNED_BOOK_PUBLIC_VECTOR_UNIT_PASSED', passed=True, completed=True,
+-                      owned_parser_public_vector_qualified=True, declared_inputs_tools_configs_unchanged=True)
++        report.update(result='OWNED_FLOOR0_SETUP_PUBLICATION_PASSED', passed=True, completed=True,
++                      owned_floor0_setup_publication_qualified=True, declared_inputs_tools_configs_unchanged=True)
+         save()
+         print(json.dumps({k:report[k] for k in ('result', 'passed', 'completed', 'source_compile_link_qualified',
+-            'owned_parser_public_vector_qualified', 'vendor_backend_qualified', 'PCM_qualified', 'full_G6_qualified', 'physical_qualified')}))
++            'owned_floor0_setup_publication_qualified', 'vendor_backend_qualified', 'PCM_qualified', 'full_G6_qualified', 'physical_qualified')}))
+         return 0
+     except BaseException as exc:
+         report.update(result='INTERRUPTED' if isinstance(exc, KeyboardInterrupt) else 'NONPASS',
+-            passed=False, completed=False, owned_parser_public_vector_qualified=False, error=repr(exc))
++            passed=False, completed=False, owned_floor0_setup_publication_qualified=False, error=repr(exc))
+         try:
+             current()
+             report['declared_inputs_tools_configs_unchanged'] = True
