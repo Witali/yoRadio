@@ -30,8 +30,8 @@ class CorrespondenceTest(unittest.TestCase):
         self.assertTrue(result['passed'])
         self.assertFalse(result['semantic_equivalence_proved'])
         self.assertEqual(result['factory_export_functions'], 176)
-        # Multi-scan privacy adds two bounded source/check adapters to upload.
-        self.assertEqual(result['native_app_functions'], 172)
+        # Real owner/async integration and platform service-memory guard.
+        self.assertEqual(result['native_app_functions'], 212)
         self.assertEqual(len(result['assembly_only']), 11)
 
     def test_missing_factory(self):

@@ -234,6 +234,7 @@ esp_err_t web_photo_post(httpd_req_t *req)
         return web_error(req, "Expected upload JSON");
     int slot;
     esp_err_t result = ESP_ERR_INVALID_ARG;
+    bool handled = false;
     if (web_integer(object, "file_number", 1, PHOTO_COUNT, &slot))
     {
         if (!strcmp(uri, "/start_upload"))
@@ -241,7 +242,10 @@ esp_err_t web_photo_post(httpd_req_t *req)
             int length, chunks;
             if (web_integer(object, "file_size", 4, PHOTO_SLOT_BYTES, &length) &&
                 web_integer(object, "total_chunks", 1, 25, &chunks))
-                result = photo_upload_start(slot - 1, length, chunks);
+            {
+                handled = true;
+                result = web_photo_async(req, false, slot - 1, length, chunks);
+            }
         }
         else if (!strcmp(uri, "/finish_upload"))
         {
@@ -249,12 +253,15 @@ esp_err_t web_photo_post(httpd_req_t *req)
             char expected[16];
             snprintf(expected, sizeof(expected), "file%d.jpg", slot);
             if (cJSON_IsString(name) && !strcmp(name->valuestring, expected))
-                result = photo_upload_finish(slot - 1);
+            {
+                handled = true;
+                result = web_photo_async(req, true, slot - 1, 0, 0);
+            }
         }
     }
     cJSON_Delete(object);
+    if (handled) return result;
     return result == ESP_OK
                ? web_ok(req)
-               : web_error(req, "Invalid upload, busy session, or unsafe JPEG (requires baseline "
-                                "240x240 without private metadata)");
+               : web_error(req, "Invalid upload arguments; photo size must be 4..102400 bytes");
 }

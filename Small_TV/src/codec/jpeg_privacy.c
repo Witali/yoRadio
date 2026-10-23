@@ -85,6 +85,7 @@ static bool segment(privacy_reader_t *reader,unsigned marker,uint32_t end,uint16
         if(memcmp(header,"Adobe",5) || header[5] || header[6]!=100 ||
            header[7] || header[8] || header[9] || header[10] || header[11]>2)
             return fail(reader,JPEG_PRIVACY_METADATA);
+        reader->diagnostic->adobe_transform=(uint8_t)(header[11]+1u);
     } else if(frame_marker(marker)) {
         if(size<8)return fail(reader,JPEG_PRIVACY_INVALID);
         if(!payload(reader,header,6))return false;

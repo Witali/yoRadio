@@ -1,6 +1,6 @@
 # План улучшения восстановленной Small TV
 
-Обновлено: 2026-10-20. База: `main` / `51cd114f9`.
+Обновлено: 2026-10-23. База: `main` / `51cd114f9`.
 
 Цель — восстановить полезное поведение заводской прошивки ESP32-C2, исправляя
 её подтверждённые ошибки. Сопоставлять ассемблер, декомпиляцию и наш C-код в обе
@@ -39,7 +39,23 @@ H10 относится к B50D. Его frozen source/SDK/snapshot и владе�
 
 ## 2. Новый JPEG в рабочей прошивке
 
-Статус: **подготовительные стенды готовы; production integration не выполнена**.
+Статус: **codec/cache/worker включены в development app; полная приёмка не завершена**.
+
+Checkpoint 2026-10-23: реальные upload/UI используют общего владельца codec и
+проверенный RGB565 cache. Фоновая очередь и SDK async HTTP освобождают HTTP task;
+общий media mutex не удерживается во время decode. Для заводского baseline
+оставлен TJpgd strip producer с прежними пикселями, расширенные режимы идут через
+bounded libjpeg. В обычной сборке генерируются matching stamp/cache headers/assets.
+6001 native checks,12 inventory controls и6 artifact checks pass; исправлены
+устаревшие queued source lengths и подавление повторной обработки после временного
+read fault. Реальный C2 workflow выявил нехватку общей RAM: одного malloc limit
+недостаточно. Добавлены16KiB service reserve при allocation и cooperative decode
+checkpoints; точные required/available в HTTP. Проверки текущего target workflow
+и дальнейшие ограничения — [JPEG_MAIN_INTEGRATION.md](tests/JPEG_MAIN_INTEGRATION.md).
+Это не приёмка всех JPEG на target: host support не означает, что конкретный
+файл помещается в рабочую C2 с Wi-Fi/UI. Safe migration старого assets без stamp,
+полный RAM/stack/time/abort matrix, отдельный LCD, power-cut/full/24h/hardware
+остаются открытыми. Предыдущие checkpoint ниже — история, не текущий статус UI.
 
 Checkpoint 2026-10-20: реализован portable NOR core с 4 KiB cache, sparse mapping,
 sector RMW и read-back verification. 3000 random operations, 83 injected partial

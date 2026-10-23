@@ -26,12 +26,12 @@ virtual-time limitations; physical-board and Internet weather checks remain pend
 | `app/app_main.c` | Initialization and task startup |
 | `app/settings/` | Factory raw-sector compatibility, NVS migration, validation and RGB565 |
 | `app/display/` | ST7789 hardware SPI, LEDC backlight, four clock themes |
-| `app/media/` | Flash assets, streaming JPEG/BMP, validated photo uploads |
+| `app/media/` | Flash assets, async photo owner, guarded cache and validated uploads |
 | `app/network/` | Station/AP mode, real Wi-Fi scan, bounded captive DNS |
 | `app/services/` | SNTP, factory timezone selection, HTTP/Kelvin weather and cached results |
 | `app/text/` | Strict UTF-8 scalar decoding and complete label prefixes |
 | `app/web/` | Recovered HTTP contracts, pages, settings and photo APIs |
-| `codec/` | Bounded JPEG API, memory/backing adapters and coefficient conversion; UI integration pending |
+| `codec/` | Bounded JPEG API, factory baseline strip producer, privacy and coefficient conversion |
 | `storage/` | Guarded NOR transport, scratch files, atomic journal and verified frame cache |
 | `third_party/` | Pinned cJSON, TJpgDec, offline libjpeg-turbo source bundle and licensed Spleen font |
 | `reference/` | 176 exported functions split into 16 logical pseudocode modules |
@@ -49,7 +49,8 @@ meaning. The executable files in `app/` use real C types and descriptive
 functions, configuration fields, buffers and state variables. SDK code is
 provided by ESP-IDF rather than stubbed out or mapped to old machine addresses.
 
-All 162 production C functions have an entry comment explaining their purpose.
+Application functions have entry comments explaining their purpose; the exact
+source inventory is checked by `tools/audit_correspondence.py`.
 Corrected functions also carry searchable entry-comment markers:
 `FIXED_FACTORY` identifies a deliberate correction of an original firmware bug;
 `FIXED_RECONSTRUCTION` identifies a repair of our C implementation to restore
@@ -61,6 +62,10 @@ The [correction marker convention](CORRECTION_MARKERS.md) documents their usage,
 examples and the functions already marked.
 The [working context](WORKING_NOTES.md) preserves the current recommendations
 and next checks; the [work journal](WORK_LOG.md) records findings and validation.
+The [current JPEG integration checkpoint](tests/JPEG_MAIN_INTEGRATION.md) separates
+host support, actual C2 memory refusals, HTTP/cache execution and pending LCD,
+migration and full/hardware acceptance. Ordinary builds now include the new
+photo owner; a successful library build alone is not the supported-format list.
 Classic city, description and weather-title text is clipped to its own field.
 Long strings scroll left and back with pauses; short strings remain centered.
 Status refreshes preserve the phase; changed text or theme re-entry resets it.

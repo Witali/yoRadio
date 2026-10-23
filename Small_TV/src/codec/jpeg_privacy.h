@@ -21,6 +21,7 @@ typedef struct {
     jpeg_privacy_result_t status;
     uint32_t offset,width,height,scans;
     uint8_t marker,process,precision,components;
+    uint8_t adobe_transform; /*0absent,1Adobe0(RGB/CMYK),2Adobe1,3Adobe2(YCCK). */
     int callback_error;
 } jpeg_privacy_diagnostic_t;
 

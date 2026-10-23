@@ -1,0 +1,1899 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "Main photo codec owner, bounded RAM admission, actual HTTP/storage; separate LCD/full/hardware acceptance pending",
+  "all_functionality_verified": false,
+  "physical_hardware_tested": false,
+  "lcd_tested": false,
+  "rf_tested": false,
+  "weather_acceptance": false,
+  "power_cut_tested": false,
+  "target_cold_hit_zero_writes_proved": false,
+  "app_sha256": "4b7530cbe033df2e011cc85b6afc16667963819ca976c096a0f7df4eadba496d",
+  "elf_sha256": "6b233c4f23839ef4c3bca0fe1fece06bc00128398b3da4b49e5e198e8583bf94",
+  "source_sha256": "c6b9d1ad977943066804277bcec6579bb52c7ee790a2a128207e07987f12fbe4",
+  "app_bytes": 1464560,
+  "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+  "native_checks": 6001,
+  "inventory_controls": 12,
+  "artifact_checks": 6,
+  "generator_rejections": 10,
+  "inventory": {
+    "factory_export_functions": 176,
+    "native_app_functions": 212,
+    "native_source_functions": 514
+  },
+  "http_workflow": {
+    "passed": true,
+    "control": false,
+    "all_functionality_verified": false,
+    "lcd_tested": false,
+    "rf_tested": false,
+    "hardware_tested": false,
+    "app_sha256": "4b7530cbe033df2e011cc85b6afc16667963819ca976c096a0f7df4eadba496d",
+    "elf_sha256": "6b233c4f23839ef4c3bca0fe1fece06bc00128398b3da4b49e5e198e8583bf94",
+    "source_sha256": "c6b9d1ad977943066804277bcec6579bb52c7ee790a2a128207e07987f12fbe4",
+    "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\photo_owner_qemu.py": "2f43e3e2c64872c672bccbf19c3ff67923133182f0a3fbd8dca31bcc45591416",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "6b233c4f23839ef4c3bca0fe1fece06bc00128398b3da4b49e5e198e8583bf94",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "4b7530cbe033df2e011cc85b6afc16667963819ca976c096a0f7df4eadba496d",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "1b8d018612336d5dd3ea5b853604a9e3d0bed7c462d9de006b6a991e4746d531",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\manifest.json": "cf9aa5732ab4443d3f59888b6bf502439df1bb4d448f7924cc7ba8ee9dc0aa81",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "924e4eb05c84aedbf5d84fe23d6bd06f893ea9fab1b62b684a4614b751c081a7",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\fixtures\\jpeg_extended\\manifest.json": "09d3bea7ec48f6228e42883fcc7a63f5261f93d0a9e1346b627c3ed8c91b9396"
+    },
+    "boots": [
+      {
+        "pid": 22244,
+        "name": "SmallTV-5cdb7506ebeb",
+        "rom_boots": 1,
+        "owners_stopped": true,
+        "probe_connections": 1
+      },
+      {
+        "pid": 15676,
+        "name": "SmallTV-0fae92b7d70a",
+        "rom_boots": 1,
+        "owners_stopped": true,
+        "probe_connections": 0
+      }
+    ],
+    "cases": [
+      {
+        "name": "full-cmyk12.jpg",
+        "source_sha256": "fe55a1ad4030093b5fa1c00a2c96a2d7bb022f6eb464b1d4d18eda9599fccd7c",
+        "probes": [
+          {
+            "status": 200,
+            "seconds": 0.5779999999795109,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.3279999999795109,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.25,
+            "finish_pending": true
+          }
+        ],
+        "status": 400,
+        "body": "heap-headroom; required=3859 available=1992",
+        "responsive_during_finish": 3,
+        "seconds": 1.9059999999590218
+      },
+      {
+        "name": "flat-sampling44-8.jpg",
+        "source_sha256": "7a4b3597f704ee4a781bbfa652ea0b02dbab39cc3933c17682ef6c6e98ee3328",
+        "probes": [
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782,
+            "finish_pending": true
+          }
+        ],
+        "status": 400,
+        "body": "heap-headroom; required=7699 available=1716",
+        "responsive_during_finish": 1,
+        "seconds": 0.4690000000409782
+      },
+      {
+        "name": "flat-sampling44-12.jpg",
+        "source_sha256": "446694de20bf72c1cd9c80770c975bb7c698ea4b8a26495a391682c065dfe405",
+        "probes": [
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109,
+            "finish_pending": true
+          }
+        ],
+        "status": 400,
+        "body": "heap-headroom; required=15379 available=11376",
+        "responsive_during_finish": 1,
+        "seconds": 0.4529999999795109
+      },
+      {
+        "name": "rich-progressive420-8.jpg",
+        "source_sha256": "881ac1f56a00bb8272a11596a8fb9eef5cabc2142f68a43b9ff2eee1e18d460f",
+        "probes": [
+          {
+            "status": 200,
+            "seconds": 0.31299999996554106,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.23400000005494803,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2809999999590218,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.28200000000651926,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2809999999590218,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.28100000007543713,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.21899999992456287,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891,
+            "finish_pending": true
+          }
+        ],
+        "status": 400,
+        "body": "service-heap-reserve; required=16384 available=10840",
+        "responsive_during_finish": 9,
+        "seconds": 4.515999999945052
+      },
+      {
+        "name": "flat-gray-progressive-8.jpg",
+        "source_sha256": "45263a1cb1be94439742e66e5cfe09553cc9495aff6efee87ba465b6acebf5ec",
+        "probes": [
+          {
+            "status": 200,
+            "seconds": 0.26500000001396984,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.35999999998603016,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.43700000003445894,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.4690000000409782,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.4220000000204891,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.5619999999180436,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.6570000000065193,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.5,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.34299999999348074,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.26500000001396984,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.25,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.25,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.31299999996554106,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.375,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.35900000005494803,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2970000000204891,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.23400000005494803,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2339999999385327,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.23400000005494803,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.21899999992456287,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.25,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.21799999999348074,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2339999999385327,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.25,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.31200000003445894,
+            "finish_pending": true
+          },
+          {
+            "status": 200,
+            "seconds": 0.2660000000614673,
+            "finish_pending": true
+          }
+        ],
+        "status": 200,
+        "body": "OK",
+        "responsive_during_finish": 32,
+        "seconds": 17.953000000095926
+      }
+    ],
+    "cold_source_exact": true,
+    "protected_bytes_unchanged": true
+  },
+  "http_control": {
+    "passed": true,
+    "control": true,
+    "all_functionality_verified": false,
+    "lcd_tested": false,
+    "rf_tested": false,
+    "hardware_tested": false,
+    "app_sha256": "4b7530cbe033df2e011cc85b6afc16667963819ca976c096a0f7df4eadba496d",
+    "elf_sha256": "6b233c4f23839ef4c3bca0fe1fece06bc00128398b3da4b49e5e198e8583bf94",
+    "source_sha256": "c6b9d1ad977943066804277bcec6579bb52c7ee790a2a128207e07987f12fbe4",
+    "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\photo_owner_qemu.py": "2f43e3e2c64872c672bccbf19c3ff67923133182f0a3fbd8dca31bcc45591416",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "6b233c4f23839ef4c3bca0fe1fece06bc00128398b3da4b49e5e198e8583bf94",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "4b7530cbe033df2e011cc85b6afc16667963819ca976c096a0f7df4eadba496d",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "1b8d018612336d5dd3ea5b853604a9e3d0bed7c462d9de006b6a991e4746d531",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\manifest.json": "cf9aa5732ab4443d3f59888b6bf502439df1bb4d448f7924cc7ba8ee9dc0aa81",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "924e4eb05c84aedbf5d84fe23d6bd06f893ea9fab1b62b684a4614b751c081a7",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\fixtures\\jpeg_extended\\manifest.json": "09d3bea7ec48f6228e42883fcc7a63f5261f93d0a9e1346b627c3ed8c91b9396"
+    },
+    "boots": [
+      {
+        "pid": 43252,
+        "name": "SmallTV-3b4dbfab678f",
+        "rom_boots": 1,
+        "owners_stopped": true,
+        "probe_connections": 1
+      },
+      {
+        "pid": 30480,
+        "name": "SmallTV-3d6a8d7d4cbc",
+        "rom_boots": 1,
+        "owners_stopped": true,
+        "probe_connections": 1
+      }
+    ],
+    "cases": [
+      {
+        "name": "network-without-upload",
+        "probes": [
+          {
+            "status": 200,
+            "seconds": 0.3440000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.2970000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.2339999999385327
+          },
+          {
+            "status": 200,
+            "seconds": 0.18799999996554106
+          },
+          {
+            "status": 200,
+            "seconds": 0.23400000005494803
+          },
+          {
+            "status": 200,
+            "seconds": 0.25
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.21799999999348074
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.28100000007543713
+          },
+          {
+            "status": 200,
+            "seconds": 0.34399999992456287
+          },
+          {
+            "status": 200,
+            "seconds": 0.39000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.18799999996554106
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.21899999992456287
+          },
+          {
+            "status": 200,
+            "seconds": 0.25
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.1869999999180436
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.21799999999348074
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.25
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.18700000003445894
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.3589999999385327
+          },
+          {
+            "status": 200,
+            "seconds": 0.35999999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.21899999992456287
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.23400000005494803
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.26500000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.25
+          },
+          {
+            "status": 200,
+            "seconds": 0.39099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.2809999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.18700000003445894
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.21899999992456287
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.21899999992456287
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.21799999999348074
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.21899999992456287
+          },
+          {
+            "status": 200,
+            "seconds": 0.23400000005494803
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.17199999990407377
+          },
+          {
+            "status": 200,
+            "seconds": 0.25
+          },
+          {
+            "status": 200,
+            "seconds": 0.23400000005494803
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.2339999999385327
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.1880000000819564
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.2809999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.26500000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.4059999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.43700000003445894
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.23499999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.25
+          }
+        ]
+      },
+      {
+        "name": "network-without-upload",
+        "probes": [
+          {
+            "status": 200,
+            "seconds": 0.29599999997299165
+          },
+          {
+            "status": 200,
+            "seconds": 0.1880000000819564
+          },
+          {
+            "status": 200,
+            "seconds": 0.17199999990407377
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.21799999999348074
+          },
+          {
+            "status": 200,
+            "seconds": 0.1880000000819564
+          },
+          {
+            "status": 200,
+            "seconds": 0.17199999990407377
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.1869999999180436
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.15700000000651926
+          },
+          {
+            "status": 200,
+            "seconds": 0.6400000000139698
+          },
+          {
+            "status": 200,
+            "seconds": 0.10999999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.125
+          },
+          {
+            "status": 200,
+            "seconds": 0.18700000003445894
+          },
+          {
+            "status": 200,
+            "seconds": 0.125
+          },
+          {
+            "status": 200,
+            "seconds": 0.18799999996554106
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.10900000005494803
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.1410000000614673
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.17199999990407377
+          },
+          {
+            "status": 200,
+            "seconds": 0.15600000007543713
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.15700000000651926
+          },
+          {
+            "status": 200,
+            "seconds": 0.21799999999348074
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.2190000000409782
+          },
+          {
+            "status": 200,
+            "seconds": 0.17199999990407377
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.15600000007543713
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.15700000000651926
+          },
+          {
+            "status": 200,
+            "seconds": 0.17099999997299165
+          },
+          {
+            "status": 200,
+            "seconds": 0.125
+          },
+          {
+            "status": 200,
+            "seconds": 0.1720000000204891
+          },
+          {
+            "status": 200,
+            "seconds": 0.15700000000651926
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.20300000009592623
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.15700000000651926
+          },
+          {
+            "status": 200,
+            "seconds": 0.15600000007543713
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.10999999998603016
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.1410000000614673
+          },
+          {
+            "status": 200,
+            "seconds": 0.125
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.125
+          },
+          {
+            "status": 200,
+            "seconds": 0.1410000000614673
+          },
+          {
+            "status": 200,
+            "seconds": 0.125
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.25
+          },
+          {
+            "status": 200,
+            "seconds": 0.18700000003445894
+          },
+          {
+            "status": 200,
+            "seconds": 0.2029999999795109
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.18799999996554106
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.14099999994505197
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          },
+          {
+            "status": 200,
+            "seconds": 0.18799999996554106
+          },
+          {
+            "status": 200,
+            "seconds": 0.125
+          },
+          {
+            "status": 200,
+            "seconds": 0.15600000007543713
+          },
+          {
+            "status": 200,
+            "seconds": 0.1559999999590218
+          },
+          {
+            "status": 200,
+            "seconds": 0.15700000000651926
+          },
+          {
+            "status": 200,
+            "seconds": 0.14000000001396984
+          }
+        ]
+      }
+    ],
+    "protected_bytes_unchanged": true
+  },
+  "source_pins": {
+    "Small_TV/local_site/pages/photo.html": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+    "Small_TV/local_site/pages/settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+    "Small_TV/local_site/pages/setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
+    "Small_TV/src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
+    "Small_TV/src/app/CMakeLists.txt": "9122729bff12e893c1e3552ccf4af89df3298e373e5213db3e0bcc236566bc89",
+    "Small_TV/src/app/display/backlight.c": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03",
+    "Small_TV/src/app/display/clock_ui.c": "1b6726a12aadb3933840286736f76e5dd89dbe788367b66db417deb4f7da1037",
+    "Small_TV/src/app/display/factory_animation.c": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09",
+    "Small_TV/src/app/display/factory_fonts.c": "a0e98417e6464d0825f8361dfce1d97cc826da8a77f0a7c44aa0b25cc20ff231",
+    "Small_TV/src/app/display/factory_photo.c": "1a12f6e63dafe015570d1312138729785cee33449c0f5e9b24af29fb779764af",
+    "Small_TV/src/app/display/factory_timer.c": "563706d717d3429544bfc8a2cafa5f028b3fd76403cd078b05323338274641fe",
+    "Small_TV/src/app/display/st7789.c": "e3194452d0b8ccaa4cbdb3b51fa229d94c92f11f2eaab80f3a127ffaf49ce17f",
+    "Small_TV/src/app/display/ui_renderer.c": "2217208c5d1f67acdfa91b073619faa86e39ee9ce913ea30e37e440d9ee8e277",
+    "Small_TV/src/app/include/board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+    "Small_TV/src/app/include/color_convert.h": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6",
+    "Small_TV/src/app/include/display.h": "3f38992b7da73f45e3a11e1e567a075c8e1cfc3cc4f3553783e2e92e13e38b09",
+    "Small_TV/src/app/include/dns_packet.h": "d03a8d292118201158ce35ba3915b2b23f2641863f28af20fbed53fbe8227107",
+    "Small_TV/src/app/include/factory_animation.h": "326c35c61c56dfa38f8a861091eb9ca45a5056a1a12c51eea079a356c913daa3",
+    "Small_TV/src/app/include/factory_photo.h": "9ee99645bdddb1a05769eb22e181d84e727aa1c4eb52a6ee6fc263313bec341a",
+    "Small_TV/src/app/include/factory_settings.h": "81743a6d77d761902589b6c073b351efbce072744aea7ca0dc5d04b3f3473dda",
+    "Small_TV/src/app/include/factory_timer.h": "dbed083df5fb927ef764042d496dcd36bfb1113f05fe2fb40cea98f788a69e2d",
+    "Small_TV/src/app/include/factory_ui.h": "28d4e15bb91fbf79adbb6d4b60c357a0d44ee8cc9228c9299b14e5aeef314321",
+    "Small_TV/src/app/include/media.h": "5b275755e5b8aa587e48534c7c44cdcd117ad359c0d6f2dbffb8f3206f7efae0",
+    "Small_TV/src/app/include/network.h": "fc88fdbbb10f4dec709f480cbd260371c7816923f5a0b9c757652e5aed5d708f",
+    "Small_TV/src/app/include/photo_codec.h": "590cd6bc9fed36bbcbd82d16050554dfcbb38f3c60a06766936c643bdd2632c1",
+    "Small_TV/src/app/include/services.h": "6490660af9c5cd11519c173a17982def5a33e0c7a5c9de32c3e7218f5faab193",
+    "Small_TV/src/app/include/settings.h": "7980fae591f32a12869b06bd02d1a821af9eb28a4113efadbaed4146dfca6426",
+    "Small_TV/src/app/include/text.h": "150044cb34ad45edbd4d3d267d7c066aafaf3b6e2635e6e2a93ec88775b3a3ef",
+    "Small_TV/src/app/include/timezones.h": "b0f6bc81cea6a32a60a48a9746ff999922b0c7af1f137d2cbe34d2e436e859f8",
+    "Small_TV/src/app/include/web.h": "ef1f410ad00755e4b9475daeb288b72ee9ab04478a2b4d63a1a697da5453f01a",
+    "Small_TV/src/app/media/assets.c": "693b1e14001a84a643d10bbeb33e7b236685c824002bd2622bcc1d91d23a8bee",
+    "Small_TV/src/app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
+    "Small_TV/src/app/media/media_internal.h": "fb1ff7747a5dc46df6425b5fc80eb5c24133948615c5b91b0ebc36e54c40e8c2",
+    "Small_TV/src/app/media/photo_codec.c": "b04c763dfe9dc9e33ea6e6b6db2e6f36c75a40ded98f2a6949057d06f5ff0417",
+    "Small_TV/src/app/media/photo_storage.c": "53dfe5b16f53afae9a599119071e8b05d5c58df98577538e29e56167a55b0b4f",
+    "Small_TV/src/app/media/photo_storage.h": "99d462c31f577ebecd09e88f3338e021cee2f3a61c3149c65fd380ab459ee89e",
+    "Small_TV/src/app/media/photo_upload.c": "ffd2578c31d3ee19af0c4a47287ffa0b7859658c13ca8025cf9b8956273a1d76",
+    "Small_TV/src/app/media/photo_worker.c": "b8d25986a92427edf84836ac694d2c012df31e601e011b172628c7de21759b46",
+    "Small_TV/src/app/media/photo_worker.h": "71794600ad9d39ab3f14a7729c7f90b4aa93e77e590a32218b627a684ecca5f0",
+    "Small_TV/src/app/network/dns.c": "a4bee538e60a4bca3aba5a7b00233c17a9c08ff39779aefde9965e3a17234025",
+    "Small_TV/src/app/network/dns_packet.c": "cb807af1329c04c534d61296138529f71e0ac5b2b2c3cf5eeb225ac763d6feb1",
+    "Small_TV/src/app/network/wifi.c": "54d1de158d20e1f41826ca902a14ee3c9e36dc8da540ab852665a91f696908ec",
+    "Small_TV/src/app/services/country_timezones.h": "d3098a16a798f3831d1321f1c8c7754c9528a38aa5523d9c2b92f65d30f11b8b",
+    "Small_TV/src/app/services/time_sync.c": "b44582771c144f62bec9181ac71a25a83cf8b1d0bbad3e3b1d8f3315f55e9c5c",
+    "Small_TV/src/app/services/timezones.c": "b7ff1ad5ce79358fa6f7967cb7dce05819636c67a74928165c2dc821ee6c7069",
+    "Small_TV/src/app/services/weather.c": "5f8cf49943d713bffc886707b64b15634dcb4749d483e222b34dd89d7f7b57e7",
+    "Small_TV/src/app/services/weather_parser.c": "af09595b9843d4d559526d39db7afd84cd45b6497408b3a7d23c2f61e8ced6e5",
+    "Small_TV/src/app/settings/factory_settings.c": "81ad9a3cef18df97d9c345abe1106c5c62ecd4e3c60ebba677200f612d7faa9b",
+    "Small_TV/src/app/settings/settings.c": "f94eeda257d0c3d4a2b952ed72efb699cbe1a83dfd6d40d0c43d857122a65d63",
+    "Small_TV/src/app/text/text.c": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa",
+    "Small_TV/src/app/web/photo_api.c": "86d732dc59558717737099821899300769e6f93dd7e41173f45f048f0408e1e2",
+    "Small_TV/src/app/web/photo_async.c": "c3112349fbf69d693a69783de94eb736cb285a899a32e9a97615be6cc04621cd",
+    "Small_TV/src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
+    "Small_TV/src/app/web/server.c": "f9dc5eecac2e34579bc79e23e1d5c70ea6d1eae67fc086a70da4b21ad85e7663",
+    "Small_TV/src/app/web/settings_api.c": "a1a2245937227c2baada3a1a97492ae13550af71965c791c65c56e084dccdd09",
+    "Small_TV/src/build.ps1": "fbc33f0aa9f696e8e1f05eec59bd9a85b033bba431d797eb93f72f28c3de7285",
+    "Small_TV/src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
+    "Small_TV/src/CMakeLists.txt": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8",
+    "Small_TV/src/codec/jpeg_backing.c": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
+    "Small_TV/src/codec/jpeg_backing.h": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e",
+    "Small_TV/src/codec/jpeg_baseline.c": "b0bb9a49fb9cbccd9c49fdd9d92c893e12721ca0bc151de98ad815d5556fe1b8",
+    "Small_TV/src/codec/jpeg_baseline.h": "f6f4c9d9f37fab7e1defeb436584afd73b23db1e1ecdc6b02f95a157a8ac6e7f",
+    "Small_TV/src/codec/jpeg_coefficients.c": "7543ca5459b2981313804f62d23feb8ea6933c9e478beec7b6b564302a39d1f1",
+    "Small_TV/src/codec/jpeg_coefficients.h": "9f1fd219b8ef83e39c72b411e258c025e4c1e159c5c94d44ef786194ace58a4a",
+    "Small_TV/src/codec/jpeg_decoder.c": "986cafff84e946b3bf942fbf8f2a4805647e582920e89b62d0f21e02722e47c9",
+    "Small_TV/src/codec/jpeg_decoder.h": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12",
+    "Small_TV/src/codec/jpeg_decoder_internal.h": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac",
+    "Small_TV/src/codec/jpeg_memory.c": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4",
+    "Small_TV/src/codec/jpeg_privacy.c": "1d8bc010dcc3caf232760f0d7a9a0fd46bb079f7768a4454044cc28a1e225618",
+    "Small_TV/src/codec/jpeg_privacy.h": "54810169a5e94edf28b56b1e32c74b61b4c651c752691725ab67083e7674e311",
+    "Small_TV/src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
+    "Small_TV/src/reference/application.c": "e7d5e924149ff566c09254957aff738c6e4eb98ee8f02aeef9adb4bb083150ef",
+    "Small_TV/src/reference/assembly/advance_photo_slideshow_at_4200bc36.asm": "d6df34881c8748da95f25915faaf57eaa5788a13e9399826a51bc5b67956130b",
+    "Small_TV/src/reference/assembly/application_main_at_42008e56.asm": "bac3aa2777746e89a53613a978dc8c53c1a13e458220d5b77f1ce5d7d51b71a4",
+    "Small_TV/src/reference/assembly/apsta-20261018/initialize_wifi_softap_at_4200d06e.asm": "0ec007a824a0e37ae2d990516462b2a22447cecd6cbed00af2682be568205285",
+    "Small_TV/src/reference/assembly/apsta-20261018/manifest.json": "776a0765f8c184beb52b96b7ccc846da90e49bb842b559d15b4b819aa066fb03",
+    "Small_TV/src/reference/assembly/apsta-20261018/wifi_ap_event_handler_at_4200c6e2.asm": "9f1ab2de7c91a45eb5bd88bd781962b3f3b0c143a73483bf5009b85f49d97343",
+    "Small_TV/src/reference/assembly/configure_sntp_and_timezone_at_42010a06.asm": "a9ed218b38a015bf8f589ed8b429051d237891be5d1804fd81bc45c68365b859",
+    "Small_TV/src/reference/assembly/decode_jpeg_at_4200c4ac.asm": "44a4f7bdb02cf7332e558d3611e2ab00aca30664b00ea26937a2ba72917b555d",
+    "Small_TV/src/reference/assembly/draw_ascii_text_at_4200abee.asm": "e15e3b90e43d39c57eb3fd6e5804d9e7ac370d9b767914c2924ed411f2e2a48c",
+    "Small_TV/src/reference/assembly/draw_city_label_at_4200aefc.asm": "010697c346f9dc8474e9384558f13f891ecde6332d3785e34c9bfdaf916d3fc9",
+    "Small_TV/src/reference/assembly/draw_classic_clock_time_at_4200afcc.asm": "e6e361583cd5738a07d25634ae077e1e8f8a7c57824a8e3b37cbbbe740cebf4e",
+    "Small_TV/src/reference/assembly/draw_clock_separator_at_4200acae.asm": "6bc1ff54ceab7620f5706cdbcf763343a4e22ee0e4e18ac74076c4930aa392e3",
+    "Small_TV/src/reference/assembly/draw_encoded_text_at_4200aa1e.asm": "883604f65d7ee7d101e9cc4ab21dd21c80658bfa9941110c497961e8b79335d6",
+    "Small_TV/src/reference/assembly/draw_filled_circle_at_420095c4.asm": "1b90d1707e6f02dc51d145ff71a0e73f962f6e9bb2625a06d1100b3870f7054f",
+    "Small_TV/src/reference/assembly/draw_glyph_transparent_at_4200a81e.asm": "e5586ee1c8b50116c1918797d0ef2652d9fe44917739ecd43d67fbe9334d5d9d",
+    "Small_TV/src/reference/assembly/draw_glyph_with_background_at_4200a5be.asm": "27d74c745ddadf9484eaebd5d4f709fd711a0e083c9d7318f3e06a9803ec4b19",
+    "Small_TV/src/reference/assembly/draw_jpeg_at_flash_offset_at_4200c518.asm": "8da64c934919d1b9c2a723e0f46e94b29c8d3766282058e80bcf97c599de7864",
+    "Small_TV/src/reference/assembly/draw_next_enabled_photo_at_4200bb4c.asm": "372c07fe13936bdb983dbbeacf8dbdd937fd66d1629dd389200bf6b197e5d9ce",
+    "Small_TV/src/reference/assembly/draw_startup_connection_status_at_4200c1c8.asm": "e8b9c7631a918e18595c2dba7075592b4334a8ab3c345d7275c167aa15cf9878",
+    "Small_TV/src/reference/assembly/draw_temperature_unit_at_4200aae0.asm": "2e11bba8467e875bc42f87071f3f6f74dac9e555fe6467fdd542a7c3c2f5003c",
+    "Small_TV/src/reference/assembly/draw_thick_line_at_42009644.asm": "a8ad89d4e3ec8b8e9ef2f754de1a181112339da062294fc1aa8586ca367be9e5",
+    "Small_TV/src/reference/assembly/draw_weather_description_at_4200af5e.asm": "afa8c589bef27e55443ece008cbcd46d25367e97bb986ca25e5d3b1fb945a0ee",
+    "Small_TV/src/reference/assembly/draw_weather_status_at_4200b340.asm": "2c43769ae692c9f9547172ce50888700e4d719f8547b6270e61673def71b16f2",
+    "Small_TV/src/reference/assembly/draw_wifi_setup_instructions_at_42010c4e.asm": "a3189c9fa1185dd50b0c4e1b9cbe67537ace5a59fe05348a7a10f48c177ddb95",
+    "Small_TV/src/reference/assembly/fetch_current_weather_at_42010864.asm": "73d8ae990383858b460a97866eabe1e8fb9c382dab1d7010a2ab5db9298d16ad",
+    "Small_TV/src/reference/assembly/helper_at_42010eca.asm": "01e659e44d7c2b61961bfb123ad922bf350df5b459088ad03768d67d4fd6e3b4",
+    "Small_TV/src/reference/assembly/helper_at_42011040.asm": "7ae538118d24e344f4444965d4730334349acca02ca12b3f34ff71e602370440",
+    "Small_TV/src/reference/assembly/helper_at_420a74e6.asm": "03950f2d59375b02c806e45f652d22f3494156d9e60fd1328ca368be9f993f19",
+    "Small_TV/src/reference/assembly/helper_at_420aa5ce.asm": "4bf18b27367b6c3958742e8f02fdd382549d03f6eb01f29b609f2107316c12bb",
+    "Small_TV/src/reference/assembly/http_advancedset_at_4200e9ea.asm": "659449bd2fa12de6c6a1748d19b5db6d68fca14cb5c92583166104d13ebf20f8",
+    "Small_TV/src/reference/assembly/http_set_led_brightness_at_4200d66a.asm": "a3c28eb68f8ab8dc120de7cfdd17201ce0e24f6eaf0960267a44bf3526455689",
+    "Small_TV/src/reference/assembly/http_set_night_brightness_at_4200d5ac.asm": "c0bf0317a5a7383b0a4cff05a4703bf6de9229be6b0276acdefc35a77ac3b274",
+    "Small_TV/src/reference/assembly/http_setclocktype_at_4200d7f0.asm": "74728cff99084bef9237f7b8f6807c24efa98612d35bbeb3ece0a4081fb7f8d0",
+    "Small_TV/src/reference/assembly/http_updateCity_at_4200f2c0.asm": "33f5a31ef1457966d2a0a8b965a91be41c9e304f4eabc0904ac566e87ba44fa4",
+    "Small_TV/src/reference/assembly/initialize_backlight_pwm_at_42008d62.asm": "9fca8682f795d065b5118c93b33928f10353de8b903352af534fc654a75c847b",
+    "Small_TV/src/reference/assembly/initialize_dial_clock_at_4200a156.asm": "bac183ea370805256742c77978f15729c96ddea12214a8d8a3bccfa20c42baae",
+    "Small_TV/src/reference/assembly/initialize_photo_slideshow_at_4200bb20.asm": "b8724a89682458f0334e63cfea6dafa1b7cea3291137b2dbdb29a73eefb9ff72",
+    "Small_TV/src/reference/assembly/initialize_selected_clock_theme_at_42008e08.asm": "cf42d05aa37a8d8f6d80778317990dbf3867a256d9cfd0780656bc79b89a7eff",
+    "Small_TV/src/reference/assembly/initialize_simple_clock_at_4200bd26.asm": "5caaa04e394166663bef9fa1f4698d18ef56fe0c2f1cab6426c568d84d56da0f",
+    "Small_TV/src/reference/assembly/initialize_system_timer_at_420083b6.asm": "4e3dce71d1d6220b202d6c4cb83f0d699828e153baaca4a060718105b65e0ca8",
+    "Small_TV/src/reference/assembly/initialize_wifi_station_at_4200ca30.asm": "ec4ac1687460f46f1a3bed0482813b008477e7a7b01d7c5f15b12b3f7e514a51",
+    "Small_TV/src/reference/assembly/jpeg_header_prepare_at_42011c48.asm": "b5322873883ebf2ed78c6e7eab397e114a8a7cc0e52387d4e8e063201efb5b90",
+    "Small_TV/src/reference/assembly/jpeg_huffman_tables_at_42011100.asm": "dcf9c5933c1239476e8172a8f7204580fe42783ded8a1e8f92d885cafc34d1f3",
+    "Small_TV/src/reference/assembly/jpeg_input_callback_at_4200c33e.asm": "6a272a139556e82aafbc882a5fe8d2c8b5d47714f6baa2b55cb80f1ed3bcc9e0",
+    "Small_TV/src/reference/assembly/jpeg_output_callback_at_4200c374.asm": "88effc7dfbe2bb1294a3f5bed79c719b8f5cf4ae42483aa929fe75f6c7a0ccfa",
+    "Small_TV/src/reference/assembly/jpeg_quantization_tables_at_4201105c.asm": "a7718f83e1a1ec7e20e62e37b9470614efc96cd85994aeba426094829adf7b81",
+    "Small_TV/src/reference/assembly/load_settings_and_defaults_at_42008552.asm": "c1eefaa7dc102f777cdbbd0ede5eef4a2e4e1b6afab25e17f95948a5a6be94bd",
+    "Small_TV/src/reference/assembly/manifest.json": "a2dfe1313883b8b97eefaf0388c7d23e82f20fba9d27cc6c833f05659406749a",
+    "Small_TV/src/reference/assembly/netif-20261018/configure_softap_network_at_4200ce9e.asm": "4656524f9903c098530fd382e3a76d8e32330064f99235aa51a3fa7ee6ee8f90",
+    "Small_TV/src/reference/assembly/netif-20261018/create_default_wifi_ap_at_420459d6.asm": "c66395f23d4dddb4d53d45d783bb34afc442a4da702fe8474c6220cffe710438",
+    "Small_TV/src/reference/assembly/netif-20261018/create_default_wifi_sta_at_42045a7a.asm": "da68c38c874a6f39606740ebb948a3ae9a585c79b60e1715a97e9990d4cb3638",
+    "Small_TV/src/reference/assembly/netif-20261018/lookup_netif_from_ifkey_api_at_420352ee.asm": "1f665c9e471aadfca0fd6295d89c1c1012244fe637cb7b4ba27015abfe791d12",
+    "Small_TV/src/reference/assembly/netif-20261018/lookup_netif_from_ifkey_at_42036770.asm": "442668252654bb62e5aa94020a962948d427ea42f416d61a8114650fa1c38d1d",
+    "Small_TV/src/reference/assembly/netif-20261018/lookup_netif_from_ifkey_unsafe_at_42034e32.asm": "33a13c729a2dd04acc55f4831ee86bb9a6951f689ac1e4dc242c7309509383f9",
+    "Small_TV/src/reference/assembly/netif-20261018/manifest.json": "fca9b346e055de6618475d4acebcb2f9e03d1544093b8c3b7c6781a59d76e8f4",
+    "Small_TV/src/reference/assembly/netif-20261018/netif_ifkey_at_42036f98.asm": "d335c933002fd5ff44ac191fe69e8346a1ac820369aae22b761519ab9c1c36d8",
+    "Small_TV/src/reference/assembly/read_clock_theme_at_4200dfdc.asm": "abb4eac4a35c742c5e33443c7d0badef909441a0457fae501f69fe9ecc7c04b6",
+    "Small_TV/src/reference/assembly/README.md": "8e1900e4f0c46f04062fafb5b9f473eb2d8e4b9cea1fcf03a823666388dabeb6",
+    "Small_TV/src/reference/assembly/render_classic_clock_at_4200b738.asm": "1e12e6af1cc3c01aa6fa11050ac5efc2a56c0b1187a617fbc9d13745b7a09a58",
+    "Small_TV/src/reference/assembly/render_simple_clock_at_4200bd8c.asm": "4448d88b750cd4eafb0eea76083ddffd4a8bbedd2f5da3878f23f137d102b92b",
+    "Small_TV/src/reference/assembly/rgb565_to_rgb888_at_42008a6a.asm": "0da46e5f12e8b9b4e3bccfdcc0010cec8cf2e993c378393c8d720fb76efa4c3d",
+    "Small_TV/src/reference/assembly/rgb888_to_rgb565_at_42008a96.asm": "7277a277e175e6edcc53d4b393942f78b631c8311cf5e7e6eabf57c79ca8296b",
+    "Small_TV/src/reference/assembly/save_settings_sector_at_42008a00.asm": "5064a0668922fdef00f1a3d16ae6ea603e1641b424bdf5f36568ea8e936c69fc",
+    "Small_TV/src/reference/assembly/set_backlight_duty_at_42008bd2.asm": "f59b06ad5bf9a3e103e61a5a7469ed8d029db3040f0abac30ada7141015cd740",
+    "Small_TV/src/reference/assembly/sntp_enabled_at_4201bec6.asm": "490f15b0652922adc7bf203d97b2cdaf840c807e0827349d82f95db5f8414518",
+    "Small_TV/src/reference/assembly/sntp_restart_at_42017ea0.asm": "47f2c72e9153ff85dcdeca1a9660b92957bd10ea7c06392d9ba57aabd5fa955a",
+    "Small_TV/src/reference/assembly/sntp_stop_init_callback_at_42017d34.asm": "3e2a5e4215983d04d710c28dfa4512587c3d4d94d98b2a62b78c7424dc76bb46",
+    "Small_TV/src/reference/assembly/system_timer_alarm_callback_at_4200826a.asm": "c278cd566332098fb54904ee9ec51ab940e9449f1de1865e9fb96103d5011a4e",
+    "Small_TV/src/reference/assembly/unpack_rgb565_channels_at_42008a34.asm": "1a4f91323feec4632f585cd4a78057f8e56329ff738a550a7766893fdbab32ad",
+    "Small_TV/src/reference/assembly/update_day_night_backlight_at_42008c4c.asm": "94cce89d415c1d4313a79172c5748b63d0c42daae926e4d6835b19346fd478be",
+    "Small_TV/src/reference/assembly/update_dial_hands_at_42009ccc.asm": "aad9bca935e3b5062558f149c467ce364176a0f2d84be582561c090cf39d147f",
+    "Small_TV/src/reference/assembly/update_local_time_at_42010b70.asm": "4eb08235ad5d2c9c2470b816a6aa4e1f6289dddccd766a182c2feb6a2c234cb1",
+    "Small_TV/src/reference/assembly/update_wifi_connection_mode_at_4200ce40.asm": "0bd730b05f48e6ec4f0807de07c48d47083b712c2a84f2cef6503ca1fabc0f35",
+    "Small_TV/src/reference/assembly/weather_http_event_handler_at_4200fccc.asm": "d728501f92709eda28bb38dca6bdcd2cc9622c0fd9e80e9fe16c7a3a24f30942",
+    "Small_TV/src/reference/assembly/wifi_station_event_handler_at_4200c602.asm": "872c757cc8583be19159137f8a736bbb3b2f51ee9fe8a85436759220f7102a3f",
+    "Small_TV/src/reference/backlight.c": "f2693633a2f6f2dcb03cb4e4c50476994abfb51c76715c71b3631e35faa8c1f5",
+    "Small_TV/src/reference/clock_dial.c": "7a6106cc6ecda7450e8c73cded0081d2df2054595c617ec8d7e13e0762369c82",
+    "Small_TV/src/reference/clock_themes.c": "412787d4b73878aff7300bf33ab595f4db5feb051005ccc81964397ad56b5511",
+    "Small_TV/src/reference/display_fonts.c": "6946e35ef6429f56503aeaff4ee0bfa3c52c84de22106f900ee99c37090e6e5a",
+    "Small_TV/src/reference/display_graphics.c": "d92a30a8f54df6e76ea29853113acf3b2315d239c8e24995523e899c101cbbe6",
+    "Small_TV/src/reference/display_spi.c": "5bff6da1dff3dca767d523dcede33847be6cbf9eba3ad24e5606c99d875c8b83",
+    "Small_TV/src/reference/http_photos.c": "a9ee52fa23ac9b14f291298d83b61d589bacb55ca83cf3adba32ac137518c6c9",
+    "Small_TV/src/reference/http_server.c": "6605d0f51ebf93ef5b1c4891e2aadff4ca6c80d613a131e5f6e54301ed69b948",
+    "Small_TV/src/reference/http_settings.c": "8866380d3f7a82c6631c3c0abb59de9492a94f58437a316dae63f75c43d74635",
+    "Small_TV/src/reference/media_images.c": "6c96d8f5dbde8d0e15f06d13460341c3bfa9d49d1d177db1563e425a38281c46",
+    "Small_TV/src/reference/sdk_platform.c": "8c3b5d5058b13574446c29d8379820177e52e05244484877d064d2bd7cf89e52",
+    "Small_TV/src/reference/settings_colors.c": "5f6984de1ccfc135ff4021c17087ecb433a7be5af9c4938bfea0bb2f5b498f47",
+    "Small_TV/src/reference/time_setup.c": "c53c0173e7062311df5b0e4039d248d774d8578786bcbf83ca2fa867a1e430da",
+    "Small_TV/src/reference/weather.c": "8755ce34a25323fbc93d1b82876fbd519f3e8321b5a12f720a4b6e0f4fcb996e",
+    "Small_TV/src/reference/wifi_dns.c": "58eb1815e3cc56865185f2f2f3ce6b2980c3b82a79593a6b92047e9d6b3d488a",
+    "Small_TV/src/resources/factory/ascii16.bin": "553df0fd53e83a3271add3302e20d86e499f0c87337e1f96946275315d6308ab",
+    "Small_TV/src/resources/factory/ascii24.bin": "04dff69c2da8ea5cf098e9ef2a4ebf97f1d5f86197c448ae90c0803f49af54c1",
+    "Small_TV/src/resources/factory/ascii32.bin": "06c24daf012467c579b23baae72d88bf94e3137fc28edf2e013e1d4f5d70fa93",
+    "Small_TV/src/resources/factory/digit_plate.bin": "36841c3d96afcba3439b7b7aad7d4a579ff3bca4a1f2815ba489d64b1a29495d",
+    "Small_TV/src/resources/factory/digits40.bin": "0813381d384a221a0c4a4c7a2d38fb4859c241e5dcb455fd2dd991b8df769de9",
+    "Small_TV/src/resources/factory/digits64.bin": "407f914a9cc5637fdc2868d6f2a0dba06cdacea326924e37b720aee24b23accc",
+    "Small_TV/src/resources/factory/digits80.bin": "da2a636d2361ee22de37f4712563a37914708a291e37180876523887823af146",
+    "Small_TV/src/resources/factory/manifest.json": "3ff5fd252b0fdcc8901ca1bd55257308be0fb3851a9b346371942e244c37db32",
+    "Small_TV/src/resources/factory/simple_plate.bin": "bc0dc23f54cade887da2c78af7992dc9e4d7d6cdb793ac9b8c4fafd4e8d93589",
+    "Small_TV/src/resources/factory/startup_border.bin": "1ebc2d8106a8ad17cd113de06ba6876dee2e97d2fe1df8c1e2ca6b1179117cc9",
+    "Small_TV/src/resources/factory/startup_cap.bin": "91ecb894bce7f85606895644c27914934ebe60782062573946d5b09a89e65d8f",
+    "Small_TV/src/resources/factory/temperature_units.bin": "2ef26961f611fc369f294797fa76d7f12fca3307f7fdf91f58f6526018e71554",
+    "Small_TV/src/resources/timezones/Africa__Accra.tzif": "f3e7fcaa0e9840ff4169d3567d8fb5926644848f4963d7acf92320843c5d486e",
+    "Small_TV/src/resources/timezones/Africa__Addis_Ababa.tzif": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466",
+    "Small_TV/src/resources/timezones/Africa__Algiers.tzif": "2f69d2e202cd16fba8f3da7762d07e9520d8636dbce12aa4187f6941023cbb07",
+    "Small_TV/src/resources/timezones/Africa__Cairo.tzif": "89cb9a36212fb82e933dcd9faa10efdfa969a29ec80c32063bbb4518c033d1be",
+    "Small_TV/src/resources/timezones/Africa__Casablanca.tzif": "6b026cdcb00868a3dc1f24f7072a1ce3ac0c3ff83b3d847fee5f3cc01fa85f50",
+    "Small_TV/src/resources/timezones/Africa__Dakar.tzif": "f3e7fcaa0e9840ff4169d3567d8fb5926644848f4963d7acf92320843c5d486e",
+    "Small_TV/src/resources/timezones/Africa__Dar_es_Salaam.tzif": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466",
+    "Small_TV/src/resources/timezones/Africa__Johannesburg.tzif": "d19aebe2435c4e84bf7ae65533d23a9d440f98162e5b4d69c73f783e02299ec8",
+    "Small_TV/src/resources/timezones/Africa__Kampala.tzif": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466",
+    "Small_TV/src/resources/timezones/Africa__Lagos.tzif": "e5ef1288571cc56c5276ca966e1c8a675c6747726d758ecafe7effce6eca7be4",
+    "Small_TV/src/resources/timezones/Africa__Luanda.tzif": "e5ef1288571cc56c5276ca966e1c8a675c6747726d758ecafe7effce6eca7be4",
+    "Small_TV/src/resources/timezones/Africa__Maputo.tzif": "910c97c091cd34ae7427c83226234ce7b4f2f425c5822d6669c24be62010a792",
+    "Small_TV/src/resources/timezones/Africa__Nairobi.tzif": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466",
+    "Small_TV/src/resources/timezones/Africa__Tunis.tzif": "ba8004111e3c449a8d786a1806e93921e62a8dcf2c1ef58bbcab2cb9509dd7c8",
+    "Small_TV/src/resources/timezones/America__Anchorage.tzif": "77ca0c22962f06998bce5e48d81cb865a14466c83ff5dc607eaa483344058bf6",
+    "Small_TV/src/resources/timezones/America__Argentina__Buenos_Aires.tzif": "20454ea527c8ea888926614d21bf556f46ce38c220c4ee5b821170eef9071469",
+    "Small_TV/src/resources/timezones/America__Asuncion.tzif": "dc938d02e787eca6bfc6ae4a3ab72d2a42806ae3dedc14e0d01393040f143542",
+    "Small_TV/src/resources/timezones/America__Barbados.tzif": "81d8897fd64a38cb3d401e1ec74f9caef76684d7c7a4dcd74d5db14da3430808",
+    "Small_TV/src/resources/timezones/America__Bogota.tzif": "268c2f06cb3237ba930d64a0bcf30c4266eee89ddc9dfabf250cc3900e411c34",
+    "Small_TV/src/resources/timezones/America__Caracas.tzif": "507994c1cd2614fa22751e140c259be13e30fe6a4206c49be01916dd238a2156",
+    "Small_TV/src/resources/timezones/America__Chicago.tzif": "c27b739ff46a7df0594e120d725b439217e11e44ea9a50cdc49130383b5482e7",
+    "Small_TV/src/resources/timezones/America__Costa_Rica.tzif": "8a1a2a03fb479989b46234d12d9bb7abc3eab2aa8e79bd4210b8d684f7ff1d71",
+    "Small_TV/src/resources/timezones/America__Denver.tzif": "9bb703920eca4b6119e81a105583a4f6ca220651f13b418479ab7cd56c413f3e",
+    "Small_TV/src/resources/timezones/America__Edmonton.tzif": "d52173b56a28205d8d6f792bcfa8bc07614ee0d269f7bf6e43ec91f68d410600",
+    "Small_TV/src/resources/timezones/America__Guayaquil.tzif": "f0e21a0b2f928ab28acf823bee5e8c4050e048b1ed8cdd13be494b54467fd34f",
+    "Small_TV/src/resources/timezones/America__Halifax.tzif": "90ee5a841336a132df592e0a5f5e456ca5dfa39c20f9ff6fc35fe130e2121a28",
+    "Small_TV/src/resources/timezones/America__Havana.tzif": "9ace6b0aeab6c81338f55993ca632d15037773968137596477c8e3cca767366f",
+    "Small_TV/src/resources/timezones/America__Jamaica.tzif": "a437b1700333aeff53a8b5868d5387c080dc14c2d3e95aa5ce36f901b3669284",
+    "Small_TV/src/resources/timezones/America__La_Paz.tzif": "da2601c677341c8c00ce5c7e437008f4b6f4188f3b558dbbf6819cae8059495b",
+    "Small_TV/src/resources/timezones/America__Lima.tzif": "eef363461c732fe5f89326daf8d9335d8340384f9caaa717bf35d3a9c4d70616",
+    "Small_TV/src/resources/timezones/America__Los_Angeles.tzif": "200d05754f6d83a371cf408d7085125797657b3b0bebeba1e508cffe86a3e5c8",
+    "Small_TV/src/resources/timezones/America__Mexico_City.tzif": "37dd2bf08f13fce0f707c3b1f4cec4018efbd9c47c8367b0fb4debbd461bd72f",
+    "Small_TV/src/resources/timezones/America__Montevideo.tzif": "97b1635baaac706cddbdf8e56c8799e4243f005592dd97950d2e69a4c24234cd",
+    "Small_TV/src/resources/timezones/America__Nassau.tzif": "815ab4db7a1b1292867d2f924b718e1bba32455ce9f92205db2feb65029c6761",
+    "Small_TV/src/resources/timezones/America__New_York.tzif": "d7f2206b3a45989fc9ad63d558922532fa7352280d5f87176bf1db79cb1d1fa9",
+    "Small_TV/src/resources/timezones/America__Nuuk.tzif": "2e5199e58fee77d270591be77079d41d102b41b6e735c9a6af3dddb8c851dc77",
+    "Small_TV/src/resources/timezones/America__Panama.tzif": "a78d73067ba3cbd94f8a23dfdd6aa8b68cb33b18484bc17b4e20ea1aec2f0a81",
+    "Small_TV/src/resources/timezones/America__Port-au-Prince.tzif": "c2c4ba55b43ffdb289d8850c3f2fcf6a8d022d12b9a57101aea91a62eaacdcdb",
+    "Small_TV/src/resources/timezones/America__Puerto_Rico.tzif": "abbe8628dd5487c889db816ce3a5077bbb47f6bafafeb9411d92d6ef2f70ce8d",
+    "Small_TV/src/resources/timezones/America__Santiago.tzif": "fd006953c2b442a2e1e66db2a967dd932a4824390f01cddd9c801ce63450c715",
+    "Small_TV/src/resources/timezones/America__Santo_Domingo.tzif": "c66268e7d9995cded69dffb7263977ee6082fbc19f37ac6693697fbe78327de2",
+    "Small_TV/src/resources/timezones/America__Sao_Paulo.tzif": "fa2ceb222f065c0289f3997ff0c54ba05a74a599b4522870fa86a96e24e18891",
+    "Small_TV/src/resources/timezones/America__Toronto.tzif": "815ab4db7a1b1292867d2f924b718e1bba32455ce9f92205db2feb65029c6761",
+    "Small_TV/src/resources/timezones/America__Vancouver.tzif": "7d23681b36849ac7f50537b9c02bd8d3aa000b98bd3d1825ce85e7ea3e5534c9",
+    "Small_TV/src/resources/timezones/America__Winnipeg.tzif": "6072e5fb802900b193407239b4fb4de9fb2ce80b43ea0f4286a954665b565cbd",
+    "Small_TV/src/resources/timezones/Asia__Baghdad.tzif": "cc57ba2d749fba82631ac9984cc1a326d05c00c2e2285903ee3efe55aa8ac07f",
+    "Small_TV/src/resources/timezones/Asia__Bangkok.tzif": "cdc8e2c282d8bc9a5e9c3caf2fc45ff4e9e5cd18f5dec8cb873340ad7c584d64",
+    "Small_TV/src/resources/timezones/Asia__Colombo.tzif": "400ca32bb82d5d459f2ee8eed4cd07dff7b0ea24ccf9bc1fccee686e0bda1f2f",
+    "Small_TV/src/resources/timezones/Asia__Dhaka.tzif": "ac21a61306d6e2a91453641f4e3e732ebc9d542abc1d35a5d5db2a10340ebefa",
+    "Small_TV/src/resources/timezones/Asia__Dubai.tzif": "0d9ea5053e83188032a6fb4d301d5db688f43011e5b6b1f917a11b71a0da7b16",
+    "Small_TV/src/resources/timezones/Asia__Ho_Chi_Minh.tzif": "0d6e76fb941d0540214ee81f161f449c6a7dc3d515e5654618a7ae42d0acd1e1",
+    "Small_TV/src/resources/timezones/Asia__Hong_Kong.tzif": "f4068f73246db97417f73467453564c57d6646ce4909b9fa2536923efcd7eb4f",
+    "Small_TV/src/resources/timezones/Asia__Jakarta.tzif": "e2a099ea48b1f7166b88d219b326f7c44373d08909cd9723b44346946fd6a384",
+    "Small_TV/src/resources/timezones/Asia__Jerusalem.tzif": "9fcde8d584dea0585f5c8727aaf35f48a149e0dbd3a83bf6cef8bca9c14021e3",
+    "Small_TV/src/resources/timezones/Asia__Kabul.tzif": "a4d2304df8921bbd4118abeb84aaa8d71771724031f6f7dcc799c96a7acbf354",
+    "Small_TV/src/resources/timezones/Asia__Karachi.tzif": "ba3a38c2ffb7a1af6d7eb153e63b0b70461c8de19e051806d90c1d5e0fe28d4e",
+    "Small_TV/src/resources/timezones/Asia__Kathmandu.tzif": "76b8f1bfe072231a1d9e7f8501310e27c0d08048c48f7422860b6477c142c438",
+    "Small_TV/src/resources/timezones/Asia__Kolkata.tzif": "3a00bdbe1bc4959e727567c730ba51b03455ecd455f7c190c5ad14386eb79b0d",
+    "Small_TV/src/resources/timezones/Asia__Kuala_Lumpur.tzif": "0954b2d9a301d94f4348024606a71bbcb2fa24d3cd3709f5bc8bca605039785d",
+    "Small_TV/src/resources/timezones/Asia__Macau.tzif": "9abf3d8bfc293285a102da99ac5d9219ca082dc530eab62b0e42143400deb3b1",
+    "Small_TV/src/resources/timezones/Asia__Manila.tzif": "1681a62321489c79277c4d74dcf6e20fae46530b269d85b3179a06cacd3706a6",
+    "Small_TV/src/resources/timezones/Asia__Pyongyang.tzif": "3710b975af284d9e12b621509e5863969f454d1b8c33e5f0b2add8838cb4c640",
+    "Small_TV/src/resources/timezones/Asia__Riyadh.tzif": "46853e94276af2eea8e86c2f152a871c092df195dc51273b8fc7091faa4b461c",
+    "Small_TV/src/resources/timezones/Asia__Seoul.tzif": "64a70b6fbcc9b65e762dbd25eb89b6f40c137146edc8dbd4d081eafacdab78de",
+    "Small_TV/src/resources/timezones/Asia__Shanghai.tzif": "bf8b7ed82fe6e63e6d98f8cea934eeac901cd16aba85eb5755ce3f8b4289ea8a",
+    "Small_TV/src/resources/timezones/Asia__Singapore.tzif": "0954b2d9a301d94f4348024606a71bbcb2fa24d3cd3709f5bc8bca605039785d",
+    "Small_TV/src/resources/timezones/Asia__Taipei.tzif": "a04c2c72f4f76a83178d036dd97d157ee1f32e478e44dda7a5c10923687ee6cf",
+    "Small_TV/src/resources/timezones/Asia__Tehran.tzif": "452d5a097a6c260fccb4e7b229b4eddca5563f5cac30c515bc89cb73bc615b72",
+    "Small_TV/src/resources/timezones/Asia__Tokyo.tzif": "59a3871430f0d3b93e619fa30a43a41d1e88bdd49ff26f09d0f405a500706f96",
+    "Small_TV/src/resources/timezones/Asia__Ulaanbaatar.tzif": "fbe23c3fafdee01b5121edf009290fb701cebbf93dacfb30f8aa90287242f6f3",
+    "Small_TV/src/resources/timezones/Atlantic__Azores.tzif": "e97069fab820f211114ded9cf9b4ca6a160f9640e7dac44e06eaa8f7001db4f1",
+    "Small_TV/src/resources/timezones/Atlantic__Bermuda.tzif": "3eec6a0f6703f7d3f38dbf211fdf43c2cd39dddff35e76478de1f4919f0b48b2",
+    "Small_TV/src/resources/timezones/Atlantic__Faroe.tzif": "230d2a074981baf887e70dd0cbc8dac4239eb34ed91e1db0916f0c3d4589aa3d",
+    "Small_TV/src/resources/timezones/Atlantic__Reykjavik.tzif": "f3e7fcaa0e9840ff4169d3567d8fb5926644848f4963d7acf92320843c5d486e",
+    "Small_TV/src/resources/timezones/Australia__Adelaide.tzif": "1a4d52746455981db7dc8f961135c0302673ecbec7573a0de1a52821c80daf78",
+    "Small_TV/src/resources/timezones/Australia__Perth.tzif": "66cb9e95c042d587d6ba01f60ab94e5d07120c3e20194242a1b0755be6aea47a",
+    "Small_TV/src/resources/timezones/Australia__Sydney.tzif": "820d45a868a88f81c731d5b2c758b4ed000039b6260a80433f8e0f094a604b59",
+    "Small_TV/src/resources/timezones/Europe__Amsterdam.tzif": "b10f9542a8509f0a63ebca78e3d80432dd86b8ea296400280febd9cfa76e8288",
+    "Small_TV/src/resources/timezones/Europe__Athens.tzif": "f1fd678b0548e329b38934f6281255e698dfa761ad1ff841f6ccb79606c61345",
+    "Small_TV/src/resources/timezones/Europe__Berlin.tzif": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7",
+    "Small_TV/src/resources/timezones/Europe__Bratislava.tzif": "a6e930e3375cdcb51f7d8a74885aff89fd14b861ebb75cb339d0f91c16c1469a",
+    "Small_TV/src/resources/timezones/Europe__Brussels.tzif": "b10f9542a8509f0a63ebca78e3d80432dd86b8ea296400280febd9cfa76e8288",
+    "Small_TV/src/resources/timezones/Europe__Bucharest.tzif": "898ef81fde9a693309be6a80873528488f128d952d3efbf83c61780a5c059ba5",
+    "Small_TV/src/resources/timezones/Europe__Budapest.tzif": "a8dafebda9680c8d667afb905ea38c90e848713d7de0473338a2228f1ac3315f",
+    "Small_TV/src/resources/timezones/Europe__Copenhagen.tzif": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7",
+    "Small_TV/src/resources/timezones/Europe__Dublin.tzif": "db9497b0a9fcafc6630b0f06b41edb1827793b3b22d9f799d11419e0439f96ec",
+    "Small_TV/src/resources/timezones/Europe__Helsinki.tzif": "71ca4af5998f09990c5e875d350fc3c8e34f280bae6fe14f36d4692face7a563",
+    "Small_TV/src/resources/timezones/Europe__Istanbul.tzif": "2a7163b16b94806f69991348e7d0a60c46eb61b1f0305f5f4b83f613db10806f",
+    "Small_TV/src/resources/timezones/Europe__Kyiv.tzif": "0589e80ddecebf9d3077898c12975d2be7393df2856ee9926c534763e1e26bf2",
+    "Small_TV/src/resources/timezones/Europe__Lisbon.tzif": "44d2f6cf84737e6a1e0daf914109e94256beca40b40c9a11b7a04e8bddaee4ec",
+    "Small_TV/src/resources/timezones/Europe__London.tzif": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33",
+    "Small_TV/src/resources/timezones/Europe__Madrid.tzif": "ca5b321ddbfc88e07e0d03ed2fa0c832ce5d0dd8e7d90a25200a8e24898c3b21",
+    "Small_TV/src/resources/timezones/Europe__Moscow.tzif": "ed2e0a099fb446b2416683438d3f56f9fc5a62a16c7549a7f59cbc935b364c8a",
+    "Small_TV/src/resources/timezones/Europe__Oslo.tzif": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7",
+    "Small_TV/src/resources/timezones/Europe__Paris.tzif": "cd588e779c5737d70e4e47158dafab7945b026b2bb34454cc47741815459b068",
+    "Small_TV/src/resources/timezones/Europe__Prague.tzif": "a6e930e3375cdcb51f7d8a74885aff89fd14b861ebb75cb339d0f91c16c1469a",
+    "Small_TV/src/resources/timezones/Europe__Rome.tzif": "86bd26a06fe3057b36cf29dd7a338f2524aff8116ef08d005aa2114ea6122869",
+    "Small_TV/src/resources/timezones/Europe__Sofia.tzif": "2d08c2f8e2642f84f365ca83f895287c3020d7ea89ba2ff6462e84a228b632e4",
+    "Small_TV/src/resources/timezones/Europe__Stockholm.tzif": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7",
+    "Small_TV/src/resources/timezones/Europe__Vienna.tzif": "abcfd4176dfe287a9cd9acb88eed2a4f54ee052a514e7941ee2eaf125938789c",
+    "Small_TV/src/resources/timezones/Europe__Warsaw.tzif": "e88f5a51f168157a41ac2dd8a4ee0e9a879419c84c6122b4771b1a2a33d93a4c",
+    "Small_TV/src/resources/timezones/Europe__Zurich.tzif": "199062b1c30cfeb2375ec84c56df52be51891986a6293b7a124d3a62509f45e9",
+    "Small_TV/src/resources/timezones/manifest.json": "1005340de075284d9e46b61a3bb5fbc6632799ac7ee808636b811bf0bb209745",
+    "Small_TV/src/resources/timezones/Pacific__Auckland.tzif": "0e06e7e55aedbc92ef5b3d106e7c392ab1628cfd8a428b20e92e99028a0bfbb9",
+    "Small_TV/src/resources/timezones/Pacific__Fiji.tzif": "ba608d86d4ee0738935e77be580c73bd8bc62aa6714d8393c0afad261621e0c4",
+    "Small_TV/src/resources/timezones/Pacific__Honolulu.tzif": "1daa5729aa1e0f32cd44be112d01ad4cc567a9fe76d87dcbb9182be8d2c88ff0",
+    "Small_TV/src/resources/timezones/Pacific__Port_Moresby.tzif": "683001055b6ef9dc9d88734e0eddd1782f1c3643b7c13a75e9cf8e9052006e19",
+    "Small_TV/src/resources/timezones/README.md": "1d93d6123e2024c7ff38256f2edf78390f5a8f8dfc2c2193168e5da0ca640252",
+    "Small_TV/src/sdkconfig.defaults": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
+    "Small_TV/src/storage/jpeg_cache.c": "699df917e16f2ea888729429200d5df080358dcc7993ed50116733a2bba13f31",
+    "Small_TV/src/storage/jpeg_cache.h": "3d6a632304d42eeb2b7e9fc6575e6dce4a87979f16310c45718d81fc34fbb3cd",
+    "Small_TV/src/storage/jpeg_espidf.c": "212b25d7522d6a067ac234528bbf742055054ad484a2ad6cfb8cdb2c66c8c5dd",
+    "Small_TV/src/storage/jpeg_espidf.h": "bdb6de1a4cebc0cbb4f29ccf49fbf26049c060d396aa2acc34fe9ca34a0cc0e5",
+    "Small_TV/src/storage/jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+    "Small_TV/src/storage/jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+    "Small_TV/src/storage/jpeg_journal.c": "46351feee7d61e410e53a43213b815a3b6c5029e48121b7382a2a6e8da2a6b54",
+    "Small_TV/src/storage/jpeg_journal.h": "42e7dc58b4e3e8058a2ba989061367a130cf1d31ca8e434a0789689f6e631743",
+    "Small_TV/src/storage/jpeg_nor.c": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+    "Small_TV/src/storage/jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+    "Small_TV/src/storage/jpeg_scratch.c": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb",
+    "Small_TV/src/storage/jpeg_scratch.h": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49",
+    "Small_TV/src/storage/jpeg_transport.c": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
+    "Small_TV/src/storage/jpeg_transport.h": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c",
+    "Small_TV/src/symbol-map.json": "2e3c397f083e025536d5461ed226372f11cdf8d6acdbf7f8961fd372f16a0e4f",
+    "Small_TV/src/third_party/cjson/cJSON.c": "298581a04a36c0165da4b0aade235c23088cb2faa58651d720ea2f3706ed0b0d",
+    "Small_TV/src/third_party/cjson/cJSON.h": "25b0145150d500498e4d209cec69c18c42cf818bffcc54690be3b895a2a16dee",
+    "Small_TV/src/third_party/cjson/LICENSE": "163766832b15cc9c90d593216360c67af579b8b36932b297fca2aeb61544de2f",
+    "Small_TV/src/third_party/cjson/UPSTREAM.json": "c972b6595982f0230b6f13f72717f7c290c26d529e91a46fb7317d0e8bde2e7c",
+    "Small_TV/src/third_party/libjpeg-turbo/BUNDLE.json": "0f52d03b10bbd42e029a6ad975bbe70efb4acdc9dce207875415c0423bb36886",
+    "Small_TV/src/third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-bounded.patch": "431c9cf3c83be38a1ad661bc6986dc182e22d3fb3f6c1d339e3346a82e6a0024",
+    "Small_TV/src/third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-compact-pools.patch": "735247281197a0df260545468d154fb18a1f6a505f69d0ec6e9ac7aa37efb981",
+    "Small_TV/src/third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-flash-tables.patch": "1fdf910f05bfbbf6fb1862ef12f9a431b3e63208ee87e24322ce6fd08b58f88f",
+    "Small_TV/src/third_party/libjpeg-turbo/licenses/LICENSE.md": "ba6bceebcba0fdd35488477c2cca8c4632ce82c74dbfbc87d886ce6fc4433579",
+    "Small_TV/src/third_party/libjpeg-turbo/licenses/README.ijg": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6",
+    "Small_TV/src/third_party/libjpeg-turbo/README.md": "465542286d3c07180e92ec34d04a9b13fd53dede4d05f72f6caaa94884559782",
+    "Small_TV/src/third_party/libjpeg-turbo/UPSTREAM.json": "e1f0c93c47ff8da22f6cf34e0d6009197d9e8fa501d351fac580e3464714f97a",
+    "Small_TV/src/third_party/libjpeg-turbo/upstream.tar.gz": "f1e58e24518134d1630a08248110622d6b041d7e79ca3efbeb9918415ec6bbe2",
+    "Small_TV/src/third_party/spleen/LICENSE": "f33fe8679d5b2abecc4f1313ce6c6bfa58262964de5f7bca146596a7318047af",
+    "Small_TV/src/third_party/spleen/spleen-6x12.bdf": "fc0743d164690f99b7e2e1b9d503180e4c719a9831ae03fd8f6da18c857dee27",
+    "Small_TV/src/third_party/spleen/UPSTREAM.json": "76fa5af9df77160ab611592d2aebc28a02325a16ca668bf765b77902f482febd",
+    "Small_TV/src/third_party/tjpgd/tjpgd.c": "c397f6332f507bf5e2e098055acb2c406957611de45bf45000a8525dacdb31ba",
+    "Small_TV/src/third_party/tjpgd/tjpgd.h": "4c7115c84f1c7042e9ee459d1a731fb6fcdd89fdc8686e95afa9c59074a69557",
+    "Small_TV/src/third_party/tjpgd/tjpgdcnf.h": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760",
+    "Small_TV/src/third_party/tjpgd/UPSTREAM.json": "2cdbf82b21d79701d3d125ffc420f21fb1f22dab44785f00ee8e29cb8023be7b",
+    "Small_TV/src/tools/build_jpeg_library.py": "cccef6c732e52f600445fd005817aebf4b24be7e9f7d3583f7952c1018343c29",
+    "Small_TV/src/tools/jpeg_cache_layout.py": "c9a0a8459f126b2565b65433a14577517bc8567c1e25e9ecc08d57cb06c456b9",
+    "Small_TV/src/tools/jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+    "Small_TV/src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
+    "Small_TV/src/tools/prepare_resources.py": "10edd9d175331fbf461b13925c91c042318ce736a4cd50ef42492295bf9258f7",
+    "Small_TV/src/tools/prepare_timezones.py": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148",
+    "Small_TV/src/IMPROVEMENT_PLAN.md": "927f382f03b8e1d15e34f40a4a260bb0787a945258cb857ae704c5d21f647b46",
+    "Small_TV/src/README.md": "312415a5ff0987539b1a0580f1d8b304eb6078bc6f15ca0d45b1fd338d0c631d",
+    "Small_TV/src/WORKING_NOTES.md": "bd83e904413befee054c3a68a219d55c14d2dec834b07aa4de24364dc53c32c7",
+    "Small_TV/src/WORK_LOG.md": "b9f28bfae8870c8dabf69d4fbc8389fc11bfce2eaa02671844db167ecaa25b09",
+    "Small_TV/src/reference/correspondence.json": "96e5d4c3747853442586705185c4ea3287a964a5d3a18c67b317a1689304d64e",
+    "Small_TV/src/tests/JPEG_MAIN_INTEGRATION.md": "d35ad05d4dc7ecda97a9b08d0f19f14072d8988f04bb69de0fe7e7c82c828acd",
+    "Small_TV/src/tests/build_host_jpeg.py": "84849826f5ada2f259f344d7d3f4880741d9194d66e54a169fb793799c62152d",
+    "Small_TV/src/tests/correspondence_test.py": "2564f5c690dcb3f818af47e33861ffd22a3e774558021214c6d4ff864d3bdcc8",
+    "Small_TV/src/tests/fixtures/jpeg_extended/flat-cmyk-progressive-12.jpg": "bd841b2529a90c4e02b8043154c79de008ada85bd50d2dca4baf7223f2505ed4",
+    "Small_TV/src/tests/fixtures/jpeg_extended/flat-gray-progressive-8.jpg": "45263a1cb1be94439742e66e5cfe09553cc9495aff6efee87ba465b6acebf5ec",
+    "Small_TV/src/tests/fixtures/jpeg_extended/flat-sampling44-12.jpg": "446694de20bf72c1cd9c80770c975bb7c698ea4b8a26495a391682c065dfe405",
+    "Small_TV/src/tests/fixtures/jpeg_extended/flat-sampling44-8.jpg": "7a4b3597f704ee4a781bbfa652ea0b02dbab39cc3933c17682ef6c6e98ee3328",
+    "Small_TV/src/tests/fixtures/jpeg_extended/full-cmyk12.jpg": "fe55a1ad4030093b5fa1c00a2c96a2d7bb022f6eb464b1d4d18eda9599fccd7c",
+    "Small_TV/src/tests/fixtures/jpeg_extended/manifest.json": "09d3bea7ec48f6228e42883fcc7a63f5261f93d0a9e1346b627c3ed8c91b9396",
+    "Small_TV/src/tests/fixtures/jpeg_extended/rich-progressive420-8.jpg": "881ac1f56a00bb8272a11596a8fb9eef5cabc2142f68a43b9ff2eee1e18d460f",
+    "Small_TV/src/tests/jpeg_cache/generator_contract.py": "ff7d189bb27e4c73d25205403eb982c495576a6d797194930ca45c2a9b1d1679",
+    "Small_TV/src/tests/native_photo_platform.c": "c30b551900dadd12f35b260801728b003776ff6b10b927eda0de7a1dd89aef72",
+    "Small_TV/src/tests/native_test.c": "b0a3bca7792f0099ce6fa4d76edb0e607ef8ed0b4d2ae629ea49e1792626dca2",
+    "Small_TV/src/tests/photo_owner.inc": "8083589ee0bf4bf8bc2eab21d75db42b8f43adf1a9492db92f5fe32fecf2673b",
+    "Small_TV/src/tests/photo_owner_qemu.py": "2f43e3e2c64872c672bccbf19c3ff67923133182f0a3fbd8dca31bcc45591416",
+    "Small_TV/src/tests/run.ps1": "e6e09c3b632b5939ba881b5ac6d5ecfb628d7bc548ad97aac9ed5c03b4b30310",
+    "Small_TV/src/tests/stubs/esp_http_server.h": "5015e2d1805694509ab512b360b0b917e90f51ad3422355dfe9b9b690b531bad",
+    "Small_TV/src/tests/stubs/esp_log.h": "c7bdd74b771b30bc44023910b31886a623eea6b84e7936800dbebc669746fd55",
+    "Small_TV/src/tests/stubs/freertos/FreeRTOS.h": "2e7bdbb0cf4c06b2e6ea09b9b1653b51a09018d56ae6a502ef56a3d062fb4243",
+    "Small_TV/src/tests/stubs/freertos/queue.h": "31cb6db443b021b4bd03e3e43fbf272435cf56dc61fd1dd06df775522b9d06a4",
+    ".gitattributes": "993f905ad835cbd0a57f97c95c5af7ba0536e9c3fc4ca2297985ddb96b6f06e2"
+  },
+  "raw": [
+    {
+      "source": ".build/photo-owner-20261023/artifact-service-floor.json",
+      "file": "raw/photo-owner-20261023/567762e9d5e0ecc96087288f1902335114030a43930f2f1f943cfb7ed9e6005f.gz",
+      "bytes": 341,
+      "sha256": "567762e9d5e0ecc96087288f1902335114030a43930f2f1f943cfb7ed9e6005f",
+      "gzip_sha256": "058c203c7310081d9f679c078764b24412811a7852db2bc170a9b505c78d15f6"
+    },
+    {
+      "source": ".build/photo-owner-20261023/artifact-service-floor.log",
+      "file": "raw/photo-owner-20261023/c95cdc7565f401b1987d6240449903df7277954a19d366b7753ce234488ea07c.gz",
+      "bytes": 665,
+      "sha256": "c95cdc7565f401b1987d6240449903df7277954a19d366b7753ce234488ea07c",
+      "gzip_sha256": "31acf72348df94cf1c25f67e3daeb0c3d8f4519944827fb17caeab7a0e19a685"
+    },
+    {
+      "source": ".build/photo-owner-20261023/blocked-heap.json",
+      "file": "raw/photo-owner-20261023/8104861973c0814bca32bd36ad60e12fc546615384c11c4a65375db3425dfce5.gz",
+      "bytes": 384,
+      "sha256": "8104861973c0814bca32bd36ad60e12fc546615384c11c4a65375db3425dfce5",
+      "gzip_sha256": "163729a0f099a5d93335ba80687f31610587a480064aa283bfe3bb7f08237cd3"
+    },
+    {
+      "source": ".build/photo-owner-20261023/blocked-tasks.json",
+      "file": "raw/photo-owner-20261023/69b36a23b62319996110bd5927671a003fdabd5df49d5abe956ea7bc4557e3a1.gz",
+      "bytes": 1099,
+      "sha256": "69b36a23b62319996110bd5927671a003fdabd5df49d5abe956ea7bc4557e3a1",
+      "gzip_sha256": "291409a6bd1e068fadd4cc49ca2ddcc20079cc2abedbaf6c130464ac01ad389f"
+    },
+    {
+      "source": ".build/photo-owner-20261023/capture.py",
+      "file": "raw/photo-owner-20261023/93af13d52782d9630a2af65db98294a714d6bbfd48f941d22addb03f320a4178.gz",
+      "bytes": 5888,
+      "sha256": "93af13d52782d9630a2af65db98294a714d6bbfd48f941d22addb03f320a4178",
+      "gzip_sha256": "90c3b44c8fb87326d6c794de2f4ce3db64820985e9e17fa5fb8d91bca11c45b5"
+    },
+    {
+      "source": ".build/photo-owner-20261023/generator-service-floor/report.json",
+      "file": "raw/photo-owner-20261023/b1d13f7cac7d21caade51d5d12e58a6c3894c5d0913a986c016a24c97ebd392a.gz",
+      "bytes": 10185,
+      "sha256": "b1d13f7cac7d21caade51d5d12e58a6c3894c5d0913a986c016a24c97ebd392a",
+      "gzip_sha256": "ec8ee751ad714c9e28b741e804d23e8d7e92fc077a135cacc64049471467d81b"
+    },
+    {
+      "source": ".build/photo-owner-20261023/generator-service-floor.log",
+      "file": "raw/photo-owner-20261023/39b4f58502afc3dd2b2b703003cf2ce94574a3699f8ee0e0e4d2193aa86b0e27.gz",
+      "bytes": 77,
+      "sha256": "39b4f58502afc3dd2b2b703003cf2ce94574a3699f8ee0e0e4d2193aa86b0e27",
+      "gzip_sha256": "0a14e66428ea08a3d7b25de4b13abc708d578b8a39511fa2797debb799c0aa76"
+    },
+    {
+      "source": ".build/photo-owner-20261023/native-retry-before.log",
+      "file": "raw/photo-owner-20261023/2ad35067537721b461fab5e5a87ae5d2ed31aea31fbcbf26cdcd10982b41e106.gz",
+      "bytes": 2050,
+      "sha256": "2ad35067537721b461fab5e5a87ae5d2ed31aea31fbcbf26cdcd10982b41e106",
+      "gzip_sha256": "f23bd32237168afc18b245abda7d6c660711970f8918c72eb5a1339289efeeda"
+    },
+    {
+      "source": ".build/photo-owner-20261023/native-service-floor.log",
+      "file": "raw/photo-owner-20261023/20a9c09c38531e36d81733cefa38b2ac37e5e075dcbf660ef03c4adc20c8f755.gz",
+      "bytes": 2075,
+      "sha256": "20a9c09c38531e36d81733cefa38b2ac37e5e075dcbf660ef03c4adc20c8f755",
+      "gzip_sha256": "b2d20aa023032c7fca179965e131d72d3192c0da80c27fb730808375131e0105"
+    },
+    {
+      "source": ".build/photo-owner-20261023/native-stale-before.log",
+      "file": "raw/photo-owner-20261023/e472c809756154d30b16d2ab23834ad9cf0c47f06c0ec882532f4b7ed18f7998.gz",
+      "bytes": 474306,
+      "sha256": "e472c809756154d30b16d2ab23834ad9cf0c47f06c0ec882532f4b7ed18f7998",
+      "gzip_sha256": "ed1b8255cfdeedf1725c1f1142a13eda735e04b78ef59a8e6f75926a1a54cf59"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control/report.json",
+      "file": "raw/photo-owner-20261023/55e19fa7d9ad2294357553835a8e26f5a0e22d507bda16fa7459498eedd9c4a1.gz",
+      "bytes": 17025,
+      "sha256": "55e19fa7d9ad2294357553835a8e26f5a0e22d507bda16fa7459498eedd9c4a1",
+      "gzip_sha256": "80fec90358c890a3e102c425ecff7c9adac105939c571de8b391bc2402ffdee6"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control/uart-0.log",
+      "file": "raw/photo-owner-20261023/3975f10c5aa622c619182f12b5b7ecb904d10b479448cf76fc8995cddf7674b6.gz",
+      "bytes": 401,
+      "sha256": "3975f10c5aa622c619182f12b5b7ecb904d10b479448cf76fc8995cddf7674b6",
+      "gzip_sha256": "79c6bc4dc60cb7bbb36830818dfd78bcdbdb2f3c741c1dc7723d9e39fa3e9edf"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control/uart-1.log",
+      "file": "raw/photo-owner-20261023/a19626acfb71af91367957df31b485b3343e77e0f87ceff9f6540b4ef77aff46.gz",
+      "bytes": 303,
+      "sha256": "a19626acfb71af91367957df31b485b3343e77e0f87ceff9f6540b4ef77aff46",
+      "gzip_sha256": "d26767d8ca9901b612bd7bc475dce46958c9fa8ea0d720a0a54354520ce96491"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/flash-after-0.bin",
+      "file": "raw/photo-owner-20261023/58d24676f6755cedca65d874b4190c92f9ff42b27d07cf690ea504795386218d.gz",
+      "bytes": 4194304,
+      "sha256": "58d24676f6755cedca65d874b4190c92f9ff42b27d07cf690ea504795386218d",
+      "gzip_sha256": "589df1a44404158e5315a4dd6815d02878f1584dcf77f8a4abb66dcde5330cf1"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/flash-after-1.bin",
+      "file": "raw/photo-owner-20261023/e34b3498b22620eb5dbe3c70ca75ea7650df3a09c1e52c08703e34f8e88db49c.gz",
+      "bytes": 4194304,
+      "sha256": "e34b3498b22620eb5dbe3c70ca75ea7650df3a09c1e52c08703e34f8e88db49c",
+      "gzip_sha256": "c05cefe4c5e54f858f9978e2184baf809f50ed4f382647906481e5e5e7186b09"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/report.json",
+      "file": "raw/photo-owner-20261023/339a313bb339e5ea03b877cca286f6bbbc4e717c7d481485436ebbea710c60fe.gz",
+      "bytes": 17157,
+      "sha256": "339a313bb339e5ea03b877cca286f6bbbc4e717c7d481485436ebbea710c60fe",
+      "gzip_sha256": "fe06512f8d6a3776a06a94274a73dea2fac79efd8e1b4e3ccabb026e0604bd69"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/uart-0.log",
+      "file": "raw/photo-owner-20261023/515cec51bf420e33120d0e4c78f583a7336a49787a45248ccca4b76e4d40e487.gz",
+      "bytes": 401,
+      "sha256": "515cec51bf420e33120d0e4c78f583a7336a49787a45248ccca4b76e4d40e487",
+      "gzip_sha256": "97fd2ba123494366d6e144aab30a805c0d56d7116a3628dc17a1bfb140c78187"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/uart-1.log",
+      "file": "raw/photo-owner-20261023/2987674c59c50096571f9cbcb213ba16ec3b019dc7b80bb613f2ee3f08fd0a30.gz",
+      "bytes": 303,
+      "sha256": "2987674c59c50096571f9cbcb213ba16ec3b019dc7b80bb613f2ee3f08fd0a30",
+      "gzip_sha256": "6226fe877af7cfa65421c6af904e5358296bd9c6f846b3eeb6073d230fbbbaf3"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/vm/prepared.json",
+      "file": "raw/photo-owner-20261023/96bd85ab1d3747013dd8e48e7e8426a4dbb78bfc3d49955a9fdec7d658f17e88.gz",
+      "bytes": 2863,
+      "sha256": "96bd85ab1d3747013dd8e48e7e8426a4dbb78bfc3d49955a9fdec7d658f17e88",
+      "gzip_sha256": "39eba1098b9514c02e32d52a32d44af6a4e139064ac5e0c38a07008c6e34a888"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/vm/qemu.log",
+      "file": "raw/photo-owner-20261023/b2181aa975dfa67d931a048228340a19150cb789d47f65b9c5818f0b029830e3.gz",
+      "bytes": 1077,
+      "sha256": "b2181aa975dfa67d931a048228340a19150cb789d47f65b9c5818f0b029830e3",
+      "gzip_sha256": "afba0e01b4289279b590004905bdfad7cbfc8a5f3dd0eb35f04d64b3a44efc15"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-control-final/vm/session.json",
+      "file": "raw/photo-owner-20261023/4a441294c6a9345c53c0413ff9c941e049cb29055a85b01342fb1aed87ed583d.gz",
+      "bytes": 2181,
+      "sha256": "4a441294c6a9345c53c0413ff9c941e049cb29055a85b01342fb1aed87ed583d",
+      "gzip_sha256": "616762842439a5c884712327f04ef452bafd731cdeb76d1b560fba3d9f2ea9b5"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-diagnostic/failure-qemu.log",
+      "file": "raw/photo-owner-20261023/caca5eb42002cb482d4e243f3dbcef2b611b635735610f781789ea58377bc761.gz",
+      "bytes": 235,
+      "sha256": "caca5eb42002cb482d4e243f3dbcef2b611b635735610f781789ea58377bc761",
+      "gzip_sha256": "9aa7eb9a3a288ef499f24ee35835ebd4126f5b3fd9e3aaf07205f71f6ac40cd1"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-diagnostic/failure-session.json",
+      "file": "raw/photo-owner-20261023/530739ba1bc0962197492e920ca3245e0457201744491c1f02bde116cae6ca05.gz",
+      "bytes": 2181,
+      "sha256": "530739ba1bc0962197492e920ca3245e0457201744491c1f02bde116cae6ca05",
+      "gzip_sha256": "464956aaeccd565276d87befc2d17d1b7463dd2bdd967cb590f99499f6bb6c50"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-diagnostic/failure-uart.log",
+      "file": "raw/photo-owner-20261023/c3af013d6415bf0830c266f3956fcc3fd0c24350c20bbb81bf57c8d1c72a6335.gz",
+      "bytes": 741,
+      "sha256": "c3af013d6415bf0830c266f3956fcc3fd0c24350c20bbb81bf57c8d1c72a6335",
+      "gzip_sha256": "e47b6e83c0c2007878f390db23f9dfd9efc13816b1b86c85b56c13f5af9e3434"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-diagnostic/report.json",
+      "file": "raw/photo-owner-20261023/1498a2dcb7239352b2a83284f1bc7941913c201ba3ea62be58a3e5ac79a82367.gz",
+      "bytes": 90291,
+      "sha256": "1498a2dcb7239352b2a83284f1bc7941913c201ba3ea62be58a3e5ac79a82367",
+      "gzip_sha256": "999acdb7df3d3946511d561bcb250392c1f6c9ba095316c446dba5ea1f990cad"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-final/failure-qemu.log",
+      "file": "raw/photo-owner-20261023/d38e2d0d07b28ecef6c57c1cdab6c4b7822b3b45e3128f3a8d1ccdfb98be709d.gz",
+      "bytes": 207,
+      "sha256": "d38e2d0d07b28ecef6c57c1cdab6c4b7822b3b45e3128f3a8d1ccdfb98be709d",
+      "gzip_sha256": "8c242a11c072d55fcf81d5c60a2ee0c1b840d38109c6cd02a36b41abd7916025"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-final/failure-session.json",
+      "file": "raw/photo-owner-20261023/95aed0563c497989dc7e54e0c556af20b8e06d115aac971349043d6eddc85ae6.gz",
+      "bytes": 2181,
+      "sha256": "95aed0563c497989dc7e54e0c556af20b8e06d115aac971349043d6eddc85ae6",
+      "gzip_sha256": "8142c7da04db3ed91276c4400244584e57437049a913e5b59d80ecc40e823991"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-final/failure-uart.log",
+      "file": "raw/photo-owner-20261023/ce0e6d0ea41524bde22574a6d2528ded3924f507e701c816f83aae02770aea7e.gz",
+      "bytes": 605,
+      "sha256": "ce0e6d0ea41524bde22574a6d2528ded3924f507e701c816f83aae02770aea7e",
+      "gzip_sha256": "f9ead9ff41e202f8fb733ee2104401bae5a4f0d05357d26bfb5b7122f603cfbd"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-final/memory-observation.json",
+      "file": "raw/photo-owner-20261023/3b11cd30497ae17d64e4e9525ab6ca8a383e8f3ded98d42377b7af7e9d92b0c7.gz",
+      "bytes": 788,
+      "sha256": "3b11cd30497ae17d64e4e9525ab6ca8a383e8f3ded98d42377b7af7e9d92b0c7",
+      "gzip_sha256": "268eaf136e3acdc0f473a3e26e507ddfdc4e2df597af89995a3a4132af7591bc"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-final/report.json",
+      "file": "raw/photo-owner-20261023/7c94519b7b8f75e98ecf14893a91197b06286883db1801048ea356de1f66ac9e.gz",
+      "bytes": 21706,
+      "sha256": "7c94519b7b8f75e98ecf14893a91197b06286883db1801048ea356de1f66ac9e",
+      "gzip_sha256": "026f98c3a4c48ee2876543abf73489a03a1fc5b43aa338f5e1e098039dc09466"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-first/report.json",
+      "file": "raw/photo-owner-20261023/4d4fc4160421df5e3c74158d08414ca88e6b5333d52b90fd996d4b54c25c409f.gz",
+      "bytes": 3503,
+      "sha256": "4d4fc4160421df5e3c74158d08414ca88e6b5333d52b90fd996d4b54c25c409f",
+      "gzip_sha256": "27fcf97100c94745da17a6fb4a090cc7c3a127cd52f904af84cb09e3bbd81baf"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-keepalive/failure-qemu.log",
+      "file": "raw/photo-owner-20261023/c61b8792993c52d91898417b645fa7b9ed8c5cc5d03a629006d386bce6c9542b.gz",
+      "bytes": 207,
+      "sha256": "c61b8792993c52d91898417b645fa7b9ed8c5cc5d03a629006d386bce6c9542b",
+      "gzip_sha256": "92f14e605f16c94be7e803aee639b24326c0f91eb1c4551f058e6d4aa96614d6"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-keepalive/failure-session.json",
+      "file": "raw/photo-owner-20261023/d4a2225153a1fb9d1368b05b62304116fbb8e3e717ac01b1ac4dc276e7aae417.gz",
+      "bytes": 2181,
+      "sha256": "d4a2225153a1fb9d1368b05b62304116fbb8e3e717ac01b1ac4dc276e7aae417",
+      "gzip_sha256": "d5dc33eedcf1e851962f5ed210a87bd65dba1aa136797e1c45c3512361979e62"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-keepalive/failure-uart.log",
+      "file": "raw/photo-owner-20261023/028eff72d5739fd055894a17a799497ab922c8c6ad278043a63f9e03b46bfba6.gz",
+      "bytes": 605,
+      "sha256": "028eff72d5739fd055894a17a799497ab922c8c6ad278043a63f9e03b46bfba6",
+      "gzip_sha256": "938ae79573b51f2ccbdcc550e1bc9f505211173a89f6612968268879027d4146"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-keepalive/report.json",
+      "file": "raw/photo-owner-20261023/8e91f12332e95d8342813d727620679a4b8d4976bb38661874742947b4bf660a.gz",
+      "bytes": 18615,
+      "sha256": "8e91f12332e95d8342813d727620679a4b8d4976bb38661874742947b4bf660a",
+      "gzip_sha256": "0d73af0b7670e745aed53d66421ef5d1b631b305f481cd71eba3fc5617a89c77"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-guard/failure-qemu.log",
+      "file": "raw/photo-owner-20261023/2fa4dff34293b7882561da384f238a83d22b7dfc97bb0d42ff68e566c74a67d7.gz",
+      "bytes": 207,
+      "sha256": "2fa4dff34293b7882561da384f238a83d22b7dfc97bb0d42ff68e566c74a67d7",
+      "gzip_sha256": "212ebad19ce39ede8c9263df4dea943cb77943c905502c85d3eefadb1e7f1168"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-guard/failure-session.json",
+      "file": "raw/photo-owner-20261023/b34138fa55711b2753d41b7a917183972d9849351fcbfdc0c22fe4dbbb2da7dc.gz",
+      "bytes": 2181,
+      "sha256": "b34138fa55711b2753d41b7a917183972d9849351fcbfdc0c22fe4dbbb2da7dc",
+      "gzip_sha256": "89275bb9b2b91348bf4779ebd75c503393aeaefb03cab5e50538ea78b281d130"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-guard/failure-uart.log",
+      "file": "raw/photo-owner-20261023/77cbfd60f5f4fb23b15f654173b1ec99fdde123b62f0dd55f56805c94eb0464d.gz",
+      "bytes": 333,
+      "sha256": "77cbfd60f5f4fb23b15f654173b1ec99fdde123b62f0dd55f56805c94eb0464d",
+      "gzip_sha256": "c3f7bfd3fa3e0d4934d6cd786d3f242c07df13fb12d911f466ccd5b57922b457"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-guard/report.json",
+      "file": "raw/photo-owner-20261023/6b4246ecb055304daafc1ba89e3f9a82c6e5aa0d056975d8f46139b2c6f189eb.gz",
+      "bytes": 3839,
+      "sha256": "6b4246ecb055304daafc1ba89e3f9a82c6e5aa0d056975d8f46139b2c6f189eb",
+      "gzip_sha256": "0aac98bebd2a396cd043cd93d4655f506ab660a6df5f07f1518d1ed006685a60"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-policy/failure-qemu.log",
+      "file": "raw/photo-owner-20261023/8b0f56f122c2a9da4f33dfe6b324515cdc4d88bfec4bb8d669cea9356bcf0d3a.gz",
+      "bytes": 207,
+      "sha256": "8b0f56f122c2a9da4f33dfe6b324515cdc4d88bfec4bb8d669cea9356bcf0d3a",
+      "gzip_sha256": "766c15ed9ecc2f22d55ed6776c87e643ef1cd87026199d967778208dd95f597e"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-policy/failure-session.json",
+      "file": "raw/photo-owner-20261023/fcbb851b3a990b575a2d36e25b98d28a97cb88ef499db6e95582a522133d6c35.gz",
+      "bytes": 2181,
+      "sha256": "fcbb851b3a990b575a2d36e25b98d28a97cb88ef499db6e95582a522133d6c35",
+      "gzip_sha256": "ce53f54e7acfa2782d64b37431972a729fa6132c191b811afd1060dd593778d8"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-policy/failure-uart.log",
+      "file": "raw/photo-owner-20261023/84c127b9124d4d679ccf9d2f8861557394bfc367dd19d9e524efefe08560cc2a.gz",
+      "bytes": 401,
+      "sha256": "84c127b9124d4d679ccf9d2f8861557394bfc367dd19d9e524efefe08560cc2a",
+      "gzip_sha256": "43717e267a289253f06bbe5ccf4d40dea6560d47cf68c841a98ff72e2dccdcca"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-memory-policy/report.json",
+      "file": "raw/photo-owner-20261023/1006b9682c7701f0befd9c690a804d3c1604c6841f74e24153c9e2220291d0e0.gz",
+      "bytes": 4746,
+      "sha256": "1006b9682c7701f0befd9c690a804d3c1604c6841f74e24153c9e2220291d0e0",
+      "gzip_sha256": "edde2d72913fe42d618820170fd3235c01897279907a2e12bb49f71df8a6a32d"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/flash-after-0.bin",
+      "file": "raw/photo-owner-20261023/e51509927c13d61d57b0d6c4efbdca5fd07b568ea5b4a5830aa1e63bfd3417c8.gz",
+      "bytes": 4194304,
+      "sha256": "e51509927c13d61d57b0d6c4efbdca5fd07b568ea5b4a5830aa1e63bfd3417c8",
+      "gzip_sha256": "36838734baf2edcd6ba631a5eb8707429a38f9302a0fd283fdcda29303def39b"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/flash-after-1.bin",
+      "file": "raw/photo-owner-20261023/8cf1f94665036186608ab09a8bc1135aac00d782b0183713e02598d05926516e.gz",
+      "bytes": 4194304,
+      "sha256": "8cf1f94665036186608ab09a8bc1135aac00d782b0183713e02598d05926516e",
+      "gzip_sha256": "f21d9b47e81ba80f015958d05e9211d53f26be4f2527735b9d3d2d5eb7960956"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/report.json",
+      "file": "raw/photo-owner-20261023/4f33d95c71764b6edc05547299fbe16756d0fb51e411787af568501e9e3f8b0e.gz",
+      "bytes": 10045,
+      "sha256": "4f33d95c71764b6edc05547299fbe16756d0fb51e411787af568501e9e3f8b0e",
+      "gzip_sha256": "ed3064841d849ef016b6d98612f00868afcfc96fafb69426dc04382d8b4caff4"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/uart-0.log",
+      "file": "raw/photo-owner-20261023/276751ba3c715f026a0eaf959588c12de0613a501bc7431998d402e563740eb5.gz",
+      "bytes": 401,
+      "sha256": "276751ba3c715f026a0eaf959588c12de0613a501bc7431998d402e563740eb5",
+      "gzip_sha256": "b8eee94a69dfa0ce5912b7177c50559fbba7d075a6d33335bfd1ad0176e931d5"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/uart-1.log",
+      "file": "raw/photo-owner-20261023/9e75f2e6904b83a53f96220db8a1f25121106b2b37beb17f78c89a84d891e5d6.gz",
+      "bytes": 235,
+      "sha256": "9e75f2e6904b83a53f96220db8a1f25121106b2b37beb17f78c89a84d891e5d6",
+      "gzip_sha256": "6ffa6f88a18579f284a00b8d7e5b5e555a7c0342fcce17d3cb100a253a1b2fd6"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/vm/prepared.json",
+      "file": "raw/photo-owner-20261023/96bd85ab1d3747013dd8e48e7e8426a4dbb78bfc3d49955a9fdec7d658f17e88.gz",
+      "bytes": 2863,
+      "sha256": "96bd85ab1d3747013dd8e48e7e8426a4dbb78bfc3d49955a9fdec7d658f17e88",
+      "gzip_sha256": "39eba1098b9514c02e32d52a32d44af6a4e139064ac5e0c38a07008c6e34a888"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/vm/qemu.log",
+      "file": "raw/photo-owner-20261023/b0f33559fde86715f6f408a1e40d333beb53c8cad757ffe29fef3d4f14a51e09.gz",
+      "bytes": 343,
+      "sha256": "b0f33559fde86715f6f408a1e40d333beb53c8cad757ffe29fef3d4f14a51e09",
+      "gzip_sha256": "26dec178437f39ff476623d1e334a451702ab01c3f98f9a927ad80477fa7d600"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-service-floor/vm/session.json",
+      "file": "raw/photo-owner-20261023/3f30fe2037bb74c59b091c9936a997d22ea26707ee3023b68d78ff01ea2f4eef.gz",
+      "bytes": 2181,
+      "sha256": "3f30fe2037bb74c59b091c9936a997d22ea26707ee3023b68d78ff01ea2f4eef",
+      "gzip_sha256": "0fff0e275cfa6bda4d6db056afe9a536605500532a153e032c27472fa1a23cce"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-stale-fixed/failure-flash.bin",
+      "file": "raw/photo-owner-20261023/7779bcf8477437e2864b4bd77e03094810d9dbc06e53072ef3577f86a55d88d5.gz",
+      "bytes": 4194304,
+      "sha256": "7779bcf8477437e2864b4bd77e03094810d9dbc06e53072ef3577f86a55d88d5",
+      "gzip_sha256": "00111e692f3eb1d09e174966b76d661f680dcf474f55aaa7a853b30a1961e1b4"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-stale-fixed/failure-qemu.log",
+      "file": "raw/photo-owner-20261023/d7cc998f520212f652569d1bd6ab6ba8a8542ca3762af334feef947ffabeef58.gz",
+      "bytes": 235,
+      "sha256": "d7cc998f520212f652569d1bd6ab6ba8a8542ca3762af334feef947ffabeef58",
+      "gzip_sha256": "38c3e1a8bf2d24a86272fa0eadef2e4b74761036d1bf4f7f290f1b4cebe0860d"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-stale-fixed/failure-session.json",
+      "file": "raw/photo-owner-20261023/14bafdaa48b7948bd152f8bf170e4eda7312a7110c31005c1aa8ab92a1eae627.gz",
+      "bytes": 2181,
+      "sha256": "14bafdaa48b7948bd152f8bf170e4eda7312a7110c31005c1aa8ab92a1eae627",
+      "gzip_sha256": "8b7166436766924f65813e6f5df2c403792ccaba03a53dddef158610f1484ecf"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-stale-fixed/failure-uart.log",
+      "file": "raw/photo-owner-20261023/07982394e714b8132e2440495c4ec6a66954d52cc670444bb597e25086b0510b.gz",
+      "bytes": 810,
+      "sha256": "07982394e714b8132e2440495c4ec6a66954d52cc670444bb597e25086b0510b",
+      "gzip_sha256": "b5cf1c3631743c2ebd4121ac19ab21d0b1bdb6e95c061876dfd1f78e8a5f74b8"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-stale-fixed/ram-case-1.bin",
+      "file": "raw/photo-owner-20261023/4072b9168745d1088b663284498aa2d014c1768daf39bee17159c995fab893a1.gz",
+      "bytes": 262144,
+      "sha256": "4072b9168745d1088b663284498aa2d014c1768daf39bee17159c995fab893a1",
+      "gzip_sha256": "8a4744f8faf9ba9924985aef5514dc7a50643810f97afeca6de10dd2ccded7e2"
+    },
+    {
+      "source": ".build/photo-owner-20261023/qemu-stale-fixed/report.json",
+      "file": "raw/photo-owner-20261023/b0c77a8922005dfe33d67d1822ba58d64fa2b76cf7a1049af87420995ba9d571.gz",
+      "bytes": 51189,
+      "sha256": "b0c77a8922005dfe33d67d1822ba58d64fa2b76cf7a1049af87420995ba9d571",
+      "gzip_sha256": "f6ae2e6e911ca0f38d4d3ead8b708d04240821ea6a3012f38a20fb0355961a3d"
+    },
+    {
+      "source": ".build/photo-owner-20261023/target-service-floor.log",
+      "file": "raw/photo-owner-20261023/fa5ee0b8665cf9c94a17dcfdec7402dbe1370c942d9aa5b8caa7f4fffe90738f.gz",
+      "bytes": 1330,
+      "sha256": "fa5ee0b8665cf9c94a17dcfdec7402dbe1370c942d9aa5b8caa7f4fffe90738f",
+      "gzip_sha256": "64e82ac639ee78eb781e5f79dd01859aa7945a150ce85e1a5a870f6caef60af9"
+    },
+    {
+      "source": ".build/photo-owner-20261023/task-layout.json",
+      "file": "raw/photo-owner-20261023/f5d2780c9fdf2a821d69fb884f698924c2f8307dd2ec1cd6cc2e2cce5a74c5c6.gz",
+      "bytes": 1503,
+      "sha256": "f5d2780c9fdf2a821d69fb884f698924c2f8307dd2ec1cd6cc2e2cce5a74c5c6",
+      "gzip_sha256": "4aed922407a2636fc90cb76237d55733ef4d94f28c3453847cf118b9f7579490"
+    },
+    {
+      "source": ".build/photo-owner-qemu-20261023.log",
+      "file": "raw/photo-owner-20261023/82fb98d76ace156bd86206daa84ea3b3659d3d4c62434e64f0ad661af659709c.gz",
+      "bytes": 1474,
+      "sha256": "82fb98d76ace156bd86206daa84ea3b3659d3d4c62434e64f0ad661af659709c",
+      "gzip_sha256": "7b5948c7cf08bf26d240f9e1172f11c7dbf5444320373ba3fedf2b36dc218f67"
+    },
+    {
+      "source": ".build/photo-owner-qemu-control-20261023.log",
+      "file": "raw/photo-owner-20261023/2f6d31783f0c5bc08a8e31ed797cb1bf4b74d01ca088571a63798b3a4fcc6fa6.gz",
+      "bytes": 556,
+      "sha256": "2f6d31783f0c5bc08a8e31ed797cb1bf4b74d01ca088571a63798b3a4fcc6fa6",
+      "gzip_sha256": "7504c72dc0a65e9d54348f958fb7b30af259cb9288eb331e04016a393f1aada8"
+    },
+    {
+      "source": ".build/photo-owner-qemu-control-final-20261023.log",
+      "file": "raw/photo-owner-20261023/237a1755b34c7cdebc1df4d279e3c0ced62ce41d49654a2e1b6e31ed6bc7f01a.gz",
+      "bytes": 128,
+      "sha256": "237a1755b34c7cdebc1df4d279e3c0ced62ce41d49654a2e1b6e31ed6bc7f01a",
+      "gzip_sha256": "ef5ffa67020701d8ae637dc24355b88986f49f405defbc9b13614d010bf59faa"
+    },
+    {
+      "source": ".build/photo-owner-qemu-diagnostic-20261023.log",
+      "file": "raw/photo-owner-20261023/866f4278addc6a750d86211e5c5f69d6f37775e695617f3008cb771c1707d769.gz",
+      "bytes": 39022,
+      "sha256": "866f4278addc6a750d86211e5c5f69d6f37775e695617f3008cb771c1707d769",
+      "gzip_sha256": "1c6781bcfaa6c5b063fd844a7c13475eef78682eef7f50883ce00d649fa28945"
+    },
+    {
+      "source": ".build/photo-owner-qemu-final-20261023.log",
+      "file": "raw/photo-owner-20261023/ad179b48223a72742893d15eb991411a564db2f34c2346e50b08b73199193a52.gz",
+      "bytes": 1152,
+      "sha256": "ad179b48223a72742893d15eb991411a564db2f34c2346e50b08b73199193a52",
+      "gzip_sha256": "a171795af00851ec3a87640936549e1de7aedec79126258fb2b85bef86c6bfd9"
+    },
+    {
+      "source": ".build/photo-owner-qemu-keepalive-20261023.log",
+      "file": "raw/photo-owner-20261023/0bb9dc1772e1bb5198eac83ef51aaf934a27e02110a859513e473b8edd43cfea.gz",
+      "bytes": 1221,
+      "sha256": "0bb9dc1772e1bb5198eac83ef51aaf934a27e02110a859513e473b8edd43cfea",
+      "gzip_sha256": "6d14995d10024641f489c8956d5fc5ae59335645c11c908b3718fb630a314b58"
+    },
+    {
+      "source": ".build/photo-owner-qemu-memory-guard-20261023.log",
+      "file": "raw/photo-owner-20261023/57495bcd6e52e6b7773abf6f517a0dbeeb48c9adf3f38289bcfbd96d0c7f4660.gz",
+      "bytes": 1129,
+      "sha256": "57495bcd6e52e6b7773abf6f517a0dbeeb48c9adf3f38289bcfbd96d0c7f4660",
+      "gzip_sha256": "ef12abaf14391171d3a7cacd05b456d06abe8a834bfebd70c57d82c2882bbcc9"
+    },
+    {
+      "source": ".build/photo-owner-qemu-memory-policy-20261023.log",
+      "file": "raw/photo-owner-20261023/6e7efdcf963059c12cd046fc24ef4c749e29c7a6894092b8097aeb7216f6c1e2.gz",
+      "bytes": 1418,
+      "sha256": "6e7efdcf963059c12cd046fc24ef4c749e29c7a6894092b8097aeb7216f6c1e2",
+      "gzip_sha256": "d3079e6b36adfb00565c9841dd7bdf48a3e0dc6a83715abe2efcb167f4806581"
+    },
+    {
+      "source": ".build/photo-owner-qemu-service-floor-20261023.log",
+      "file": "raw/photo-owner-20261023/82425d7efc9a56942887f0bb018d46f8e037239da9efb9704fd295407d55e301.gz",
+      "bytes": 807,
+      "sha256": "82425d7efc9a56942887f0bb018d46f8e037239da9efb9704fd295407d55e301",
+      "gzip_sha256": "351b68bde262708536d9d085785527ffae952435a14088a01f15a7f25003762c"
+    },
+    {
+      "source": ".build/photo-owner-qemu-stale-fixed-20261023.log",
+      "file": "raw/photo-owner-20261023/dbc159d56d6f21bfd2623711da912cbf35162abb22130ae8e54c5d44b2f7c77e.gz",
+      "bytes": 1054,
+      "sha256": "dbc159d56d6f21bfd2623711da912cbf35162abb22130ae8e54c5d44b2f7c77e",
+      "gzip_sha256": "ed889efa8faee53ed99b8f6d6ba672ce2b156ff7d3173151b57b3494837a301c"
+    },
+    {
+      "source": ".build/small-tv-esp32c2/native-tests/privacy-report.json",
+      "file": "raw/photo-owner-20261023/6ed4a8e7eda71c83ebd5adbe66b9eaf0b49d7af8280a1a8206079b93e9709341.gz",
+      "bytes": 111,
+      "sha256": "6ed4a8e7eda71c83ebd5adbe66b9eaf0b49d7af8280a1a8206079b93e9709341",
+      "gzip_sha256": "8d439f0cd945e9981c9464110ec2b4abb83a96196c24d409ffe92a622388e4c3"
+    },
+    {
+      "source": ".build/small-tv-esp32c2/native-tests/report.json",
+      "file": "raw/photo-owner-20261023/dd57fa44ef25b35b70b7d48d78f1f925ccbdedd3b89958bce548c168ed5a3d6b.gz",
+      "bytes": 2792,
+      "sha256": "dd57fa44ef25b35b70b7d48d78f1f925ccbdedd3b89958bce548c168ed5a3d6b",
+      "gzip_sha256": "a5cfa68d0e0cde4b24300f0d35344836e78e00a55a290ccc0dad1f8faf9a04f8"
+    }
+  ],
+  "limitations": [
+    "Safe unstamped-assets migration pending",
+    "Target complete memory/stack/format/fault matrix pending",
+    "Independent LCD and clock-continuity gate pending",
+    "Short-connection churn remains a separate failed stress workload",
+    "Whole-image audit, reconnect/lifecycle, power-cut, full/24h/hardware pending"
+  ],
+  "app_partition_free_bytes": 71440
+}

@@ -4,6 +4,7 @@
 #include "display.h"
 #include "settings.h"
 #include "tjpgd.h"
+#include "photo_worker.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,7 +22,8 @@ esp_err_t media_init(void)
     if (!media_partition || media_partition->address != ASSETS_BASE ||
         media_partition->size != 0x1e7000)
         return ESP_ERR_NOT_FOUND;
-    return ESP_OK;
+    esp_err_t error = photo_worker_init();
+    return error;
 }
 
 esp_err_t media_read_unlocked(uint32_t offset, void *data, size_t length)
@@ -39,7 +41,7 @@ esp_err_t media_read(uint32_t offset, void *data, size_t length)
     /* Read an asset safely unless an upload currently owns the partition. */
 
     xSemaphoreTake(media_mutex, portMAX_DELAY);
-    esp_err_t result = photo_upload_active_unlocked() ? ESP_ERR_INVALID_STATE
+    esp_err_t result = photo_upload_overlaps_unlocked(offset, length) ? ESP_ERR_INVALID_STATE
                                                       : media_read_unlocked(offset, data, length);
     xSemaphoreGive(media_mutex);
     return result;
@@ -145,27 +147,62 @@ esp_err_t media_draw_jpeg(uint32_t offset, size_t length, int x, int y)
     /* Draw an asset JPEG while excluding concurrent flash uploads. */
 
     xSemaphoreTake(media_mutex, portMAX_DELAY);
-    esp_err_t result = photo_upload_active_unlocked() ? ESP_ERR_INVALID_STATE
+    esp_err_t result = photo_upload_overlaps_unlocked(offset, length) ? ESP_ERR_INVALID_STATE
                                                       : draw_jpeg_unlocked(offset, length, x, y);
     xSemaphoreGive(media_mutex);
     return result;
 }
 
+static int photo_row(void *context, uint32_t row, const uint16_t *pixels, uint32_t count)
+{
+    /* Display only rows from a physically verified complete RGB565 cache. */
+    unsigned *painted = context;
+    display_blit(0, (int)row, (int)count, 1, pixels);
+    ++*painted;
+    return 0;
+}
+
+static esp_err_t draw_photo(unsigned slot, bool blocking)
+{
+    /* UI uses a nonblocking cache read; synchronous C clients use the same
+     * real prepare/cache path, preserving one producer and identical pixels. */
+    if (slot >= PHOTO_COUNT) return ESP_ERR_INVALID_ARG;
+    tv_settings_t settings; settings_snapshot(&settings);
+    if (!settings.photo_size[slot]) return ESP_ERR_NOT_FOUND;
+    unsigned painted = 0;
+    esp_err_t error = photo_worker_draw(slot, settings.photo_size[slot], blocking, photo_row, &painted);
+    if (error != ESP_OK && painted) display_fill(0, 0, LCD_WIDTH, LCD_HEIGHT, 0);
+    return error;
+}
+
 esp_err_t media_draw_photo(unsigned slot)
 {
-    /* Draw an enabled photo slot using its persisted byte length. */
+    /* Fully prepare/draw for synchronous users; the clock uses cached-only API. */
+    return draw_photo(slot, true);
+}
 
-    xSemaphoreTake(media_mutex, portMAX_DELAY);
-    tv_settings_t settings;
-    settings_snapshot(&settings);
-    esp_err_t result = ESP_ERR_NOT_FOUND;
-    if (slot < PHOTO_COUNT && settings.photo_size[slot])
-        result = photo_upload_active_unlocked()
-                     ? ESP_ERR_INVALID_STATE
-                     : draw_jpeg_unlocked(ASSETS_BASE + slot * PHOTO_SLOT_BYTES,
-                                          settings.photo_size[slot], 0, 0);
-    xSemaphoreGive(media_mutex);
-    return result;
+esp_err_t media_draw_photo_cached(unsigned slot)
+{
+    /* No waits for the decoder and no decode/flash writes from the UI task. */
+    return draw_photo(slot, false);
+}
+
+void media_request_photo(unsigned slot)
+{
+    /* Queue at most one background request per slot; never wait for its result. */
+    photo_worker_request(slot);
+}
+
+uint32_t media_photo_ready_mask(void)
+{
+    /* Expose verified cache readiness without making network code parse JPEG. */
+    return photo_worker_ready_mask();
+}
+
+bool media_photo_idle(void)
+{
+    /* Preserve slideshow fade state while a producer or upload owns its source. */
+    return photo_worker_idle();
 }
 
 static uint16_t little16(const uint8_t *data)
@@ -209,9 +246,8 @@ unsigned media_animation_frames(unsigned animation)
     xSemaphoreTake(media_mutex, portMAX_DELAY);
     unsigned count = 0;
     uint32_t offset, length;
-    if (!photo_upload_active_unlocked())
-        while (count < 126 && animation_entry(animation, count, &offset, &length) == ESP_OK)
-            ++count;
+    while (count < 126 && animation_entry(animation, count, &offset, &length) == ESP_OK)
+        ++count;
     xSemaphoreGive(media_mutex);
     return count;
 }
@@ -222,9 +258,7 @@ esp_err_t media_draw_animation(unsigned animation, unsigned frame, int x, int y)
 
     xSemaphoreTake(media_mutex, portMAX_DELAY);
     uint32_t offset, length;
-    esp_err_t result = photo_upload_active_unlocked()
-                           ? ESP_ERR_INVALID_STATE
-                           : animation_entry(animation, frame, &offset, &length);
+    esp_err_t result = animation_entry(animation, frame, &offset, &length);
     if (result == ESP_OK)
         result = draw_jpeg_unlocked(offset, length, x, y);
     xSemaphoreGive(media_mutex);
@@ -245,7 +279,6 @@ esp_err_t media_draw_weather(const char *code, int x, int y)
         return ESP_ERR_NOT_FOUND;
     xSemaphoreTake(media_mutex, portMAX_DELAY);
     esp_err_t result = ESP_ERR_INVALID_STATE;
-    if (!photo_upload_active_unlocked())
     {
         uint32_t base = WEATHER_BASE + index * WEATHER_SLOT_BYTES;
         uint8_t header[54], row[180];

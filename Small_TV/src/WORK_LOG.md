@@ -3981,3 +3981,43 @@ Next owner/worker+async HTTP, one decode into durablecache, source invalidation/
 publish ordering and typed network errors. Combined heap/stack/time/deployment/
 independent network/LCD/full/24h/hardware remain pending; goal active. Proof:
 qemu/parity/jpeg-privacy-validation-20261020.json; tests/JPEG_PRIVACY.md.
+
+## 2026-10-23 — actual photo owner and whole-app resource admission
+
+Продолжен IMPROVEMENT_PLAN в той же worktree. Реальные UI/upload теперь используют
+photo_codec/photo_worker и durable RGB565 cache; TJpgd strip producer сохраняет
+factory baseline pixels, расширенные JPEG идут через bounded libjpeg. Source
+invalidation durable до erase; publish length только после full privacy/decode/
+physical verify/journal. SDK async begin/complete освобождает HTTP task, общий
+media_mutex не удерживается во время decode, clocks/immutable media продолжаются.
+Matching ownership stamp/cache headers/assets генерируются обычной offline build.
+
+Failing native regressions выявили stale queued source length и permanent-failure
+cache после transient privacy read. Исправлены повторная проверка length/ownership
+и публикация результатов под codec owner; retryable I/O/allocation/stop причины
+не блокируют неизменённое фото навсегда. Queue-full/async-begin/disconnected-send
+проверяют single completion и освобождение source/request ownership.
+
+FullCMYK12 в main действительно декодировался, но HTTP timeouts и1392sum heap
+minima не позволили принять результат. Переход observer на keep-alive сам проблему
+не устранил. Allocation-only16KiB reserve тоже недостаточен: другие задачи могут
+выделять RAM позже. Final allocator + cooperative service floor отвергают вход с
+точным required/available, освобождают pools и не публикуют partial frame. Это
+resource admission, не доказательство неисправного JPEG или полноты support на C2.
+
+6001native +direct privacy,12inventory controls и6artifact checks pass; inventory
+176factory/212app/514total. Final QEMU:5HTTP workflows,46concurrent GET probes без
+ошибок (max0.657host seconds), source exact после второго cold process, protected
+flash/другие photos unchanged.3allocation refusals +1late reserve abort, gray
+progressive accepted. Separate HTTP-only control160GET pass, max0.640seconds.
+Четыре собственных VM остановлены/reaped. Не LCD/RF/weather/power-cut/full/24h gate.
+
+App4B7530CB/ELF6B233C4F/sourceC6B9D1AD,1464560bytes/71440partitionfree, DEBUGoff.
+Saved firmware/development/small-tv-esp32c2-reconstructed, matching assets1032119B.
+Подробности tests/JPEG_MAIN_INTEGRATION.md; raw failures сохраняются отдельно от
+final proof qemu/parity/jpeg-main-integration-validation-20261023.json.
+
+Далее safe migration старого unstamped assets без потери photos/settings, полный
+target memory/stack/fault/format matrix, independent LCD/clock continuity, actual
+upload/decode power-cut, network lifecycle/churn, whole image audit/full/24h/hardware.
+Old frozen QEMU/SDK не менять; на физической плате действий не было. Goal active.

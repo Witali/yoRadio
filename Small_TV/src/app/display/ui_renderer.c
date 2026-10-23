@@ -466,7 +466,7 @@ void factory_draw_photo(unsigned slot, const char *address)
 {
     /* Draw one full-screen photo and the original transparent IP footer. */
 
-    display_fill(0, 0, 240, 240, 0);
-    media_draw_photo(slot);
-    display_factory_text(5, 225, address, 16, 0xffff, 0, true);
+    /* REQUESTED_CHANGE: a pending/failed cache never clears the old frame. */
+    if (media_draw_photo_cached(slot) == ESP_OK)
+        display_factory_text(5, 225, address, 16, 0xffff, 0, true);
 }

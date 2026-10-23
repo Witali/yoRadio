@@ -3,12 +3,12 @@
 #include "settings.h"
 #include "board.h"
 #include "esp_timer.h"
-#include "jpeg_privacy.h"
+#include "photo_worker.h"
 #include <string.h>
 
 static struct
 {
-    bool active;
+    bool active, preparing, finishing;
     unsigned slot, chunks, next;
     uint32_t length, received;
     int64_t last_activity;
@@ -20,41 +20,66 @@ bool photo_upload_active_unlocked(void)
      * FIXED_FACTORY: abandoned factory uploads have no inactivity recovery.
      * Release our upload state after 120 seconds so drawing/uploads can resume. */
 
-    if (upload.active && esp_timer_get_time() - upload.last_activity > 120000000)
+    if (upload.active && !upload.preparing && !upload.finishing && esp_timer_get_time() - upload.last_activity > 120000000)
         upload.active = false;
     return upload.active;
 }
 
-esp_err_t photo_upload_start(unsigned slot, uint32_t length, unsigned chunks)
+bool photo_upload_overlaps_unlocked(uint32_t offset,size_t bytes)
 {
-    /* Validate a new upload, invalidate its slot and erase only that photo region.
-     * FIXED_FACTORY: 0x4200dda4 checks slot/maximum size but not minimum size
-     * or chunk-count consistency. Check both and mark the photo absent before erase so
-     * interrupted uploads cannot expose old lengths over partially written data. */
+    /* Immutable animation/weather reads do not share the mutable photo slot. */
+    if(!photo_upload_active_unlocked() || !bytes)return false;
+    uint32_t source=ASSETS_BASE+upload.slot*PHOTO_SLOT_BYTES;
+    return offset>=source ? offset-source<PHOTO_SLOT_BYTES:bytes>source-offset;
+}
 
+esp_err_t photo_upload_start_detailed(unsigned slot, uint32_t length, unsigned chunks,
+                                      photo_diagnostic_t *diagnostic)
+{
+    /* REQUESTED_CHANGE: claim upload ownership before waiting for background
+     * cancellation; durable cache invalidation precedes source erase/write. */
+    if (diagnostic) memset(diagnostic, 0, sizeof(*diagnostic));
     if (slot >= PHOTO_COUNT || length < 4 || length > PHOTO_SLOT_BYTES ||
         chunks != (length + PHOTO_CHUNK_BYTES - 1) / PHOTO_CHUNK_BYTES)
+    {
+        if (diagnostic) diagnostic->status = PHOTO_ARGUMENT;
         return ESP_ERR_INVALID_ARG;
+    }
     xSemaphoreTake(media_mutex, portMAX_DELAY);
-    esp_err_t result = ESP_ERR_INVALID_STATE;
-    if (!photo_upload_active_unlocked())
+    if (photo_upload_active_unlocked())
+    {
+        xSemaphoreGive(media_mutex);
+        if (diagnostic) diagnostic->status = PHOTO_BUSY;
+        return ESP_ERR_INVALID_STATE;
+    }
+    memset(&upload, 0, sizeof(upload));
+    upload.active = upload.preparing = true;
+    upload.slot = slot; upload.length = length; upload.chunks = chunks;
+    upload.last_activity = esp_timer_get_time();
+    photo_worker_forget(slot);
+    xSemaphoreGive(media_mutex);
+    esp_err_t result = photo_worker_invalidate(slot, diagnostic);
+    if (result == ESP_OK)
     {
         result = settings_photo_size(slot, 0);
-        if (result == ESP_OK)
-            result = esp_partition_erase_range(media_partition, slot * PHOTO_SLOT_BYTES,
-                                               PHOTO_SLOT_BYTES);
-        if (result == ESP_OK)
-        {
-            memset(&upload, 0, sizeof(upload));
-            upload.active = true;
-            upload.slot = slot;
-            upload.length = length;
-            upload.chunks = chunks;
-            upload.last_activity = esp_timer_get_time();
-        }
+        if (result != ESP_OK && diagnostic) diagnostic->status = PHOTO_SETTINGS;
     }
+    if (result == ESP_OK)
+        result = esp_partition_erase_range(media_partition, slot * PHOTO_SLOT_BYTES, PHOTO_SLOT_BYTES);
+    if (result != ESP_OK && diagnostic && diagnostic->status == PHOTO_OK)
+        diagnostic->status = PHOTO_STORAGE;
+    xSemaphoreTake(media_mutex, portMAX_DELAY);
+    upload.preparing = false;
+    upload.active = result == ESP_OK;
+    upload.last_activity = esp_timer_get_time();
     xSemaphoreGive(media_mutex);
     return result;
+}
+
+esp_err_t photo_upload_start(unsigned slot, uint32_t length, unsigned chunks)
+{
+    /* Synchronous C API shares the exact worker operation used by HTTP. */
+    return photo_upload_start_detailed(slot, length, chunks, NULL);
 }
 
 esp_err_t photo_upload_chunk(unsigned slot, unsigned index, unsigned total, const uint8_t *data,
@@ -65,9 +90,11 @@ esp_err_t photo_upload_chunk(unsigned slot, unsigned index, unsigned total, cons
      * and does not enforce chunk ordering. Bound writes to the declared slot,
      * enforce the next index, and accept a last-block retry only if bytes match. */
 
+    if (!data || !length) return ESP_ERR_INVALID_ARG;
     xSemaphoreTake(media_mutex, portMAX_DELAY);
     esp_err_t result = ESP_ERR_INVALID_ARG;
-    if (photo_upload_active_unlocked() && slot == upload.slot && total == upload.chunks &&
+    if (photo_upload_active_unlocked() && !upload.preparing && !upload.finishing &&
+        slot == upload.slot && total == upload.chunks &&
         index < total)
     {
         uint32_t start = index * PHOTO_CHUNK_BYTES;
@@ -109,49 +136,38 @@ esp_err_t photo_upload_chunk(unsigned slot, unsigned index, unsigned total, cons
     return result;
 }
 
-static int privacy_read(void *context, uint32_t offset, void *data, size_t bytes)
+esp_err_t photo_upload_finish_detailed(unsigned slot, photo_diagnostic_t *diagnostic)
 {
-    /* Read only this immutable upload while media_mutex owns its source slot. */
-    uint32_t base = *(const uint32_t *)context;
-    return media_read_unlocked(base + offset, data, bytes);
-}
-
-static int privacy_check(void *context)
-{
-    /* The synchronous legacy owner holds media_mutex; background owner later
-     * supplies its request deadline/cancellation checkpoint to the same gate. */
-    (void)context;
-    return 0;
-}
-
-static bool photo_headers_safe(uint32_t base, uint32_t length)
-{
-    /* REQUESTED_CHANGE: inspect metadata in every scan rather than conflating
-     * privacy with baseline-only decoder support. Entropy validation is separate. */
-    jpeg_privacy_source_t source = {&base, length, privacy_read, privacy_check};
-    return jpeg_privacy_check(&source, NULL) == JPEG_PRIVACY_OK;
+    /* FIXED_FACTORY: publish only complete ordered uploads after successful
+     * privacy, ONE decode/cache preparation and whole physical-frame verify.
+     * REQUESTED_CHANGE: slow processing never holds the shared media mutex. */
+    if (diagnostic) memset(diagnostic, 0, sizeof(*diagnostic));
+    xSemaphoreTake(media_mutex, portMAX_DELAY);
+    if (!photo_upload_active_unlocked() || upload.preparing || upload.finishing ||
+        slot != upload.slot || upload.next != upload.chunks || upload.received != upload.length)
+    {
+        xSemaphoreGive(media_mutex);
+        if (diagnostic) diagnostic->status = PHOTO_BUSY;
+        return ESP_ERR_INVALID_STATE;
+    }
+    upload.finishing = true;
+    uint32_t length = upload.length;
+    xSemaphoreGive(media_mutex);
+    esp_err_t result = photo_worker_prepare(slot, length, diagnostic);
+    if (result == ESP_OK)
+    {
+        result = settings_photo_size(slot, length);
+        if (result != ESP_OK && diagnostic) diagnostic->status = PHOTO_SETTINGS;
+    }
+    xSemaphoreTake(media_mutex, portMAX_DELAY);
+    upload.active = upload.finishing = false;
+    xSemaphoreGive(media_mutex);
+    if (result == ESP_OK) photo_worker_publish(slot, length);
+    return result;
 }
 
 esp_err_t photo_upload_finish(unsigned slot)
 {
-    /* Validate a complete photo, then publish its stored length.
-     * FIXED_FACTORY: 0x4200d978 publishes a length without checking complete
-     * ordered data or JPEG validity. Publish only after all chunks and decode
-     * validation succeed. REQUESTED_CHANGE: enforce metadata-free 240x240 JPEG. */
-
-    xSemaphoreTake(media_mutex, portMAX_DELAY);
-    esp_err_t result = ESP_ERR_INVALID_STATE;
-    if (photo_upload_active_unlocked() && slot == upload.slot && upload.next == upload.chunks &&
-        upload.received == upload.length)
-    {
-        uint32_t base = ASSETS_BASE + slot * PHOTO_SLOT_BYTES;
-        result = photo_headers_safe(base, upload.length)
-                     ? media_validate_jpeg_unlocked(base, upload.length, 240, 240)
-                     : ESP_ERR_INVALID_ARG;
-        if (result == ESP_OK)
-            result = settings_photo_size(slot, upload.length);
-        upload.active = false;
-    }
-    xSemaphoreGive(media_mutex);
-    return result;
+    /* Synchronous users invoke the same real codec/cache operation as HTTP. */
+    return photo_upload_finish_detailed(slot, NULL);
 }

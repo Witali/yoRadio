@@ -1,5 +1,7 @@
 #pragma once
 #include <stddef.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include "esp_http_server.h"
 #include "cJSON.h"
 esp_err_t web_start(void);
@@ -16,3 +18,5 @@ esp_err_t web_ok(httpd_req_t *req);
 char *web_body(httpd_req_t *req, size_t max_length);
 cJSON *web_parse_json(httpd_req_t *req);
 bool web_integer(const cJSON *object, const char *name, int minimum, int maximum, int *out);
+
+esp_err_t web_photo_async(httpd_req_t *request,bool finish,unsigned slot,uint32_t length,unsigned chunks);

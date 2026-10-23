@@ -1,0 +1,619 @@
+{
+  "schema_version": 1,
+  "status": "native_image_capacity_planned",
+  "all_functionality_verified": false,
+  "scope": "Read-only native image allocation only. Not a flash backend, wear/power-loss acceptance, factory-dump layout or universal JPEG backing bound.",
+  "image_sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+  "sector_bytes": 4096,
+  "available_sectors": 262,
+  "allocated_sectors": 260,
+  "candidate_extents": [
+    {
+      "offset": 1601536,
+      "bytes": 495616,
+      "reason": "application-media gap"
+    },
+    {
+      "offset": 2686976,
+      "bytes": 126976,
+      "reason": "animation 0 unused tail"
+    },
+    {
+      "offset": 2920448,
+      "bytes": 98304,
+      "reason": "animation 1 unused tail"
+    },
+    {
+      "offset": 3125248,
+      "bytes": 98304,
+      "reason": "animation 2 unused tail"
+    },
+    {
+      "offset": 3407872,
+      "bytes": 20480,
+      "reason": "animation 3 unused tail"
+    },
+    {
+      "offset": 3518464,
+      "bytes": 114688,
+      "reason": "animation 4 unused tail"
+    },
+    {
+      "offset": 3973120,
+      "bytes": 118784,
+      "reason": "unused media tail"
+    }
+  ],
+  "protected_extents": [
+    {
+      "offset": 0,
+      "bytes": 1601536,
+      "reason": "boot/NVS/application"
+    },
+    {
+      "offset": 2097152,
+      "bytes": 512000,
+      "reason": "all five full upload slots"
+    },
+    {
+      "offset": 2609152,
+      "bytes": 77824,
+      "reason": "animation 0 payload and final erase sector"
+    },
+    {
+      "offset": 2813952,
+      "bytes": 106496,
+      "reason": "animation 1 payload and final erase sector"
+    },
+    {
+      "offset": 3018752,
+      "bytes": 106496,
+      "reason": "animation 2 payload and final erase sector"
+    },
+    {
+      "offset": 3223552,
+      "bytes": 184320,
+      "reason": "animation 3 payload and final erase sector"
+    },
+    {
+      "offset": 3428352,
+      "bytes": 90112,
+      "reason": "animation 4 payload and final erase sector"
+    },
+    {
+      "offset": 3633152,
+      "bytes": 339968,
+      "reason": "full weather/status slots"
+    },
+    {
+      "offset": 4091904,
+      "bytes": 102400,
+      "reason": "settings and flash tail"
+    }
+  ],
+  "backing": {
+    "logical_bytes": 460800,
+    "sector_count": 113,
+    "extents": [
+      {
+        "offset": 1601536,
+        "bytes": 462848
+      }
+    ]
+  },
+  "metadata": {
+    "logical_bytes": 8192,
+    "sector_count": 2,
+    "extents": [
+      {
+        "offset": 2064384,
+        "bytes": 8192
+      }
+    ]
+  },
+  "caches": [
+    {
+      "logical_bytes": 115200,
+      "sector_count": 29,
+      "extents": [
+        {
+          "offset": 2072576,
+          "bytes": 24576
+        },
+        {
+          "offset": 2686976,
+          "bytes": 94208
+        }
+      ]
+    },
+    {
+      "logical_bytes": 115200,
+      "sector_count": 29,
+      "extents": [
+        {
+          "offset": 2781184,
+          "bytes": 32768
+        },
+        {
+          "offset": 2920448,
+          "bytes": 86016
+        }
+      ]
+    },
+    {
+      "logical_bytes": 115200,
+      "sector_count": 29,
+      "extents": [
+        {
+          "offset": 3006464,
+          "bytes": 12288
+        },
+        {
+          "offset": 3125248,
+          "bytes": 98304
+        },
+        {
+          "offset": 3407872,
+          "bytes": 8192
+        }
+      ]
+    },
+    {
+      "logical_bytes": 115200,
+      "sector_count": 29,
+      "extents": [
+        {
+          "offset": 3416064,
+          "bytes": 12288
+        },
+        {
+          "offset": 3518464,
+          "bytes": 106496
+        }
+      ]
+    },
+    {
+      "logical_bytes": 115200,
+      "sector_count": 29,
+      "extents": [
+        {
+          "offset": 3624960,
+          "bytes": 8192
+        },
+        {
+          "offset": 3973120,
+          "bytes": 110592
+        }
+      ]
+    }
+  ],
+  "spare_extents": [
+    {
+      "offset": 4083712,
+      "bytes": 8192
+    }
+  ],
+  "spare_sectors": 2,
+  "required_remaining": [
+    "NOR sector read/modify/erase/program and fault tests",
+    "atomic cache publication and cold recovery",
+    "measure erase counts and avoid periodic decode writes",
+    "invalidate cache on source/codec/layout changes",
+    "expanded subsampling backing bound",
+    "production link/total heap/stack and HTTP/LCD/full/soak"
+  ],
+  "layout_id": "44268211f268cfdaf07208a74ef030bc2f09a784e305a8ca2502a3d64afad4a1",
+  "guard_ownership": {
+    "ownership_id": "35a937cdf3191c56e6d472a1496f530e27db9ab55f1c9d6626ebe41c337b0405",
+    "authority": {
+      "schema_version": 1,
+      "flash_bytes": 4194304,
+      "partitions": [
+        {
+          "label": "nvs",
+          "type": 1,
+          "subtype": 2,
+          "offset": 36864,
+          "bytes": 24576,
+          "flags": 0
+        },
+        {
+          "label": "phy_init",
+          "type": 1,
+          "subtype": 1,
+          "offset": 61440,
+          "bytes": 4096,
+          "flags": 0
+        },
+        {
+          "label": "factory",
+          "type": 0,
+          "subtype": 0,
+          "offset": 65536,
+          "bytes": 1536000,
+          "flags": 0
+        },
+        {
+          "label": "assets",
+          "type": 1,
+          "subtype": 64,
+          "offset": 2097152,
+          "bytes": 1994752,
+          "flags": 0
+        }
+      ],
+      "immutable": [
+        {
+          "offset": 2609152,
+          "bytes": 75543,
+          "sha256": "09f2ce579205dd6cc63df5da687b0d3c875f3b128d8c6d7e47855177cd9bfb44"
+        },
+        {
+          "offset": 2813952,
+          "bytes": 102902,
+          "sha256": "2b93ab4ae2c7a78abefc098656dfaa330f48eb8836a2289398f239f78180abfa"
+        },
+        {
+          "offset": 3018752,
+          "bytes": 104999,
+          "sha256": "e6544a3c9c052b6dd6ee19a85815441507179cafa10ccde13cd562fd3ce8678e"
+        },
+        {
+          "offset": 3223552,
+          "bytes": 181090,
+          "sha256": "2aebd2a4d960f3536779788a88f9d6e98d3c12755d253425e863e26e10ccad97"
+        },
+        {
+          "offset": 3428352,
+          "bytes": 88148,
+          "sha256": "219b2e07273f6ed58466dd871f99ae5a201211bfed571c7421b8382a8f9b2081"
+        },
+        {
+          "offset": 3633152,
+          "bytes": 10854,
+          "sha256": "417492fb64c8583dfe988d1a6c2dc761900f7d71a4ad659adc2f5d6b58158dc6"
+        },
+        {
+          "offset": 3648512,
+          "bytes": 10854,
+          "sha256": "417492fb64c8583dfe988d1a6c2dc761900f7d71a4ad659adc2f5d6b58158dc6"
+        },
+        {
+          "offset": 3663872,
+          "bytes": 10854,
+          "sha256": "193749c3bd5225738354a4551acfabfce785d146887766b9c46146ba18e7c355"
+        },
+        {
+          "offset": 3679232,
+          "bytes": 10854,
+          "sha256": "193749c3bd5225738354a4551acfabfce785d146887766b9c46146ba18e7c355"
+        },
+        {
+          "offset": 3694592,
+          "bytes": 10854,
+          "sha256": "9a4dfa01bc9e87f5807df82f71ddfa0bfc68cadcdda148654d4da14edf03da99"
+        },
+        {
+          "offset": 3709952,
+          "bytes": 10854,
+          "sha256": "9a4dfa01bc9e87f5807df82f71ddfa0bfc68cadcdda148654d4da14edf03da99"
+        },
+        {
+          "offset": 3725312,
+          "bytes": 10854,
+          "sha256": "461d4fff5f04e2ef9e61a45526ddadad8bd717513a2e4845277212db6b8617ff"
+        },
+        {
+          "offset": 3740672,
+          "bytes": 10854,
+          "sha256": "461d4fff5f04e2ef9e61a45526ddadad8bd717513a2e4845277212db6b8617ff"
+        },
+        {
+          "offset": 3756032,
+          "bytes": 10854,
+          "sha256": "40d111a16e639d77dfdc94c47c967bbf8b70b2e3349701e2271e6ff07b0dd43e"
+        },
+        {
+          "offset": 3771392,
+          "bytes": 10854,
+          "sha256": "40d111a16e639d77dfdc94c47c967bbf8b70b2e3349701e2271e6ff07b0dd43e"
+        },
+        {
+          "offset": 3786752,
+          "bytes": 10854,
+          "sha256": "164c486d4ad76e3ace3595fa48ef18afb0a51260f762700afe1db3a5e155386d"
+        },
+        {
+          "offset": 3802112,
+          "bytes": 10854,
+          "sha256": "164c486d4ad76e3ace3595fa48ef18afb0a51260f762700afe1db3a5e155386d"
+        },
+        {
+          "offset": 3817472,
+          "bytes": 10854,
+          "sha256": "82c3cce3d2eded231ff13e133bb544d4b15b52c7abb5e6177612e8511e67fdea"
+        },
+        {
+          "offset": 3832832,
+          "bytes": 10854,
+          "sha256": "82c3cce3d2eded231ff13e133bb544d4b15b52c7abb5e6177612e8511e67fdea"
+        },
+        {
+          "offset": 3848192,
+          "bytes": 10854,
+          "sha256": "9d85e545ace4eb059f4981957837eb2808400bade58145b2c946e4b2aa7a2645"
+        },
+        {
+          "offset": 3863552,
+          "bytes": 10854,
+          "sha256": "9d85e545ace4eb059f4981957837eb2808400bade58145b2c946e4b2aa7a2645"
+        },
+        {
+          "offset": 3878912,
+          "bytes": 10854,
+          "sha256": "b30b579814b8d4524e8d81cd7fa81bde811762fb535a954a4ef813cf3c5ffbe3"
+        },
+        {
+          "offset": 3894272,
+          "bytes": 10854,
+          "sha256": "b30b579814b8d4524e8d81cd7fa81bde811762fb535a954a4ef813cf3c5ffbe3"
+        },
+        {
+          "offset": 3909632,
+          "bytes": 935,
+          "sha256": "104b4b82726f28e222909ba26a99cf5026e18ce4f75d835fbc5078b8f6d77bf4"
+        },
+        {
+          "offset": 3924992,
+          "bytes": 1175,
+          "sha256": "f0ff9accbf39a4ffa66936f24ef6dc6e40f51186fcd987f19d6d97861e918b5a"
+        },
+        {
+          "offset": 3940352,
+          "bytes": 955,
+          "sha256": "f84528eaba64354a3c5967cabe9db0fe9b5e6d877df8357d213ccb6e63a0a062"
+        },
+        {
+          "offset": 3955712,
+          "bytes": 938,
+          "sha256": "828d585cd6fed6b62f8309cbda92d4087f359dd59fb5a82b3212af4cc88351cb"
+        }
+      ],
+      "stamp": {
+        "offset": 2684704,
+        "bytes": 64
+      },
+      "allocation": {
+        "candidate_extents": [
+          {
+            "offset": 1601536,
+            "bytes": 495616,
+            "reason": "application-media gap"
+          },
+          {
+            "offset": 2686976,
+            "bytes": 126976,
+            "reason": "animation 0 unused tail"
+          },
+          {
+            "offset": 2920448,
+            "bytes": 98304,
+            "reason": "animation 1 unused tail"
+          },
+          {
+            "offset": 3125248,
+            "bytes": 98304,
+            "reason": "animation 2 unused tail"
+          },
+          {
+            "offset": 3407872,
+            "bytes": 20480,
+            "reason": "animation 3 unused tail"
+          },
+          {
+            "offset": 3518464,
+            "bytes": 114688,
+            "reason": "animation 4 unused tail"
+          },
+          {
+            "offset": 3973120,
+            "bytes": 118784,
+            "reason": "unused media tail"
+          }
+        ],
+        "protected_extents": [
+          {
+            "offset": 0,
+            "bytes": 1601536,
+            "reason": "boot/NVS/application"
+          },
+          {
+            "offset": 2097152,
+            "bytes": 512000,
+            "reason": "all five full upload slots"
+          },
+          {
+            "offset": 2609152,
+            "bytes": 77824,
+            "reason": "animation 0 payload and final erase sector"
+          },
+          {
+            "offset": 2813952,
+            "bytes": 106496,
+            "reason": "animation 1 payload and final erase sector"
+          },
+          {
+            "offset": 3018752,
+            "bytes": 106496,
+            "reason": "animation 2 payload and final erase sector"
+          },
+          {
+            "offset": 3223552,
+            "bytes": 184320,
+            "reason": "animation 3 payload and final erase sector"
+          },
+          {
+            "offset": 3428352,
+            "bytes": 90112,
+            "reason": "animation 4 payload and final erase sector"
+          },
+          {
+            "offset": 3633152,
+            "bytes": 339968,
+            "reason": "full weather/status slots"
+          },
+          {
+            "offset": 4091904,
+            "bytes": 102400,
+            "reason": "settings and flash tail"
+          }
+        ],
+        "backing": {
+          "logical_bytes": 460800,
+          "sector_count": 113,
+          "extents": [
+            {
+              "offset": 1601536,
+              "bytes": 462848
+            }
+          ]
+        },
+        "metadata": {
+          "logical_bytes": 8192,
+          "sector_count": 2,
+          "extents": [
+            {
+              "offset": 2064384,
+              "bytes": 8192
+            }
+          ]
+        },
+        "caches": [
+          {
+            "logical_bytes": 115200,
+            "sector_count": 29,
+            "extents": [
+              {
+                "offset": 2072576,
+                "bytes": 24576
+              },
+              {
+                "offset": 2686976,
+                "bytes": 94208
+              }
+            ]
+          },
+          {
+            "logical_bytes": 115200,
+            "sector_count": 29,
+            "extents": [
+              {
+                "offset": 2781184,
+                "bytes": 32768
+              },
+              {
+                "offset": 2920448,
+                "bytes": 86016
+              }
+            ]
+          },
+          {
+            "logical_bytes": 115200,
+            "sector_count": 29,
+            "extents": [
+              {
+                "offset": 3006464,
+                "bytes": 12288
+              },
+              {
+                "offset": 3125248,
+                "bytes": 98304
+              },
+              {
+                "offset": 3407872,
+                "bytes": 8192
+              }
+            ]
+          },
+          {
+            "logical_bytes": 115200,
+            "sector_count": 29,
+            "extents": [
+              {
+                "offset": 3416064,
+                "bytes": 12288
+              },
+              {
+                "offset": 3518464,
+                "bytes": 106496
+              }
+            ]
+          },
+          {
+            "logical_bytes": 115200,
+            "sector_count": 29,
+            "extents": [
+              {
+                "offset": 3624960,
+                "bytes": 8192
+              },
+              {
+                "offset": 3973120,
+                "bytes": 110592
+              }
+            ]
+          }
+        ],
+        "spare_extents": [
+          {
+            "offset": 4083712,
+            "bytes": 8192
+          }
+        ]
+      }
+    },
+    "unmarked_source_layout_id": "4508149b7701de9fbd945b6f9fe7145b5f2dbe93de9760e56fe2437f51ad9ca6"
+  },
+  "cache_codec_identity": {
+    "schema_version": 1,
+    "format": "RGB565-little-endian-row-major",
+    "width": 240,
+    "height": 240,
+    "library_sha256": "d690bdf330d3c406b92686100a9478432724f13dec8b7faff63fde882dc17d8a",
+    "sources_sha256": {
+      "codec/jpeg_privacy.c": "1d8bc010dcc3caf232760f0d7a9a0fd46bb079f7768a4454044cc28a1e225618",
+      "codec/jpeg_privacy.h": "54810169a5e94edf28b56b1e32c74b61b4c651c752691725ab67083e7674e311",
+      "codec/jpeg_decoder.c": "986cafff84e946b3bf942fbf8f2a4805647e582920e89b62d0f21e02722e47c9",
+      "codec/jpeg_decoder.h": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12",
+      "codec/jpeg_decoder_internal.h": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac",
+      "codec/jpeg_memory.c": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4",
+      "codec/jpeg_baseline.c": "b0bb9a49fb9cbccd9c49fdd9d92c893e12721ca0bc151de98ad815d5556fe1b8",
+      "codec/jpeg_baseline.h": "f6f4c9d9f37fab7e1defeb436584afd73b23db1e1ecdc6b02f95a157a8ac6e7f",
+      "app/media/photo_codec.c": "b04c763dfe9dc9e33ea6e6b6db2e6f36c75a40ded98f2a6949057d06f5ff0417",
+      "app/include/photo_codec.h": "590cd6bc9fed36bbcbd82d16050554dfcbb38f3c60a06766936c643bdd2632c1",
+      "third_party/tjpgd/tjpgd.c": "c397f6332f507bf5e2e098055acb2c406957611de45bf45000a8525dacdb31ba",
+      "third_party/tjpgd/tjpgd.h": "4c7115c84f1c7042e9ee459d1a731fb6fcdd89fdc8686e95afa9c59074a69557",
+      "third_party/tjpgd/tjpgdcnf.h": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760",
+      "codec/jpeg_backing.c": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
+      "codec/jpeg_backing.h": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e",
+      "codec/jpeg_coefficients.c": "7543ca5459b2981313804f62d23feb8ea6933c9e478beec7b6b564302a39d1f1",
+      "codec/jpeg_coefficients.h": "9f1fd219b8ef83e39c72b411e258c025e4c1e159c5c94d44ef786194ace58a4a",
+      "app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
+      "app/include/color_convert.h": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6",
+      "storage/jpeg_cache.c": "699df917e16f2ea888729429200d5df080358dcc7993ed50116733a2bba13f31",
+      "storage/jpeg_cache.h": "3d6a632304d42eeb2b7e9fc6575e6dce4a87979f16310c45718d81fc34fbb3cd",
+      "storage/jpeg_journal.c": "46351feee7d61e410e53a43213b815a3b6c5029e48121b7382a2a6e8da2a6b54",
+      "storage/jpeg_journal.h": "42e7dc58b4e3e8058a2ba989061367a130cf1d31ca8e434a0789689f6e631743",
+      "storage/jpeg_nor.c": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+      "storage/jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+      "storage/jpeg_scratch.c": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb",
+      "storage/jpeg_scratch.h": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49",
+      "third_party/libjpeg-turbo/UPSTREAM.json": "e1f0c93c47ff8da22f6cf34e0d6009197d9e8fa501d351fac580e3464714f97a",
+      "third_party/libjpeg-turbo/BUNDLE.json": "0f52d03b10bbd42e029a6ad975bbe70efb4acdc9dce207875415c0423bb36886",
+      "third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-bounded.patch": "431c9cf3c83be38a1ad661bc6986dc182e22d3fb3f6c1d339e3346a82e6a0024",
+      "third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-flash-tables.patch": "1fdf910f05bfbbf6fb1862ef12f9a431b3e63208ee87e24322ce6fd08b58f88f",
+      "third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-compact-pools.patch": "735247281197a0df260545468d154fb18a1f6a505f69d0ec6e9ac7aa37efb981"
+    }
+  },
+  "cache_codec_id": "b33bc0a1b53aff9fceb5a08987a59b73fae1d8f76532dcb133682e3d3f30471a"
+}

@@ -2631,3 +2631,40 @@ combined heap/stack/time, independent LCD/network/full/24h/hardware. Goal active
 User asked about backdoor: existing static audit Small_TV/analysis/security/README.md
 finds no confirmed malicious path but unauthenticated management/open AP/plaintext
 weather/unsafe factory bounds. Don't claim whole-image absence; full audit pending.
+
+## 2026-10-23 — current real main integration checkpoint
+
+Do not repeat standalone integration work: UI/upload now call photo_codec/cache
+through photo_worker, SDK async start/finish and matching stamped assets. Baseline
+factory TJpgd pixels preserved via strip producer, extended modes via real libjpeg.
+Source lengths/ready/failed results are rechecked under media/codec ownership.
+Only stable input/fixed-capacity failures suppress background retries. Real
+one-shot privacy-read fault and stale queued length both failed before their fixes.
+
+Whole-app memory was the actual acceptance failure: successful fullCMYK12 alone
+was misleading. Keep-alive probe alone and malloc-time reserve alone both failed.
+Final policy preserves16KiB at allocation and checks the service floor during
+buffered decode work; late pressure aborts, releases codec pools and reports
+service-heap-reserve with measured required/free. Other allocations can happen
+between checks: no claim of a hard reserved RAM bank. Heavy valid JPEG may be
+refused; no broad target-format claims based on host/probe support.
+
+6001native+privacy,176factory/212app/514total inventory,12controls,6artifact pass.
+Main app4B7530CB/ELF6B233C4F/sourceC6B9D1AD,1464560bytes/71440free, DEBUGoff.
+Final5HTTP cases: three heap-headroom refusals, one late service-reserve abort,
+one progressive gray success;46concurrent GETs/max0.657host sec. Separate control
+160GETs/max0.640sec. Two cold processes preserve source/protected bytes; all four
+final workflow/control owners stopped/reaped. This is HTTP/storage, not LCD,
+RF/weather, cold-hit0writes or power-loss proof. Final report/data in
+qemu/parity/jpeg-main-integration-validation-20261023.json and tests/JPEG_MAIN_INTEGRATION.md.
+
+NEXT: old unstamped-assets safe migration must verify matching immutable27payloads,
+raw/SDK partition map and candidate ownership before any stamp/cache write; never
+erase user photos/preferences to make the guard pass. Then exact whole-app
+heap/stack/time/format/fault coverage and independent LCD frames/clock continuity.
+Existing photo_frames_qemu assumes two clock delays/present31 before async cache
+warm-up; adapt observer to real readiness, without guest RAM/PC changes or hiding
+factory differences. Continue upload/decode power-cut, network reconnect/client/
+connection-churn gates, whole-image indirect-call audit, full/24h/hardware.
+No physical flashing/reset, no edits to frozen bundle or shared SDK. Goal active;
+commit completed change, do not push without the user's next push instruction.

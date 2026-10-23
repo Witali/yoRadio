@@ -59,6 +59,12 @@ static void hash_reset(void *context)
     jpeg_espidf_t *s=context;(void)psa_hash_abort(&s->hash);
 }
 
+jpeg_guard_sha256_t jpeg_espidf_hash_provider(jpeg_espidf_t *storage)
+{
+    /* Reuse the already-qualified platform SHA implementation for cache jobs. */
+    return (jpeg_guard_sha256_t){storage,hash_begin,hash_update,hash_finish,hash_reset};
+}
+
 static esp_err_t sdk_matches(const jpeg_guard_partition_t *parts,unsigned count)
 {
     /* Do not trust a selected assets-only iterator or discard unexpected entries. */

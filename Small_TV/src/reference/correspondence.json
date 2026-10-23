@@ -989,7 +989,8 @@
       "status": "source_reviewed",
       "native": [
         "app/web/photo_api.c#web_photo_post",
-        "app/media/photo_upload.c#photo_upload_finish"
+        "app/media/photo_upload.c#photo_upload_finish",
+        "app/media/photo_upload.c#photo_upload_finish_detailed"
       ],
       "note": "Five slot offsets/lengths, enable mask, multipart and upload lifecycle reviewed. Privacy, size/order/timeout/decode validation intentionally strengthen the factory protocol."
     },
@@ -1033,7 +1034,8 @@
       "status": "source_reviewed",
       "native": [
         "app/web/photo_api.c#web_photo_post",
-        "app/media/photo_upload.c#photo_upload_start"
+        "app/media/photo_upload.c#photo_upload_start",
+        "app/media/photo_upload.c#photo_upload_start_detailed"
       ],
       "note": "Five slot offsets/lengths, enable mask, multipart and upload lifecycle reviewed. Privacy, size/order/timeout/decode validation intentionally strengthen the factory protocol."
     },
@@ -1845,10 +1847,6 @@
     "app/media/photo_upload.c#photo_upload_active_unlocked": {
       "kind": "reconstruction_support",
       "note": "Reviewed implementation support in app/media/photo_upload.c; factoring/validation/synchronization/formatting for the mapped module behavior, without a separate factory entry point. This classification does not prove every branch."
-    },
-    "app/media/photo_upload.c#photo_headers_safe": {
-      "kind": "requested_privacy_policy",
-      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
     },
     "app/network/wifi.c#network_connected": {
       "kind": "reconstruction_support",
@@ -3202,13 +3200,189 @@
       "kind": "requested_privacy_policy",
       "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
     },
-    "app/media/photo_upload.c#privacy_read": {
-      "kind": "requested_privacy_policy",
-      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    "app/media/assets.c#photo_row": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/assets.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
     },
-    "app/media/photo_upload.c#privacy_check": {
-      "kind": "requested_privacy_policy",
-      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    "app/media/assets.c#draw_photo": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/assets.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/assets.c#media_draw_photo_cached": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/assets.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/assets.c#media_request_photo": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/assets.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/assets.c#media_photo_ready_mask": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/assets.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/assets.c#media_photo_idle": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/assets.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#request_check": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#checkpoint": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#end_job": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#begin_job": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#finish_job": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#input": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#output": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#allocate": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#release": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#decode": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#photo_codec_init": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#photo_codec_invalidate": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#photo_codec_prepare": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#photo_codec_draw": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_codec.c#photo_diagnostic_describe": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_codec.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_storage.c#photo_storage_authorize": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_storage.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_upload.c#photo_upload_overlaps_unlocked": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_upload.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_codec_cancelled": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#run": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_init": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_submit": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_invalidate": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_prepare": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_draw": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_forget": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_publish": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_request": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_ready_mask": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#photo_worker_idle": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_worker.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/web/photo_async.c#execute": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/web/photo_async.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/web/photo_async.c#web_photo_async": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in app/web/photo_async.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "codec/jpeg_baseline.c#checkpoint": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in codec/jpeg_baseline.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "codec/jpeg_baseline.c#input": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in codec/jpeg_baseline.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "codec/jpeg_baseline.c#output": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in codec/jpeg_baseline.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "codec/jpeg_baseline.c#jpeg_baseline_decode": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in codec/jpeg_baseline.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "storage/jpeg_espidf.c#jpeg_espidf_hash_provider": {
+      "kind": "requested_photo_owner",
+      "note": "Requested bounded photo owner/cache integration in storage/jpeg_espidf.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+    },
+    "app/media/photo_worker.c#record_result": {
+      "kind": "requested_photo_owner",
+      "note": "Publish readiness or permanent failure only for the still-current committed source, while the codec owner excludes a replacement upload; reject obsolete queued results."
+    },
+    "app/media/photo_worker.c#source_current_unlocked": {
+      "kind": "reconstruction_fix",
+      "note": "Recheck committed source length and upload ownership under media_mutex before processing a queued snapshot or publishing its result. Native regression reproduces stale cache writes before this correction; not a factory feature."
+    },
+    "app/media/photo_storage.c#photo_storage_allocation_available": {
+      "kind": "reconstruction_fix",
+      "note": "Preserve16KiB service headroom and respect largest contiguous8bit block before codec allocations. Whole-app C2 RAM snapshot found minimum1392bytes with HTTP timeouts; resource refusal reports exact requested allocation/observed availability instead of corrupted JPEG."
+    },
+    "app/media/photo_storage.c#photo_storage_service_memory": {
+      "kind": "reconstruction_fix",
+      "note": "Recheck16KiB service RAM floor during CPU/buffered decode work; other tasks may consume memory after malloc. Abort releases decoder pools and reports exact reserve/free observation instead of starving HTTP."
     }
   },
   "assembly_only": {
@@ -3295,15 +3469,15 @@
     "local_site/pages/settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
     "local_site/pages/setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
     "src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
-    "src/app/CMakeLists.txt": "4313aa15c4ce7f150cda886c0e3758fde0761cbde51535b8a289a644077f1f26",
+    "src/app/CMakeLists.txt": "9122729bff12e893c1e3552ccf4af89df3298e373e5213db3e0bcc236566bc89",
     "src/app/display/backlight.c": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03",
-    "src/app/display/clock_ui.c": "8789756db122c93b5c9803d0c50ac48c505b5b383641aedf9681b52a8036b007",
+    "src/app/display/clock_ui.c": "1b6726a12aadb3933840286736f76e5dd89dbe788367b66db417deb4f7da1037",
     "src/app/display/factory_animation.c": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09",
     "src/app/display/factory_fonts.c": "a0e98417e6464d0825f8361dfce1d97cc826da8a77f0a7c44aa0b25cc20ff231",
     "src/app/display/factory_photo.c": "1a12f6e63dafe015570d1312138729785cee33449c0f5e9b24af29fb779764af",
     "src/app/display/factory_timer.c": "563706d717d3429544bfc8a2cafa5f028b3fd76403cd078b05323338274641fe",
     "src/app/display/st7789.c": "e3194452d0b8ccaa4cbdb3b51fa229d94c92f11f2eaab80f3a127ffaf49ce17f",
-    "src/app/display/ui_renderer.c": "2da92adadef583678d8c06666107cde45c1e1545635eae34766fdbf042a35ed3",
+    "src/app/display/ui_renderer.c": "2217208c5d1f67acdfa91b073619faa86e39ee9ce913ea30e37e440d9ee8e277",
     "src/app/include/board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
     "src/app/include/color_convert.h": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6",
     "src/app/include/display.h": "3f38992b7da73f45e3a11e1e567a075c8e1cfc3cc4f3553783e2e92e13e38b09",
@@ -3313,17 +3487,23 @@
     "src/app/include/factory_settings.h": "81743a6d77d761902589b6c073b351efbce072744aea7ca0dc5d04b3f3473dda",
     "src/app/include/factory_timer.h": "dbed083df5fb927ef764042d496dcd36bfb1113f05fe2fb40cea98f788a69e2d",
     "src/app/include/factory_ui.h": "28d4e15bb91fbf79adbb6d4b60c357a0d44ee8cc9228c9299b14e5aeef314321",
-    "src/app/include/media.h": "d75d4172760d302ba31a914947bcdbf21f3eee73ae73ec661f371f78be8ad995",
+    "src/app/include/media.h": "5b275755e5b8aa587e48534c7c44cdcd117ad359c0d6f2dbffb8f3206f7efae0",
     "src/app/include/network.h": "fc88fdbbb10f4dec709f480cbd260371c7816923f5a0b9c757652e5aed5d708f",
+    "src/app/include/photo_codec.h": "590cd6bc9fed36bbcbd82d16050554dfcbb38f3c60a06766936c643bdd2632c1",
     "src/app/include/services.h": "6490660af9c5cd11519c173a17982def5a33e0c7a5c9de32c3e7218f5faab193",
     "src/app/include/settings.h": "7980fae591f32a12869b06bd02d1a821af9eb28a4113efadbaed4146dfca6426",
     "src/app/include/text.h": "150044cb34ad45edbd4d3d267d7c066aafaf3b6e2635e6e2a93ec88775b3a3ef",
     "src/app/include/timezones.h": "b0f6bc81cea6a32a60a48a9746ff999922b0c7af1f137d2cbe34d2e436e859f8",
-    "src/app/include/web.h": "fb5d64e86859718aa5f1ee0f0519d9194c33c0df8d831b30ff4e252e4cd89a23",
-    "src/app/media/assets.c": "21a3553ad69f31c3ac3ae2fb1d38d7c02b6a2a3fda99db4108a2051953ac9c41",
+    "src/app/include/web.h": "ef1f410ad00755e4b9475daeb288b72ee9ab04478a2b4d63a1a697da5453f01a",
+    "src/app/media/assets.c": "693b1e14001a84a643d10bbeb33e7b236685c824002bd2622bcc1d91d23a8bee",
     "src/app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
-    "src/app/media/media_internal.h": "a18fc231725ee9297d539ed239085b88f661c7349632f17b56556996946a2a32",
-    "src/app/media/photo_upload.c": "fde026fd4b54b3da14b31eb904cf5f8e21b38b648617ce979fc78ac85e0a7504",
+    "src/app/media/media_internal.h": "fb1ff7747a5dc46df6425b5fc80eb5c24133948615c5b91b0ebc36e54c40e8c2",
+    "src/app/media/photo_codec.c": "b04c763dfe9dc9e33ea6e6b6db2e6f36c75a40ded98f2a6949057d06f5ff0417",
+    "src/app/media/photo_storage.c": "53dfe5b16f53afae9a599119071e8b05d5c58df98577538e29e56167a55b0b4f",
+    "src/app/media/photo_storage.h": "99d462c31f577ebecd09e88f3338e021cee2f3a61c3149c65fd380ab459ee89e",
+    "src/app/media/photo_upload.c": "ffd2578c31d3ee19af0c4a47287ffa0b7859658c13ca8025cf9b8956273a1d76",
+    "src/app/media/photo_worker.c": "b8d25986a92427edf84836ac694d2c012df31e601e011b172628c7de21759b46",
+    "src/app/media/photo_worker.h": "71794600ad9d39ab3f14a7729c7f90b4aa93e77e590a32218b627a684ecca5f0",
     "src/app/network/dns.c": "a4bee538e60a4bca3aba5a7b00233c17a9c08ff39779aefde9965e3a17234025",
     "src/app/network/dns_packet.c": "cb807af1329c04c534d61296138529f71e0ac5b2b2c3cf5eeb225ac763d6feb1",
     "src/app/network/wifi.c": "54d1de158d20e1f41826ca902a14ee3c9e36dc8da540ab852665a91f696908ec",
@@ -3335,23 +3515,26 @@
     "src/app/settings/factory_settings.c": "81ad9a3cef18df97d9c345abe1106c5c62ecd4e3c60ebba677200f612d7faa9b",
     "src/app/settings/settings.c": "f94eeda257d0c3d4a2b952ed72efb699cbe1a83dfd6d40d0c43d857122a65d63",
     "src/app/text/text.c": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa",
-    "src/app/web/photo_api.c": "f5935dfe63bd1679855791c58f92e023b36bfba61e6dba995b7259e25eee0400",
+    "src/app/web/photo_api.c": "86d732dc59558717737099821899300769e6f93dd7e41173f45f048f0408e1e2",
+    "src/app/web/photo_async.c": "c3112349fbf69d693a69783de94eb736cb285a899a32e9a97615be6cc04621cd",
     "src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
     "src/app/web/server.c": "f9dc5eecac2e34579bc79e23e1d5c70ea6d1eae67fc086a70da4b21ad85e7663",
     "src/app/web/settings_api.c": "a1a2245937227c2baada3a1a97492ae13550af71965c791c65c56e084dccdd09",
-    "src/build.ps1": "0ecaa7a38389e0001f2a16c287603255b99b11e1ad635f1440897c481b4047bd",
+    "src/build.ps1": "fbc33f0aa9f696e8e1f05eec59bd9a85b033bba431d797eb93f72f28c3de7285",
     "src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
     "src/CMakeLists.txt": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8",
     "src/codec/jpeg_backing.c": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
     "src/codec/jpeg_backing.h": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e",
+    "src/codec/jpeg_baseline.c": "b0bb9a49fb9cbccd9c49fdd9d92c893e12721ca0bc151de98ad815d5556fe1b8",
+    "src/codec/jpeg_baseline.h": "f6f4c9d9f37fab7e1defeb436584afd73b23db1e1ecdc6b02f95a157a8ac6e7f",
     "src/codec/jpeg_coefficients.c": "7543ca5459b2981313804f62d23feb8ea6933c9e478beec7b6b564302a39d1f1",
     "src/codec/jpeg_coefficients.h": "9f1fd219b8ef83e39c72b411e258c025e4c1e159c5c94d44ef786194ace58a4a",
     "src/codec/jpeg_decoder.c": "986cafff84e946b3bf942fbf8f2a4805647e582920e89b62d0f21e02722e47c9",
     "src/codec/jpeg_decoder.h": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12",
     "src/codec/jpeg_decoder_internal.h": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac",
     "src/codec/jpeg_memory.c": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4",
-    "src/codec/jpeg_privacy.c": "1b956d3f082d173017b530050d049ec25dcab8f13e8abbb9052541588629a477",
-    "src/codec/jpeg_privacy.h": "2110442de0ab393fb157a2b09d69143652a3a118c0fd609c3169a116bef7913e",
+    "src/codec/jpeg_privacy.c": "1d8bc010dcc3caf232760f0d7a9a0fd46bb079f7768a4454044cc28a1e225618",
+    "src/codec/jpeg_privacy.h": "54810169a5e94edf28b56b1e32c74b61b4c651c752691725ab67083e7674e311",
     "src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
     "src/reference/application.c": "e7d5e924149ff566c09254957aff738c6e4eb98ee8f02aeef9adb4bb083150ef",
     "src/reference/assembly/advance_photo_slideshow_at_4200bc36.asm": "d6df34881c8748da95f25915faaf57eaa5788a13e9399826a51bc5b67956130b",
@@ -3566,8 +3749,8 @@
     "src/sdkconfig.defaults": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
     "src/storage/jpeg_cache.c": "699df917e16f2ea888729429200d5df080358dcc7993ed50116733a2bba13f31",
     "src/storage/jpeg_cache.h": "3d6a632304d42eeb2b7e9fc6575e6dce4a87979f16310c45718d81fc34fbb3cd",
-    "src/storage/jpeg_espidf.c": "3c1f6da36252388ada387ce25c6d0ccae7caebd2afb066aa7ece561b359dc743",
-    "src/storage/jpeg_espidf.h": "2cea326b1290b61079e987709ac1ddd1a4a6f12049fa062d5f7624b946d11e07",
+    "src/storage/jpeg_espidf.c": "212b25d7522d6a067ac234528bbf742055054ad484a2ad6cfb8cdb2c66c8c5dd",
+    "src/storage/jpeg_espidf.h": "bdb6de1a4cebc0cbb4f29ccf49fbf26049c060d396aa2acc34fe9ca34a0cc0e5",
     "src/storage/jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
     "src/storage/jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
     "src/storage/jpeg_journal.c": "46351feee7d61e410e53a43213b815a3b6c5029e48121b7382a2a6e8da2a6b54",
@@ -3600,10 +3783,10 @@
     "src/third_party/tjpgd/tjpgdcnf.h": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760",
     "src/third_party/tjpgd/UPSTREAM.json": "2cdbf82b21d79701d3d125ffc420f21fb1f22dab44785f00ee8e29cb8023be7b",
     "src/tools/build_jpeg_library.py": "cccef6c732e52f600445fd005817aebf4b24be7e9f7d3583f7952c1018343c29",
-    "src/tools/jpeg_cache_layout.py": "bc216ed1cb84076ec3f88743ee3fae9d71edd11576b1b243588fea5c9ce604a7",
+    "src/tools/jpeg_cache_layout.py": "c9a0a8459f126b2565b65433a14577517bc8567c1e25e9ecc08d57cb06c456b9",
     "src/tools/jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
     "src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
-    "src/tools/prepare_resources.py": "18f7a27e4b157060b80f4318c21b4802bfcfed8e219ab757ac755ba0f17d51f7",
+    "src/tools/prepare_resources.py": "10edd9d175331fbf461b13925c91c042318ce736a4cd50ef42492295bf9258f7",
     "src/tools/prepare_timezones.py": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148"
   },
   "findings": [
@@ -3674,7 +3857,7 @@
   "limitations": [
     "source_reviewed means source-to-source control/data/constants review, not proof of semantic identity or complete path testing.",
     "Factory source here is a selected Ghidra pseudocode export (176 functions), addressed IROM excerpts and original flash/ELF, not manufacturer C. Unexported direct SDK/cJSON calls remain listed; full-image indirect targets and other tasks are not exhausted.",
-    "Native inventory covers handwritten app, codec and storage C sources plus TJpgd/cJSON, including inactive APIs. Codec/storage are compiled into the component but not yet called from UI/upload; section GC is not runtime qualification. The offline upstream library is a separately pinned SDK-like dependency. This inventory is not a linked reachability graph.",
+    "Native inventory covers app, codec, storage and bundled TJpgd/cJSON source definitions, including inactive APIs. Actual new decoder/cache callers now exist in photo_codec; source inventory does not prove memory/latency/runtime acceptance or complete factory equivalence. Upstream library is a separately pinned dependency.",
     "SDK 6.1 Wi-Fi/lwIP/HTTPD/NVS/flash/libc delegates are platform boundaries; do not equate their versions or errors to the factory SDK based on symbol names.",
     "The snapshot includes app headers, build settings, addressed assembly, font/timezone bytes and recovered HTML pages. Existing tests provide scoped evidence only; B50D full regression does not certify C8FD or future edits.",
     "No board flashing, flash modification or new QMP/RSP client is used by this audit. Physical display/Wi-Fi/power-loss/timing equivalence remains unproven."

@@ -1,5 +1,9 @@
 /* Execute the production media/settings/HTTP code with in-memory platform I/O.
  * These tests do not validate ESP-IDF timing, Wi-Fi, TLS or physical display. */
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <bcrypt.h>
 #include <assert.h>
 #include <math.h>
 #include <stddef.h>
@@ -20,12 +24,20 @@
 #include "esp_partition.h"
 #include "nvs.h"
 #include "freertos/semphr.h"
+#include "freertos/queue.h"
+#include "freertos/FreeRTOS.h"
 #include "lwip/sockets.h"
+#include "../app/media/photo_worker.h"
 
 static unsigned checks;
 #define CHECK(condition) do {++checks;if (!(condition)) {fprintf(stderr,"Check failed at %s:%d: %s\n",__FILE__,__LINE__,#condition);exit(1);}} while (0)
 static uint8_t flash_bytes[0x1e7000],saved_nvs[1024];
-static uint8_t factory_sector[4096];
+static uint8_t factory_sector[4096],low_flash[ASSETS_BASE],tail_flash[0x18000];
+static uint16_t panel[240*240];
+static uint64_t cache_program_bytes,cache_erases;
+static unsigned source_read_fault_after,source_read_faults;
+static volatile LONG async_open;
+static volatile LONG async_begin_failure,async_send_failures;
 static size_t saved_nvs_length;
 static int64_t clock_us;
 static unsigned rendered_pixels,registered_routes,restart_requests,weather_requests;
@@ -43,11 +55,27 @@ extern const unsigned char web_setup[],web_settings[],web_photo[];
 extern const size_t web_setup_length,web_settings_length,web_photo_length;
 
 int64_t esp_timer_get_time(void) {return clock_us;}
-SemaphoreHandle_t xSemaphoreCreateMutex(void) {return (void *)1;}
-int xSemaphoreTake(SemaphoreHandle_t m,unsigned ticks) {(void)m;(void)ticks;return 1;}
-int xSemaphoreGive(SemaphoreHandle_t m) {(void)m;return 1;}
+void native_port_enter(portMUX_TYPE *lock)
+{while(InterlockedCompareExchange(lock,1,0)!=0)SwitchToThread();}
+void native_port_exit(portMUX_TYPE *lock)
+{assert(InterlockedExchange(lock,0)==1);}
+SemaphoreHandle_t xSemaphoreCreateMutex(void) {return CreateSemaphoreW(NULL,1,1,NULL);}
+int xSemaphoreTake(SemaphoreHandle_t m,unsigned ticks) {return WaitForSingleObject(m,ticks)==WAIT_OBJECT_0;}
+int xSemaphoreGive(SemaphoreHandle_t m) {return ReleaseSemaphore(m,1,NULL)!=0;}
+typedef struct {CRITICAL_SECTION lock;HANDLE items,slots,changed;volatile LONG receive_entered;unsigned capacity,bytes,read,write;uint8_t data[];} native_queue_t;
+static native_queue_t *photo_test_queue;
+QueueHandle_t xQueueCreate(unsigned count,unsigned bytes)
+{native_queue_t *q=calloc(1,sizeof(*q)+(size_t)count*bytes);assert(q);InitializeCriticalSection(&q->lock);q->items=CreateSemaphoreW(NULL,0,count,NULL);q->slots=CreateSemaphoreW(NULL,count,count,NULL);q->changed=CreateEventW(NULL,FALSE,FALSE,NULL);q->capacity=count;q->bytes=bytes;photo_test_queue=q;return q;}
+int xQueueSend(QueueHandle_t handle,const void *data,unsigned ticks)
+{native_queue_t *q=handle;if(WaitForSingleObject(q->slots,ticks)!=WAIT_OBJECT_0)return 0;EnterCriticalSection(&q->lock);memcpy(q->data+(size_t)q->write*q->bytes,data,q->bytes);q->write=(q->write+1)%q->capacity;LeaveCriticalSection(&q->lock);ReleaseSemaphore(q->items,1,NULL);return 1;}
+int xQueueReceive(QueueHandle_t handle,void *data,unsigned ticks)
+{native_queue_t *q=handle;InterlockedIncrement(&q->receive_entered);SetEvent(q->changed);if(WaitForSingleObject(q->items,ticks)!=WAIT_OBJECT_0)return 0;EnterCriticalSection(&q->lock);memcpy(data,q->data+(size_t)q->read*q->bytes,q->bytes);q->read=(q->read+1)%q->capacity;LeaveCriticalSection(&q->lock);ReleaseSemaphore(q->slots,1,NULL);return 1;}
+typedef struct {void (*task)(void *);void *context;} native_task_t;
+static DWORD WINAPI native_task(void *context)
+{native_task_t task=*(native_task_t *)context;free(context);task.task(task.context);return 0;}
 int xTaskCreate(void (*task)(void *),const char *name,unsigned stack,void *argument,unsigned priority,void *handle)
-{(void)task;(void)name;(void)stack;(void)argument;(void)priority;(void)handle;return 1;}
+{(void)stack;(void)priority;(void)handle;if(!strcmp(name,"tv-photo")){native_task_t *start=malloc(sizeof(*start));assert(start);*start=(native_task_t){task,argument};HANDLE thread=CreateThread(NULL,0,native_task,start,0,NULL);assert(thread);SetThreadPriority(thread,THREAD_PRIORITY_LOWEST);CloseHandle(thread);}return 1;}
+
 void vTaskDelay(unsigned ticks) {clock_us+=(int64_t)ticks*1000;}
 esp_err_t nvs_open(const char *name,int mode,nvs_handle_t *handle) {(void)name;(void)mode;*handle=1;return ESP_OK;}
 esp_err_t nvs_get_blob(nvs_handle_t handle,const char *key,void *data,size_t *length)
@@ -69,13 +97,32 @@ esp_err_t esp_partition_write(const esp_partition_t *p,size_t offset,const void 
 {if (offset>p->size || length>p->size-offset)return ESP_ERR_INVALID_SIZE;const uint8_t *bytes=data;for(size_t i=0;i<length;++i){assert((flash_bytes[offset+i]&bytes[i])==bytes[i]);flash_bytes[offset+i]&=bytes[i];}return ESP_OK;}
 esp_err_t esp_partition_erase_range(const esp_partition_t *p,size_t offset,size_t length)
 {if(offset>p->size || length>p->size-offset || offset%4096 || length%4096)return ESP_ERR_INVALID_SIZE;memset(flash_bytes+offset,255,length);return ESP_OK;}
+static uint8_t *physical(uint32_t at,size_t bytes)
+{
+    if(at>0x400000 || bytes>0x400000-at)return NULL;
+    if(at<ASSETS_BASE)return bytes<=ASSETS_BASE-at ? low_flash+at:NULL;
+    at-=ASSETS_BASE;
+    if(at<sizeof(flash_bytes))return bytes<=sizeof(flash_bytes)-at ? flash_bytes+at:NULL;
+    at-=(uint32_t)sizeof(flash_bytes);
+    if(at<sizeof(factory_sector))return bytes<=sizeof(factory_sector)-at ? factory_sector+at:NULL;
+    at-=(uint32_t)sizeof(factory_sector);
+    return bytes<=sizeof(tail_flash)-at ? tail_flash+at:NULL;
+}
+int native_photo_read(uint32_t at,void *data,size_t bytes)
+{if(at==ASSETS_BASE && bytes==256 && source_read_fault_after && --source_read_fault_after==0){++source_read_faults;return -19;}uint8_t *p=physical(at,bytes);assert(p);memcpy(data,p,bytes);return 0;}
+int native_photo_program(uint32_t at,const void *data,size_t bytes)
+{uint8_t *p=physical(at,bytes);const uint8_t *input=data;assert(p);for(size_t i=0;i<bytes;++i)assert((p[i]&input[i])==input[i]);for(size_t i=0;i<bytes;++i)p[i]&=input[i];cache_program_bytes+=bytes;return 0;}
+int native_photo_erase(uint32_t at)
+{assert(at%4096==0);uint8_t *p=physical(at,4096);assert(p);memset(p,255,4096);++cache_erases;return 0;}
 void display_blit(int x,int y,int width,int height,const uint16_t *pixels)
-{assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240 && pixels);rendered_pixels+=width*height;}
+{assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240 && pixels);rendered_pixels+=width*height;for(int line=0;line<height;++line)memcpy(panel+(y+line)*240+x,pixels+line*width,(size_t)width*2);}
 void display_fill(int x,int y,int width,int height,uint16_t color)
 {
-    /* Accept bounded JPEG error cleanup; the RV32 oracle checks actual pixels. */
-    assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240 && color==0);
+    /* Preserve complete pixels for old TJpgd vs new cache producer comparison. */
+    assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240);
+    for(int line=0;line<height;++line)for(int column=0;column<width;++column)panel[(y+line)*240+x+column]=color;
 }
+
 bool network_connected(void) {return connected;}
 bool network_ap_active(void) {return setup_ap;}
 void network_restart_later(void) {++restart_requests;}
@@ -88,7 +135,7 @@ esp_err_t httpd_resp_set_type(httpd_req_t *req,const char *type) {strcpy(req->re
 esp_err_t httpd_resp_set_hdr(httpd_req_t *req,const char *name,const char *value)
 {if(!strcmp(name,"Location"))strcpy(req->location,value);if(!strcmp(name,"Cache-Control"))strcpy(req->cache_control,value);return ESP_OK;}
 esp_err_t httpd_resp_send(httpd_req_t *req,const char *data,int length)
-{if(length<0)length=(int)strlen(data);assert((size_t)length<sizeof(req->response));memcpy(req->response,data,length);req->response[length]=0;req->response_length=length;req->response_complete=true;return ESP_OK;}
+{if(req->send_disconnected){InterlockedIncrement(&async_send_failures);return ESP_FAIL;}if(length<0)length=(int)strlen(data);assert((size_t)length<sizeof(req->response));memcpy(req->response,data,length);req->response[length]=0;req->response_length=length;req->response_complete=true;return ESP_OK;}
 esp_err_t httpd_resp_send_chunk(httpd_req_t *req,const char *data,int length)
 {
     /* Model the SDK's concatenated response body, including its empty final chunk. */
@@ -171,6 +218,10 @@ esp_err_t httpd_register_uri_handler(httpd_handle_t server,const httpd_uri_t *ur
 esp_err_t httpd_register_err_handler(httpd_handle_t server,httpd_err_code_t code,esp_err_t (*handler)(httpd_req_t *,httpd_err_code_t))
 {(void)server;assert(code==HTTPD_404_NOT_FOUND);not_found=handler;return ESP_OK;}
 
+esp_err_t httpd_req_async_handler_begin(httpd_req_t *request,httpd_req_t **copy)
+{if(InterlockedCompareExchange(&async_begin_failure,0,0))return ESP_ERR_NO_MEM;assert(!request->async_event);request->async_event=CreateEventW(NULL,TRUE,FALSE,NULL);assert(request->async_event);*copy=malloc(sizeof(**copy));assert(*copy);**copy=*request;(*copy)->async_original=request;InterlockedIncrement(&async_open);return ESP_OK;}
+esp_err_t httpd_req_async_handler_complete(httpd_req_t *copy)
+{httpd_req_t *original=copy->async_original;assert(original);HANDLE event=copy->async_event;*original=*copy;original->async_original=NULL;InterlockedDecrement(&async_open);free(copy);SetEvent(event);return ESP_OK;}
 static httpd_req_t request;
 static void prepare(const char *uri,const void *body,size_t length,const char *type)
 {memset(&request,0,sizeof(request));request.uri=uri;request.input=body;request.content_len=length;request.content_type=type;request.host="192.168.43.1";request.status=200;request.recv_timeout_us=5000000;}
@@ -192,6 +243,7 @@ static void dispatch(httpd_method_t method)
         {
             request.user_ctx=route_table[i]->user_ctx;
             route_table[i]->handler(&request);
+            if(request.async_event){HANDLE event=request.async_event;CHECK(WaitForSingleObject(event,30000)==WAIT_OBJECT_0);CloseHandle(event);request.async_event=NULL;}
             if(request.status==200)++route_success[i];else ++route_errors[i];
             return;
         }
@@ -494,7 +546,18 @@ static void test_weather(void)
 static void test_assets(void)
 {
     CHECK(media_init()==ESP_OK);tv_settings_t s;settings_snapshot(&s);
-    for(unsigned i=0;i<PHOTO_COUNT;++i){rendered_pixels=0;CHECK(media_draw_photo(i)==ESP_OK);CHECK(rendered_pixels==240*240);}
+    uint16_t *expected=malloc(sizeof(panel));CHECK(expected);
+    for(unsigned i=0;i<PHOTO_COUNT;++i) {
+        CHECK(media_draw_jpeg(ASSETS_BASE+i*PHOTO_SLOT_BYTES,s.photo_size[i],0,0)==ESP_OK);
+        memcpy(expected,panel,sizeof(panel));rendered_pixels=0;
+        CHECK(media_draw_photo(i)==ESP_OK);CHECK(rendered_pixels==240*240);
+        CHECK(!memcmp(expected,panel,sizeof(panel)));
+        uint64_t programs=cache_program_bytes,erases=cache_erases;
+        memset(panel,0,sizeof(panel));CHECK(media_draw_photo_cached(i)==ESP_OK);
+        CHECK(!memcmp(expected,panel,sizeof(panel)));
+        CHECK(cache_program_bytes==programs && cache_erases==erases);
+    }
+    free(expected);
     unsigned frames=0;const unsigned counts[]={19,15,25,16,23};
     for(unsigned animation=0;animation<5;++animation){CHECK(media_animation_frames(animation)==counts[animation]);for(unsigned frame=0;frame<counts[animation];++frame){rendered_pixels=0;CHECK(media_draw_animation(animation,frame,83,143)==ESP_OK);CHECK(rendered_pixels==74*74);++frames;}}
     CHECK(frames==98);CHECK(media_draw_animation(0,19,0,0)!=ESP_OK);
@@ -598,16 +661,90 @@ static void test_advanced_page(void)
 #include "http_contracts.inc"
 #include "http_captive.inc"
 #include "city_theme.inc"
+#include "photo_owner.inc"
+
+static void digest(const void *data,size_t bytes,char output[65])
+{
+    /* Independent OS digest covers the full row-major RGB565 panel bytes. */
+    BCRYPT_ALG_HANDLE algorithm;BCRYPT_HASH_HANDLE hash;uint8_t value[32];
+    CHECK(BCryptOpenAlgorithmProvider(&algorithm,BCRYPT_SHA256_ALGORITHM,NULL,0)==0);
+    CHECK(BCryptCreateHash(algorithm,&hash,NULL,0,NULL,0,0)==0);
+    CHECK(BCryptHashData(hash,(PUCHAR)data,(ULONG)bytes,0)==0);
+    CHECK(BCryptFinishHash(hash,value,32,0)==0);
+    CHECK(BCryptDestroyHash(hash)==0);CHECK(BCryptCloseAlgorithmProvider(algorithm,0)==0);
+    for(unsigned i=0;i<32;++i)sprintf(output+i*2,"%02x",value[i]);
+}
+
+static void test_extended_photos(const char *folder)
+{
+    /* Actual HTTP worker path accepts12-bit CMYK, gives precise resource
+     * refusals and recovers, while ordinary settings and other slots survive. */
+    const char *names[]={"flat-cmyk-progressive-12.jpg","flat-sampling44-8.jpg","flat-sampling44-12.jpg","flat-cmyk-progressive-12.jpg"};
+    const char *fixture_hash[]={"bd841b2529a90c4e02b8043154c79de008ada85bd50d2dca4baf7223f2505ed4",NULL,NULL,"bd841b2529a90c4e02b8043154c79de008ada85bd50d2dca4baf7223f2505ed4"};
+    char others_before[65],others_after[65];digest(flash_bytes,4*PHOTO_SLOT_BYTES,others_before);
+    tv_settings_t before,after;settings_snapshot(&before);
+    extern size_t native_photo_available,native_photo_service_free;
+    for(unsigned case_number=0;case_number<4;++case_number) {
+        char path[1024];snprintf(path,sizeof(path),"%s/%s",folder,names[case_number]);
+        FILE *file=fopen(path,"rb");CHECK(file);uint8_t image[4096];size_t bytes=fread(image,1,sizeof(image),file);CHECK(bytes>4 && bytes<sizeof(image));CHECK(fgetc(file)==EOF);fclose(file);
+        if(fixture_hash[case_number]){char value[65];digest(image,bytes,value);CHECK(!strcmp(value,fixture_hash[case_number]));}
+        if(case_number==0) {
+            /* Refuse the context allocation before any decoder/backing work,
+             * retain exact resource reason, then reuse the same owner normally. */
+            CHECK(photo_upload_start(4,(uint32_t)bytes,1)==ESP_OK);
+            CHECK(photo_upload_chunk(4,0,1,image,bytes)==ESP_OK);
+            native_photo_available=1;photo_diagnostic_t diagnostic;
+            CHECK(photo_upload_finish_detailed(4,&diagnostic)!=ESP_OK);
+            CHECK(diagnostic.status==PHOTO_MEMORY && diagnostic.required>1 && diagnostic.available==1);
+            char reason[192];photo_diagnostic_describe(&diagnostic,reason,sizeof(reason));
+            CHECK(strstr(reason,"heap-headroom; required=") && strstr(reason,"available=1"));
+            CHECK(!media_upload_active());settings_snapshot(&after);CHECK(after.photo_size[4]==0);
+            native_photo_available=SIZE_MAX;
+            CHECK(photo_upload_start(4,(uint32_t)bytes,1)==ESP_OK);
+            CHECK(photo_upload_chunk(4,0,1,image,bytes)==ESP_OK);
+            native_photo_service_free=1;
+            CHECK(photo_upload_finish_detailed(4,&diagnostic)!=ESP_OK);
+            CHECK(diagnostic.status==PHOTO_MEMORY && diagnostic.service_memory && diagnostic.required==16384 && diagnostic.available==1);
+            photo_diagnostic_describe(&diagnostic,reason,sizeof(reason));
+            CHECK(!strcmp(reason,"service-heap-reserve; required=16384 available=1"));
+            CHECK(!media_upload_active());settings_snapshot(&after);CHECK(after.photo_size[4]==0);
+            native_photo_service_free=SIZE_MAX;
+        }
+        char json[192];snprintf(json,sizeof(json),"{\"file_number\":5,\"file_size\":%u,\"total_chunks\":1}",(unsigned)bytes);
+        post("/start_upload",json,200);
+        char body[5000];size_t position=append_part(body,0,"file_number","5",1);
+        position=append_part(body,position,"chunk_index","0",1);position=append_part(body,position,"total_chunks","1",1);position=append_part(body,position,"chunk",image,bytes);
+        memcpy(body+position,"--test-boundary--\r\n",19);position+=19;
+        prepare("/upload_chunk",body,position,"multipart/form-data; boundary=test-boundary");dispatch(HTTP_POST);CHECK(request.status==200);
+        bool valid=case_number==0 || case_number==3;
+        post("/finish_upload","{\"file_number\":5,\"file_name\":\"file5.jpg\"}",valid ? 200:400);
+        settings_snapshot(&after);CHECK(after.photo_size[4]==(valid ? bytes:0));
+        if(valid) {
+            uint64_t programs=cache_program_bytes,erases=cache_erases;
+            CHECK(media_draw_photo_cached(4)==ESP_OK);char value[65];digest(panel,sizeof(panel),value);
+            CHECK(!strcmp(value,"09d3a79920a60f62fd5be6adb090f666dbcacc0cbc6412df450fbf14003efda6"));
+            CHECK(cache_program_bytes==programs && cache_erases==erases);
+        } else if(case_number==1) {
+            CHECK(strstr(request.response,"backing-capacity"));CHECK(strstr(request.response,"required=524288 available=460800"));
+        } else {
+            CHECK(strstr(request.response,"library-pool-limit"));CHECK(strstr(request.response,"required=70760 available=65536"));
+        }
+    }
+    digest(flash_bytes,4*PHOTO_SLOT_BYTES,others_after);CHECK(!strcmp(others_before,others_after));
+    after.photo_size[4]=before.photo_size[4];CHECK(!memcmp(&before,&after,sizeof(before)));
+}
 
 int main(int argc,char **argv)
 {
-    memset(factory_sector,255,sizeof(factory_sector));
-    CHECK(argc==2 || argc==3);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
+    memset(factory_sector,255,sizeof(factory_sector));memset(low_flash,255,sizeof(low_flash));memset(tail_flash,255,sizeof(tail_flash));
+    CHECK(argc==4);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
     test_settings();test_theme_requests();test_city_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_advanced_page();test_uploads();test_multipart();test_dns();test_http_captive();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
-    if(argc==3)write_native_report(argv[2]);
+    test_photo_owner_lifetime();test_photo_owner_stale();test_photo_owner_retry();test_extended_photos(argv[3]);
+    CHECK(async_open==0);
+    if(argc>=3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);
     return 0;
 }

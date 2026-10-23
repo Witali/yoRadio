@@ -172,14 +172,8 @@ static void clock_task(void *unused)
             else
                 --weather_retry;
         }
-        /* A photo slot can be partially overwritten during upload. Weather has
-         * a separate worker and publishes a complete snapshot under its mutex,
-         * so waiting for its network timeout would needlessly freeze the UI. */
-        if (media_upload_active())
-        {
-            vTaskDelay(pdMS_TO_TICKS(100));
-            continue;
-        }
+        /* REQUESTED_CHANGE: only mutable photo/cache work is excluded. Clock,
+         * network state and immutable animation/weather drawing keep running. */
         /* A confirmed clock needs no further progress animation. Cancel only
          * startup: resetting all counters would shift GIF, colon and photo phases.
          * Weather is optional and must not keep a usable clock on this screen. */
@@ -266,13 +260,13 @@ static void clock_task(void *unused)
             }
             else if (settings.theme == 2)
             {
-                uint32_t present = 0;
                 for (unsigned slot = 0; slot < PHOTO_COUNT; ++slot)
-                    if (settings.photo_size[slot])
-                        present |= 1u << slot;
+                    if (settings.photo_size[slot] && (settings.photo_mask & (1u << slot)))
+                        media_request_photo(slot);
+                uint32_t present = media_photo_ready_mask();
                 factory_photo_action_t action;
                 factory_photo_step(&slideshow, settings.photo_mask, present,
-                                   (ticks.pending & TV_TIMER_PHOTO) || reset_theme, false, &action);
+                                   (ticks.pending & TV_TIMER_PHOTO) || reset_theme, !media_photo_idle(), &action);
                 if (action.set_duty)
                     backlight_set_level(action.duty);
                 if (action.photo >= -1)
@@ -320,5 +314,8 @@ void clock_ui_start(void)
 {
     /* Start the sole task that owns normal clock rendering. */
 
+    tv_settings_t initial; settings_snapshot(&initial);
+    for (unsigned slot = 0; slot < PHOTO_COUNT; ++slot)
+        if (initial.photo_mask & (1u << slot)) media_request_photo(slot);
     configASSERT(xTaskCreate(clock_task, "clock_display", 4096, NULL, 2, NULL) == pdPASS);
 }

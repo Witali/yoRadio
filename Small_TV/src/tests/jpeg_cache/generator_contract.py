@@ -27,7 +27,8 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=False)
     assets=args.assets_dir/'assets.bin';manifest=args.assets_dir/'assets-manifest.json'
-    board=PROJECT/'app/include/board.h';partitions=PROJECT/'partitions.csv';lib=args.library_build/'build.json'
+    board=PROJECT/'app/include/board.h';partitions=PROJECT/'partitions.csv';lib=args.library_build/'report.json'
+    if not lib.exists():lib=args.library_build/'build.json'
     metadata=json.loads(lib.read_text());image=assets.read_bytes();m=json.loads(manifest.read_text());b=board.read_text();p=partitions.read_text()
     paths=[assets,manifest,board,partitions,lib,Path(__file__),PROJECT/'tools/jpeg_cache_layout.py',PROJECT/'tools/jpeg_guard_layout.py',PROJECT/'tools/jpeg_storage_layout.py']+[PROJECT/n for n in CODEC_INPUTS]
     generator=json.loads((args.generator_build/'build.json').read_text())

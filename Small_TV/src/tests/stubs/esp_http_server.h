@@ -21,13 +21,14 @@ typedef struct
 {
     const char *uri, *input, *content_type, *host, *origin;
     void *user_ctx;
+    void *async_original,*async_event;
     size_t content_len, position, response_length;
     unsigned status;
     unsigned recv_timeouts;
     unsigned recv_calls, recv_block_bytes, shutdown_calls, timeout_set_calls, fail_timeout_set_call;
     int64_t recv_timeout_us, recv_step_us;
     bool read_shutdown, fail_timeout_get;
-    bool recv_disconnect, response_complete;
+    bool recv_disconnect, response_complete, send_disconnected;
     char response_type[64], location[128], cache_control[64];
     char response[98305];
 } httpd_req_t;
@@ -59,6 +60,8 @@ esp_err_t httpd_req_get_url_query_str(httpd_req_t *req, char *out, size_t capaci
 esp_err_t httpd_query_key_value(const char *query, const char *key, char *out, size_t capacity);
 esp_err_t httpd_start(httpd_handle_t *server, const httpd_config_t *config);
 esp_err_t httpd_stop(httpd_handle_t server);
+esp_err_t httpd_req_async_handler_begin(httpd_req_t *request,httpd_req_t **copy);
+esp_err_t httpd_req_async_handler_complete(httpd_req_t *copy);
 esp_err_t httpd_register_uri_handler(httpd_handle_t server, const httpd_uri_t *uri);
 esp_err_t httpd_register_err_handler(httpd_handle_t server, httpd_err_code_t code,
                                      esp_err_t (*handler)(httpd_req_t *, httpd_err_code_t));

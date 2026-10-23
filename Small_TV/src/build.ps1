@@ -19,8 +19,6 @@ if (!(Test-Path -LiteralPath (Join-Path $idf "export.ps1"))) { throw "Install th
 $actual = (& git -C $idf rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or $actual -ne $expected) { throw "ESP-IDF revision differs from $expected" }
 $bootstrap = Join-Path $DependencyRoot "python-3.12.10\tools"
-& (Join-Path $bootstrap "python.exe") -B (Join-Path $PSScriptRoot "tools\prepare_resources.py") --output (Join-Path $BuildDirectory "resources")
-if ($LASTEXITCODE -ne 0) { throw "Resource preparation failed" }
 $saved = @{}
 foreach ($key in @("Path","IDF_PATH","IDF_TOOLS_PATH","IDF_COMPONENT_MANAGER","PYTHONNOUSERSITE","PYTHONIOENCODING","PYTHONUTF8","PYTHONDONTWRITEBYTECODE")) { $saved[$key] = [Environment]::GetEnvironmentVariable($key) }
 try {
@@ -41,6 +39,8 @@ try {
     & $python -B (Join-Path $PSScriptRoot 'tools/build_jpeg_library.py') --output (Join-Path $BuildDirectory 'jpeg-library') --toolchain-bin (Split-Path $jpegTools['riscv32-esp-elf-gcc.exe']) --cmake $jpegTools['cmake.exe'] --ninja $jpegTools['ninja.exe']
     if ($LASTEXITCODE -ne 0) { throw 'Offline JPEG dependency build failed' }
     $jpegSelection = Get-Content -LiteralPath (Join-Path $BuildDirectory 'jpeg-library/selection.json') -Raw | ConvertFrom-Json
+    & $python -B (Join-Path $PSScriptRoot 'tools/prepare_resources.py') --output (Join-Path $BuildDirectory 'resources') --jpeg-library-build $jpegSelection.build_directory
+    if ($LASTEXITCODE -ne 0) { throw 'Matching JPEG resources preparation failed' }
     Push-Location $PSScriptRoot
     try {
         $debugValue = if ($DebugLogging) { "ON" } else { "OFF" }
@@ -70,6 +70,9 @@ if (!$NoArchive) {
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\assets-manifest.json") -Destination (Join-Path $destination "assets-manifest.json")
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\source-manifest.json") -Destination (Join-Path $destination "source-manifest.json")
     Copy-Item -LiteralPath (Join-Path $jpegSelection.build_directory 'report.json') -Destination (Join-Path $destination 'jpeg-library-build.json')
+    foreach ($name in @('jpeg_layout.h','jpeg_cache_layout.h','jpeg-cache-plan.json')) {
+        Copy-Item -LiteralPath (Join-Path $BuildDirectory ('resources/'+$name)) -Destination (Join-Path $destination $name)
+    }
     $archivedConfig = [IO.File]::ReadAllText((Join-Path $BuildDirectory "sdkconfig")).Replace("`r`n", "`n")
     [IO.File]::WriteAllText((Join-Path $destination "sdkconfig"), $archivedConfig, [Text.UTF8Encoding]::new($false))
     $images = @(@{file="bootloader.bin"; offset="0x0"},@{file="partition-table.bin";offset="0x8000"},@{file="app.bin";offset="0x10000"},@{file="assets.bin";offset="0x200000"})
