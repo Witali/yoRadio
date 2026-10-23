@@ -942,11 +942,8 @@ Stream остаётся на core0, decode/output на core1 с прежними
   сохраняют failed01 и acceptance02 и не требуют PCM/reference архивов.
   Это публикация наших полей; integer-кривая/vendor/PCM/fullG6/radio/physical
   остаются открытыми. Production source, ABI и radio task affinities не менялись.
-  Архив746 файлов/7535253 байт сохраняет27 hash-only binary omissions и
+  Архив712 файлов/7689937 байт сохраняет27 hash-only binary omissions и
   фактический ELF header64. Manifest SHA256:
-  `4126c63d4fa6c9699d094b965961055ed9ea4c112bcc9d7b2cfdf5c84d7ad237`.
-  [Автономная проверка](../tests/results/cyd-vorbis-owned-book-verification-20261023/README.md)
+  `43ef7d4dac52ab244be58a851ab2fee74fe02be04d34ee14a93f7400675cdea8`.
+  [Автономная проверка](../tests/results/cyd-vorbis-owned-floor0-verification-20261023/README.md)
   staged и конечного canonical каталога из другого cwd завершена0.
-  Первый offline verifier ошибочно считал разные headers с одинаковым
-  basename одним повторённым путём; его NONPASS и исправление на полные пути
-  сохранены отдельно от actual unit PASS и успешного повторного verifier.
