@@ -1,0 +1,29 @@
+--- new-format-qualifier/qualify.py
++++ wide-width12/qualify.py
+@@ -63,6 +63,7 @@
+     need(re.search(r'^#tb 0: 1/' + str(rate) + '$', text, re.M) and
+          re.search(r'^#sample_rate 0: ' + str(rate) + '$', text, re.M) and '#codec_id 0: pcm_s16le' in text,
+          'Actual framemd5 metadata')
++    need(re.search(r'^#channel_layout_name 0: (?:2 channels|stereo)$', text, re.M), 'Actual stereo framemd5 layout')
+     rows = [line for line in text.splitlines() if line.strip() and not line.startswith('#')]
+     need(len(rows) == len(frames) - 1 and frames[0] == 0, 'Exact nonprimer packet count')
+     cursor = timestamp = 0
+@@ -199,7 +200,8 @@
+                             row['sha256'], row['bytes'])
+             stderr = inputs.read('log/' + name + '/decode-' + decoder + '.stderr.log', folder / ('decode-' + decoder + '.stderr.log'))
+             if refused_case:
+-                need(b'Codebook lookup type not supported.' in stderr and decoder not in recorded['decoded'] and
++                stdout = inputs.read('log/' + name + '/decode-' + decoder + '.stdout.log', folder / ('decode-' + decoder + '.stdout.log'))
++                need(not stdout and b'Codebook lookup type not supported.' in stderr and b'Setup header corrupt.' in stderr and decoder not in recorded['decoded'] and
+                      len(recorded['failures']) == 1 and recorded['failures'][0]['stage'] == 'vorbis', 'Only exact documented native lookup2 refusals allowed')
+                 refused += 1
+                 continue
+@@ -255,7 +257,7 @@
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument('--profile', choices=('mono21', 'map2-eight'), required=True)
++    parser.add_argument('--profile', choices=('wide12',), required=True)
+     for name in ('repository', 'campaign', 'outer', 'output'):
+         parser.add_argument('--' + name, type=Path, required=True)
+     args = parser.parse_args()

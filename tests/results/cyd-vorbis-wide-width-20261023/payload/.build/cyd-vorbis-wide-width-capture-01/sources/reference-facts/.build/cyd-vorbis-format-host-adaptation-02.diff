@@ -1,0 +1,43 @@
+--- cyd-vorbis-format-corpus-host-01.py
++++ cyd-vorbis-format-corpus-host-02.py
+@@ -59,7 +59,8 @@
+     for mi,mpath in enumerate(a.matrix):
+         mpath=mpath.resolve();matrix=json.loads(freeze(mpath));matrices.append((mi,matrix))
+         for source in sorted(mpath.parent.parent.glob('*.py')):freeze(source)
+-        for name in ('README.md','pins.json','readiness.json'):
++        for source in sorted(mpath.parent.parent.glob('*.md')):freeze(source)
++        for name in ('pins.json','readiness.json'):
+             source=mpath.parent.parent/name
+             if source.is_file():freeze(source)
+         for original in matrix['cases']:
+@@ -107,15 +108,20 @@
+                     observed_frames=[int(row[3]) for row in lines];observed_bytes=[int(row[4]) for row in lines]
+                     need(observed_frames==frames[1:] and observed_bytes==[n*channels*2 for n in frames[1:]],'Actual per-packet frame durations/PCM sizes')
+                     need(len(pcm)==sum(frames)*channels*2,'Actual complete PCM bytes')
+-                    transition_nonzero={};cursor=0
++                    transition_nonzero={};transition_channel_nonzero={};cursor=0
+                     for i,n in enumerate(frames):
+                         size=n*channels*2;chunk=pcm[cursor:cursor+size];cursor+=size
+                         if i:
+                             kind=('L' if modes[i-1] else 'S')+('L' if modes[i] else 'S')
+                             transition_nonzero[kind]=transition_nonzero.get(kind,0)+sum(v!=0 for v in chunk)
++                            counts=transition_channel_nonzero.setdefault(kind,[0]*channels)
++                            for channel in range(channels):
++                                counts[channel]+=sum(bool(chunk[i] or chunk[i+1]) for i in range(channel*2,len(chunk),channels*2))
+                     need(transition_nonzero and all(v>0 for v in transition_nonzero.values()),'Nonzero output for every present transition')
++                    need(all(all(n>0 for n in counts) for counts in transition_channel_nonzero.values()),'Every reference channel nonzero for each transition')
+                     case['decoded'][decoder]=dict(rate=rate,channels=channels,bits=16,frames=observed_frames,
+                         pcm_bytes=len(pcm),nonzero_bytes=sum(v!=0 for v in pcm),transition_nonzero_bytes=transition_nonzero,
++                        transition_nonzero_frames_per_channel=transition_channel_nonzero,
+                         wav_sha256=sha(wav_path),pcm_sha256=hashlib.sha256(pcm).hexdigest())
+                     pcm_by_case[(mi,original['id'],decoder)]=pcm
+                 except Exception as exc:
+@@ -139,7 +145,7 @@
+                 report['metamorphic_checks'].append(dict(decoder=decoder,kind='different',cases=pair,passed=passed))
+     need(all(sha(path)==row['sha256']==sha(out/row['snapshot']) for path,row in report['inputs'].items()),'Frozen inputs changed')
+     need(all(sha(path)==digest for path,digest in report['tools'].items()),'Reference tools changed')
+-    report['xiph_reference_qualified']=bool(report['cases']) and all('libvorbis' in c['decoded'] for c in report['cases'])
++    report['xiph_reference_qualified']=bool(report['cases']) and all('libvorbis' in c['decoded'] for c in report['cases']) and all(x['passed'] for x in report['metamorphic_checks'] if x['decoder']=='libvorbis')
+     report['dual_reference_qualified']=report['xiph_reference_qualified'] and not report['failures'] and all(x['passed'] for x in report['metamorphic_checks'])
+     report['completed']=True;save()
+     print(json.dumps({k:report[k] for k in ('completed','xiph_reference_qualified','dual_reference_qualified')}) ,flush=True)

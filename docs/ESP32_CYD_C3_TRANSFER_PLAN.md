@@ -146,7 +146,13 @@ allocation и численные настройки C3 являются канд
   декодируются; исходный отказ case6 воспроизведён до исправления.
   Полное численное сравнение C3 также завершено и остаётся NONPASS:
   те же wide4/floor0×6 нарушают предел2, остальные15 имеют max1.
-  Остальные gaps: sparse-single/map1-single и wide9–16-bit.
+  [Эквивалентные wide lookup2 ширины2/9/16](../tests/results/cyd-vorbis-wide-width-20261023/CHECKPOINT.md)
+  проверены отдельно:12 случаев/168 пакетов/337920 PCM байт. Все12 имеют
+  max65535; все4 target width-группы и6 sparse/dense пар нарушают равенство,
+  Xiph подтверждает все10 relations. Исходные4 PCM совпадают с прежним25.
+  Одна лишь смена ширины эту ошибку не устраняет; общий wide формат не квалифицирован.
+  Остальные gaps: sparse-single/map1-single, остальные wide widths/dimensions
+  и mapping/format случаи.
   Полное G6 открыто; bridge в radio не подключён.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
@@ -903,6 +909,22 @@ Stream остаётся на core0, decode/output на core1 с прежними
   проверены отдельно, включая полный31 и все14 relations. Публикация floor0
   полей, публичная integer-кривая, остальные форматы/G1–G8, radio integration
   и физические gates остаются открытыми; задачи и аппаратные настройки сохранены.
+
+- 2026-10-23, CYD-C3-14/G6: [wide width checkpoint](../tests/results/cyd-vorbis-wide-width-20261023/CHECKPOINT.md)
+  сохраняет исходные4 D16 lookup2 книги и8 эквивалентных представлений qbits9/16.
+  Собственный raw/Fraction/CRC witness проверяет12 cases/all declared rows и5
+  construction controls. Xiph принимает12, все4 тройки PCM равны; native12
+  lookup2 отказы и actual host exit1 сохранены. После отдельной recorded-reference
+  квалификации actual SDK6.0.2/Xtensa/core1 декодирует12/168/337920 с375 events,
+  все9 команд0 и ноль compiler warnings. Полное численное сравнение12 завершено
+  без input errors: max65535 во всех случаях; target не выполняет4 width-triples
+  и6 source-derived sparse/dense пар, Xiph выполняет все10. Прежние4 input/PCM
+  из полного25 совпадают; supplemental сравнение с31 сохранено только как запись.
+  [Canonical offline replay](../tests/results/cyd-vorbis-wide-width-verification-20261023/README.md)
+  повторно проверяет весь12 scope, raw witness,24 reference children, metrics,
+  relations и original25 dependency. Предел2 S16 LSB и NONPASS сохранены;
+  причина backend ошибки не установлена. Production код/ABI/привязки задач
+  не менялись, fullG6/radio/physical остаются открытыми.
   Архив746 файлов/7535253 байт сохраняет27 hash-only binary omissions и
   фактический ELF header64. Manifest SHA256:
   `4126c63d4fa6c9699d094b965961055ed9ea4c112bcc9d7b2cfdf5c84d7ad237`.

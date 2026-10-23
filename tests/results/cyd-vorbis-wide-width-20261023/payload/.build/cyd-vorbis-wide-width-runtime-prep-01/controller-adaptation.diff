@@ -1,0 +1,91 @@
+--- expanded31/controller.template.py
++++ wide-width12/controller.template.py
+@@ -18,7 +18,7 @@
+ MATRIX_INPUTS = (
+     ('__FIRST_MATRIX_PATH__', '__FIRST_MATRIX_SHA__'),
+     ('__SECOND_MATRIX_PATH__', '__SECOND_MATRIX_SHA__'))
+-REFERENCE_PROOFS = {'.build/cyd-vorbis-format-corpus-qualified-01/qualification.json': 'd269d71ab02568fcb549c5abf39e4daf8ffcd082b1ede3c259351615768e02b0', '.build/cyd-vorbis-format-corpus-host-01/report.json': 'eaf3d8033406d5c6844f5dd6e3f42b26195d6e03b3293c27ea03353d6ca0ae29', '.build/cyd-vorbis-format-corpus-host-01-command.json': '799bb892e5b12e0ccc13fc02607aefe49527f51568d0aecfe8a98ac88c492773', '.build/cyd-vorbis-map2-regression-qualified-01/qualification.json': 'bb78d2478d6e2a191202098443f5d224cda37fe7c44b33052de005ce10662bc4', '.build/cyd-vorbis-map2-regression-host-01/report.json': '5701c50e49118123e059c2a48a152f1fdd2f9def3bffb84053759b51c9a8df88', '.build/cyd-vorbis-map2-regression-host-01-command.json': '829899ce49f473962c2abc838fb9a1c6a6be14cf1ec007e66c464f7cff09bc2f', '.build/cyd-vorbis-floor0-equivalent-qualified-01/qualification.json': '29ca7992d6deed8766f61ec5fc79ac3b5108bf7ec0dd12d1732df514af65881c', '.build/cyd-vorbis-floor0-equivalent-qualification-01-command.json': '5a277145b1f9a5eff4f5fc779bb891ef49eff5283373e50031509d72cd53f322', '.build/cyd-vorbis-floor0-equivalent-host-01/report.json': '804a46f29eed98ab6e3c71a5aff79d11546d1efd87dddea8f6fad7f7cee2ce17', '.build/cyd-vorbis-floor0-equivalent-host-01-command.json': '3606acc8058a6147b3eedf86f61683bca1902b41fe2b1f8479281fbfa95a7e54', '.build/cyd-vorbis-floor0-equivalent-generated-01/manifest.json': '54f32a21da51be89c3ba18b8878f775ba9c7a626fdc0a2f8cfe91751af430332', '.build/cyd-vorbis-floor0-equivalent-generated-01/comparison-matrix.json': '26dacab30ffe48b49fc568bec05bb4144c40990ae20651f31c71a677240b9bd4', '.build/cyd-vorbis-floor0-equivalent-generated-01/matrix.json': '2fe27ab3ee2179fbc1221af5a10281e0fac11e318d70ffac185c738eb079d849', '.build/cyd-vorbis-floor0-equivalent-witness-01/report.json': '6847029d693a61b17690d1798b4c5e8c5d1c3c19574afc20932a3e0fe4ba84b9', '.build/cyd-vorbis-floor0-equivalent-witness-01-command.json': 'ea0b9c4ff97bc7d64b8a2634fced10c51a4131137a7f49c6f64a415374f34aa9'}
++REFERENCE_PROOFS = __REFERENCE_PROOFS__
+ CONTRACT_ID = '__CONTRACT_ID__'
+ CONTRACT_FILE_SHA = '__CONTRACT_FILE_SHA__'
+ DATA_HEADER_SHA = '__DATA_HEADER_SHA__'
+@@ -63,12 +63,14 @@
+     if not all(re.fullmatch(r'[0-9a-f]{64}',value) for value in (args.contract_sha256,args.data_sha256)):
+         parser.error('Require independently reviewed lowercase contract/data SHA256 values')
+     if args.contract_sha256!=CONTRACT_FILE_SHA or args.data_sha256!=DATA_HEADER_SHA:
+-        parser.error('Require the unchanged reviewed31-case contract and materialized data header')
++        parser.error('Require the unchanged reviewed12-case contract and materialized data header')
+     if not all((CALLER_SHA,PROTOCOL_SHA,CASE_HEADER_SHA)):
+         parser.error('Source proposal incomplete: independent caller source freeze is required')
+     if sys.platform != 'win32': parser.error('Pinned Windows SDK launcher required')
+     if not all((args.idf, args.qemu, args.powershell)): parser.error('Specify missing SDK/QEMU/PowerShell paths')
+     out, candidate, sdk = args.output.resolve(), args.candidate.resolve(), args.idf.resolve()
++    need(sha(candidate/'vorbis_repair/setup.c') == '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c',
++         'Exact reviewed CYD public setup source required')
+     tools = (args.idf_tools or sdk.parent / 'tools-v6.0.2').resolve()
+     codec = (args.codec or sdk.parent / 'esp-adf-libs/esp_audio_codec').resolve()
+     py, ps, qemu = tools / 'python_env/idf6.0_py3.12_env/Scripts/python.exe', args.powershell.resolve(), args.qemu.resolve()
+@@ -76,16 +78,14 @@
+     taskkill = Path(os.environ['SystemRoot']) / 'System32/taskkill.exe'
+     rom = qemu.parent.parent / 'pc-bios'
+     # The sibling layout permits review from this scratch prep before promotion.
+-    harness = Path(__file__).resolve().parent / 'target/cyd_vorbis_format_expanded31_qemu'
++    harness = Path(__file__).resolve().parent / 'target/cyd_vorbis_wide_width12_qemu'
+     source_map_path = Path(__file__).with_name('source-map.json')
+-    binding_path = Path(__file__).with_name('reference-binding31.json')
++    binding_path = Path(__file__).with_name('reference-binding12.json')
+     binding_helper = Path(__file__).with_name('reference_binding.py')
+     source_pins_path = Path(__file__).with_name('source-pins.json')
+     contract_path, data_header = args.contract.resolve(), args.data_header.resolve()
+     protected = (candidate,harness,contract_path,data_header,source_map_path,binding_path,binding_helper,source_pins_path,sdk,tools,codec,ps.parent,qemu.parent,rom,
+-                 repo/'.build/cyd-vorbis-format-corpus-qualified-01',repo/'.build/cyd-vorbis-format-corpus-host-01',
+-                 repo/'.build/cyd-vorbis-map2-regression-qualified-01',repo/'.build/cyd-vorbis-map2-regression-host-01',
+-                 repo/'.build/cyd-vorbis-floor0-equivalent-qualified-01',repo/'.build/cyd-vorbis-floor0-equivalent-host-01')
++                 repo/'.build/cyd-vorbis-wide-width-host-01', repo/'__QUALIFICATION_ROOT__')
+     if (not all(path.is_relative_to(repo) for path in (candidate,contract_path,data_header))
+         or not out.is_relative_to(repo / '.build') or out == repo / '.build'
+         or out.exists() or any((p / 'report.json').is_file() for p in out.parents if p != repo)
+@@ -169,11 +169,11 @@
+         contract = json.loads((out/'sources/corpus/contract.json').read_text())
+         expected_manifests = [dict(path=str((repo/name).resolve()),sha256=digest) for name,digest in MATRIX_INPUTS]
+         need(contract['manifest_inputs']==expected_manifests and load_contract(expected_manifests)==contract,
+-             'Contract differs from exact unchanged books16 plus original9 and additive6 floor15 source matrices/raw packets')
++             'Contract differs from exact unchanged original4 plus additive8 width-control source matrices/raw packets')
+         model = contract['model']
+         need(contract['contract_sha256']==CONTRACT_ID and len(model['cases'])==__CASE_COUNT__ and
+              model['total_packets']==__TOTAL_PACKETS__ and model['total_pcm']==__TOTAL_PCM__ and model['case_mask']==__CASE_MASK__,
+-             'All31 corpus contract shape/identity required')
++             'All12 corpus contract shape/identity required')
+         for fact in contract['source_facts']:
+             path = Path(fact['path']).resolve()
+             need(path.is_relative_to(repo) and sha(path)==fact['sha256'] and path.stat().st_size==fact['bytes'],
+@@ -201,9 +201,9 @@
+              sha(out/'sources/helpers/protocol.py')==PROTOCOL_SHA and
+              sha(out/'sources/project/raw-enable.cmake')==RAW_HELPER_SHA,'Wrong reviewed caller/protocol/raw helper')
+         need(sha(source_map_path)==SOURCE_MAP_SHA and sha(binding_path)==REFERENCE_BINDING_SHA and
+-             sha(binding_helper)==REFERENCE_HELPER_SHA and sha(source_pins_path)==SOURCE_PINS_SHA,'Expanded31 source binding/helper pins')
++             sha(binding_helper)==REFERENCE_HELPER_SHA and sha(source_pins_path)==SOURCE_PINS_SHA,'WideWidth12 source binding/helper pins')
+         freeze(source_map_path,Path('corpus/source-map.json'))
+-        freeze(binding_path,Path('reference/reference-binding31.json'))
++        freeze(binding_path,Path('reference/reference-binding12.json'))
+         freeze(binding_helper,Path('helpers/reference_binding.py'))
+         freeze(source_pins_path,Path('helpers/source-pins.json'))
+         mapping = json.loads(source_map_path.read_bytes())
+@@ -211,7 +211,7 @@
+         verify_source_binding(contract,mapping,binding)
+         need(len(binding['cases'])==__CASE_COUNT__ and binding['new_reference_commands_executed'] is False and
+              binding['aggregate_reference_campaign_exists'] is False and binding['dual_reference_passed'] is False,
+-             'Exact coherent31 source bindings required; historical dual NONPASS remains')
++             'Exact coherent12 source bindings required; historical dual NONPASS remains')
+         for item in binding['proof_facts']:
+             path = Path(item['path'])
+             need(path.is_relative_to(repo) and sha(path)==item['sha256'] and path.stat().st_size==item['bytes'],
+@@ -320,7 +320,7 @@
+         need(len(captured)==__CASE_COUNT__ and observed['protocol_lines']==__PROTOCOL_EVENTS__ and observed['cases']==__CASE_COUNT__ and observed['decoded_packets']==__TOTAL_PACKETS__ and observed['pcm']==__TOTAL_PCM__ and
+              observed['checked_decode_completed'] is True and observed['vendor_checked_pcm_equal'] is False and
+              observed['vendor_comparison_available'] is False and observed['independent_reference_compared'] is False,
+-             'All31 actual PCM observations required')
++             'All12 actual PCM observations required')
+         pcm_directory = out/'observed-pcm'
+         pcm_directory.mkdir()
+         report['observed'] = observed

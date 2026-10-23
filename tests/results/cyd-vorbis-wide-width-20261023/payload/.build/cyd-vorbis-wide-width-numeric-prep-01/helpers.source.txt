@@ -1,0 +1,81 @@
+"""Pure captured PCM/reference comparison; no decoder, SDK or process launch."""
+
+import argparse
+
+import hashlib
+
+import importlib.util
+
+import io
+
+import json
+
+from pathlib import Path, PurePosixPath, PureWindowsPath
+
+import re
+
+import sys
+
+import wave
+
+from pcm_metrics import alignment, compare, need
+
+from policy12 import CASE_IDS, TRIPLES, SHAPE_PAIRS, relations, bounded_policy
+
+sys.dont_write_bytecode = True
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def relative(value):
+    path = PurePosixPath(str(value).replace('\\', '/'))
+    need(str(value) and not path.is_absolute() and '..' not in path.parts and ':' not in str(path), 'Unsafe relative input path')
+    return path.as_posix()
+
+class Inputs:
+    def __init__(self):
+        self.rows = {}
+
+    def read(self, role, path, expected=None, size=None):
+        path = Path(path).resolve()
+        data = path.read_bytes()
+        digest = sha(data)
+        need(expected is None or digest == expected, 'Input identity mismatch: ' + role)
+        need(size is None or len(data) == size, 'Input size mismatch: ' + role)
+        row = dict(path=str(path), bytes=len(data), sha256=digest)
+        need(role not in self.rows or self.rows[role] == row, 'Role input changed: ' + role)
+        self.rows[role] = row
+        return data
+
+    def current(self):
+        for role, row in self.rows.items():
+            data = Path(row['path']).read_bytes()
+            need(len(data) == row['bytes'] and sha(data) == row['sha256'], 'Input changed during comparison: ' + role)
+
+def wav_pcm(data, rate, frames):
+    with wave.open(io.BytesIO(data), 'rb') as stream:
+        need(stream.getcomptype() == 'NONE' and stream.getnchannels() == 2 and stream.getsampwidth() == 2 and
+             stream.getframerate() == rate and stream.getnframes() == frames, 'Reference WAV metadata/count mismatch')
+        pcm = stream.readframes(frames + 1)
+    need(len(pcm) == frames * 4, 'Truncated or excess reference WAV PCM')
+    return pcm
+
+def frame_checksums(data, pcm, rate, frames):
+    text = data.decode('utf-8').replace('\r\n', '\n')
+    need(re.search(r'^#tb 0: 1/' + str(rate) + '$', text, re.M) and
+         re.search(r'^#sample_rate 0: ' + str(rate) + '$', text, re.M) and
+         '#codec_id 0: pcm_s16le' in text and re.search(r'^#channel_layout_name 0: (?:2 channels|stereo)$', text, re.M),
+         'Reference framemd5 metadata mismatch')
+    rows = [line for line in text.splitlines() if line and not line.startswith('#')]
+    need(len(rows) == len(frames) - 1 and frames[0] == 0, 'Exact thirteen nonprimer reference frames required')
+    cursor = timestamp = 0
+    for line, count in zip(rows, frames[1:]):
+        fields = [item.strip() for item in line.split(',')]
+        need(len(fields) == 6 and [int(x) for x in fields[:5]] == [0, timestamp, timestamp, count, count * 4],
+             'Reference per-packet PTS/duration/size mismatch')
+        part = pcm[cursor:cursor + count * 4]
+        need(hashlib.md5(part).hexdigest() == fields[5], 'Reference per-packet checksum mismatch')
+        cursor += count * 4
+        timestamp += count
+    need(cursor == len(pcm), 'Reference packet offsets do not cover full PCM')
+

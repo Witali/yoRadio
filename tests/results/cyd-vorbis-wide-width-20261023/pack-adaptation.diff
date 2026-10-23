@@ -1,0 +1,92 @@
+--- floor31-archive/pack.py
++++ width12-archive/pack.py
+@@ -1,33 +1,34 @@
+-"""Focused CYD floor0-equivalent31 source/evidence packer; no SDK, compiler, codec, emulator, or Git calls."""
++"""Focused CYD wide-width12 source/evidence packer; no SDK, compiler, codec, emulator, or Git calls."""
+ import argparse
+ import gzip
+ import json
+ from pathlib import Path
+ from dependency import Dependency, MANIFEST_SHA, need, norm, obj, rel, sha
+ 
+-ROLES = {'capture31', 'numeric31', 'host-new12'}
++ROLES = {'capture12', 'numeric12', 'host-new12'}
+ CONTEXT = ('compile_commands.json', 'project_description.json', 'flasher_args.json',
+            'build.ninja', 'CMakeCache.txt', 'config/sdkconfig.h', 'toolchain/cflags', 'specs/picolibc.specs')
+ SELF = ('pack.py', 'verify.py', 'dependency.py', 'README.md', 'plan.template.json',
+-        'source-relation.json', 'readiness.json', 'pack-from-c3.diff', 'source-checks.json')
++        'source-relation.json', 'readiness.json', 'pack-adaptation.diff', 'verify-adaptation.diff',
++        'check_source.py', 'source-closure.json', 'verify.body.txt')
+ 
+ 
+ def pack(repo, out, plan_path):
+     repo, out, plan_path = repo.resolve(), out.resolve(), plan_path.resolve()
+     plan = obj(plan_path.read_bytes())
+-    need(plan['schema'] == 'cyd-floor0-equivalent31-selection-v1' and set(plan['roles']) == ROLES and
+-         plan['dependency_manifest_sha256'] == MANIFEST_SHA, 'Exact CYD31/dependency role selection required')
++    need(plan['schema'] == 'cyd-wide-width12-selection-v1' and set(plan['roles']) == ROLES and
++         plan['dependency_manifest_sha256'] == MANIFEST_SHA, 'Exact CYD width12/dependency role selection required')
+     need(out.is_relative_to(repo / '.build') and out != repo / '.build' and not out.exists(),
+          'Use a fresh independent .build stage')
+     roots = [(repo / rel(item['path'])).resolve() for item in plan['roles'].values()]
+     roots += [(repo / rel(path)).resolve() for path in plan['trees']]
+     need(all(p.is_relative_to(repo) and p.is_dir() and not (p.is_relative_to(out) or out.is_relative_to(p))
+-             for p in roots), 'Missing or overlapping CYD31 input roots')
++             for p in roots), 'Missing or overlapping CYD width12 input roots')
+     dep = Dependency(repo)
+-    manifest = dict(schema='cyd-floor0-equivalent31-checkpoint-v1', repository=norm(repo), plan=plan, files={},
++    manifest = dict(schema='cyd-wide-width12-checkpoint-v1', repository=norm(repo), plan=plan, files={},
+         aliases={}, roles={}, external_omitted={}, generated={}, verified=False,
+         dependency_archive=dict(path='tests/results/cyd-vorbis-map2-20261020', manifest_sha256=MANIFEST_SHA,
+-            required=True, standalone=False), intended_destination='tests/results/cyd-vorbis-floor0-equivalent-20261023',
++            required=True, standalone=False), intended_destination='tests/results/cyd-vorbis-wide-width-20261023',
+         full_G6_qualified=False, physical_device=False, production_firmware=False)
+     out.mkdir(parents=True, exist_ok=False)
+     originals = {}
+@@ -108,7 +109,7 @@
+         report = obj((root / 'report.json').read_bytes())
+         need(sha((root / 'report.json').read_bytes()) == item['report_sha256'], 'Reviewed actual report identity differs')
+         need(sha((repo / rel(item['terminal'])).read_bytes()) == item['terminal_sha256'], 'Reviewed actual outer receipt identity differs')
+-        manifest['roles'][role] = dict(root=root.relative_to(repo).as_posix(), kind='numeric' if role == 'numeric31' else 'host' if role == 'host-new12' else 'target',
++        manifest['roles'][role] = dict(root=root.relative_to(repo).as_posix(), kind='numeric' if role == 'numeric12' else 'host' if role == 'host-new12' else 'target',
+             terminal=receipt(item['terminal']), expected_outer_exit=item['expected_outer_exit'])
+         selected = [p for p in root.iterdir() if p.is_file()]
+         for folder in ('sources', 'variant', 'observed-pcm', 'cases'):
+@@ -118,7 +119,7 @@
+         for field in ('build_outputs', 'variant_sources'):
+             selected += [root / rel(path) for path in report.get(field, {})]
+         for path in sorted(set(selected)):
+-            add(path, allow_borrow=False)  # Preserve actual31/full12 snapshot copies locally, including matching dependency bytes.
++            add(path, allow_borrow=False)  # Preserve actual target12/host12 snapshot copies locally, including matching dependency bytes.
+         aliases = manifest['aliases'][role] = {}
+         for original, row in report.get('inputs', {}).items():
+             path = root / rel(row['snapshot']) if 'snapshot' in row else Path(row['path'])
+@@ -127,7 +128,7 @@
+                 key = add(path, row['sha256'], allow_borrow='snapshot' not in row)
+                 aliases[original_path] = key
+             else:
+-                need(role == 'numeric31' and 'snapshot' not in row and path.name in {'ffmpeg.exe', 'python.exe'},
++                need(role == 'numeric12' and 'snapshot' not in row and path.name in {'ffmpeg.exe', 'python.exe'},
+                      'Only explicitly identified external numeric reference tools may be hash-only inputs')
+                 tool(path, row['sha256'])
+                 external = manifest['external_omitted'][norm(path.resolve())]
+@@ -136,19 +137,6 @@
+                 manifest.setdefault('external_numeric_aliases', {}).setdefault(role, {})[original_path] = norm(path.resolve())
+         for path, digest in report.get('tools', {}).items():
+             tool(path, digest)
+-
+-    # Retain the two exact independently qualified host scopes by explicit pinned
+-    # committed-archive keys. Their actual files are never recopied or synthesized.
+-    for role in ('host-old17', 'host-new8'):
+-        source_role = dep.manifest['roles'][role]
+-        manifest['roles'][role] = dict(source_role, dependency_role=True, expected_outer_exit=1)
+-        manifest['aliases'][role] = dict(dep.manifest['aliases'][role])
+-        keys = [key for key in dep.files if key.startswith(source_role['root'] + '/')]
+-        keys += list(manifest['aliases'][role].values()) + [source_role['terminal']]
+-        name = 'old17' if role == 'host-old17' else 'new8'
+-        keys.append(dep.manifest['plan']['hosts'][name]['qualification'])
+-        for key in sorted(set(keys)):
+-            borrow(key)
+ 
+     # Exact committed25 report/PCM/native events are a dependency, not recopied.
+     old25 = dep.manifest['roles']['capture25']

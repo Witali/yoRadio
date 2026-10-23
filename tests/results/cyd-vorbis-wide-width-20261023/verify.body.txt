@@ -1,0 +1,243 @@
+    target = reports['capture12']
+    need(target['result'] == 'CHECKED_CORPUS_PCM_CAPTURED' and target['completed'] is True and
+         target['target_capture_completed'] is True and target['checked_decode_completed'] is True and
+         all(target.get(name) is False for name in ('passed', 'vendor_comparison_available', 'vendor_checked_pcm_equal',
+             'independent_reference_compared', 'numeric_reference_qualified', 'format_corpus_qualified', 'full_G6_qualified',
+             'physical_device', 'production_radio_integration')), 'Actual full12 capture scope')
+    terminal = obj(raw[manifest['roles']['capture12']['terminal']])
+    need(terminal['report_sha256'] == sha(data('capture12')) and terminal['entrypoint_sha256'] ==
+         '7bd4c7da8e302f43ef5781976c3a7f618633859efba4ca4f63aefe327cb4ca6a' and
+         (terminal['session_id'], terminal['terminal_chunk_id'], terminal['exit_code']) == (67597, '977a73', 0), 'Actual direct-tool target terminal')
+    need([row['name'] for row in target['commands']] == COMMANDS, 'All9 actual target commands')
+    for command in target['commands']:
+        need(command['state'] == 'complete' and type(command['exit_status']) is int and command['exit_status'] == 0 and
+             command['timed_out'] is False and command['interrupted'] is False and type(command['pid']) is int and command['pid'] > 0,
+             'Actual owned target command terminals')
+        for stream in ('stdout', 'stderr'):
+            need(sha(data('capture12', command['name'] + '.' + stream + '.log')) == command[stream + '_sha256'], 'Actual target command log')
+    for field in ('build_outputs', 'variant_sources'):
+        for path, digest in target.get(field, {}).items():
+            need(files[manifest['roles']['capture12']['root'] + '/' + norm(path)]['raw_sha256'] == digest, 'Actual target output/variant identity')
+    need(sha(data('capture12', 'sources/project/main/main.c')) == '37eaeb25a272ceadaafe36d6309449d31895b7019523333ed0e4c48226d0d065' and
+         sha(data('capture12', 'variant/vorbis_repair/setup.c')) == sha(data('capture12', 'sources/candidate/vorbis_repair/setup.c')) ==
+         '6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c', 'Exact public caller/CYD source')
+    context = target['setup_macro_context']
+    need(context['row'] in record('capture12', 'build/compile_commands.json'), 'Actual setup compile row')
+    need(len(context['generated_inputs']) == 2, 'Actual cflags/specs macro context')
+    for path, row in context['generated_inputs'].items():
+        need(row['sha256_before'] == row['sha256_after'] == sha(raw[address(path, 'capture12')]), 'Stable actual macro inputs')
+    macros = data('capture12', 'setup-macros.stdout.log').decode().replace('\r\n', '\n')
+    need(not re.search(r'^#define (LIMIT_TO_64kHz|CONFIG_FREERTOS_UNICORE)\b', macros, re.M) and
+         re.search(r'^#define CONFIG_IDF_TARGET_ESP32 1$', macros, re.M) and
+         re.search(r'^#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ 240$', macros, re.M) and
+         data('capture12', 'sdk-head.stdout.log').strip() == b'7101770dc6db2667b3c477cc31365dd1acd6db4e' and
+         not data('capture12', 'sdk-clean.stdout.log').strip(), 'Actual CYD SDK/Xtensa/SMP profile')
+    contract = record('capture12', 'sources/corpus/contract.json')
+    need(sha(data('capture12', 'sources/corpus/contract.json')) == 'cbf7d453a1e8b0baa8df6fff4ec15e0537ba1948b9072621f80243eaf7874b1d' and
+         sha(data('capture12', 'sources/project/main/data.h')) == '3fc6f56c996dbdf6103f3e1361b018bc5640cc6ff250d14c502de82b77204da6', 'Exact full12 contract/header')
+    protocol_key = manifest['roles']['capture12']['root'] + '/sources/helpers/protocol.py'
+    protocol = source_module('offline_width12_protocol', protocol_key, '547655c4fa31a100f29f52b3a142a54442578393b860723b2b1147732578700e')
+    protocol.Path = ArchivedPath
+    qemu = target['commands'][6]
+    log = (data('capture12', 'qemu.stdout.log') + b'\n' + data('capture12', 'qemu.stderr.log')).decode(errors='replace')
+    observed = protocol.validate_log(log, contract, returncode=qemu['exit_status'], timed_out=qemu['timed_out'],
+        interrupted=qemu['interrupted'], manifest_hashes=contract['model']['manifest_sha256'])
+    captured = observed.pop('case_pcm')
+    need(observed == target['observed'] and (observed['cases'], observed['decoded_packets'], observed['pcm'], observed['protocol_lines'], observed['case_mask']) ==
+         (12, 168, 337920, 375, 4095) and len(captured) == len(target['observed_pcm']) == 12, 'Strict full12 actual protocol')
+    for item, row in zip(captured, target['observed_pcm']):
+        need(item['pcm'] == data('capture12', row['path']) and item['sha256'] == row['sha256'] and
+             (item['case'], item['id'], item['packet_offsets']) == (row['case'], row['id'], row['packet_offsets']), 'Every persisted actual PCM byte/boundary')
+    need({manifest['roles']['capture12']['root'] + '/' + norm(row['path']) for row in target['observed_pcm']} ==
+         {key for key in raw if key.startswith(manifest['roles']['capture12']['root'] + '/observed-pcm/')}, 'Exact target PCM inventory')
+
+    runtime_root = '.build/cyd-vorbis-wide-width-runtime-01/'
+    materializer = source_module('offline_width12_restricted_C_reader', runtime_root + 'materialize.py',
+        '674715dd805e2d9eeb3ee0eb5c2bc349801e3782b5e14c8fad5c87400f813dc2')
+    mapping = record('capture12', 'sources/corpus/source-map.json')
+    raw_cases = [{kind: raw[address(item['files'][kind]['selected']['path'], 'capture12')]
+                  for kind in ('identification', 'setup', 'audio')} for item in mapping['cases']]
+    recovered = materializer.recover(data('capture12', 'sources/project/main/data.h').decode('ascii'), contract, raw_cases,
+                                    sha(data('capture12', 'sources/corpus/contract.json')))
+    saved_materialization = obj(raw[runtime_root + 'materialized01/report.json'])
+    need(recovered == saved_materialization['cases'] and saved_materialization['counts'] ==
+         dict(cases=12, arrays=60, full_raw_payload_arrays=36, packets=168, expected_pcm_bytes=337920,
+              descriptor_capacity=12, case_mask=4095) and len(saved_materialization['controls']) == 5 and
+         all(row['rejected'] is True for row in saved_materialization['controls']), 'Actual independent60-array/header recovery and controls')
+
+    generated_root = '.build/cyd-vorbis-wide-width-generated-01/'
+    source_root = '.build/cyd-vorbis-wide-width-prep-01/'
+    comparison = obj(raw[generated_root + 'comparison12/matrix.json'])
+    source_manifest = obj(raw[generated_root + 'manifest.json'])
+    need({key[len(generated_root):] for key in raw if key.startswith(generated_root)} ==
+         {row['path'] for row in source_manifest['files']} | {'manifest.json'}, 'Complete generated8/12 file inventory')
+    for row in source_manifest['files']:
+        value = raw[generated_root + row['path']]
+        need(len(value) == row['bytes'] and sha(value) == row['sha256'], 'Generated raw/source metadata identity')
+    raw_witness = obj(raw['.build/cyd-vorbis-wide-width-witness-01.json'])
+    witness = source_module('offline_width12_raw_fraction_witness', source_root + 'inspect_width_equivalence.py',
+        'af2db084b13b91f0f60f2392e926c0401c9ed99bb63fa4f6222b850b169f9560')
+    need(raw_witness['construction_witness_completed'] is True and raw_witness['manifest_sha256'] == sha(raw[generated_root + 'manifest.json']) and
+         raw_witness['source_pins_sha256'] == sha(raw[source_root + 'source-pins.json']) ==
+         '75cb073a50c88b93086ebddf18a83108cdda69b46a96f3f7c1a29dadad97db96', 'Actual raw width witness provenance')
+    source_pins = obj(raw[source_root + 'source-pins.json'])
+    for name, row in source_pins['files'].items():
+        value = raw[source_root + name]
+        need(len(value) == row['bytes'] and sha(value) == row['sha256'], 'Frozen original raw byte identities')
+    books = []
+    for index, (case, reported) in enumerate(zip(comparison['cases'], raw_witness['cases'])):
+        original = source_pins['selected_original_cases'][index % 4]
+        original_id = original['id']
+        parts = {kind: raw[generated_root + 'comparison12/' + case[kind]] for kind in ('identification', 'comment', 'setup', 'audio', 'ogg')}
+        old = {kind: raw[source_root + 'originals/' + original_id + '/' + PureWindowsPath(original[kind]).name] for kind in parts}
+        before, after = witness.setup(old['setup']), witness.setup(parts['setup'])
+        width = 2 if index < 4 else 9 if index < 8 else 16
+        if width != 2: witness.equivalent(before['book'], after['book'], width)
+        else: need(after == before, 'Original four setup bytes')
+        need(before['unchanged_prefix_bits'] == after['unchanged_prefix_bits'] and before['suffix_bits'] == after['suffix_bits'] and
+             before['padding_bits'] == after['padding_bits'] and after['spans']['quant_end'] - after['spans']['quant_start'] ==
+             width * after['book']['entries'] * 16, 'Exact original/all-row quant-width invariance')
+        need(all(parts[kind] == old[kind] for kind in ('identification', 'comment', 'audio')) and
+             (index >= 4 or parts == old), 'Unchanged complete raw original/ID/comment/audio')
+        old_pages, new_pages = witness.pages(old['ogg']), witness.pages(parts['ogg'])
+        packets = [parts['identification'], parts['comment'], parts['setup']] + [parts['audio'][a:b] for a, b in zip(case['offsets'], case['offsets'][1:])]
+        need(len(new_pages) == len(old_pages) == 17 and [row['packet'] for row in new_pages] == packets and
+             all(a['serial'] == b['serial'] and a['flags'] == b['flags'] and a['granule'] == b['granule'] and
+                 (i == 2 or a['raw'] == b['raw']) for i, (a, b) in enumerate(zip(old_pages, new_pages))), 'Exact carrier/CRC/non-setup page invariance')
+        fraction_rows = [[[value.numerator, value.denominator] for value in row] for row in witness.vectors(after['book'])]
+        expected = dict(id=case['id'], original_id=original_id, quant_width=width, original_entries=after['book']['entries'],
+            dimensions=16, multiplicands=after['book']['multiplicands'], all_original_rows_retained=True,
+            fraction_vectors_by_original_entry=fraction_rows, codeword_lengths=after['book']['lengths'], setup_span=after['spans'],
+            setup_used_bits=after['used_bits'], original_setup_sha256=sha(old['setup']), setup_sha256=sha(parts['setup']),
+            ID_comment_audio_unchanged=True, carrier_only_setup_page_changed=True)
+        need(reported == expected, 'Recomputed raw-bit/Fraction witness row')
+        books.append(after['book'])
+    need(len(books) == 12 and raw_witness['exact_construction_negative_controls'] == witness.negative_controls(books[0], books[4]),
+         'All12 width witnesses and5 exact construction controls')
+
+    host, numeric = reports['host-new12'], reports['numeric12']
+    need(host['completed'] is True and host['xiph_reference_qualified'] is True and host['dual_reference_qualified'] is False and
+         len(host['cases']) == len(host['failures']) == 12 and len(host['commands']) == 24, 'Actual original full12 host dual NONPASS')
+    need(numeric['result'] == 'BOUNDED_CORPUS_PCM_REJECTED' and numeric['measurement_completed'] is True and
+         numeric['actual_reference_compared'] is True and numeric['bounded_corpus_pcm_qualified'] is False and len(numeric['cases']) == 12 and
+         all(numeric[name] is False for name in ('passed', 'numeric_reference_qualified', 'format_corpus_qualified',
+             'full_G6_qualified', 'physical_device', 'production_radio_integration')), 'Actual complete numeric NONPASS')
+    qualifier_root = '.build/cyd-vorbis-wide-width-runtime-prep-01/'
+    numeric_root = '.build/cyd-vorbis-wide-width-numeric-prep-01/'
+    qualified_key = '.build/cyd-vorbis-wide-width-qualified-01/qualification.json'
+    qualified = obj(raw[qualified_key])
+    need(sha(raw[qualified_key]) == '45130a3de50aa41212f30ef41fd071b0f77aea13899575a88842767ed29f37f3' and
+         qualified['completed'] is True and qualified['reference_corpus_qualified'] is True and qualified['xiph_reference_qualified'] is True and
+         qualified['dual_reference_qualified'] is False and qualified['original_dual_reference_passed'] is False and
+         qualified['original_report_sha256'] == sha(data('host-new12')) and
+         (qualified['xiph_cases'], qualified['native_compared'], qualified['native_lookup2_refusals'], qualified['paired_raw_packets'], qualified['expected_pcm_bytes']) ==
+         (12, 0, 12, 168, 337920), 'Independent full12 actual reference scope')
+    saved = {name: sys.modules.get(name) for name in ('pcm_metrics', 'policy12', 'carrier')}
+    try:
+        metrics = source_module('pcm_metrics', numeric_root + 'pcm_metrics.py', METRICS); sys.modules['pcm_metrics'] = metrics
+        policy = source_module('policy12', numeric_root + 'policy12.py', 'ee492b1b28cbd6f72256676f18473f735a900c1d81901da294727bf57cdf0579'); sys.modules['policy12'] = policy
+        carrier = source_module('carrier', qualifier_root + 'carrier.py', '6cf4f49de61cf94184578fe753272606b1ef8e0225b1444ede4c73d4c549712b'); sys.modules['carrier'] = carrier
+        qualifier = source_module('offline_width12_qualification_PCM_helpers', qualifier_root + 'qualify.py', '4549ae75b4ef127504425dfe936997c53cb428de2fced6bf2e555bcdda4b8ebc')
+        adapter = source_module('offline_width12_numeric_helpers', numeric_root + 'compare_capture12.py', '77d01fbaf091e43586958162b0a6941ee80af7ccbc28b31e1658ba4f321cf626')
+        need(tuple(case['id'] for case in comparison['cases']) == policy.CASE_IDS and comparison['expected_same_decoder_pcm_equal_groups'] == policy.TRIPLES,
+             'Exact declared12 order and four triple groups')
+        original_matrix = obj(raw[source_root + 'originals/matrix.json'])
+        original_pairs = original_matrix['expected_same_decoder_pcm_equal_groups'][:2]
+        derived_pairs = [pair if width == 2 else [name + f'_qbits{width}' for name in pair] for width in (2, 9, 16) for pair in original_pairs]
+        need(policy.SHAPE_PAIRS == derived_pairs, 'Six pairs derived only from predeclared original pairs/width equivalence')
+        commands = {row['name']: row for row in host['commands']}
+        xiph_all, target_all = {}, {}
+        for index, (case, current, measured, host_case, accepted) in enumerate(zip(contract['model']['cases'], captured, numeric['cases'], host['cases'], qualified['cases'])):
+            source = comparison['cases'][index]
+            case_id = '0-' + case['id']
+            need(host_case['id'] == accepted['id'] == case_id and host_case['input'] == source and
+                 host_case['source_matrix_sha256'] == sha(raw[generated_root + 'comparison12/matrix.json']) and accepted['xiph_qualified'] is True and
+                 accepted['native_lookup2_refusal'] is True, 'Exact real reference case identity')
+            parts = {kind: raw[generated_root + 'comparison12/' + source[kind]] for kind in ('identification', 'comment', 'setup', 'audio', 'ogg')}
+            need(all(sha(parts[kind]) == case['raw_sha256'][kind] for kind in ('identification', 'setup', 'audio')), 'Exact target/reference raw packets')
+            pages = carrier.packets(parts['ogg'])
+            expected_packets = [parts['identification'], parts['comment'], parts['setup']] + [parts['audio'][a:b] for a, b in zip(case['offsets'], case['offsets'][1:])]
+            need([row['data'] for row in pages] == expected_packets and len(pages) == 17 and
+                 [row['granule'] for row in pages] == [0, 0, 0] + source['packet_granules'], 'Qualified carrier CRC/raw/granule equivalence')
+            folder = 'cases/' + case_id + '/'
+            need(data('host-new12', folder + 'input.ogg') == parts['ogg'], 'Actually decoded carrier bytes')
+            for decoder, code in (('vorbis', 3199971767), ('libvorbis', 0)):
+                command = commands[folder + 'decode-' + decoder]
+                need(command['receipt'] == folder + 'decode-' + decoder + '.json', 'Exact child receipt role')
+                child_raw = data('host-new12', command['receipt'])
+                need(sha(child_raw) == command['sha256'], 'Actual child receipt SHA')
+                child = obj(child_raw)
+                receipt(child, code, 'host-new12')
+                need(child['runner_sha256'] == '33a64601d773382e748d69391eb068d7bc2b682540e3b670ddc13c0a19e22f7e' and
+                     child['executable_sha256'] == host['tools'][child['argv'][0]], 'Actual child tool/capture identities')
+                argv = child['argv']
+                need(argv[argv.index('-c:a')+1] == decoder and '-ar' not in argv and '-ac' not in argv and '-xerror' in argv and
+                     argv[argv.index('-err_detect')+1] == 'explode' and
+                     address(argv[argv.index('-i')+1], 'host-new12') == manifest['roles']['host-new12']['root'] + '/' + folder + 'input.ogg',
+                     'Actual strict child decoder/input/unforced metadata options')
+                stdout = data('host-new12', folder + 'decode-' + decoder + '.stdout.log')
+                stderr = data('host-new12', folder + 'decode-' + decoder + '.stderr.log')
+                if decoder == 'vorbis':
+                    need(not stdout and b'Codebook lookup type not supported.' in stderr and b'Setup header corrupt.' in stderr and
+                         decoder not in host_case['decoded'] and len(host_case['failures']) == 1 and host_case['failures'][0]['stage'] == 'vorbis', 'Exact original native lookup2 refusal')
+                else:
+                    need(not stderr, 'Strict successful Xiph stderr')
+            wav = data('host-new12', folder + 'libvorbis.wav')
+            md5 = data('host-new12', folder + 'decode-libvorbis.stdout.log')
+            reference, evidence = qualifier.decoded_pcm(wav, md5, case['rate'], 2, case['frames'], case['modes'])
+            need(evidence == host_case['decoded']['libvorbis'] and all(accepted[key] == value for key, value in evidence.items()), 'All actual WAV/framemd5/PCM/hash/nonzero reference facts')
+            need(measured['case'] == index and measured['id'] == case['id'] and measured['packet_offsets'] == current['packet_offsets'] and
+                 measured['comparison'] == metrics.compare(reference, current['pcm'], case['pcm']) and
+                 measured['alignment'] == metrics.alignment(reference, current['pcm'], 8) and
+                 measured['reference_transition_nonzero'] == adapter.transition_counts(reference, case, current['packet_offsets']) and
+                 measured['target_transition_nonzero'] == adapter.transition_counts(current['pcm'], case, current['packet_offsets']), 'All12 signed-S16 sample/channel/packet/diagnostic metrics')
+            xiph_all[case['id']], target_all[case['id']] = reference, current['pcm']
+        relations = dict(xiph_triples=policy.relations(xiph_all, policy.TRIPLES), target_triples=policy.relations(target_all, policy.TRIPLES),
+            xiph_shape_pairs=policy.relations(xiph_all, policy.SHAPE_PAIRS), target_shape_pairs=policy.relations(target_all, policy.SHAPE_PAIRS))
+        need(relations == numeric['metamorphic_relations'] and
+             all(row['expected_relation_observed'] for key, rows in relations.items() if key.startswith('xiph') for row in rows) and
+             all(not row['expected_relation_observed'] for key, rows in relations.items() if key.startswith('target') for row in rows), 'All10 Xiph pass/all10 target relations fail preserved')
+        selected_policy, passed = policy.bounded_policy(numeric['cases'], relations, 2)
+        need(selected_policy == numeric['policy'] and passed is numeric['bounded_corpus_pcm_qualified'] is False and
+             all(row['comparison']['zero_lag_direct_LR']['max_abs_error'] == 65535 for row in numeric['cases']), 'Fixed2LSB complete12 NONPASS/all12 actual maxima')
+        need(qualified['xiph_metamorphic_checks'] == [dict(decoder='libvorbis', kind='equal', cases=group, passed=True) for group in policy.TRIPLES] and
+             host['metamorphic_checks'] == [dict(decoder=decoder, kind='equal', cases=group, passed=decoder == 'libvorbis')
+                for decoder in ('vorbis', 'libvorbis') for group in policy.TRIPLES], 'Actual original host/qualifier width groups and dual NONPASS')
+        old25 = reports['old25']
+        old_contract = record('old25', 'sources/corpus/contract.json')
+        need(old25['completed'] is True and len(old25['observed_pcm']) == len(old_contract['model']['cases']) == 25 and
+             numeric['prior_comparison_available'] is True and numeric['prior_original4_byte_equal'] is True and len(numeric['prior_original4_comparison']) == 4,
+             'Explicit fully verified committed prior25, not an undeclared old31 fallback')
+        for case, item, row in zip(contract['model']['cases'][:4], captured[:4], numeric['prior_original4_comparison']):
+            matches = [(old, prior) for old, prior in zip(old_contract['model']['cases'], old25['observed_pcm']) if old['id'] == case['id']]
+            need(len(matches) == 1, 'Unique original case in complete25 dependency')
+            old, prior = matches[0]
+            prior_pcm = data('old25', prior['path'])
+            need(old['raw_sha256'] == case['raw_sha256'] and old['pcm'] == case['pcm'] and prior['packet_offsets'] == item['packet_offsets'] and
+                 prior_pcm == item['pcm'] and len(prior_pcm) == case['total_pcm'], 'Exact complete prior25 original4 input/PCM identity')
+            need(row == dict(id=case['id'], prior_full_cases=25, prior_sha256=sha(prior_pcm), current_sha256=item['sha256'], byte_equal=True,
+                comparison=metrics.compare(prior_pcm, item['pcm'], case['pcm']), applied_trim=False), 'Complete historical comparison metrics without truncation')
+    finally:
+        for name, previous in saved.items():
+            if previous is None: sys.modules.pop(name, None)
+            else: sys.modules[name] = previous
+
+    for receipt_key in manifest['plan']['extra_receipts']:
+        need(sha(raw[receipt_key]) == manifest['plan']['extra_receipt_pins'][receipt_key], 'Exact actual supplemental receipt')
+        receipt(obj(raw[receipt_key]), 0)
+    checkpoint = manifest['plan']['checkpoint']
+    need(files[checkpoint['path']]['stored'] == 'CHECKPOINT.md' and sha(raw[checkpoint['path']]) == checkpoint['sha256'], 'Exact frozen root checkpoint')
+    # Retain the root's old31-comparison source/report/terminal only as a record.
+    # No old31 inputs are resolved, loaded or replayed by this checkpoint.
+    need(set(manifest['plan']['supplemental_records_not_replayed']) == {
+        '.build/cyd-vorbis-wide-width-target-witness-01.py', '.build/cyd-vorbis-wide-width-target-witness-01.json'}, 'Explicit supplemental record-only scope')
+    supplemental = obj(raw['.build/cyd-vorbis-wide-width-target-witness-01.json'])
+    need(supplemental['current']['sha256'] == sha(data('capture12')) and supplemental['vendor_cause_attributed'] is False and
+         supplemental['numeric_reference_compared'] is False and supplemental['full_G6_qualified'] is False, 'Supplemental record scope retained')
+    dep.current()
+    return dict(verified=True, files=len(files), cases=12, packets=168, PCM_bytes=337920, protocol_events=375,
+        raw_width_witness_cases=12, exact_construction_controls=5, recorded_reference_child_commands=24,
+        Xiph_relations_passed=10, target_relations_failed=10, all_max_abs_errors=65535,
+        complete_prior25_original4_PCM_equal=True, old31_supplemental_record_replayed=False,
+        original_host_dual_NONPASS_preserved=True, numeric_NONPASS_preserved=True, metric_bound=2,
+        full_G6_qualified=False, physical_device=False, production_firmware=False)
