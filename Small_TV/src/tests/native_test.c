@@ -43,6 +43,9 @@ static size_t saved_nvs_length;
 static int64_t clock_us;
 static unsigned rendered_pixels,registered_routes,restart_requests,weather_requests;
 static unsigned nvs_commits;
+static bool saved_jpeg_limit_present;
+static uint32_t saved_jpeg_limit;
+static esp_err_t jpeg_limit_write_result=ESP_OK;
 static unsigned route_success[48],route_errors[48];
 static bool connected, setup_ap = true;
 static uint16_t scan_count=1;
@@ -84,6 +87,10 @@ esp_err_t nvs_get_blob(nvs_handle_t handle,const char *key,void *data,size_t *le
 esp_err_t nvs_set_blob(nvs_handle_t handle,const char *key,const void *data,size_t length)
 {(void)handle;(void)key;assert(length<=sizeof(saved_nvs));memcpy(saved_nvs,data,length);saved_nvs_length=length;return ESP_OK;}
 esp_err_t nvs_commit(nvs_handle_t handle) {(void)handle;++nvs_commits;return ESP_OK;}
+esp_err_t nvs_get_u32(nvs_handle_t handle,const char *key,uint32_t *value)
+{(void)handle;assert(!strcmp(key,"jpeg_write_kib"));if(!saved_jpeg_limit_present)return ESP_ERR_NVS_NOT_FOUND;*value=saved_jpeg_limit;return ESP_OK;}
+esp_err_t nvs_set_u32(nvs_handle_t handle,const char *key,uint32_t value)
+{(void)handle;assert(!strcmp(key,"jpeg_write_kib"));if(jpeg_limit_write_result!=ESP_OK)return jpeg_limit_write_result;saved_jpeg_limit=value;saved_jpeg_limit_present=true;return ESP_OK;}
 esp_err_t esp_flash_read(esp_flash_t *chip,void *data,uint32_t offset,uint32_t length)
 {(void)chip;if(offset!=FACTORY_SETTINGS_OFFSET || length>sizeof(factory_sector))return ESP_ERR_INVALID_SIZE;memcpy(data,factory_sector,length);return ESP_OK;}
 esp_err_t esp_flash_write(esp_flash_t *chip,const void *data,uint32_t offset,uint32_t length)
@@ -677,6 +684,34 @@ static void digest(const void *data,size_t bytes,char output[65])
     for(unsigned i=0;i<32;++i)sprintf(output+i*2,"%02x",value[i]);
 }
 
+static void test_jpeg_write_setting(void)
+{
+    /* Independent NVS key survives raw-sector precedence and rejects malformed
+     * values without changing any ordinary preference or writing a second time. */
+    CHECK(settings_jpeg_write_limit_kib()==200);
+    CHECK(strstr(get("/get_jpeg_write_limit"),"\"limit_kib\":200"));
+    unsigned commits=nvs_commits;
+    post("/set_jpeg_write_limit","{\"limit_kib\":200}",200);CHECK(nvs_commits==commits);
+    tv_settings_t before,after;settings_snapshot(&before);
+    post("/set_jpeg_write_limit","{\"limit_kib\":0}",200);
+    CHECK(settings_jpeg_write_limit_kib()==0 && nvs_commits==commits+1);
+    settings_snapshot(&after);CHECK(!memcmp(&before,&after,sizeof(before)));
+    CHECK(settings_init()==ESP_OK && settings_jpeg_write_limit_kib()==0);
+    const char *invalid[]={"{}","{\"limit_kib\":-1}","{\"limit_kib\":0.5}",
+        "{\"limit_kib\":4294967296}","{\"limit_kib\":true}","{\"limit_kib\":null}","{\"limit_kib\":\"200\"}"};
+    commits=nvs_commits;
+    for(unsigned i=0;i<sizeof(invalid)/sizeof(invalid[0]);++i)post("/set_jpeg_write_limit",invalid[i],400);
+    CHECK(settings_jpeg_write_limit_kib()==0 && nvs_commits==commits);
+    jpeg_limit_write_result=ESP_FAIL;
+    post("/set_jpeg_write_limit","{\"limit_kib\":123}",400);
+    CHECK(settings_jpeg_write_limit_kib()==0 && nvs_commits==commits);
+    jpeg_limit_write_result=ESP_OK;
+    post("/set_jpeg_write_limit","{\"limit_kib\":4294967295}",200);
+    CHECK(settings_jpeg_write_limit_kib()==UINT32_MAX);
+    CHECK(strstr(get("/get_jpeg_write_limit?fresh=1"),"4294967295"));
+    post("/set_jpeg_write_limit","{\"limit_kib\":200}",200);
+}
+
 static void test_extended_photos(const char *folder)
 {
     /* Actual HTTP worker path accepts12-bit CMYK, gives precise resource
@@ -736,17 +771,83 @@ static void test_extended_photos(const char *folder)
     after.photo_size[4]=before.photo_size[4];CHECK(!memcmp(&before,&after,sizeof(before)));
 }
 
+static void test_jpeg_write_budget(const char *folder)
+{
+    /* Check physical traffic, not coefficient capacity. A legal rich file is
+     * rejected at200KiB, then a small progressive file succeeds on the same owner. */
+    CHECK(settings_set_jpeg_write_limit_kib(200)==ESP_OK);
+    const char *names[]={"full-cmyk12.jpg","flat-gray-progressive-8.jpg"};
+    for(unsigned test=0;test<2;++test) {
+        char path[1024];snprintf(path,sizeof(path),"%s/%s",folder,names[test]);
+        FILE *file=fopen(path,"rb");CHECK(file);CHECK(!fseek(file,0,SEEK_END));long size=ftell(file);
+        CHECK(size>0 && size<=PHOTO_SLOT_BYTES && !fseek(file,0,SEEK_SET));
+        uint8_t *image=malloc((size_t)size);CHECK(image && fread(image,1,(size_t)size,file)==(size_t)size);fclose(file);
+        unsigned chunks=((unsigned)size+PHOTO_CHUNK_BYTES-1)/PHOTO_CHUNK_BYTES;
+        uint64_t image_program_start=cache_program_bytes;
+        CHECK(photo_upload_start(4,(uint32_t)size,chunks)==ESP_OK);
+        for(unsigned chunk=0;chunk<chunks;++chunk) {
+            size_t count=(size_t)size-chunk*PHOTO_CHUNK_BYTES;if(count>PHOTO_CHUNK_BYTES)count=PHOTO_CHUNK_BYTES;
+            CHECK(photo_upload_chunk(4,chunk,chunks,image+chunk*PHOTO_CHUNK_BYTES,count)==ESP_OK);
+        }
+        free(image);uint64_t before=cache_program_bytes;photo_diagnostic_t d;
+        esp_err_t result=photo_upload_finish_detailed(4,&d);
+        CHECK(cache_program_bytes-before<=200u*1024u && !media_upload_active());
+        CHECK(cache_program_bytes-image_program_start<=200u*1024u);
+        CHECK(d.program_bytes==cache_program_bytes-image_program_start);
+        tv_settings_t settings;settings_snapshot(&settings);
+        if(!test) {
+            CHECK(result!=ESP_OK && d.write_limit && d.available==200u*1024u && d.required>d.available);
+            char reason[192];photo_diagnostic_describe(&d,reason,sizeof(reason));
+            CHECK(strstr(reason,"flash-write-limit; required=") && strstr(reason,"available=204800"));
+            CHECK(settings.photo_size[4]==0);
+        } else {
+            CHECK(result==ESP_OK && !d.write_limit && settings.photo_size[4]==(uint32_t)size);
+            CHECK(cache_program_bytes-before>0 && media_draw_photo_cached(4)==ESP_OK);
+        }
+    }
+    /* Zero permits a verified cold/hot hit but no mutation of cache or source
+     * while durable source invalidation would itself require a journal write. */
+    CHECK(settings_set_jpeg_write_limit_kib(0)==ESP_OK);
+    char before[65],after[65];digest(flash_bytes,sizeof(flash_bytes),before);
+    uint64_t programs=cache_program_bytes,erases=cache_erases;
+    CHECK(media_draw_photo_cached(4)==ESP_OK);
+    photo_diagnostic_t d;
+    CHECK(photo_upload_start_detailed(4,508,1,&d)!=ESP_OK && d.write_limit && d.available==0);
+    char reason[192];photo_diagnostic_describe(&d,reason,sizeof(reason));
+    CHECK(strstr(reason,"flash-writes-disabled;"));
+    CHECK(cache_program_bytes==programs && cache_erases==erases && !media_upload_active());
+    digest(flash_bytes,sizeof(flash_bytes),after);CHECK(!strcmp(before,after));
+    CHECK(media_draw_photo_cached(4)==ESP_OK);
+    CHECK(settings_set_jpeg_write_limit_kib(200)==ESP_OK);
+
+    /* A background policy refusal is remembered, so each slideshow pass does
+     * not retry it. Raising the cap makes that unchanged source eligible again. */
+    CHECK(photo_worker_invalidate(0,&d)==ESP_OK);photo_worker_forget(0);
+    CHECK(settings_set_jpeg_write_limit_kib(0)==ESP_OK);
+    LONG received=InterlockedCompareExchange(&photo_test_queue->receive_entered,0,0);
+    photo_worker_request(0);photo_test_drain(received+1);
+    CHECK((photo_worker_failed_mask()&1) && !(photo_worker_ready_mask()&1));
+    photo_test_gate_t gate;received=photo_test_begin_hold(&gate);
+    unsigned write=photo_test_queue->write;
+    for(unsigned i=0;i<10;++i)photo_worker_request(0);
+    CHECK(photo_test_queue->write==write);
+    CHECK(settings_set_jpeg_write_limit_kib(200)==ESP_OK && !(photo_worker_failed_mask()&1));
+    photo_worker_request(0);CHECK(photo_test_queue->write!=write);
+    photo_test_end_hold(&gate,received+2);CHECK(photo_worker_ready_mask()&1);
+}
+
 int main(int argc,char **argv)
 {
     memset(factory_sector,255,sizeof(factory_sector));memset(low_flash,255,sizeof(low_flash));memset(tail_flash,255,sizeof(tail_flash));
     CHECK(argc==4);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
-    CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
+    CHECK(web_start()==ESP_OK);CHECK(registered_routes==42);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_theme_requests();test_city_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_advanced_page();test_uploads();test_multipart();test_dns();test_http_captive();
+    test_settings();test_jpeg_write_setting();test_theme_requests();test_city_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_advanced_page();test_uploads();test_multipart();test_dns();test_http_captive();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
     test_photo_owner_lifetime();test_photo_owner_stale();test_photo_owner_retry();
     test_photo_prefetch_policy();test_photo_prefetch_failed_source();test_photo_prefetch_cancel_retry();
     test_extended_photos(argv[3]);
+    test_jpeg_write_budget(argv[3]);
     CHECK(async_open==0);
     if(argc>=3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);

@@ -15,9 +15,9 @@ typedef struct {
     jpeg_cache_result_t cache;
     unsigned transport;
     int io;
-    uint64_t required,available;
+    uint64_t required,available,program_bytes;
     bool available_known;
-    bool cached,baseline,service_memory;
+    bool cached,baseline,service_memory,write_limit;
 } photo_diagnostic_t;
 
 /* One owner, serialized by the media worker's codec mutex. Source mutations
@@ -25,7 +25,7 @@ typedef struct {
  * before any cache/scratch writes. Draw's row callback paints only verified data. */
 esp_err_t photo_codec_init(void);
 esp_err_t photo_codec_invalidate(unsigned slot,photo_diagnostic_t *diagnostic);
-esp_err_t photo_codec_prepare(unsigned slot,uint32_t length,bool background,
+esp_err_t photo_codec_prepare(unsigned slot,uint32_t length,bool background,uint64_t prior_program_bytes,
                              photo_diagnostic_t *diagnostic);
 esp_err_t photo_codec_draw(unsigned slot,uint32_t length,
     int (*row)(void *,uint32_t,const uint16_t *,uint32_t),void *context,

@@ -172,6 +172,17 @@
     <button id="crop-cancel" type="button">Cancel</button>
 </dialog>
 
+<section aria-labelledby="jpeg-write-title" style="margin:20px 0;padding:12px;border:1px solid #aaa;border-radius:8px">
+    <h2 id="jpeg-write-title">Photo processing write limit</h2>
+    <form id="jpeg-write-form">
+        <label for="jpeg-write-limit">Maximum flash writes per processed photo (KiB)</label>
+        <input id="jpeg-write-limit" type="number" min="0" max="4294967295" step="1" required value="200">
+        <button id="jpeg-write-save" type="submit">Save limit</button>
+    </form>
+    <p>The limit includes temporary data and the prepared display image. Saving the uploaded JPEG is separate. Set 0 to forbid processing writes and erases; already prepared photos can still be shown.</p>
+    <p id="jpeg-write-status" role="status" aria-live="polite"></p>
+</section>
+
 <script>
 /* Remove encoder metadata from the known sRGB Canvas JPEG, keeping pixel data.
  * The device still validates baseline 240x240 dimensions, complete scans and EOI. */
@@ -208,6 +219,57 @@ async function stripCanvasJpegMetadata(blob) {
     }
     throw new Error('Canvas JPEG has no image scan');
 }
+
+// REQUESTED_CHANGE: persist a cumulative per-photo limit, without changing crop/privacy.
+(() => {
+    'use strict';
+    const maximumKiB = 4294967295;
+    const validLimit = value => Number.isInteger(value) && value >= 0 && value <= maximumKiB;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('jpeg-write-form');
+        const input = document.getElementById('jpeg-write-limit');
+        const button = document.getElementById('jpeg-write-save');
+        const status = document.getElementById('jpeg-write-status');
+        if (!form || !input || !button || !status) return;
+
+        // Never show a guessed default as the saved preference after a read error.
+        button.disabled = true;
+        fetch('/get_jpeg_write_limit').then(response => {
+            if (!response.ok) throw new Error('Could not read the saved write limit');
+            return response.json();
+        }).then(data => {
+            if (!validLimit(data.limit_kib)) throw new Error('Invalid saved write limit');
+            input.value = String(data.limit_kib);
+            button.disabled = false;
+        }).catch(error => { status.textContent = error.message; });
+
+        // Validate before POST; textContent keeps server errors out of HTML markup.
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            const text = input.value.trim();
+            const value = Number(text);
+            if (!/^[0-9]+$/.test(text) || !validLimit(value)) {
+                status.textContent = 'Enter a whole number from 0 to 4294967295 KiB';
+                return;
+            }
+            button.disabled = true;
+            try {
+                const response = await fetch('/set_jpeg_write_limit', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({limit_kib: value})
+                });
+                if (!response.ok) throw new Error(await response.text());
+                status.textContent = value === 0 ? 'Saved: processing writes and erases are disabled' :
+                    `Saved: ${value} KiB per processed photo`;
+            } catch (error) {
+                status.textContent = `Could not save: ${error.message}`;
+            } finally {
+                button.disabled = false;
+            }
+        });
+    });
+})();
 
         // 全局变量
         let currentSettings = {

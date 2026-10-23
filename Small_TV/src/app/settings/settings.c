@@ -17,6 +17,8 @@ static uint32_t generation;
 static uint32_t theme_selection_generation;
 static bool dirty;
 static int64_t last_change_us;
+static portMUX_TYPE jpeg_limit_lock=portMUX_INITIALIZER_UNLOCKED;
+static uint32_t jpeg_write_limit_kib=TV_JPEG_WRITE_LIMIT_DEFAULT_KIB;
 
 /* Read the old native ABI explicitly; the unchanged raw-sector ABI is separate. */
 typedef struct
@@ -206,6 +208,12 @@ esp_err_t settings_init(void)
     esp_err_t result = nvs_open("small_tv", NVS_READWRITE, &settings_store);
     if (result != ESP_OK)
         return result;
+    /* REQUESTED_CHANGE: keep the new preference outside both legacy layouts.
+     * Reading an absent key uses the default without a startup flash write. */
+    uint32_t jpeg_limit=TV_JPEG_WRITE_LIMIT_DEFAULT_KIB;
+    result=nvs_get_u32(settings_store,"jpeg_write_kib",&jpeg_limit);
+    if(result!=ESP_OK && result!=ESP_ERR_NVS_NOT_FOUND)return result;
+    portENTER_CRITICAL(&jpeg_limit_lock);jpeg_write_limit_kib=jpeg_limit;portEXIT_CRITICAL(&jpeg_limit_lock);
     bool migrated;
     dirty = false;
     if (!load_nvs(&current_settings, &migrated))
@@ -345,4 +353,27 @@ uint32_t settings_generation(void)
     uint32_t value = generation;
     xSemaphoreGive(settings_mutex);
     return value;
+}
+
+uint32_t settings_jpeg_write_limit_kib(void)
+{
+    /* A short atomic snapshot is cheap enough for every decoder checkpoint. */
+    portENTER_CRITICAL(&jpeg_limit_lock);uint32_t value=jpeg_write_limit_kib;portEXIT_CRITICAL(&jpeg_limit_lock);
+    return value;
+}
+
+esp_err_t settings_set_jpeg_write_limit_kib(uint32_t kib)
+{
+    /* Persist before publishing; serialize with ordinary settings NVS commits.
+     * A repeated value causes no flash write or unrelated theme reinitialization. */
+    xSemaphoreTake(settings_mutex,portMAX_DELAY);
+    esp_err_t result=ESP_OK;
+    if(kib!=settings_jpeg_write_limit_kib()) {
+        result=nvs_set_u32(settings_store,"jpeg_write_kib",kib);
+        if(result==ESP_OK)result=nvs_commit(settings_store);
+        if(result==ESP_OK) {
+            portENTER_CRITICAL(&jpeg_limit_lock);jpeg_write_limit_kib=kib;portEXIT_CRITICAL(&jpeg_limit_lock);
+        }
+    }
+    xSemaphoreGive(settings_mutex);return result;
 }

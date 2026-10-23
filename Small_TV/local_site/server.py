@@ -26,6 +26,7 @@ DEFAULTS = {
     "colors": ["#ff0000", "#ffff00", "#ffffff"],
     "settings": {"tempUnit": 0, "hourFormat": 0, "mileDisplay": 0, "timeSync": 0, "nightmode": 0},
     "photo_enabled": [True] * 5, "custom_photos": [False] * 5, "restart_count": 0,
+    "jpeg_write_limit_kib": 200,
 }
 NETWORKS = [{"ssid": "Small_TV Demo", "rssi": -38},
             {"ssid": "Home Wi-Fi Demo", "rssi": -57},
@@ -210,6 +211,8 @@ class Handler(BaseHTTPRequestHandler):
                                                   else "night_brightness"]})
                 elif path == "/get_display_time":
                     self.json({"displaytime": data["display_time"]})
+                elif path == "/get_jpeg_write_limit":
+                    self.json({"limit_kib": data["jpeg_write_limit_kib"]})
                 elif path == "/get_checkbox_state":
                     self.json({f"file{i + 1}_switch": on for i, on in enumerate(data["photo_enabled"])})
                 elif path == "/get_Photo_File":
@@ -270,6 +273,13 @@ class Handler(BaseHTTPRequestHandler):
                 if path in SET_INTEGER:
                     field, key, low, high = SET_INTEGER[path]
                     data[key] = integer(fields[field], low, high)
+                elif path == "/set_jpeg_write_limit":
+                    # Configuration parity only; real physical traffic limits
+                    # are checked by firmware/QEMU, not guessed from file size.
+                    value = fields.get("limit_kib")
+                    if type(value) not in (int, float) or not 0 <= value <= 4294967295 or int(value) != value:
+                        raise ValueError("Expected integer limit_kib from 0 to 4294967295")
+                    data["jpeg_write_limit_kib"] = int(value)
                 elif path == "/settings":
                     updated = {key: integer(fields.get(key, data["settings"][key]), 0, 1)
                                for key in ("tempUnit", "hourFormat", "mileDisplay", "timeSync")}

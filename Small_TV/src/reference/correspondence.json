@@ -3287,7 +3287,7 @@
     },
     "app/media/photo_storage.c#photo_storage_authorize": {
       "kind": "requested_photo_owner",
-      "note": "Requested bounded photo owner/cache integration in app/media/photo_storage.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension."
+      "note": "Requested bounded photo owner/cache integration in app/media/photo_storage.c. One privacy/decode/cache publication path, source invalidation before writes, nonblocking UI and SDK async HTTP ownership. Semantic/runtime acceptance pending the new integration tests; not a claim of factory identity for the requested extension. Persisted zero uses strict read-only authorization and cannot provision a legacy ownership stamp before HTTP startup."
     },
     "app/media/photo_upload.c#photo_upload_overlaps_unlocked": {
       "kind": "requested_photo_owner",
@@ -3452,6 +3452,18 @@
     "app/media/photo_worker.c#photo_worker_failed_mask": {
       "kind": "requested_prefetch_optimization",
       "note": "Prepare one next round-robin source before selection, between fades. Ready first source does not wait for unrelated caches; current-length stable failures may skip, transient I/O/cancel/memory failures retry. Preserve original fade/order and one codec owner; native/QEMU timing/pixel acceptance required."
+    },
+    "app/settings/settings.c#settings_jpeg_write_limit_kib": {
+      "kind": "requested_change",
+      "note": "REQUESTED_CHANGE: atomic read of separately persisted cumulative per-image JPEG program budget, KiB; zero disables decoder writes/erases."
+    },
+    "app/settings/settings.c#settings_set_jpeg_write_limit_kib": {
+      "kind": "requested_change",
+      "note": "REQUESTED_CHANGE: validate numeric policy in web layer, persist separate NVS uint32 before atomic publication, avoid duplicate writes and preserve legacy settings ABIs."
+    },
+    "storage/jpeg_transport.c#jpeg_transport_limit_program": {
+      "kind": "requested_change",
+      "note": "REQUESTED_CHANGE: tighten active shared program quota without resetting usage, prevent subtraction underflow, revoke erases at zero, never revive a stopped epoch."
     }
   },
   "assembly_only": {
@@ -3534,7 +3546,7 @@
     }
   },
   "inputs": {
-    "local_site/pages/photo.html": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+    "local_site/pages/photo.html": "940059834b084b1dd6778fe596709272c33b0f6a551b03f6a02f5acf5064d879",
     "local_site/pages/settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
     "local_site/pages/setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
     "src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
@@ -3558,21 +3570,21 @@
     "src/app/include/factory_ui.h": "28d4e15bb91fbf79adbb6d4b60c357a0d44ee8cc9228c9299b14e5aeef314321",
     "src/app/include/media.h": "c99790fc9b44bde16fe951f1ec703f7ebe2dbd408895cbc8e5f1cea948a77c72",
     "src/app/include/network.h": "fc88fdbbb10f4dec709f480cbd260371c7816923f5a0b9c757652e5aed5d708f",
-    "src/app/include/photo_codec.h": "590cd6bc9fed36bbcbd82d16050554dfcbb38f3c60a06766936c643bdd2632c1",
+    "src/app/include/photo_codec.h": "6d6347a3b01fd4978abb481a9a087b3c75863acb30d8bfaa166c448ded553081",
     "src/app/include/services.h": "6490660af9c5cd11519c173a17982def5a33e0c7a5c9de32c3e7218f5faab193",
-    "src/app/include/settings.h": "7980fae591f32a12869b06bd02d1a821af9eb28a4113efadbaed4146dfca6426",
+    "src/app/include/settings.h": "862df47c95be90b99c764e776d47cff1baf616ad0d976c7850cf01c66efb973f",
     "src/app/include/text.h": "150044cb34ad45edbd4d3d267d7c066aafaf3b6e2635e6e2a93ec88775b3a3ef",
     "src/app/include/timezones.h": "b0f6bc81cea6a32a60a48a9746ff999922b0c7af1f137d2cbe34d2e436e859f8",
     "src/app/include/web.h": "ef1f410ad00755e4b9475daeb288b72ee9ab04478a2b4d63a1a697da5453f01a",
     "src/app/media/assets.c": "9c77a9e70621d6c51825f92dda707dde2b52e0a2e879fabf2e269fc763b13cdd",
     "src/app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
     "src/app/media/media_internal.h": "fb1ff7747a5dc46df6425b5fc80eb5c24133948615c5b91b0ebc36e54c40e8c2",
-    "src/app/media/photo_codec.c": "b04c763dfe9dc9e33ea6e6b6db2e6f36c75a40ded98f2a6949057d06f5ff0417",
-    "src/app/media/photo_storage.c": "0e3948311dfcbe3d8e85b6dfe25ba8b6e59e0fbc526ab37358a86aa68b7c879a",
+    "src/app/media/photo_codec.c": "226f7fd651e1177375754a2d5aff3218c3fd7275bd32f5fe8a426bc3ac5287d3",
+    "src/app/media/photo_storage.c": "cca07ca7f39ce335a4225eaa8b72a0a766c451a55d1dcb3742e21cc3334131ae",
     "src/app/media/photo_storage.h": "99d462c31f577ebecd09e88f3338e021cee2f3a61c3149c65fd380ab459ee89e",
-    "src/app/media/photo_upload.c": "ffd2578c31d3ee19af0c4a47287ffa0b7859658c13ca8025cf9b8956273a1d76",
-    "src/app/media/photo_worker.c": "af6e1fe31bb236afa92a32217eb4b20d809cac169243d402021efb316ec56852",
-    "src/app/media/photo_worker.h": "a1647de92b4ed675689dd3d72ec516167d2f001e9bce99947b98bcfd0f2b36ee",
+    "src/app/media/photo_upload.c": "a5c2481e63955af760ed8a71a38f6ea7ed8239c588de11cf664d65bc3407a12f",
+    "src/app/media/photo_worker.c": "3d3ac78e85436d66a607e1e50a04391c6a92b2ddf36a68f4ba32d4ed7a8e8522",
+    "src/app/media/photo_worker.h": "3bb861bd1dfda99e51d5b4c7e575c91ae0c9d30d24ef5b590ceb35e142c319e3",
     "src/app/network/dns.c": "a4bee538e60a4bca3aba5a7b00233c17a9c08ff39779aefde9965e3a17234025",
     "src/app/network/dns_packet.c": "cb807af1329c04c534d61296138529f71e0ac5b2b2c3cf5eeb225ac763d6feb1",
     "src/app/network/wifi.c": "54d1de158d20e1f41826ca902a14ee3c9e36dc8da540ab852665a91f696908ec",
@@ -3582,13 +3594,13 @@
     "src/app/services/weather.c": "5f8cf49943d713bffc886707b64b15634dcb4749d483e222b34dd89d7f7b57e7",
     "src/app/services/weather_parser.c": "af09595b9843d4d559526d39db7afd84cd45b6497408b3a7d23c2f61e8ced6e5",
     "src/app/settings/factory_settings.c": "81ad9a3cef18df97d9c345abe1106c5c62ecd4e3c60ebba677200f612d7faa9b",
-    "src/app/settings/settings.c": "f94eeda257d0c3d4a2b952ed72efb699cbe1a83dfd6d40d0c43d857122a65d63",
+    "src/app/settings/settings.c": "ca22375f42e088cf97c3215622e7cf2a8e6b48bffd7e7924571a0e7e9d7820fd",
     "src/app/text/text.c": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa",
     "src/app/web/photo_api.c": "86d732dc59558717737099821899300769e6f93dd7e41173f45f048f0408e1e2",
     "src/app/web/photo_async.c": "c3112349fbf69d693a69783de94eb736cb285a899a32e9a97615be6cc04621cd",
     "src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
-    "src/app/web/server.c": "f9dc5eecac2e34579bc79e23e1d5c70ea6d1eae67fc086a70da4b21ad85e7663",
-    "src/app/web/settings_api.c": "a1a2245937227c2baada3a1a97492ae13550af71965c791c65c56e084dccdd09",
+    "src/app/web/server.c": "b936b84396482b72beee190a12d76fdbb1ad17437de93526fd9b40a4ec31a0cc",
+    "src/app/web/settings_api.c": "80247849a96e7324488fd9c944de364828016e3e6ebbbc81db67aaf4c6167773",
     "src/build.ps1": "fbc33f0aa9f696e8e1f05eec59bd9a85b033bba431d797eb93f72f28c3de7285",
     "src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
     "src/CMakeLists.txt": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8",
@@ -3830,8 +3842,8 @@
     "src/storage/jpeg_provision.h": "83d559b40ab251512413f7d850b65785d6fe1b73fddf7542e8098aaa7eda2146",
     "src/storage/jpeg_scratch.c": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb",
     "src/storage/jpeg_scratch.h": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49",
-    "src/storage/jpeg_transport.c": "6ccb423708032f06d5fc1ca42f8f6384396d5671af8b791a1261178f60d7272d",
-    "src/storage/jpeg_transport.h": "9507e6f9ca4efd2a62a666589dd7656c5d1481c722f357cc0304aebb9a40b7ea",
+    "src/storage/jpeg_transport.c": "a8d72795495a5783a3505e3b0d4871dae56d5ec5789bfc86fae6fa69e0bf1a4b",
+    "src/storage/jpeg_transport.h": "a2cd5ca7c8d09a8718e5ee91bbdd48696cf8a54a60d0409898aee374b4b49702",
     "src/symbol-map.json": "2e3c397f083e025536d5461ed226372f11cdf8d6acdbf7f8961fd372f16a0e4f",
     "src/third_party/cjson/cJSON.c": "298581a04a36c0165da4b0aade235c23088cb2faa58651d720ea2f3706ed0b0d",
     "src/third_party/cjson/cJSON.h": "25b0145150d500498e4d209cec69c18c42cf818bffcc54690be3b895a2a16dee",

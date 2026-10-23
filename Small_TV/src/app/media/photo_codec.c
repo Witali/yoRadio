@@ -5,6 +5,7 @@
 #include "jpeg_backing.h"
 #include "jpeg_cache_layout.h"
 #include "board.h"
+#include "settings.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -20,6 +21,7 @@ static struct {
     size_t allocation_required,allocation_available;
     bool allocation_refused,service_refused,decoding;
     bool initialized,background;
+    uint64_t budget_limit,prior_program_bytes;
 } codec;
 
 static jpeg_decode_check_t request_check(void *context)
@@ -27,6 +29,12 @@ static jpeg_decode_check_t request_check(void *context)
     /* Every source/cache/scratch/decoder callback shares one stop cause. */
     (void)context;
     if(codec.background && photo_codec_cancelled())return JPEG_CHECK_CANCELLED;
+    /* REQUESTED_CHANGE: an in-flight reduction applies at the next checkpoint;
+     * increasing the preference never resets this image's consumed budget. */
+    uint64_t configured=(uint64_t)settings_jpeg_write_limit_kib()*1024u;
+    if(configured<codec.budget_limit)codec.budget_limit=configured;
+    uint64_t remaining=codec.budget_limit>codec.prior_program_bytes ? codec.budget_limit-codec.prior_program_bytes:0;
+    jpeg_transport_limit_program(codec.transport,remaining);
     jpeg_transport_result_t result=jpeg_transport_check(codec.transport);
     if(result==JPEG_TRANSPORT_STATE && codec.transport->last_error!=JPEG_TRANSPORT_OK)
         result=codec.transport->last_error;
@@ -57,15 +65,18 @@ static void end_job(void)
     jpeg_nor_abort(&codec.scratch);jpeg_transport_end(codec.transport);
 }
 
-static esp_err_t begin_job(unsigned slot,bool writing,bool background,photo_diagnostic_t *diagnostic)
+static esp_err_t begin_job(unsigned slot,bool writing,bool background,uint64_t prior_program_bytes,photo_diagnostic_t *diagnostic)
 {
     /* Capability maps are compiled constants, never flash offsets from HTTP. */
     memset(diagnostic,0,sizeof(*diagnostic));
     if(!codec.initialized || slot>=PHOTO_COUNT){diagnostic->status=PHOTO_STORAGE;return ESP_ERR_INVALID_STATE;}
     end_job();codec.background=background;codec.allocation_refused=false;
     codec.service_refused=codec.decoding=false;
+    codec.prior_program_bytes=prior_program_bytes;
+    codec.budget_limit=writing ? (uint64_t)settings_jpeg_write_limit_kib()*1024u:0;
+    uint64_t program_limit=codec.budget_limit>prior_program_bytes ? codec.budget_limit-prior_program_bytes:0;
     const jpeg_transport_limits_t limits={writing ? 200000:5000,writing ? 64000000:2000000,
-                                         writing ? 16000000:0,writing ? 4096:0,
+                                         program_limit,program_limit ? 4096:0,
                                          writing ? 180000000:2000000};
     if(jpeg_transport_begin(codec.transport,&limits)!=JPEG_TRANSPORT_OK)goto failed;
     jpeg_cache_devices_t devices;
@@ -88,6 +99,15 @@ static esp_err_t finish_job(esp_err_t result,photo_diagnostic_t *diagnostic)
     /* Preserve low-level causes before cleanup resets reusable handles. */
     diagnostic->transport=codec.transport ? codec.transport->last_error:JPEG_TRANSPORT_STATE;
     diagnostic->io=codec.transport ? codec.transport->last_io_error:0;
+    diagnostic->program_bytes=codec.prior_program_bytes+(codec.transport ? codec.transport->usage.program_bytes:0);
+    if(result!=ESP_OK && diagnostic->transport==JPEG_TRANSPORT_LIMIT &&
+       codec.transport->program_limit_hit) {
+        /* One ledger covers coefficient scratch, final frame and its journal.
+         * Source upload lives outside this decoder job. Zero forbids erase too. */
+        diagnostic->write_limit=true;diagnostic->available_known=true;
+        diagnostic->required=codec.prior_program_bytes+codec.transport->program_required;
+        diagnostic->available=codec.budget_limit;
+    }
     if(result!=ESP_OK && codec.service_refused) {
         diagnostic->status=PHOTO_MEMORY;diagnostic->service_memory=true;
         diagnostic->required=codec.allocation_required;diagnostic->available=codec.allocation_available;
@@ -189,7 +209,7 @@ esp_err_t photo_codec_invalidate(unsigned slot,photo_diagnostic_t *diagnostic)
 {
     /* This durable step MUST finish before erasing or overwriting source bytes. */
     photo_diagnostic_t local;if(!diagnostic)diagnostic=&local;
-    esp_err_t result=begin_job(slot,true,false,diagnostic);
+    esp_err_t result=begin_job(slot,true,false,0,diagnostic);
     if(result==ESP_OK) {
         diagnostic->cache=jpeg_cache_invalidate(&codec.cache,slot);
         if(diagnostic->cache!=JPEG_CACHE_OK)result=ESP_FAIL;
@@ -197,12 +217,12 @@ esp_err_t photo_codec_invalidate(unsigned slot,photo_diagnostic_t *diagnostic)
     return finish_job(result,diagnostic);
 }
 
-esp_err_t photo_codec_prepare(unsigned slot,uint32_t length,bool background,
+esp_err_t photo_codec_prepare(unsigned slot,uint32_t length,bool background,uint64_t prior_program_bytes,
                              photo_diagnostic_t *diagnostic)
 {
     /* A cold verified hit skips decoding; misses validate AND fill the frame. */
     photo_diagnostic_t local;if(!diagnostic)diagnostic=&local;
-    esp_err_t result=begin_job(slot,true,background,diagnostic);
+    esp_err_t result=begin_job(slot,true,background,prior_program_bytes,diagnostic);
     if(result!=ESP_OK)return finish_job(result,diagnostic);
     diagnostic->cache=jpeg_cache_lookup(&codec.cache,slot,length);
     if(diagnostic->cache==JPEG_CACHE_OK){diagnostic->cached=true;return finish_job(ESP_OK,diagnostic);}
@@ -229,7 +249,7 @@ esp_err_t photo_codec_draw(unsigned slot,uint32_t length,
     /* Readonly display job: verify source and the entire physical frame first.
      * No library decode or program/erase operation is permitted in this epoch. */
     photo_diagnostic_t local;if(!diagnostic)diagnostic=&local;
-    esp_err_t result=begin_job(slot,false,false,diagnostic);
+    esp_err_t result=begin_job(slot,false,false,0,diagnostic);
     if(!row){diagnostic->status=PHOTO_ARGUMENT;return finish_job(ESP_ERR_INVALID_ARG,diagnostic);}
     if(result!=ESP_OK)return finish_job(result,diagnostic);
     diagnostic->cache=jpeg_cache_lookup(&codec.cache,slot,length);
@@ -251,6 +271,11 @@ void photo_diagnostic_describe(const photo_diagnostic_t *diagnostic,char *text,s
     if(!text || !bytes)return;
     const char *reason="photo-storage-unavailable";
     if(diagnostic) {
+        if(diagnostic->write_limit) {
+            snprintf(text,bytes,"%s; required=%llu available=%llu",
+                diagnostic->available ? "flash-write-limit":"flash-writes-disabled",
+                (unsigned long long)diagnostic->required,(unsigned long long)diagnostic->available);return;
+        }
         if(diagnostic->transport==JPEG_TRANSPORT_TIME)reason="time-limit";
         else if(diagnostic->transport==JPEG_TRANSPORT_LIMIT)reason="io-limit";
         else if(diagnostic->status==PHOTO_BUSY)reason="upload-busy-or-incomplete";

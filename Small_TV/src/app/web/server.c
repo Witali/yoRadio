@@ -273,6 +273,9 @@ static esp_err_t captive_redirect(httpd_req_t *req, httpd_err_code_t error)
 
 /* All 34 recovered method/URI pairs. Additions are page aliases and /advanced. */
 static const httpd_uri_t routes[] = {
+    /* REQUESTED_CHANGE: cumulative decode/cache flash budget, in KiB. */
+    {.uri = "/get_jpeg_write_limit", .method = HTTP_GET, .handler = web_settings_get},
+    {.uri = "/set_jpeg_write_limit", .method = HTTP_POST, .handler = web_settings_post},
     {.uri = "/get_Photo_File", .method = HTTP_GET, .handler = web_photo_get},
     {.uri = "/set_checkbox_state", .method = HTTP_POST, .handler = web_settings_post},
     {.uri = "/get_checkbox_state", .method = HTTP_GET, .handler = web_settings_get},

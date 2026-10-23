@@ -45,6 +45,11 @@ esp_err_t web_settings_get(httpd_req_t *req)
     const char *uri = req->user_ctx;
     tv_settings_t s;
     settings_snapshot(&s);
+    if(!strcmp(uri,"/get_jpeg_write_limit")) {
+        cJSON *value=cJSON_CreateObject();
+        cJSON_AddNumberToObject(value,"limit_kib",settings_jpeg_write_limit_kib());
+        return web_json(req,value);
+    }
     cJSON *result = NULL;
     for (unsigned i = 0; i < sizeof(integers) / sizeof(integers[0]); ++i)
         if (!strcmp(uri, integers[i].get))
@@ -185,6 +190,20 @@ esp_err_t web_settings_post(httpd_req_t *req)
      * on the factory handlers' literal substring parsing. */
 
     const char *uri = req->user_ctx;
+    if(!strcmp(uri,"/set_jpeg_write_limit")) {
+        /* REQUESTED_CHANGE: accept exact uint32 KiB, including zero; neither
+         * narrowing nor floating-point truncation may relax the chosen limit. */
+        cJSON *object=web_parse_json(req);
+        if(!object)return web_error(req,"Expected a bounded JSON object");
+        const cJSON *value=cJSON_GetObjectItemCaseSensitive(object,"limit_kib");
+        bool valid=cJSON_IsNumber(value) && value->valuedouble>=0 && value->valuedouble<=UINT32_MAX;
+        uint32_t kib=valid ? (uint32_t)value->valuedouble:0;
+        valid=valid && (double)kib==value->valuedouble;
+        cJSON_Delete(object);
+        if(!valid)return web_error(req,"Expected integer limit_kib from 0 to 4294967295");
+        if(settings_set_jpeg_write_limit_kib(kib)!=ESP_OK)return web_error(req,"Could not save JPEG write limit");
+        return web_ok(req);
+    }
     tv_settings_t s;
     settings_snapshot(&s);
     bool valid = false, restart = false, weather = false, select_theme = false,

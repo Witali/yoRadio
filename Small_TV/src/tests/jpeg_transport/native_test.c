@@ -149,6 +149,35 @@ static void test_limits(void)
     CHECK(transport.usage.erase_calls==1 && transport.usage.program_bytes==256 && transport.usage.calls==2);++cases;
 }
 
+static void test_live_program_limit(void)
+{
+    /* Tighten without resetting any usage; stale ports and integer underflow
+     * must not let an in-flight image escape the user's smaller quota. */
+    reset();jpeg_transport_limits_t limits=ample;limits.program_bytes=512;
+    begin(&limits);jpeg_nor_device_t a=port(&first,probe_scratch);
+    memset(buffer,0,256);CHECK(!a.program(a.context,PROBE_SCRATCH_ADDRESS,buffer,256));
+    CHECK(jpeg_transport_limit_program(&transport,4096)==JPEG_TRANSPORT_OK);
+    CHECK(transport.limits.program_bytes==512 && transport.usage.program_bytes==256);
+    CHECK(jpeg_transport_limit_program(&transport,256)==JPEG_TRANSPORT_OK);
+    unsigned programs=model.programs;
+    CHECK(a.program(a.context,PROBE_SCRATCH_ADDRESS,buffer,256)!=0 && model.programs==programs);
+    CHECK(transport.program_limit_hit && transport.program_required==512 && transport.usage.program_bytes==256);
+    CHECK(jpeg_transport_limit_program(&transport,4096)==JPEG_TRANSPORT_STATE);++cases;
+
+    reset();begin(&ample);a=port(&first,probe_scratch);
+    CHECK(!a.program(a.context,PROBE_SCRATCH_ADDRESS,buffer,256));
+    CHECK(jpeg_transport_limit_program(&transport,0)==JPEG_TRANSPORT_LIMIT);
+    CHECK(transport.program_limit_hit && transport.program_required==256 && !transport.active);
+    CHECK(transport.limits.program_bytes==0 && transport.limits.erase_calls==0);++cases;
+
+    reset();begin(&ample);a=port(&first,probe_scratch);
+    CHECK(jpeg_transport_limit_program(&transport,0)==JPEG_TRANSPORT_OK);
+    programs=model.programs;unsigned erases=model.erases;
+    CHECK(a.erase_sector(a.context,PROBE_SCRATCH_ADDRESS)!=0 && model.erases==erases);
+    CHECK(a.program(a.context,PROBE_SCRATCH_ADDRESS,buffer,256)!=0 && model.programs==programs);
+    CHECK(!transport.usage.program_bytes && !transport.usage.erase_calls);++cases;
+}
+
 static void test_time_and_faults(void)
 {
     /* Before-call deadline, after-call overrun, rollback and large timestamp. */
@@ -221,7 +250,7 @@ int main(int argc,char **argv)
     CHECK(argc==2 && BCryptOpenAlgorithmProvider(&algorithm,BCRYPT_SHA256_ALGORITHM,NULL,0)>=0);
     memset(flash_data,0xff,sizeof(flash_data));FILE *file=fopen(argv[1],"rb");CHECK(file);
     CHECK(fread(flash_data+0x200000,1,0x1e7000,file)==0x1e7000 && fgetc(file)==EOF);CHECK(!fclose(file));
-    test_limits();test_time_and_faults();test_scopes();CHECK(!model.hash);
+    test_limits();test_live_program_limit();test_time_and_faults();test_scopes();CHECK(!model.hash);
     CHECK(BCryptCloseAlgorithmProvider(algorithm,0)>=0);
     printf("{\"passed\":true,\"checks\":%u,\"cases\":%u,\"physical_hardware_tested\":false}\n",checks,cases);
     return 0;

@@ -41,6 +41,36 @@ H10 относится к B50D. Его frozen source/SDK/snapshot и владе�
 
 Статус: **codec/cache/worker включены в development app; полная приёмка не завершена**.
 
+Уточнение пользователя 2026-10-23: не отключать все progressive JPEG по названию
+режима. Ограничивать **суммарный program traffic** одной обработки, включая
+коэффициенты, RGB565 cache и его journal. Default200KiB (204800bytes), значение
+настраивается от0;0запрещает program **и erase** decoder/cache. Исходный upload
+считается отдельно. Cache invalidation до source upload переносит свой расход
+в finish, чтобы два этапа не получали по полному бюджету. Это не лимит размера
+scratch и не обещание заранее знать суммарный трафик любого JPEG. Операция,
+которая превысила бы бюджет, не должна попасть в physical callback; partial
+результат не публикуется. Нужны persisted UI/API setting, отказ с точной причиной,
+reuse после отказа, zero hot/cold readonly, live reduction без reset/underflow,
+отсутствие periodic retry writes и разрешение retry после увеличения лимита.
+Это заменяет прежний безусловный acceptance тяжёлых JPEG по умолчанию; полезное
+поведение заводской прошивки, остальные форматы и весь план остаются в scope.
+
+Настраиваемый лимит **реализован и проверен** в app9C1A83BD/ELF76B5CE37/
+source7D95988C, DEBUGoff;1476432bytes/59568free. Отдельный NVS key, UI/API0..uint32
+KiB, единый allowance invalidation+decode, live tightening и background retry
+policy. Zero включает startup: legacy без stamp не размечается; complete cache
+читается без program/erase. Требование0 относится к обработке JPEG, исходный
+upload/обычные settings отдельно.6298native +privacy,13inventory controls,
+18transport +6integrated unsafe mutants,16DOM contracts,6artifact checks pass.
+Actual C2 trace: CMYK12 остановлен ровно на204800bytes, gray progressive после
+него успешен за115968; zero hot/cold и legacy startup0callbacks, whole flash
+unchanged. Отдельный current LCD:15wholeframes/864000pixels exact для3тем,
+real decode overlap/minute rollover.6текущих VM закрыты. Старый40-byte startup
+bug сохранён как failing before control. Подробности и независимый offline
+verifier: [JPEG_WRITE_BUDGET.md](tests/JPEG_WRITE_BUDGET.md).
+Полная target format/fault/RAM/stack матрица под новой политикой ещё открыта;
+прежние unlimited JPEG результаты не подменяют приёмку current default policy.
+
 Checkpoint 2026-10-23: реальные upload/UI используют общего владельца codec и
 проверенный RGB565 cache. Фоновая очередь и SDK async HTTP освобождают HTTP task;
 общий media mutex не удерживается во время decode. Для заводского baseline

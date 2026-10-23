@@ -47,6 +47,7 @@ static jpeg_transport_result_t start(jpeg_transport_t *t,const jpeg_transport_li
     ++t->epoch;
     if(!limits || !limits->duration_us)return stop(t,JPEG_TRANSPORT_ARGUMENT);
     t->limits=*limits;memset(&t->usage,0,sizeof(t->usage));t->last_io_error=0;
+    t->program_limit_hit=false;t->program_required=0;
     t->started_us=t->now_us(t->clock_context);t->last_error=JPEG_TRANSPORT_OK;t->active=true;
     return JPEG_TRANSPORT_OK;
 }
@@ -57,9 +58,20 @@ static jpeg_transport_result_t charge(jpeg_transport_t *t,char operation,size_t 
      * issued, not if rejected. Zero budget explicitly forbids that operation. */
     if(!t->active)return JPEG_TRANSPORT_STATE;
     jpeg_transport_result_t result=deadline(t);if(result!=JPEG_TRANSPORT_OK)return result;
+    if(operation=='P' && bytes>t->limits.program_bytes-t->usage.program_bytes) {
+        /* Record the next cumulative demand, not a guessed whole-image size.
+         * Failed physical requests count; a rejected request is never issued. */
+        t->program_limit_hit=true;
+        t->program_required=bytes>UINT64_MAX-t->usage.program_bytes ? UINT64_MAX:t->usage.program_bytes+bytes;
+        return stop(t,JPEG_TRANSPORT_LIMIT);
+    }
+    if(operation=='E' && !t->limits.program_bytes && !t->limits.erase_calls) {
+        t->program_limit_hit=true;
+        t->program_required=t->usage.program_bytes==UINT64_MAX ? UINT64_MAX:t->usage.program_bytes+1;
+        return stop(t,JPEG_TRANSPORT_LIMIT);
+    }
     if(t->usage.calls>=t->limits.calls ||
         (operation=='R' && bytes>t->limits.read_bytes-t->usage.read_bytes) ||
-        (operation=='P' && bytes>t->limits.program_bytes-t->usage.program_bytes) ||
         (operation=='E' && t->usage.erase_calls>=t->limits.erase_calls))return stop(t,JPEG_TRANSPORT_LIMIT);
     ++t->usage.calls;
     if(operation=='R')t->usage.read_bytes+=bytes;
@@ -247,6 +259,21 @@ jpeg_transport_result_t jpeg_transport_check(jpeg_transport_t *t)
     /* I/O revocation cannot by itself stop RAM-only work; owners check here. */
     if(!t || !t->initialized || !t->authorized || !t->active)return JPEG_TRANSPORT_STATE;
     return deadline(t);
+}
+
+jpeg_transport_result_t jpeg_transport_limit_program(jpeg_transport_t *t,uint64_t bytes)
+{
+    /* REQUESTED_CHANGE: lowering a live preference never replenishes a job.
+     * Revoke before subtraction could underflow when usage already exceeds it. */
+    if(!t || !t->initialized || !t->authorized || !t->active)return JPEG_TRANSPORT_STATE;
+    if(bytes>=t->limits.program_bytes)return JPEG_TRANSPORT_OK;
+    t->limits.program_bytes=bytes;
+    if(!bytes)t->limits.erase_calls=0;
+    if(t->usage.program_bytes>bytes) {
+        t->program_limit_hit=true;t->program_required=t->usage.program_bytes;
+        return stop(t,JPEG_TRANSPORT_LIMIT);
+    }
+    return JPEG_TRANSPORT_OK;
 }
 
 void jpeg_transport_end(jpeg_transport_t *t)

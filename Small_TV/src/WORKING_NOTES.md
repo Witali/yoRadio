@@ -2793,3 +2793,106 @@ NEXT: current target format/RAM/stack/fault matrix; expand LCD load to accepted
 fullCMYK12/richRGB progressive; publication/program/erase cuts, network lifecycle/
 churn, whole-image/full/24h/hardware. Keep network/display acceptance separate.
 SDK/frozen QEMU unchanged; no physical actions/no push. Goal remains active.
+
+## Historical in-progress 2026-10-23 — configurable cumulative JPEG write budget
+
+USER CHANGED POLICY: keep JPEG mode support, but cap cumulative physical program
+bytes per image including coefficient scratch/RGB565/journal, default200KiB.
+Original JPEG upload excluded. Configurable from0;0forbids decoder/cache erase
+too. User explicitly selected cumulative traffic, NOT scratch capacity. Do not
+silently disable all progressive. Live reductions must not reset usage; raising
+cap enables a later retry. Cache invalidation before upload carries its program
+usage into finish, preventing two full allowances for one image.
+
+HEAD2e811f338 committed prior gray clock/HTTP/recovery checkpoint; active goal
+unbounded. Current substantial edits UNCOMMITTED. Settings use separate NVS u32
+key jpeg_write_kib (same small_tv namespace), default200read-only fallback;
+legacy settings struct/version/raw ABI untouched. /get_jpeg_write_limit and
+/set_jpeg_write_limit JSON limit_kib uint32, UI fragments photo_write_policy.*
+injected by local_site/extract_pages.py. Generated pages/manifest refreshed.
+Local-site server mirrors configuration only, NOT a NOR traffic model.
+
+photo_codec shared transport program quota, zero erase quota; typed
+flash-write-limit/flash-writes-disabled with next cumulative required/available.
+transport program_required/program_limit_hit reset at begin; limit_program only
+tightens and revokes before subtraction underflow. Separate global settings
+short critical read each checkpoint, no new sleeps. Source upload stores prior
+cache program bytes, prepare gets remaining allowance; returned diagnostic
+program_bytes totals both phases. Background policy failures cached for current
+length +budget; no repeated retries until a larger cap or changed source.
+
+Native first failed only stale inventory expected217; updated219app/535total,
+13correspondence controls. native-second.log passed6294checks +independent privacy
+under .build/jpeg-write-budget-20261023; exec50041 TERMINAL0. transport-first gate
+passed348557checks/34cases; actual tightening/zero/overflow safeguards. Need final
+tests, production build/archive, actual QEMU byte-counter/zero cold/persistence,
+browser setting/crop/privacy, mutants, proof/verifier, focused commit. No push.
+
+Earlier heavy clock work superseded by this policy: current jpeg_clock_qemu.py
+adds fixture choices and photo_runtime_metrics.py (passive DWARF/RAM SDK heap/
+task fill diagnostics). .build/jpeg-clock-load-20261023/cmyk12/classic passed127
+full frames, actual CMYK12 status0/finish200, pool40592/context4984/backing460800,
+worker untouched stack4940/8192. RGB classic45frames exact, decode0/HTTP200,
+pool37804/context4984/backing172800/stack5060, but gate correctly failed because
+minute rollover happened before decoder entry. Need NTP phase45 instead of55
+for that workload if reusing it. These are OLD ABF14143 partial runs, not new
+policy acceptance or complete3theme matrices. CMYK continued to simple; explicit
+supersede-intent saved, own QMP busy so verified PID/UUID/path VM terminated.
+Exec81990 terminal1; RGB8038 terminal1; no owned VM remains. Old frozen47files/SDK
+unchanged. old-app/ contains exact old firmware archive+app.elf BEFORE new build.
+Preserve/label partial results and do not claim all themes passed. No physical
+flashing/UART/reset. Full target fault/format, publication cuts, lifecycle/churn,
+whole-image/full/24h/hardware remain open after policy qualification.
+
+## CHECKPOINT 2026-10-23 — configurable JPEG budget qualified and saved
+
+The user-selected cumulative write policy is implemented. Default200KiB,
+0forbids decoder/cache PROGRAM AND ERASE, including startup provisioning.
+Separate NVS u32 small_tv/jpeg_write_kib; settings legacy ABI unchanged.
+Photos field and GET/POST API accept0..UINT32_MAX KiB, uint64 byte arithmetic.
+Original JPEG save and ordinary NVS/settings remain separate as explicitly
+agreed. Cache invalidation traffic carries into finish; no second allowance.
+Live reductions tighten without counter reset/underflow, increases take effect
+on next job. Background stable budget failures do not repeat writes; larger
+budget or changed source allows retry. No new software sleeps.
+
+FINAL app9C1A83BD/ELF76B5CE37/source7D95988C,1476432bytes/59568free,DEBUGoff.
+Production firmware/development archive saved. Assets1032119B/layout44268211/
+libraryD690 unchanged, codec6B537BBB. Native6298 +privacy3727,13inventory controls,
+219app/535total, transport348557/34cases +18unsafe mutants,6integrated unsafe
+mutants with compiled positive control, DOM16, artifact6 PASS.
+
+Actual C2 JPEG callback trace: CMYK12 refused at204800programbytes, next205056
+demand never issued. Gray progressive succeeds at115968 incl invalidation and
+finish; diagnostic matches independent count. Persisted0 hot upload rejects
+before program/erase, paused wholeflash same. Cold EXACT warm stoppedimage,
+no reseed: true photo_worker_draw(slot4) succeeds, callbacks armed from reset,
+0program/erase, entire4MiB same. Independent canonical journal/source/frame SHA.
+
+Found genuine zero-startup loophole in first policy appF94C00B8: unmarked legacy
+provision wrote32+8bytes stamp before HTTP. Retained actual failing report and
+both images. Fixed photo_storage_authorize to strict readonly authorization at0.
+Current legacy samecase:0callbacks/whole4MiB same, stamp/candidates FF, clocks/
+HTTP boot. Without valid stamp photo storage remains unavailable; increasing
+budget requires ordinary restart for safe startup adoption. No runtime erase.
+
+Separate current LCD gray load: classic7/simple4/dial4 exactwholeframes,864000
+pixels, actual foreground decode and minute rollover,16negative controls.
+Worker untouched5012/8192; pool14099/context4984 observed. Passive exactELF DWARF
+heap/task derivation, six256KiB RAM snapshots, heap minima explicitly lower
+bound rather than simultaneous aggregate. Decoder diagnostic pointer not saved:
+pool observation is runtime report, not independently reconstructable from RAM.
+All6current owned processes stopped/reaped. Network timing not requalified here.
+
+tests/JPEG_WRITE_BUDGET.md; qemu/parity/jpeg-write-budget-validation-20261023.json.
+Lossless15physical images (13current+2old failing),15PNG,6RAM snapshots, mutant
+source/compile/run logs; offline verifier recounts writes, reconstructs all
+images/RGB/stack/heaps and checks source pins. Earlier wrongphoto-theme cold
+observer, stale inventory/routes, equivalent mutant and compile-failed mutation
+remain labelled historical failures, not accepted controls.
+
+NEXT unchanged: full current target format/fault/RAM/stack matrix, publication
+cuts, lifecycle/churn, whole-image/full/24h/hardware. Earlier unlimited heavy
+JPEG passes are not new default-policy acceptance. Shared SDK/frozen QEMU
+unchanged; no physical flashing/UART/reset, no push. Broader goal status is
+controlled by the user; this checkpoint completes the requested budget feature.

@@ -99,13 +99,14 @@ class ArtifactTests(unittest.TestCase):
         report = json.loads((ROOT / '.build/small-tv-esp32c2/native-tests/report.json').read_text())
         self.assertTrue(report['passed'])
         routes = {(row['method'], row['uri']): row for row in report['routes']}
-        self.assertEqual(len(routes), 40)
+        self.assertEqual(len(routes), 42)
         with (ROOT / 'Small_TV/analysis/security/registered-routes.tsv').open() as file:
             original = {({'1': 'GET', '3': 'POST'}[row['method']], row['uri'])
                         for row in csv.DictReader(file, delimiter='\t')}
         self.assertEqual(len(original), 34)
         aliases = {('GET', uri) for uri in ('/setup', '/setup.html', '/settings', '/settings.html', '/photo.html', '/advanced')}
-        self.assertEqual(set(routes), original | aliases)
+        policy = {('GET', '/get_jpeg_write_limit'), ('POST', '/set_jpeg_write_limit')}
+        self.assertEqual(set(routes), original | aliases | policy)
         for key, row in routes.items():
             self.assertGreater(row['successes'], 0, key)
             if key[0] == 'POST' and key[1] != '/restart':

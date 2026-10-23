@@ -11,6 +11,7 @@ static struct
     bool active, preparing, finishing;
     unsigned slot, chunks, next;
     uint32_t length, received;
+    uint64_t cache_program_bytes;
     int64_t last_activity;
 } upload;
 
@@ -38,7 +39,9 @@ esp_err_t photo_upload_start_detailed(unsigned slot, uint32_t length, unsigned c
 {
     /* REQUESTED_CHANGE: claim upload ownership before waiting for background
      * cancellation; durable cache invalidation precedes source erase/write. */
-    if (diagnostic) memset(diagnostic, 0, sizeof(*diagnostic));
+    photo_diagnostic_t local;
+    if(!diagnostic)diagnostic=&local;
+    memset(diagnostic,0,sizeof(*diagnostic));
     if (slot >= PHOTO_COUNT || length < 4 || length > PHOTO_SLOT_BYTES ||
         chunks != (length + PHOTO_CHUNK_BYTES - 1) / PHOTO_CHUNK_BYTES)
     {
@@ -59,6 +62,9 @@ esp_err_t photo_upload_start_detailed(unsigned slot, uint32_t length, unsigned c
     photo_worker_forget(slot);
     xSemaphoreGive(media_mutex);
     esp_err_t result = photo_worker_invalidate(slot, diagnostic);
+    /* REQUESTED_CHANGE: retain cache invalidation traffic across source upload.
+     * The finish step gets the remaining budget, never a second full allowance. */
+    upload.cache_program_bytes=diagnostic->program_bytes;
     if (result == ESP_OK)
     {
         result = settings_photo_size(slot, 0);
@@ -152,8 +158,9 @@ esp_err_t photo_upload_finish_detailed(unsigned slot, photo_diagnostic_t *diagno
     }
     upload.finishing = true;
     uint32_t length = upload.length;
+    uint64_t prior_program_bytes=upload.cache_program_bytes;
     xSemaphoreGive(media_mutex);
-    esp_err_t result = photo_worker_prepare(slot, length, diagnostic);
+    esp_err_t result = photo_worker_prepare(slot, length, prior_program_bytes, diagnostic);
     if (result == ESP_OK)
     {
         result = settings_photo_size(slot, length);

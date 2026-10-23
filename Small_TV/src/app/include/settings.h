@@ -7,6 +7,7 @@
 /* The factory raw sector reserves 20 bytes, including NUL, for regional keys. */
 #define TV_COUNTRY_BYTES 20
 #define TV_SETTINGS_VERSION 2
+#define TV_JPEG_WRITE_LIMIT_DEFAULT_KIB 200u
 typedef struct
 {
     uint32_t version;
@@ -29,3 +30,7 @@ esp_err_t settings_flush(void);
 uint32_t settings_generation(void);
 bool settings_valid(const tv_settings_t *s);
 bool settings_country_valid(const char country[TV_COUNTRY_BYTES]);
+/* REQUESTED_CHANGE: independent NVS preference; factory and native blob ABIs
+ * remain compatible. Zero forbids codec program/erase; source upload is separate. */
+uint32_t settings_jpeg_write_limit_kib(void);
+esp_err_t settings_set_jpeg_write_limit_kib(uint32_t kib);

@@ -21,6 +21,8 @@ static QueueHandle_t jobs;
 static SemaphoreHandle_t codec_mutex;
 static portMUX_TYPE state_lock=portMUX_INITIALIZER_UNLOCKED;
 static uint32_t ready,pending,ready_lengths[PHOTO_COUNT],failed_lengths[PHOTO_COUNT];
+static uint32_t failed_write_limits[PHOTO_COUNT];
+static bool failed_by_write_limit[PHOTO_COUNT];
 static bool cancel_background,enabled;
 static unsigned foreground_pending;
 
@@ -41,7 +43,8 @@ static bool source_current_unlocked(unsigned slot,uint32_t length)
     return settings.photo_size[slot]==length;
 }
 
-static void record_result(unsigned slot,uint32_t length,bool success,bool permanent_failure)
+static void record_result(unsigned slot,uint32_t length,bool success,bool permanent_failure,
+                          const photo_diagnostic_t *diagnostic)
 {
     /* Never resurrect ready or suppress retries from an obsolete source job.
      * The worker publishes while still holding codec_mutex, before a waiting
@@ -50,7 +53,11 @@ static void record_result(unsigned slot,uint32_t length,bool success,bool perman
     bool current=source_current_unlocked(slot,length);
     portENTER_CRITICAL(&state_lock);
     if(current && success){ready|=1u<<slot;ready_lengths[slot]=length;failed_lengths[slot]=0;}
-    else if(current && permanent_failure)failed_lengths[slot]=length;
+    else if(current && permanent_failure) {
+        failed_lengths[slot]=length;
+        failed_by_write_limit[slot]=diagnostic && diagnostic->write_limit;
+        failed_write_limits[slot]=failed_by_write_limit[slot] ? (uint32_t)(diagnostic->available/1024u):0;
+    }
     portEXIT_CRITICAL(&state_lock);xSemaphoreGive(media_mutex);
 }
 
@@ -76,19 +83,19 @@ static void run(void *argument)
         xSemaphoreTake(media_mutex,portMAX_DELAY);
         bool current=source_current_unlocked(job.slot,job.length);
         xSemaphoreGive(media_mutex);
-        if(!foreground && current)success=photo_codec_prepare(job.slot,job.length,true,&diagnostic)==ESP_OK;
+        if(!foreground && current)success=photo_codec_prepare(job.slot,job.length,true,0,&diagnostic)==ESP_OK;
         /* FIXED_RECONSTRUCTION: cache only stable input/fixed-capacity refusals.
          * A privacy read fault, allocator pressure or callback failure must not
          * suppress this source forever; the unchanged image can succeed later. */
         jpeg_decode_status_t status=diagnostic.decode.status;
         jpeg_privacy_result_t privacy=diagnostic.privacy.status;
-        bool permanent=(diagnostic.status==PHOTO_PRIVACY &&
+        bool permanent=diagnostic.write_limit || (diagnostic.status==PHOTO_PRIVACY &&
             privacy>=JPEG_PRIVACY_INVALID && privacy<=JPEG_PRIVACY_TRAILING) ||
             (diagnostic.status==PHOTO_DECODE && (status==JPEG_DECODE_INVALID ||
              status==JPEG_DECODE_TRUNCATED || status==JPEG_DECODE_UNSUPPORTED ||
              status==JPEG_DECODE_DIMENSIONS || status==JPEG_DECODE_POOL_LIMIT ||
              status==JPEG_DECODE_BACKING_LIMIT || status==JPEG_DECODE_BACKING_FILES));
-        record_result(job.slot,job.length,success,permanent);
+        record_result(job.slot,job.length,success,permanent,&diagnostic);
         portENTER_CRITICAL(&state_lock);
         pending&=~(1u<<job.slot);
         portEXIT_CRITICAL(&state_lock);
@@ -131,12 +138,12 @@ esp_err_t photo_worker_invalidate(unsigned slot,photo_diagnostic_t *diagnostic)
     xSemaphoreGive(codec_mutex);return error;
 }
 
-esp_err_t photo_worker_prepare(unsigned slot,uint32_t length,photo_diagnostic_t *diagnostic)
+esp_err_t photo_worker_prepare(unsigned slot,uint32_t length,uint64_t prior_program_bytes,photo_diagnostic_t *diagnostic)
 {
     /* Foreground finish owns a stable uploaded source until settings publication. */
     if(!enabled){if(diagnostic)diagnostic->status=PHOTO_STORAGE;return ESP_ERR_INVALID_STATE;}
     xSemaphoreTake(codec_mutex,portMAX_DELAY);
-    esp_err_t error=photo_codec_prepare(slot,length,false,diagnostic);
+    esp_err_t error=photo_codec_prepare(slot,length,false,prior_program_bytes,diagnostic);
     xSemaphoreGive(codec_mutex);return error;
 }
 
@@ -153,7 +160,7 @@ esp_err_t photo_worker_draw(unsigned slot,uint32_t length,bool blocking,
     bool current=source_current_unlocked(slot,length);xSemaphoreGive(media_mutex);
     esp_err_t error=ESP_ERR_INVALID_STATE;photo_diagnostic_t diagnostic;
     if(current) {
-        error=blocking ? photo_codec_prepare(slot,length,false,&diagnostic):ESP_OK;
+        error=blocking ? photo_codec_prepare(slot,length,false,0,&diagnostic):ESP_OK;
         if(error==ESP_OK) {
             if(xSemaphoreTake(media_mutex,blocking ? portMAX_DELAY:0)==pdTRUE) {
                 if(source_current_unlocked(slot,length))error=photo_codec_draw(slot,length,row,context,&diagnostic);
@@ -162,7 +169,7 @@ esp_err_t photo_worker_draw(unsigned slot,uint32_t length,bool blocking,
             } else error=ESP_ERR_INVALID_STATE;
         }
     }
-    if(error==ESP_OK)record_result(slot,length,true,false);
+    if(error==ESP_OK)record_result(slot,length,true,false,NULL);
     xSemaphoreGive(codec_mutex);
     return error;
 }
@@ -177,7 +184,7 @@ void photo_worker_forget(unsigned slot)
 void photo_worker_publish(unsigned slot,uint32_t length)
 {
     /* The source length was committed and upload ownership released first. */
-    if(slot<PHOTO_COUNT)record_result(slot,length,true,false);
+    if(slot<PHOTO_COUNT)record_result(slot,length,true,false,NULL);
 }
 
 void photo_worker_request(unsigned slot)
@@ -186,9 +193,14 @@ void photo_worker_request(unsigned slot)
     if(!enabled || slot>=PHOTO_COUNT || media_upload_active())return;
     tv_settings_t settings;settings_snapshot(&settings);uint32_t length=settings.photo_size[slot];
     if(!length)return;
+    uint32_t write_limit=settings_jpeg_write_limit_kib();
     portENTER_CRITICAL(&state_lock);
+    /* Do not spend the same budget again on every slideshow pass. A larger
+     * user budget permits a retry; lowering it cannot make this source fit. */
+    bool failed=failed_lengths[slot]==length &&
+        (!failed_by_write_limit[slot] || write_limit<=failed_write_limits[slot]);
     bool needed=!(pending&(1u<<slot)) &&
-        (!(ready&(1u<<slot)) || ready_lengths[slot]!=length) && failed_lengths[slot]!=length;
+        (!(ready&(1u<<slot)) || ready_lengths[slot]!=length) && !failed;
     if(needed)pending|=1u<<slot;
     portEXIT_CRITICAL(&state_lock);
     if(!needed)return;
@@ -221,8 +233,10 @@ uint32_t photo_worker_failed_mask(void)
     /* Never make an old failed length hide a newly committed source. Retryable
      * I/O, allocator pressure and cancellation do not enter failed_lengths. */
     tv_settings_t settings;settings_snapshot(&settings);uint32_t mask=0;
+    uint32_t write_limit=settings_jpeg_write_limit_kib();
     portENTER_CRITICAL(&state_lock);
     for(unsigned slot=0;slot<PHOTO_COUNT;++slot)
-        if(settings.photo_size[slot] && failed_lengths[slot]==settings.photo_size[slot])mask|=1u<<slot;
+        if(settings.photo_size[slot] && failed_lengths[slot]==settings.photo_size[slot] &&
+           (!failed_by_write_limit[slot] || write_limit<=failed_write_limits[slot]))mask|=1u<<slot;
     portEXIT_CRITICAL(&state_lock);return mask;
 }

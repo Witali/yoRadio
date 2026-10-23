@@ -1,6 +1,7 @@
 #include "photo_storage.h"
 #include "jpeg_espidf.h"
 #include "jpeg_layout.h"
+#include "settings.h"
 #include "esp_heap_caps.h"
 
 static jpeg_espidf_t storage;
@@ -34,9 +35,18 @@ esp_err_t photo_storage_authorize(const jpeg_guard_layout_t *layout,
      * after full vacant-candidate checks, with no erases/photos/settings writes. */
     esp_err_t error=jpeg_espidf_init(&storage);
     if(error!=ESP_OK)return error;
-    const jpeg_transport_limits_t limits={30000,0x800000,JPEG_PROVISION_PROGRAM_BYTES,0,60000000};
-    jpeg_provision_diagnostic_t diagnostic;
-    if(jpeg_espidf_provision(&storage,layout,&jpeg_layout_stamp,&diagnostic,&limits)!=JPEG_TRANSPORT_OK)
+    /* REQUESTED_CHANGE: a persisted zero also forbids adopting an unstamped
+     * legacy image. Startup precedes HTTP, so the loaded policy is stable here.
+     * Complete matching stamps authorize reads without any program/erase. */
+    bool readonly=settings_jpeg_write_limit_kib()==0;
+    const jpeg_transport_limits_t limits={30000,0x800000,readonly ? 0:JPEG_PROVISION_PROGRAM_BYTES,0,60000000};
+    jpeg_transport_result_t authorized;
+    if(readonly)authorized=jpeg_espidf_authorize(&storage,layout,&limits);
+    else {
+        jpeg_provision_diagnostic_t diagnostic;
+        authorized=jpeg_espidf_provision(&storage,layout,&jpeg_layout_stamp,&diagnostic,&limits);
+    }
+    if(authorized!=JPEG_TRANSPORT_OK)
         return ESP_ERR_INVALID_STATE;
     *transport=&storage.transport;*hash=jpeg_espidf_hash_provider(&storage);return ESP_OK;
 }

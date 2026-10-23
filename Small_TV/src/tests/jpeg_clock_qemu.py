@@ -17,6 +17,7 @@ from machine_oracle import Machine,Panel,ROOT
 from photo_cache_frames_qemu import native_entries
 from photo_owner_qemu import multipart,process_handle
 from photo_target_state import describe
+import photo_runtime_metrics as metrics
 from jpeg_clock_contract import validate,rejection_checks
 from qemu_storage import direct_flash_backing
 import scene_qemu as scene
@@ -43,7 +44,7 @@ def clean_frame(machine,theme,data,registers):
     return panel_rgb(machine.panel)
 
 
-def run_theme(vm,args,theme,symbols,loop_end,state_addresses,fixture):
+def run_theme(vm,args,theme,symbols,loop_end,state_addresses,fixture,metric_layout):
     """Own one VM; trigger decode by HTTP and observe full foreground clock frames."""
     import compare
     from small_tv_http_test import http,wait_http,clean_uart
@@ -59,7 +60,8 @@ def run_theme(vm,args,theme,symbols,loop_end,state_addresses,fixture):
         hardware_profile=str(ROOT/'Small_TV/qemu/profiles/small-tv-c2.json'),network='clock',display='none',
         persistent=True,paused=True,gdb_port=port,http_base_port=0,service_port=fixture.port)
     result=dict(passed=False,theme=theme,control=args.control,frames=[],observations=[],owners_stopped=False,
-        checks={},reference='clean native RV32 and corrected literal factory RV32; no pixel masks')
+        checks={},reference='clean native RV32 and corrected literal factory RV32; no pixel masks',
+        fixture=args.fixture,resources={})
     observer=session=kernel=handle=None;pending=None;executor=ThreadPoolExecutor(max_workers=1)
     before=None;deadline=time.monotonic()+900
     try:
@@ -79,7 +81,7 @@ def run_theme(vm,args,theme,symbols,loop_end,state_addresses,fixture):
         # later reference starts clean; no actual target panel is copied into it.
         observer.breakpoint(loop_end);observer.continue_to(loop_end);observer.breakpoint(loop_end,False)
         observer.resume()
-        image=ROOT/'Small_TV/src/tests/fixtures/jpeg_extended/flat-gray-progressive-8.jpg'
+        image=ROOT/'Small_TV/src/tests/fixtures/jpeg_extended'/args.fixture
         data=image.read_bytes();chunks=(len(data)+4095)//4096
         assert http(url,'/start_upload',{'file_number':5,'file_size':len(data),'total_chunks':chunks},origin=url,timeout=30)==(200,b'OK')
         for index in range(chunks):assert multipart(url,5,index,chunks,data[index*4096:(index+1)*4096])==(200,b'OK')
@@ -97,6 +99,9 @@ def run_theme(vm,args,theme,symbols,loop_end,state_addresses,fixture):
             assert int.from_bytes(observer.memory(state_addresses['slot'],4),'little')==4
             with vm.QMP(session['qmp_port'],session['name']) as qmp:
                 result['decoder_entry_guest']=weather.virtual_seconds(qmp)
+                result['resources']['entry']=metrics.snapshot(qmp,folder,'decode-entry',metric_layout)
+            worker=result['resources']['entry']['worker']['tcb_address']
+            diagnostic=observer.register(12)
             result['decoder_entry']=decoder;result['decoder_return']=decode_return
         dump=(ROOT/'Small_TV/full-flash.bin').read_bytes()
         assets=json.loads((ROOT/'Small_TV/assets/manifest.json').read_text())
@@ -115,7 +120,9 @@ def run_theme(vm,args,theme,symbols,loop_end,state_addresses,fixture):
                 if pc==decode_return:
                     observer.breakpoint(decode_return,False)
                     result['decoder_status']=observer.register(10)
-                    result['decoder_exit_guest']=weather.virtual_seconds(qmp);ended=True;break
+                    result['decoder_exit_guest']=weather.virtual_seconds(qmp)
+                    result['resources']['exit']=metrics.snapshot(qmp,folder,'decode-exit',metric_layout,worker,diagnostic)
+                    ended=True;break
                 code=observer.memory(entry,4)
                 registers={name:observer.register(number) for name,number in
                     [('a0',10),('a1',11),('a2',12),('a3',13),('a4',14),('a5',15),('a6',16)]}
@@ -128,6 +135,7 @@ def run_theme(vm,args,theme,symbols,loop_end,state_addresses,fixture):
                 if at==decode_return:
                     observer.breakpoint(decode_return,False);result['decoder_status']=observer.register(10)
                     result['decoder_exit_guest']=weather.virtual_seconds(qmp);ended=True
+                    result['resources']['exit']=metrics.snapshot(qmp,folder,'decode-exit',metric_layout,worker,diagnostic)
                     observer.continue_to(loop_end)
                 observer.breakpoint(loop_end,False)
                 assert observer.memory(entry,4)==code
@@ -211,6 +219,8 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--themes',nargs='+',choices=('classic','simple','dial'),default=['classic','simple','dial'])
     parser.add_argument('--control',action='store_true')
+    parser.add_argument('--fixture',choices=('flat-gray-progressive-8.jpg','rich-progressive420-8.jpg','full-cmyk12.jpg'),
+        default='flat-gray-progressive-8.jpg',help='Exact prequalified input; all clock criteria remain unchanged')
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=False)
     sys.path.insert(0,str(args.qemu_root/'tools'));sys.path.insert(0,str(ROOT/'Small_TV/qemu/parity'))
     import small_tv_vm as vm
@@ -219,6 +229,8 @@ def main():
     for row in frozen['files']:assert vm.digest((args.qemu_root/row['file']).read_bytes())==row['sha256']
     symbols,loop_end=native_entries();elf=ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf'
     layout=describe(elf);codec=layout['globals']['codec']
+    metric_layout=metrics.describe(elf,layout,args.dependency_root)
+    (args.output/'resource-layout.json').write_text(json.dumps(metric_layout,indent=2)+'\n',encoding='utf-8',newline='\n')
     addresses={name:codec['address']+codec['fields'][name]['offset'] for name in ('decoding','background')}
     addresses['slot']=codec['address']+codec['fields']['cache']['offset']+codec['fields']['cache']['fields']['slot']['offset']
     fixture=weather.WeatherFixture();payload=weather.payload();payload['weather'][0].update(main='Clear',description='clear',icon='01d')
@@ -226,17 +238,20 @@ def main():
     archive=ROOT/'firmware/development/small-tv-esp32c2-reconstructed';manifest=json.loads((archive/'manifest.json').read_text())
     files=[Path(__file__),*[ROOT/'Small_TV/src/tests'/name for name in ('photo_target_state.py','photo_owner_qemu.py',
         'photo_cache_frames_qemu.py','photo_cache_frame_contract.py','scene_qemu.py','gdb_observer.py','machine_oracle.py',
-        'classic_oracle.py','weather_render_oracle.py','frame_replay.py','control_oracle.py','jpeg_oracle.py','weather_qemu.py','qemu_storage.py','jpeg_clock_contract.py')],
-        ROOT/'Small_TV/qemu/parity/compare.py',elf,ROOT/'Small_TV/src/tests/fixtures/jpeg_extended/flat-gray-progressive-8.jpg',
+        'classic_oracle.py','weather_render_oracle.py','frame_replay.py','control_oracle.py','jpeg_oracle.py','weather_qemu.py','qemu_storage.py','jpeg_clock_contract.py','photo_runtime_metrics.py')],
+        ROOT/'Small_TV/qemu/parity/compare.py',elf,ROOT/'Small_TV/src/tests/fixtures/jpeg_extended'/args.fixture,
         *[archive/name for name in ('app.bin','bootloader.bin','partition-table.bin','assets.bin','manifest.json','source-manifest.json','jpeg-cache-plan.json')]]
     inputs={str(p.resolve()):vm.digest(p.read_bytes()) for p in files}
+    inputs.update(metric_layout['sdk_sources'])
     report=dict(passed=False,control=args.control,all_functionality_verified=False,network_acceptance=False,
         rf_tested=False,hardware_tested=False,app_sha256=verify_inputs(ROOT,args.dependency_root),
         elf_sha256=manifest['elf_sha256'],source_sha256=manifest['source_sha256'],
         qemu_sha256=vm.digest((args.qemu_root/'bin/qemu-system-riscv32.exe').read_bytes()),inputs_sha256=inputs,
-        state_addresses=addresses,complete_theme_matrix=set(args.themes)=={'classic','simple','dial'},themes={})
+        state_addresses=addresses,fixture=args.fixture,fixture_sha256=vm.digest((ROOT/'Small_TV/src/tests/fixtures/jpeg_extended'/args.fixture).read_bytes()),
+        resource_layout_sha256=vm.digest((args.output/'resource-layout.json').read_bytes()),
+        complete_theme_matrix=set(args.themes)=={'classic','simple','dial'},themes={})
     try:
-        for theme in args.themes:report['themes'][theme]=run_theme(vm,args,theme,symbols,loop_end,addresses,fixture)
+        for theme in args.themes:report['themes'][theme]=run_theme(vm,args,theme,symbols,loop_end,addresses,fixture,metric_layout)
         report['passed']=True
     except Exception as error:report['error']=type(error).__name__+': '+str(error);raise
     finally:

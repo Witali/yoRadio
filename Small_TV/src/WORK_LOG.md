@@ -4165,3 +4165,41 @@ coefficient optimization и persistent cache включены: не повтор
 NEXT: current target format/RAM/stack/fault, LCD под CMYK12/richRGB, publication
 powercuts, lifecycle/churn, whole-image/full/24h/hardware. Shared SDK/frozen QEMU
 не менялись, физических действий и push нет. Цель всего плана остаётся активной.
+
+## 2026-10-23 — настраиваемый суммарный лимит записи JPEG
+
+По уточнению пользователя default200KiB относится к cumulative program traffic
+одной обработки: коэффициенты, RGB565, journal. Исходный upload отдельно.
+Photos UI/API принимают0..uint32 KiB, отдельный NVS key сохраняется без изменения
+legacy ABI.0запрещает program и erase JPEG/cache. Уже готовые фото читаются.
+Расход invalidation переносится в finish, live снижение не сбрасывает счётчик,
+background failure не вызывает бесконечные новые записи. Повышение разрешает
+следующую попытку. Отказ сообщает flash-write-limit/flash-writes-disabled и
+следующую cumulative потребность; partial ready frame не публикуется.
+
+6298native +privacy3727,13inventory controls,348557transport/34cases,18unsafe
+transport +6integrated policy mutants,16DOM/HTTP contracts и6artifact pass.
+На текущем C2: CMYK12 отказ ровно204800bytes, следующий запрос205056 не выполнен;
+gray progressive после отказа успешен за115968bytes. Сохранённый0: hot request
+без записи/стирания, cold EXACT stopped flash без reseed — настоящий draw из
+cache успешен, callbacks с reset0, весь4MiB unchanged. Physical journal/source/
+frame SHA проверены отдельным reader.
+
+Дополнительный legacy startup выявил40-byte обход нуля в первой appF94C00B8:
+bootstrap писал32+8bytes stamp. Failing trace/images сохранены. Исправлен readonly
+startup в photo_storage.c: при0 legacy без stamp не принимается, никаких writes/
+erases, остальные часы/HTTP работают; matching complete cache доступен. Если
+stamp отсутствует, повышение лимита требует обычного restart для adoption.
+
+App9C1A83BD/ELF76B5CE37/source7D95988C,1476432bytes/59568free,DEBUGoff, archive
+firmware/development сохранён. Separate LCD:15wholeframes/864000pixels exact
+classic/simple/dial при реальном gray decode и minute rollover,16negative controls.
+Worker untouched5012/8192, pool14099/context4984 observed. Raw RAM и точный ELF
+layout позволяют отдельно пересчитать stack/heaps; pool pointer не сохранён.
+Все6текущих VM остановлены/закрыты. Timing icount не является скоростью платы.
+
+tests/JPEG_WRITE_BUDGET.md и jpeg-write-budget-validation-20261023.json:15physical
+images (13current+2failingbefore), PNG/RAM/trace/mutants и independent offline
+verifier. Legacy factory dump не добавлялся. SDK/frozen QEMU не менялись, physical
+flash/UART/reset и push не выполнялись. Полная новая target matrix, publication
+cuts, network lifecycle/churn, whole-image/full/24h/hardware остаются в плане.

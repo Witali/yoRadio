@@ -29,8 +29,9 @@ typedef struct {
     uint64_t epoch, started_us;
     const jpeg_guard_layout_t *verifying;
     jpeg_transport_result_t last_error;
+    uint64_t program_required;
     int last_io_error;
-    bool initialized, authorized, active;
+    bool initialized, authorized, active, program_limit_hit;
 } jpeg_transport_t;
 
 typedef struct {
@@ -68,6 +69,9 @@ jpeg_transport_result_t jpeg_transport_provision(jpeg_transport_t *transport,
 jpeg_transport_result_t jpeg_transport_begin(jpeg_transport_t *transport,const jpeg_transport_limits_t *limits);
 /* Cooperative deadline checkpoint for buffered RAM operations/decoder rows too. */
 jpeg_transport_result_t jpeg_transport_check(jpeg_transport_t *transport);
+/* Tighten a running job without resetting usage or resurrecting revoked ports.
+ * Zero also revokes erase permission. A larger cap applies only to the next job. */
+jpeg_transport_result_t jpeg_transport_limit_program(jpeg_transport_t *transport,uint64_t bytes);
 void jpeg_transport_end(jpeg_transport_t *transport);
 void jpeg_transport_revoke(jpeg_transport_t *transport);
 /* Writable full-sector ports are restricted to verified ownership capabilities.
