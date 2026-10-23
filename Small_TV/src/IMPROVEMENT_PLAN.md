@@ -73,6 +73,21 @@ legacy migration в host/QEMU, не аппаратную или произвол
 Target memory/stack/fault/format matrix, отдельный LCD, upload/decode power-cut,
 network lifecycle/full/24h/hardware по-прежнему открыты.
 
+Следующий checkpoint: [cache-backed photo LCD](tests/PHOTO_CACHE_FRAMES.md) текущей
+app034287C7 прошёл отдельно от network gate. 54 полных кадра /3110400 pixels
+совпадают с literal factory instructions: все пять фото, mask10, empty mask,
+все fade phases, configured day/night restoration с настоящей SNTP синхронизацией.
+13 negative report controls, 3 owned/reaped native VM; protected source photos/
+immutable flash сохранены. Это не clock continuity других тем во время upload.
+Найдено открытое расхождение времени старта: первое native фото23.389901guest sec
+против factory20.565822 в том же профиле (отдельная owned VM). Slot0 готов уже
+около5.3sec, но worker держит slideshow заблокированным до подготовки всех пяти.
+Следующее действие: оптимизировать initial/preload scheduling без искусственных
+задержек, пропуска валидных фото, зависания на damaged slot или изменения fade;
+добавить failing timing/partial-readiness/cancellation/cold0writes проверки.
+Pixel gate pass не закрывает этот timing gap, полный JPEG target matrix,
+clock continuity, power-cut/network lifecycle/whole-image/full/24h/hardware.
+
 Checkpoint 2026-10-20: реализован portable NOR core с 4 KiB cache, sparse mapping,
 sector RMW и read-back verification. 3000 random operations, 83 injected partial
 failures, 7 реальных layout stores и 6 compiled mutation controls прошли.

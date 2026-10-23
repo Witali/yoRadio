@@ -2701,3 +2701,24 @@ Then complete target heap/stack/time/format/fault/refusal matrix; real upload/
 decode/journal reset/power-cut; network clients/reconnect/churn; full-image
 indirect-call audit/full/24h/hardware. Do not re-open solved standalone core work.
 Frozen QEMU/SDK unchanged, no physical actions, no push. Goal active.
+
+## 2026-10-23 — current photo LCD complete, startup regression measured
+
+Do not rerun obsolete pre-worker photo_frames_qemu as a current-main acceptance:
+it expects2delay calls/present31, whereas current coordinator has1yield and masked
+async readiness. New photo_cache_frames_qemu +contract observes real ABI/states,
+literal factory replay, full57600pixels, no RAM/PC/time writes or diff masks.
+54frames/3110400pixels exact;13report rejects;3native owners reaped. Four masked
+cycles exercise unsynced then actual SNTP night restoration. No production changes.
+Proof qemu/parity/photo-cache-frames-validation-20261023.json; tests/PHOTO_CACHE_FRAMES.md.
+
+IMPORTANT NEXT: startup timing DOES NOT match. Current first photo23.389901guest sec
+(repeat23.559866), literal stock20.565822 in separate reaped VM, same seed/profile.
+Slot0 ready~5.3sec, but photo_worker_idle gates fade until all5warm jobs complete.
+Optimize initial/prefetch scheduling rather than inventing a delay or hiding
+warm-up from measurement. Preserve invalid-slot skip, partial readiness ordering,
+source cancellation/retry, fade timing. Add failing native/QEMU timing and cold
+durable-cache0write tests. Existing source/app/ELF hashes remain034287/BB7FD7/1D1F52.
+Then independent classic/simple/dial clock continuity under foreground decode,
+full target RAM/stack/time/format/fault, reset/power-cut, lifecycle/churn,
+whole-image/full/24h/hardware. Goal active; no physical actions, no push.

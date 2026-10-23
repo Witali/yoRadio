@@ -4063,3 +4063,29 @@ qemu/parity/jpeg-legacy-provision-validation-20261023.json. Полные flash i
 format/fault matrix, actual upload/decode/journal reset/power-cut, network lifecycle/
 churn, whole-image audit/full/24h/hardware. На физическом устройстве действий нет;
 SDK/frozen QEMU не менялись. Цель остаётся активной; push отдельно не выполнялся.
+
+## 2026-10-23 — independent cache-backed LCD, startup timing gap
+
+Старый photo_frames observer падает до VM: ждёт два vTaskDelay calls, в текущем
+clock_task один final yield. Новый photo_cache_frames_qemu наблюдает real cache
+readiness, blocked calls не меняют state; не подменяет guest RAM/PC/time. Literal
+factory PhotoMachine исполняет JPEG/footer/selection/fade instructions. Известное
+исправление restoration отдельно учитывает actual backlight_update calendar.
+
+Текущая неизменённая app034287C7: 54 whole frames /3110400 pixels exact, 28 all-photo,
+22 masked-night с4cycles (2unsynced +actual synchronized restore),4empty-dark.
+13 report mutation controls pass;3main owned VM stopped/reaped. Boot/application/
+photos/immutable/protected сохраняются, candidate scratch/cache writes разрешены.
+Это LCD gate, не HTTP/RF или clock continuity других тем при foreground decode.
+
+Дополнительная literal-stock owned VM с тем же профилем измерила первый полный
+кадр20.565822guest sec; current main23.389901 (предыдущий repeat23.559866).
+Timing gap не скрыт pixel success. Ready samples показывают slot0 примерно5.3sec,
+но renderer ждёт все5jobs до23sec. Оптимизация initial/preload scheduling — NEXT:
+без новых software sleeps, пропусков valid slots, застревания на damaged slot,
+регрессии fade/cancel/retry. Добавить timing/partial readiness/cold0writes tests.
+
+Production firmware/SDK/frozen QEMU не менялись; на плате действий нет. Подробности
+tests/PHOTO_CACHE_FRAMES.md, proof qemu/parity/photo-cache-frames-validation-20261023.json.
+Полный target JPEG memory/stack/format/fault, clock continuity, actual power-cut,
+network lifecycle/churn, whole-image audit/full/24h/hardware остаются открытыми.
