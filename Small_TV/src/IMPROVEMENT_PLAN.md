@@ -296,6 +296,16 @@ deterministic loss и full APSTA/RF gate остаются открытыми. О
 endpoints каждого Wi-Fi peer — возможное улучшение QEMU, не условие текущей
 проверки: AP/STA endpoints уже разделены, HTTP здесь проходит через оставшегося peer.
 
+2026-10-24 AP activity checkpoint: native `9C1A83BD` на том же QEMU `7a9764712b`
+прошёл scan/start/chunk/finish/theme/reselect во время alternating peer changes.
+Два полных цикла: 12 основных HTTP 200, 14 SDK peer events, две точные проверки
+байтов JPEG и темы, один start/ноль stop сервера. Presence меняется на реальном
+входе функции при ещё pending HTTP; 6 callbacks вложены в исполняемые вызовы.
+Offline proof `network-activity-validation-20261024.json`, 8 negative controls.
+См. [NETWORK_ACTIVITY.md](tests/NETWORK_ACTIVITY.md). AP scan/upload/theme на
+этих selected переходах проверены; STA weather/reconnect, prolonged churn/soak,
+deterministic loss и аппаратная RF/WPA приёмка остаются открытыми.
+
 ## 4. Электрические и аппаратные различия
 
 Статус: **аппаратная приёмка не выполнена**. Исследовать RESET/DC pull-ups:

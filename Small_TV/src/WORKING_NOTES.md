@@ -3145,7 +3145,7 @@ CYD run in this checkpoint, no complete hardware claim. Other whole-image,
 SDK I/O/allocation/NVS-internal cuts/full regression/24h/H01-H09 remain.
 
 
-## CURRENT 2026-10-24 — either AP peer departure repaired in QEMU
+## Checkpoint 2026-10-24 — either AP peer departure (newer CURRENT below)
 
 Progress continues, broad goal active, no blockers/new push request. QEMU now
 HEAD7a9764712b (Keep the AP Ethernet relay working across client departures),
@@ -3190,3 +3190,53 @@ Selected any-one departure cases pass; entire HTTP-LIFETIME/full/24h/hardware,
 SDK I/O/allocation/NVSinternal faults and wholeimage audit remain open. Known
 CYDIDF6 esp_phy_enable assert stillopen (not changedbyRISC-Vmodel). No freshCYD
 run performed here. References tests/NETWORK_CLIENTS.md,QEMU docs/WIFI_AP_CLIENTS.md.
+
+
+## CURRENT 2026-10-24 — AP activity during real peer transitions passed
+
+Previous goal turn made progress (four focused QEMU commits + two yoRadio network
+proof commits). This turn authoritatively inspected clean yoRadio HEADfc6e7750e
+and QEMU7a9764712b, no new emulation bug or production change found.
+Broad goal remains active; no blocker/new push request, no physical actions.
+
+New tests/network_activity_qemu.py uses exact native9C1A83BD/ELF76B5CE37 with
+unchanged clients-v5-riscv32 CCE6B471 and frozenD64 tools (47file pins). Reuses
+Events observer/target SDK ABI, generic activity hook changes AP presence at real
+SDK/photo/theme function entry while HTTP Future is stillpending. Records actual
+return_event_index to distinguish nested callbacks from later events. No guest
+code/PC/register/memory writes. Network gate has NO LCD acceptance criterion.
+
+Initialpilot .build/network-activity-20261024/pilot exec54721 terminal0:
+1cycle6ops, allpass. Saved exact older producer.py (before extra metadata),
+matching reportinputhash. Final .build/network-activity-20261024/final exec91607
+terminal0:2cycles12ops, 14SDKpeer events,6nestedinsideactualfunctioncalls,
+2exact508byte sourceJPEG readbacks andthemeGET. BothVMsstopped/reaped.
+Scan finds3APs yoRadio-QEMU/QEMU-2/QEMU-3. JPEG fixture flat-gray-progressive-8
+SHA45263A1C; no realphotos/private dump data copied into new archive.
+
+Sequenceeachcycle:scan mask3->2 atesp_wifi_scan_start(blocking1), uploadstart2->3,
+chunk3->1, finish1->3, theme3->2, reselect2->3. FunctionreturnsESP_OK, mainHTTP200,
+ordinary file/themeGETs match. Native onehttpd_start andzerohttpd_stop throughout.
+PeerMAC/AID/reason bytes tracked by actual SDK layout, ready onlyafterDHCPACK.
+This uses sharedhostbridge throughremainingpeer, not separateperpeerTCPbackends.
+
+network_activity_contract.py independently validates records and8negativecontrols:
+completedHTTP, wrongMACbytes, wrongreturnboundary, missingAP, alteredJPEG,
+duplicateserver, notreaped, finish400. verify_network_activity_evidence.py
+rechecks exactELFsymbols/code/base/SDKET_REL and modelGitblobs. Full proof
+Small_TV/qemu/parity/network-activity-validation-20261024.json passedoffline,
+29raw/29payloads,25531newgzipbytes, unchanged olderpayloads reused. No fullVM
+flash/RAM/UART archive. OwnVMprocessinventory must remain empty beforecommit.
+Documentation tests/NETWORK_ACTIVITY.md +IMPROVEMENT_PLAN updated.
+Historical producer replay supported with --source-revision, nohashskips/reset.
+
+NEXT: STA weather fetch during actual station disconnect/reconnect, then remaining
+controlled managementloss/DHCP retransmission/APSTA/prolongedchurn. Existing
+weather_qemu.WeatherFixture supports hold_response/release_response; snapshot()
+reads identified cached_weather DWARF, separateLCDgates mustnotbeused for network.
+Station profile(nativefirmware) hasnoAPnetif, APsetup usesAPSTAidleSTA so weather
+cannot be checked from APclient-onlycase. Current network_activity is nativeonly;
+factoryscan empty-result nullbug isalreadydocumented, nofactoryscan pass claimed.
+Do not change currentproducer withoutfresh run (selfhashpinned). QEMU7a clean,
+productionapp/SDK/frozenD64 unchanged. KnownCYDIDF6PHYassert, wholeimage audit,
+SDKI/O/allocation/NVSinternalcuts/fullsuite/24h/H01-H09 stillopen.

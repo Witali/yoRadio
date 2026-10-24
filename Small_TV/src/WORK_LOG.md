@@ -4363,3 +4363,21 @@ QEMU7a9764712b/CCE6B471: native/factory × уход первого/второг�
 ухода (FIXED_TEST). Proof network-relay-validation-20261024.json повторно использует
 неизменённые gzip payloads; factory fullflash/RAM/UART в новый архив не копируются.
 Полный HTTP-LIFETIME/traffic/churn/APSTA/RF и остальной план остаются открытыми.
+
+
+## 2026-10-24 — scan/photo/theme в ходе реальных AP peer transitions
+
+Новый network_activity_qemu.py проверяет native на9C1A83BD/76B5CE37/QEMUCCE6B471.
+При реальном входе в SDK/photo/settings function ещё pending HTTP меняет mask
+внешних клиентов; затем исполняются штатные callbacks/return/HTTP. Двацикла:
+scan3→2, start2→3, chunk3→1, finish1→3, theme3→2, reselect2→3.
+12основных HTTP200,14SDKpeer events,6nestedcallbacks, две побайтные проверки
+508-byte JPEG и сохранённой темы, одинстарт/нольостановокHTTP. Scan видит все3APs.
+
+Pilot1cycle и final2cycles terminal0; обеownedVMs остановлены/reaped. Olderpilot
+producer сохранён по егоhash, финальная приёмка не смешивает разныеисходники.
+Offlinecontract сверил actualABI/ELF/MAC/AID/returnordering и отверг8unsafecontrols.
+Proof network-activity-validation-20261024.json:29raw/29payloads,25531newgzipbytes,
+старыеpayloads reused, полнаяVMflash/RAM/UART не копируются. No app/SDK/QEMUchange,
+physicalactions/push нет. Network gate отдельный отLCD; STAweather/reconnect,
+prolongedchurn/loss/полныйплан остаются открытыми. См.tests/NETWORK_ACTIVITY.md.
