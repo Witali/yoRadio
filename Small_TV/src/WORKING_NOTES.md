@@ -3192,7 +3192,7 @@ CYDIDF6 esp_phy_enable assert stillopen (not changedbyRISC-Vmodel). No freshCYD
 run performed here. References tests/NETWORK_CLIENTS.md,QEMU docs/WIFI_AP_CLIENTS.md.
 
 
-## CURRENT 2026-10-24 — AP activity during real peer transitions passed
+## Checkpoint 2026-10-24 — AP activity (newer CURRENT below)
 
 Previous goal turn made progress (four focused QEMU commits + two yoRadio network
 proof commits). This turn authoritatively inspected clean yoRadio HEADfc6e7750e
@@ -3240,3 +3240,48 @@ factoryscan empty-result nullbug isalreadydocumented, nofactoryscan pass claimed
 Do not change currentproducer withoutfresh run (selfhashpinned). QEMU7a clean,
 productionapp/SDK/frozenD64 unchanged. KnownCYDIDF6PHYassert, wholeimage audit,
 SDKI/O/allocation/NVSinternalcuts/fullsuite/24h/H01-H09 stillopen.
+
+
+## CURRENT 2026-10-24 — station weather during disconnect/recovery passed
+
+Previous goal turn progress: committed3aedd9bb1 APactivity tests/actual12ops.
+This turn inspected clean3aedd9bb1 and QEMU7a9764712b before work. Goal broad/active,
+no blocker/new push request, no physical/app/SDK/QEMUsource changes. Exactnative
+9C1A83BD/ELF76B5CE37/source7D95988C, candidateCCE6B471, frozenD64tools unchanged.
+
+New station_event_layout.py extracts constants2/5/0 and IPevent20bytes/offset4
+from ACTUAL ELF/DWARF. No target recompilation or new field assumptions. Native
+objects:IP_EVENT3c13a984,connected3fcb6718,APactive3fcb6717,retries3fcb6708,
+lastaddress3fcb6710. Existing weather.native_layout derives248byte cache/fields,
+request_state3fcb6724 and cached_weather3fcafa78. Types/constants agreeacrossCUs.
+
+New station_weather_qemu.py observes SDK callbackentry/return viahardwareRSP.
+Initialpositive67/idle; realPOSTsamecity/fixtureheldresponse (200negative,503JSON).
+At first SDKdisconnectentry restores ONLY externalAPproperty, lets nativebody
+executeesp_wifi_connect and obtains realDHCP/GOT_IP. Actualconnected0/retries1 ->
+connected1/retries0, addressretained10.0.2.15/APfalse. HeldworkerRUNNING1; initial
+cacheunchanged. Bothrequests aborted beforefixture.release (before_releaseworker0),
+oldrawcache retained. RecoveryPOST obtains distinct body/humidity78then79, raw
+cachegeneration2->3->4. Do NOT claim full503received/rejected fromthisoutage:
+actualTCPabort precedesrelease, HTTP503parserpolicy is separateoldweathergate.
+
+Pilot .build/station-weather-20261024/pilot exec12222 terminal0; final /final
+exec35690 terminal0. Pilot producer.py savedbeforeadding extra HTTP/beforerelease/
+holdtiming metadata, matchesitsreporthash. Finaltwooutages,3GOTIP,2freshweather
+publications,4refreshPOST+2themeGET200,1httpd_start0stop,1 ROM boot, no panic/watchdog.
+Holdhostseconds1.563/1.610 (<30sfixturebound); firmwareHTTP10s unchanged. BothownVMs
+stopped/reaped. ExpectedSDK socketabort errno113 recordedlocally, notapanic.
+
+station_weather_contract.py independently reconstructs rawdouble/text/generation,
+SDKIPbytes/baseIDs/nativeflagtransitions/HTTP records/bodySHAs and rejects9controls.
+verify_station_weather_evidence.py rederivesstation+weatherDWARF fromexactELF,
+checks entryinstructions andmodelGitblobs. Proof station-weather-validation-20261024.json passed offline:32raw/32payloads,30274newgzipbytes; unchanged old
+payloads reused, nofullVMflash/RAM/UART. See tests/STATION_WEATHER.md; planupdated.
+Do noteditpinnedproducer beforefresh rerun. Historic --source-revision available.
+
+NEXT: controlled managementloss/retries, DHCP retransmission policy and prolonged
+AP/STA churn/soak, then fullnetworkgate. Earlier AP any-one departure +2cycle
+scan/photo/theme activity andnowSTAweather selectedrecovery covered. No complete
+HTTP-LIFETIME/RF/24h acceptanceclaim. KnownCYDIDF6PHY, wholeimage audit, SDKI/O/
+allocation/NVSinternalpublicationfaults/fullsuite/H01-H09 remainopen. NoQEMU
+process should remain beforecommit. Goal notcomplete orblocked.

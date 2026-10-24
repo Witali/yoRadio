@@ -306,6 +306,18 @@ Offline proof `network-activity-validation-20261024.json`, 8 negative controls.
 этих selected переходах проверены; STA weather/reconnect, prolonged churn/soak,
 deterministic loss и аппаратная RF/WPA приёмка остаются открытыми.
 
+STA weather checkpoint того же дня: `station-weather-validation-20261024.json`
+проверяет два удержанных запроса при реальных SDK DISCONNECTED→GOT_IP.
+Native сохраняет raw weather cache после обрыва транспорта, получает свежие
+HTTP/JSON после reconnect (humidity78/79), сбрасывает retries, не перезапускает
+HTTP-сервер и не перезагружается. ABI взят из точного ELF/DWARF; offline replay
+и 9 negative controls pass. Обрывы произошли до освобождения fixture response;
+не заявлять получение полного 503 как результат этого теста. См.
+[STATION_WEATHER.md](tests/STATION_WEATHER.md). Selected AP activity и STA
+weather/recovery теперь проверены. Остались prolonged churn/soak, deterministic
+loss, полный network gate и физическая RF/WPA приёмка; весь `HTTP-LIFETIME`
+по-прежнему не закрыт.
+
 ## 4. Электрические и аппаратные различия
 
 Статус: **аппаратная приёмка не выполнена**. Исследовать RESET/DC pull-ups:

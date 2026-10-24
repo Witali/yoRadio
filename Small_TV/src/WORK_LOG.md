@@ -4381,3 +4381,22 @@ Proof network-activity-validation-20261024.json:29raw/29payloads,25531newgzipbyt
 старыеpayloads reused, полнаяVMflash/RAM/UART не копируются. No app/SDK/QEMUchange,
 physicalactions/push нет. Network gate отдельный отLCD; STAweather/reconnect,
 prolongedchurn/loss/полныйплан остаются открытыми. См.tests/NETWORK_ACTIVITY.md.
+
+
+## 2026-10-24 — погода при реальном STA disconnect/GOT_IP
+
+Новый station_weather_qemu.py на неизменённом9C1A83BD/76B5CE37/CCE6B471:
+локальныйfixture удерживает ответпогоды, реальнаяAP выключается, SDKcallback
+восстанавливаеттолько externalAP, native сампереподключается/получаетDHCP.
+2outages/3GOTIP, retries1→0, адресretained,2freshHTTPпубликации(humidity78/79),
+старыйrawcache сохранён,1serverstart0stop/1ROMboot. ОбаHTTPweather запроса
+завершилиськакобрывтранспорта доосвобожденияfixture; этотscope не доказывает
+полныйполученный503. Holding1.563/1.610hostсек, гостевыетаймауты неизменены.
+
+Pilot/final2cases каждыйterminal0,обеVMs stopped/reaped. ELF/DWARF выводитSDK
+IDs2/5/0,IPevent20bytes/offset4 безперекомпиляции. Offlinecontract декодируетrawcache,
+проверяетnativeflags/SDKIPbytes/HTTPfreshbodySHAs и отвергает9unsafecontrols.
+Proof station-weather-validation-20261024.json:32raw/32payloads,30274newgzipbytes,
+старыеpayloads reused,fullVMflash/RAM/UART не копируются. Production/SDK/QEMU
+source/physicalнеизменны,pushнет. SelectedSTAweather/recovery теперьпроверен;
+prolongedchurn/loss/полныйnetwork/fullsuite/24h/hardware иостальнойплан ещёоткрыты.
