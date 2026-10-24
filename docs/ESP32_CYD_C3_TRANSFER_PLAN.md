@@ -197,6 +197,16 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   пакетов и 336 отказов малому буферу на CYD/C3. Все повторные PCM совпадают
   побайтно с baseline, независимо сравнённым с Xiph при max1.
   Полные G1/G3/G6 открыты; bridge в radio не подключён.
+  [Public raw-open OOM](../tests/results/vorbis-raw-open-oom-20261024/README.md)
+  исправляет потерю `MEM_LACK` в header parser на обеих архитектурах:
+  по560 отказов/полных восстановлений, четыре nested пары и два task-сценария
+  проходят. Полные allocation/lifetime/SMP gates остаются.
+  [Полный current-source31 прогон](../tests/results/vorbis-current-format31-20261024/CHECKPOINT.md)
+  теперь повторён с текущим floor1 renderer:434 пакета/738560 PCM байт,
+  все31 вектора побайтно равны прежним. Численный итог остаётся NONPASS:
+  15 случаев max1, wide4 и floor0×12 нарушают предел2; target12/14 relations.
+  [Следующий floor0 шаг](CYD_VORBIS_FLOOR0_REMAINING.md) требует сохранения
+  точности и диапазона всей цепочки, а не отдельной подгонки inverse2.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
   Xtensa векторов; host331 точный вектор и34 UBSan NONPASS остаются отдельно.
@@ -1311,3 +1321,22 @@ Stream остаётся на core0, decode/output на core1 с прежними
   сохраняются в архиве.
   Это частичное закрытие raw-open G4/G5; полные G1/G4/G5/G6, остальные
   allocation/lifetime/SMP, deferred Ogg, radio/resource/physical gates остаются.
+
+- 2026-10-24, CYD-C3-14/G6: [полная31 current-source регрессия](../tests/results/vorbis-current-format31-20261024/CHECKPOINT.md)
+  сохраняет весь прежний корпус и эталоны:31 open/decode/close,434 пакета,
+  738560 PCM байт,964 события. На текущих canonical setup/output/ABI/floor1
+  проходят actual SDK6.0.2/Xtensa и все10 owned commands; выбранный ELF
+  имеет три wrapper flags в наблюдённом Ninja recipe и linked symbols.
+  Сведения о recipe не выдаются за независимое наблюдение исполнения linker.
+  Полное численное измерение завершено как NONPASS без изменения предела2:
+  15 max1, wide4 max65535, floor0×12 с прежними ошибками; Xiph14/14 relations,
+  target12/14. Все31 текущих PCM побайтно равны сохранённым прежним векторам.
+  Это подтверждает сохранность результатов и остающиеся ошибки после floor1,
+  без вывода о private vendor cause. Сохранённые Xiph WAV и исходные
+  dual-reference NONPASS повторно проверены; новых reference-процессов нет.
+  Host8 CMake phase +8 link-recipe selection +9 numeric binding проходят.
+  Первая попытка с ошибочным аргументом SDK Python сохранена до compiler/QEMU;
+  с правильным SDK virtualenv та же frozen source завершилась штатно.
+  Production source/task bindings не менялись, bridge не включён в radio.
+  [Floor0 precision/range](CYD_VORBIS_FLOOR0_REMAINING.md) зафиксированы как
+  требования следующей реализации. Полные G6/прочие gates и physical остаются.

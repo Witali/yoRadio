@@ -1,0 +1,33 @@
+--- .build/collect-vorbis-current-format31-01.py
++++ .build/collect-vorbis-current-format31-02.py
+@@ -7,7 +7,7 @@
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ DEST = ROOT/'tests/results/vorbis-current-format31-20261024'
+-VERIFIER = ROOT/'.build/verify-vorbis-current-format31-template-01.py'
++VERIFIER = ROOT/'.build/verify-vorbis-current-format31-template-02.py'
+ CHECKPOINT = ROOT/'.build/vorbis-current-format31-checkpoint-01.md'
+ GROUPS = {
+     'prep': '.build/vorbis-format31-current-prep-01',
+--- .build/verify-vorbis-current-format31-template-01.py
++++ .build/verify-vorbis-current-format31-template-02.py
+@@ -622,9 +622,16 @@
+         need(c['expected_error'] in (raw(directory+'/stdout.log')+raw(directory+'/stderr.log')).decode('utf-8'),'exact intended phase/pin refusal')
+     need(sha(raw(directory+'/variant/compat/vorbis_repair/enable.cmake'))==PINS['target/cyd_vorbis_format_expanded31_qemu/raw-enable.cmake'],
+          'every actual host case used exact frozen helper')
+-for original,pin in host['inputs'].items():
+-    if norm(original).casefold() in ORIGINS: artifact(original,pin['sha256'],pin['bytes'])
+-    else: need(norm(original).endswith('/python.exe') or norm(original).endswith('/cmake.exe'),'only historical host tool identities lack body')
++recorded_host_tools={norm(value).casefold() for value in
++    [obj('commands/preparation-host.json')['argv'][0],*[row['argv'][0] for row in host['commands']]]}
++for original,pin in host['inputs'].items():
++    key=norm(original).casefold()
++    tool=key in recorded_host_tools and key.rsplit('/',1)[-1] in ('python.exe','cmake.exe')
++    if key in ORIGINS:
++        row=ORIGINS[key]
++        identity_only=tool and 'alias' not in row and bool(row.get('omission_reason'))
++        artifact(original,pin['sha256'],pin['bytes'],required=not identity_only)
++    else: need(tool,'only recorded historical host tool identities lack body')
+ link_host,link_logs=receipt('commands/link-host.json',0,'.build/test-vorbis-format31-current-link-01.py')
+ need(b'Ran 8 tests in ' in link_logs['link-host.stderr.log'] and
+      link_logs['link-host.stderr.log'].replace(b'\r\n',b'\n').endswith(b'\nOK\n') and

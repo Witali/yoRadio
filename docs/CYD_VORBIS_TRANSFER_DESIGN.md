@@ -461,3 +461,40 @@ offline verifier with explicit reviewed pure-parser reuse and independent PCM
 metrics. This advances finite checked raw-open coverage within G4/G5. Full
 G1/G4/G5/G6, general decode/reset/close allocation failures and lifetime/SMP
 integration, deferred Ogg, radio integration and physical acceptance remain open.
+
+## Current-source complete31 format checkpoint, 2026-10-24
+
+The [refreshed capture](../tests/results/vorbis-current-format31-20261024/CHECKPOINT.md)
+replays the complete earlier31 corpus with current canonical setup/output/ABI
+and `floor1_render.h`. All 31 public raw open/decode/close cases finish on
+SDK6.0.2/Xtensa: 434 packets, 738560 captured PCM bytes, 964 protocol records,
+coordinator core0 and worker core1/priority3/stack16384. All ten owned commands
+terminate successfully. The selected ELF's generated/queried link recipe has
+all three wraps, including `floor1_inverse2`; its symbol and actual source pins
+are also checked. A Ninja recipe query is not independent linker-execution
+evidence. Production firmware and task bindings are unchanged.
+
+Full numerical measurement completes with NONPASS at the existing bound2.
+Fifteen cases have maximum signed16 error1. Four wide D16 cases still have
+65535; all twelve original/equivalent floor0 cases retain their earlier errors.
+Xiph satisfies all14 relations; target satisfies12 and still fails the two
+wide sparse/dense equalities. Every one of the31 current PCM vectors is
+byte-identical to its retained old target vector. Thus adding the current
+floor1 renderer does not resolve these failures for this corpus. No opaque
+backend cause is inferred and no new production parser correction is guessed.
+
+The adapter revalidates retained qualified Xiph outputs in three original
+scopes. It executes no new reference decoder and preserves their original
+dual-reference NONPASS. Every original signed16 sample and packet is measured
+without signal transforms. Eight real CMake phase tests, eight link-recipe
+selection tests and nine changed-binding tests pass. A first attempt with an
+incorrect SDK-Python argument stopped during environment activation and is
+retained separately; the same frozen source succeeds with the installed SDK
+virtualenv. No target ran in the first attempt.
+
+[Remaining floor0 requirements](CYD_VORBIS_FLOOR0_REMAINING.md) distinguish the
+public mathematical discrepancy from unverified backend behavior and explain
+why an inverse2-only change cannot establish general precision/range support.
+This checkpoint extends current-source regression evidence. Full G6, wide/
+sequence1/floor0 correctness, callbacks/lifetime/SMP, deferred work, radio,
+resources and physical acceptance remain open.
