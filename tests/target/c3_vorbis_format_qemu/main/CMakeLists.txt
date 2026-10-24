@@ -24,11 +24,14 @@ if(NOT setup_sha_length EQUAL 64 OR NOT "${FORMAT_SETUP_SHA256}" MATCHES "^[0-9a
     message(FATAL_ERROR "Explicit reviewed FORMAT_SETUP_SHA256 is required")
 endif()
 set(pinned_setup "${FORMAT_SETUP_SHA256}")
-set(pinned_output "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2")
+set(pinned_output "e5e272a492a91f5c1f24794858f3a89a219b7c8d50a33298ec51c923c6cbaea6")
+set(pinned_floor "3b24c3980895de79c2b3cd6460e31182d7fbc5192d474bc7e88be1fe9f917b4b")
 set(pinned_abi "dd26a294cf3887853e12174f3958ea9cccdaa9425ff6a7b21d46faa350bde61c")
-foreach(name setup output abi)
+foreach(name setup output abi floor)
     if(name STREQUAL "abi")
         set(path "${M}/vorbis_repair_abi.h")
+    elseif(name STREQUAL "floor")
+        set(path "${M}/vorbis_repair/floor1_render.h")
     else()
         set(path "${M}/vorbis_repair/${name}.c")
     endif()
@@ -60,4 +63,5 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
 target_sources(${COMPONENT_LIB} PRIVATE
     "${M}/vorbis_repair/setup.c" "${M}/vorbis_repair/output.c")
 target_link_options(${COMPONENT_LIB} INTERFACE
-    "-Wl,--wrap=esp_vorbis_dec_open" "-Wl,--wrap=esp_vorbis_dec_decode")
+    "-Wl,--wrap=esp_vorbis_dec_open" "-Wl,--wrap=esp_vorbis_dec_decode"
+    "-Wl,--wrap=floor1_inverse2")

@@ -5,7 +5,7 @@ opaque handles. It feeds 68 complete raw packets with ample output buffers.
 It exercises actual 8192 MDCT blocks without target Ogg parsing, EOF/flush,
 reset, OOM injection, private-state access, radio integration or physical audio.
 
-The original vendor public decoder must first open and decode all 68 packets
+The handle opened through the vendor public API must first decode all 68 packets
 at 192000 Hz / 8192 blocks, with correct public metadata, consumed lengths,
 overlap sizes, nonzero PCM and output canaries. Only then may the checked bridge
 be compared against that synthesis byte for byte, per packet. Metadata failures
@@ -15,6 +15,15 @@ that handle's decode calls. Every packet, including the zero-output priming
 packet, must have the expected sample rate, channel count and bit depth. Counted
 packet lines include these actual fields; pair lines also include both expected
 rates and expected channel/bit values, all checked by the host validator.
+
+In fresh runs, both handles use the linked `floor1_inverse2` renderer wrapper.
+The retained `VENDOR_*`, `PAIR_PACKET exact=1` and `EXACT` wire markers describe
+handle parity under that shared renderer. They do not establish unchanged vendor
+floor arithmetic. Reports state `pcm_comparison_scope`,
+`unchanged_vendor_pcm_oracle=false` and `independent_reference_compared=false`,
+and require the renderer wrapper symbol. Independent PCM comparisons or frozen
+old-image comparisons remain separate; the historical results below retain
+their original frozen source and oracle scope.
 
 `main/fixture.h` SHA256 is
 `839febe9f12d7bc33e6afd8a9f0b16ee799f12d6c8ecb88188537b7ae8349378`.
@@ -71,8 +80,9 @@ The runner has explicit scopes:
 - `--scope baseline`: require unchanged low-rate rejections plus all vendor,
   ordinary, high-rate and invalid-header prerequisites. Exit0 means diagnostic
   reproduction; `passed=false` and `format_acceptance_qualified=false` remain.
-- `--scope acceptance`: require all legal rates accepted with exact vendor PCM,
-  metadata, packet counts and canaries. Only this mode can qualify the format.
+- `--scope acceptance`: require all legal rates accepted with exact shared-renderer
+  handle PCM, metadata, packet counts and canaries. Only this mode qualifies the
+  selected raw format checks; independent numerical conformance remains separate.
 - `--scope acceptance --control old-guard`: add the old default restriction only
   to the frozen `setup.c` variant. Require the exact
   `legal_candidate_open_required` failure after all vendor/ordinary/high-rate

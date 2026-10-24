@@ -23,6 +23,7 @@ parser.add_argument('--idf', type=Path, default=nearest('.idf/v6.0.2'))
 parser.add_argument('--idf-tools', type=Path)
 parser.add_argument('--codec', type=Path)
 parser.add_argument('--qemu', type=Path, default=shutil.which('qemu-system-xtensa.exe'))
+parser.add_argument('--rom', type=Path, help='QEMU ROM directory; defaults to the installed QEMU layout')
 parser.add_argument('--powershell', type=Path, default=shutil.which('pwsh.exe') or shutil.which('pwsh'))
 args = parser.parse_args()
 if sys.platform != 'win32':
@@ -36,16 +37,17 @@ CODEC = (args.codec or SDK.parent / 'esp-adf-libs/esp_audio_codec').resolve()
 PY = TOOLS / 'python_env/idf6.0_py3.12_env/Scripts/python.exe'
 PS = args.powershell.resolve()
 QEMU = args.qemu.resolve()
+ROM = (args.rom or QEMU.parent.parent / 'pc-bios').resolve()
 OUT = args.output.resolve()
 if OUT == ROOT / '.build' or not OUT.is_relative_to((ROOT / '.build').resolve()):
     parser.error('Use a fresh output strictly inside repository .build')
 if any((parent / 'report.json').is_file() for parent in OUT.parents if parent != ROOT):
     parser.error('Do not nest a new run inside an existing evidence campaign')
-protected = (SDK, TOOLS, CODEC, PY.parent, PS.parent, QEMU.parent, QEMU.parent.parent / 'pc-bios')
+protected = (SDK, TOOLS, CODEC, PY.parent, PS.parent, QEMU.parent, ROM)
 if any(OUT == path or OUT.is_relative_to(path) or path.is_relative_to(OUT) for path in protected):
     parser.error('Output must not overlap SDK, tools, codec, Python, PowerShell or QEMU directories')
 required = (SDK / 'export.ps1', SDK / 'tools/idf.py', PY, PS, QEMU,
-            QEMU.parent.parent / 'pc-bios/esp32-v3-rom.bin', QEMU.parent.parent / 'pc-bios/esp32-v3-rom-app.bin',
+            ROM / 'esp32-v3-rom.bin', ROM / 'esp32-v3-rom-app.bin',
             CODEC / 'lib/esp32/libesp_audio_codec.a', CODEC / 'lib/esp32/libesp_audio_simple_dec.a')
 if any(not path.is_file() for path in required):
     parser.error('Missing required pinned runtime: ' + ', '.join(str(path) for path in required if not path.is_file()))
@@ -53,7 +55,9 @@ if OUT.exists():
     parser.error('Output exists; choose a fresh campaign')
 OUT.mkdir(parents=True, exist_ok=False)
 report = {'passed': False, 'scope': __doc__, 'production_radio_integration': False, 'canonical_bridge_sources': True,
-          'physical_device': False, 'commands': [], 'inputs': {}, 'tools': {}}
+          'physical_device': False, 'commands': [], 'inputs': {}, 'tools': {},
+          'pcm_comparison_scope': 'same-loader handle parity with shared floor1 renderer',
+          'unchanged_vendor_pcm_oracle': False, 'independent_reference_compared': False}
 sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def save():
     (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
@@ -87,7 +91,7 @@ def current():
 env = os.environ.copy()
 env.update(PYTHONUTF8='1', PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1', GIT_OPTIONAL_LOCKS='0')
 try:
-    for name in ('vorbis_repair/setup.c', 'vorbis_repair/simple.c', 'vorbis_repair/output.c',
+    for name in ('vorbis_repair/setup.c', 'vorbis_repair/simple.c', 'vorbis_repair/output.c', 'vorbis_repair/floor1_render.h',
                  'vorbis_repair/COPYING', 'vorbis_repair_abi.h', 'compat/vorbis_repair/enable.cmake'):
         freeze(MAIN / name, Path('candidate/main') / name)
     for path in HARNESS.rglob('*'):
@@ -99,7 +103,7 @@ try:
     freeze(fixture, Path('fixture/input.ogg'))
     for name in ('tools/cmake/version.cmake', 'export.ps1', 'tools/idf.py'):
         freeze(SDK / name, Path('sdk') / name)
-    for tool in (PY, PS, QEMU, QEMU.parent.parent / 'pc-bios/esp32-v3-rom.bin', QEMU.parent.parent / 'pc-bios/esp32-v3-rom-app.bin'):
+    for tool in (PY, PS, QEMU, ROM / 'esp32-v3-rom.bin', ROM / 'esp32-v3-rom-app.bin'):
         report['tools'][str(tool)] = sha(tool)
     assert execute('sdk-head', ['git', '-c', 'core.longpaths=true', '-C', SDK, 'rev-parse', 'HEAD']).strip() == '7101770dc6db2667b3c477cc31365dd1acd6db4e'
     assert not execute('sdk-clean', ['git', '-c', 'core.longpaths=true', '-C', SDK, 'status', '--porcelain', '--untracked-files=no']).strip()
@@ -156,7 +160,8 @@ try:
     report['tools'][str(cc)] = sha(cc)
     report['tools'][str(nm)] = sha(nm)
     symbols = execute('symbols', [nm, '-n', '-S', elf])
-    for symbol in ('__wrap_esp_vorbis_dec_open', '__wrap_esp_vorbis_dec_decode', 'esp_vorbis_dec_open', 'esp_vorbis_dec_decode'):
+    for symbol in ('__wrap_esp_vorbis_dec_open', '__wrap_esp_vorbis_dec_decode', '__wrap_floor1_inverse2',
+                   'esp_vorbis_dec_open', 'esp_vorbis_dec_decode'):
         assert re.search(r'\b' + symbol + '$', symbols, re.M), symbol
     rows = json.loads((build / 'compile_commands.json').read_text())
     selected = [row for row in rows if Path(row['file']).resolve().is_relative_to(OUT / 'variant')]
@@ -171,7 +176,7 @@ try:
     report['execution_bundle'] = {'frozen_inputs': report['inputs'], 'generated': generated,
         'variant_sources': variants, 'elf_sha256': sha(elf), 'flash_sha256': sha(flash), 'archives': report['archives'], 'tools': report['tools']}
     save()
-    log = execute('qemu', [QEMU, '-M', 'esp32', '-smp', '2', '-L', QEMU.parent.parent / 'pc-bios', '-display', 'none', '-monitor', 'none', '-serial', 'stdio', '-no-reboot', '-snapshot', '-nic', 'none', '-drive', 'file=' + str(flash) + ',if=mtd,format=raw'], 120)
+    log = execute('qemu', [QEMU, '-M', 'esp32', '-smp', '2', '-L', ROM, '-display', 'none', '-monitor', 'none', '-serial', 'stdio', '-no-reboot', '-snapshot', '-nic', 'none', '-drive', 'file=' + str(flash) + ',if=mtd,format=raw'], 120)
     assert not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP', log), log[-3000:]
     matches = re.findall(r'^CYD_VORBIS_RAW_COMPLETE packets=(\d+) rejected=(\d+) pcm=(\d+) original_exact=1 core=1$', log, re.M)
     failures = re.findall(r'^CYD_VORBIS_FAILURE (.+)$', log, re.M)

@@ -9,12 +9,14 @@ precede radio activation; a raw PCM fixture alone does not close those gates.
 The donor is `idf/esp32c3-oled-native/main/vorbis_repair`. Its setup implementation
 adapts Xiph.Org Tremor revision
 [0ad0141e864cfbb130db4f22e279d421832e7336](https://android.googlesource.com/platform/external/tremor/+/0ad0141e864cfbb130db4f22e279d421832e7336/Tremor/),
-with the BSD license retained in `COPYING`. Synthesis, MDCT, windows, floor and
-residue decoding and PCM arithmetic continue to use the pinned vendor archive.
+with the BSD license retained in `COPYING`. Synthesis, MDCT, windows, residue
+decoding and PCM conversion continue to use the pinned vendor archive. The
+portable `floor1_render.h` replaces floor1 curve application through
+`floor1_inverse2`, including the inverse-dB gain on short-endpoint tails.
 
 The Xtensa CMake helper independently requires classic ESP32, the exact SDK
 6.0.2 version tuple and both audited ESP32 codec 2.6.2 archive hashes. It adds
-the exact three canonical files and nine named linker wrappers. The ABI header
+the exact three canonical files and their named linker wrappers. The ABI header
 asserts ILP32 widths, field offsets, sizes and alignments with the target
 compiler. The stripped vendor consumers corroborate selected fields; compiler
 assertions are not proof of complete vendor type semantics or format coverage.
@@ -24,8 +26,16 @@ through one owner chain. Ogg allocation failures are scoped per task, restoring
 the previous scope after nesting. PCM capacity is checked before synthesis,
 repeated undersized Ogg retries retain the pending packet, and a genuine final
 byte adapts a separate empty EOF. These paths still require their own target
-tests. The donor's inherited rate/block-size limits are retained for now and
-remain an explicit conformance item in the transfer design.
+tests. Finite rate/block-size and floor-format regressions are recorded in the
+transfer design; they do not establish full conformance.
+
+The [floor1 renderer checkpoint](../../../../tests/results/vorbis-floor1-render-20261024/README.md)
+compares every PCM16 sample with Xiph libvorbis for two eight-case banks on
+both architectures at maximum error 1 under the project limit 2. A separate
+old-tail image reproduces the original target vectors and their three large
+errors. Same-image vendor/checked handles now share the renderer; their parity
+does not provide an independent unchanged-vendor floor oracle. This adds no
+ABI fields, allocations or changes to task cores, stacks or priorities.
 
 See [the design and remaining gates](../../../../docs/CYD_VORBIS_TRANSFER_DESIGN.md)
 and [the isolated target](../../../../tests/target/cyd_vorbis_qemu/README.md).

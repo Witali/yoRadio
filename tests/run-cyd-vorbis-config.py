@@ -2,7 +2,7 @@
 """Configure-only tests of the canonical CYD Vorbis repair CMake helper.
 
 Run real CMake project(NONE) configuration, never a compiler, SDK export or
-decoder. Verify exact source/link properties and 18 named guard rejections.
+decoder. Verify exact source/link properties and 19 named guard rejections.
 This gate does not qualify private ABI, playback, OOM or format conformance.
 """
 import argparse
@@ -17,7 +17,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 MAIN = Path('idf/esp32-cyd2usb-native/main')
 SOURCES = ('setup.c', 'simple.c', 'output.c')
+REPAIR_FILES = (*SOURCES, 'floor1_render.h')
 WRAPS = ('esp_vorbis_dec_open', 'esp_vorbis_dec_register', 'esp_vorbis_dec_decode',
+         'floor1_inverse2',
          'esp_audio_simple_dec_open', 'esp_audio_simple_dec_process', 'esp_audio_simple_dec_reset',
          'esp_es_parse_frame', 'esp_ogg_parse_frame', 'media_lib_module_realloc')
 ARCHIVES = {
@@ -42,7 +44,7 @@ CASES = {
     'bad-simple': {'component': 'bad-simple', 'error': 'requires audited ESP32 simple_dec archive'},
     'missing-codec': {'component': 'missing-codec', 'error': 'missing codec archive'},
     'missing-simple': {'component': 'missing-simple', 'error': 'missing simple_dec archive'},
-    **{'missing-' + name: {'missing': name, 'error': 'missing canonical ' + name} for name in SOURCES},
+    **{'missing-' + name: {'missing': name, 'error': 'missing canonical ' + name} for name in REPAIR_FILES},
     'missing-abi': {'missing': 'vorbis_repair_abi.h', 'error': 'missing canonical ABI header'},
 }
 
@@ -84,7 +86,7 @@ def arguments():
     if any(out == path or out.is_relative_to(path) or path.is_relative_to(out) for path in protected):
         parser.error('Output must not overlap codec component or installed tool directories')
     required = [args.cmake, args.ninja, ROOT / MAIN / 'compat/vorbis_repair/enable.cmake',
-                ROOT / MAIN / 'vorbis_repair_abi.h', *[ROOT / MAIN / 'vorbis_repair' / name for name in SOURCES],
+                ROOT / MAIN / 'vorbis_repair_abi.h', *[ROOT / MAIN / 'vorbis_repair' / name for name in REPAIR_FILES],
                 *[args.codec_component / name for name in HEADERS],
                 *[args.codec_component / ('lib/esp32/libesp_audio_' + name + '.a') for name in ARCHIVES]]
     missing = [str(path) for path in required if not path.is_file()]
@@ -121,7 +123,7 @@ def run(args):
 
     try:
         files = [Path(__file__).resolve(), ROOT / MAIN / 'compat/vorbis_repair/enable.cmake',
-                 ROOT / MAIN / 'vorbis_repair_abi.h', *[ROOT / MAIN / 'vorbis_repair' / name for name in SOURCES]]
+                 ROOT / MAIN / 'vorbis_repair_abi.h', *[ROOT / MAIN / 'vorbis_repair' / name for name in REPAIR_FILES]]
         for source in files:
             freeze(source, Path('repo') / source.relative_to(ROOT))
         for header in HEADERS:
@@ -161,7 +163,7 @@ def run(args):
             main = project / 'main'
             (main / 'compat/vorbis_repair').mkdir(parents=True)
             shutil.copyfile(helper, main / 'compat/vorbis_repair/enable.cmake')
-            for source in [*[Path('vorbis_repair') / entry for entry in SOURCES], Path('vorbis_repair_abi.h')]:
+            for source in [*[Path('vorbis_repair') / entry for entry in REPAIR_FILES], Path('vorbis_repair_abi.h')]:
                 if source.name != values.get('missing'):
                     destination = main / source
                     destination.parent.mkdir(parents=True, exist_ok=True)

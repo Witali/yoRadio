@@ -15,7 +15,7 @@ ARCHIVES = {'libesp_audio_codec.a': '92ba997358f50994d41422438c78bf2d7ee86dc1efc
             'libesp_audio_simple_dec.a': 'ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6'}
 FIXTURE_SHA = '839febe9f12d7bc33e6afd8a9f0b16ee799f12d6c8ecb88188537b7ae8349378'
 SDK_HEAD = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
-MODULES = ('vorbis_repair/setup.c', 'vorbis_repair/output.c', 'vorbis_repair/simple.c',
+MODULES = ('vorbis_repair/setup.c', 'vorbis_repair/output.c', 'vorbis_repair/simple.c', 'vorbis_repair/floor1_render.h',
            'vorbis_repair/COPYING', 'vorbis_repair_abi.h', 'compat/vorbis_repair/enable.cmake')
 
 
@@ -117,7 +117,9 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     report = dict(passed=False, completed=False, scope=args.scope, control=args.control,
                   regression_reproduced=False, format_acceptance_qualified=False, physical_device=False,
-                  production_radio_integration=False, commands=[], inputs={}, tools={})
+                  production_radio_integration=False, commands=[], inputs={}, tools={},
+                  pcm_comparison_scope='same-loader handle parity with shared floor1 renderer',
+                  unchanged_vendor_pcm_oracle=False, independent_reference_compared=False)
     env = dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1', GIT_OPTIONAL_LOCKS='0')
     def save():
         temp = out / 'report.json.tmp'
@@ -251,7 +253,8 @@ def main():
         for name in ('CONFIG_IDF_TARGET_ESP32','CONFIG_YORADIO_VORBIS_REPAIR'):
             need(re.search(r'^#define '+name+r' 1$',macros,re.M),'Expected setup compile context '+name)
         symbols = execute('symbols',[nm,'-n','-S',elf])
-        for symbol in ('__wrap_esp_vorbis_dec_open','__wrap_esp_vorbis_dec_decode','esp_vorbis_dec_open','esp_vorbis_dec_decode'):
+        for symbol in ('__wrap_esp_vorbis_dec_open','__wrap_esp_vorbis_dec_decode','__wrap_floor1_inverse2',
+                       'esp_vorbis_dec_open','esp_vorbis_dec_decode'):
             need(re.search(r'\b'+symbol+'$',symbols,re.M),'Missing symbol '+symbol)
         recipe = json.loads((build/'flasher_args.json').read_text())
         settings = recipe.get('flash_settings',{})

@@ -2,8 +2,9 @@
 
 Enabled by `CONFIG_YORADIO_VORBIS_REPAIR` (default on). The CMake integration
 refuses archives other than the two pinned Espressif 2.6.2 ESP32-C3 libraries.
-This is an ownership/initialization repair; the original synthesis, MDCT,
-windowing, floor/residue decode and PCM arithmetic remain linked.
+The repair covers ownership, initialization and output preflight. The original
+synthesis, MDCT, windowing, residue and PCM conversion remain linked; floor1
+curve application is replaced as described below.
 
 ## Source and ABI
 
@@ -46,6 +47,21 @@ unchanged. Output resize/retry and exact EOF trimming are separate plan steps.
 This is not a complete malformed-input audit or a physical-radio qualification.
 
 ## Tests
+
+The [floor1 renderer checkpoint](../../../../tests/results/vorbis-floor1-render-20261024/README.md)
+adds `floor1_render.h` and wraps `floor1_inverse2` on both C3 and CYD. It applies
+the inverse-dB gain to the whole spectral vector, including the tail after a
+short final X position. Clipping a segment at the block boundary preserves its
+original slope. The portable multiply defines the signed wide-product bit
+extraction without signed-shift overflow. No new allocations or ABI fields
+are introduced.
+
+Independent SDK/QEMU captures cover eight position cases and eight nonflat
+curve cases per architecture. Every original stereo PCM16 sample differs from
+Xiph libvorbis by at most 1 under the predeclared project limit 2. A separate
+old-tail image reproduces the frozen target output and its three numerical
+failures. Same-image vendor/checked handles share the renderer and therefore
+cannot provide an unchanged-vendor arithmetic oracle.
 
 Use the original lifecycle overlay for the retained unmodified baseline;
 append `sdkconfig.qemu-vorbis-repair.defaults` for this implementation. Run

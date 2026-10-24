@@ -20,8 +20,9 @@ DIO40/4MiB and disable the emulated NIC.
 Eight legal setups include the maximum 65 total X positions, unsorted unique
 positions, rangebits0 with no explicit positions, and a large legal endpoint.
 Six invalid setups contain repeated positions or 66/250 total positions. Only
-valid setups reach synthesis: every complete packet compares guarded PCM and
-metadata with a fresh ample-buffer original vendor handle. Each invalid open
+valid setups reach synthesis. With `--renderer off` (the setup-only default),
+every complete packet compares guarded PCM and metadata with a fresh
+ample-buffer original vendor handle. Each invalid open
 must return FAIL and a null handle. Heap integrity is checked after each case.
 
 `--control count` or `--control unique` removes just that guard from a frozen
@@ -39,3 +40,38 @@ include both architectures, the two ESP32 controls, the original dual-reference
 NONPASS and an independent Xiph PCM comparison. Full numerical correctness is
 still NONPASS for three short-endpoint cases. No hardware or radio integration
 claim follows from this setup-validation regression.
+
+## Independent renderer qualification
+
+`--renderer on` selects `render.c`, links the `floor1_inverse2` wrapper, and
+captures one checked handle's guarded PCM. It reports `RENDER_CAPTURED` with
+`passed=false` until an independent numerical check. It does not compare two
+handles sharing the same renderer as an arithmetic oracle.
+
+Use the positions corpus above with `--corpus-kind positions`. A second bank
+has individual packets for nonflat curves, all four multipliers, active and
+inactive interior points, unsorted coordinates and short/long endpoints:
+
+```text
+python -B tests/vorbis_format_corpus/generate_floor1_slopes.py --output .build/vorbis-floor1-slopes-corpus-01
+python -B tests/test-vorbis-floor1-slopes.py
+python -B tests/test-vorbis-floor1-render.py --output .build/vorbis-floor1-render-host-01
+python -B tests/test-vorbis-floor1-reference-outcomes.py
+```
+
+Select that bank with `--renderer on --corpus-kind slopes --corpus <directory>`
+and retain independent ESP32/C3 captures. `--control old-tail` changes only the
+frozen renderer's final multiplication; it must reproduce the original
+position-bank PCM and its specific numerical failures. The raw control capture
+alone does not qualify that semantic check.
+
+`tests/check-vorbis-floor1-render.py` compares complete signed PCM16 samples
+with explicit Xiph libvorbis at the fixed project bound 2, with no gain,
+alignment, resampling or trim. For slopes it requires `--ffmpeg` with the pinned
+executable. Its positions/reference/baseline checks deliberately bind to the
+retained original campaign; this is a finite qualification tool. The
+[renderer checkpoint](../../results/vorbis-floor1-render-20261024/README.md)
+includes a portable offline verifier for the published evidence. Both banks
+now have maximum error 1 on both architectures, while the original setup-only
+NONPASS remains historical evidence. Full G6, radio and physical acceptance
+remain separate.

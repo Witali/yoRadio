@@ -1,4 +1,8 @@
-idf_component_register(SRCS "main.c" INCLUDE_DIRS "."
+set(test_source "main.c")
+if(FLOOR1_RENDER_MODE STREQUAL "on")
+    set(test_source "render.c")
+endif()
+idf_component_register(SRCS "${test_source}" INCLUDE_DIRS "."
     REQUIRES esp_audio_codec freertos heap esp_system esp_rom)
 if(CMAKE_BUILD_EARLY_EXPANSION)
     return()
@@ -16,9 +20,11 @@ if(NOT "${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}.${IDF_VERSION_PATCH}" STREQUAL
     message(FATAL_ERROR "Wrong pinned SDK for selected target")
 endif()
 set(variant "$ENV{VORBIS_FLOOR1_MAIN}")
-foreach(part setup output abi)
+foreach(part setup output abi floor)
     if(part STREQUAL "abi")
         set(source "${variant}/vorbis_repair_abi.h")
+    elseif(part STREQUAL "floor")
+        set(source "${variant}/vorbis_repair/floor1_render.h")
     else()
         set(source "${variant}/vorbis_repair/${part}.c")
     endif()
@@ -35,3 +41,8 @@ target_sources(${COMPONENT_LIB} PRIVATE
     "${variant}/vorbis_repair/setup.c" "${variant}/vorbis_repair/output.c")
 target_link_options(${COMPONENT_LIB} INTERFACE
     "-Wl,--wrap=esp_vorbis_dec_open" "-Wl,--wrap=esp_vorbis_dec_decode")
+if(FLOOR1_RENDER_MODE STREQUAL "on")
+    target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=floor1_inverse2")
+elseif(NOT FLOOR1_RENDER_MODE STREQUAL "off")
+    message(FATAL_ERROR "Explicit FLOOR1_RENDER_MODE on/off is required")
+endif()

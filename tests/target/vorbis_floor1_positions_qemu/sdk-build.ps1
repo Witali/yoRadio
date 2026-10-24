@@ -3,7 +3,8 @@ param([Parameter(Mandatory)][string]$Campaign,
       [Parameter(Mandatory)][string]$ToolsDirectory,
       [Parameter(Mandatory)][string]$CodecDirectory,
       [Parameter(Mandatory)][string]$PythonExecutable,
-      [Parameter(Mandatory)][ValidateSet('esp32','esp32c3')][string]$Target)
+      [Parameter(Mandatory)][ValidateSet('esp32','esp32c3')][string]$Target,
+      [ValidateSet('on','off')][string]$Renderer = 'off')
 $ErrorActionPreference = 'Stop'
 $Campaign = [IO.Path]::GetFullPath($Campaign)
 if (!(Test-Path -LiteralPath (Join-Path $Campaign 'report.json') -PathType Leaf)) {
@@ -28,9 +29,10 @@ if ($LASTEXITCODE -ne 0) { throw 'SDK activation failed' }
 $idfArgs = @((Join-Path $env:IDF_PATH 'tools/idf.py'),'-C',(Join-Path $Campaign 'project'),
     '-B',(Join-Path $Campaign 'build'),'--no-ccache','-D',"IDF_TARGET=$Target",
     '-D',"SDKCONFIG=$Campaign/sdkconfig",'-D',"SDKCONFIG_DEFAULTS=$Campaign/project/sdkconfig.defaults",
+    '-D',"FLOOR1_RENDER_MODE=$Renderer",
     '-D','CMAKE_JOB_POOLS=compile=2;link=1','-D','CMAKE_JOB_POOL_COMPILE=compile','-D','CMAKE_JOB_POOL_LINK=link')
-foreach ($part in @('setup','output','abi')) {
-    $relative = if ($part -eq 'abi') { 'vorbis_repair_abi.h' } else { "vorbis_repair/$part.c" }
+foreach ($part in @('setup','output','abi','floor')) {
+    $relative = if ($part -eq 'abi') { 'vorbis_repair_abi.h' } elseif ($part -eq 'floor') { 'vorbis_repair/floor1_render.h' } else { "vorbis_repair/$part.c" }
     $digest = (Get-FileHash -LiteralPath (Join-Path $Campaign "variant/$relative") -Algorithm SHA256).Hash.ToLowerInvariant()
     $idfArgs += @('-D',"FLOOR1_${part}_SHA256=$digest")
 }

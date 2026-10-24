@@ -2,6 +2,7 @@
 // Vorbis I 4.3.1 / 4.3.8; pinned Tremor dsp.c uses the same block calculation.
 #include "../vorbis_repair_abi.h"
 #include "esp_vorbis_dec.h"
+#include "floor1_render.h"
 
 extern esp_audio_err_t __real_esp_vorbis_dec_decode(void *, esp_audio_dec_in_raw_t *,
     esp_audio_dec_out_frame_t *, esp_audio_dec_info_t *);
@@ -34,6 +35,17 @@ esp_audio_err_t __wrap_esp_vorbis_dec_decode(void *handle, esp_audio_dec_in_raw_
             }
         }
     }
-    // Preserve the original malformed-packet and PCM conversion behavior.
+    // Raw decoding and PCM conversion remain in the pinned archive; floor1
+    // curve application is wrapped independently below.
     return __real_esp_vorbis_dec_decode(handle, raw, out, info);
+}
+
+// Public low-memory Tremor floor1 ABI; see floor1_render.h and COPYING.
+int __wrap_floor1_inverse2(vorbis_dsp_state *dsp, vorbis_info_floor *parameters,
+                           int32_t *fit, int32_t *out) {
+    const codec_setup_info *setup = dsp->vi->codec_setup;
+    const vorbis_info_floor1 *floor = parameters;
+    return repair_floor1_render(setup->blocksizes[dsp->W] / 2, floor->posts,
+                                floor->mult, floor->postlist,
+                                floor->forward_index, fit, out);
 }

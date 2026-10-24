@@ -289,3 +289,46 @@ The setup validation regression advances finite G6/G7 coverage only. The new
 short-endpoint numerical failure joins the outstanding wide/floor0/sequence1
 failures. Full G6, callback ABI, Ogg/lifetime/SMP, radio integration, resources
 and physical acceptance remain open; deferred work is not resumed.
+
+## Floor1 curve application, 2026-10-24
+
+The [renderer successor](../tests/results/vorbis-floor1-render-20261024/README.md)
+resolves the three short-endpoint numerical failures in the checkpoint above.
+Both architectures now wrap `floor1_inverse2` with the same portable
+[curve renderer](../idf/esp32-cyd2usb-native/main/vorbis_repair/floor1_render.h).
+Vorbis I section 7.2.4 and the pinned public Tremor `floor1.c`, `misc.h` and
+`floor_lookup.c` supply the algorithm and full-precision inverse-dB table.
+The final constant segment uses the same gain lookup and multiplication as
+the preceding line segments; a segment extending beyond the spectral block
+retains its original denominator. The wrapper consumes existing asserted ABI
+fields and changes no allocation, ownership, task core, stack or priority.
+
+Two independent SDK/QEMU banks cover eight position configurations and eight
+nonflat curves on each architecture, including multipliers 1 through 4,
+ascending/descending curves, active/inactive interior points and endpoints
+1 through 32768. Each bank rejects six malformed setups and emits 112 raw
+packets/225280 PCM bytes per architecture. All signed16 samples compare with
+explicit Xiph libvorbis at maximum error 1 under the unchanged project bound
+2, with no gain, alignment, resampling or trimming. This is a finite project
+qualification, not a numerical tolerance specified by the Vorbis standard.
+
+The five ordinary position cases remain byte-exact to the frozen old target
+images. Restoring only the old tail computation in a separate ESP32 image
+reproduces all eight frozen vectors, including the three errors up to 65535.
+That is a functional control; the vendor's internal implementation is not
+asserted from it. The old NONPASS reports and failed checker-classification
+attempt are preserved. Eight classifier tests distinguish actual codec
+refusals from crashes, timeouts and output failures.
+
+ASan/UBSan tests independently check 1472 curves/1501440 bins, 2349 wide
+products, 32 absent-floor cases, input preservation and output canaries.
+The runner's bounded timeout/interruption controls also confirm termination
+of its own child and grandchild process groups. The existing complete raw
+capacity gate also passes with 535 packets/2112000 PCM bytes and 1602 rejected
+undersized retries; its separate preflight-bypass control reaches the expected
+`rejected_dsp_unchanged` failure. All 22 configure-only CMake cases pass,
+including the missing-renderer-header guard and exact wrapper options.
+Fresh same-loader raw/format
+reports explicitly describe shared-renderer handle parity; they cannot prove
+unchanged vendor PCM. The full G6 and other outstanding/deferred gates above
+remain open. No production firmware or physical-board acceptance is claimed.

@@ -46,8 +46,12 @@ def main():
     p.add_argument('--qemu', type=Path, required=True)
     p.add_argument('--rom', type=Path, required=True)
     p.add_argument('--corpus', type=Path, required=True)
-    p.add_argument('--control', choices=['count', 'unique'])
+    p.add_argument('--corpus-kind', choices=['positions', 'slopes'], default='positions')
+    p.add_argument('--renderer', choices=['on', 'off'], default='off')
+    p.add_argument('--control', choices=['count', 'unique', 'old-tail'])
     a = p.parse_args()
+    need(a.control!='old-tail' or a.renderer=='on','old-tail requires the explicit renderer path')
+    need(a.corpus_kind!='slopes' or a.renderer=='on','per-case slope packets require renderer harness')
     out = a.output.resolve()
     runtimes = [getattr(a, name).resolve() for name in ('idf','idf_tools','codec','powershell','qemu','rom')]
     need(out.is_relative_to(ROOT/'.build') and out != ROOT/'.build' and not out.exists(), 'fresh .build output required')
@@ -59,6 +63,7 @@ def main():
     need(all(x.is_file() for x in (py,ps,qemu,sdk/'export.ps1')), 'missing runtime')
     out.mkdir(parents=True)
     r = dict(completed=False,passed=False,control_effective=False,target=a.target,control=a.control,
+        renderer=a.renderer,corpus_kind=a.corpus_kind,target_capture_completed=False,numerical_reference_qualified=False,
         full_G6_qualified=False,production_radio_integration=False,physical_device=False,
         commands=[],inputs={},tools={},build_outputs={},scope=__doc__)
     env = os.environ.copy()
@@ -112,10 +117,12 @@ def main():
         need(rom_files,'ROMs missing')
         for path in rom_files:r['tools'][str(path)]=sha(path)
         source_main=ROOT/('idf/esp32-cyd2usb-native/main' if a.target=='esp32' else 'idf/esp32c3-oled-native/main')
-        for relative in ('vorbis_repair/setup.c','vorbis_repair/output.c','vorbis_repair_abi.h','vorbis_repair/COPYING'):
+        for relative in ('vorbis_repair/setup.c','vorbis_repair/output.c','vorbis_repair/floor1_render.h','vorbis_repair_abi.h','vorbis_repair/COPYING'):
             freeze(source_main/relative,Path('main')/relative)
         freeze(Path(__file__),Path('runner.py'))
         freeze(ROOT/'tests/vorbis_format_corpus/generate_floor1_positions.py',Path('generator.py'))
+        generator=ROOT/('tests/vorbis_format_corpus/generate_floor1_'+a.corpus_kind+'.py')
+        if a.corpus_kind=='slopes':freeze(generator,Path('slopes-generator.py'))
         freeze(ROOT/'tests/vorbis_block_matrix/generate_minimal.py',Path('generate_minimal.py'))
         for path in PROJECT.rglob('*'):
             if path.is_file():freeze(path,Path('project')/path.relative_to(PROJECT))
@@ -125,13 +132,12 @@ def main():
         freeze(ROOT/'tests/target/cyd_vorbis_qemu/partitions.csv',Path('partitions.csv'))
         for path in codec.rglob('*.h'):freeze(path,Path('codec')/path.relative_to(codec))
         corpus=a.corpus.resolve();manifest=json.loads((corpus/'manifest.json').read_text())
-        need(manifest['generator_sha256']==sha(ROOT/'tests/vorbis_format_corpus/generate_floor1_positions.py'),'corpus generator identity')
+        need(manifest['generator_sha256']==sha(generator),'corpus generator identity')
         need(all((corpus/row['path']).is_relative_to(corpus) and
                  (corpus/row['path']).stat().st_size==row['bytes'] and
                  sha(corpus/row['path'])==row['sha256'] for row in manifest['files']),'corpus body identity')
         matrix=json.loads((corpus/'matrix.json').read_text())
         need(len(matrix['cases'])==14 and [x['expected_valid'] for x in matrix['cases']]==[True]*8+[False]*6,'exact corpus validity matrix')
-        generator=ROOT/'tests/vorbis_format_corpus/generate_floor1_positions.py'
         need(manifest['helper']['sha256']==sha(ROOT/'tests/vorbis_block_matrix/generate_minimal.py'),'corpus helper identity')
         spec=importlib.util.spec_from_file_location('floor1_fixture_identity',generator)
         generated=importlib.util.module_from_spec(spec);spec.loader.exec_module(generated)
@@ -144,11 +150,18 @@ def main():
         r['corpus_manifest_sha256']=sha(corpus/'manifest.json')
         shutil.copytree(out/'sources/main',out/'variant')
         setup=out/'variant/vorbis_repair/setup.c'
-        if a.control:
+        if a.control in ('count','unique'):
             data=setup.read_bytes();guard=COUNT_GUARD if a.control=='count' else UNIQUE_GUARD
             # Preserve each platform's existing line endings outside the selected guard.
             if guard not in data:guard=guard.replace(b'\n',b'\r\n')
             need(data.count(guard)==1,'control anchor changed');setup.write_bytes(data.replace(guard,b'',1))
+        elif a.control=='old-tail':
+            header=out/'variant/vorbis_repair/floor1_render.h'
+            data=header.read_bytes()
+            anchor=b'out[j] = repair_floor1_multiply(out[j], repair_floor1_from_db[ly]);'
+            need(data.count(anchor)==1,'old-tail anchor changed')
+            # Defined product bits reproduce old int32 multiplication without C overflow.
+            header.write_bytes(data.replace(anchor,b'out[j] = repair_floor1_multiply(out[j], ly * 32768);',1))
         r['variant_sources']={str(x.relative_to(out)):sha(x) for x in (out/'variant').rglob('*') if x.is_file()}
         shutil.copytree(out/'sources/project',out/'project')
         shutil.copyfile(out/'sources/sdkconfig.defaults',out/'project/sdkconfig.defaults')
@@ -158,7 +171,7 @@ def main():
         current();save()
         run('build',[ps,'-NoProfile','-NonInteractive','-File',out/'sources/project/sdk-build.ps1',
             '-Campaign',out,'-SdkDirectory',sdk,'-ToolsDirectory',tools,'-CodecDirectory',codec,
-            '-PythonExecutable',py,'-Target',a.target],1200)
+            '-PythonExecutable',py,'-Target',a.target,'-Renderer',a.renderer],1200)
         for path in (out/'sdk-build.stdout.log',out/'sdk-build.stderr.log'):
             need(path.is_file(),'missing actual SDK child log')
             r['build_outputs'][str(path.relative_to(out))]=sha(path)
@@ -169,7 +182,9 @@ def main():
         cc=Path(desc['c_compiler']);nm=cc.with_name(cc.name.replace('gcc','nm'))
         for tool in (cc,nm):r['tools'][str(tool)]=sha(tool)
         symbols=run('symbols',[nm,'-n','-S',elf])
-        for symbol in ('__wrap_esp_vorbis_dec_open','__wrap_esp_vorbis_dec_decode','esp_vorbis_dec_open','esp_vorbis_dec_decode'):
+        required_symbols=['__wrap_esp_vorbis_dec_open','__wrap_esp_vorbis_dec_decode','esp_vorbis_dec_decode']
+        required_symbols+=['__wrap_floor1_inverse2'] if a.renderer=='on' else ['esp_vorbis_dec_open']
+        for symbol in required_symbols:
             need(re.search(r'\b'+symbol+'$',symbols,re.M),'missing symbol '+symbol)
         rows=json.loads((build/'compile_commands.json').read_text())
         r['compile_rows']=[x for x in rows if Path(x['file']).resolve().is_relative_to(out/'variant')]
@@ -197,20 +212,20 @@ def main():
         need(log.count('FLOOR1_CONTROLLED_STOP')==1,'controlled terminal marker')
         core=1 if a.target=='esp32' else 0
         need(re.findall(r'^FLOOR1_START coordinator=0 decoder=(\d+)$',log,re.M)==[str(core)],'task cores')
-        accepted_rows=re.findall(r'^FLOOR1_ACCEPT case=(\d+) name=(\S+) packets=14 pcm=28160 original_exact=1 core=(\d+)$',log,re.M)
+        marker='renderer_repair=1' if a.renderer=='on' else 'original_exact=1'
+        accepted_rows=re.findall(r'^FLOOR1_ACCEPT case=(\d+) name=(\S+) packets=14 pcm=28160 '+marker+r' core=(\d+)$',log,re.M)
         rejected_rows=re.findall(r'^FLOOR1_REJECT case=(\d+) name=(\S+) result=-1 handle=0 core=(\d+)$',log,re.M)
         need(accepted_rows==[(str(i),matrix['cases'][i]['id'],str(core)) for i in range(8)],'complete accepted prefix')
         opens=re.findall(r'^FLOOR1_OPEN case=(\d+) result=(-?\d+) handle=([01])$',log,re.M)
         rejected_end=12 if a.control=='count' else 8 if a.control=='unique' else 14
         need(rejected_rows==[(str(i),matrix['cases'][i]['id'],str(core)) for i in range(8,rejected_end)],'exact rejected prefix')
         expected_opens=[(str(i),'0','1') for i in range(8)]+[(str(i),'-1','0') for i in range(8,rejected_end)]
-        if a.control:expected_opens.append((str(rejected_end),'0','1'))
+        if a.control in ('count','unique'):expected_opens.append((str(rejected_end),'0','1'))
         need(opens==expected_opens,'exact setup open outcomes; only accepted malformed setup qualifies a control')
         pcm_rows=re.findall(r'^FLOOR1_PCM case=(\d+) packet=(\d+) consumed=(\d+) bytes=(\d+) hex=([0-9a-f]*)$',log,re.M)
         need(len(pcm_rows)==112 and [(int(x[0]),int(x[1])) for x in pcm_rows]==[(c,p) for c in range(8) for p in range(14)],'complete ordered PCM prefix')
-        offsets=matrix['offsets'];expected_bytes=matrix['cases'][0]['expected_packet_bytes']
-        need(all(int(x[2])==offsets[int(x[1])+1]-offsets[int(x[1])] and
-                 int(x[3])==expected_bytes[int(x[1])] and len(bytes.fromhex(x[4]))==int(x[3])
+        need(all(int(x[2])==matrix['cases'][int(x[0])]['offsets'][int(x[1])+1]-matrix['cases'][int(x[0])]['offsets'][int(x[1])] and
+                 int(x[3])==matrix['cases'][int(x[0])]['expected_packet_bytes'][int(x[1])] and len(bytes.fromhex(x[4]))==int(x[3])
                  for x in pcm_rows),'per-packet consumption and PCM bytes')
         (out/'pcm').mkdir()
         for c in range(8):
@@ -219,20 +234,21 @@ def main():
             (out/'pcm'/f'{c}.s16le').write_bytes(data)
         r['observed']=dict(accepted=accepted_rows,rejected=rejected_rows,opens=opens,
             pcm={str(x.relative_to(out)):sha(x) for x in (out/'pcm').iterdir()})
-        if a.control:
+        if a.control in ('count','unique'):
             expected='12' if a.control=='count' else '8'
             need(failures==[(expected,'invalid_setup_rejected')] and not summaries,'exact guard control')
             r['observed']['exact_failure']=failures[0];r['control_effective']=True
         else:
             need(not failures and summaries==[('8','6','112','225280',str(core))],'complete finite matrix')
             r['observed']['summary']=summaries[0]
-            r['passed']=True
+            r['target_capture_completed']=True
+            r['passed']=a.renderer=='off'
         current()
         need(all(sha(out/path)==digest for group in ('variant_sources','project_sources','build_outputs') for path,digest in r[group].items()),'execution bytes changed')
         need(run('sdk-head-after',[git,'-c','core.longpaths=true','-C',sdk,'rev-parse','HEAD']).strip()==SDK_HEAD[a.target],'SDK identity changed')
         need(not run('sdk-clean-after',[git,'-c','core.longpaths=true','-C',sdk,'status','--porcelain','--untracked-files=no']).strip(),'SDK modified after')
-        r.update(completed=True,result='CONTROL_EFFECTIVE' if a.control else 'FINITE_MATRIX_PASSED',
-            limitations='Raw floor1 fixture only. No QMP EOF claim, allocation-failure, radio, hardware or full G6 qualification; selected files/tools, not full dependency closure.')
+        r.update(completed=True,result='CONTROL_EFFECTIVE' if a.control in ('count','unique') else 'RENDER_CAPTURED' if a.renderer=='on' else 'FINITE_MATRIX_PASSED',
+            limitations='Raw floor1 fixture only. Renderer captures, including old-tail, need independent numerical comparison; no same-loader unchanged vendor oracle. No QMP EOF, allocation-failure, radio, hardware or full G6 qualification; selected files/tools, not full dependency closure.')
         save();print(json.dumps({k:r[k] for k in ('completed','passed','control_effective','result')}));return 0
     except BaseException as exc:
         r.update(completed=False,passed=False,result='NONPASS',error=repr(exc));save();raise

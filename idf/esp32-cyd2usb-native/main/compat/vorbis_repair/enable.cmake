@@ -34,7 +34,7 @@ function(native_enable_vorbis_repair)
         endif()
     endforeach()
     get_filename_component(main "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
-    foreach(source setup.c simple.c output.c)
+    foreach(source setup.c simple.c output.c floor1_render.h)
         if(NOT EXISTS "${main}/vorbis_repair/${source}")
             message(FATAL_ERROR "Vorbis repair missing canonical ${source}")
         endif()
@@ -50,6 +50,7 @@ function(native_enable_vorbis_repair)
         "-Wl,--wrap=esp_vorbis_dec_open"
         "-Wl,--wrap=esp_vorbis_dec_register"
         "-Wl,--wrap=esp_vorbis_dec_decode"
+        "-Wl,--wrap=floor1_inverse2"
         "-Wl,--wrap=esp_audio_simple_dec_open"
         "-Wl,--wrap=esp_audio_simple_dec_process"
         "-Wl,--wrap=esp_audio_simple_dec_reset"
