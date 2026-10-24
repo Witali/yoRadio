@@ -191,8 +191,12 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   дополнительно проверяет generic open/process/get_info/close на CYD и C3:
   по14 циклов регистрации,112 пакетов/225280 PCM байт и312 повторных отказов
   малому выходному буферу. Checked open/decode выбираются через public ops;
-  весь PCM имеет max1 относительно Xiph. Reset проверен только как указатель.
-  Полные G1/G6 открыты; bridge в radio не подключён.
+  весь PCM имеет max1 относительно Xiph. Следующий
+  [public raw reset checkpoint](../tests/results/vorbis-raw-reset-20261024/README.md)
+  проверяет реальное повторное использование handle: по 72 reset, 656 обработок
+  пакетов и 336 отказов малому буферу на CYD/C3. Все повторные PCM совпадают
+  побайтно с baseline, независимо сравнённым с Xiph при max1.
+  Полные G1/G3/G6 открыты; bridge в radio не подключён.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
   Xtensa векторов; host331 точный вектор и34 UBSan NONPASS остаются отдельно.
@@ -1254,3 +1258,30 @@ Stream остаётся на core0, decode/output на core1 с прежними
   положения проверки. Первые configure-only отказы обеих целей сохранены;
   QEMU в них не запускался. Это частичная квалификация G1. Полные G1/G6,
   reset/Ogg/OOM/SMP, radio/resource/physical gates остаются открытыми.
+
+- 2026-10-24, CYD-C3-14/G1/G3: [public raw reset checkpoint](../tests/results/vorbis-raw-reset-20261024/README.md)
+  проходит на CYD и C3 с их собственными SDK, архивами и QEMU.
+  Один generic opaque handle на допустимый случай используется последовательно:
+  initial reset перед baseline, reset после полного прохода, reset после
+  префиксов 7/5 пакетов, после трёх tiny retries и три повторных reset подряд.
+  Выполнены 9 вызовов на случай / 72 всего: baseline 112 + replay 448 +
+  prefix 96 = 656 принятых пакетов; 312 baseline + 24 reset retries.
+  PCM: 225280 + 901120 + 212992 = 1339392 байта. Каждый replay/prefix
+  побайтно совпадает с соответствующим baseline; полное сравнение baseline
+  с Xiph даёт max1 при прежнем пределе 2. Все 14 свежих reference-команд
+  штатно завершаются: 8 допустимых случаев и 6 отказов ошибочным заголовкам.
+  Отдельный ESP32 skip-control после baseline/round 0/prefix 7 даёт 2304
+  лишних PCM байта и точный `reset_primer_empty`, закрывает handle и очищает
+  registry. Проходят
+  14 reset protocol, 22 CMake phase, прежние 12 registry protocol и 8 classifier
+  host-тестов. Первые SDK попытки сохранены как NONPASS до запуска compiler;
+  причина WinError 623 воспроизводится в sandbox, установленный GCC исправен
+  вне него. Повторные запуски завершены через обычное разрешение на исполнение.
+  Production source/core/stack/priority не менялись. В fixture CYD coordinator
+  core 0/worker core 1, C3 core 0; priority 3/stack 16384.
+  Espressif 2.6.2 разрешает повторное использование handle после reset и
+  запрещает reset одновременно с processing; сценарии последовательные.
+  [Xiph restart](https://xiph.org/vorbis/doc/libvorbis/vorbis_synthesis_restart.html)
+  задаёт freshly initialized synthesis state. Это частичная квалификация
+  G1/G3; полные G1/G3/G6, deferred Ogg, integration/resource/physical gates
+  остаются открытыми.

@@ -366,3 +366,49 @@ configuration failures are preserved; neither reached QEMU. This advances
 the selected public callback path within G1. Full G1/G6, reset, Ogg,
 allocation/lifetime/SMP service, radio integration and physical resource
 acceptance remain open. Production source and task affinity are unchanged.
+
+## Public raw reset checkpoint, 2026-10-24
+
+The optional [reset caller](../tests/target/vorbis_floor1_positions_qemu/main/reset_cycles.h)
+reuses one opaque generic handle per valid case on its single owner task.
+The pinned Espressif codec 2.6.2 public `esp_audio_dec.h` describes resetting
+processing state/cached buffers and reusing the handle without reopening;
+it warns against reset during processing. Xiph's public
+[`vorbis_synthesis_restart`](https://xiph.org/vorbis/doc/libvorbis/vorbis_synthesis_restart.html)
+documents restoration of freshly initialized synthesis state. These public
+contracts motivate the empty-primer and baseline-equivalence assertions;
+the vendor's internal reset call path is not examined.
+
+Each of eight valid cases requires an initial reset before its baseline,
+a full replay after reset, replays after 7- and 5-packet prefixes, three tiny
+retries before the latter reset, and a replay after three consecutive resets.
+There are 9 calls per handle / 72 total. Invalid setups never reach reset.
+The finite matrix counts 112 baseline + 448 replay + 96 prefix packets = 656,
+312 baseline + 24 reset retries, and 225280 + 901120 + 212992 = 1339392 PCM
+bytes. Every complete replay and prefix equals the corresponding captured
+baseline bytes, including every final PCM16 sample. Metadata, consumption,
+output guards and exact needed capacities are checked. Independent complete
+baseline/Xiph comparison has maximum error 1 under the unchanged project
+bound 2, without signal transforms. All 14 fresh reference commands terminate
+normally: eight decode and six reject malformed setups. The replay/prefix
+byte equality binds their complete vectors to that numerical comparison.
+
+The separate ESP32 `reset-skip` image omits only the case-0 round-1 restart
+after the complete baseline, round-0 replay and 7-packet prefix. It retains
+2304 actual unexpected primer bytes, then the exact `reset_primer_empty`
+failure, owned-handle close, public registry cleanup and controlled stop.
+An empty primer, different failure, panic or timeout cannot qualify it.
+
+Fourteen reset-protocol host methods, 22 CMake phase methods, the existing
+12 registry-protocol methods and 8 reference-classifier methods pass. Initial
+SDK attempts remain preserved NONPASS before compiler execution: sandbox
+WinError 623 prevented tool startup. The installed GCC works outside the
+sandbox; normal approved execution completes both targets and the control.
+The [saved evidence](../tests/results/vorbis-raw-reset-20261024/README.md)
+retains those attempts and explicit reuse of reviewed pure protocol parsers;
+the offline signed16 metrics are independently recomputed. Production source,
+task cores, stacks and priorities are unchanged. The fixture uses CYD
+coordinator 0/worker 1, C3 core 0, priority 3 and stack 16384. This is
+a finite public raw G1/G3 subset. Full G1/G3/G6, the explicitly deferred Ogg
+work, allocation/lifetime/SMP integration, radio and physical resources remain
+open.

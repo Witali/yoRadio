@@ -61,14 +61,18 @@ def main():
     p.add_argument('--corpus-kind', choices=['positions', 'slopes'], default='positions')
     p.add_argument('--renderer', choices=['on', 'off'], default='off')
     p.add_argument('--dispatch', choices=['direct', 'registered'], default='direct')
-    p.add_argument('--control', choices=['count', 'unique', 'old-tail', 'register-open', 'register-decode'])
+    p.add_argument('--reset-cycles', action='store_true')
+    p.add_argument('--control', choices=['count', 'unique', 'old-tail', 'register-open', 'register-decode', 'reset-skip'])
     a = p.parse_args()
     need(a.control!='old-tail' or a.renderer=='on','old-tail requires the explicit renderer path')
     need(a.corpus_kind!='slopes' or a.renderer=='on','per-case slope packets require renderer harness')
     binding_control = a.control in ('register-open', 'register-decode')
     need(not binding_control or a.dispatch == 'registered', 'registration controls require registered dispatch')
-    need(a.dispatch != 'registered' or (a.renderer == 'on' and a.control in (None, 'register-open', 'register-decode')),
+    need(a.dispatch != 'registered' or (a.renderer == 'on' and a.control in (None, 'register-open', 'register-decode', 'reset-skip')),
          'registered dispatch requires renderer and its own binding controls')
+    need(not a.reset_cycles or (a.dispatch == 'registered' and a.control in (None, 'reset-skip')),
+         'reset cycles require registered dispatch without binding controls')
+    need(a.control != 'reset-skip' or a.reset_cycles, 'reset-skip requires reset cycles')
     out = a.output.resolve()
     runtimes = [getattr(a, name).resolve() for name in ('idf','idf_tools','codec','powershell','qemu','rom')]
     need(out.is_relative_to(ROOT/'.build') and out != ROOT/'.build' and not out.exists(), 'fresh .build output required')
@@ -81,7 +85,7 @@ def main():
     out.mkdir(parents=True)
     r = dict(completed=False,passed=False,control_effective=False,target=a.target,control=a.control,
         renderer=a.renderer,dispatch=a.dispatch,corpus_kind=a.corpus_kind,target_capture_completed=False,numerical_reference_qualified=False,
-        registered_callbacks_qualified=False,
+        registered_callbacks_qualified=False,reset_cycles=a.reset_cycles,raw_reset_behavior_qualified=False,
         full_G6_qualified=False,production_radio_integration=False,physical_device=False,
         commands=[],inputs={},tools={},build_outputs={},scope=__doc__)
     env = os.environ.copy()
@@ -132,7 +136,7 @@ def main():
         need(all(sha(out/path)==digest for group in ('variant_sources','project_sources','build_outputs')
                  for path,digest in r[group].items()),'execution bytes changed')
         r.update(completed=True,result=result,
-            limitations='Finite raw fixture only. Renderer captures need independent numerical comparison; no shared-renderer unchanged vendor oracle. Registered dispatch covers public callbacks and capacity retries, not reset behavior or full callback ABI. No Ogg, QMP EOF, allocation-failure, radio, hardware or full G6 qualification; selected files/tools, not full dependency closure.')
+            limitations='Finite raw fixture only. Renderer captures need independent numerical comparison; no shared-renderer unchanged vendor oracle. Optional reset cycles cover sequential public raw handle reuse only; default registered dispatch does not call reset. No full callback ABI, Ogg, QMP EOF, allocation-failure, radio, hardware or full G6 qualification; selected files/tools, not full dependency closure.')
         save();print(json.dumps({k:r[k] for k in ('completed','passed','control_effective','result')}));return 0
     try:
         save()
@@ -151,6 +155,8 @@ def main():
         freeze(Path(__file__),Path('runner.py'))
         if a.dispatch == 'registered':
             freeze(ROOT/'tests/vorbis_registered_protocol.py',Path('registered_protocol.py'))
+        if a.reset_cycles:
+            freeze(ROOT/'tests/vorbis_reset_protocol.py',Path('reset_protocol.py'))
         freeze(ROOT/'tests/vorbis_format_corpus/generate_floor1_positions.py',Path('generator.py'))
         generator=ROOT/('tests/vorbis_format_corpus/generate_floor1_'+a.corpus_kind+'.py')
         if a.corpus_kind=='slopes':freeze(generator,Path('slopes-generator.py'))
@@ -200,12 +206,19 @@ def main():
         shutil.copyfile(out/'sources/sdkconfig.defaults',out/'project/sdkconfig.defaults')
         shutil.copyfile(out/'sources/partitions.csv',out/'project/partitions.csv')
         shutil.copyfile(out/'sources/corpus/fixture.h',out/'project/main/fixture.h')
+        if a.control == 'reset-skip':
+            reset_header = out/'project/main/reset_cycles.h'
+            data = reset_header.read_bytes()
+            anchor = b'#define VORBIS_RESET_SKIP_CONTROL 0'
+            need(data.count(anchor) == 1, 'single frozen reset-skip control anchor')
+            reset_header.write_bytes(data.replace(anchor, b'#define VORBIS_RESET_SKIP_CONTROL 1', 1))
         r['project_sources']={str(x.relative_to(out)):sha(x) for x in (out/'project').rglob('*') if x.is_file()}
         current();save()
         run('build',[ps,'-NoProfile','-NonInteractive','-File',out/'sources/project/sdk-build.ps1',
             '-Campaign',out,'-SdkDirectory',sdk,'-ToolsDirectory',tools,'-CodecDirectory',codec,
             '-PythonExecutable',py,'-Target',a.target,'-Renderer',a.renderer,
-            '-Dispatch',a.dispatch,'-BindingControl',a.control if binding_control else 'none'],1200)
+            '-Dispatch',a.dispatch,'-BindingControl',a.control if binding_control else 'none',
+            '-ResetCycles','on' if a.reset_cycles else 'off'],1200)
         for path in (out/'sdk-build.stdout.log',out/'sdk-build.stderr.log'):
             need(path.is_file(),'missing actual SDK child log')
             r['build_outputs'][str(path.relative_to(out))]=sha(path)
@@ -222,6 +235,8 @@ def main():
             required_symbols += ['esp_vorbis_dec_register' if a.control == 'register-open' else '__wrap_esp_vorbis_dec_register', 'esp_audio_dec_get_ops',
                                  'esp_audio_dec_open', 'esp_audio_dec_process', 'esp_audio_dec_get_info',
                                  'esp_audio_dec_close', 'esp_audio_dec_unregister']
+        if a.reset_cycles:
+            required_symbols += ['esp_audio_dec_reset']
         for symbol in required_symbols:
             need(re.search(r'\b'+symbol+'$',symbols,re.M),'missing symbol '+symbol)
         rows=json.loads((build/'compile_commands.json').read_text())
@@ -230,6 +245,9 @@ def main():
         if a.dispatch == 'registered':
             r['harness_compile_rows'] = [row for row in rows if Path(row['file']).resolve() == out/'project/main/registered.c']
             need(len(r['harness_compile_rows']) == 1, 'actual registered fixture compilation')
+            if a.reset_cycles:
+                need(re.search(r'(?:^|\s)-DVORBIS_RESET_CYCLES=1(?:\s|$)',
+                               r['harness_compile_rows'][0]['command']), 'actual reset-enabled fixture compilation')
             for path in (build/'compile_commands.json', build/'project_description.json'):
                 r['build_outputs'][str(path.relative_to(out))] = sha(path)
         config=(out/'sdkconfig').read_text()
@@ -255,6 +273,18 @@ def main():
         need(log.count('FLOOR1_CONTROLLED_STOP')==1,'controlled terminal marker')
         core=1 if a.target=='esp32' else 0
         need(re.findall(r'^FLOOR1_START coordinator=0 decoder=(\d+)$',log,re.M)==[str(core)],'task cores')
+        if a.reset_cycles:
+            from vorbis_reset_protocol import validate_log as validate_reset
+            qemu_command = next(row for row in r['commands'] if row['name'] == 'qemu')
+            r['observed_reset'] = validate_reset(log, matrix, a.target, a.control,
+                returncode=qemu_command['exit_status'], timed_out=qemu_command['state'] != 'complete',
+                interrupted=qemu_command['state'] == 'interrupted')
+            if a.control == 'reset-skip':
+                need(failures == [('0', 'reset_primer_empty')], 'exact reset-skip behavioral witness')
+                r['observed'] = dict(exact_failure=failures[0])
+                r['control_effective'] = True
+                return finish('RESET_SKIP_CONTROL_EFFECTIVE')
+            r['raw_reset_behavior_qualified'] = True
         if a.dispatch == 'registered':
             from vorbis_registered_protocol import validate_log
             qemu_command = next(row for row in r['commands'] if row['name'] == 'qemu')
@@ -300,7 +330,9 @@ def main():
         return finish('CONTROL_EFFECTIVE' if a.control in ('count','unique') else
                       'RENDER_CAPTURED' if a.renderer=='on' else 'FINITE_MATRIX_PASSED')
     except BaseException as exc:
-        r.update(completed=False,passed=False,result='NONPASS',error=repr(exc));save();raise
+        r.update(completed=False,passed=False,control_effective=False,
+                 registered_callbacks_qualified=False,raw_reset_behavior_qualified=False,
+                 target_capture_completed=False,result='NONPASS',error=repr(exc));save();raise
 
 
 if __name__=='__main__':sys.exit(main())

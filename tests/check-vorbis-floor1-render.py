@@ -247,6 +247,9 @@ class Checker:
              'actual variant compilation rows')
         dispatch = report.get('dispatch', 'direct')
         need(dispatch in ('direct', 'registered'), 'known raw API dispatch')
+        reset_cycles = report.get('reset_cycles', False)
+        need(type(reset_cycles) is bool and (not reset_cycles or dispatch == 'registered'),
+             'known public raw reset selection')
         need(dispatch != 'registered' or role == 'candidate', 'registered dispatch candidate only')
         source_name = 'main.c' if role == 'baseline' else 'registered.c' if dispatch == 'registered' else 'render.c'
         source = project['project/main/' + source_name]
@@ -269,6 +272,16 @@ class Checker:
                             if Path(row['file']).resolve() == path.parent/'project/main/registered.c']
                 need(len(compiled) == 1 and compiled == report['harness_compile_rows'],
                      'actual compiled registered fixture binding')
+                if reset_cycles:
+                    need(argument(build_argv, '-ResetCycles') == 'on' and
+                         re.search(r'(?:^|\s)-DVORBIS_RESET_CYCLES=1(?:\s|$)', compiled[0]['command']) and
+                         report['raw_reset_behavior_qualified'] is True and
+                         re.search(r'\besp_audio_dec_reset$', symbols, re.M),
+                         'actual reset-enabled compilation and public API symbol')
+                    need(b'#include "reset_cycles.h"' in source and
+                         b'esp_audio_dec_reset(' in project['project/main/reset_cycles.h'] and
+                         b'#define VORBIS_RESET_SKIP_CONTROL 0' in project['project/main/reset_cycles.h'],
+                         'unaltered public reset caller source')
                 tokens = (b'esp_audio_dec_open(', b'esp_audio_dec_process(', b'esp_audio_dec_get_info(',
                           b'esp_audio_dec_close(', b'esp_audio_dec_unregister(', b'guard();',
                           b'"output_canaries"', b'"invalid_setup_rejected"', b'"public_metadata"')
@@ -297,6 +310,14 @@ class Checker:
             actual = validate_log(log, matrix, platform, returncode=logs['qemu'][0]['exit_status'],
                                   timed_out=logs['qemu'][0]['state'] != 'complete', interrupted=False)
             need(actual == report['observed_registry'], 'independent registered protocol replay')
+            if reset_cycles:
+                reset_protocol = ROOT / 'tests/vorbis_reset_protocol.py'
+                need(self.freeze(reset_protocol) == snapshots.get(str(reset_protocol.resolve())),
+                     'executed public raw reset protocol source')
+                from vorbis_reset_protocol import validate_log as validate_reset
+                reset_facts = validate_reset(log, matrix, platform, returncode=logs['qemu'][0]['exit_status'],
+                                            timed_out=False, interrupted=False)
+                need(reset_facts == report['observed_reset'], 'independent ordered raw reset replay')
         need(re.findall(r'^FLOOR1_START coordinator=0 decoder=(\d+)$', log, re.M) == [str(core)] and
              log.count('FLOOR1_CONTROLLED_STOP') == 1, 'coordinator/decoder cores and controlled terminal')
         summary = ['8', '6', '112', '225280', str(core)]
@@ -334,8 +355,12 @@ class Checker:
                  'complete transcript/raw PCM/hash equality')
             pcm[i] = raw
         need(sum(map(len, pcm.values())) == 225280, 'complete target PCM byte count')
+        if reset_cycles:
+            need(reset_facts['baseline_pcm_sha256'] == {str(i): digest(raw) for i, raw in pcm.items()},
+                 'all reset replay vectors bind the numerically compared full baseline')
         return dict(target=platform, core=core, role=role, dispatch=dispatch,
                     registered_callbacks_qualified=dispatch == 'registered',
+                    raw_reset_behavior_qualified=reset_cycles,
                     report=str(path), report_sha256=digest(path.read_bytes()),
                     pcm_bytes=225280, pcm_sha256={str(i): digest(raw) for i, raw in pcm.items()},
                     metadata_evidence='Frozen executable harness checks stereo48k/S16 and canaries before PCM publication.'), pcm

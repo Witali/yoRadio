@@ -54,6 +54,9 @@ static void guard(void) {
     for(unsigned i=0;i<16;i++)
         check(pcm.before[i]==0xa5 && pcm.after[i]==0x5a,"output_canaries");
 }
+#ifdef VORBIS_RESET_CYCLES
+#include "reset_cycles.h"
+#endif
 static void unregister_case(void) {
     esp_audio_dec_unregister(ESP_AUDIO_TYPE_VORBIS);
     check(empty_registry(),"registry_unregistered");
@@ -114,6 +117,9 @@ static void decode_task(void *unused) {
             continue;
         }
         check(result==ESP_AUDIO_ERR_OK && checked!=NULL,"valid_setup_open");
+#ifdef VORBIS_RESET_CYCLES
+        reset_initial();
+#endif
         unsigned total=0;
         for(unsigned packet=0;packet<FIXTURE_PACKETS;packet++) {
             uint32_t len=offsets[packet+1]-offsets[packet];
@@ -153,9 +159,15 @@ static void decode_task(void *unused) {
                 case_index,packet,raw.consumed,out.decoded_size);
             for(unsigned i=0;i<out.decoded_size;i++) printf("%02x",pcm.data[i]);
             printf("\n"); total+=out.decoded_size; packets_done++;
+#ifdef VORBIS_RESET_CYCLES
+            reset_capture(packet,pcm.data,out.decoded_size);
+#endif
             if(!(packet&3)) vTaskDelay(1);
         }
         check(total==FIXTURE_PCM_BYTES,"complete_case_pcm");
+#ifdef VORBIS_RESET_CYCLES
+        reset_exercise(c,packets,offsets);
+#endif
         esp_audio_dec_close(checked); checked=NULL; checked_owned=false; closes++;
         printf("VORBIS_REGISTRY_CLOSE case=%u called=1 core=%d\n",case_index,xPortGetCoreID());
         unregister_case();
@@ -166,6 +178,9 @@ static void decode_task(void *unused) {
     }
     check(accepted==8 && rejected==6 && registrations==14 && bindings==14 && closes==8 &&
         unregistrations==14 && metadata==112 && retries==312,"complete_registry_matrix");
+#ifdef VORBIS_RESET_CYCLES
+    reset_summary();
+#endif
     printf("VORBIS_REGISTRY_COMPLETE registrations=14 bindings=14 closes=8 unregistrations=14 metadata=112 retries=312 core=%d\n",xPortGetCoreID());
     printf("FLOOR1_COMPLETE accepted=%u rejected=%u packets=%u pcm=%u core=%d\n",
         accepted,rejected,packets_done,pcm_bytes,xPortGetCoreID());

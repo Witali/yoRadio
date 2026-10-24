@@ -111,3 +111,47 @@ test requires a fresh output directory; supply `--cmake` when the pinned
 default executable is unavailable. First SDK configure failures are retained;
 their misplaced discovery guard was fixed before the successful captures.
 Full G1/G6, reset/Ogg, production radio and physical acceptance remain open.
+
+## Optional sequential public raw reset cycles
+
+`--dispatch registered --renderer on --reset-cycles` includes
+[reset_cycles.h](main/reset_cycles.h). The default registered mode still does
+not invoke reset. One generic opaque handle per valid setup remains on its
+owner task: initial reset before the baseline; reset/full replay; prepare
+reset/prefix 7/restart/full replay; prepare reset/prefix 5/three one-byte
+retries/restart/full replay; and three consecutive resets/full replay. This
+is 9 public reset calls per valid case, 72 total. Invalid setups have no reset
+events. No production source or task affinity is changed.
+
+The strict interleaved registry/reset protocol requires 112 baseline + 448
+replay + 96 prefix = 656 accepted packets and 312 + 24 rejected tiny retries.
+The corresponding PCM totals are 225280 + 901120 + 212992 = 1339392 bytes.
+Every replay/prefix byte must equal its baseline packet slice; public metadata,
+full consumption, capacities and canaries remain checked. Reports retain
+hashes/counts while the existing baseline PCM files support the independent
+Xiph comparison at the fixed bound 2. Both architectures complete this
+matrix; full signed16 comparison has maximum error 1. Eight fresh Xiph
+references decode and six malformed setups receive normal codec refusals.
+
+`--control reset-skip` additionally requires reset cycles and skips only the
+case-0 round-1 restart. The full baseline, round-0 replay and 7-packet prefix
+must precede the actual nonempty full-primer record and exact
+`reset_primer_empty` failure, owned-handle close, registry cleanup and controlled
+stop. No unrelated failure or timeout qualifies the control. The separate
+ESP32 image demonstrates the required 2304-byte unexpected primer and cleanup.
+
+```text
+python -B tests/test-vorbis-reset-protocol.py -v
+```
+
+The 14 reset-protocol, 22 CMake phase, existing 12 registry-protocol and 8
+reference-classifier host methods pass. Initial SDK NONPASS attempts stopped
+before compiler execution on sandbox WinError 623 and remain preserved. Normal
+approved execution outside the sandbox completes the same frozen sources. The
+[reset evidence](../../results/vorbis-raw-reset-20261024/README.md) keeps their
+history. Espressif codec 2.6.2 documents handle reuse after reset and disallows
+reset during processing; all fixture calls are sequential. Xiph's
+[restart contract](https://xiph.org/vorbis/doc/libvorbis/vorbis_synthesis_restart.html)
+provides the freshly initialized-state expectation. This finite public raw
+subset leaves full G1/G3/G6, deferred Ogg, production radio, integration and
+physical resource acceptance open.
