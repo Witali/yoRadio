@@ -4297,3 +4297,28 @@ Supplement verifier повторно проверил весьbase70 archive и 
 pins из Git05da без reset рабочей копии; неверныйE5D (24pin differences) отклонён.
 Exact45lossless pairs выведены изactual successful SOF3 RAM diagnostics, не списка
 генерируемых файлов. Producer inputs/current app identity сохраняются отдельно.
+
+## 2026-10-24 — cold recovery на8границах публикации фото
+
+Новый отдельный storage harness прерывает реальные HTTP/cache/settings операции
+неизменённой production9C1A83BD после completed SDK call/HTTP chunk. Сохраняет
+paused/stopped actual flash; новый process получает EXACT bytes без reseed.
+8cuts: invalidationbody/footer, sourceerase, firstchunk, firstframepage,
+publicationbody/footer, completefinish. Старый CMYK6 видим только в первых2,
+новый RGB6 только после complete; промежуточные5состояний невидимы. Full committed
+cache footer до settings commit также не публикует photo_size0.
+
+Оба4-case exec88011/66603 terminal0;16owned VMs stopped/reaped.8cold boots и
+8normal gray recovery uploads successful. Independent saved-byte checker повторил
+source/frame/journal/protected identities;10unsafe report/image controls rejected.
+Initial images до первого CPUcontinue, all callback traces/return status и actual
+instruction prefix сохранены; offline verifier связывает их с exact ELF symbols.
+Proof photo-publication-validation-20261024.json. DOM policy16cases также pass.
+Archive57full physical images/78raw items,60416new gzip bytes плюс JSON metadata;
+все4MiB identities восстанавливаются побайтно, прежние sector payloads reused.
+
+Два failed pilots — ошибки observer: numeric response parsing доcut; затем30s
+host recovery timeout. Они не засчитаны. Final900s host observer не меняет firmware
+guest time/write policies. No app/SDK/frozenQEMU/physical/push changes. Проверены
+selected completed-operation boundaries; actual in-page electrical cuts, SDK I/O/
+allocation/NVS-internal faults и остальные требования плана остаются открытыми.

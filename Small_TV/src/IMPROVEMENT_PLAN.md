@@ -85,8 +85,14 @@ lowerbound15468 не является simultaneous whole-app peak. Два lossle
 вектора превышают source slot; дополнительные27754/36999-byte gradient fixtures
 на том же app/ELF/source прошли настоящий decode и exact physical pixel/RAM gate.
 Теперь исполнены все45precision/color pairs2..16×gray/RGB/CMYK; это не все
-возможные JPEG streams. Current actual I/O/allocation faults, publication cuts, lifecycle/churn,
-whole-image/full/24h/hardware остаются открытыми.
+возможные JPEG streams. Current actual I/O/allocation faults, exhaustive publication
+cuts, lifecycle/churn, whole-image/full/24h/hardware остаются открытыми.
+Выбранные8границ между completed SDK operations проверены отдельно:
+[PHOTO_PUBLICATION.md](tests/PHOTO_PUBLICATION.md).16fresh owned processes,
+8exact cold backings и8успешных recovery uploads; весь physical flash/authority
+проверен offline,10negative controls отвергнуты. Partial cache никогда не видим;
+committed cache до settings commit тоже не публикуется. Это abrupt process cuts,
+не in-page electrical power loss, injected SDK I/O/allocation или NVS-internal faults.
 
 Checkpoint 2026-10-23: реальные upload/UI используют общего владельца codec и
 проверенный RGB565 cache. Фоновая очередь и SDK async HTTP освобождают HTTP task;

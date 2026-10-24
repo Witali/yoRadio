@@ -3035,3 +3035,36 @@ skips hash verification. Base70 source357pins match05da, wrongE5D differs24files
 Supplement recursively rechecks all192base images/RAM +6additional images/4RAM,
 then derives exact45modes from actual successful SOF3 diagnostics. This proves
 joint coverage without pretending the old producer was today's changed harness.
+
+## CURRENT 2026-10-24 — actual publication operation-boundary cuts
+
+photo_publication_qemu.py исполнил8selected cuts на прежней9C1A83BD/76B5CE37/
+7D95988C/frozenD64. Seed — stopped lossless6 VM flash с CMYK6ready slot5.
+Replacement —27754-byte RGB6, recovery — known gray progressive. Clock seed
+не включает photo prefetch; cold observations оставляют все4MiB unchanged.
+
+Два4-case runs .build/photo-publication-20261024/part-0 иpart-1; exec88011/66603
+terminal0, все16owned processes stopped/reaped. Warm process убивается через
+TerminateProcess pinned own handle после selected completed SDK operation либо
+обычного completed chunk/finish. Hardware RSP only, no memory/register/code writes.
+Paused/stopped bytes exact; cold gets EXACT stopped flash без NVS/settings reseed,
+actual initial image сохранён до первого CPUcontinue. No guest shutdown at cut.
+
+Cuts: invalidation firstbody/footer => oldCMYK visible; source erased/firstchunk/
+firstRGBpage/publication firstbody/footer => absent; fully completefinish => newRGB.
+Последний footer уже имеет full ready physical cache, но photo_size0 не разрешает
+видимость до settings publication. Каждый cold process затем успешно загружает
+gray; source/frame/journal и protected bytes/остальные slots/cache entries exact.
+
+Independent replay4+4pass,5unsafe report/image controls на каждую часть отвергнуты.
+Trace last return/status/address и code prefix сверены с exact ELF. Archive
+photo-publication-validation-20261024.json сохраняет complete physical identities
+через lossless deltas, raw logs/trace/initial/cut/recovered и failed pilots.
+57complete physical images/78raw items,60416new gzip bytes; each full SHA verified.
+First pilot до cut: runner TypeError numeric getclocktype. Second cut/cold прошёл,
+но recovery HTTP observer30s истёк; не counted. Final900s host observation как в
+format harness; guest quotas/timeouts не менялись. Final обаrun success terminal.
+
+Functional NOR/WIP timing не electrical partial-page power loss. Actual SDK I/O/
+malloc faults, NVS-internal publication cuts, exhaustive timing, network lifecycle/
+churn, whole-image/full/24h/hardware remain. No app/SDK/QEMU edits, physical/push нет.
