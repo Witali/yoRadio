@@ -62,17 +62,24 @@ def main():
     p.add_argument('--renderer', choices=['on', 'off'], default='off')
     p.add_argument('--dispatch', choices=['direct', 'registered'], default='direct')
     p.add_argument('--reset-cycles', action='store_true')
-    p.add_argument('--control', choices=['count', 'unique', 'old-tail', 'register-open', 'register-decode', 'reset-skip'])
+    p.add_argument('--open-oom', action='store_true')
+    p.add_argument('--control', choices=['count', 'unique', 'old-tail', 'register-open', 'register-decode',
+                                       'reset-skip', 'oom-legacy', 'oom-global'])
     a = p.parse_args()
     need(a.control!='old-tail' or a.renderer=='on','old-tail requires the explicit renderer path')
     need(a.corpus_kind!='slopes' or a.renderer=='on','per-case slope packets require renderer harness')
     binding_control = a.control in ('register-open', 'register-decode')
     need(not binding_control or a.dispatch == 'registered', 'registration controls require registered dispatch')
-    need(a.dispatch != 'registered' or (a.renderer == 'on' and a.control in (None, 'register-open', 'register-decode', 'reset-skip')),
+    need(a.dispatch != 'registered' or (a.renderer == 'on' and a.control in
+         (None, 'register-open', 'register-decode', 'reset-skip', 'oom-legacy', 'oom-global')),
          'registered dispatch requires renderer and its own binding controls')
     need(not a.reset_cycles or (a.dispatch == 'registered' and a.control in (None, 'reset-skip')),
          'reset cycles require registered dispatch without binding controls')
     need(a.control != 'reset-skip' or a.reset_cycles, 'reset-skip requires reset cycles')
+    need(not a.open_oom or (a.dispatch == 'registered' and not a.reset_cycles and
+                           a.control in (None, 'oom-legacy', 'oom-global')),
+         'open allocation checks require registered dispatch without reset or binding controls')
+    need(a.control not in ('oom-legacy', 'oom-global') or a.open_oom, 'allocation controls require open-oom')
     out = a.output.resolve()
     runtimes = [getattr(a, name).resolve() for name in ('idf','idf_tools','codec','powershell','qemu','rom')]
     need(out.is_relative_to(ROOT/'.build') and out != ROOT/'.build' and not out.exists(), 'fresh .build output required')
@@ -86,6 +93,7 @@ def main():
     r = dict(completed=False,passed=False,control_effective=False,target=a.target,control=a.control,
         renderer=a.renderer,dispatch=a.dispatch,corpus_kind=a.corpus_kind,target_capture_completed=False,numerical_reference_qualified=False,
         registered_callbacks_qualified=False,reset_cycles=a.reset_cycles,raw_reset_behavior_qualified=False,
+        open_oom=a.open_oom,raw_open_oom_qualified=False,
         full_G6_qualified=False,production_radio_integration=False,physical_device=False,
         commands=[],inputs={},tools={},build_outputs={},scope=__doc__)
     env = os.environ.copy()
@@ -99,7 +107,7 @@ def main():
         need(all(sha(path)==row['sha256']==sha(out/row['snapshot']) for path,row in r['inputs'].items()),'input changed')
         need(all(sha(path)==digest for path,digest in r['tools'].items()),'selected tool changed')
     def run(name, argv, timeout=60):
-        argv=list(map(str,argv));row=dict(name=name,argv=argv,cwd=str(out),state='starting')
+        argv=list(map(str,argv));row=dict(name=name,argv=argv,cwd=str(out),state='starting',timeout_seconds=timeout)
         r['commands'].append(row);save();started=time.monotonic();child=None
         so=out/(name+'.stdout.log');se=out/(name+'.stderr.log')
         try:
@@ -136,7 +144,7 @@ def main():
         need(all(sha(out/path)==digest for group in ('variant_sources','project_sources','build_outputs')
                  for path,digest in r[group].items()),'execution bytes changed')
         r.update(completed=True,result=result,
-            limitations='Finite raw fixture only. Renderer captures need independent numerical comparison; no shared-renderer unchanged vendor oracle. Optional reset cycles cover sequential public raw handle reuse only; default registered dispatch does not call reset. No full callback ABI, Ogg, QMP EOF, allocation-failure, radio, hardware or full G6 qualification; selected files/tools, not full dependency closure.')
+            limitations='Finite raw fixture only. Renderer captures need independent numerical comparison; no shared-renderer unchanged vendor oracle. Optional reset cycles cover sequential raw reuse; optional open allocation checks cover own raw open failures and error-scope isolation only. No full callback ABI, Ogg, QMP EOF, full allocation/lifetime gate, radio, hardware or full G6 qualification; selected files/tools, not full dependency closure.')
         save();print(json.dumps({k:r[k] for k in ('completed','passed','control_effective','result')}));return 0
     try:
         save()
@@ -157,6 +165,8 @@ def main():
             freeze(ROOT/'tests/vorbis_registered_protocol.py',Path('registered_protocol.py'))
         if a.reset_cycles:
             freeze(ROOT/'tests/vorbis_reset_protocol.py',Path('reset_protocol.py'))
+        if a.open_oom:
+            freeze(ROOT/'tests/vorbis_open_oom_protocol.py',Path('open_oom_protocol.py'))
         freeze(ROOT/'tests/vorbis_format_corpus/generate_floor1_positions.py',Path('generator.py'))
         generator=ROOT/('tests/vorbis_format_corpus/generate_floor1_'+a.corpus_kind+'.py')
         if a.corpus_kind=='slopes':freeze(generator,Path('slopes-generator.py'))
@@ -201,6 +211,23 @@ def main():
             header.write_bytes(data.replace(anchor,b'out[j] = repair_floor1_multiply(out[j], ly * 32768);',1))
         elif a.control == 'register-decode':
             setup.write_bytes(registration_decode_control(setup.read_bytes()))
+        elif a.control == 'oom-legacy':
+            data = setup.read_bytes()
+            anchor = b'result = open_scope.failed ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_FAIL;'
+            if anchor in data:
+                need(data.count(anchor) == 1, 'single allocation error classification anchor')
+                setup.write_bytes(data.replace(anchor, b'result = ESP_AUDIO_ERR_FAIL;', 1))
+                r['oom_control_source'] = 'restored header-error classification only'
+            else:
+                need(data.count(b'        result = ESP_AUDIO_ERR_FAIL;') == 1,
+                     'known unchanged legacy allocation classification')
+                r['oom_control_source'] = 'unchanged legacy source baseline'
+        elif a.control == 'oom-global':
+            data = setup.read_bytes()
+            anchor = b'static _Thread_local repair_open_scope *repair_active_open_scope;'
+            need(data.count(anchor) == 1, 'single task-local open allocation scope')
+            setup.write_bytes(data.replace(anchor, b'static repair_open_scope *repair_active_open_scope;', 1))
+            r['oom_control_source'] = 'removed open error-scope TLS only'
         r['variant_sources']={str(x.relative_to(out)):sha(x) for x in (out/'variant').rglob('*') if x.is_file()}
         shutil.copytree(out/'sources/project',out/'project')
         shutil.copyfile(out/'sources/sdkconfig.defaults',out/'project/sdkconfig.defaults')
@@ -218,7 +245,7 @@ def main():
             '-Campaign',out,'-SdkDirectory',sdk,'-ToolsDirectory',tools,'-CodecDirectory',codec,
             '-PythonExecutable',py,'-Target',a.target,'-Renderer',a.renderer,
             '-Dispatch',a.dispatch,'-BindingControl',a.control if binding_control else 'none',
-            '-ResetCycles','on' if a.reset_cycles else 'off'],1200)
+            '-ResetCycles','on' if a.reset_cycles else 'off','-OpenOom','on' if a.open_oom else 'off'],1200)
         for path in (out/'sdk-build.stdout.log',out/'sdk-build.stderr.log'):
             need(path.is_file(),'missing actual SDK child log')
             r['build_outputs'][str(path.relative_to(out))]=sha(path)
@@ -237,6 +264,9 @@ def main():
                                  'esp_audio_dec_close', 'esp_audio_dec_unregister']
         if a.reset_cycles:
             required_symbols += ['esp_audio_dec_reset']
+        if a.open_oom:
+            required_symbols += ['__wrap_media_lib_module_calloc', '__wrap_media_lib_free',
+                                 'media_lib_module_calloc', 'media_lib_free', 'esp_vorbis_dec_close']
         for symbol in required_symbols:
             need(re.search(r'\b'+symbol+'$',symbols,re.M),'missing symbol '+symbol)
         rows=json.loads((build/'compile_commands.json').read_text())
@@ -248,6 +278,9 @@ def main():
             if a.reset_cycles:
                 need(re.search(r'(?:^|\s)-DVORBIS_RESET_CYCLES=1(?:\s|$)',
                                r['harness_compile_rows'][0]['command']), 'actual reset-enabled fixture compilation')
+            if a.open_oom:
+                need(re.search(r'(?:^|\s)-DVORBIS_OPEN_OOM=1(?:\s|$)',
+                               r['harness_compile_rows'][0]['command']), 'actual allocation-check fixture compilation')
             for path in (build/'compile_commands.json', build/'project_description.json'):
                 r['build_outputs'][str(path.relative_to(out))] = sha(path)
         config=(out/'sdkconfig').read_text()
@@ -266,13 +299,26 @@ def main():
         qargs=[qemu,'-M',a.target,'-smp','2' if a.target=='esp32' else '1','-L',rom,
             '-display','none','-monitor','none','-serial','stdio','-no-reboot','-snapshot','-nic','none',
             '-drive','file='+str(flash)+',if=mtd,format=raw']
-        log=run('qemu',qargs,180);stderr=(out/'qemu.stderr.log').read_text(errors='replace')
+        log=run('qemu',qargs,600 if a.open_oom else 180);stderr=(out/'qemu.stderr.log').read_text(errors='replace')
         need(not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP',log+stderr),'target panic')
         failures=re.findall(r'^FLOOR1_FAILURE case=(\d+) reason=(\S+)$',log,re.M)
         summaries=re.findall(r'^FLOOR1_COMPLETE accepted=(\d+) rejected=(\d+) packets=(\d+) pcm=(\d+) core=(\d+)$',log,re.M)
         need(log.count('FLOOR1_CONTROLLED_STOP')==1,'controlled terminal marker')
         core=1 if a.target=='esp32' else 0
         need(re.findall(r'^FLOOR1_START coordinator=0 decoder=(\d+)$',log,re.M)==[str(core)],'task cores')
+        if a.open_oom:
+            from vorbis_open_oom_protocol import validate_log as validate_open_oom
+            qemu_command = next(row for row in r['commands'] if row['name'] == 'qemu')
+            r['observed_oom'] = validate_open_oom(log, matrix, a.target, a.control,
+                returncode=qemu_command['exit_status'], timed_out=qemu_command['state'] != 'complete',
+                interrupted=qemu_command['state'] == 'interrupted')
+            if a.control in ('oom-legacy', 'oom-global'):
+                expected_failure = ('0', 'oom_memory_error') if a.control == 'oom-legacy' else ('14', 'oom_task_error_isolation')
+                need(failures == [expected_failure], 'exact allocation control behavioral witness')
+                r['observed'] = dict(exact_failure=failures[0])
+                r['control_effective'] = True
+                return finish('OPEN_OOM_CONTROL_EFFECTIVE')
+            r['raw_open_oom_qualified'] = True
         if a.reset_cycles:
             from vorbis_reset_protocol import validate_log as validate_reset
             qemu_command = next(row for row in r['commands'] if row['name'] == 'qemu')
@@ -332,6 +378,7 @@ def main():
     except BaseException as exc:
         r.update(completed=False,passed=False,control_effective=False,
                  registered_callbacks_qualified=False,raw_reset_behavior_qualified=False,
+                 raw_open_oom_qualified=False,
                  target_capture_completed=False,result='NONPASS',error=repr(exc));save();raise
 
 

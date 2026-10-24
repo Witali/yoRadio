@@ -8,8 +8,20 @@
 #include <string.h>
 extern void *media_lib_module_calloc(const char *, size_t, size_t);
 extern void media_lib_free(void *);
+typedef struct repair_open_scope {
+    bool failed;
+    struct repair_open_scope *previous;
+} repair_open_scope;
+static _Thread_local repair_open_scope *repair_active_open_scope;
+
 static void *repair_alloc(size_t bytes) {
-    return bytes ? media_lib_module_calloc("AUD_Codec", 1, bytes) : NULL;
+    if (!bytes) return NULL;
+    void *allocation = media_lib_module_calloc("AUD_Codec", 1, bytes);
+    // Header helpers share one format-error return for malformed data and OOM.
+    // Attribute actual allocation failures only to this task's current open.
+    if (!allocation && repair_active_open_scope)
+        repair_active_open_scope->failed = true;
+    return allocation;
 }
 static void *repair_calloc(size_t count, size_t bytes) {
     return bytes && count <= SIZE_MAX / bytes ? repair_alloc(count * bytes) : NULL;
@@ -1055,29 +1067,34 @@ esp_audio_err_t __wrap_esp_vorbis_dec_open(void *configuration, uint32_t bytes,
     if (!cfg->info_header || !cfg->info_size || !cfg->setup_header || !cfg->setup_size ||
         cfg->info_size > INT32_MAX || cfg->setup_size > INT32_MAX)
         return ESP_AUDIO_ERR_INVALID_PARAMETER;
+    repair_open_scope open_scope = {.failed = false, .previous = repair_active_open_scope};
+    repair_active_open_scope = &open_scope;
     esp_audio_err_t result = ESP_AUDIO_ERR_MEM_LACK;
     vorbis_wrapper *wrapper = repair_alloc(sizeof(*wrapper));
     vorbis_info *info = NULL;
-    if (!wrapper) return result;
+    if (!wrapper) goto done;
     info = repair_alloc(sizeof(*info));
     if (!info) goto failed;
     info->codec_setup = repair_alloc(sizeof(*info->codec_setup));
     if (!info->codec_setup) goto failed;
     if (repair_header(info, cfg->info_header, cfg->info_size, repair__vorbis_unpack_info) ||
         repair_header(info, cfg->setup_header, cfg->setup_size, repair__vorbis_unpack_books)) {
-        result = ESP_AUDIO_ERR_FAIL;
+        result = open_scope.failed ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_FAIL;
         goto failed;
     }
     wrapper->dsp = repair_dsp_create(info);
     if (!wrapper->dsp) goto failed;
     *handle = wrapper;
-    return ESP_AUDIO_ERR_OK;
+    result = ESP_AUDIO_ERR_OK;
+    goto done;
 failed:
     if (info) {
         repair_vorbis_info_clear(info);
         media_lib_free(info);
     }
     media_lib_free(wrapper);
+done:
+    repair_active_open_scope = open_scope.previous;
     return result;
 }
 

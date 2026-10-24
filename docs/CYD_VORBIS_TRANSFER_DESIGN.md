@@ -412,3 +412,52 @@ coordinator 0/worker 1, C3 core 0, priority 3 and stack 16384. This is
 a finite public raw G1/G3 subset. Full G1/G3/G6, the explicitly deferred Ogg
 work, allocation/lifetime/SMP integration, radio and physical resources remain
 open.
+
+## Checked raw-open allocation checkpoint, 2026-10-24
+
+The pinned Espressif codec 2.6.2 public `esp_vorbis_dec.h` specifies
+`ESP_AUDIO_ERR_MEM_LACK` for allocation failure and `ESP_AUDIO_ERR_FAIL` for
+initialization failure. Actual unchanged-source ESP32 and C3 images expose a
+classification defect: allocation 4 fails while parsing books, cleanup returns
+all observed allocations, but open reports `FAIL`. The first three allocation
+failures correctly report `MEM_LACK` and each allows a complete recovery decode.
+
+Both [setup implementations](../idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c)
+now record actual positive-size calloc failures in a task-local open scope.
+Every post-validation exit restores the previous scope after cleanup, including
+nested opens and successful publication. Zero-size requests and arithmetic
+rejections do not become allocation failures. This changes error classification
+without adding allocator calls, ABI fields, decoder arithmetic or task bindings.
+TLS storage and physical memory/performance effects are not measured.
+
+The optional [public raw caller](../tests/target/vorbis_floor1_positions_qemu/main/open_oom.h)
+observes 32/36/32/36/36/36/36/36 positive allocation positions in eight valid
+setups. Both targets complete single-failure and persistent-failure injection
+at every observed position: 560 failed opens and 560 successful reopen/decode/
+close recoveries per target. Every recovery checks 14 packets / 28160 bytes,
+for 7840 recovery packets / 15769600 PCM bytes. Guarded external allocation
+ledgers end empty, and all six uninjected malformed setups retain `FAIL`.
+Four nested-open pairs and two ordered two-task scenarios check restoration
+and error isolation across CYD cores 0/1 and C3 core 0. Independent handles
+are never processed concurrently with their own close/reset.
+
+Two separate ESP32 controls restore only the old header classification or
+remove only the task-local scope pointer. They reach precisely
+`oom_memory_error` at case 0 and `oom_task_error_isolation` at case 14. The
+latter requires both an allocation-failing companion and an uninjected malformed
+companion: two `MEM_LACK` outcomes alone could hide cross-task contamination.
+All ordered prerequisites, cleanup and normal termination are required.
+
+Independent full captured baseline PCM comparison with 14 fresh Xiph libvorbis
+runs passes at maximum signed16 error 1 under the existing bound 2. Recovery
+PCM equality is a target memcmp assertion against that baseline; recovery
+vectors are not separately captured or independently numerically compared.
+The 18 OOM-protocol, 37 real CMake-phase, 12 registry-protocol and 8 reference
+outcome host methods pass.
+
+The [saved evidence](../tests/results/vorbis-raw-open-oom-20261024/README.md)
+retains initial baselines, both corrected targets, exact controls and an
+offline verifier with explicit reviewed pure-parser reuse and independent PCM
+metrics. This advances finite checked raw-open coverage within G4/G5. Full
+G1/G4/G5/G6, general decode/reset/close allocation failures and lifetime/SMP
+integration, deferred Ogg, radio integration and physical acceptance remain open.

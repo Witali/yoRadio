@@ -39,3 +39,13 @@ ABI fields, allocations or changes to task cores, stacks or priorities.
 
 See [the design and remaining gates](../../../../docs/CYD_VORBIS_TRANSFER_DESIGN.md)
 and [the isolated target](../../../../tests/target/cyd_vorbis_qemu/README.md).
+
+Checked raw open distinguishes actual positive-size allocation failure from
+malformed setup failure using a task-local nested scope, restoring the previous
+scope on every exit after validation. This preserves the public Espressif
+`MEM_LACK` contract without new allocator calls, ABI fields or task bindings.
+The [raw-open checkpoint](../../../../tests/results/vorbis-raw-open-oom-20261024/README.md)
+covers all observed allocation positions in eight finite setups on both targets,
+560 failures/recoveries per target, six malformed setups, four nested pairs and
+two task-isolation scenarios. Full allocation/lifetime, Ogg, radio integration
+and physical resource qualification remain open; TLS cost is not measured.

@@ -7,7 +7,8 @@ param([Parameter(Mandatory)][string]$Campaign,
       [ValidateSet('on','off')][string]$Renderer = 'off',
       [ValidateSet('direct','registered')][string]$Dispatch = 'direct',
       [ValidateSet('none','register-open','register-decode')][string]$BindingControl = 'none',
-      [ValidateSet('on','off')][string]$ResetCycles = 'off')
+      [ValidateSet('on','off')][string]$ResetCycles = 'off',
+      [ValidateSet('on','off')][string]$OpenOom = 'off')
 $ErrorActionPreference = 'Stop'
 $Campaign = [IO.Path]::GetFullPath($Campaign)
 if (!(Test-Path -LiteralPath (Join-Path $Campaign 'report.json') -PathType Leaf)) {
@@ -35,6 +36,7 @@ $idfArgs = @((Join-Path $env:IDF_PATH 'tools/idf.py'),'-C',(Join-Path $Campaign 
     '-D',"FLOOR1_RENDER_MODE=$Renderer",
     '-D',"FLOOR1_DISPATCH_MODE=$Dispatch",'-D',"FLOOR1_BINDING_CONTROL=$BindingControl",
     '-D',"FLOOR1_RESET_MODE=$ResetCycles",
+    '-D',"FLOOR1_OPEN_OOM_MODE=$OpenOom",
     '-D','CMAKE_JOB_POOLS=compile=2;link=1','-D','CMAKE_JOB_POOL_COMPILE=compile','-D','CMAKE_JOB_POOL_LINK=link')
 foreach ($part in @('setup','output','abi','floor')) {
     $relative = if ($part -eq 'abi') { 'vorbis_repair_abi.h' } elseif ($part -eq 'floor') { 'vorbis_repair/floor1_render.h' } else { "vorbis_repair/$part.c" }

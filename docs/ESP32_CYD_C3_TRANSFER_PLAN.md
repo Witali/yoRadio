@@ -1285,3 +1285,29 @@ Stream остаётся на core0, decode/output на core1 с прежними
   задаёт freshly initialized synthesis state. Это частичная квалификация
   G1/G3; полные G1/G3/G6, deferred Ogg, integration/resource/physical gates
   остаются открытыми.
+
+- 2026-10-24, CYD-C3-14/G4/G5: [checked raw-open OOM checkpoint](../tests/results/vorbis-raw-open-oom-20261024/README.md)
+  воспроизводит реальную ошибку на прежних CYD/C3 исходниках: отказ четвёртого
+  calloc при разборе setup превращался в `FAIL` вместо предусмотренного
+  Espressif 2.6.2 `MEM_LACK`. [Исправление CYD](../idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c)
+  и такое же исправление C3 сохраняют причину отказа в отдельной task-local
+  области каждого open с восстановлением после вложенных вызовов и очистки.
+  Новых вызовов allocator, ABI полей, изменений декодирующей арифметики или
+  production core/stack/priority нет; стоимость TLS и физические ресурсы не измерены.
+  [Тестовый public raw caller](../tests/target/vorbis_floor1_positions_qemu/main/open_oom.h)
+  наблюдает 32/36/32/36/36/36/36/36 allocation positions. На каждой архитектуре
+  проходят 560 одиночных/постоянных отказов и 560 полных восстановлений:
+  7840 recovery packets / 15769600 PCM байт, пустой ledger и целые guards.
+  Шесть ошибочных заголовков без OOM сохраняют `FAIL`; четыре nested пары и
+  два ordered task-сценария проверяют восстановление и разделение причин
+  ошибки на CYD cores 0/1 и C3 core 0. Два отдельных ESP32 control images
+  достигают точных `oom_memory_error` на case 0 и `oom_task_error_isolation`
+  на case 14 с обязательными префиксами, очисткой и штатным завершением.
+  Полный baseline PCM сравнён с 14 свежими Xiph запусками: max1 при прежнем
+  пределе2. Recovery равенство подтверждено target memcmp с этим baseline;
+  отдельные recovery PCM vectors не сохранены. Проходят 18 OOM protocol,
+  37 CMake phase, 12 registry protocol и 8 reference outcome host-тестов.
+  Исходные bug baselines, оба corrected targets, controls и offline verification
+  сохраняются в архиве.
+  Это частичное закрытие raw-open G4/G5; полные G1/G4/G5/G6, остальные
+  allocation/lifetime/SMP, deferred Ogg, radio/resource/physical gates остаются.

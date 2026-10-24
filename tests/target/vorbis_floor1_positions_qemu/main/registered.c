@@ -57,6 +57,9 @@ static void guard(void) {
 #ifdef VORBIS_RESET_CYCLES
 #include "reset_cycles.h"
 #endif
+#ifdef VORBIS_OPEN_OOM
+#include "open_oom.h"
+#endif
 static void unregister_case(void) {
     esp_audio_dec_unregister(ESP_AUDIO_TYPE_VORBIS);
     check(empty_registry(),"registry_unregistered");
@@ -89,6 +92,9 @@ static void decode_task(void *unused) {
     check(empty_registry(),"registry_initial_empty");
     printf("VORBIS_REGISTRY_INITIAL empty=1 unsupported=1 core=%d\n",xPortGetCoreID());
     check(FIXTURE_CASES==14 && FIXTURE_PACKETS==14 && FIXTURE_PCM_BYTES==28160,"fixture_matrix");
+#ifdef VORBIS_OPEN_OOM
+    oom_begin();
+#endif
     for(case_index=0;case_index<FIXTURE_CASES;case_index++) {
         const floor1_case_t *c=&cases[case_index];
 #ifdef FLOOR1_PER_CASE_AUDIO
@@ -113,6 +119,9 @@ static void decode_task(void *unused) {
             check(heap_caps_check_integrity_all(true),"rejected_heap_integrity");
             printf("FLOOR1_REJECT case=%u name=%s result=%d handle=0 core=%d\n",
                 case_index,c->name,result,xPortGetCoreID());
+#ifdef VORBIS_OPEN_OOM
+            oom_malformed(c);
+#endif
             unregister_case();
             continue;
         }
@@ -162,6 +171,9 @@ static void decode_task(void *unused) {
 #ifdef VORBIS_RESET_CYCLES
             reset_capture(packet,pcm.data,out.decoded_size);
 #endif
+#ifdef VORBIS_OPEN_OOM
+            oom_capture(packet,pcm.data,out.decoded_size);
+#endif
             if(!(packet&3)) vTaskDelay(1);
         }
         check(total==FIXTURE_PCM_BYTES,"complete_case_pcm");
@@ -170,6 +182,9 @@ static void decode_task(void *unused) {
 #endif
         esp_audio_dec_close(checked); checked=NULL; checked_owned=false; closes++;
         printf("VORBIS_REGISTRY_CLOSE case=%u called=1 core=%d\n",case_index,xPortGetCoreID());
+#ifdef VORBIS_OPEN_OOM
+        oom_exercise(c,packets,offsets);
+#endif
         unregister_case();
         accepted++;pcm_bytes+=total;
         check(heap_caps_check_integrity_all(true),"valid_heap_integrity");
@@ -180,6 +195,9 @@ static void decode_task(void *unused) {
         unregistrations==14 && metadata==112 && retries==312,"complete_registry_matrix");
 #ifdef VORBIS_RESET_CYCLES
     reset_summary();
+#endif
+#ifdef VORBIS_OPEN_OOM
+    oom_summary();
 #endif
     printf("VORBIS_REGISTRY_COMPLETE registrations=14 bindings=14 closes=8 unregistrations=14 metadata=112 retries=312 core=%d\n",xPortGetCoreID());
     printf("FLOOR1_COMPLETE accepted=%u rejected=%u packets=%u pcm=%u core=%d\n",

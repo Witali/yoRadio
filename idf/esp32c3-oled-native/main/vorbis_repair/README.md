@@ -73,3 +73,14 @@ sample count and SHA-256 with the retained original decoder output.
 
 These cases do not cover all legal codebooks, rates, channel layouts, malformed
 inputs or network schedules; see `docs/ESP32C3_VORBIS_REPAIR_PLAN.md`.
+
+Checked raw open also preserves Espressif's public `MEM_LACK` result for an
+actual positive-size calloc failure inside header parsing. A task-local nested
+scope restores the previous error context after cleanup or successful open;
+uninjected malformed setups retain `FAIL`. The
+[raw-open checkpoint](../../../../tests/results/vorbis-raw-open-oom-20261024/README.md)
+uses independent SDK/QEMU builds for C3 and CYD, observes every allocation
+position in eight finite setups, and passes 560 failures/recoveries per target,
+six malformed setups, four nested pairs and two task-isolation scenarios.
+No allocator calls, ABI fields or task bindings are added. TLS storage cost and
+full allocation/lifetime, Ogg, radio and physical qualification remain open.

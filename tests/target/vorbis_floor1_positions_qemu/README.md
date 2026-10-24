@@ -155,3 +155,42 @@ reset during processing; all fixture calls are sequential. Xiph's
 provides the freshly initialized-state expectation. This finite public raw
 subset leaves full G1/G3/G6, deferred Ogg, production radio, integration and
 physical resource acceptance open.
+
+## Optional checked raw-open allocation failures
+
+`--dispatch registered --renderer on --open-oom` includes
+[open_oom.h](main/open_oom.h); it is off by default and excludes reset cycles
+and registration controls. The test observes only `AUD_Codec` allocations on
+the calling task during the direct checked raw-open callback. Public close
+runs outside that interval. Guarded, aligned, zeroed payloads and an external
+ledger check cleanup without reading decoder-private fields.
+
+Both SDK/QEMU targets discover 32/36/32/36/36/36/36/36 allocation positions
+across eight valid setups. Each position gets a single failure and a persistent
+failure from that position onward: 560 failed opens and 560 successful recovery
+opens per target. Every recovery decodes all 14 packets / 28160 PCM bytes and
+compares them with its captured baseline. There are 7840 recovery packets /
+15769600 PCM bytes; these are target memcmp assertions, not separately captured
+recovery vectors. All owned allocations are released and guards remain intact.
+Six uninjected malformed setups still report `FAIL`. Four nested-open pairs
+and two ordered two-task scenarios check error-scope restoration and isolation;
+CYD uses cores 0/1, while both C3 workers use core 0.
+
+The original source on both targets fails exactly at allocation 4: header
+unpacking loses the actual memory failure and reports `FAIL` instead of the
+publicly specified `MEM_LACK`. The production fix tracks actual positive-size
+allocation failures in a task-local nested open scope. It adds no allocator
+calls or ABI fields. TLS storage cost and physical resource margins are not
+measured. A separate `--control oom-legacy` restores only the old classification;
+`--control oom-global` removes only task locality. Both must reach their exact
+named failures with ordered prerequisites and clean termination. The latter
+requires the uninjected malformed companion to expose cross-task contamination.
+
+The 18 OOM-protocol, 37 real CMake-phase, 12 registry-protocol and 8 reference
+outcome tests pass. Independent full captured baseline PCM comparison against
+14 fresh Xiph reference runs has maximum error 1 under the fixed project bound
+2. The evidence retains an extra argument-parsing failure that ran no tests.
+
+See [saved raw-open evidence](../../results/vorbis-raw-open-oom-20261024/README.md).
+This is finite checked raw-open coverage within G4/G5. Full allocation/lifetime,
+callback, Ogg, radio integration and physical acceptance remain open.

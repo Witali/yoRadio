@@ -250,6 +250,9 @@ class Checker:
         reset_cycles = report.get('reset_cycles', False)
         need(type(reset_cycles) is bool and (not reset_cycles or dispatch == 'registered'),
              'known public raw reset selection')
+        open_oom = report.get('open_oom', False)
+        need(type(open_oom) is bool and (not open_oom or (dispatch == 'registered' and not reset_cycles)),
+             'known public raw open allocation selection')
         need(dispatch != 'registered' or role == 'candidate', 'registered dispatch candidate only')
         source_name = 'main.c' if role == 'baseline' else 'registered.c' if dispatch == 'registered' else 'render.c'
         source = project['project/main/' + source_name]
@@ -282,6 +285,14 @@ class Checker:
                          b'esp_audio_dec_reset(' in project['project/main/reset_cycles.h'] and
                          b'#define VORBIS_RESET_SKIP_CONTROL 0' in project['project/main/reset_cycles.h'],
                          'unaltered public reset caller source')
+                if open_oom:
+                    need(argument(build_argv, '-OpenOom') == 'on' and
+                         re.search(r'(?:^|\s)-DVORBIS_OPEN_OOM=1(?:\s|$)', compiled[0]['command']) and
+                         report['raw_open_oom_qualified'] is True and b'#include "open_oom.h"' in source,
+                         'actual open-allocation fixture compilation and capture')
+                    for symbol in ('__wrap_media_lib_module_calloc', '__wrap_media_lib_free',
+                                   'media_lib_module_calloc', 'media_lib_free', 'esp_vorbis_dec_close'):
+                        need(re.search(r'\b' + symbol + r'$', symbols, re.M), 'actual allocator observer/close symbol')
                 tokens = (b'esp_audio_dec_open(', b'esp_audio_dec_process(', b'esp_audio_dec_get_info(',
                           b'esp_audio_dec_close(', b'esp_audio_dec_unregister(', b'guard();',
                           b'"output_canaries"', b'"invalid_setup_rejected"', b'"public_metadata"')
@@ -318,6 +329,14 @@ class Checker:
                 reset_facts = validate_reset(log, matrix, platform, returncode=logs['qemu'][0]['exit_status'],
                                             timed_out=False, interrupted=False)
                 need(reset_facts == report['observed_reset'], 'independent ordered raw reset replay')
+            if open_oom:
+                oom_protocol = ROOT / 'tests/vorbis_open_oom_protocol.py'
+                need(self.freeze(oom_protocol) == snapshots.get(str(oom_protocol.resolve())),
+                     'executed public raw open allocation protocol source')
+                from vorbis_open_oom_protocol import validate_log as validate_open_oom
+                oom_facts = validate_open_oom(log, matrix, platform, returncode=logs['qemu'][0]['exit_status'],
+                                            timed_out=False, interrupted=False)
+                need(oom_facts == report['observed_oom'], 'ordered public raw open allocation replay')
         need(re.findall(r'^FLOOR1_START coordinator=0 decoder=(\d+)$', log, re.M) == [str(core)] and
              log.count('FLOOR1_CONTROLLED_STOP') == 1, 'coordinator/decoder cores and controlled terminal')
         summary = ['8', '6', '112', '225280', str(core)]
@@ -358,9 +377,13 @@ class Checker:
         if reset_cycles:
             need(reset_facts['baseline_pcm_sha256'] == {str(i): digest(raw) for i, raw in pcm.items()},
                  'all reset replay vectors bind the numerically compared full baseline')
+        if open_oom:
+            need(oom_facts['baseline_pcm_sha256'] == {str(i): digest(raw) for i, raw in pcm.items()},
+                 'all recovery comparisons bind the numerically compared full baseline')
         return dict(target=platform, core=core, role=role, dispatch=dispatch,
                     registered_callbacks_qualified=dispatch == 'registered',
                     raw_reset_behavior_qualified=reset_cycles,
+                    raw_open_oom_qualified=open_oom,
                     report=str(path), report_sha256=digest(path.read_bytes()),
                     pcm_bytes=225280, pcm_sha256={str(i): digest(raw) for i, raw in pcm.items()},
                     metadata_evidence='Frozen executable harness checks stereo48k/S16 and canaries before PCM publication.'), pcm

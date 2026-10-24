@@ -18,6 +18,7 @@ SUBJECT = ROOT / 'tests/target/vorbis_floor1_positions_qemu/main/CMakeLists.txt'
 DEFAULT_CMAKE = Path('C:/Work/yoRadio/.idf/tools-v6.0.2/tools/cmake/4.0.3/bin/cmake.exe')
 BINDING_ERROR = 'Explicit known FLOOR1_BINDING_CONTROL is required'
 RESET_MODE_ERROR = 'Known FLOOR1_RESET_MODE on/off is required when defined'
+OPEN_OOM_MODE_ERROR = 'Known FLOOR1_OPEN_OOM_MODE on/off is required when defined'
 EXPECTED_CASES = frozenset((
     'early-undefined', 'early-registered', 'early-unknown', 'unknown-dispatch',
     'unknown-binding', 'renderer-off', 'direct-control', 'old-placement-control',
@@ -25,7 +26,12 @@ EXPECTED_CASES = frozenset((
     'unknown-reset', 'empty-reset', 'reset-renderer-off', 'reset-direct',
     'reset-open-control', 'reset-decode-control', 'component-legacy-undefined',
     'component-reset-off', 'component-reset-esp32', 'component-reset-esp32c3',
-    'component-legacy-open-control'))
+    'component-legacy-open-control',
+    'early-open-oom-undefined', 'early-open-oom-registered', 'early-open-oom-unknown',
+    'unknown-open-oom', 'empty-open-oom', 'open-oom-renderer-off', 'open-oom-direct',
+    'open-oom-open-control', 'open-oom-decode-control', 'open-oom-reset-on',
+    'component-open-oom-esp32', 'component-open-oom-esp32c3', 'component-open-oom-off',
+    'component-reset-open-oom-off', 'component-open-oom-default-reset'))
 
 
 def identity(path):
@@ -65,7 +71,7 @@ class RegisteredCMake(unittest.TestCase):
     def save(cls):
         (cls.output / 'report.json').write_text(json.dumps(cls.report, indent=2) + '\n', encoding='utf-8')
 
-    def component_stubs(self, directory, target, dispatch, binding, renderer, reset):
+    def component_stubs(self, directory, target, dispatch, binding, renderer, reset, open_oom):
         """Allow only subject-owned configuration calls; never read an SDK/archive."""
         self.assertIn(target, ('esp32', 'esp32c3'))
         variant = (directory / 'mock-variant').as_posix()
@@ -88,7 +94,8 @@ class RegisteredCMake(unittest.TestCase):
             'set_property(GLOBAL PROPERTY HASH_CALLS "")',
             'set_property(GLOBAL PROPERTY SOURCE_CALLS 0)',
             'set_property(GLOBAL PROPERTY LINK_OPTIONS "")',
-            'set_property(GLOBAL PROPERTY DEFINITION_CALLS 0)']
+            'set_property(GLOBAL PROPERTY DEFINITION_CALLS 0)',
+            'set_property(GLOBAL PROPERTY COMPILE_DEFINITIONS "")']
         lines += ['set(FLOOR1_'+part+'_SHA256 '+pin+')' for part,pin in pins.items()]
         lines += ['function(file)',
             '  if(NOT ARGC EQUAL 3 OR NOT "${ARGV0}" STREQUAL "SHA256")',
@@ -113,15 +120,22 @@ class RegisteredCMake(unittest.TestCase):
             '  set_property(GLOBAL APPEND PROPERTY LINK_OPTIONS ${options})', 'endfunction()',
             'function(target_compile_definitions)',
             '  if(NOT ARGC EQUAL 3 OR NOT "${ARGV0}" STREQUAL "fixture_component" OR',
-            '     NOT "${ARGV1}" STREQUAL "PRIVATE" OR NOT "${ARGV2}" STREQUAL "VORBIS_RESET_CYCLES=1")',
-            '    message(FATAL_ERROR "UNEXPECTED_RESET_DEFINITION")', '  endif()',
+            '     NOT "${ARGV1}" STREQUAL "PRIVATE" OR',
+            '     (NOT "${ARGV2}" STREQUAL "VORBIS_RESET_CYCLES=1" AND NOT "${ARGV2}" STREQUAL "VORBIS_OPEN_OOM=1"))',
+            '    message(FATAL_ERROR "UNEXPECTED_FIXTURE_DEFINITION")', '  endif()',
             '  get_property(count GLOBAL PROPERTY DEFINITION_CALLS)',
             '  math(EXPR count "${count}+1")', '  set_property(GLOBAL PROPERTY DEFINITION_CALLS "${count}")',
+            '  set_property(GLOBAL APPEND PROPERTY COMPILE_DEFINITIONS "${ARGV2}")',
             'endfunction()']
         links = ['-Wl,--wrap=esp_vorbis_dec_open', '-Wl,--wrap=esp_vorbis_dec_decode']
         if renderer == 'on': links.append('-Wl,--wrap=floor1_inverse2')
         if dispatch == 'registered' and binding != 'register-open':
             links.append('-Wl,--wrap=esp_vorbis_dec_register')
+        if open_oom == 'on':
+            links += ['-Wl,--wrap=media_lib_module_calloc', '-Wl,--wrap=media_lib_free']
+        definitions = []
+        if reset == 'on': definitions.append('VORBIS_RESET_CYCLES=1')
+        if open_oom == 'on': definitions.append('VORBIS_OPEN_OOM=1')
         checks = ['get_property(hashes GLOBAL PROPERTY HASH_CALLS)',
             'if(NOT "${hashes}" STREQUAL "'+';'.join(path for path,pin in allowed)+'")',
             '  message(FATAL_ERROR "Wrong ordered source/archive hash calls")', 'endif()',
@@ -131,12 +145,15 @@ class RegisteredCMake(unittest.TestCase):
             'if(NOT "${links}" STREQUAL "'+';'.join(links)+'")',
             '  message(FATAL_ERROR "Wrong complete wrapper link recipe: ${links}")', 'endif()',
             'get_property(definitions GLOBAL PROPERTY DEFINITION_CALLS)',
-            'if(NOT definitions EQUAL '+('1)' if reset == 'on' else '0)'),
-            '  message(FATAL_ERROR "Wrong private reset compile definition count")', 'endif()',
+            'if(NOT definitions EQUAL '+str(len(definitions))+')',
+            '  message(FATAL_ERROR "Wrong private fixture compile definition count")', 'endif()',
+            'get_property(actual_definitions GLOBAL PROPERTY COMPILE_DEFINITIONS)',
+            'if(NOT "${actual_definitions}" STREQUAL "'+';'.join(definitions)+'")',
+            '  message(FATAL_ERROR "Wrong complete private fixture compile definitions")', 'endif()',
             'message(STATUS "REGISTRY_CMAKE_COMPONENT_RECIPE target='+target+' reset='+str(reset or 'undefined')+'")']
         return lines, checks
 
-    def run_cmake(self, name, *, early=False, dispatch=None, binding=None, renderer=None, reset=None,
+    def run_cmake(self, name, *, early=False, dispatch=None, binding=None, renderer=None, reset=None, open_oom=None,
                   expected=None, source='main.c', control=False, undefined=False, component_target=None):
         directory = self.output / name
         directory.mkdir()
@@ -156,18 +173,18 @@ class RegisteredCMake(unittest.TestCase):
         component_checks = []
         if component_target is not None:
             self.assertFalse(early or expected or control)
-            component_lines, component_checks = self.component_stubs(directory, component_target, dispatch, binding, renderer, reset)
+            component_lines, component_checks = self.component_stubs(directory, component_target, dispatch, binding, renderer, reset, open_oom)
             lines += component_lines
         else:
             # Any SDK/archive access or target mutation before a guard is an error.
             for command in ('file','target_sources','target_link_options','target_compile_definitions'):
                 lines += ['function('+command+')', '  message(FATAL_ERROR "UNEXPECTED_'+command.upper()+'")', 'endfunction()']
         if undefined:
-            lines += ['foreach(option FLOOR1_DISPATCH_MODE FLOOR1_BINDING_CONTROL FLOOR1_RENDER_MODE FLOOR1_RESET_MODE)',
+            lines += ['foreach(option FLOOR1_DISPATCH_MODE FLOOR1_BINDING_CONTROL FLOOR1_RENDER_MODE FLOOR1_RESET_MODE FLOOR1_OPEN_OOM_MODE)',
                 '  if(DEFINED ${option})', '    message(FATAL_ERROR "Unexpected inherited option ${option}")',
                 '  endif()', 'endforeach()', 'message(STATUS "REGISTRY_CMAKE_OPTIONS_UNDEFINED")']
         for key, value in (('FLOOR1_DISPATCH_MODE', dispatch), ('FLOOR1_BINDING_CONTROL', binding),
-                           ('FLOOR1_RENDER_MODE', renderer), ('FLOOR1_RESET_MODE', reset)):
+                           ('FLOOR1_RENDER_MODE', renderer), ('FLOOR1_RESET_MODE', reset), ('FLOOR1_OPEN_OOM_MODE', open_oom)):
             if value is not None:
                 lines.append('set(' + key + ' "' + value + '")')
         helper = self.control if control else self.frozen
@@ -181,7 +198,7 @@ class RegisteredCMake(unittest.TestCase):
         record = dict(name=name, argv=argv, cwd=str(directory), script=identity(script),
             helper=helper.name, expected_error=expected, returncode=None, timed_out=False,
             interrupted=False, passed=False, component_target=component_target,
-            archive_hashes_stubbed=component_target is not None, reset_mode=reset)
+            archive_hashes_stubbed=component_target is not None, reset_mode=reset, open_oom_mode=open_oom)
         started = time.monotonic()
         try:
             with (directory / 'stdout.log').open('wb') as stdout, (directory / 'stderr.log').open('wb') as stderr:
@@ -303,6 +320,64 @@ class RegisteredCMake(unittest.TestCase):
     def test_normal_legacy_open_control_reset_off_component_recipe(self):
         self.run_cmake('component-legacy-open-control', dispatch='registered', binding='register-open',
             renderer='on', reset='off', source='registered.c', component_target='esp32')
+
+    def test_early_open_oom_discovery_without_other_cache_options(self):
+        self.run_cmake('early-open-oom-undefined', early=True, open_oom='on', undefined=True)
+
+    def test_early_open_oom_discovery_registered_source(self):
+        self.run_cmake('early-open-oom-registered', early=True, dispatch='registered', binding='none',
+            renderer='on', reset='off', open_oom='on', source='registered.c')
+
+    def test_early_open_oom_discovery_does_not_validate_unknown_mode(self):
+        self.run_cmake('early-open-oom-unknown', early=True, open_oom='unknown')
+
+    def test_unknown_open_oom_mode_rejected_before_sdk(self):
+        self.run_cmake('unknown-open-oom', dispatch='registered', binding='none', renderer='on',
+            reset='off', open_oom='unknown', source='registered.c', expected=OPEN_OOM_MODE_ERROR)
+
+    def test_empty_open_oom_mode_rejected_before_sdk(self):
+        self.run_cmake('empty-open-oom', dispatch='registered', binding='none', renderer='on',
+            reset='off', open_oom='', source='registered.c', expected=OPEN_OOM_MODE_ERROR)
+
+    def test_open_oom_requires_renderer_before_sdk(self):
+        self.run_cmake('open-oom-renderer-off', dispatch='registered', binding='none', renderer='off',
+            reset='off', open_oom='on', source='registered.c', expected='Open allocation failures require the renderer')
+
+    def test_open_oom_requires_registered_dispatch_before_sdk(self):
+        self.run_cmake('open-oom-direct', dispatch='direct', binding='none', renderer='on', reset='off',
+            open_oom='on', source='render.c', expected='Open allocation failures require registered dispatch')
+
+    def test_open_oom_rejects_open_binding_control_before_sdk(self):
+        self.run_cmake('open-oom-open-control', dispatch='registered', binding='register-open', renderer='on',
+            reset='off', open_oom='on', source='registered.c', expected='Open allocation failures require no binding control')
+
+    def test_open_oom_rejects_decode_binding_control_before_sdk(self):
+        self.run_cmake('open-oom-decode-control', dispatch='registered', binding='register-decode', renderer='on',
+            reset='off', open_oom='on', source='registered.c', expected='Open allocation failures require no binding control')
+
+    def test_open_oom_rejects_reset_cycles_before_sdk(self):
+        self.run_cmake('open-oom-reset-on', dispatch='registered', binding='none', renderer='on', reset='on',
+            open_oom='on', source='registered.c', expected='Open allocation failures require reset cycles off')
+
+    def test_normal_esp32_open_oom_component_recipe(self):
+        self.run_cmake('component-open-oom-esp32', dispatch='registered', binding='none', renderer='on',
+            reset='off', open_oom='on', source='registered.c', component_target='esp32')
+
+    def test_normal_esp32c3_open_oom_component_recipe(self):
+        self.run_cmake('component-open-oom-esp32c3', dispatch='registered', binding='none', renderer='on',
+            reset='off', open_oom='on', source='registered.c', component_target='esp32c3')
+
+    def test_normal_open_oom_off_registered_component_recipe(self):
+        self.run_cmake('component-open-oom-off', dispatch='registered', binding='none', renderer='on',
+            reset='off', open_oom='off', source='registered.c', component_target='esp32')
+
+    def test_normal_open_oom_off_preserves_reset_component_recipe(self):
+        self.run_cmake('component-reset-open-oom-off', dispatch='registered', binding='none', renderer='on',
+            reset='on', open_oom='off', source='registered.c', component_target='esp32')
+
+    def test_normal_open_oom_uses_default_off_reset_component_recipe(self):
+        self.run_cmake('component-open-oom-default-reset', dispatch='registered', binding='none', renderer='on',
+            open_oom='on', source='registered.c', component_target='esp32')
 
 
 def main():
