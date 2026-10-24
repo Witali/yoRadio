@@ -3069,7 +3069,7 @@ Functional NOR/WIP timing не electrical partial-page power loss. Actual SDK I/
 malloc faults, NVS-internal publication cuts, exhaustive timing, network lifecycle/
 churn, whole-image/full/24h/hardware remain. No app/SDK/QEMU edits, physical/push нет.
 
-## CURRENT 2026-10-24 — network peers checkpoint and QEMU DHCP fixed
+## Checkpoint 2026-10-24 — network peers and QEMU DHCP (see newer CURRENT below)
 
 Goal remains broad/active, no blocker, no new push request. Latest user explicitly
 requests fixing QEMU emulation bugs when found. No app/SDK/physical changes.
@@ -3143,3 +3143,50 @@ Known earlier CYD IDF6 esp_phy_enable assert is still open; identical Xtensa
 binary only demonstrates these RISC-V Wi-Fi edits do not change it. No fresh
 CYD run in this checkpoint, no complete hardware claim. Other whole-image,
 SDK I/O/allocation/NVS-internal cuts/full regression/24h/H01-H09 remain.
+
+
+## CURRENT 2026-10-24 — either AP peer departure repaired in QEMU
+
+Progress continues, broad goal active, no blockers/new push request. QEMU now
+HEAD7a9764712b (Keep the AP Ethernet relay working across client departures),
+preceded d49be39d77/6324e5e152/fdb97bef73 in same taskworktree/branch. Final
+clients-v5-riscv32.exe SHA cce6b4717d4da21ca1871b817ab697346d428d803f733377dac74ba6e57e5aaa.
+Xtensa still821D9807 byte-identical baseline. No build/liveVM remains.
+
+Actual oldv2 primary departure repro native-primary-before failed HTTP Timeout
+atmask2 while secondary actually SDK-associated/DHCPbound and native serverstill
+onehandle/0stop. v3 selecting surviving peer alone stillfailed(native-primary-relay-v3).
+v4 normal ARP probe via radio/DMA repaired guest neighbor, primary case passed
+factory/native. One factory-secondary-relay-v4 stalled final association instate3;
+explicitly stopped own QMP tosavefailedtrace/reap, notaccepted. v5 distinguishes
+probe3/auth4/association8 waits and retries outstanding exchange after1virtualsec
+onexistingbeacon (no guest busywait). ARP+selection and retransmit saved7a9764712b.
+
+Final v5 all4native/factory x primary/secondary departures pass. Masks1,3,1,0,1
+or1,3,2,0,2;16ordinaryHTTP200. Native1start0stop;factorysame losthandle defect.
+C3 default/modular each60sboot pass also v4 and FINALv5, allstopped/reaped.
+Including earlier pilots this phase19C2runs and6C3runs, noQEMUprocess now.
+All sourceapp/SDK/frozenD64 unchanged, nophysicalactions/push.
+
+Source observer network_clients_qemu.py now --departure primary|secondary
+(defaultsecondary). DO NOT alter it without a fresh run: its exact hash pins all
+v2before/v3/v4/v5 newreports. Independent contract now tracks AID perassociation:
+finalsecondaryrejoin maygetAID1; former fixedMAC->AID assumption waswrongtest.
+FIXED_TEST documentedCORRECTION_MARKERS. Native/factoryrawbytes otherwiseunchanged.
+
+New schema2 proof network-relay-validation-20261024.json archives fourv5runs,
+bothfailedprimarycontrols, excludedfactoryv4stall, exact7a9764712bGitblobs and
+newproducerpins. Older payloads reused. Offline verifier terminal0: all4runs/24unsafecontrols andbothbeforecontrols pass.
+36raw/35unique payloads; new gzip bytes=65978; old payloads reused.
+Unused failed-capture AID-contract source preserved under ignored .build, not staged. Earlier
+network-peer proof remains verified with --source-revision4f501d7af; do not
+pretend previous producer source is today's changedharness.
+
+NEXT after saving/replaying evidence: scan/upload/weather/theme during reconnect,
+controlled management loss/retries, DHCP retransmission policy, APSTA/churn.
+Per-peerhostendpoints are optional future capability, not requirement of current
+AP/STA hostportseparation or twopeerHTTPgate. Do not expand goal unnecessarily.
+Selected any-one departure cases pass; entire HTTP-LIFETIME/full/24h/hardware,
+SDK I/O/allocation/NVSinternal faults and wholeimage audit remain open. Known
+CYDIDF6 esp_phy_enable assert stillopen (not changedbyRISC-Vmodel). No freshCYD
+run performed here. References tests/NETWORK_CLIENTS.md,QEMU docs/WIFI_AP_CLIENTS.md.

@@ -286,6 +286,16 @@ parser/identity/server selection/ACK-before-ready, отдельные protocol t
 маршрутизация/endpoint selection, scan/upload/weather/theme/reconnect/churn.
 Этот checkpoint не закрывает весь `HTTP-LIFETIME`.
 
+Следующий checkpoint того же дня: QEMU `7a9764712b` исправляет выбор оставшегося
+peer, ARP-соседа и повтор незавершённой management association. Обе прошивки
+прошли уход **любого** из двух клиентов и zero→survivor return (4 runs/16 HTTP).
+Before controls воспроизводят потерю HTTP на старой модели; один stalled factory
+reconnect сохранён отдельно. Proof `network-relay-validation-20261024.json`.
+Эти selected сценарии закрыты; scan/upload/weather/theme, reconnect/churn,
+deterministic loss и full APSTA/RF gate остаются открытыми. Отдельные host
+endpoints каждого Wi-Fi peer — возможное улучшение QEMU, не условие текущей
+проверки: AP/STA endpoints уже разделены, HTTP здесь проходит через оставшегося peer.
+
 ## 4. Электрические и аппаратные различия
 
 Статус: **аппаратная приёмка не выполнена**. Исследовать RESET/DC pull-ups:

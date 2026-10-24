@@ -4344,3 +4344,22 @@ Offline proof network-peer-validation-20261024.json повторно сверя�
 HTTP-LIFETIME всё ещё открыт: уход первого/маршрутизация через второго,
 per-client endpoints/scan/upload/weather/theme/reconnect/churn. Общая цель
 активна, physical actions/push не выполнялись. Детали tests/NETWORK_CLIENTS.md.
+
+
+## 2026-10-24 — исправлены уход первого AP-клиента и L2-маршрутизация QEMU
+
+На прежнем QEMU128D native реально терял HTTP при маске2, хотя второй peer
+был associated/DHCPbound, а HTTP handle оставался рабочим. Выбор другого peer
+сам по себе не помог (v3): ARP гостя сохранял MAC первого. v4 отправляет обычный
+ARP через radio/DMA перед IPv4 при смене relay. Отдельный factory reconnect
+завис в managementstate3; run исключён/остановлен/reaped. v5 повторяет незаконченный
+probe/auth/association после1virtualsec без задержки приложения.
+
+QEMU7a9764712b/CCE6B471: native/factory × уход первого/второго —4runs pass,
+16HTTP200, zero→survivor recovery. FinalC3default/modular60sboot pass, Xtensa
+побайтно baseline. Все19C2+6C3 процессов этой серии остановлены. App unchanged.
+Новый offline contract проверяет обе departure пары и before controls; AID
+правильно отслеживается в пределах ассоциации, с повторным использованием после
+ухода (FIXED_TEST). Proof network-relay-validation-20261024.json повторно использует
+неизменённые gzip payloads; factory fullflash/RAM/UART в новый архив не копируются.
+Полный HTTP-LIFETIME/traffic/churn/APSTA/RF и остальной план остаются открытыми.

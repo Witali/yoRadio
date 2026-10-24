@@ -101,6 +101,7 @@ def main():
     parser.add_argument('--dependency-root',type=Path,default=Path('C:/Work/yoRadio'))
     parser.add_argument('--abi',type=Path,required=True)
     parser.add_argument('--firmware',choices=('reconstructed','original'),default='reconstructed')
+    parser.add_argument('--departure',choices=('secondary','primary'),default='secondary')
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=False)
     sys.path.insert(0,str(args.qemu_root/'tools'));import small_tv_vm as vm
@@ -120,7 +121,8 @@ def main():
         native_app_sha256=verify_inputs(ROOT,args.dependency_root),elf_sha256=sha(elf),qemu_sha256=sha(args.qemu),
         inputs_sha256=pins,tools_snapshot=snapshot,entries=entries,event_base_object=base,
         wire=abi['wire'],phases=[],events=[],owners_stopped=False,
-        scope='Two actual AP associations; secondary departure and zero->primary return. Primary departure, multi-endpoint routing, RF/WPA and churn remain separate')
+        departure=args.departure,
+        scope='Two actual AP associations; selected peer departure and zero->one return. Multi-endpoint routing, RF/WPA and churn remain separate')
     with socket.socket() as reservation:
         reservation.bind(('127.0.0.1',0));port=reservation.getsockname()[1]
     options=SimpleNamespace(yoradio=str(ROOT),firmware=args.firmware,qemu=str(args.qemu.resolve()),
@@ -135,8 +137,10 @@ def main():
         observer=Observer(port);observer.socket.settimeout(120)
         trace=Events(observer,entries,base,abi['wire'],factory)
         expected_starts=0
+        survivor=primary if args.departure=='secondary' else secondary
         for phase_index,(mask,peers) in enumerate(((1,{primary}),(3,{primary,secondary}),
-            (1,{primary}),(0,set()),(1,{primary}))):
+            ((1 if survivor==primary else 2),{survivor}),(0,set()),
+            ((1 if survivor==primary else 2),{survivor}))):
             before=len(trace.rows)
             expected_starts+=len(peers-trace.active)
             with vm.QMP(session['qmp_port'],session['name']) as qmp:

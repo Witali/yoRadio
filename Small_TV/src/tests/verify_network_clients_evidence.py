@@ -36,7 +36,7 @@ def code_reader(path, digest):
 def verify(path, root, dependencies, revision=None):
     """Reject missing peers, failed requests, invalid handles or broadened scope."""
     proof = json.loads(path.read_text())
-    assert proof['schema_version'] == 1 and proof['passed']
+    assert proof['schema_version'] in (1,2) and proof['passed']
     assert not any(proof[key] for key in ('network_lifecycle_complete',
         'all_functionality_verified','lcd_acceptance','rf_acceptance','physical_hardware_tested'))
     blobs = {}
@@ -67,8 +67,8 @@ def verify(path, root, dependencies, revision=None):
     results = []; coverage = set()
     for run in proof['runs']:
         report = json.loads(files[run['source']]); flavor = report['firmware']
-        assert (report['qemu_sha256'], flavor) not in coverage
-        coverage.add((report['qemu_sha256'], flavor))
+        key = report['qemu_sha256'], flavor, report.get('departure','secondary')
+        assert key not in coverage; coverage.add(key)
         assert report['qemu_sha256'] in proof['qemu_sources']
         assert report['elf_sha256'] == proof[('factory' if flavor == 'original' else 'native')+'_elf_sha256']
         assert report['native_app_sha256'] == proof['app_sha256']
@@ -92,7 +92,21 @@ def verify(path, root, dependencies, revision=None):
             source = files[row['source']]
             assert sha(source) == row['sha256']
             assert hashlib.sha1(b'blob '+str(len(source)).encode()+b'\0'+source).hexdigest() == row['git_blob']
-    assert len(coverage) == 4 and len(proof['qemu_sources']) == 2
+    assert len(coverage) == 4
+    if proof['schema_version'] == 1:
+        assert len(proof['qemu_sources']) == 2
+    else:
+        assert len(proof['qemu_sources']) == 1
+        assert {(flavor,side) for _,flavor,side in coverage} == {
+            (flavor,side) for flavor in ('original','reconstructed') for side in ('primary','secondary')}
+        for name in proof['failed_primary_controls']:
+            failed = json.loads(files[name])
+            assert not failed['passed'] and failed['owners_stopped']
+            assert failed['departure'] == 'primary' and failed['firmware'] == 'reconstructed'
+            assert [phase['mask'] for phase in failed['phases']] == [1,3,2]
+            assert failed['phases'][2]['http'] == dict(error='TimeoutError')
+            assert len(failed['server_handles']) == 1 and failed['server_handles'][0]
+            assert not any(e['function']=='httpd_stop' for e in failed['events'])
     return dict(passed=True,runs=results,unsafe_controls_rejected=24,
                 network_lifecycle_complete=False,rf_acceptance=False)
 

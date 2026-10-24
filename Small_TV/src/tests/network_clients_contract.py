@@ -27,7 +27,7 @@ def verify_abi(report, obj, source):
 
 
 def validate(report, wire, read_code, base_value):
-    """Require SDK-posted distinct peers, successful HTTP and actual server handles."""
+    """Require SDK peers/HTTP/handles; FIXED_TEST: an AID belongs to an association."""
     assert report['passed'] and report['owners_stopped']
     assert not any(report[key] for key in ('network_lifecycle_complete',
         'all_functionality_verified', 'lcd_acceptance', 'rf_acceptance',
@@ -35,9 +35,12 @@ def validate(report, wire, read_code, base_value):
     assert report['wire'] == wire
     factory = report['firmware'] == 'original'
     assert factory or report['firmware'] == 'reconstructed'
-    events = report['events']; active = set(); end = 0
+    events = report['events']; active = set(); aids = {}; end = 0
     primary, secondary = '52:54:00:43:00:02', '52:54:00:43:00:03'
-    expected = [{primary}, {primary, secondary}, {primary}, set(), {primary}]
+    departure = report.get('departure','secondary')
+    assert departure in ('primary','secondary')
+    survivor = secondary if departure == 'primary' else primary
+    expected = [{primary}, {primary, secondary}, {survivor}, set(), {survivor}]
     assert len(report['phases']) == len(expected)
     for phase, wanted in zip(report['phases'], expected):
         begin, finish = phase['event_range']
@@ -56,14 +59,19 @@ def validate(report, wire, read_code, base_value):
             mac = ':'.join(f'{b:02x}' for b in raw[offset:offset+6])
             assert mac == event['mac'] and mac in (primary, secondary)
             aid_offset = 6 if factory else wire[kind+'_aid']
-            assert raw[aid_offset] == (1 if mac == primary else 2)
+            aid = raw[aid_offset]
+            assert 1 <= aid <= 3
             if not factory and kind == 'disconnected':
                 reason = wire['disconnected_reason']
                 assert int.from_bytes(raw[reason:reason+wire['reason_bytes']], 'little') == 3
             if kind == 'connected':
-                assert mac not in active; active.add(mac)
+                # After the last peer leaves, the SDK can reuse AID 1 for a
+                # different MAC. Require uniqueness only among active peers.
+                assert mac not in active and aid not in aids.values()
+                active.add(mac); aids[mac] = aid
             else:
-                assert mac in active; active.remove(mac)
+                assert mac in active and aids.pop(mac) == aid
+                active.remove(mac)
         assert set(phase['active_peers']) == active == wanted
         assert phase['mask'] == sum(1 << i for i, mac in enumerate((primary,secondary)) if mac in wanted)
         clients = phase['model_clients']
@@ -98,7 +106,8 @@ def validate(report, wire, read_code, base_value):
     else:
         assert len(starts) == len(handles) == 1 and handles[0] and not stops
         assert starts[0]['return_value'] == 0 and starts[0]['server_handle'] == handles[0]
-    return dict(firmware=report['firmware'], sdk_peer_events=sum('kind' in e for e in events),
+    return dict(firmware=report['firmware'], departure=departure,
+                sdk_peer_events=sum('kind' in e for e in events),
                 http_checks=4, starts=len(starts), stops=len(stops), owners_stopped=True)
 
 

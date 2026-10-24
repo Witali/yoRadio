@@ -69,7 +69,8 @@ HTTP и время жизни дескриптора. На каждый отчё
 $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/verify_network_clients_evidence.py `
-  --proof Small_TV/qemu/parity/network-peer-validation-20261024.json
+  --proof Small_TV/qemu/parity/network-peer-validation-20261024.json `
+  --source-revision 4f501d7af
 ```
 
 После изменения наблюдателей используйте `--source-revision` с коммитом этой
@@ -87,3 +88,47 @@ handler вместо AP handler. Оба завершены и не засчит�
 C3 OLED прошёл отдельные 60-секундные boot checks с default/modular профилем.
 Xtensa для CYD побайтно совпал с baseline; это не закрывает ранее известный
 CYD IDF6 PHY gap. Полная прошивочная/24h/аппаратная приёмка не объявляется.
+
+## Следующий checkpoint: уход любого клиента
+
+QEMU `7a9764712b` исправляет общий Ethernet-мост: выбирает подключённого клиента
+с подтверждённым DHCP вместо постоянного первого. При смене клиента обычный
+ARP-запрос обновляет L2-соседа в госте через radio/DMA. Прототип с одним лишь
+переключением клиента ещё терял HTTP, потому что ARP сохранял старый MAC.
+Таблицы/память гостя не подменяются. Отдельные backend/endpoints для каждого
+клиента остаются другой задачей.
+
+В одном заводском прогоне также зависла повторная ассоциация: виртуальный
+клиент бесконечно ждал ответ без retransmit. Добавлены отдельные ожидания
+probe/authentication/association и повтор незавершённого обмена через одну
+виртуальную секунду. Используется существующее событие beacon; программная
+задержка в гостевую прошивку не добавляется. Прогон с зависанием исключён,
+сохранён отдельно и завершён через собственный QMP/process handle.
+
+На финальном QEMU SHA
+`cce6b4717d4da21ca1871b817ab697346d428d803f733377dac74ba6e57e5aaa`
+обе прошивки прошли **оба** сценария:
+`1→3→1→0→1` и `1→3→2→0→2` (числа — mask клиентов).
+Итого четыре принятых прогона, 16 HTTP 200. Native по-прежнему один start/ноль
+stop; заводская потеря handle остаётся наблюдаемой. C3 default/modular снова
+прошли по 60 секунд; Xtensa совпал с прежним baseline.
+
+[`network-relay-validation-20261024.json`](../../qemu/parity/network-relay-validation-20261024.json)
+сохраняет четыре новых отчёта, два before controls с timeout после ухода первого
+клиента, исключённый заводской reconnect и точные Git blobs модели. Прежние
+неизменившиеся gzip payloads используются повторно. Schema 2 независимо
+проверяет обе firmware/departure пары и повторяет 24 negative controls.
+
+```powershell
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_network_clients_evidence.py `
+  --proof Small_TV/qemu/parity/network-relay-validation-20261024.json
+```
+
+Весь `HTTP-LIFETIME` остаётся открытым: нужны scan/upload/weather/theme/reconnect/churn,
+контролируемая потеря управляющих
+кадров, APSTA и отдельная RF/WPA проверка. Повторная отправка DHCP при потерях,
+lease renewal/rebinding также не объявлены реализованными этим checkpoint.
+Отдельные host endpoints для каждого peer остаются возможным улучшением модели;
+для текущего сценария достаточно проверенного моста через оставшегося клиента.
+AP и STA endpoints существующего инструмента уже разделены.
