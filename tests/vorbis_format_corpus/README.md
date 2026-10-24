@@ -32,6 +32,19 @@ supplement](../vorbis_floor_presence/README.md), including residue0/1/2,
 coupling, explicit silence witnesses and packet-to-packet presence changes.
 Its README gives the required explicit fresh-output and control-test commands.
 
+`generate_floor1_positions.py` adds 14 floor1 setup cases: eight legal position
+lists, including 65 total positions and unsorted/wide coordinates, and six
+explicit duplicate/count rejection controls. Vorbis I section 7.2.2 requires
+at most 65 total X positions and unique coordinates. All cases retain the same
+two books, stereo/48000 Hz, 256/2048 blocks and 14 minimal audio packets;
+subbook -1 makes interior Y values implicit, requiring no extra packet bits.
+`fixture.h` exports payload-only identification/setup arrays, complete audio,
+case validity and per-packet overlap arithmetic (28160 PCM bytes per valid
+case). Full/raw headers, fields, coordinates, dimensions, carriers and hashes
+remain in the manifest/matrix output. Invalid carriers are rejection inputs,
+not decodable streams. Construction tests do not qualify decoder rejection,
+PCM, target Ogg handling or the existing numerical NONPASS results.
+
 `generate_map2_regression.py` produces eight stereo/192000 Hz cases. Four pairs
 compare sparse lookup2 vectors of dimension16 against dense active rows, or a
 mapped single-entry book against two identical dense rows, with sequence0/1.
@@ -58,11 +71,14 @@ python -B tests/vorbis_format_corpus/test_books.py
 python -B tests/vorbis_format_corpus/generate_floor0.py
 python -B tests/vorbis_format_corpus/generate_mono_mapping.py
 python -B tests/vorbis_format_corpus/generate_map2_regression.py
+python -B tests/vorbis_format_corpus/generate_floor1_positions.py
+python -B tests/test-vorbis-floor1-positions.py
 ```
 
 Defaults are this checkout's `.build/vorbis-books-corpus-01`,
 `.build/vorbis-floor0-corpus-01`, `.build/vorbis-mono-mapping-corpus-01` and
-`.build/vorbis-map2-regression-corpus-01`. Existing outputs are rejected. To choose a fresh
+`.build/vorbis-map2-regression-corpus-01`; floor1 positions defaults to
+`.build/vorbis-floor1-positions-corpus-01`. Existing outputs are rejected. To choose a fresh
 output beneath this checkout's `.build`, use `--output`; pass the corresponding
 books directory to `test_books.py --data`. Relative arguments resolve from the
 calling working directory. Parents are created only after the guard has accepted

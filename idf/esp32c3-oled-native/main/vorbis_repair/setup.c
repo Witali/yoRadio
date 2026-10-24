@@ -727,6 +727,8 @@ vorbis_info_floor *repair_floor1_info_unpack (vorbis_info *vi,oggpack_buffer *op
   if(rangebits<0)goto err_out;
   for(j=0,k=0;j<info->partitions;j++)
     count+=info->class[(unsigned char)info->partitionclass[j]].class_dim;
+  /* Vorbis I 7.2.2: at most 65 X positions, including both endpoints. */
+  if(count>63)goto err_out;
   info->postlist=
     (ogg_uint16_t *)repair_alloc((count+2)*sizeof(*info->postlist));
   info->forward_index=
@@ -754,6 +756,10 @@ vorbis_info_floor *repair_floor1_info_unpack (vorbis_info *vi,oggpack_buffer *op
   /* also store a sorted position index */
   for(j=0;j<info->posts;j++)info->forward_index[j]=j;
   if(mergesort(info->forward_index,info->postlist,info->posts))goto err_out;
+  /* All X positions must be unique, including the implicit zero endpoint. */
+  for(j=1;j<info->posts;j++)
+    if(info->postlist[(unsigned char)info->forward_index[j-1]]==
+       info->postlist[(unsigned char)info->forward_index[j]])goto err_out;
 
   /* discover our neighbors for decode where we don't use fit flags
      (that would push the neighbors outward) */

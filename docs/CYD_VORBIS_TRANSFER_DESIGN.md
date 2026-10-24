@@ -264,3 +264,28 @@ partially exercises four of them. Existing CYD registration
 rollback, independent PCM ownership and terminal cleanup are reused, with new
 regressions where coverage is missing. AAC compact-owner adaptation remains a
 separate stage-14 work item; the deferred AAC item stays explicitly deferred.
+
+## Floor1 X-position checkpoint, 2026-10-24
+
+The [floor1 regression](../tests/results/vorbis-floor1-positions-20261024/README.md)
+adds the missing normative maximum of 65 total X positions and uniqueness
+checks in both CYD and C3 setup parsers. Existing sorting/cleanup and synthesis
+are preserved. Eight construction tests pass. Independent SDK/QEMU runs on
+both architectures accept 8 valid setups, reject 6 invalid setups and compare
+112 packets/225280 PCM bytes exactly with their original vendor decoders.
+Two ESP32 controls remove each guard independently and demonstrate actual
+OK/non-null acceptance of its malformed case after the complete valid prefix.
+
+Xiph independently confirms all 14 header decisions. Full target numerical
+comparison remains NONPASS: three legal short-endpoint cases differ from Xiph
+by up to 65535 S16 units on both platforms; the other five have maximum 1.
+Every original signed16 sample is included with the unchanged project bound 2,
+without alignment or signal modifications. Both targets produce identical PCM.
+The internal vendor cause is not established. Native FFmpeg additionally
+refuses one legal large endpoint and accepts both over-limit configurations;
+its original NONPASS is retained, including the old classifier's limitations.
+
+The setup validation regression advances finite G6/G7 coverage only. The new
+short-endpoint numerical failure joins the outstanding wide/floor0/sequence1
+failures. Full G6, callback ABI, Ogg/lifetime/SMP, radio integration, resources
+and physical acceptance remain open; deferred work is not resumed.

@@ -1,0 +1,1741 @@
+{
+  "scope": "Independent int.from_bytes signed16 math and actual UART/raw byte readback only. No prepared imports, replay/decoder/runtime execution, edits to source or old reports.",
+  "replay_report_sha256": "ee50a85a34b971f35fb695c0193f871426c8dabcf74d3be29b8464e3f0a4c883",
+  "replay_completed": true,
+  "replay_overall_passed": false,
+  "math_and_packet_boundaries_match": true,
+  "all_eight_arch_pcm_byte_equal": true,
+  "xiph_all_eight_pcm_byte_equal": true,
+  "observed": "Cases0/1/2 exceed the unchanged2LSB bound on both architectures; cases3..7 have maximum1. Native inverse-floor/vendor cause is unproven; only correlation with short floor endpoints is established.",
+  "checks": "Each16-bit scalar recomputed with int.from_bytes(little,signed=True), independent of replay struct.iter_unpack. All112 UART packets per architecture reconstructed and checked against raw files; every packet consumption/byte size and all reported packet/scalar metrics agree.",
+  "cases": [
+    {
+      "target": "esp32",
+      "case": 0,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 65535,
+      "over_bound": 13722,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 65535,
+          "over_bound": 6838
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 65535,
+          "over_bound": 6884
+        }
+      ],
+      "pcm_sha256": "7afbc210032bcb0c17983ecd29dbc4bff21533cb597a03434fecb573f6099ebf",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          65094,
+          245
+        ],
+        [
+          2,
+          2304,
+          61582,
+          1152
+        ],
+        [
+          3,
+          4096,
+          64103,
+          1908
+        ],
+        [
+          4,
+          4096,
+          64950,
+          1986
+        ],
+        [
+          5,
+          2304,
+          65535,
+          1144
+        ],
+        [
+          6,
+          2304,
+          62479,
+          1152
+        ],
+        [
+          7,
+          2304,
+          65535,
+          1116
+        ],
+        [
+          8,
+          512,
+          65114,
+          244
+        ],
+        [
+          9,
+          512,
+          59179,
+          256
+        ],
+        [
+          10,
+          2304,
+          62372,
+          1152
+        ],
+        [
+          11,
+          4096,
+          59102,
+          1983
+        ],
+        [
+          12,
+          2304,
+          64722,
+          1128
+        ],
+        [
+          13,
+          512,
+          65272,
+          256
+        ]
+      ]
+    },
+    {
+      "target": "esp32",
+      "case": 1,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 65535,
+      "over_bound": 10779,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 65535,
+          "over_bound": 5481
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 65535,
+          "over_bound": 5298
+        }
+      ],
+      "pcm_sha256": "7317e6593fe6fbd550811b6fa58f19a633aed042c77a46fc2c5031666e6d823e",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          65535,
+          242
+        ],
+        [
+          2,
+          2304,
+          65535,
+          719
+        ],
+        [
+          3,
+          4096,
+          65535,
+          1661
+        ],
+        [
+          4,
+          4096,
+          65535,
+          1692
+        ],
+        [
+          5,
+          2304,
+          65535,
+          700
+        ],
+        [
+          6,
+          2304,
+          65535,
+          991
+        ],
+        [
+          7,
+          2304,
+          65535,
+          859
+        ],
+        [
+          8,
+          512,
+          65535,
+          169
+        ],
+        [
+          9,
+          512,
+          65535,
+          195
+        ],
+        [
+          10,
+          2304,
+          65535,
+          965
+        ],
+        [
+          11,
+          4096,
+          65535,
+          1532
+        ],
+        [
+          12,
+          2304,
+          54651,
+          888
+        ],
+        [
+          13,
+          512,
+          65535,
+          166
+        ]
+      ]
+    },
+    {
+      "target": "esp32",
+      "case": 2,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 65535,
+      "over_bound": 7346,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 65535,
+          "over_bound": 3731
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 65535,
+          "over_bound": 3615
+        }
+      ],
+      "pcm_sha256": "48dfec90b3c9e9036a5549724b051086272f9f938edfcdea0c6848eda51c644f",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          65535,
+          168
+        ],
+        [
+          2,
+          2304,
+          65535,
+          625
+        ],
+        [
+          3,
+          4096,
+          65535,
+          923
+        ],
+        [
+          4,
+          4096,
+          65535,
+          1226
+        ],
+        [
+          5,
+          2304,
+          65535,
+          423
+        ],
+        [
+          6,
+          2304,
+          65535,
+          607
+        ],
+        [
+          7,
+          2304,
+          65535,
+          513
+        ],
+        [
+          8,
+          512,
+          65535,
+          135
+        ],
+        [
+          9,
+          512,
+          65535,
+          132
+        ],
+        [
+          10,
+          2304,
+          65535,
+          722
+        ],
+        [
+          11,
+          4096,
+          65535,
+          1151
+        ],
+        [
+          12,
+          2304,
+          65535,
+          604
+        ],
+        [
+          13,
+          512,
+          65535,
+          117
+        ]
+      ]
+    },
+    {
+      "target": "esp32",
+      "case": 3,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32",
+      "case": 4,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32",
+      "case": 5,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32",
+      "case": 6,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32",
+      "case": 7,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 0,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 65535,
+      "over_bound": 13722,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 65535,
+          "over_bound": 6838
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 65535,
+          "over_bound": 6884
+        }
+      ],
+      "pcm_sha256": "7afbc210032bcb0c17983ecd29dbc4bff21533cb597a03434fecb573f6099ebf",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          65094,
+          245
+        ],
+        [
+          2,
+          2304,
+          61582,
+          1152
+        ],
+        [
+          3,
+          4096,
+          64103,
+          1908
+        ],
+        [
+          4,
+          4096,
+          64950,
+          1986
+        ],
+        [
+          5,
+          2304,
+          65535,
+          1144
+        ],
+        [
+          6,
+          2304,
+          62479,
+          1152
+        ],
+        [
+          7,
+          2304,
+          65535,
+          1116
+        ],
+        [
+          8,
+          512,
+          65114,
+          244
+        ],
+        [
+          9,
+          512,
+          59179,
+          256
+        ],
+        [
+          10,
+          2304,
+          62372,
+          1152
+        ],
+        [
+          11,
+          4096,
+          59102,
+          1983
+        ],
+        [
+          12,
+          2304,
+          64722,
+          1128
+        ],
+        [
+          13,
+          512,
+          65272,
+          256
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 1,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 65535,
+      "over_bound": 10779,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 65535,
+          "over_bound": 5481
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 65535,
+          "over_bound": 5298
+        }
+      ],
+      "pcm_sha256": "7317e6593fe6fbd550811b6fa58f19a633aed042c77a46fc2c5031666e6d823e",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          65535,
+          242
+        ],
+        [
+          2,
+          2304,
+          65535,
+          719
+        ],
+        [
+          3,
+          4096,
+          65535,
+          1661
+        ],
+        [
+          4,
+          4096,
+          65535,
+          1692
+        ],
+        [
+          5,
+          2304,
+          65535,
+          700
+        ],
+        [
+          6,
+          2304,
+          65535,
+          991
+        ],
+        [
+          7,
+          2304,
+          65535,
+          859
+        ],
+        [
+          8,
+          512,
+          65535,
+          169
+        ],
+        [
+          9,
+          512,
+          65535,
+          195
+        ],
+        [
+          10,
+          2304,
+          65535,
+          965
+        ],
+        [
+          11,
+          4096,
+          65535,
+          1532
+        ],
+        [
+          12,
+          2304,
+          54651,
+          888
+        ],
+        [
+          13,
+          512,
+          65535,
+          166
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 2,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 65535,
+      "over_bound": 7346,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 65535,
+          "over_bound": 3731
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 65535,
+          "over_bound": 3615
+        }
+      ],
+      "pcm_sha256": "48dfec90b3c9e9036a5549724b051086272f9f938edfcdea0c6848eda51c644f",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          65535,
+          168
+        ],
+        [
+          2,
+          2304,
+          65535,
+          625
+        ],
+        [
+          3,
+          4096,
+          65535,
+          923
+        ],
+        [
+          4,
+          4096,
+          65535,
+          1226
+        ],
+        [
+          5,
+          2304,
+          65535,
+          423
+        ],
+        [
+          6,
+          2304,
+          65535,
+          607
+        ],
+        [
+          7,
+          2304,
+          65535,
+          513
+        ],
+        [
+          8,
+          512,
+          65535,
+          135
+        ],
+        [
+          9,
+          512,
+          65535,
+          132
+        ],
+        [
+          10,
+          2304,
+          65535,
+          722
+        ],
+        [
+          11,
+          4096,
+          65535,
+          1151
+        ],
+        [
+          12,
+          2304,
+          65535,
+          604
+        ],
+        [
+          13,
+          512,
+          65535,
+          117
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 3,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 4,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 5,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 6,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "target": "esp32c3",
+      "case": 7,
+      "bytes": 28160,
+      "samples": 14080,
+      "max_abs_error": 1,
+      "over_bound": 0,
+      "channels": [
+        {
+          "channel": 0,
+          "max_abs_error": 1,
+          "over_bound": 0
+        },
+        {
+          "channel": 1,
+          "max_abs_error": 1,
+          "over_bound": 0
+        }
+      ],
+      "pcm_sha256": "0a6dcd6738a00ce29b2229db904a1f8e86ecf73ed3d2c5db00c82c2f93c930f4",
+      "xiph_sha256": "3f8eefb8c7d8e7e4e5e4c31025c35fa0bb63a61afa6ca9a2feed918070d98c43",
+      "packet_metrics": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          512,
+          1,
+          0
+        ],
+        [
+          2,
+          2304,
+          1,
+          0
+        ],
+        [
+          3,
+          4096,
+          1,
+          0
+        ],
+        [
+          4,
+          4096,
+          1,
+          0
+        ],
+        [
+          5,
+          2304,
+          1,
+          0
+        ],
+        [
+          6,
+          2304,
+          1,
+          0
+        ],
+        [
+          7,
+          2304,
+          1,
+          0
+        ],
+        [
+          8,
+          512,
+          1,
+          0
+        ],
+        [
+          9,
+          512,
+          1,
+          0
+        ],
+        [
+          10,
+          2304,
+          1,
+          0
+        ],
+        [
+          11,
+          4096,
+          1,
+          0
+        ],
+        [
+          12,
+          2304,
+          1,
+          0
+        ],
+        [
+          13,
+          512,
+          1,
+          0
+        ]
+      ]
+    }
+  ]
+}
