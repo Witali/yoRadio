@@ -27,6 +27,11 @@ advertised rates (8000 through 48000 Hz), plus stereo coupling with all four
 sign quadrants, two submaps with swapped channel mux, and bundled residue2.
 Blocks remain 256/2048. All 294 packets produce 464640 expected PCM16 bytes.
 
+`generate_floor_presence.py` adds the separate [39-case floor1 presence
+supplement](../vorbis_floor_presence/README.md), including residue0/1/2,
+coupling, explicit silence witnesses and packet-to-packet presence changes.
+Its README gives the required explicit fresh-output and control-test commands.
+
 `generate_map2_regression.py` produces eight stereo/192000 Hz cases. Four pairs
 compare sparse lookup2 vectors of dimension16 against dense active rows, or a
 mapped single-entry book against two identical dense rows, with sequence0/1.
