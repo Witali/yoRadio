@@ -1,0 +1,85 @@
+{
+  "schema": "independent-floorpresence39-runtime-source-review-v1",
+  "source_readiness": {
+    "path": ".build/cyd-vorbis-floor-presence-runtime-prep-01/readiness.json",
+    "bytes": 7783,
+    "sha256": "297695b21c90199aff8e2a97708ece79676366682865eacb8dcf1a635da8b56b"
+  },
+  "source_closure": {
+    "path": ".build/codec-reference-runtime-review-20261024-01/source-closure.json",
+    "bytes": 67003,
+    "sha256": "2eb4d44e45b015e19a33a3d465394ed61a4c5501413861d802863e7d73bcbb8c"
+  },
+  "exact_ancestry_diffs": {
+    "path": ".build/codec-reference-runtime-review-20261024-01/exact-diffs.json",
+    "bytes": 2636,
+    "sha256": "9f6a7450232ec969cf9fc0cc4a550071072dacfd50e168deb5adfbcfae96e7b6"
+  },
+  "clarification_readiness": {
+    "path": ".build/cyd-vorbis-floor-presence-source-clarification-01/readiness.json",
+    "bytes": 466,
+    "sha256": "6c8139707373a894eb54ae527c6f63dc32bc95f3c77ac450562c89e7c04c7887"
+  },
+  "clarification": {
+    "path": ".build/cyd-vorbis-floor-presence-source-clarification-01/CLARIFICATION.md",
+    "bytes": 5610,
+    "sha256": "fe41331af6b6c39c209355c16428161624ced1758a91b1bf94778124ad161de0"
+  },
+  "counts": {
+    "indexed": 40,
+    "physical": 41,
+    "origins": 274,
+    "AST_sources": 19,
+    "host_control_methods": 30,
+    "exact_ancestry_diffs": 9,
+    "clarification_origins": 9
+  },
+  "reviewed_scope": {
+    "cases": 39,
+    "raw_packets": 546,
+    "PCM16_bytes": 971520,
+    "protocol_events": 1212,
+    "reference_children": 78,
+    "case_mask": 549755813887,
+    "project_max_abs_error": 2
+  },
+  "implemented_checks": [
+    "Exact actual matrix/manifest and original39 order",
+    "Explicit input decoder selection before -i in host driver; no forced channels/rate",
+    "All full WAV samples, packet PTS/durations/byte counts/MD5 and channel metadata",
+    "Coupling-aware floor masks and residue0/1 skip vs residue2 bundle",
+    "Every predeclared silent PCM sample plus required some-nonzero per packet/channel",
+    "Complete full39 raw target protocol and uint64 coverage",
+    "Actual host and qualifier metadata/terminal hashes sealed only after real outcomes",
+    "Runtime publication after complete actual39 reference binding and234-array recovery",
+    "Actual completed target report and direct-terminal0 gate before numeric PCM access",
+    "Exact reconstructed runtime controller and all persisted full PCM bytes",
+    "Both full reference comparisons under fixed predeclared2LSB; no fitted correction",
+    "Original21 and unrelated NONPASS unchanged"
+  ],
+  "findings": [
+    {
+      "id": "host_nested_output_guard",
+      "severity": "minor",
+      "status": "nonblocking_for_documented_actual_invocation_future_hardening",
+      "detail": "Host driver allows fresh descendants beneath .build. A destination nested under its own prep can enter recursive input freeze. Root uses a separate direct-child output, which avoids this path; no executed source is rewritten."
+    },
+    {
+      "id": "README_overstates_controller_and_replay_evidence",
+      "severity": "documentation",
+      "status": "factually_corrected_by_separate_pinned_clarification",
+      "detail": "Immutable README references QMP/dependency lifecycle and broad independent context replay that this legacy nine-command fixture does not implement. Pinned clarification separates direct stdio/no-reboot terminal completion, explicit source/macro checks, actual controller tools/variant/build-output rehash, and narrower independent numeric replay."
+    }
+  ],
+  "not_implemented_or_qualified": [
+    "QMP greeting/capabilities/quit acknowledgement/SHUTDOWN/EOF lifecycle",
+    "Full configured compiler dependency walk",
+    "Independent numeric rehash of every tool/build-output/variant member",
+    "Complete G1-G8 or Vorbis standard conformance",
+    "Production radio integration or physical performance"
+  ],
+  "prepared_modules_imported": false,
+  "prepared_functions_or_tests_executed": false,
+  "decoders_compilers_SDK_QEMU_Git_executed": false,
+  "verdict": "PASS for the finite implemented source workflow with its pinned factual clarification. Actual execution outcomes remain root-owned evidence; this source review does not invent them."
+}

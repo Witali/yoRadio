@@ -1,0 +1,112 @@
+--- .build/cyd-vorbis-mono-mapping-numeric-prep-02/compare_capture21.py
++++ presence39/compare_capture39.py
+@@ -1,4 +1,4 @@
+-"""Complete21 raw-channel numerical measurement against both recorded references; no processes."""
++"""Complete39 raw-channel numerical measurement against both recorded references; no processes."""
+ import argparse
+ import json
+ from pathlib import Path
+@@ -8,8 +8,8 @@
+ import mono_metrics
+ import pcm_metrics
+ import recorded_qualification as recorded
+-from capture21 import Inputs, capture, relative, sha
+-from policy21 import CASE_IDS, DECODERS, MAX_ABS_ERROR, bounded_policy, whole
++from capture39 import Inputs, capture, relative, sha
++from policy39 import CASE_IDS, DECODERS, MAX_ABS_ERROR, bounded_policy, whole
+ from pcm_metrics import need
+ 
+ HERE = Path(__file__).resolve().parent
+@@ -31,7 +31,7 @@
+ def run(args, result, save):
+     inputs = Inputs()
+     result['inputs'] = inputs.rows
+-    pins = json.loads(inputs.read('adapter/pins', HERE / 'pins.json'))
++    pins = json.loads(inputs.read('adapter/pins', HERE / 'numeric-pins.json'))
+     for name, digest in pins['adapter_helpers'].items():
+         inputs.read('adapter/' + name, HERE / name, digest)
+     inputs.read('adapter/entrypoint', Path(__file__))
+@@ -51,7 +51,7 @@
+     need(matrix_raw == (repo / refs['host_matrix']['path']).read_bytes(), 'Canonical matrix must equal actual host origin bytes')
+     recorded.terminal(outer, 0)
+     recorded.terminal(qterminal, 0)
+-    need(q['profile'] == 'mono21' and q['result'] == 'DUAL_REFERENCE_QUALIFIED' and
++    need(q['profile'] == 'floorpresence39' and q['result'] == 'DUAL_REFERENCE_QUALIFIED' and
+          all(q[k] is True for k in ('completed', 'reference_corpus_qualified', 'xiph_reference_qualified',
+              'dual_reference_qualified', 'original_dual_reference_passed')) and
+          all(q[k] is False for k in ('target_executed', 'production_changed', 'standard_conformance_qualified',
+@@ -59,11 +59,11 @@
+          q['original_report_sha256'] == refs['host']['sha256'] and
+          q['original_outer_receipt_sha256'] == refs['host_outer']['sha256'] and
+          (q['xiph_cases'], q['native_compared'], q['native_lookup2_refusals'], q['paired_raw_packets'], q['expected_pcm_bytes']) ==
+-         (21, 21, 0, 294, 464640) and len(host['cases']) == len(q['cases']) == 21 and len(host['commands']) == 42 and
++         (39, 39, 0, 546, 971520) and len(host['cases']) == len(q['cases']) == 39 and len(host['commands']) == 78 and
+          host['completed'] is host['xiph_reference_qualified'] is host['dual_reference_qualified'] is True and
+          host['failures'] == q['original_failures'] == [] and
+          q['policy'] == dict(max_abs_error=2, predeclared=True, purpose='bounded-reference-crosscheck-not-standard-conformance'),
+-         'Exact existing21 dual-reference scope/policy/actual terminals required')
++         'Exact actual39 dual-reference scope/policy/actual terminals required')
+     need(q['validated_inputs']['qualifier/script']['sha256'] == pins['adapter_helpers']['recorded_qualification.py'] and
+          outer['runner_sha256'] == qterminal['runner_sha256'] == pins['command_wrapper_sha256'], 'Recorded qualifier/wrapper identities')
+     for role, row in q['validated_inputs'].items():
+@@ -71,19 +71,19 @@
+     for name, receipt in (('host', outer), ('qualifier', qterminal)):
+         for path, row in receipt['logs'].items():
+             inputs.read('reference/log/' + name + '/' + path, path, row['sha256'], row['bytes'])
+-    need(binding['schema'] == 'mono21-recorded-dual-reference-binding-v1' and binding['completed'] is True and
++    need(binding['schema'] == 'floor-presence39-recorded-dual-reference-binding-v1' and binding['completed'] is True and
+          binding['contract_sha256'] == contract['contract_sha256'] and
+-         len(binding['cases']) == len(mapping['cases']) == len(matrix['cases']) == 21 and
++         len(binding['cases']) == len(mapping['cases']) == len(matrix['cases']) == 39 and
+          binding['dual_reference_passed'] is binding['actual_single_scope_reference_campaign_exists'] is True and
+-         binding['dual_reference_scope'] == 'only-existing-mono21-campaign' and
++         binding['dual_reference_scope'] == 'only-floor-presence39-campaign' and
+          binding['previous_unrelated_dual_NONPASS_reinterpreted'] is binding['target_executed'] is
+          binding['target_numeric_comparison_performed'] is binding['full_G6_qualified'] is False and
+          binding['new_reference_commands_executed'] is binding['aggregate_reference_campaign_exists'] is False and
+          tuple(c['id'] for c in matrix['cases']) == CASE_IDS and
+-         mapping['original_cases_rewritten'] is False, 'Actual full21 raw/reference binding only')
++         mapping['original_cases_rewritten'] is False, 'Actual full39 raw/reference binding only')
+     host_root = (repo / refs['host']['path']).parent
+     commands = {row['name']: row for row in host['commands']}
+-    need(len(commands) == 42, 'Distinct complete42 reference child commands required')
++    need(len(commands) == 78, 'Distinct complete78 reference child commands required')
+     rows = []
+     for index, (case, item, original, accepted, bound, origin, source) in enumerate(zip(
+             contract['model']['cases'], captured, host['cases'], q['cases'], binding['cases'], mapping['cases'], matrix['cases'])):
+@@ -125,9 +125,9 @@
+             md5path = host_root / 'cases' / rid / ('decode-' + decoder + '.stdout.log')
+             md5fact = q['validated_inputs']['log/cases/' + rid + '/decode-' + decoder + '/decode-' + decoder + '.stdout.log']
+             md5 = inputs.read('reference/framemd5/' + rid + '/' + decoder, md5path, md5fact['sha256'], md5fact['bytes'])
+-            pcm, info = recorded.decoded_pcm(wav, md5, case['rate'], case['channels'], case['frames'], case['modes'])
++            pcm, info = recorded.decoded_pcm(wav, md5, case['rate'], case['channels'], case['frames'], case['modes'], source)
+             need(info == original['decoded'][decoder] == bound['actual_reference_decoders'][decoder] and
+-                 len(pcm) == len(item['pcm']) == case['total_pcm'], 'Complete42 recorded WAV/framemd5 real-channel reference streams required')
++                 len(pcm) == len(item['pcm']) == case['total_pcm'], 'Complete78 recorded WAV/framemd5 real-channel reference streams required')
+             pcms[decoder], details[decoder] = pcm, info
+             references[decoder] = dict(comparison=metrics.compare(pcm, item['pcm'], case['pcm']),
+                 alignment_diagnostic=metrics.alignment(pcm, item['pcm'], 8),
+@@ -140,7 +140,7 @@
+              accepted['pcm_sha256'] == details['libvorbis']['pcm_sha256'] == bound['reference_pcm_sha256'],
+              'Actual full reference crosscheck/recorded qualification changed')
+         rows.append(dict(case=index, id=case['id'], rate=case['rate'], channels=case['channels'], bits=16,
+-            frames=case['frames'], packet_bytes=case['pcm'], pcm_bytes=len(item['pcm']),
++            frames=case['frames'], packet_bytes=case['pcm'], pcm_bytes=len(item['pcm']), floor_masks=case['floor_masks'],
+             packet_offsets=item['packet_offsets'], reference_id=rid, references=references,
+             original_reference_cross_comparison=cross, original_reference_metadata=details))
+         result['cases'] = rows
+@@ -149,11 +149,11 @@
+     inputs.current()
+     result.update(result='BOUNDED_CORPUS_PCM_QUALIFIED' if bounded else 'BOUNDED_CORPUS_PCM_REJECTED',
+         measurement_completed=True, actual_reference_compared=True, target_platform_verified=True,
+-        complete_target_cases=21, complete_target_packets=294, complete_target_PCM_bytes=464640,
+-        complete_reference_streams_verified=42, complete_target_reference_comparisons=42,
++        complete_target_cases=39, complete_target_packets=546, complete_target_PCM_bytes=971520,
++        complete_reference_streams_verified=78, complete_target_reference_comparisons=78,
+         policy=policy, bounded_corpus_pcm_qualified=bounded,
+         bounded_by_reference=policy['bounded_by_reference'], original_dual_reference_passed=True,
+-        original_dual_reference_scope='only-existing-mono21-campaign',
++        original_dual_reference_scope='only-floor-presence39-campaign',
+         original_reference_report_sha256=refs['host']['sha256'], original_reference_failures=host['failures'],
+         previous_unrelated_NONPASS_reinterpreted=False, no_predeclared_metamorphic_groups=True,
+         target_report_sha256=args.target_report_sha256, target_terminal_sha256=args.target_terminal_sha256,

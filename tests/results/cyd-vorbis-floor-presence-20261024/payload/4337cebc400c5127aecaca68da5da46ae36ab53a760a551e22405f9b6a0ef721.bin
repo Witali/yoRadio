@@ -1,0 +1,98 @@
+--- mono21/materialize.py
++++ presence39/materialize.py
+@@ -1,4 +1,4 @@
+-"""Root-owned pure21 materialization; imports pinned corrected25 formatting helpers."""
++"""Root-owned pure39 presence materialization; imports pinned corrected25 formatting helpers."""
+ import hashlib
+ import importlib.util
+ import json
+@@ -21,7 +21,7 @@
+ 
+ def base_module():
+     need(digest(BASE_PATH.read_bytes()) == BASE_SHA, "corrected25_materializer_pin")
+-    spec = importlib.util.spec_from_file_location("mono21_corrected25_materializer", BASE_PATH)
++    spec = importlib.util.spec_from_file_location("presence39_corrected25_materializer", BASE_PATH)
+     module = importlib.util.module_from_spec(spec)
+     spec.loader.exec_module(module)  # Definitions only; original guarded main never runs.
+     return module
+@@ -31,9 +31,9 @@
+     base = base_module()
+     model = contract["model"]
+     count = len(model["cases"])
+-    need(count == len(raw_cases) == 21 and model["case_mask"] == (1 << count) - 1 and count <= 31,
+-         "complete21_bounded_model")
+-    text = ("// Complete public raw21 data; materialization is not target qualification.\n"
++    need(count == len(raw_cases) == 39 and model["case_mask"] == (1 << count) - 1 and count <= 63,
++         "complete39_bounded_model")
++    text = ("// Complete public floor-presence39 raw data; materialization is not target qualification.\n"
+         "#pragma once\n#include \"corpus_case.h\"\n\n"
+         f"#define CORPUS_CASE_COUNT {count}U\n"
+         f"#define CORPUS_CONTRACT_SHA256 \"{contract['contract_sha256']}\"\n"
+@@ -42,13 +42,18 @@
+     descriptors = []
+     for index, (case, raw) in enumerate(zip(model["cases"], raw_cases)):
+         names = base.symbols(index)
++        names["floors"] = f"corpus_{index:03d}_floors"
+         for kind in ("identification", "setup", "audio"):
+             need(digest(raw[kind]) == case["raw_sha256"][kind], "model_raw_identity")
+             text += base.array(names[kind], "uint8_t", raw[kind])
+         text += base.array(names["offsets"], "uint32_t", case["offsets"])
+         text += base.array(names["modes"], "uint8_t", case["modes"])
++        text += base.array(names["floors"], "uint8_t", case["floor_masks"])
++        fields = base.descriptor_fields(index, case)
++        fields["floor_masks"] = names["floors"]
++        fields["floor_mask_count"] = f"sizeof({names['floors']}) / sizeof({names['floors']}[0])"
+         descriptors.append("    {\n" + "".join(f"        .{key} = {value},\n"
+-            for key, value in base.descriptor_fields(index, case).items()) + "    },\n")
++            for key, value in fields.items()) + "    },\n")
+     text += "static const corpus_case_t corpus_cases[CORPUS_CASE_COUNT] = {\n" + "".join(descriptors) + "};\n"
+     return text, descriptors
+ 
+@@ -57,7 +62,7 @@
+     """Independent restricted C parser: no compiler, formatter or generator calls."""
+     model, cases = contract["model"], contract["model"]["cases"]
+     count = len(cases)
+-    need(count == len(raw_cases) == 21 and count <= 31, "recovery_complete21")
++    need(count == len(raw_cases) == 39 and count <= 63, "recovery_complete39")
+     for name, expected in (("CORPUS_CASE_COUNT", f"{count}U"),
+         ("CORPUS_EXPECTED_PCM_BYTES", f"{model['total_pcm']}U"),
+         ("CORPUS_CONTRACT_SHA256", json.dumps(contract["contract_sha256"])),
+@@ -74,7 +79,7 @@
+         need(len(values) == int(capacity) and all(0 <= value <= (255 if kind == "uint8_t" else 0xffffffff)
+              for value in values), "array_capacity_or_integer_range")
+         arrays[name] = (kind, values)
+-    need(len(arrays) == count * 5, "complete_array_set")
++    need(len(arrays) == count * 6, "complete_array_set")
+     tables = re.findall(r"static const corpus_case_t corpus_cases\[CORPUS_CASE_COUNT\] = \{\n(.*?)\n\};", text, re.S)
+     need(len(tables) == 1, "one_bounded_descriptor_table")
+     blocks = re.findall(r"    \{\n(.*?)    \},\n?", tables[0], re.S)
+@@ -82,7 +87,7 @@
+     need(declared == len(blocks) == count == len(raw_cases), "declared_capacity_descriptor_model_raw_count")
+     rows, used = [], set()
+     for index, (case, raw, block) in enumerate(zip(cases, raw_cases, blocks)):
+-        names = {kind: f"corpus_{index:03d}_{kind}" for kind in ("identification", "setup", "audio", "offsets", "modes")}
++        names = {kind: f"corpus_{index:03d}_{kind}" for kind in ("identification", "setup", "audio", "offsets", "modes", "floors")}
+         expected = {"id": json.dumps(case["id"])}
+         for kind in ("identification", "setup", "audio"):
+             expected[kind], expected[kind + "_size"] = names[kind], f"sizeof({names[kind]})"
+@@ -93,6 +98,9 @@
+             expected[kind] = names[kind]
+             expected[count_field] = f"sizeof({names[kind]}) / sizeof({names[kind]}[0])"
+             need(arrays[names[kind]] == (c_type, case[kind]), "model_array_values:" + kind)
++        expected["floor_masks"] = names["floors"]
++        expected["floor_mask_count"] = f"sizeof({names['floors']}) / sizeof({names['floors']}[0])"
++        need(arrays[names["floors"]] == ("uint8_t", case["floor_masks"]), "model_array_values:floors")
+         for field, value in (("rate", case["rate"]), ("channels", case["channels"]), ("short_block", case["short"]),
+             ("long_block", case["long"]), ("expected_pcm_bytes", case["total_pcm"])):
+             expected[field] = f"{value}U"
+@@ -144,8 +152,8 @@
+             observed.append(dict(name=name, rejected=True, exact_reason=reason))
+         else:
+             raise RuntimeError("control_accepted:" + name)
+-    report = dict(schema="mono21-pure-materialization-v1", completed=True, source_verified=True,
+-        counts=dict(cases=cases, arrays=cases * 5, full_raw_payload_arrays=cases * 3,
++    report = dict(schema="presence39-pure-materialization-v1", completed=True, source_verified=True,
++        counts=dict(cases=cases, arrays=cases * 6, full_raw_payload_arrays=cases * 3,
+             packets=contract["model"]["total_packets"], expected_pcm_bytes=pcm,
+             descriptor_capacity=cases, case_mask=contract["model"]["case_mask"]),
+         header=dict(path=str(header.resolve()), bytes=header.stat().st_size, sha256=digest(header.read_bytes())),

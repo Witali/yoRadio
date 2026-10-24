@@ -1,0 +1,86 @@
+"""Seal numeric39 input pins from explicit actual complete target facts; no PCM read."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+ADAPTERS = ('compare_capture39.py', 'capture39.py', 'policy39.py', 'mono_metrics.py',
+            'pcm_metrics.py', 'recorded_qualification.py', 'carrier.py', 'pcm_witness.py')
+HELPERS = ('protocol.py', 'windows_compile_command.py', 'materialize.py', 'reference_binding.py',
+           'recorded_qualification.py', 'carrier.py', 'pcm_witness.py')
+
+
+def need(ok, reason):
+    if not ok:
+        raise RuntimeError(reason)
+
+
+def sha(raw): return hashlib.sha256(raw).hexdigest()
+
+
+def fact(path):
+    path = Path(path).resolve(); raw = path.read_bytes()
+    return dict(path=str(path), bytes=len(raw), sha256=sha(raw))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('runtime', 'target', 'target-terminal', 'output'):
+        parser.add_argument('--' + name, type=Path, required=True)
+    for name in ('target-report-sha256', 'target-terminal-sha256', 'runtime-preparation-sha256', 'readiness-sha256'):
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args(); runtime, target, output = (getattr(args, name).resolve() for name in ('runtime', 'target', 'output'))
+    need(runtime.parent == target.parent == output.parent == ROOT / '.build' and not output.exists() and
+         len({runtime, target, output, HERE}) == 4, 'separate_actual_runtime_capture_and_fresh_numeric_bundle')
+    readiness_path = HERE / 'readiness.json'; readiness = json.loads(readiness_path.read_bytes())
+    need(sha(readiness_path.read_bytes()) == args.readiness_sha256, 'reviewed_runtime_source_readiness')
+    source_facts = [fact(readiness_path)]
+    for row in readiness['files']:
+        actual = fact(HERE / row['path']); need((actual['bytes'], actual['sha256']) == (row['bytes'], row['sha256']), 'numeric_source_preparation_pin')
+        source_facts.append(actual)
+    actual_capture = {}
+    for role, path, digest in (('target_report', target / 'report.json', args.target_report_sha256),
+        ('target_terminal', args.target_terminal.resolve(), args.target_terminal_sha256),
+        ('runtime_preparation', runtime / 'preparation.json', args.runtime_preparation_sha256)):
+        row = fact(path); need(row['sha256'] == digest and path.is_relative_to(ROOT), 'explicit_actual_target_fact:' + role)
+        actual_capture[role] = dict(row, path=path.relative_to(ROOT).as_posix())
+    report = json.loads((target / 'report.json').read_bytes()); terminal = json.loads(args.target_terminal.read_bytes())
+    preparation = json.loads((runtime / 'preparation.json').read_bytes())
+    need(report['result'] == 'CHECKED_CORPUS_PCM_CAPTURED' and report['completed'] is report['target_capture_completed'] is True and
+         terminal['schema'] == 'direct-exec-tool-terminal-v1' and type(terminal['exit_code']) is int and terminal['exit_code'] == 0 and
+         terminal['report_sha256'] == args.target_report_sha256 and terminal['entrypoint_sha256'] == preparation['controller']['sha256'],
+         'actual_complete_capture_direct_terminal0_before_numeric_seal')
+    need(preparation['schema'] == 'floorpresence39-root-materialization-v1' and preparation['completed'] is True and
+         preparation['counts'] == dict(cases=39, packets=546, expected_pcm_bytes=971520, protocol_events=1212,
+             case_mask=549755813887, arrays=234, full_raw_arrays=117), 'actual_complete39_runtime_shape')
+    runtime_pins = json.loads((runtime / 'source-pins.json').read_bytes())
+    runtime_helpers = {}
+    for name in HELPERS:
+        prepared, actual = fact(HERE / name), fact(runtime / name)
+        need((prepared['bytes'], prepared['sha256']) == (actual['bytes'], actual['sha256']), 'actual_runtime_helper_source:' + name)
+        runtime_helpers[name] = actual['sha256']
+    template = fact(HERE / 'controller.template.py')
+    pins = dict(schema='floor-presence39-actual-numeric-input-pins-v1', actual_capture=actual_capture,
+        reference=runtime_pins['reference'], runtime_helpers=runtime_helpers,
+        adapter_helpers={name: fact(HERE / name)['sha256'] for name in ADAPTERS},
+        frozen_runtime_prep_readiness=dict(path=readiness_path.relative_to(ROOT).as_posix(), sha256=args.readiness_sha256),
+        controller_template=dict(path=Path(template['path']).relative_to(ROOT).as_posix(), sha256=template['sha256']),
+        caller_sha256=fact(HERE / 'target/cyd_vorbis_floor_presence39_qemu/main/main.c')['sha256'],
+        setup_sha256='6b36d56bf0800cae21e071e194353993237f6bfd93f6ea73ea28c4c480b4903c',
+        command_wrapper_sha256='33a64601d773382e748d69391eb068d7bc2b682540e3b670ddc13c0a19e22f7e')
+    output.mkdir()
+    for name in ADAPTERS:
+        with (output / name).open('xb') as stream: stream.write((HERE / name).read_bytes())
+    with (output / 'numeric-pins.json').open('xb') as stream: stream.write((json.dumps(pins, indent=2) + '\n').encode())
+    for row in source_facts: need(fact(row['path']) == row, 'numeric_source_changed_while_sealing')
+    with (output / 'preparation.json').open('xb') as stream:
+        stream.write((json.dumps(dict(schema='floor-presence39-numeric-seal-v1', completed=True,
+            target_report_and_terminal_read=True, target_PCM_or_protocol_logs_read=False,
+            numeric_comparison_executed=False, source_facts=source_facts,
+            actual_capture=actual_capture, pins=fact(output / 'numeric-pins.json')), indent=2) + '\n').encode())
+    print(json.dumps(dict(output=str(output), pins=fact(output / 'numeric-pins.json'), numeric_comparison_executed=False)))
+
+
+if __name__ == '__main__': main()

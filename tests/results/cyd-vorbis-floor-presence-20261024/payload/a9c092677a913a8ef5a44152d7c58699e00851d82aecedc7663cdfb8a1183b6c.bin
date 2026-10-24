@@ -1,0 +1,111 @@
+--- .build/cyd-vorbis-mono-mapping-numeric-prep-02/policy21.py
++++ presence39/policy39.py
+@@ -1,13 +1,20 @@
+-"""Predeclared full21 raw-channel zero-lag bound2; no output-dependent policy fitting."""
++"""Predeclared complete39 raw-channel bound2 and presence semantics."""
+ from pcm_metrics import need
+ 
+-RATES = (8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000)
+-CASE_IDS = tuple('uncoupled-c' + str(channels) + '-r' + str(rate)
+-                 for rate in RATES for channels in (1, 2)) + (
+-    'coupled-c2-r48000', 'submaps-c2-r48000', 'residue2-c2-r48000')
+-CHANNELS = (1, 2) * 9 + (2, 2, 2)
+-CASE_RATES = tuple(rate for rate in RATES for unused in (1, 2)) + (48000, 48000, 48000)
++MODES = tuple(int(x) for x in '00111010001100')
+ FRAMES = (0, 128, 576, 1024, 1024, 576, 576, 576, 128, 128, 576, 1024, 576, 128)
++MONO_SCHEDULE = (0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1)
++STEREO_SCHEDULE = (0, 0, 1, 2, 3, 0, 2, 1, 0, 0, 3, 3, 0, 1)
++REQUESTS = tuple((f'floor1-r{r}-mono-mask{m}', 1, (m,) * 14) for r in range(3) for m in range(2)) + tuple(
++    (f"floor1-r{r}-{'coupled' if c else 'uncoupled'}-mask{m:02b}", 2, (m,) * 14)
++    for r in range(3) for c in (False, True) for m in range(4)) + tuple(
++    (f'floor1-r{r}-mono-schedule', 1, MONO_SCHEDULE) for r in range(3)) + tuple(
++    (f"floor1-r{r}-{'coupled' if c else 'uncoupled'}-schedule", 2, STEREO_SCHEDULE)
++    for r in range(3) for c in (False, True))
++CASE_IDS = tuple(row[0] for row in REQUESTS)
++CHANNELS = tuple(row[1] for row in REQUESTS)
++SCHEDULES = tuple(row[2] for row in REQUESTS)
++CASE_RATES = (48000,) * 39
+ DECODERS = ('vorbis', 'libvorbis')
+ MAX_ABS_ERROR = 2
+ 
+@@ -18,47 +25,49 @@
+ 
+ def bounded_policy(cases, max_abs_error=MAX_ABS_ERROR):
+     need(type(max_abs_error) is int and max_abs_error == 2, 'Only fixed predeclared bound2 is supported')
+-    need(tuple(row['id'] for row in cases) == CASE_IDS and
+-         [row['case'] for row in cases] == list(range(21)) and
+-         tuple(row['channels'] for row in cases) == CHANNELS, 'Exact complete21 ordered mono/stereo cases required')
++    need(tuple(row['id'] for row in cases) == CASE_IDS and [row['case'] for row in cases] == list(range(39)) and
++         tuple(row['channels'] for row in cases) == CHANNELS, 'Exact complete39 ordered mono/stereo cases required')
+     numeric = {decoder: True for decoder in DECODERS}
+-    nonzero = {decoder: True for decoder in DECODERS}
+-    transitions = {decoder: True for decoder in DECODERS}
+-    for row, channels, rate in zip(cases, CHANNELS, CASE_RATES):
+-        need(tuple(row['frames']) == FRAMES and row['bits'] == 16 and row['rate'] == rate and
+-             row['packet_bytes'] == [n * channels * 2 for n in FRAMES] and
++    presence = {decoder: True for decoder in DECODERS}
++    for row, channels, schedule in zip(cases, CHANNELS, SCHEDULES):
++        need(tuple(row['frames']) == FRAMES and row['bits'] == 16 and row['rate'] == 48000 and
++             tuple(row['floor_masks']) == schedule and row['packet_bytes'] == [n * channels * 2 for n in FRAMES] and
+              row['pcm_bytes'] == 7040 * channels * 2 and set(row['references']) == set(DECODERS),
+-             'Exact full21 frames/real-channel PCM/reference geometry required')
++             'Exact39 predeclared masks/frames/PCM/reference geometry required')
++        ever_present = [any(mask & (1 << c) for mask in schedule) for c in range(channels)]
++        expected_transition = {}
++        for packet in range(1, 14):
++            name = 'SL'[MODES[packet - 1]] + 'SL'[MODES[packet]]
++            values = expected_transition.setdefault(name, [False] * channels)
++            for channel in range(channels):
++                values[channel] |= bool((schedule[packet - 1] | schedule[packet]) & (1 << channel))
+         for decoder in DECODERS:
+-            ref = row['references'][decoder]
+-            comparison = ref['comparison']
++            ref = row['references'][decoder]; comparison = ref['comparison']
+             need(comparison['frames'] == 7040 and len(comparison['channels']) == channels and
+                  len(comparison['packets']) == 14 and
+-                 [packet['packet'] for packet in comparison['packets']] == list(range(14)) and
+-                 [packet['bytes'] for packet in comparison['packets']] == row['packet_bytes'] and
+-                 [packet['frames'] for packet in comparison['packets']] == list(FRAMES) and
+-                 all(len(packet['channels']) == channels for packet in comparison['packets']) and
++                 [p['packet'] for p in comparison['packets']] == list(range(14)) and
++                 [p['bytes'] for p in comparison['packets']] == row['packet_bytes'] and
++                 [p['frames'] for p in comparison['packets']] == list(FRAMES) and
++                 all(len(p['channels']) == channels for p in comparison['packets']) and
+                  whole(comparison, channels)['samples'] == 7040 * channels and
+-                 all(channel['samples'] == 7040 for channel in comparison['channels']),
+-                 'Complete unchanged mono/stereo measurement sample/packet counts required')
+-            numeric[decoder] = numeric[decoder] and whole(comparison, channels)['max_abs_error'] <= max_abs_error
+-            nonzero[decoder] = nonzero[decoder] and all(
+-                channel['reference_nonzero_samples'] > 0 and channel['target_nonzero_samples'] > 0
+-                for channel in comparison['channels'])
++                 all(c['samples'] == 7040 for c in comparison['channels']), 'Complete39 full sample/packet counts required')
++            numeric[decoder] &= whole(comparison, channels)['max_abs_error'] <= max_abs_error
++            for channel, active in zip(comparison['channels'], ever_present):
++                presence[decoder] &= ((channel['reference_nonzero_samples'] > 0) == active and
++                                      (channel['target_nonzero_samples'] > 0) == active)
+             for name in ('reference_transition_nonzero', 'target_transition_nonzero'):
+                 counts = ref[name]
+-                transitions[decoder] = transitions[decoder] and set(counts) == {'SS', 'SL', 'LS', 'LL'} and all(
+-                    len(values) == channels and all(type(n) is int and n > 0 for n in values)
+-                    for values in counts.values())
+-    policy = dict(purpose='bounded-corpus-regression-not-standard-conformance', scope='exact_mono_mapping21',
+-        max_abs_error=2, required_cases=21, required_reference_comparisons=42,
++                presence[decoder] &= set(counts) == set(expected_transition) and all(
++                    len(counts[kind]) == channels and all(type(n) is int and n >= 0 and (n > 0) == expected
++                        for n, expected in zip(counts[kind], expected_transition[kind])) for kind in expected_transition)
++    policy = dict(purpose='bounded-corpus-regression-not-standard-conformance', scope='exact_floor_presence39',
++        max_abs_error=2, required_cases=39, required_reference_comparisons=78,
+         selected_before_target_measurement=True, threshold_fitted_to_output=False,
+         both_existing_reference_decoders_required=True, zero_lag_original_channels_only=True,
+         applied_trim=False, applied_gain_fit=False, applied_shift=False, applied_channel_swap=False,
+         applied_resampling=False, applied_mono_duplication=False, applied_padding=False,
+-        max_abs_error_within_bound_by_reference=numeric, every_actual_channel_nonzero_by_reference=nonzero,
+-        every_actual_channel_nonzero_each_transition_by_reference=transitions,
+-        bounded_by_reference={decoder: numeric[decoder] and nonzero[decoder] and transitions[decoder]
+-                              for decoder in DECODERS},
+-        original_dual_reference_scope='only-existing-mono21-campaign', previous_unrelated_NONPASS_reinterpreted=False)
++        max_abs_error_within_bound_by_reference=numeric, predeclared_zero_nonzero_summary_by_reference=presence,
++        full_per_frame_silence_witnesses_required_before_metrics=True,
++        bounded_by_reference={decoder: bool(numeric[decoder] and presence[decoder]) for decoder in DECODERS},
++        original_dual_reference_scope='only-floor-presence39-campaign', previous_unrelated_NONPASS_reinterpreted=False)
+     return policy, all(policy['bounded_by_reference'].values())

@@ -1,6 +1,6 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-10-23. Ветка: `codex/esp32-cyd-c3-review`.
+Обновлено: 2026-10-24. Ветка: `codex/esp32-cyd-c3-review`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
@@ -1140,3 +1140,22 @@ Stream остаётся на core0, decode/output на core1 с прежними
   корректна для отрицательных значений — эти пути без доказанного дефекта не менялись.
   CYD stream core0/decode-output core1, приоритеты/стеки и C3 unicore сохранены.
   Codec deferrals и fullG6/radio/resource/physical gates остаются открытыми.
+
+- 2026-10-24, CYD-C3-14/G6: [floor1 presence39](../tests/results/cyd-vorbis-floor-presence-20261024/CHECKPOINT.md)
+  закрывает отдельный пробел floor present/absent, coupling-aware residue0/1/2
+  и перекрытия окон: 9 mono/30 stereo, 546 пакетов/971520 PCM байт/1212 events.
+  [Генератор](../tests/vorbis_format_corpus/generate_floor_presence.py) и
+  [контрольные тесты](../tests/vorbis_floor_presence/README.md) доступны в tests;
+  30 исходных и 17 canonical controls проходят. Оба эталона выполняют все78
+  декодирований; Xtensa/ESP32/240MHz/two-core target сохраняет worker core1,
+  priority3/stack16384 и coordinator core0. Все78 полных target/reference
+  сравнений имеют max1 при прежнем проектном пределе2LSB, без коррекции PCM.
+  [Автономный replay](../tests/results/cyd-vorbis-floor-presence-verification-20261024/README.md)
+  проходит до/после переноса архива, второй раз из другого cwd. Архив433 файла,
+  manifest `0f95d0c5451290879a088ef4648ebd89cc966622584ebdbb769f2737a08f9cfc`.
+  Первый отказ упаковки сохранён; добавлены точные source aliases без изменения
+  verifier/helpers/policy. Контроллер остаётся прежним nine-command fixture
+  без QMP; полный dependency walk и независимая проверка пропущенных binaries
+  не заявляются. Scalar dimension1 не расширяет multidimensional residue0.
+  Production source/ABI/core bindings сохранены; старые wide/floor0/sequence1
+  NONPASS, codec deferrals, fullG6/radio/physical gates остаются открытыми.

@@ -1,0 +1,50 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\pathlib.py", line 1311, in mkdir
+    os.mkdir(self, mode)
+FileNotFoundError: [WinError 3] Системе не удается найти указанный путь: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{343cc424-4a9b-4401-bd57-0e5592a19f65}\\AC\\Temp\\floor-presence39-archive-co3tf_e4\\cases\\floor1-r0-coupled-mask00'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-floor-presence-archive-stage-02\verify.py", line 196, in run
+    destination.parent.mkdir(parents=True, exist_ok=True); destination.write_bytes(get(corpus_name + '/' + relative))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\pathlib.py", line 1315, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\pathlib.py", line 1311, in mkdir
+    os.mkdir(self, mode)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{343cc424-4a9b-4401-bd57-0e5592a19f65}\\AC\\Temp\\floor-presence39-archive-co3tf_e4\\cases'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{343cc424-4a9b-4401-bd57-0e5592a19f65}\\AC\\Temp\\floor-presence39-archive-co3tf_e4'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-floor-presence-archive-stage-02\verify.py", line 281, in <module>
+    run(parser.parse_args())
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-floor-presence-archive-stage-02\verify.py", line 190, in run
+    with tempfile.TemporaryDirectory(prefix='floor-presence39-archive-') as temporary:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Отказано в доступе: 'C:\\Users\\rudol\\AppData\\Local\\Packages\\sandbox.{343cc424-4a9b-4401-bd57-0e5592a19f65}\\AC\\Temp\\floor-presence39-archive-co3tf_e4'

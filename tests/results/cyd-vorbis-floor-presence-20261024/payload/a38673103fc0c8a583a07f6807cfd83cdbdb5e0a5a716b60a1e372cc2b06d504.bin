@@ -1,0 +1,11 @@
+--- prep01/generate.py
++++ prep02/generate.py
+@@ -281,6 +281,8 @@
+         pages = base.read_pages(carrier)
+         need([p["packet"] for p in pages] == all_packets and [p["granule"] for p in pages] == [0, 0, 0] + granules,
+              "complete_Ogg_packet_CRC_granule_roundtrip")
++        need(all(p["serial"] == 0x46500001 + index for p in pages), "complete_Ogg_serial_roundtrip")
++        need([p["flags"] for p in pages] == [2] + [0] * 15 + [4], "complete_Ogg_flags_roundtrip")
+         for kind, data in raw.items(): payloads[folder + kind + ".bin"] = data
+         payloads[folder + "reference.ogg"] = carrier
+         pcm = [count * channels * 2 for count in frames]

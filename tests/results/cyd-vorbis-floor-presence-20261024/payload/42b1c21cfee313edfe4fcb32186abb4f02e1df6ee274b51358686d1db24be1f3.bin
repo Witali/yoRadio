@@ -1,0 +1,61 @@
+--- mono21/protocol.py
++++ floorpresence39/protocol.py
+@@ -5,7 +5,8 @@
+ import re
+ 
+ PREFIX = "CYD_VORBIS_CHECKED_CORPUS_"
+-MAX_CASES, PACKETS = 31, 14
++MAX_CASES, PACKETS = 63, 14
++import pcm_witness
+ 
+ 
+ def need(condition, message):
+@@ -56,12 +57,13 @@
+     return dict(id=case["id"], source_index=source_index, rate=rate, channels=channels,
+                 short=short, long=long, offsets=offsets, modes=modes, sizes=sizes,
+                 frames=frames, pcm=pcm, total_pcm=sum(pcm), transitions=transitions,
+-                raw_sha256={k: sha(v) for k, v in raw.items()}), facts
++                raw_sha256={k: sha(v) for k, v in raw.items()},
++                floor_masks=case["schedule"], presence_witnesses=pcm_witness.derive(case)), facts
+ 
+ 
+ def load_contract(manifest_inputs):
+     """Inputs are explicit {path, sha256} pairs; caller supplies independently pinned SHAs."""
+-    need(len(manifest_inputs) == 1, "one complete mono21 source matrix required")
++    need(len(manifest_inputs) == 1, "one complete floorpresence39 source matrix required")
+     cases, facts, pins = [], [], []
+     for source_index, source in enumerate(manifest_inputs):
+         path = Path(source["path"]).resolve()
+@@ -70,11 +72,11 @@
+         pins.append(dict(path=str(path), sha256=source["sha256"]))
+         facts.append(dict(path=str(path), bytes=len(data), sha256=sha(data)))
+         matrix = json.loads(data)
+-        need(len(matrix["cases"]) == 21, "complete21 source cases required")
++        need(len(matrix["cases"]) == 39, "complete39 source cases required")
+         for case in matrix["cases"]:
+             item, raw_facts = inspect_case(case, path.parent, source_index)
+             cases.append(item); facts.extend(raw_facts)
+-    need(len(cases) == 21 <= MAX_CASES and len({c["id"] for c in cases}) == len(cases), "complete21 distinct named cases")
++    need(len(cases) == 39 <= MAX_CASES and len({c["id"] for c in cases}) == len(cases), "complete39 distinct named cases")
+     model = dict(schema="public-vorbis-corpus-contract-v1", manifest_sha256=[p["sha256"] for p in pins],
+                  cases=cases, total_packets=len(cases) * PACKETS,
+                  total_pcm=sum(c["total_pcm"] for c in cases), case_mask=(1 << len(cases)) - 1)
+@@ -136,16 +138,14 @@
+             result = take("PACKET", dict(case=index, packet=packet, size=size, checked_rc=0,
+                 checked_consumed=size, expected_pcm=pcm, checked_pcm=pcm, checked_rate=case["rate"],
+                 checked_channels=case["channels"], checked_bits=16, checked_canary=1, transition=transition, core=1), ("nz_l", "nz_r"))
+-            need((result["nz_l"] == result["nz_r"] == 0) if not packet else
+-                 (1 <= result["nz_l"] <= frames and
+-                  (result["nz_r"] == 0 if case["channels"] == 1 else 1 <= result["nz_r"] <= frames)),
+-                 "nonzero each actual channel/transition; absent mono right channel stays zero")
+             emitted = take("PCM_HEX", dict(case=index, packet=packet, bytes=pcm, core=1), strings=("hex",))["hex"]
+             need(len(emitted) == 2 * pcm and re.fullmatch(r"(?:[0-9a-f]{2})*", emitted) is not None,
+                  "PCM hex length/alphabet")
+             packet_pcm = bytes.fromhex(emitted)
+             observed = channel_nonzero(packet_pcm, case["channels"])
+             need(observed == result, "PCM bytes/nonzero observations disagree")
++            need(pcm_witness.packet(packet_pcm, case["channels"], case["presence_witnesses"][packet]) == result,
++                 "predeclared presence/overlap witness")
+             case_pcm.extend(packet_pcm); packet_offsets.append(len(case_pcm))
+             nl += result["nz_l"]; nr += result["nz_r"]
+         take("CLOSE", dict(case=index, checked_rc=0, core=1))

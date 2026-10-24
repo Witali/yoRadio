@@ -1,0 +1,121 @@
+# Floor1 presence39 source proposal
+
+This separate supplement contains39 valid raw-input cases, each14 packets,
+48000Hz, mono/stereo, short256/long2048, and the unchanged mode schedule
+`SSLLLSLSSSLLSS`. The existing mono21 generator, corpora, reference runs and target
+results remain byte-exact. These sources have not been imported or executed by
+the preparer. There is no generated corpus, reference result, target execution,
+test pass, production change or G6 qualification in this preparation.
+
+| New cases | Count | Matrix |
+| --- | ---: | --- |
+| Mono constants | 6 | residue0/1/2 × floor mask0/1 |
+| Stereo constants | 24 | residue0/1/2 × uncoupled/coupled × floor mask00/01/10/11 |
+| Mono scheduled | 3 | residue0/1/2 × fixed14-packet schedule |
+| Stereo scheduled | 6 | residue0/1/2 × uncoupled/coupled × fixed14-packet schedule |
+
+Maskbit0 means channel0, maskbit1 channel1. Binary ID suffix01 therefore means
+channel0 present and channel1 absent. Mono schedule:
+`[0,0,1,0,1,1,0,1,0,0,1,1,0,1]`. Stereo schedule:
+`[0,0,1,2,3,0,2,1,0,0,3,3,0,1]`. These schedules are declared before measurements;
+they include both silent runs and reactivation, alongside all four block
+transition types and all four long-window neighbor shapes. The finite set does
+not claim every possible mask-transition × window-transition Cartesian product.
+
+## Packet grammar and independent accounting
+
+The original mono21/minimal helpers are SHA-pinned ordinary imports. There is no
+function replacement, altered helper global, corpus trimming or relabelling.
+Setup contains the same classbook length1/symbol0, complete scalar mapped book,
+floor1 with no partitions, multiplier1, rangebits10 (endpoint1024), one submap,
+two modes and optional stereo coupling magnitude0/angle1. All mapped operands are
+unchanged finite nonzero quantizers. No blocked zero-guard/public-book sentinel,
+private handle, reset/EOF/OOM, damaged-input, FLAC or AAC work is involved.
+
+The complete mapped scalar tree is two entries(-1,+1) for uncoupled/mono and four
+entries(-2,-1,+1,+2) for coupled cases, exactly as in mono21. All dimensions are1.
+This deliberately exercises the residue0/1 skip branches without claiming new
+multi-dimensional residue0 placement coverage: with dimension1 their scalar wire
+order coincides. Residue0/1 range0..16, partition16. Residue2 range0..16×channels,
+partition16×channels; positions interleave all channels and each has16 scalars.
+
+Each audio packet begins type0, one modebit, and for long blocks two exact
+neighbor flags. All floor records precede residue data in channel order. Each
+floor begins one presentbit; only present floors have y0=y1=255 (8bits each).
+The actual floor flags independently determine nonzero flags. Coupling propagates
+decode-needed to both channels if either floor is present (VorbisI4.3.3).
+Residue0/1 skip each decode-not-needed channel. If any channel needs residue2,
+the complete bundle is read, including initially skipped channels (8.6.5).
+When all channels are skipped there are no classwords or VQ symbols. Otherwise
+residue0/1 emit one zero classword per active channel then channel-major vectors;
+residue2 emits one zero classword then interleaved vectors. The bit reader checks
+all values, exact bytes/zero padding, inverse coupling and final floor zeroing.
+The scalar model is construction accounting and does not synthesize PCM.
+
+One raw packet is placed per Ogg page solely for reference decoders. CRC, serial,
+sequence, exact packet bytes and cumulative overlap granules are checked. CYD
+continues to receive only raw identification/setup/audio packets via the public
+API and the unchanged setup/output bridge.
+
+## Predeclared silence and nonzero witnesses
+
+The final spectrum of a channel with an unused floor is zero even if coupling
+caused its residue to be decoded. Current packet absence alone does not imply a
+silent output packet because overlap includes the preceding block.
+
+For previous blockA/current blockB, outputF=(A+B)/4 frames. Previous contribution
+has support `[0,min(A/2,F))`; current contribution has support
+`[max(0,(A-B)/4),F)`. A missing floor removes the corresponding contribution.
+The complement of the union is guaranteed silence, checked at every PCM16 sample.
+Both absent gives `[0,F)`. S256→L2048 with previous-only present gives silent
+tail`[128,576)`; L2048→S256 with current-only present gives prefix`[0,448)`.
+Other samples may individually be zero; the witness requires only some nonzero
+sample on each real channel/packet with at least one contributing present floor.
+Primer0 emits no PCM. The pure validator derives envelopes independently by
+union-of-support sample accounting and compares all stored witness metadata.
+
+There are9 separately labelled constant-all-absent cases (3mono+6stereo).
+The12 constant mixed-mask stereo cases independently witness each always-absent
+channel. Every reference and target stream must satisfy these zero spans and
+per-packet/channel nonzero predicates. There is no blanket nonzero waiver or
+post-hoc observation-based classification.
+
+## Reference and emulator execution plan (root only after review)
+
+1. Review this grammar/matrix against Xiph VorbisI4.3.3,4.3.4, floor1 section7,
+   residue8.6.5 and window/overlap4.3.1/4.3.8, together with version1.3.7 mapping0,
+   res0, floor1 and block implementation. Source URLs are in `generate.py`.
+2. Root runs create-only generation, then a separately reviewed bounded raw
+   reader and new host-only controls. No preparer invocation is a reference.
+3. Adapt existing dual-reference driver explicitly to39 and to the above
+   witnesses, retaining complete WAV/framemd5 metadata/packet PTS/frame accounting,
+   rate48000, mono/stereo exact PCM16, all14 packets and strict terminal/log hashes.
+   Decode every case with explicit input `-c:a libvorbis` and independently with
+   explicit input `-c:a vorbis`. Their complete streams must both pass witnesses
+   and differ by no more than the unchanged predeclared project bound2LSB.
+   That bound is not a normative Vorbis tolerance. Any failure remains NONPASS.
+4. Adapt the mono21 public raw runtime source at the exact source pins below.
+   Keep descriptor/header recovery, full reference qualification gating, exact
+   source/input identities, no current-file fallback, all metadata/full packet
+   consumption/canaries/frame counts/order and full PCM_HEX persistence. Replace
+   only21-specific counts, the old blanket nonzero predicate and32bitcase mask.
+   New corpus has39cases/546packets/1212protocol events; its case mask is
+   `549755813887` (`(UINT64_C(1)<<39)-1`). Caller uses uint64_t mask, `UINT64_C(1)`
+   shifts, PRIu64 output. Python accepts at most63 and requires exactly39 here.
+   The extra C descriptor points to explicit14-packet floor masks; the C caller
+   derives support predicates independently for every emitted frame. Materializer
+   must recover those39 arrays (234total arrays) and every descriptor independently.
+5. Keep root controller build/snapshot/QMP lifecycle, frozen configured source
+   and dependency walk unchanged. It may run only after full78 actual reference
+   decoder commands pass and after source/contract/header readback is reviewed.
+   Use ESP-IDF6.0.2 Xtensa/ESP32 at240MHz, emulator with no NIC, coordinator core0,
+   worker core1/priority3/stack16384. No physical board or radio integration.
+6. Compare every target PCM sample against each full reference using no trimming,
+   resampling, fitting, shift, channel swap or duplication. Both reference streams
+   and target must satisfy the same witnesses. Preserve any NONPASS. Archive
+   source/actual receipts/complete PCM and exact finite result in a focused commit.
+
+The exact reusable sources and hashes are in `source-inputs.json`. The existing
+mono21 runner is provenance, not directly runnable for39: its hardcoded21 gates,
+32bit mask and per-channel nonzero checks require the reviewed adapters above.
+No inherited prior21 qualification may be applied to these39 new cases.

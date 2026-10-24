@@ -1,0 +1,91 @@
+--- mono21/main.c
++++ floorpresence39/main.c
+@@ -13,7 +13,7 @@
+ #ifdef LIMIT_TO_64kHz
+ #error This corpus requires the normal unrestricted format profile
+ #endif
+-_Static_assert(CORPUS_CASE_COUNT == 21, "Complete mono21 corpus required");
++_Static_assert(CORPUS_CASE_COUNT == 39, "Complete floorpresence39 corpus required");
+ 
+ #define P "CYD_VORBIS_CHECKED_CORPUS_"
+ #define PACKETS 14U
+@@ -56,7 +56,7 @@
+     return ((previous + current) / 4U) * c->channels * sizeof(int16_t);
+ }
+ static void descriptor(const corpus_case_t *c) {
+-    need(c->id && *c->id && c->identification && c->setup && c->audio && c->offsets && c->modes,
++    need(c->id && *c->id && c->identification && c->setup && c->audio && c->offsets && c->modes && c->floor_masks,
+          "descriptor_pointers");
+     for (const char *p = c->id; *p; ++p)
+         need((*p >= 'a' && *p <= 'z') || (*p >= '0' && *p <= '9') || *p == '-' || *p == '_',
+@@ -69,13 +69,13 @@
+     need(block_ok(c->short_block) && block_ok(c->long_block) && c->short_block <= c->long_block &&
+          (1U << (id[28] & 15U)) == c->short_block && (1U << (id[28] >> 4)) == c->long_block,
+          "identification_blocks");
+-    need(c->mode_count == PACKETS && c->offset_count == PACKETS + 1 &&
++    need(c->mode_count == PACKETS && c->floor_mask_count == PACKETS && c->offset_count == PACKETS + 1 &&
+          c->audio_size <= UINT32_MAX && c->offsets[0] == 0 &&
+          c->offsets[PACKETS] == c->audio_size, "descriptor_offsets_shape");
+     uint32_t total = 0;
+     unsigned transitions = 0;
+     for (unsigned i = 0; i < PACKETS; ++i) {
+-        need(c->modes[i] <= 1 && c->offsets[i] < c->offsets[i + 1] && c->offsets[i + 1] <= c->audio_size &&
++        need(c->modes[i] <= 1 && c->floor_masks[i] < (1U << c->channels) && c->offsets[i] < c->offsets[i + 1] && c->offsets[i + 1] <= c->audio_size &&
+              c->offsets[i + 1] - c->offsets[i] <= INPUT_CAPACITY, "descriptor_packet_bounds");
+         uint8_t first = c->audio[c->offsets[i]];
+         need(!(first & 1U) && ((first >> 1) & 1U) == c->modes[i], "descriptor_packet_mode");
+@@ -99,6 +99,29 @@
+         *left += (pcm[i] | pcm[i + 1]) != 0;
+         if (channels == 2) *right += (pcm[i + 2] | pcm[i + 3]) != 0;
+     }
++}
++static void presence_pcm(const corpus_case_t *c, unsigned packet, const uint8_t *pcm,
++                         uint32_t bytes, uint32_t nl, uint32_t nr) {
++    unsigned channels = c->channels;
++    need(bytes == expected_pcm(c, packet), "presence_full_frames");
++    if (!packet) { need(!bytes && !nl && !nr, "presence_primer_empty"); return; }
++    unsigned previous = c->modes[packet - 1] ? c->long_block : c->short_block;
++    unsigned current = c->modes[packet] ? c->long_block : c->short_block;
++    unsigned frames = (previous + current) / 4U;
++    unsigned previous_end = previous / 2U < frames ? previous / 2U : frames;
++    unsigned current_start = previous > current ? (previous - current) / 4U : 0;
++    for (unsigned channel = 0; channel < channels; ++channel) {
++        bool prior = (c->floor_masks[packet - 1] & (1U << channel)) != 0;
++        bool now = (c->floor_masks[packet] & (1U << channel)) != 0;
++        uint32_t nonzero_count = channel ? nr : nl;
++        need((nonzero_count != 0) == (prior || now), "presence_channel_zero_nonzero");
++        for (unsigned sample = 0; sample < frames; ++sample) {
++            bool support = (prior && sample < previous_end) || (now && sample >= current_start);
++            unsigned offset = 2U * (sample * channels + channel);
++            if (!support) need(!(pcm[offset] | pcm[offset + 1]), "presence_exact_silent_frame");
++        }
++    }
++    if (channels == 1) need(!nr, "presence_no_mono_right");
+ }
+ static uint32_t run_case(const corpus_case_t *c, unsigned index) {
+     current_case = index; current_packet = 0;
+@@ -136,8 +159,7 @@
+         need(bounded && bo.decoded_size == expected && cg, "checked_pcm_size_and_canaries");
+         need(ci.sample_rate == c->rate && ci.channel == c->channels && ci.bits_per_sample == 16,
+              "checked_retained_public_metadata");
+-        need(!packet ? !nl && !nr : nl && (c->channels == 1 ? !nr : nr != 0),
+-             "checked_nonzero_each_actual_channel_transition");
++        presence_pcm(c, packet, checked_pcm.data, bo.decoded_size, nl, nr);
+         static const char digits[] = "0123456789abcdef";
+         for (uint32_t i = 0; i < bo.decoded_size; ++i) {
+             pcm_hex[2U * i] = digits[checked_pcm.data[i] >> 4];
+@@ -164,10 +186,10 @@
+     int core = xPortGetCoreID(); unsigned priority = (unsigned)uxTaskPriorityGet(NULL);
+     printf(P "WORKER core=%d priority=%u configured_stack=16384\n", core, priority);
+     need(core == 1 && priority == 3, "worker_core_priority");
+-    uint64_t total = 0; uint32_t mask = 0;
+-    for (unsigned i = 0; i < CORPUS_CASE_COUNT; ++i) { total += run_case(corpus_cases + i, i); mask |= 1U << i; }
+-    need(total == CORPUS_EXPECTED_PCM_BYTES && mask == ((UINT32_C(1) << CORPUS_CASE_COUNT) - 1U), "complete_corpus_total");
+-    printf(P "COMPLETE cases=%u packets=%u pcm=%" PRIu64 " cases_mask=%" PRIu32 " core=%d\n",
++    uint64_t total = 0, mask = 0;
++    for (unsigned i = 0; i < CORPUS_CASE_COUNT; ++i) { total += run_case(corpus_cases + i, i); mask |= UINT64_C(1) << i; }
++    need(total == CORPUS_EXPECTED_PCM_BYTES && mask == ((UINT64_C(1) << CORPUS_CASE_COUNT) - UINT64_C(1)), "complete_corpus_total");
++    printf(P "COMPLETE cases=%u packets=%u pcm=%" PRIu64 " cases_mask=%" PRIu64 " core=%d\n",
+         CORPUS_CASE_COUNT, CORPUS_CASE_COUNT * PACKETS, total, mask, xPortGetCoreID());
+     stop(NULL);
+ }

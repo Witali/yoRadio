@@ -1,0 +1,115 @@
+# Floor-presence39 reference and emulator source preparation
+
+This preparation follows the root-generated immutable generator02 corpus at
+`.build/cyd-vorbis-floor-presence-corpus-01`: matrix SHA
+`4a66d9f6cefc4876eb3a89c0084baeaf6d19ad5455a16c449de21c0525927f86`,
+manifest SHA`85b4042b179ca9177e1789ae41b4c0c3e29d6d1b7fd48e10a327b7fa1d92472f`.
+Root recorded actual construction terminal0,39cases/546packets/971520PCM bytes,
+9mono/30stereo and9constant-all-absent cases. This is construction evidence only;
+neither reference decoder nor target has run in this preparation.
+
+The preparer read/wrote source files, read the root's construction metadata,
+produced complete adaptation diffs and parsed Python AST. No prepared module
+was imported, no prepared function or control was executed, and no decoder,
+compiler, SDK, QEMU, Git or device command was run. All30 host control methods
+remain pending root execution. Their synthetic PCM/log/WAV/MD5 data is never
+reported as reference decoding or emulator output.
+
+## Complete reference workflow
+
+`host_driver.py` is a focused successor of the existing strict dual-reference
+driver. It requires the exact actual matrix/manifest, all39case descriptors,
+complete raw/carrier equivalence, all four transition types, and complete78
+recorded decoder commands. Each command explicitly selects `vorbis` or
+`libvorbis` before the input. Rate/channels are never forced. Each decoder must
+produce exact full PCM16 WAV and framemd5 packet PTS/durations/MD5. Full decoded
+streams satisfy all predeclared silence spans and per-packet/channel nonzero
+witnesses. The cross-reference bound remains2signed-S16LSB, selected before any
+measurement. The driver retains all failures and unmodified streams. It freezes
+explicit corpus/preparation/source inputs, without globbing unrelated `.build`
+scripts around the new direct-child corpus directory.
+
+`seal_reference.py` accepts independently reviewed ACTUAL host report, wrapper
+terminal and matrix SHA arguments, plus this preparation's reviewed readiness
+SHA. It requires successful actual39/78 host facts before creating a fresh
+qualifier bundle. It writes concrete `pins.json` from those actual identities;
+it does not invent future report hashes, replay PCM or run a decoder/qualifier.
+
+The bundle's `recorded_qualification.py --profile floorpresence39` independently
+replays all78 actual receipts, executable/capture identities, original/frozen
+source bytes, complete WAV/framemd5 streams, every witness and both reference
+streams under bound2. Apart from adding witness metadata and replacing the
+inapplicable blanket nonzero predicate, its receipt/path/PTS/MD5/format checks
+retain the existing strict qualifier. Only this newly completed39 campaign may
+be qualified. Prior21 qualifications and unrelated NONPASS reports are not used.
+
+## Target preparation and complete numerical comparison
+
+`prepare_runtime.py` accepts explicit actual qualifier report/terminal hashes,
+actual qualifier-bundle pins, original matrix SHA and reviewed source readiness.
+It validates the actual complete39 qualification before creating output. It
+copies all198 original corpus members without rewriting them, derives the exact
+contract and independently recovers all234C arrays/39descriptors, including39
+floor-mask arrays. It replays the full recorded reference binding with the exact
+qualified helper bytes before publishing the first runnable target controller.
+The `controller.template.py` here is deliberately unresolved and is not runnable.
+
+The controller retains the prior mono21 build/context/source snapshots,
+compile-macro evidence, exact SDK identity, public raw API, full PCM persistence,
+QMP lifecycle and nine actual command receipts. The finite case mask explicitly
+uses uint64_t/UINT64_C/PRIu64. Coordinator remains core0; worker remains
+core1/priority3/stack16384. Production CYD setup/output bridge and all radio
+sources are unchanged. This fixture app is not production firmware.
+
+`seal_numeric.py` accepts ACTUAL complete target report, direct-tool terminal and
+runtime-preparation hashes plus reviewed source readiness. It reads those
+metadata files and seals a fresh numeric bundle without reading target PCM or
+protocol logs. Its `compare_capture39.py` then independently verifies the entire
+actual target command/source/context/protocol/file record, reconstructs the
+sealed controller, recovers all39 full target streams, and replays all78 full
+reference streams before comparing every original channel/packet/sample.
+All reference and target silence witnesses remain mandatory. `policy39.py`
+predeclares exact39case order, floor schedules and2LSB bound for both references.
+It allows only the deliberately silent channels/packets, with exact zero checks
+already enforced per frame by the reference reader and target protocol.
+Alignment diagnostics are never applied as corrections. No fitting, truncation,
+shift, resampling, padding, channel swapping or mono duplication is performed.
+
+## Root execution order after source review and freeze
+
+1. Run `test_controls.py` and `test_reference_numeric.py`, each with explicit
+   `--matrix .build/cyd-vorbis-floor-presence-corpus-01/matrix.json` and
+   `--matrix-sha256 4a66d9f6cefc4876eb3a89c0084baeaf6d19ad5455a16c449de21c0525927f86`.
+   Retain each actual wrapper receipt/log and terminal. No pass is claimed here.
+2. Run the reviewed `host_driver.py --matrix <that-matrix> --output <fresh-host>`
+   with the actual command wrapper. Preserve an actual NONPASS unchanged.
+3. Only if the complete actual host run passes, seal its reference bundle using
+   `seal_reference.py --campaign <host> --outer <host-wrapper-receipt> --matrix
+   <that-matrix> --output <fresh-qualifier-bundle> --report-sha256 <actual>
+   --outer-sha256 <actual> --matrix-sha256 <above> --readiness-sha256 <reviewed>`.
+   Review its actual pins/entrypoint before executing its qualifier with
+   `--profile floorpresence39 --repository . --campaign <host> --outer
+   <host-wrapper-receipt> --output <fresh-qualification>`.
+4. After actual complete qualification, run `prepare_runtime.py --output
+   <fresh-runtime> --qualification <actual-qualification.json>
+   --qualification-sha256 <actual> --qualification-terminal <actual-receipt>
+   --qualification-terminal-sha256 <actual> --reference-bundle <qualifier-bundle>
+   --bundle-pins-sha256 <actual> --host-terminal <host-wrapper-receipt> --matrix
+   <that-matrix> --matrix-sha256 <above> --readiness-sha256 <reviewed>`.
+5. Review actual contract/data/controller hashes, then root may execute the
+   sealed controller with explicit reviewed contract/header SHA arguments and
+   known ESP-IDF6.0.2/Xtensa/QEMU paths. No NIC or physical board is needed.
+6. After actual target terminal0, seal its numeric bundle with `seal_numeric.py
+   --runtime <runtime> --target <capture> --target-terminal <actual-direct-tool>
+   --output <fresh-numeric-bundle> --target-report-sha256 <actual>
+   --target-terminal-sha256 <actual> --runtime-preparation-sha256 <actual>
+   --readiness-sha256 <reviewed>`. Review the actual numeric pins, then run its
+   `compare_capture39.py` with explicit repository/runtime/target/terminal/output
+   paths and the same three actual SHA arguments. Any complete numerical
+   NONPASS remains a rejection under the original bound2.
+
+This is finite valid-input floor1 presence work. It does not claim completeG6,
+Vorbis conformance, physical performance, radio integration, or codec root-cause
+diagnosis. Deferred zero-guard, target Ogg EOF/reset/OOM, FLAC target-error and
+AAC private-state work remains untouched. Focused raw source origins and all
+adaptation diffs are retained for review; source-only integrity is not execution.

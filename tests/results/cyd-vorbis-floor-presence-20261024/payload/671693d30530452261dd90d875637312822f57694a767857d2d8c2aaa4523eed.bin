@@ -1,0 +1,63 @@
+--- .build/cyd-vorbis-mono-mapping-runtime-prep-02/recorded_qualification.py
++++ presence39/recorded_qualification.py
+@@ -8,6 +8,7 @@
+ import struct
+ import wave
+ from carrier import packets
++import pcm_witness
+ 
+ 
+ def need(ok, message):
+@@ -53,7 +54,7 @@
+          'Actual terminal/non-timeout/non-interrupted process facts required')
+ 
+ 
+-def decoded_pcm(wav, md5_text, rate, channels, frames, modes):
++def decoded_pcm(wav, md5_text, rate, channels, frames, modes, case):
+     with wave.open(io.BytesIO(wav), 'rb') as stream:
+         need(stream.getcomptype() == 'NONE' and stream.getframerate() == rate and stream.getnchannels() == channels and
+              stream.getsampwidth() == 2 and stream.getnframes() == sum(frames), 'Actual WAV metadata/frame count')
+@@ -81,12 +82,13 @@
+             counts[channel] += sum(chunk[pos:pos + 2] != b'\0\0' for pos in range(channel * 2, len(chunk), channels * 2))
+         cursor += size
+         timestamp += count
+-    need(cursor == len(pcm) and set(transition_bytes) == {'SS', 'SL', 'LS', 'LL'} and
+-         all(transition_bytes.values()) and all(all(values) for values in transition_channels.values()),
+-         'Every channel must be nonzero in every present transition')
++    need(cursor == len(pcm) and set(transition_bytes) == {'SS', 'SL', 'LS', 'LL'},
++         'Complete four-transition PCM stream required')
++    witness = pcm_witness.stream(pcm, case)
+     return pcm, dict(rate=rate, channels=channels, bits=16, frames=frames[1:], pcm_bytes=len(pcm),
+         nonzero_bytes=sum(value != 0 for value in pcm), transition_nonzero_bytes=transition_bytes,
+-        transition_nonzero_frames_per_channel=transition_channels, wav_sha256=sha(wav), pcm_sha256=sha(pcm))
++        transition_nonzero_frames_per_channel=transition_channels, wav_sha256=sha(wav), pcm_sha256=sha(pcm),
++        presence_witnesses=witness)
+ 
+ 
+ def qualify(args, result, save):
+@@ -97,6 +99,7 @@
+     repo, root = args.repository.resolve(), args.campaign.resolve()
+     inputs.read('qualifier/pins', Path(__file__).with_name('pins.json'))
+     inputs.read('qualifier/script', __file__)
++    inputs.read('qualifier/pcm-witness', Path(__file__).with_name('pcm_witness.py'), pins['pcm_witness_sha256'])
+     inputs.read('qualifier/carrier', Path(__file__).with_name('carrier.py'), pins['carrier_source']['proposed_helper_sha256'])
+     raw_report = inputs.read('report', root / 'report.json', profile['report_sha256'])
+     report = json.loads(raw_report)
+@@ -206,7 +209,7 @@
+             need(not stderr, 'Successful strict reference emitted error diagnostics')
+             wav = inputs.read('wav/' + case_id + '/' + decoder, folder / (decoder + '.wav'), recorded['decoded'][decoder]['wav_sha256'])
+             md5 = inputs.read('log/' + name + '/decode-' + decoder + '.stdout.log', folder / ('decode-' + decoder + '.stdout.log'))
+-            pcm, observed = decoded_pcm(wav, md5, rate, channels, frames, modes)
++            pcm, observed = decoded_pcm(wav, md5, rate, channels, frames, modes, case)
+             need(observed == recorded['decoded'][decoder], 'Recomputed PCM evidence differs from report')
+             actual_info[decoder] = observed
+             pcm_by_case[(mi, case['id'], decoder)] = pcm
+@@ -255,7 +258,7 @@
+ 
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument('--profile', choices=('mono21', 'map2-eight'), required=True)
++    parser.add_argument('--profile', choices=('floorpresence39',), required=True)
+     for name in ('repository', 'campaign', 'outer', 'output'):
+         parser.add_argument('--' + name, type=Path, required=True)
+     args = parser.parse_args()

@@ -1,0 +1,142 @@
+"""Synthetic WAV/MD5 and numeric policy controls; no real decoder/target evidence."""
+import argparse
+import copy
+import hashlib
+import io
+import json
+from pathlib import Path
+import unittest
+import wave
+
+import mono_metrics
+import pcm_metrics
+import policy39
+import protocol
+import recorded_qualification as recorded
+from compare_capture39 import transition_counts
+import test_controls
+
+MATRIX = None
+MATRIX_SHA = None
+
+
+def wav_bytes(pcm, channels, rate=48000):
+    result = io.BytesIO()
+    with wave.open(result, 'wb') as stream:
+        stream.setnchannels(channels); stream.setsampwidth(2); stream.setframerate(rate); stream.writeframes(pcm)
+    return result.getvalue()
+
+
+def md5_bytes(pcm, case):
+    lines = ['#tb 0: 1/48000', '#sample_rate 0: 48000', '#codec_id 0: pcm_s16le']
+    offset = timestamp = 0
+    for count in case['frames'][1:]:
+        size = count * case['channels'] * 2; chunk = pcm[offset:offset + size]
+        lines.append(f'0, {timestamp}, {timestamp}, {count}, {size}, {hashlib.md5(chunk).hexdigest()}')
+        timestamp += count; offset += size
+    return ('\n'.join(lines) + '\n').encode()
+
+
+class ReferenceNumericControls(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.matrix = json.loads(MATRIX.read_bytes())
+        cls.contract = protocol.load_contract([dict(path=str(MATRIX), sha256=MATRIX_SHA)])
+        cls.pcm = [b''.join(test_controls.synthetic_packet(case, packet) for packet in range(14))
+            for case in cls.contract['model']['cases']]
+
+    def decoded(self, index, *, pcm=None, md5=None, wav=None):
+        case = self.contract['model']['cases'][index]; raw = self.pcm[index] if pcm is None else pcm
+        return recorded.decoded_pcm(wav_bytes(raw, case['channels']) if wav is None else wav,
+            md5_bytes(raw, case) if md5 is None else md5,
+            48000, case['channels'], case['frames'], case['modes'], self.matrix['cases'][index])
+
+    def test_reference_all39_synthetic_WAV_MD5_witness_replay(self):
+        for index, raw in enumerate(self.pcm):
+            with self.subTest(index=index):
+                pcm, details = self.decoded(index)
+                self.assertEqual(pcm, raw); self.assertEqual(details['pcm_sha256'], hashlib.sha256(raw).hexdigest())
+
+    def test_reference_MD5_corruption_rejected(self):
+        case = self.contract['model']['cases'][1]; raw = self.pcm[1]
+        md5 = md5_bytes(raw, case); actual = hashlib.md5(raw[:case['pcm'][1]]).hexdigest().encode()
+        damaged = md5.replace(actual, b'0' * 32, 1); self.assertNotEqual(damaged, md5)
+        with self.assertRaisesRegex(RuntimeError, 'Actual packet MD5'):
+            self.decoded(1, md5=damaged)
+
+    def test_reference_PTS_corruption_rejected(self):
+        case = self.contract['model']['cases'][1]; md5 = md5_bytes(self.pcm[1], case)
+        damaged = md5.replace(b'0, 0, 0, 128,', b'0, 1, 1, 128,', 1); self.assertNotEqual(damaged, md5)
+        with self.assertRaisesRegex(RuntimeError, 'Actual packet PTS'):
+            self.decoded(1, md5=damaged)
+
+    def test_reference_missing_packet_rejected(self):
+        case = self.contract['model']['cases'][1]; md5 = md5_bytes(self.pcm[1], case)
+        with self.assertRaisesRegex(RuntimeError, 'Exact nonprimer packet count'):
+            self.decoded(1, md5=b'\n'.join(md5.splitlines()[:-1]) + b'\n')
+
+    def test_reference_wrong_rate_rejected(self):
+        with self.assertRaisesRegex(RuntimeError, 'Actual WAV metadata'):
+            self.decoded(1, wav=wav_bytes(self.pcm[1], 1, 44100))
+
+    def test_reference_silent_channel_leak_rejected_with_correct_MD5(self):
+        raw = bytearray(self.pcm[7]); raw[2] = 1
+        with self.assertRaisesRegex(RuntimeError, 'guaranteed_silent_frame_span_channel:1'):
+            self.decoded(7, pcm=bytes(raw))
+
+    def test_reference_partial_frame_rejected(self):
+        with self.assertRaisesRegex(RuntimeError, 'Actual WAV metadata|Complete WAV PCM'):
+            self.decoded(1, pcm=self.pcm[1][:-1])
+
+    def rows(self):
+        rows = []
+        for index, (case, pcm) in enumerate(zip(self.contract['model']['cases'], self.pcm)):
+            metric = mono_metrics if case['channels'] == 1 else pcm_metrics
+            offsets = [0]
+            for size in case['pcm']: offsets.append(offsets[-1] + size)
+            counts = transition_counts(pcm, case, offsets)
+            refs = {decoder: dict(comparison=metric.compare(pcm, pcm, case['pcm']),
+                reference_transition_nonzero=counts, target_transition_nonzero=counts) for decoder in policy39.DECODERS}
+            rows.append(dict(case=index, id=case['id'], channels=case['channels'], rate=48000, bits=16,
+                frames=case['frames'], packet_bytes=case['pcm'], pcm_bytes=len(pcm), floor_masks=case['floor_masks'], references=refs))
+        return rows
+
+    def test_policy_predeclared_all39_silence_and_active_channels(self):
+        policy, passed = policy39.bounded_policy(self.rows())
+        self.assertTrue(passed); self.assertEqual(policy['required_reference_comparisons'], 78)
+        self.assertEqual(policy['max_abs_error'], 2)
+
+    def test_policy_either_reference_error3_is_NONPASS(self):
+        for decoder in policy39.DECODERS:
+            rows = self.rows(); key = 'zero_lag_direct_mono'
+            rows[1]['references'][decoder]['comparison'][key]['max_abs_error'] = 3
+            policy, passed = policy39.bounded_policy(rows)
+            self.assertFalse(passed); self.assertFalse(policy['bounded_by_reference'][decoder])
+
+    def test_policy_missing_high_case_rejected(self):
+        with self.assertRaisesRegex(RuntimeError, 'Exact complete39 ordered'):
+            policy39.bounded_policy(self.rows()[:-1])
+
+    def test_policy_reordered_cases_rejected(self):
+        rows = self.rows(); rows[-1], rows[-2] = rows[-2], rows[-1]
+        with self.assertRaisesRegex(RuntimeError, 'Exact complete39 ordered'):
+            policy39.bounded_policy(rows)
+
+    def test_policy_threshold_fitting_rejected(self):
+        for value in (None, True, 1, 3, 65535):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(RuntimeError, 'Only fixed predeclared bound2'):
+                    policy39.bounded_policy(self.rows(), value)
+
+    def test_policy_absent_channel_whole_summary_leak_is_NONPASS(self):
+        rows = self.rows()
+        rows[7]['references']['vorbis']['comparison']['channels'][1]['target_nonzero_samples'] = 1
+        self.assertFalse(policy39.bounded_policy(rows)[1])
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--matrix', type=Path, required=True); parser.add_argument('--matrix-sha256', required=True)
+    args, remaining = parser.parse_known_args(); MATRIX = args.matrix.resolve(); MATRIX_SHA = args.matrix_sha256
+    if hashlib.sha256(MATRIX.read_bytes()).hexdigest() != MATRIX_SHA: raise RuntimeError('reviewed_actual_matrix_SHA')
+    unittest.main(argv=[__file__, *remaining])

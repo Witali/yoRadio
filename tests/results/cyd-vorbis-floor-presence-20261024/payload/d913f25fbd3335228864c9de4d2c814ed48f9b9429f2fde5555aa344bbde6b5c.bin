@@ -1,0 +1,104 @@
+"""Seal a recorded39 qualifier against explicit ACTUAL host report/terminal hashes.
+
+This entry point never launches a decoder or qualifies data. The separate root
+qualifier execution must replay all78 child receipts/WAV/framemd5 and witnesses.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+WRAPPER_SHA = '33a64601d773382e748d69391eb068d7bc2b682540e3b670ddc13c0a19e22f7e'
+
+
+def need(ok, message):
+    if not ok:
+        raise RuntimeError(message)
+
+
+def sha(raw): return hashlib.sha256(raw).hexdigest()
+
+
+def fact(path):
+    path = Path(path).resolve(); data = path.read_bytes()
+    return dict(path=str(path), bytes=len(data), sha256=sha(data))
+
+
+def put(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as stream: stream.write(raw)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('campaign', 'outer', 'matrix', 'output'):
+        parser.add_argument('--' + name, type=Path, required=True)
+    for name in ('report-sha256', 'outer-sha256', 'matrix-sha256', 'readiness-sha256'):
+        parser.add_argument('--' + name, required=True)
+    args = parser.parse_args(); campaign, output = args.campaign.resolve(), args.output.resolve()
+    need(output.parent == ROOT / '.build' and not output.exists() and campaign.parent == ROOT / '.build' and
+         all(not output.is_relative_to(p) and not p.is_relative_to(output) for p in (HERE, campaign)),
+         'fresh_separate_direct_build_qualifier_bundle')
+    readiness_data = (HERE / 'readiness.json').read_bytes()
+    need(sha(readiness_data) == args.readiness_sha256, 'reviewed_source_readiness_SHA')
+    facts = [fact(HERE / 'readiness.json')]
+    for row in json.loads(readiness_data)['files']:
+        observed = fact(HERE / row['path'])
+        need((observed['bytes'], observed['sha256']) == (row['bytes'], row['sha256']), 'source_preparation_pin')
+        facts.append(observed)
+    report_path, outer_path, matrix_path = campaign / 'report.json', args.outer.resolve(), args.matrix.resolve()
+    for path, digest in ((report_path, args.report_sha256), (outer_path, args.outer_sha256), (matrix_path, args.matrix_sha256)):
+        row = fact(path); need(row['sha256'] == digest and path.is_relative_to(ROOT), 'explicit_actual_input_SHA')
+        facts.append(row)
+    report, outer, matrix = (json.loads(p.read_bytes()) for p in (report_path, outer_path, matrix_path))
+    need(outer['status'] == 'TERMINAL' and type(outer['returncode']) is int and outer['returncode'] == 0 and
+         type(outer['owned_pid']) is int and outer['owned_pid'] > 0 and not outer.get('timed_out', False) and
+         not outer.get('interrupted', False) and not outer.get('error_type') and 'returncode_after_stop' not in outer and
+         outer['runner_sha256'] == WRAPPER_SHA and Path(outer['cwd']).resolve() == ROOT, 'actual_host_terminal0')
+    argv = outer['argv']
+    need(sum((ROOT / x).resolve() == HERE / 'host_driver.py' for x in argv) == 1 and argv.count('--matrix') == 1 and
+         (ROOT / argv[argv.index('--matrix') + 1]).resolve() == matrix_path and argv.count('--output') == 1 and
+         (ROOT / argv[argv.index('--output') + 1]).resolve() == campaign, 'actual_host_driver_operands')
+    for path, row in outer['logs'].items():
+        observed = fact(path); need((observed['bytes'], observed['sha256']) == (row['bytes'], row['sha256']), 'actual_outer_log')
+        facts.append(observed)
+    need(report['completed'] is report['xiph_reference_qualified'] is report['dual_reference_qualified'] is True and
+         report['target_executed'] is report['production_changed'] is False and report['failures'] == [] and
+         report['driver_sha256'] == fact(HERE / 'host_driver.py')['sha256'] and report['capture_sha256'] == WRAPPER_SHA and
+         report['cross_reference_pcm16_max_error_allowed'] == 2 and len(report['cases']) == 39 and len(report['commands']) == 78,
+         'actual_complete39_host_success_required_before_qualifier_seal')
+    need(matrix['schema'] == 'vorbis-floor-presence39-matrix-v1' and len(matrix['cases']) == 39 and
+         matrix['total_packets'] == 546 and matrix['expected_total_s16le_bytes'] == 971520 and
+         [row['id'] for row in report['cases']] == ['0-' + c['id'] for c in matrix['cases']], 'exact_complete39_case_identity')
+    # Static supporting-source pins plus every active source file. Existing21
+    # reports are never selected as this new campaign's qualification.
+    supporting = [dict(path=Path(row['path']).relative_to(ROOT).as_posix(), bytes=row['bytes'], sha256=row['sha256'])
+                  for row in facts if Path(row['path']).is_relative_to(HERE)]
+    pins = dict(schema='floor-presence39-recorded-reference-pins-v1',
+        driver_sha256=report['driver_sha256'], parser_sha256=report['parser_source_sha256'], capture_sha256=WRAPPER_SHA,
+        pcm_witness_sha256=fact(HERE / 'pcm_witness.py')['sha256'], supporting_source_inputs=supporting,
+        carrier_source=dict(proposed_helper_sha256=fact(HERE / 'carrier.py')['sha256']),
+        tools={Path(path).name: digest for path, digest in report['tools'].items()},
+        cross_reference_policy=dict(max_abs_error=2, predeclared=True,
+            purpose='bounded-reference-crosscheck-not-standard-conformance'),
+        profiles=dict(floorpresence39=dict(report_sha256=args.report_sha256, outer_sha256=args.outer_sha256,
+            outer_returncode=0, source_matrices={str(matrix_path): args.matrix_sha256}, case_count=39,
+            case_ids=['0-' + c['id'] for c in matrix['cases']], campaign=campaign.name,
+            native_compared=39, native_lookup2_refusals=0, xiph_relations=0)))
+    need(len(pins['tools']) == 2 and set(pins['tools']) == {'python.exe', 'ffmpeg.exe'}, 'exact_actual_reference_tool_names')
+    output.mkdir()
+    for name in ('recorded_qualification.py', 'carrier.py', 'pcm_witness.py'):
+        put(output / name, (HERE / name).read_bytes())
+    put(output / 'pins.json', (json.dumps(pins, indent=2) + '\n').encode())
+    for row in facts: need(fact(row['path']) == row, 'input_changed_while_sealing_reference')
+    put(output / 'preparation.json', (json.dumps(dict(schema='floor-presence39-qualifier-seal-v1',
+        completed=True, qualification_executed=False, reference_data_replayed=False, input_facts=facts,
+        next_entrypoint=fact(output / 'recorded_qualification.py'), pins=fact(output / 'pins.json')),
+        indent=2) + '\n').encode())
+    print(json.dumps(dict(output=str(output), qualifier=fact(output / 'recorded_qualification.py'),
+        pins=fact(output / 'pins.json'), qualification_executed=False)))
+
+
+if __name__ == '__main__': main()

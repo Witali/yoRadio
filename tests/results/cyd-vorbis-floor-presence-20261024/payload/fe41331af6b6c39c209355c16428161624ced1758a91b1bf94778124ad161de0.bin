@@ -1,0 +1,87 @@
+# Factual scope of the floor-presence39 fixture controller
+
+This source-only clarification corrects an overstatement in the immutable
+`.build/cyd-vorbis-floor-presence-runtime-prep-01/README.md`. Its description of
+an inherited "QMP lifecycle" is incorrect. The planning description in immutable
+generator02 `DESIGN.md` also must not be read as evidence that a QMP lifecycle or
+complete configured compiler-dependency walk was implemented in this fixture.
+The executable source is authoritative. Both preparations remain byte-exact.
+This note changes no source, input, witness, metric, threshold or recorded result.
+
+## Implemented controller behavior
+
+`controller.template.py` inherits the earlier mono21 nine-command controller.
+Its ordered actual command roles are `sdk-head`, `sdk-clean`, `build`,
+`setup-macros`, `symbols`, `merge`, `qemu`, `sdk-head-after`, `sdk-clean-after`.
+It records each owned command's argv, cwd, PID, terminal status, timeout /
+interruption state and stdout/stderr hashes. Nonzero exits fail the controller.
+
+It launches QEMU directly with serial stdio, no display or monitor, `-no-reboot`,
+`-snapshot`, `-nic none`, two emulated cores and the isolated merged flash image.
+It waits for the owned QEMU process's real terminal exit and then validates the
+complete serial protocol. It does not open QMP, negotiate QMP capabilities, send
+quit, verify a quit acknowledgement, or record a QMP SHUTDOWN/EOF lifecycle.
+There is no QMP helper in this capsule.
+
+Before the target runs, the controller verifies and snapshots the explicit
+candidate setup/output bridge, caller/project files, raw corpus / contract /
+materialized header, reference proofs / binding and active Python helpers. It
+records tool/archive/ROM hashes and checks those identities using `current()`.
+It checks SDK HEAD and tracked SDK cleanliness before and after execution. It
+requires the expected vendor archive identities, actual Xtensa ELF machine94,
+one frozen caller compile row and the two expected bridge compile rows.
+
+The actual setup macro probe uses its recorded compile row and two generated
+compiler-input files; those two files are frozen and checked before and after
+the probe. It requires ESP32, repair enabled,240MHz, two-core and unrestricted
+format macros. It checks the wrapper/decoder symbols and the isolated flash
+recipe / offsets. These are explicit compile-context checks. They do not form a
+complete compiler dependency walk or a full snapshot of the configured SDK /
+transitive source tree. This capsule has no such dependency-walk stage.
+
+The controller's `current()` rehashes every explicit report input and its frozen
+copy, each recorded tool/archive/ROM, and all recorded variant source members.
+Before successful completion it separately rehashes every recorded
+`build_outputs` member. It validates all1212 protocol events, full consumption,
+metadata, canaries, overlap frame counts, uint64 case mask and all per-frame
+silence/nonzero witnesses. It persists all39 target PCM files and checks their
+exact bytes, hashes, offsets, file set and971520-byte total. Actual success must
+still be established by root execution; source inspection alone is not success.
+
+## Implemented independent numerical replay
+
+`capture39.py` requires the actual completed target report and direct-tool
+terminal0 bound to the sealed controller before interpreting target PCM. It
+checks the runtime preparation / exact counts, reconstructs the controller from
+the reviewed template and actual runtime facts, checks all nine actual command
+terminals / log hashes, and rehashes every recorded frozen report input.
+
+It checks the frozen caller and helpers, original and variant setup identities,
+the macro evidence, the complete relocated raw contract, every protocol event,
+all per-frame silence/nonzero witnesses, and each persisted full PCM file with
+its raw-channel / reference metadata, offsets and hash. It canonicalizes the
+full `variant_sources` pathname/hash map and rejects duplicate/unsafe names;
+its direct variant-file identity check is for setup.c. It does not independently
+rehash every `report.tools`, every `report.build_outputs` or every remaining
+variant source file. Those broader identity checks are performed by the actual
+controller at its completion, as described above; the numerical replay must
+not be described as independently repeating all of them.
+
+`compare_capture39.py` then replays all78 recorded reference streams / child
+receipts and applies both full-stream comparisons under the unchanged
+predeclared2signed-S16LSB bound. This project bound is not a normative Vorbis
+tolerance. All reference and target silence witnesses are still mandatory.
+No trim, shift, fitting, resampling, padding, channel swap or mono duplication
+is applied. This correction introduces no weakened or substituted pass gate.
+
+The intended finite scope remains39 valid floor1 presence cases,546 raw packets,
+two reference decoders and the public raw CYD fixture. It is not fullG6, complete
+Vorbis conformance, physical performance or production radio integration.
+Existing mono21 evidence and unrelated NONPASS results retain their own scope.
+The root's actual safe direct-child host output is unaffected; the source review
+also noted that the generic host output guard does not prohibit nesting output
+inside its source directory, which is outside the documented current invocation.
+No such nested output is used or endorsed by this finite workflow.
+
+This note was prepared by source / metadata reading and hashing only, before
+target execution. It does not claim a future target or numerical outcome.

@@ -1,0 +1,53 @@
+# CYD Vorbis floor1 presence39 recorded evidence
+
+This compact archive preserves the finite valid-input corpus and the actual
+recorded reference / emulator measurements. It retains original bytes through
+an explicit logical inventory; equal copies share a SHA-addressed payload.
+Large text / JSON members use deterministic gzip. Every logical member has its
+original path label, byte count, SHA256, encoding and physical storage key.
+Original paths are evidence labels, never filesystem read fallbacks.
+
+The corpus has 39 cases (9 mono / 30 stereo), 546 raw packets and 971520 PCM16
+bytes. It covers floor1 present/absent, residue0/1/2, coupled and uncoupled
+stereo masks, fixed presence schedules and short/long overlap. Separate
+constant-all-absent and always-absent-channel witnesses check every guaranteed
+silent frame. Active portions require some nonzero output. Residue0/1 scalar
+dimension1 does not add multidimensional residue0 placement coverage.
+
+Actual root results retained here include 30 original host controls, 17
+canonical controls, complete 78 reference decoder commands, the independent
+recorded-reference qualification, the complete 39-case target capture and the
+complete 78 target/reference comparisons. The recorded numerical result is
+`BOUNDED_CORPUS_PCM_QUALIFIED`: maximum 1 signed-S16 LSB against each reference,
+under the unchanged predeclared project bound2. This bound is not a normative
+Vorbis tolerance. All original channels/packets/samples and silence witnesses
+are retained; no fitting, shift, trim, resampling, padding, swap or duplication
+is applied. The report's other false qualification fields remain unchanged.
+
+`verify.py --root <archive> --manifest-sha256 <independently-reviewed-SHA>` reads
+only this archive and writes a temporary relocated raw corpus. It verifies the
+exact physical/logical SHA closure, full original/canonical corpus, recorded
+receipts/logs, full WAV/framemd5 PTS/duration/MD5 and silence witnesses. Ordinary
+imports use exact frozen protocol, witness, WAV/MD5 and metric helper bytes.
+The original contract model/ID must survive relocation. It replays all1212
+target protocol events, checks every persisted target PCM byte, recomputes all78
+full comparisons and the original numeric policy/report. It invokes no decoder,
+process, compiler, SDK, emulator or device. Source preparation of this verifier
+is not a verification pass; root must execute it before canonical publication.
+
+The target uses the inherited nine-command fixture, serial stdio, snapshot
+storage and no NIC. It has no QMP lifecycle or full configured dependency walk.
+The historical preparation README's broader claims are retained with the
+separate factual correction and root execution-scope note. The actual
+controller checks its declared tool/variant/build-output identities, while the
+independent numerical reader has the narrower scope described in that note.
+This portable replay does not claim an independent rehash of omitted live tools,
+vendor libraries, firmware/ELF/flash binaries or a complete SDK/build tree.
+`omissions.json` preserves their recorded paths/hashes and explicitly excludes
+the bodies. Selected frozen text build context is retained without claiming
+dependency closure. No production radio source was changed by this floor39
+step; canonical test-source promotion was root commit `c252dfeaa`.
+
+See `CHECKPOINT.md` for exact report identities and source limitations. This is
+finite recorded evidence, not new target execution, fullG6, complete Vorbis
+conformance, physical audio, performance, or production radio qualification.

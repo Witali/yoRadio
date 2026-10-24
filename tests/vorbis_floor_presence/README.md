@@ -32,8 +32,10 @@ Root has recorded 30 passing controls (17 protocol/witness plus 13 reference /
 numeric controls), all 39 cases through both reference decoders (78 commands),
 and a separate successful recorded-reference qualification using the frozen
 preparations. The canonical generator reproduces all 197 payload files exactly,
-and all 17 canonical controls pass. CYD target PCM comparison remains pending.
-Reference/target numerical acceptance requires
+and all 17 canonical controls pass. The [CYD target checkpoint](../results/cyd-vorbis-floor-presence-20261024/CHECKPOINT.md)
+records all 546 decoded packets and 78 full comparisons, with maximum error
+1 LSB against each reference. [Offline archive replay](../results/cyd-vorbis-floor-presence-verification-20261024/README.md)
+reproduces those measurements from the retained data. Reference/target acceptance requires
 both Xiph libvorbis and independent FFmpeg-native vorbis, complete original
 channels/packets, all silence witnesses, and the predeclared maximum error of
 2 signed-S16 LSB. That is a project regression bound, not a normative Vorbis

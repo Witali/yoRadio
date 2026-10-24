@@ -1,0 +1,47 @@
+{
+  "schema": "floorpresence39-review01-actual-runtime-finding-addendum-v1",
+  "prior_review_sha256": "5a2078afe9558f1166ce739215d72da808727a2e6cc346f67a33ccd5e2574ee8",
+  "prior_review_unchanged": true,
+  "root_actual_terminal_chunk": "6015f7",
+  "actual_receipt": {
+    "path": ".build/cyd-vorbis-floor-presence-root-01/archive-stage-verify-command.json",
+    "bytes": 1238,
+    "sha256": "162b3088d54924ebcfe53c278a0f6e00dfc115b53fd01067d1fa208d60f349b8",
+    "returncode": 1,
+    "owned_pid": 6600
+  },
+  "actual_logs": [
+    {
+      "path": ".build/cyd-vorbis-floor-presence-root-01/archive-stage-verify-command.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".build/cyd-vorbis-floor-presence-root-01/archive-stage-verify-command.stderr.log",
+      "bytes": 1119,
+      "sha256": "c2eebdf3647083827b1822217ff114afe3d9f0ef861f34081ffecdd44fa89957"
+    }
+  ],
+  "finding": {
+    "kind": "archive_logical_input_closure_incomplete",
+    "missing_path": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-floor-presence-target-01/variant/vorbis_repair/setup.c",
+    "failure": "Correct no-current-file-fallback guard rejected a numeric.inputs source with neither retained logical body nor declared alias.",
+    "phase": "Before numerical replay; all selected archive payload hashes can be correct while an advertised source reference is absent.",
+    "review_limitation": "Review01 verified selected physical/logical bytes but did not independently project every numeric.inputs and qualification.validated_inputs path through the inventory/alias/explicit-omission resolver. Its broad source/byte PASS must not be treated as proven end-to-end advertised input closure."
+  },
+  "unchanged_numeric_evidence": {
+    "report_sha256": "c5aa4e7b5385327f927cbaf4d6ddfc27ae9fca9f7b0d5347eb7221054bd29be0",
+    "result": "BOUNDED_CORPUS_PCM_QUALIFIED",
+    "cases": 39,
+    "reference_comparisons": 78,
+    "codec_NONPASS_introduced": false
+  },
+  "required_successor_scope": [
+    "Retain immutable stage01, actual failed receipt/logs and prior review/addendum as provenance",
+    "Add every actual target variant source body from target.variant_sources",
+    "Resolve and SHA/size-check every numeric.inputs and qualification.validated_inputs row through retained logical bytes or declared aliases; only existing explicit record-only tool/binary omissions are allowed",
+    "Preserve strict verifier bytes and no-current-file-fallback guard",
+    "Root must execute fresh stage02 verification; review alone is not verification"
+  ],
+  "verifier_or_helpers_executed_by_reviewer": false
+}

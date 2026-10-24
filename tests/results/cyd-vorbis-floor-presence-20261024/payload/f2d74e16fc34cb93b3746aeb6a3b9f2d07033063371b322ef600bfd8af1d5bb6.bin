@@ -1,0 +1,179 @@
+"""Validate complete public Vorbis format candidates with pinned host references."""
+import argparse,array,hashlib,importlib.util,json,os,subprocess,sys,wave
+from pathlib import Path
+import pcm_witness
+from recorded_qualification import decoded_pcm
+
+ROOT=Path(__file__).resolve().parents[2]
+PY=Path(sys.executable).resolve()
+CAPTURE=ROOT/'.build/cyd-vorbis-format-command-01.py'
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def need(ok,message):
+    if not ok:raise RuntimeError(message)
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--matrix',type=Path,action='append',required=True)
+    p.add_argument('--output',type=Path,required=True)
+    a=p.parse_args();out=a.output.resolve()
+    need(out.is_relative_to(ROOT/'.build') and not out.exists(),'Fresh host output required')
+    previous_path=ROOT/'.build/cyd-vorbis-block-host-01/report.json'
+    need(sha(previous_path)=='9614d4d9c03c3ce7ca04e6f9b232c62ecd860d95135eb9878fe414ba98d62d5f','Recorded reference tool provenance changed')
+    previous=json.loads(previous_path.read_text())
+    ffmpeg=next(Path(k) for k in previous['tools'] if Path(k).name=='ffmpeg.exe')
+    need(sha(ffmpeg)==previous['tools'][str(ffmpeg)],'Pinned reference executable changed')
+    need(sha(CAPTURE)=='33a64601d773382e748d69391eb068d7bc2b682540e3b670ddc13c0a19e22f7e','Command capture changed')
+    parser_source=ROOT/'.build/cyd-vorbis-block-host-driver-01.py'
+    need(sha(parser_source)==previous['driver_sha256'],'Reviewed public carrier parser changed')
+    out.mkdir();(out/'sources').mkdir()
+    report=dict(schema='public-vorbis-format-corpus-host-v1',completed=False,
+        xiph_reference_qualified=False,dual_reference_qualified=False,target_executed=False,
+        production_changed=False,driver_sha256=sha(__file__),tools={str(ffmpeg):sha(ffmpeg),str(PY):sha(PY)},
+        parser_source_sha256=sha(parser_source),capture_sha256=sha(CAPTURE),inputs={},cases=[],commands=[],
+        failures=[],metamorphic_checks=[],cross_reference_pcm16_max_error_allowed=2)
+    def save():
+        (out/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    def freeze(source):
+        source=Path(source).resolve();need(source.is_relative_to(ROOT),'Input outside checkout')
+        data=source.read_bytes();digest=hashlib.sha256(data).hexdigest()
+        name=source.relative_to(ROOT).as_posix();target=out/'sources'/name
+        if str(source) in report['inputs']:
+            need(report['inputs'][str(source)]['sha256']==digest,'Input changed while preparing')
+        else:
+            target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+            report['inputs'][str(source)]=dict(sha256=digest,bytes=len(data),snapshot=target.relative_to(out).as_posix())
+        return data
+    for path in sorted(Path(__file__).resolve().parent.rglob('*')):
+        if path.is_file():freeze(path)
+    freeze(parser_source);freeze(CAPTURE);freeze(previous_path)
+    spec=importlib.util.spec_from_file_location('reviewed_public_carrier_parser',parser_source)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    pcm_by_case={};matrices=[]
+    def run(name,argv):
+        dest=out/(name+'.json');dest.parent.mkdir(parents=True,exist_ok=True)
+        argv=list(map(str,argv))
+        wrapper=subprocess.run([str(PY),'-B','-X','utf8',str(CAPTURE),'--record',str(dest),
+            '--cwd',str(ROOT),'--timeout','30','--',*argv],cwd=ROOT,stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=50,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+        need(dest.is_file(),'Missing owned command receipt '+name)
+        receipt=json.loads(dest.read_text());report['commands'].append(dict(name=name,receipt=dest.relative_to(out).as_posix(),sha256=sha(dest)))
+        save()
+        need(wrapper.returncode==0 and receipt['status']=='TERMINAL' and type(receipt['returncode']) is int and receipt['returncode']==0,
+            'Nonpassing reference command '+name)
+        return dest.with_suffix('.stdout.log').read_text(errors='replace')
+    for mi,mpath in enumerate(a.matrix):
+        mpath=mpath.resolve()
+        need(mpath==ROOT/'.build/cyd-vorbis-floor-presence-corpus-01/matrix.json' and sha(mpath)=='4a66d9f6cefc4876eb3a89c0084baeaf6d19ad5455a16c449de21c0525927f86', 'Exact actual root-generated matrix required')
+        need(sha(mpath.parent/'manifest.json')=='85b4042b179ca9177e1789ae41b4c0c3e29d6d1b7fd48e10a327b7fa1d92472f', 'Exact actual root-generated manifest required')
+        matrix=json.loads(freeze(mpath));matrices.append((mi,matrix))
+        need(len(a.matrix)==1 and matrix['schema']=='vorbis-floor-presence39-matrix-v1' and
+             len(matrix['cases'])==39 and matrix['total_packets']==546 and
+             matrix['expected_total_s16le_bytes']==971520 and matrix['case_mask']==549755813887 and
+             matrix['predeclared_max_abs_error']==2 and matrix['references_required']==['libvorbis','vorbis'],
+             'Exact complete39 predeclared floor-presence scope required')
+        generator_root=ROOT/'.build/cyd-vorbis-floor-presence-prep-02'
+        need(sha(generator_root/'readiness.json')=='b441d51bf7df0a6863cfb81c5e436c2bf27eb34753368b5027cc71dab0070710',
+             'Frozen final generator preparation required')
+        readiness=json.loads(freeze(generator_root/'readiness.json'))
+        for row in readiness['files']:
+            value=freeze(generator_root/row['path'])
+            need(len(value)==row['bytes'] and hashlib.sha256(value).hexdigest()==row['sha256'],'Frozen generator source closure')
+        manifest=json.loads(freeze(mpath.parent/'manifest.json'))
+        for row in manifest['files']:
+            path=(mpath.parent/row['path']).resolve();need(path.is_relative_to(mpath.parent),'Corpus manifest path boundary')
+            value=freeze(path)
+            need(len(value)==row['bytes'] and hashlib.sha256(value).hexdigest()==row['sha256'],'Complete generated corpus closure')
+        for original in matrix['cases']:
+            case=dict(id=f'{mi}-{original["id"]}',input=original,source_matrix=str(mpath),
+                source_matrix_sha256=sha(mpath),decoded={},failures=[])
+            report['cases'].append(case);save()
+            folder=out/'cases'/case['id'];folder.mkdir(parents=True)
+            try:
+                parts={name:freeze(mpath.parent/original[name]) for name in ('identification','setup','comment','audio','ogg')}
+                info=parts['identification'];need(len(info)==30 and info[:7]==b'\x01vorbis','Full public identification header required')
+                channels,rate=info[11],int.from_bytes(info[12:16],'little')
+                short,long=1<<(info[28]&15),1<<(info[28]>>4)
+                need((rate,channels,short,long)==tuple(original[k] for k in ('rate','channels','short','long')),'Encoded public identification metadata differs')
+                modes=original['mode_flags'];offsets=original['offsets']
+                need(len(offsets)==len(modes)+1 and offsets[0]==0 and offsets[-1]==len(parts['audio']) and
+                    all(type(x) is int and x in (0,1) for x in modes) and all(x<y for x,y in zip(offsets,offsets[1:])),'Raw packet/mode offsets')
+                frames=[0]+[((long if x else short)+(long if y else short))//4 for x,y in zip(modes,modes[1:])]
+                declared=original.get('expected_packet_samples',original.get('expected_packet_frames'))
+                need(frames==declared and sum(frames)==original['expected_raw_samples'] and sum(frames)*channels*2==original['expected_s16le_bytes'],'Independent overlap accounting')
+                packets=module.packets(parts['ogg'])
+                need([r['data'] for r in packets[:3]]==[parts['identification'],parts['comment'],parts['setup']] and
+                     [r['data'] for r in packets[3:]]==[parts['audio'][x:y] for x,y in zip(offsets,offsets[1:])], 'Carrier/raw payload equivalence')
+                cumulative=0
+                for i,row in enumerate(packets[3:]):
+                    cumulative+=frames[i];first=row['data'][0]
+                    need(row['granule']==cumulative and row['eos']==(i+1==len(modes)) and first&3==modes[i]<<1,'Complete carrier mode/granule accounting')
+                    if modes[i]:
+                        need(((first>>2)&1)==modes[i-1] and ((first>>3)&1)==modes[i+1],'Long window neighbor flags')
+                (folder/'input.ogg').write_bytes(parts['ogg'])
+                case['ogg_sha256']=hashlib.sha256(parts['ogg']).hexdigest()
+            except Exception as exc:
+                case['failures'].append(dict(stage='input',error=repr(exc)));report['failures'].append(dict(case=case['id'],stage='input',error=repr(exc)));save();continue
+            for decoder in ('vorbis','libvorbis'):
+                try:
+                    wav_path=folder/(decoder+'.wav')
+                    stdout=run('cases/'+case['id']+'/decode-'+decoder,[ffmpeg,'-nostdin','-n','-hide_banner','-loglevel','error',
+                        '-xerror','-err_detect','explode','-c:a',decoder,'-i',folder/'input.ogg','-map','0:a:0','-map_metadata','-1',
+                        '-fflags','+bitexact','-flags:a','+bitexact','-c:a','pcm_s16le','-f','wav',wav_path,
+                        '-map','0:a:0','-map_metadata','-1','-flags:a','+bitexact','-c:a','pcm_s16le','-f','framemd5','-'])
+                    with wave.open(str(wav_path),'rb') as w:
+                        need((w.getframerate(),w.getnchannels(),w.getsampwidth(),w.getnframes())==(rate,channels,2,sum(frames)),'Actual WAV metadata/sample count')
+                        pcm=w.readframes(w.getnframes())
+                    lines=[line.split(',') for line in stdout.splitlines() if line.strip() and not line.startswith('#')]
+                    need(all(len(row)==6 and int(row[0])==0 for row in lines),'Actual framemd5 syntax')
+                    observed_frames=[int(row[3]) for row in lines];observed_bytes=[int(row[4]) for row in lines]
+                    need(observed_frames==frames[1:] and observed_bytes==[n*channels*2 for n in frames[1:]],'Actual per-packet frame durations/PCM sizes')
+                    need(len(pcm)==sum(frames)*channels*2,'Actual complete PCM bytes')
+                    transition_nonzero={};transition_channel_nonzero={};cursor=0
+                    for i,n in enumerate(frames):
+                        size=n*channels*2;chunk=pcm[cursor:cursor+size];cursor+=size
+                        if i:
+                            kind=('L' if modes[i-1] else 'S')+('L' if modes[i] else 'S')
+                            transition_nonzero[kind]=transition_nonzero.get(kind,0)+sum(v!=0 for v in chunk)
+                            counts=transition_channel_nonzero.setdefault(kind,[0]*channels)
+                            for channel in range(channels):
+                                counts[channel]+=sum(bool(chunk[i] or chunk[i+1]) for i in range(channel*2,len(chunk),channels*2))
+                    need(set(transition_nonzero)=={'SS','SL','LS','LL'},'Complete four-transition observations required')
+                    witness=pcm_witness.stream(pcm,original)
+                    replay_pcm,replay_info=decoded_pcm(wav_path.read_bytes(),stdout.encode(),rate,channels,frames,modes,original)
+                    need(replay_pcm==pcm,'Independent WAV/framemd5 full PCM replay differs')
+                    case['decoded'][decoder]=dict(rate=rate,channels=channels,bits=16,frames=observed_frames,
+                        pcm_bytes=len(pcm),nonzero_bytes=sum(v!=0 for v in pcm),transition_nonzero_bytes=transition_nonzero,
+                        transition_nonzero_frames_per_channel=transition_channel_nonzero,
+                        wav_sha256=sha(wav_path),pcm_sha256=hashlib.sha256(pcm).hexdigest(),presence_witnesses=witness)
+                    need(case['decoded'][decoder]==replay_info,'Full WAV/framemd5 metadata replay differs')
+                    pcm_by_case[(mi,original['id'],decoder)]=pcm
+                except Exception as exc:
+                    failure=dict(stage=decoder,error=repr(exc));case['failures'].append(failure);report['failures'].append(dict(case=case['id'],**failure))
+                save()
+            if len(case['decoded'])==2:
+                av=array.array('h');bv=array.array('h');av.frombytes(pcm_by_case[(mi,original['id'],'vorbis')]);bv.frombytes(pcm_by_case[(mi,original['id'],'libvorbis')])
+                if sys.byteorder!='little':av.byteswap();bv.byteswap()
+                difference=max((abs(x-y) for x,y in zip(av,bv)),default=0);case['cross_reference_max_abs_error']=difference
+                if difference>2:report['failures'].append(dict(case=case['id'],stage='cross-reference',error='PCM16 maximum error exceeds2'))
+            print(json.dumps(dict(case=case['id'],decoded=list(case['decoded']),failures=len(case['failures']),max_error=case.get('cross_reference_max_abs_error'))),flush=True);save()
+    for mi,matrix in matrices:
+        for decoder in ('vorbis','libvorbis'):
+            for group in matrix.get('expected_same_decoder_pcm_equal_groups',[]):
+                keys=[(mi,name,decoder) for name in group]
+                passed=all(k in pcm_by_case for k in keys) and all(pcm_by_case[k]==pcm_by_case[keys[0]] for k in keys[1:])
+                report['metamorphic_checks'].append(dict(decoder=decoder,kind='equal',cases=group,passed=passed))
+            for pair in matrix.get('expected_same_decoder_pcm_different_pairs',[]):
+                x,y=[(mi,name,decoder) for name in pair]
+                passed=x in pcm_by_case and y in pcm_by_case and pcm_by_case[x]!=pcm_by_case[y]
+                report['metamorphic_checks'].append(dict(decoder=decoder,kind='different',cases=pair,passed=passed))
+    need(all(sha(path)==row['sha256']==sha(out/row['snapshot']) for path,row in report['inputs'].items()),'Frozen inputs changed')
+    need(all(sha(path)==digest for path,digest in report['tools'].items()),'Reference tools changed')
+    report['xiph_reference_qualified']=bool(report['cases']) and all('libvorbis' in c['decoded'] for c in report['cases']) and all(x['passed'] for x in report['metamorphic_checks'] if x['decoder']=='libvorbis')
+    report['dual_reference_qualified']=report['xiph_reference_qualified'] and not report['failures'] and all(x['passed'] for x in report['metamorphic_checks'])
+    need(len(report['cases'])==39 and len(report['commands'])==78,'Complete39/78 reference command set required')
+    report['completed']=True;save()
+    print(json.dumps({k:report[k] for k in ('completed','xiph_reference_qualified','dual_reference_qualified')}) ,flush=True)
+    return 0 if report['dual_reference_qualified'] else 1
+
+if __name__=='__main__':raise SystemExit(main())

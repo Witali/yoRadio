@@ -1,0 +1,13 @@
+--- .build/cyd-vorbis-floor-presence-prep-02/materialize.py
++++ presence39/materialize.py
+@@ -142,6 +142,10 @@
+         ("first_offset", text.replace("    0U,", "    1U,", 1), "model_array_values:offsets"),
+         ("descriptor_order", text.replace(descriptors[0] + descriptors[1], descriptors[1] + descriptors[0], 1), "ordered_descriptor_fields"),
+     ]
++    floor_start = text.index("static const uint8_t corpus_000_floors[")
++    floor_stop = text.index("\n};", floor_start)
++    changed_floors = text[:floor_start] + text[floor_start:floor_stop].replace("0x00", "0x01", 1) + text[floor_stop:]
++    controls.append(("first_floor_mask", changed_floors, "model_array_values:floors"))
+     observed = []
+     for name, damaged, reason in controls:
+         need(damaged != text, "control_not_applied:" + name)
