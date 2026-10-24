@@ -3477,7 +3477,7 @@ helpers; use an appropriate isolated snapshot or defer changes until it ends.
 Actual SDK I/O/allocation/NVS-internal/electrical publication faults and hardware
 H01-H09 still open. Goal not complete, blocked or paused.
 
-## CURRENT 2026-10-24 — complete-database xref inventory; H10 still live
+## Checkpoint 2026-10-24 — xref inventory (newer CURRENT below)
 
 Previous goal turn was PROGRESS: deda58625 qualified current-image runtime,
 00096f882 candidate selection,677defd99 stalled-peer tests/QEMU21a8d6dd8c.
@@ -3551,3 +3551,95 @@ analysis copy, never edit original factory bytes or claim5140equalsall functions
 Known CYD IDF6 PHY issue still open; separate full current network/display/suite,
 SDK I/O/allocation/NVS internal/electrical cuts and hardwareH01-H09 remain open.
 All full plan requirements persist; goal not complete/blocked/paused.
+
+## CURRENT 2026-10-24 — three SDK gaps identified/recovered; H10 live
+
+Previous goal turn PROGRESS36adbd6f7, current turn also PROGRESS. No blocker,
+physical action or new push request. Full objective remains active/unbounded.
+Native9C1A83BD/ELF76B5CE37/source7D95988C, SDK installations and QEMU21a8d6dd8c
+unchanged. Work stays in .worktree/small-tv-improvement-plan branch; main/root
+untouched. New work is static reverse tooling/evidence, not a firmware rebuild.
+
+Three GP-only missing sites belong to complete known SDK functions:
+* ieee80211_tx_mgt_cb:420581b6..4205838a, source516/linked468,27localbranches.
+* wifi_connect_process:420662da..4206632e, source100/linked84,1localbranch.
+* pm_coex_slice_timeout_process:420756f0..4207581e,source318/linked302,15branches.
+SDK source tagv5.5.4/commit735507283d5b2f9fb363a1901172dbd9e847945d, gitlink
+b87cce81803b85c3639fb14bac6c24cff6d0fbad in espressif/esp32-wifi-lib. Local old
+SDK submodule absent, fetched only3officialC2archives to .build/factory-gaps-
+20261024/sdk-wifi-b87cce8, verified Git blob+SHA via exact commit tree. NO SDK
+writes. Whole934SDKbytes/854factorybytes matched, only17authorizedCALL relaxations
+and3GP LUI elisions.43localCFdestinations/repeatedsymbol/shared g_wifi_nvs,g_ic,
+g_osi_funcs_p,wifi_log bindings verified. This is SDK code identity, not semantic
+or timing equivalence across SDK versions.
+
+New modules tools/reverse/elf_archive.py (bounded ar reader, no extraction),
+rv32_link_match.py (relocation-aware instruction/CF match), xref_delta.py,
+native_sdk_links.py; tools/match_factory_sdk.py; tests/factory_sdk_match_test.py;
+tests/verify_factory_sdk_evidence.py; Java InspectFactoryGaps/RecoverFactoryGaps.
+Classify raw whole source bodies with only supported relocations; no prefix-only
+identity. Direct semantic branch controls are checked after legitimate immediate
+masking. Unsupported/ambiguous alignments fail, no generic all-SDK acceptance.
+Existing audit_factory_xrefs.audit adds expected_gaps, default old3 unchanged;
+new recovery requires empty. factory_xrefs_test supports historical source SHA
+via --source-revision, old36ad proof+9controls replay passed. Do not overwrite old
+source snapshots/reports as though they used the new graph.
+
+Ghidra source copied to .build/factory-gaps-20261024/project-copy (10files hashed),
+then -readOnly -noanalysis RecoverFactoryGaps + ExportFactoryXrefs. Only analysis
+instructions/function definitions changed transiently, every initialized block
+SHA unchanged. Both source project and copied project disk hashes identical to
+before afterwards, source factory ELF8C9FD166 unchanged. Script session terminal0.
+Result5143enumeratedfunctions (was5140),286671instructions (was286384), all396GP
+instructions match GNU. Manager count5145→5148 differs from enumeration but both
+increase3. After-audit verified17233code references,475literal pointers/3metadata/
+syntheticentry still checked. Newgraph stored as14function-row replacements/
+additions,3GP rows,instructioncount over immutable ancestor; actualbefore/after
+full files stay ignored. This closes these THREE gaps, not whole image.
+
+Sourcecaller ownership: first materialization4206fd6a belongs4206fd54..4206fd71;
+second42068f1e belongs42068eec..42068f43. Caller4207b120 still has NO containing
+function. pm original SDK match ends7581e, not nextGhidrafunction75896: intervening
+code still needs classification, do not infer boundary from next known symbol.
+Some bound SDK log anchors lie outside loaded DROM; identity matching alone
+must not turn that into a firmware/backdoor/error claim or proof of reachability.
+
+Native ELF already includes ieee80211_tx_mgt_cb4205b482/452B,
+wifi_connect_process4206a534/836B, pm_coex_slice_timeout_process4207ab2c/6B. Last
+is c.li a0,1 +tailJALto4207a9f0 pm_coex_go_to_sleep316B, not an absent body.
+Native symbol existence/link target are verified, old-vs-new SDK behavior NOT
+proved equivalent. No app functions added/removed or manual SDK duplication.
+
+Proof factory-sdk-gaps-validation-20261024.json:24payload references,
+50296newgzipbytes, ancestor gzip/source reused.15SDK+5analysis negative cases
+rejected, replay matched actual libraries/ELF/ancestor+delta/native ELF/app and
+source pins. NO full library .a/firmwareELF/dump/DROMdata/VMflash/RAM/UART added.
+Need exact local libs to replay: net80211 SHA8f989ecd..., ppb460bb30..., core85394ad5...
+(complete values in reference/SDK_GAP_RECOVERY.md and loader constants). Raw caches
+SDKobjects, SDKmatches-final.json, before.json, recovery.json, after-graph.json,
+after-audit.json, graph-delta.json, native-links.json, sdk-controls.json,
+project-integrity.json and archive.py are under .build/factory-gaps-20261024.
+Producer SDK match input still same exact helpers as sdk-matches-final.json;
+avoid changing them without preserving/rerunning. New verifier supports
+--source-revision for future compatible source changes. Oldfull-image proof
+command now documents --source-revision36ad +PYTHONPATH for shared oracle deps.
+
+ONE H10 STILL LIVE: .build/runtime-h10-current-20261024, supervisor34280,
+workload34996,guard13180,VM1512/SmallTV-dc56f2b7a572, created24Oct10:41UTC.
+Host CIM verified same live processes this turn; last145cycles/2STAoutages,
+oneROMboot/noerrors. Duration86400guestseconds/interval15/outageEvery60 remains
+PENDING. Never restart on observation timeout, never open second debugger/QMP,
+never edit its pinned runtime/weather/time/source helpers or overwrite V8 exe.
+Earlystart .build/runtime-h10-current-20261024-start.json. After terminal use
+analyze_runtime with exact start record and allowed dependency/QEMU roots; do
+not claim24h from short runs. Prior checkpoint has full command/preservation rules.
+
+NEXT: caller4207b120 +undefinedregion7581e..75896, callback registration parents
+and wider SDK/application xrefs/reachability. The matcher can help classify SDK
+boundaries; keep all unclassified nodes explicit and no whole-image claims.
+Also resolve known CYD IDF6 PHY assertion (QEMU docs/ESP_FLASH_WRITE.md), possibly
+independent of C2. Preserve H10's clients-v8 exe if making/building new QEMU;
+build a DISTINCT candidate filename and separate CYD/C3/C2 regression. Full
+current network/display/suite, SDK I/O/allocation/NVSinternal/electrical faults,
+H10 and hardwareH01-H09 remain open. Hardware requires identified intended board,
+no unsolicited serial resets/flashes. Goal not complete/blocked/paused.

@@ -375,6 +375,17 @@ Proof full-image-xrefs-validation-20261024.json,9negativecontrols pass.
 computed aliases, границыпропущенныхfunctions, task/timer registrations иполная
 достижимостьостаютсяоткрытыми. Полнотаобраза/semantic equivalence не заявлены.
 
+SDK recovery checkpoint24Oct: три GNU-only GP sites идентифицированы полным
+сопоставлением с Wi-Fi libraries IDF5.5.4: ieee80211_tx_mgt_cb,
+wifi_connect_process, pm_coex_slice_timeout_process. 934SDK/854linkedbytes,
+43localbranches и shared-symbol bindings проверены,20negative controls pass.
+В отдельной transient-копии Ghidra восстановлены3функции:5143enumerated/396GP,
+gapsпусты; firmware bytes и10файлов обоихпроектов неизменны. Native ELF уже
+содержит3SDKcounterparts; coex6-byte wrapper ведётв316-byte implementation.
+См. [SDK_GAP_RECOVERY.md](reference/SDK_GAP_RECOVERY.md). Этот selected gap закрыт;
+caller4207b120/другие undefined functions, SDK/application boundary иполная
+достижимость остаютсяоткрытыми. Равенство разныхверсийSDK не заявлено.
+
 ## 6. Приёмка окончательной версии и правила работы
 
 Для завершённого исправления — focused commit, failing test и проверка исправления,

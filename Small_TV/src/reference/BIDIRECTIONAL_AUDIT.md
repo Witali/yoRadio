@@ -125,6 +125,11 @@ Ghidra (5140functions), с независимой сверкой ELF/GNU и 396G
 Восстановлены четыре ранее неиндексированных обращения рабочего `browser_time`.
 Три GNU участка отсутствуют в базе; полнота остаётся недоказанной. См.
 [FULL_IMAGE_XREFS.md](FULL_IMAGE_XREFS.md) и сохранённый proof с9negative controls.
+Следом все3пропущенные GP sites сопоставлены с полными телами функций SDK5.5.4
+и восстановлены в transient-копии анализа; bytes прошивки и обоихпроектов прежние.
+Native counterpart symbols присутствуют, coex wrapper проверен до316-byte target.
+См. [SDK_GAP_RECOVERY.md](SDK_GAP_RECOVERY.md). Это закрывает именно3analysis gaps,
+не доказывает весьcallgraph/semantic equivalence и не меняет app-код.
 
 - Отдельные timer/photo/GIF, UI, UTF-8, цвета, JSON/body, raw settings и
   mutex/atomic helpers реализуют разделение по назначению. Отношение функций

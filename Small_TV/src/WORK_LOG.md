@@ -4528,3 +4528,44 @@ inventory proof доказательством всей программы. Де
 H10 повторно подтверждён на тех же4 живых процессах; наблюдалось42 завершённых
 цикла, один ROM boot, guard без ошибок. Это продолжающийся тест, не pass24h.
 Общий план активен; новые изменения сохраняются focused commit, push нет.
+
+## 2026-10-24 — восстановлены три пропущенные SDK-функции
+
+Предыдущий goal turn дал progress36adbd6f7: полная база ссылок и три явных GP
+gap. Текущее продолжение подтвердило живой H10, затем выполнило независимый
+статический разбор; QMP/RSP/физическая плата не затрагивались.
+
+В ESP-IDF v5.5.4 (73550728) найден gitlink Wi-Fi library b87cce81. Подмодуль
+локально отсутствовал; три официальных C2 archives загружены в ignored .build,
+проверены Git blob/SHA, установленный SDK не менялся. Полное сопоставление bytes,
+ELF relocations/RELAX permissions,43local branches и shared bindings установило:
+ieee80211_tx_mgt_cb420581b6..4205838a, wifi_connect_process420662da..4206632e,
+pm_coex_slice_timeout_process420756f0..4207581e.934SDK/854linked bytes;
+17call relaxations и3GP high elisions объясняют все80bytes разницы. Имена
+подтверждены SDK symbols, не только похожим прологом.
+
+Проект Ghidra скопирован в отдельный .build и открыт readOnly/noanalysis.
+Временное описание добавило три подтверждённых function bodies и287instructions;
+перечисление5140→5143, все396GP accesses совпали с GNU. SHA всех initialized
+blocks прежние. Все10файлов исходного проекта и его копии после завершения
+процесса тоже прежние. Изменения анализа хранятся как delta14function rows/
+3GP rows, без второго полного7MBграфа. Whole-image completeness остаётся false;
+caller4207b120 всё ещё undefined, новые SDK/application boundaries не доказаны.
+
+В native ELF76B5CE37 найдены все3counterparts. pm_coex_slice_timeout_process
+на4207ab2c занимает6bytes: a0=1 иtailjump в316-byte pm_coex_go_to_sleep4207a9f0.
+Малый размер не оказался пустой реализацией. Семантика SDK5.5.4 иSDK6.1 не
+приравнивается наличием символов. Production app9C1A83BD/SDK/QEMU не изменены.
+
+15настоящих SDK negative controls проверяют fixed bits/branch targets/truncation/
+RELAX permission/repeated wifi_log/shared NVS/truncated archive;5analysis controls
+проверяют coverage/owner/memory/bounds/project state. Все20rejected. Новый proof
+factory-sdk-gaps-validation-20261024.json:24payload references,50296newgzipbytes,
+старыеpayloads reused. Replay пересобирает SDK matches/ancestor+delta/native links.
+Ни полные SDK archives, ни firmware ELF/dump/DROMdata/VMflash/RAM/UART не добавлены.
+Старый proof отдельно replay36adbd6f7/9controls pass; добавлен --source-revision.
+Детали reference/SDK_GAP_RECOVERY.md, новые helpers разделены по назначению.
+
+H10 на прежних4процессах продолжает работу: последнее подтверждение145cycles,
+2реальныхSTAoutages, oneROMboot/noerrors. Это pending24h, не completed pass.
+Source/main и physical device не менялись; push не выполнялся. Общий план активен.

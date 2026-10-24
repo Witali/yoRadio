@@ -90,7 +90,7 @@ def instructions(text,image):
     return rows
 
 
-def audit(ghidra,text,elf,selected):
+def audit(ghidra,text,elf,selected,expected_gaps=None):
     """Validate database bytes and compare independently discovered gp accesses."""
     image=Image(elf);assert ghidra['schema_version']==1 and ghidra['program_sha256']==FACTORY_SHA
     assert ghidra['semantic_equivalence_proved'] is False and ghidra['whole_image_completeness_proved'] is False
@@ -112,7 +112,8 @@ def audit(ghidra,text,elf,selected):
     # the discrepancy explicitly; this audit must not certify full coverage.
     gaps=set(decoded)-set(observed)
     assert not set(observed)-set(decoded),'Ghidra-only gp instruction needs investigation'
-    assert gaps=={0x42058280,0x420662da,0x420757d2},'New database coverage gap needs review'
+    if expected_gaps is None:expected_gaps={0x42058280,0x420662da,0x420757d2}
+    assert gaps==set(expected_gaps),'Database coverage differs from the reviewed profile'
     for pc,row in observed.items():assert bytes.fromhex(row['bytes'])==rows[pc]
     checked=data_checked=metadata_checked=entry_checked=0;types=Counter();outside=set();pointers=[]
     functions=ghidra['functions'];entries={(f['space'],f['entry']) for f in functions}
@@ -168,7 +169,7 @@ def audit(ghidra,text,elf,selected):
         gp=hex(gp),gp_memory_instructions=len(decoded),verified_code_references=checked,
         verified_literal_function_pointers=data_checked,verified_metadata_references=metadata_checked,
         verified_synthetic_entry_references=entry_checked,
-        gp_coverage_agrees=False,verified_common_gp_instructions=len(observed),
+        gp_coverage_agrees=not gaps,verified_common_gp_instructions=len(observed),
         database_gp_gaps=[dict(from_address=hex(pc),bytes=rows[pc].hex(),**decoded[pc]) for pc in sorted(gaps)],
         function_reference_types=dict(sorted(types.items())),pointer_candidate_edges=len(pointers),
         pointer_targets_outside_selected=sorted({p['target'] for p in pointers if p['target'] not in selected}),

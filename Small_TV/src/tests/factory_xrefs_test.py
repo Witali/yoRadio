@@ -35,7 +35,7 @@ def check_controls(ghidra,text,elf,selected):
     return rejected
 
 
-def replay(proof_path,assembly,elf,root):
+def replay(proof_path,assembly,elf,root,revision=None):
     """Check exact archived producers and rederive the audit from local code bytes."""
     proof=json.loads(proof_path.read_text());assert proof['schema_version']==1 and proof['passed']
     assert not any(proof[k] for k in ('whole_image_completeness_proved','semantic_equivalence_proved','physical_hardware_tested'))
@@ -45,8 +45,12 @@ def replay(proof_path,assembly,elf,root):
         packed=path.read_bytes();assert sha(packed)==row['gzip_sha256'];data=gzip.decompress(packed)
         assert sha(data)==row['sha256'] and len(data)==row['bytes'];assert row['source'] not in files
         files[row['source']]=data
-    for name,digest in proof['source_pins'].items():
-        assert sha((root/name).read_bytes())==digest and sha(files['producer/'+name])==digest
+    if revision:
+        from verify_photo_format_matrix_evidence import source_hashes
+        actual=source_hashes(root,proof['source_pins'],revision)
+    else:actual={name:sha((root/name).read_bytes()) for name in proof['source_pins']}
+    assert actual==proof['source_pins']
+    for name,digest in proof['source_pins'].items():assert sha(files['producer/'+name])==digest
     ghidra=json.loads(files['ghidra.json']);selected={r['address'] for r in json.loads(files['producer/Small_TV/src/symbol-map.json'])['functions']}
     result=audit(ghidra,assembly.read_text(),elf.read_bytes(),selected)
     original=json.loads(files['audit.json']);original.pop('inputs_sha256')
@@ -68,8 +72,9 @@ def main():
     parser.add_argument('--elf',type=Path,required=True)
     parser.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[3])
     parser.add_argument('--output',type=Path)
+    parser.add_argument('--source-revision',help='Read historical producer identities without resetting the checkout')
     args=parser.parse_args()
-    if args.proof:result=replay(args.proof,args.assembly,args.elf,args.root)
+    if args.proof:result=replay(args.proof,args.assembly,args.elf,args.root,args.source_revision)
     else:
         ghidra=json.loads(args.ghidra.read_text());text=args.assembly.read_text();elf=args.elf.read_bytes()
         selected={r['address'] for r in json.loads((args.root/'Small_TV/src/symbol-map.json').read_text())['functions']}

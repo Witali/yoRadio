@@ -92,11 +92,13 @@ Path('.build/factory-all-executable-20261024.asm').write_bytes(subprocess.check_
 ```
 
 ```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/factory_xrefs_test.py `
   --elf C:/Work/yoRadio/.build/small-tv-reverse/factory-analysis.elf `
   --assembly .build/factory-all-executable-20261024.asm `
-  --proof Small_TV/qemu/parity/full-image-xrefs-validation-20261024.json
+  --proof Small_TV/qemu/parity/full-image-xrefs-validation-20261024.json `
+  --source-revision 36adbd6f7
 ```
 
 Replay проверяет snapshot исходников и ELF, пересчитывает отчёт, отвергает девять
@@ -111,3 +113,9 @@ Ghidra может вернуть code 0 при ошибке Java script; усп�
 
 Production app, SDK и QEMU в этом checkpoint не изменены. Длительный H10
 наблюдается отдельно; этот статический аудит не подключается к его QMP/RSP.
+
+Следующий checkpoint идентифицировал все три GNU-only sites как функции
+официальной Wi-Fi library и восстановил их в отдельной transient-копии анализа.
+Там все396GP accesses согласованы, bytes исходной прошивки и обоих проектов
+неизменны. Это дополнение не переписывает первоначальный результат и не
+доказывает полноту всего образа. См. [SDK_GAP_RECOVERY.md](SDK_GAP_RECOVERY.md).
