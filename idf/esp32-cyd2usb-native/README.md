@@ -49,6 +49,9 @@ To install or restore the WebUI explicitly:
 
 The display driver is a native ESP-IDF ST7789/SPI-DMA port taken from the
 HLV-codec CYD firmware and kept locally in `main/cyd_display.*`.
+It already writes rectangular pixel windows with automatic row advancement;
+see [ST7789/ILI9341 address windows](../../docs/TFT_ADDRESS_WINDOWS.md) for the
+command sequence and the current CYD DMA path.
 
 ## Native service API
 
