@@ -1,0 +1,97 @@
+{
+  "schema": "independent-qemu-sr2-continuity-source-review-v1",
+  "verdict": "PASS_NARROW_SOURCE_CORRECTION_REVIEW_ONLY",
+  "blocking_findings": [],
+  "source_before": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\m25p80-sr2-before.c",
+    "bytes": 63472,
+    "sha256": "6eecf0409bfc52ba9df31234144e4fa63af15122d0682a355e5350942585f99b"
+  },
+  "source_after": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\m25p80-sr2-after.c",
+    "bytes": 63572,
+    "sha256": "7e3999f743d2c9d3c391f54eab2dfb3732b04a16964529258ee822a20f85c9df"
+  },
+  "current_external_source_matches_after": true,
+  "source_delta": "Exactly one functional line data_read_loop=true, plus explanatory comment, in existing GigaDevice/Winbond opcode0x35 block.",
+  "reasoning": [
+    "The branch prepares one status byte but omits the existing RDSR loop flag. STATE_READING_DATA returns to IDLE after that byte; the next0xff is misdecoded as a command although CS is still low.",
+    "Production trace03 lines112-118 and350-356 show status0x02 on the first clock, followed by IDLE/new command0xff before deselect. Enabled controller dummy forwarding discards that first byte, so later caller data sees zero.",
+    "Setting the existing loop flag repeats the same modeled status until CS high, where m25p80_cs resets state/len/pos/loop. This is real status-instruction behavior, not a firmware dummy workaround, fixed readiness value or assertion bypass."
+  ],
+  "primary_sources": [
+    {
+      "url": "https://download.gigadevice.com/Datasheet/DS-00088-GD25Q32C-Rev4.1.pdf",
+      "authorship": "GigaDevice, official domain",
+      "access": "Official search extraction",
+      "location": "Section7.4/Figure5, printedpage18",
+      "supports": "Commands05/35/15 read the selected register continuously while CS remains asserted."
+    },
+    {
+      "url": "https://devzone.nordicsemi.com/cfs-file/__key/support-attachments/beef5d1b77644c448dabff31668f3a47-0c4c655c5804440494198f0e003d1611/5810.W25Q32JV-RevI-05042021-Plus.pdf",
+      "authorship": "Winbond-authored RevI May04 2021, hosted mirror",
+      "access": "Direct PDF opened,79pages",
+      "location": "Printedpage24/Figure8 under section7.2 instruction descriptions; also table note2, page22",
+      "supports": "Selected status register repeats until CS high. Earlier8.2.4 locator from another revision is not used."
+    }
+  ],
+  "driver": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\mmio-200.py",
+    "bytes": 17198,
+    "sha256": "16d7a9dcf2cf9dfb6fae13d065720856f13161be16fbf76f513df6b2c4d68bb4"
+  },
+  "driver_AST_only": true,
+  "driver_review": "Original187 comparisons retained plus13 status-control rows: initial2/16/64, WEL set/clear, QE repeated2/16/64,8/16/256 dummy clocks, clear and restore; strict complete200 guard. Nonzero QE detects false-zero output; SR1/WEL and fresh commands exercise CS termination and distinct registers.",
+  "actual_pre_fix_control": {
+    "report": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-sr2-control-mmio-01\\report.json",
+      "bytes": 45694,
+      "sha256": "dc33f37a0508d488f2558c4991998610b898ad48684f7f4d8fc882b97d057daa"
+    },
+    "receipt": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\sr2-control-mmio-command.json",
+      "bytes": 1406,
+      "sha256": "eca726287835426953790229e4829ed232c57b12be82c84384021201d255c33a"
+    },
+    "checks": 200,
+    "passed": 193,
+    "failed": 7,
+    "failed_cases": [
+      "GD SR2 QE continuous 2",
+      "GD SR2 QE continuous 16",
+      "GD SR2 QE continuous 64",
+      "GD SR2 after 8 dummy clocks",
+      "GD SR2 after 16 dummy clocks",
+      "GD SR2 after 256 dummy clocks",
+      "GD SR2 restore continuous"
+    ],
+    "controller_completed": true,
+    "EOF_join_unchanged": true,
+    "no_controller_errors": true,
+    "executed_by": "root, not reviewer",
+    "result": "Expected pre-fix failure preserved"
+  },
+  "production_evidence": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-03\\report.json",
+      "bytes": 31270,
+      "sha256": "7719ceb97f54c2397b0320326b69ae7c76294f678bf901b2223ccd979ff94bda"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-03\\flash-trace.log",
+      "bytes": 30329,
+      "sha256": "65ff9b6ec78b5af551726a2cf4a3724630eb11e39c17f2af5cb2aa75f469a5b9"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-03\\uart.log",
+      "bytes": 1837,
+      "sha256": "b05e2aba5bdfae8eed41a8739d0209c05f3a61dfb4e83a795ac30508d9842862"
+    }
+  ],
+  "scope_limits": [
+    "Actual4MiB fixture is GigaDevice. Winbond has authored-document/source review, not a separate executed Winbond fixture.",
+    "Only existing modeled QE output continuity is corrected. All status bits, dynamic WIP timing, opcode0x15 support and every part are not established.",
+    "Post-fix rebuild/full200/peripheral regressions remain separate root actual facts. Controller observation03 completed with early QIE/flash assertion and no app_main; production boot remains unqualified.",
+    "Reviewer did not import or call prepared code, run tests/build/QEMU/Git/device, or mutate external/production files. Only this new ignored note was written."
+  ]
+}

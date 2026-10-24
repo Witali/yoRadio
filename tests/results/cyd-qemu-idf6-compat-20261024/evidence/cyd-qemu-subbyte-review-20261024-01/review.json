@@ -1,0 +1,123 @@
+{
+  "schema": "independent-qemu-subbyte-SSI-source-review-v1",
+  "verdict": "PASS_NARROW_BYTE_MODEL_APPROXIMATION_ONLY",
+  "blocking_source_findings": [],
+  "scope_finding": "The274-case suite establishes extra1-clock sensitivity only. Exact saved80MHz/iomux-false SDK path implies extra_dummy2; full runtime/QIO problem remains unproven by this correction and must stay NONPASS until observed.",
+  "source_before": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\spi-subbyte-before.c",
+    "bytes": 18322,
+    "sha256": "4521cbc6b051225c398dd4881994c231992c52e5aa5aa4516cac266100bb1a65"
+  },
+  "source_after": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\spi-subbyte-after.c",
+    "bytes": 18570,
+    "sha256": "36b55766623a24506cfaab89e4895f53a899b56879a1f00310769f971d78d5d2"
+  },
+  "current_external_source_matches_after": true,
+  "reasoning": [
+    "SSI sends complete bytes, and the old ceil(total bits) promotes every residual1..7bits into a whole additional byte, consuming real response data. The proposed complete-byte floor plus clamp is a coherent conservative quantization inside this existing functional model.",
+    "The applied conditional form is algebraically MAX(floor((addr_bits+clocks*lanes)/8),ceil(addr_bits/8))-ceil(addr_bits/8). It counts complete combined bytes and cannot subtract below the already emitted address bytes. It avoids unsigned underflow and remains identical to the old formula whenever combined phase bits are divisible by8.",
+    "Whole-byte baselines remain: QIO28/5 gives4address+2dummy bytes, DIO28/2 gives4+0, QIO24/6 gives3+3, DIO24/4 gives3+1, fast/DOUT/QOUT24/8 gives3+1. With one extra compensation clock these totals remain unchanged; JEDEC addr0/dummy1 produces no whole dummy byte.",
+    "This does not accurately emulate real fractional wire bits or analog MISO latency. Physical devices still see compensation clocks; the functional model discards only the unrepresentable fractional-byte remainder, without returning fabricated IDs, changing backing data or disabling a firmware assertion.",
+    "A general accurate solution would model bit-level SPI and the receiver sampling delay explicitly. Do not silently drop arbitrary full-byte dummy excess or clamp to opcode-specific expected minima: that would hide configured timing/protocol behavior."
+  ],
+  "SDK_primary_chain": [
+    "esp_flash_spi_init.c:116-123 ESP32 default iomux=false/input_delay_ns0 and selected DEFAULT_FLASH_SPEED; :526 assigns source frequency.",
+    "spi_flash_hal.c:63-79 computes compensation from input/GPIO delay; :125 binds extra_dummy. common.inc:24,163-165 adds extra_dummy to protocol dummy length, and :213-215 avoids input compensation on transactions without MISO.",
+    "ESP32 gpio_caps.h:11 says GPIO matrix delay25ns; soc.h:156 says APB80MHz; spi_flash_ll.h:30 says flash source80MHz; saved sdkconfig.h selects FLASHFREQ_80M.",
+    "Source-only arithmetic under that selected path gives divider1 and floor((1+0+25)*80000/1000000)=2, hence extra_dummy2. Actual trace merely shows one whole SSI byte consumed and cannot distinguish1 from2 subbyte clocks.",
+    "For QIO28/(5+2), combined56bits is already seven whole bytes; the new floor preserves that extra byte. Therefore resolving JEDEC0k does not by itself establish the later QIO transport. This is an explicit remaining runtime question, not a request to change firmware/config."
+  ],
+  "primary_source_facts": [
+    {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hal_mspi\\spi_flash_hal.c",
+      "bytes": 6279,
+      "sha256": "ecd217e6869c4c1e029dec9fd2478c1a279b749de93359341f7cdfba66859008"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hal_mspi\\spi_flash_hal_common.inc",
+      "bytes": 9662,
+      "sha256": "643910cef60364b1b49d9183eb160786878163b9283aef89d9934e03c5e75996"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\spi_flash\\esp_flash_spi_init.c",
+      "bytes": 23770,
+      "sha256": "71744aba2387c911ae207e6eb92117f3eba661ba072123437d4e3db0a8cc0427"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hal_mspi\\esp32\\include\\hal\\spi_flash_ll.h",
+      "bytes": 15775,
+      "sha256": "5c68c1189f73741522318c0910445734b81beca22107e65e963ced2565e60a72"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hal_gpio\\esp32\\include\\hal\\gpio_caps.h",
+      "bytes": 281,
+      "sha256": "60d1c0b7ed54a17b29642f56ce31123d0a7a4e5e603ebbac9881169591bb054f"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\soc\\esp32\\include\\soc\\soc.h",
+      "bytes": 12670,
+      "sha256": "f31406d9ce67c09764a4f30311a24fc90a636d51e49cb2ca1193c9bfcf9301fd"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\config\\sdkconfig.h",
+      "bytes": 40369,
+      "sha256": "c5222bd0657c83cc18ee2768f07f45fb04c3c9f5ccf439da9b48e1176c771516"
+    }
+  ],
+  "primary_web_reference": {
+    "url": "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/spi_master.html#timing-considerations",
+    "scope": "Official guide distinguishes physical MISO setup delay, GPIO routing and added sampling/dummy clocks. General timing context, not proof of this byte approximation or the exact6.0.2 path; local pinned sources above are authoritative."
+  },
+  "driver": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\mmio-274.py",
+    "bytes": 18133,
+    "sha256": "c07cac9b1f980c0a610de1b9487f3d698d08ddd123ad71ccf254d3dbf0eb2f18",
+    "AST_only": true,
+    "delta_from_200": "Exactly74 new comparison rows: six modes x three addresses x four lengths =72, plus real model JEDEC ID and SR2 after one compensation clock. QIO uses28/6 and DIO28/3. Original200 retained; complete274 guard."
+  },
+  "actual_pre_fix_control": {
+    "report": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-subbyte-control-mmio-01\\report.json",
+      "bytes": 62275,
+      "sha256": "5f976553417707aaa267cbb63ad4357553ae8e8328f423161c2bcf904031330d"
+    },
+    "receipt": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\subbyte-control-mmio-command.json",
+      "bytes": 1417,
+      "sha256": "1f1eb6d7500e13a4d3b5452b082991708552a3c9b551e6e759bc2984a70551cd"
+    },
+    "checks": 274,
+    "passed": 201,
+    "failed": 73,
+    "failures": "All72 extra1-clock backing-data rows plus JEDEC401600 vsC84016; SR2 extra1 passes due continuous output.",
+    "controller_complete": true,
+    "EOF_join_inputs_unchanged": true,
+    "controller_errors": [],
+    "executed_by": "root, not reviewer"
+  },
+  "production_observation": {
+    "report": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-04\\report.json",
+      "bytes": 31737,
+      "sha256": "9b7efcaf8a36bad5c4d6dbb0b76d3bd22cc8f3953c868abe8942c2bb807a4b93"
+    },
+    "trace": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-04\\flash-trace.log",
+      "bytes": 26718,
+      "sha256": "9c8aad76f494dbd42d67c7b303959768d822288104e50c3bccea4a5bf1baf9c2"
+    },
+    "UART": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-04\\uart.log",
+      "bytes": 1883,
+      "sha256": "a6ecae55c8e4231791cb28b956eec53ff435a28f93c2347583ece4ac11b46fb2"
+    },
+    "trace_locations": "Initial9F lines21-30 returns C8,40,16; runtime lines297-308 and325-348 clock C8,40,16,00 before CS high.",
+    "classification": "Controller complete; QIE error absent, flash size0k/assert remains; no app_main or production boot qualification."
+  },
+  "source_diff": "--- \n+++ \n@@ -378,13 +378,16 @@\n         lanes = 2;\n     }\n     /*\n-     * SSI transfers complete wire bytes. ESP-IDF on classic ESP32 puts four\n-     * continuous-read mode bits in the address phase (QIO: 28 address bits,\n-     * five dummy clocks). The last address byte already contains four dummy\n-     * bits, so round the combined phases rather than rounding each twice.\n+     * SSI transfers complete wire bytes and does not model fractional-bit\n+     * sampling delays. ESP-IDF may add a sampling-compensation clock; rounding\n+     * that remainder up would consume a complete byte of actual flash data.\n+     * Classic ESP32 also packs four QIO/DIO mode bits into the final address\n+     * byte. Count complete combined bytes, excluding address bytes already\n+     * sent. Arbitrary partial-bit waveforms and analog latency are not modeled.\n      */\n-    return DIV_ROUND_UP(addr_bits + clocks * lanes, 8) -\n-           DIV_ROUND_UP(addr_bits, 8);\n+    unsigned addr_bytes = DIV_ROUND_UP(addr_bits, 8);\n+    unsigned wire_bytes = (addr_bits + clocks * lanes) / 8;\n+    return wire_bytes > addr_bytes ? wire_bytes - addr_bytes : 0;\n }\n \n static uint8_t esp32_spi_read_opcode(Esp32SpiState *s)\n",
+  "prepared_modules_imported_or_called": false,
+  "tests_build_QEMU_Git_device_run_by_reviewer": false,
+  "external_or_firmware_mutation_by_reviewer": false,
+  "post_fix_execution_pass_claimed": false
+}

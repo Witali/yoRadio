@@ -1,0 +1,863 @@
+{
+  "scope": "Observe unchanged production PDM on one separately pinned emulator; no boot qualification.",
+  "result": "OBSERVATION_COMPLETED",
+  "profile": "pdm",
+  "source_commit_of_original_image": "3a563324abdca56144a40d5759def0ccfe708b3c",
+  "full_radio_startup_qualified": false,
+  "startup_qualified": false,
+  "network_association_qualified": false,
+  "network_traffic_qualified": false,
+  "audio_output_qualified": false,
+  "physical_qualification": false,
+  "static_rx_loan_exercised": false,
+  "reserve_performance_qualified": false,
+  "firmware_patched": false,
+  "emulator_model_patched": true,
+  "firmware_or_model_patched": true,
+  "host_network_backend": "none",
+  "host_audio_backend": "none",
+  "physical_device": false,
+  "qmp_transport": "owned-child-stdio",
+  "commands": [
+    {
+      "request": {
+        "execute": "qmp_capabilities",
+        "id": "root-0"
+      },
+      "response": {
+        "return": {},
+        "id": "root-0"
+      }
+    },
+    {
+      "request": {
+        "execute": "query-name",
+        "id": "root-1"
+      },
+      "response": {
+        "return": {
+          "name": "cyd-production-observer-bc03a995ecac4b808db0dc64d5037a68"
+        },
+        "id": "root-1"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-get-state",
+        "id": "root-2",
+        "arguments": {
+          "name": "m25p80_*"
+        }
+      },
+      "response": {
+        "return": [
+          {
+            "name": "m25p80_binding_no_bdrv",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_binding",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_read_sfdp",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_read_data",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_read_byte",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_transfer",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_page_program",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_select",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_chip_erase",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_populated_jedec",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_complete_collecting",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_command_decoded",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_reset_done",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_programming_zero_to_one",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_flash_erase",
+            "state": "disabled"
+          }
+        ],
+        "id": "root-2"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-set-state",
+        "id": "root-3",
+        "arguments": {
+          "name": "m25p80_command_decoded",
+          "enable": true,
+          "ignore-unavailable": false
+        }
+      },
+      "response": {
+        "return": {},
+        "id": "root-3"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-set-state",
+        "id": "root-4",
+        "arguments": {
+          "name": "m25p80_complete_collecting",
+          "enable": true,
+          "ignore-unavailable": false
+        }
+      },
+      "response": {
+        "return": {},
+        "id": "root-4"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-set-state",
+        "id": "root-5",
+        "arguments": {
+          "name": "m25p80_select",
+          "enable": true,
+          "ignore-unavailable": false
+        }
+      },
+      "response": {
+        "return": {},
+        "id": "root-5"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-set-state",
+        "id": "root-6",
+        "arguments": {
+          "name": "m25p80_transfer",
+          "enable": true,
+          "ignore-unavailable": false
+        }
+      },
+      "response": {
+        "return": {},
+        "id": "root-6"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-set-state",
+        "id": "root-7",
+        "arguments": {
+          "name": "m25p80_read_data",
+          "enable": true,
+          "ignore-unavailable": false
+        }
+      },
+      "response": {
+        "return": {},
+        "id": "root-7"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-set-state",
+        "id": "root-8",
+        "arguments": {
+          "name": "m25p80_reset_done",
+          "enable": true,
+          "ignore-unavailable": false
+        }
+      },
+      "response": {
+        "return": {},
+        "id": "root-8"
+      }
+    },
+    {
+      "request": {
+        "execute": "trace-event-get-state",
+        "id": "root-9",
+        "arguments": {
+          "name": "m25p80_*"
+        }
+      },
+      "response": {
+        "return": [
+          {
+            "name": "m25p80_binding_no_bdrv",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_binding",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_read_sfdp",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_read_data",
+            "state": "enabled"
+          },
+          {
+            "name": "m25p80_read_byte",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_transfer",
+            "state": "enabled"
+          },
+          {
+            "name": "m25p80_page_program",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_select",
+            "state": "enabled"
+          },
+          {
+            "name": "m25p80_chip_erase",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_populated_jedec",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_complete_collecting",
+            "state": "enabled"
+          },
+          {
+            "name": "m25p80_command_decoded",
+            "state": "enabled"
+          },
+          {
+            "name": "m25p80_reset_done",
+            "state": "enabled"
+          },
+          {
+            "name": "m25p80_programming_zero_to_one",
+            "state": "disabled"
+          },
+          {
+            "name": "m25p80_flash_erase",
+            "state": "disabled"
+          }
+        ],
+        "id": "root-9"
+      }
+    },
+    {
+      "request": {
+        "execute": "cont",
+        "id": "root-10"
+      },
+      "response": {
+        "return": {},
+        "id": "root-10"
+      }
+    }
+  ],
+  "guest_execution_started": true,
+  "original_pins": {
+    "bytes": 37067,
+    "sha256": "f9cf237bbbefe7967abbb558b06beb1ed4617035769669bb770223ad01bf5b12"
+  },
+  "runner": {
+    "bytes": 21940,
+    "sha256": "1d1ef7baa863688d91ebd84133f108d5ac1c2bd4d9e8f0dd9f99381b3a91974b"
+  },
+  "qemu": {
+    "bytes": 72605569,
+    "sha256": "efb42c7613b56eb811567c2b73726b44ea016984ea4fb9a61b75a386197d535d"
+  },
+  "observation_seconds": 20,
+  "per_artifact_size_limit": 33554432,
+  "markers": {
+    "after_early_mpi": true,
+    "display_driver_entered": true,
+    "pipeline_owners_ready": false,
+    "radio_control_entered": false,
+    "web_service_ready": false
+  },
+  "application_start_banner_count": 1,
+  "network_failure_observed": false,
+  "early_mpi_prepare_returned": true,
+  "display_init_and_clear_returned": false,
+  "audio_owners_created": false,
+  "radio_control_initialized": false,
+  "panic_observed": true,
+  "startup_error_observed": true,
+  "original_qie_failure_observed": false,
+  "original_flash_assert_observed": false,
+  "input_preflight_completed": true,
+  "original_inputs": {
+    "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe": {
+      "bytes": 72397203,
+      "sha256": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": {
+      "bytes": 455722,
+      "sha256": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": {
+      "bytes": 455722,
+      "sha256": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442"
+    },
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe": {
+      "bytes": 274424,
+      "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\manifest.json": {
+      "bytes": 4631,
+      "sha256": "921136058c6f149c3651830fa84047454041e1ef6b01ab2716f32f4f2606dd7b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\app.bin": {
+      "bytes": 1545280,
+      "sha256": "66e99cfb4773bad31cd646ec22e0cdda5d1231bf9b3ea74a6940401aea98ecf3"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\sdkconfig": {
+      "bytes": 82380,
+      "sha256": "fc5e70eb799dca935f7cb0e12d55a7b938a6db85c1eb4454904879a1a6643a3e"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\partition-table.bin": {
+      "bytes": 3072,
+      "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\flasher_args.json": {
+      "bytes": 1230,
+      "sha256": "3eafedc8c08642cdf6e5fce5814aabec9e7cd8dcbdf1aa7cfdaa68f9fef69f36"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\bootloader\\bootloader.bin": {
+      "bytes": 25488,
+      "sha256": "b9b3027fab25f9e4929726a5e5f6c47b87c818198ffcae6c155345e2ffe10ebe"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\partition_table\\partition-table.bin": {
+      "bytes": 3072,
+      "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\ota_data_initial.bin": {
+      "bytes": 8192,
+      "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\spiffs.bin": {
+      "bytes": 589824,
+      "sha256": "e92e0bab990144ad683306fc59b60cb510656f96dff6f13952332cc7ca8ed027"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\yoradio_cyd2usb_native.elf": {
+      "bytes": 11679760,
+      "sha256": "1a7a09139e1f7d76b32fa1043c8436fabe8665519dc8130dd3f43c398d7f2578"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\yoradio_cyd2usb_native.map": {
+      "bytes": 9479245,
+      "sha256": "9fa0f11fb5c6e541da30ae5f9acadac199da84d2dab8b69ac745c08ccbee5313"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\yoradio_cyd2usb_native.bin": {
+      "bytes": 1545280,
+      "sha256": "66e99cfb4773bad31cd646ec22e0cdda5d1231bf9b3ea74a6940401aea98ecf3"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\flasher_args.json": {
+      "bytes": 1230,
+      "sha256": "3eafedc8c08642cdf6e5fce5814aabec9e7cd8dcbdf1aa7cfdaa68f9fef69f36"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": {
+      "bytes": 4854,
+      "sha256": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\cyd_display.c": {
+      "bytes": 8728,
+      "sha256": "ec0e84b798d88ac3a7d8995956a2687ee29d0e8ec70173615c84b698d43210bb"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\board_config.h": {
+      "bytes": 1023,
+      "sha256": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c": {
+      "bytes": 657,
+      "sha256": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.c": {
+      "bytes": 6424,
+      "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_service.c": {
+      "bytes": 9270,
+      "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c": {
+      "bytes": 66672,
+      "sha256": "7992e86c450a9157c239514282ac5eff9798dd5f6916b45944a15e6805060798"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_service.c": {
+      "bytes": 28023,
+      "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_storage\\include\\radio_control_impl.h": {
+      "bytes": 22530,
+      "sha256": "531f5cd005920a1fe3d47c86fb51bb8b0f30813a28c3f897fcdab53be6771a8b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-tls-static-rx-qemu.py": {
+      "bytes": 27233,
+      "sha256": "e16f8c1fe67ba1233ac3d41be4b389cc16a87482231050fcea4512a903fb3df6"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-static-rx-production-prep-01\\plan02\\qualifications\\export-pdm\\app-main.log": {
+      "bytes": 7633,
+      "sha256": "7595e8a0b9e61c6e2c1019a45ec8b42e29e3d7b7c77ee8bf41cf2d9f58d77814"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-static-rx-production-prep-01\\plan02\\qualifications\\export-pdm\\early-mpi.log": {
+      "bytes": 502,
+      "sha256": "44a43aa8ebd4d0334256e1ede8f3bfcc66f175b6e42b6f8941e18521d7f09259"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\xtensa\\esp32.c": {
+      "bytes": 48720,
+      "sha256": "6dde74f858de9b5c3eb16ce56a2787b8cc790ab2b105e0d8c529bbd2e53ac0ce"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\ssi\\esp32_spi.c": {
+      "bytes": 16322,
+      "sha256": "78716409f03bd4ef2d3735ff86d4cae9699648b9d5d283095d99b295a24c20b4"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\audio\\esp32_i2s_dac.c": {
+      "bytes": 11849,
+      "sha256": "084c73fa9befe51991b3df63983d7be0e4709479c7716b711fb7355050fb3384"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\core\\machine.c": {
+      "bytes": 58421,
+      "sha256": "b4a456907b4b79f6c4e8ed4f6a07905a3862d1a613f6673185aaabf0d013259c"
+    },
+    "C:\\Work\\QEMU-ESP32\\qemu-options.hx": {
+      "bytes": 272396,
+      "sha256": "bf687f25943a7fe3a4583b96220145f761408331b89bad80bc4cb693d7c5e8b9"
+    },
+    "C:\\Work\\QEMU-ESP32\\README-modular-esp.md": {
+      "bytes": 6315,
+      "sha256": "0da92a93aa5c68acdca22d27caf5ef2e829774a7214cbd009b50a3361e278875"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\cyd-production-radio-boot-20261020\\preparation\\inputs.json": {
+      "bytes": 37067,
+      "sha256": "f9cf237bbbefe7967abbb558b06beb1ed4617035769669bb770223ad01bf5b12"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-03\\qemu-system-xtensa.exe": {
+      "bytes": 72605569,
+      "sha256": "efb42c7613b56eb811567c2b73726b44ea016984ea4fb9a61b75a386197d535d"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-05\\capture.py": {
+      "bytes": 21940,
+      "sha256": "1d1ef7baa863688d91ebd84133f108d5ac1c2bd4d9e8f0dd9f99381b3a91974b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-04\\capture.py": {
+      "bytes": 21796,
+      "sha256": "11fec3212e40250ca9e7af1c2225666c1519c18444811d80147ba0f070e16f40"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-03\\capture.py": {
+      "bytes": 21652,
+      "sha256": "d3ffa0230bb7caa983fc04758176222230074d55b54f985ececeb90370b0d1f6"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-flash-trace-prep-01\\capture.py": {
+      "bytes": 14122,
+      "sha256": "e353d95cfd22faf0282a4357d8d7bea8f7ec82b60e6b38a5a12749a089a5a652"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\cyd-production-radio-boot-20261020\\preparation\\capture.py": {
+      "bytes": 10414,
+      "sha256": "abc29b18e694d7a48abd5a90ed30da983cfea0650e40ec0a468b0afde2205f80"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-02\\capture.py": {
+      "bytes": 21296,
+      "sha256": "dea7385425b2a05a0d57f769bafb84a00b8dc528ea45681ba190de0391722d7b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-compat-review-20261024-01\\review.json": {
+      "bytes": 5995,
+      "sha256": "2de220f1c540ea4db351b318feee0a256b502f7164ef50badfb2bf583b26480d"
+    }
+  },
+  "argv": [
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-03\\qemu-system-xtensa.exe",
+    "-name",
+    "cyd-production-observer-bc03a995ecac4b808db0dc64d5037a68",
+    "-audiodev",
+    "none,id=quiet",
+    "-M",
+    "esp32,st7789=on,audiodev=quiet",
+    "-smp",
+    "2",
+    "-L",
+    "C:\\Work\\QEMU-ESP32\\pc-bios",
+    "-display",
+    "none",
+    "-monitor",
+    "none",
+    "-serial",
+    "file:C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-05\\uart.log",
+    "-no-reboot",
+    "-snapshot",
+    "-nic",
+    "none",
+    "-S",
+    "-qmp",
+    "stdio",
+    "-D",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-05\\flash-trace.log",
+    "-drive",
+    "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-05\\qemu-flash.bin,if=mtd,format=raw"
+  ],
+  "guest_name": "cyd-production-observer-bc03a995ecac4b808db0dc64d5037a68",
+  "flash_before": {
+    "bytes": 4194304,
+    "sha256": "4eb701f7c78a1a7aa88c1f2cd72c355f626c9cb9db0d503012fc177a03125e2a"
+  },
+  "owned_pid": 30192,
+  "qmp_greeting": {
+    "QMP": {
+      "version": {
+        "qemu": {
+          "micro": 2,
+          "minor": 2,
+          "major": 9
+        },
+        "package": "CYD-IDF6-compat"
+      },
+      "capabilities": []
+    }
+  },
+  "owned_instance_name_verified": true,
+  "trace_states_before_cont": [
+    {
+      "name": "m25p80_binding_no_bdrv",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_binding",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_read_sfdp",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_read_data",
+      "state": "enabled"
+    },
+    {
+      "name": "m25p80_read_byte",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_transfer",
+      "state": "enabled"
+    },
+    {
+      "name": "m25p80_page_program",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_select",
+      "state": "enabled"
+    },
+    {
+      "name": "m25p80_chip_erase",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_populated_jedec",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_complete_collecting",
+      "state": "enabled"
+    },
+    {
+      "name": "m25p80_command_decoded",
+      "state": "enabled"
+    },
+    {
+      "name": "m25p80_reset_done",
+      "state": "enabled"
+    },
+    {
+      "name": "m25p80_programming_zero_to_one",
+      "state": "disabled"
+    },
+    {
+      "name": "m25p80_flash_erase",
+      "state": "disabled"
+    }
+  ],
+  "guest_observation_seconds": 1.8440000000409782,
+  "trace_event_counts": {
+    "m25p80_command_decoded": 433,
+    "m25p80_complete_collecting": 340,
+    "m25p80_select": 865,
+    "m25p80_transfer": 23664,
+    "m25p80_read_data": 85,
+    "m25p80_reset_done": 0
+  },
+  "expected_shutdown": {
+    "guest": true,
+    "reason": "guest-reset"
+  },
+  "host_quit_requested": false,
+  "qmp_reader": {
+    "actual_eof": true,
+    "joined": true,
+    "error": null,
+    "bytes_received": 2363,
+    "controller_closed_stdout": false
+  },
+  "qmp_events": [
+    {
+      "timestamp": {
+        "seconds": 1792830314,
+        "microseconds": 552981
+      },
+      "event": "RESUME"
+    },
+    {
+      "timestamp": {
+        "seconds": 1792830316,
+        "microseconds": 352741
+      },
+      "event": "SHUTDOWN",
+      "data": {
+        "guest": true,
+        "reason": "guest-reset"
+      }
+    }
+  ],
+  "cleanup_errors": [],
+  "actual_qemu_exit_code": 0,
+  "inputs_after": {
+    "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe": {
+      "bytes": 72397203,
+      "sha256": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": {
+      "bytes": 455722,
+      "sha256": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": {
+      "bytes": 455722,
+      "sha256": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442"
+    },
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe": {
+      "bytes": 274424,
+      "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\manifest.json": {
+      "bytes": 4631,
+      "sha256": "921136058c6f149c3651830fa84047454041e1ef6b01ab2716f32f4f2606dd7b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\app.bin": {
+      "bytes": 1545280,
+      "sha256": "66e99cfb4773bad31cd646ec22e0cdda5d1231bf9b3ea74a6940401aea98ecf3"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\sdkconfig": {
+      "bytes": 82380,
+      "sha256": "fc5e70eb799dca935f7cb0e12d55a7b938a6db85c1eb4454904879a1a6643a3e"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\partition-table.bin": {
+      "bytes": 3072,
+      "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\firmware\\development\\esp32-cyd2usb-native-static-rx-pdm\\flasher_args.json": {
+      "bytes": 1230,
+      "sha256": "3eafedc8c08642cdf6e5fce5814aabec9e7cd8dcbdf1aa7cfdaa68f9fef69f36"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\bootloader\\bootloader.bin": {
+      "bytes": 25488,
+      "sha256": "b9b3027fab25f9e4929726a5e5f6c47b87c818198ffcae6c155345e2ffe10ebe"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\partition_table\\partition-table.bin": {
+      "bytes": 3072,
+      "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\ota_data_initial.bin": {
+      "bytes": 8192,
+      "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\spiffs.bin": {
+      "bytes": 589824,
+      "sha256": "e92e0bab990144ad683306fc59b60cb510656f96dff6f13952332cc7ca8ed027"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\yoradio_cyd2usb_native.elf": {
+      "bytes": 11679760,
+      "sha256": "1a7a09139e1f7d76b32fa1043c8436fabe8665519dc8130dd3f43c398d7f2578"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\yoradio_cyd2usb_native.map": {
+      "bytes": 9479245,
+      "sha256": "9fa0f11fb5c6e541da30ae5f9acadac199da84d2dab8b69ac745c08ccbee5313"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\yoradio_cyd2usb_native.bin": {
+      "bytes": 1545280,
+      "sha256": "66e99cfb4773bad31cd646ec22e0cdda5d1231bf9b3ea74a6940401aea98ecf3"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\srx01\\gvp\\flasher_args.json": {
+      "bytes": 1230,
+      "sha256": "3eafedc8c08642cdf6e5fce5814aabec9e7cd8dcbdf1aa7cfdaa68f9fef69f36"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": {
+      "bytes": 4854,
+      "sha256": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\cyd_display.c": {
+      "bytes": 8728,
+      "sha256": "ec0e84b798d88ac3a7d8995956a2687ee29d0e8ec70173615c84b698d43210bb"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\board_config.h": {
+      "bytes": 1023,
+      "sha256": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c": {
+      "bytes": 657,
+      "sha256": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_rx_reserve.c": {
+      "bytes": 6424,
+      "sha256": "17e98a29cadd0387d9db725d50c12514847426cd9cfa607abf5224884fe17555"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_service.c": {
+      "bytes": 9270,
+      "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c": {
+      "bytes": 66672,
+      "sha256": "7992e86c450a9157c239514282ac5eff9798dd5f6916b45944a15e6805060798"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_service.c": {
+      "bytes": 28023,
+      "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_storage\\include\\radio_control_impl.h": {
+      "bytes": 22530,
+      "sha256": "531f5cd005920a1fe3d47c86fb51bb8b0f30813a28c3f897fcdab53be6771a8b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-tls-static-rx-qemu.py": {
+      "bytes": 27233,
+      "sha256": "e16f8c1fe67ba1233ac3d41be4b389cc16a87482231050fcea4512a903fb3df6"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-static-rx-production-prep-01\\plan02\\qualifications\\export-pdm\\app-main.log": {
+      "bytes": 7633,
+      "sha256": "7595e8a0b9e61c6e2c1019a45ec8b42e29e3d7b7c77ee8bf41cf2d9f58d77814"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-static-rx-production-prep-01\\plan02\\qualifications\\export-pdm\\early-mpi.log": {
+      "bytes": 502,
+      "sha256": "44a43aa8ebd4d0334256e1ede8f3bfcc66f175b6e42b6f8941e18521d7f09259"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\xtensa\\esp32.c": {
+      "bytes": 48720,
+      "sha256": "6dde74f858de9b5c3eb16ce56a2787b8cc790ab2b105e0d8c529bbd2e53ac0ce"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\ssi\\esp32_spi.c": {
+      "bytes": 16322,
+      "sha256": "78716409f03bd4ef2d3735ff86d4cae9699648b9d5d283095d99b295a24c20b4"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\audio\\esp32_i2s_dac.c": {
+      "bytes": 11849,
+      "sha256": "084c73fa9befe51991b3df63983d7be0e4709479c7716b711fb7355050fb3384"
+    },
+    "C:\\Work\\QEMU-ESP32\\hw\\core\\machine.c": {
+      "bytes": 58421,
+      "sha256": "b4a456907b4b79f6c4e8ed4f6a07905a3862d1a613f6673185aaabf0d013259c"
+    },
+    "C:\\Work\\QEMU-ESP32\\qemu-options.hx": {
+      "bytes": 272396,
+      "sha256": "bf687f25943a7fe3a4583b96220145f761408331b89bad80bc4cb693d7c5e8b9"
+    },
+    "C:\\Work\\QEMU-ESP32\\README-modular-esp.md": {
+      "bytes": 6315,
+      "sha256": "0da92a93aa5c68acdca22d27caf5ef2e829774a7214cbd009b50a3361e278875"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\cyd-production-radio-boot-20261020\\preparation\\inputs.json": {
+      "bytes": 37067,
+      "sha256": "f9cf237bbbefe7967abbb558b06beb1ed4617035769669bb770223ad01bf5b12"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-03\\qemu-system-xtensa.exe": {
+      "bytes": 72605569,
+      "sha256": "efb42c7613b56eb811567c2b73726b44ea016984ea4fb9a61b75a386197d535d"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-05\\capture.py": {
+      "bytes": 21940,
+      "sha256": "1d1ef7baa863688d91ebd84133f108d5ac1c2bd4d9e8f0dd9f99381b3a91974b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-04\\capture.py": {
+      "bytes": 21796,
+      "sha256": "11fec3212e40250ca9e7af1c2225666c1519c18444811d80147ba0f070e16f40"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-03\\capture.py": {
+      "bytes": 21652,
+      "sha256": "d3ffa0230bb7caa983fc04758176222230074d55b54f985ececeb90370b0d1f6"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-flash-trace-prep-01\\capture.py": {
+      "bytes": 14122,
+      "sha256": "e353d95cfd22faf0282a4357d8d7bea8f7ec82b60e6b38a5a12749a089a5a652"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\cyd-production-radio-boot-20261020\\preparation\\capture.py": {
+      "bytes": 10414,
+      "sha256": "abc29b18e694d7a48abd5a90ed30da983cfea0650e40ec0a468b0afde2205f80"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observer-prep-02\\capture.py": {
+      "bytes": 21296,
+      "sha256": "dea7385425b2a05a0d57f769bafb84a00b8dc528ea45681ba190de0391722d7b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-compat-review-20261024-01\\review.json": {
+      "bytes": 5995,
+      "sha256": "2de220f1c540ea4db351b318feee0a256b502f7164ef50badfb2bf583b26480d"
+    }
+  },
+  "changed_input_paths": [],
+  "all_selected_inputs_unchanged": true,
+  "flash_after": {
+    "bytes": 4194304,
+    "sha256": "4eb701f7c78a1a7aa88c1f2cd72c355f626c9cb9db0d503012fc177a03125e2a"
+  },
+  "scratch_flash_unchanged": true,
+  "artifacts": {
+    "uart.log": {
+      "bytes": 3939,
+      "sha256": "ff0a2b1343dbdac92db60d941f6c3d81095e8844b2a35805ec8a6bb4aa062074"
+    },
+    "qemu-stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "flash-trace.log": {
+      "bytes": 2510823,
+      "sha256": "905b95b7de731365a61a685a934f2b8b230a5d99ab08cfe47d88afee986bf4ee"
+    },
+    "qmp-received.jsonl": {
+      "bytes": 2363,
+      "sha256": "fa9a59a762724d22f59c8ecb74d6744d448d429749b4c17746206c785bbf4178"
+    }
+  },
+  "elapsed_seconds": 2.547000000020489
+}

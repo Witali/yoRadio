@@ -1,0 +1,156 @@
+{
+  "schema": "independent-production-observer06-readonly-diagnostic-v1",
+  "result": "CONTROLLER_COMPLETED_RF_MODEL_BOUNDARY_NONPASS",
+  "report": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-06\\report.json",
+    "bytes": 32888,
+    "sha256": "d1e3de5c399d1d2a762a43ec6b45598da2e7af766ff3aa44890f43c780fa46ca"
+  },
+  "outer_receipt": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\production-observer06-command.json",
+    "bytes": 1470,
+    "sha256": "ab1ca6c48096d2b1152b12b8f59d575829f44f1301ccba3156f11070cfb2d0f8"
+  },
+  "artifacts": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-06\\uart.log",
+      "bytes": 3832,
+      "sha256": "a50a3014a0559a440a07f8c3612fd6f5483198ef9215d16fab0709b794f44046"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-06\\qemu-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-06\\flash-trace.log",
+      "bytes": 20570088,
+      "sha256": "358457d2a20a981840ea9cdf6b52fb8c3f2ce4478c0376bf742cd7b2b005bb16"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-06\\qmp-received.jsonl",
+      "bytes": 2363,
+      "sha256": "ae0a73f25c1538f6fa654d6938adc8236490f5b26298945a5073d75d4b3c7a81"
+    }
+  ],
+  "selected_QEMU": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-05\\qemu-system-xtensa.exe",
+    "bytes": 72607617,
+    "sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d"
+  },
+  "original_inventory": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\results\\cyd-production-radio-boot-20261020\\preparation\\inputs.json",
+    "bytes": 37067,
+    "sha256": "f9cf237bbbefe7967abbb558b06beb1ed4617035769669bb770223ad01bf5b12"
+  },
+  "scratch_flash": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-production-observation-20261024-06\\qemu-flash.bin",
+    "bytes": 4194304,
+    "sha256": "4eb701f7c78a1a7aa88c1f2cd72c355f626c9cb9db0d503012fc177a03125e2a"
+  },
+  "firmware_patched": false,
+  "emulator_model_patched": true,
+  "explicit_SPI_input_delay_ns": 25,
+  "fixed_flash_source_clock_hz": 80000000,
+  "recorded_lifecycle": "Normal QEMU0, one raw QMP guest-reset SHUTDOWN, report records actual EOF/reader join/no errors or forced stdout close; input/snapshot identities preserved.",
+  "milestones": [
+    "UART directly shows GD detection/QIO, app_main called and one application banner after early MPI, restored audio settings and ST7789 SPI2 DMA entry.",
+    "The original QIE/flash-size/flash assertion, SPIFFS mount failure and PHY clock-mask assertion are absent. Trace magic reads at lines24525-24528 and24551-24554 now enter STATE_READ=2 and advance over3700fc/fd and3710fc/fd, unlike the old collecting-state failure.",
+    "Source-order inference, separate from frozen observer predicates: the reached ST7789 path follows mount_spiffs without a logged failure; this supports successful mount return, not full filesystem integrity. Later Wi-Fi code implies cyd_display_init/clear returned before network_task creation. The frozen display_init_and_clear_returned=False predicate is retained unchanged, not silently reclassified."
+  ],
+  "remaining_boundary": [
+    "UART reports missing RF calibration data0x1102, falls back to full calibration, then Core0 LoadStorePIFAddrError with EXCVADDR0x60033c00. Fresh scratch NVS is erased by fixture design; missing saved calibration is expected in that fixture.",
+    "Public SDK source orders the old clock guard before full calibration and calls register_chipv7_phy. QEMU Xtensa maps a failed data transaction to this exception. Classic SoC public registration lacks a Wi-Fi/PHY device covering the fault region, consistent with an RF/peripheral-model boundary.",
+    "Classic alias arithmetic maps APB0x60033c00 to DPORT0x3ff73c00 using the classic ESP32 map. The exact RF register/function is not identified from public source here; no C3 peripheral map, binary disassembly or vendor-library cause claim is substituted.",
+    "Pipeline/audio-owner, radio-control and Web markers remain false. Network service has not returned to the subsequent audio/radio/Web initialization chain. No full radio, production boot, association/traffic, physical audio, performance or hardware qualification follows."
+  ],
+  "trace": {
+    "bytes": 20570088,
+    "total_named_event_lines": 203578,
+    "counts": {
+      "m25p80_transfer": 191356,
+      "m25p80_command_decoded": 3058,
+      "m25p80_complete_collecting": 2965,
+      "m25p80_select": 6115,
+      "m25p80_read_data": 84
+    },
+    "sample_raw_flash_magic": {
+      "block0": "b904",
+      "block1": "a604"
+    },
+    "limitation": "Selected trace proves read-state/address progress, not a direct returned-data-byte recording; this note does not replay an emulator or qualify the entire filesystem."
+  },
+  "source_citations": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c",
+      "bytes": 4854,
+      "sha256": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80",
+      "location": "99-129: initialization order; 26-34: no automatic SPIFFS format; 78-97: network precedes audio/radio/Web."
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\cyd_display.c",
+      "bytes": 8728,
+      "sha256": "ec0e84b798d88ac3a7d8995956a2687ee29d0e8ec70173615c84b698d43210bb",
+      "location": "102-105: ST7789 log precedes cyd_display_clear return."
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_service.c",
+      "bytes": 9270,
+      "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f",
+      "location": "102-145: Wi-Fi initialization/start before network_service_start returns."
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_phy\\src\\phy_init.c",
+      "bytes": 45155,
+      "sha256": "17d39bb3058a2d3f9a0bb1340a8296c31543bda73d4cfb853558b4aa405aceb1",
+      "location": "324-338: clock guard precedes PHY initialization; 946-960: missing NVS calibration selects PHY_RF_CAL_FULL then register_chipv7_phy."
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\xtensa\\esp32.c",
+      "bytes": 48859,
+      "sha256": "820de5d5bb015693f64c074e007152c77c2b8d36c28b073a1fd47a94034b0178",
+      "location": "251-266: APB alias formula; SoC peripheral registration includes no Wi-Fi/PHY device at the fault region."
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\xtensa\\esp32.h",
+      "bytes": 1946,
+      "sha256": "5235046d5323219af20a4f0241493b8ce969f98fe6cdd11a7b1ce022a7f6457d",
+      "location": "30-68: classic SoC device state; no Wi-Fi/PHY instance."
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\misc\\esp32_reg.h",
+      "bytes": 10878,
+      "sha256": "a3c7914cc6d8b38b16026afdb606cdbfdf0a941fffcb7dcd3956291be0ba8920",
+      "location": "12,64: classic DPORT_APB base0x3ff40000 and APB base0x60000000."
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\target\\xtensa\\helper.c",
+      "bytes": 11861,
+      "sha256": "e3cadbef278c612cb5df1efb094f0113ac2bfca20344be301d744fcae57e5489",
+      "location": "302-314: failed data transactions raise LOAD_STORE_PIF_ADDR_ERROR_CAUSE."
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\block\\m25p80.c",
+      "bytes": 63572,
+      "sha256": "7e3999f743d2c9d3c391f54eab2dfb3732b04a16964529258ee822a20f85c9df",
+      "location": "457-465: STATE_READ=2; 1658-1662: read advances actual storage address."
+    }
+  ],
+  "official_context": {
+    "url": "https://docs.espressif.com/projects/esp-idf/en/v5.1.1/esp32/api-guides/RF_calibration.html",
+    "supports": "Espressif documents full calibration when NVS calibration is absent/erased. Exact6.0.2 behavior is pinned in local phy_init.c; the6.0.2 web page was unavailable."
+  },
+  "preserved_false_qualifications": {
+    "full_radio_startup_qualified": false,
+    "startup_qualified": false,
+    "network_association_qualified": false,
+    "network_traffic_qualified": false,
+    "audio_output_qualified": false,
+    "physical_qualification": false,
+    "static_rx_loan_exercised": false,
+    "reserve_performance_qualified": false,
+    "arbitrary_partial_bit_or_analog_timing_qualified": false
+  },
+  "reviewer_execution": "Read/hash/JSON/text parsing only; no prepared imports/calls, build/QEMU/Git/disassembly/device/network operation. No RF stubs or model/firmware changes.",
+  "unrelated_prior_results_reclassified": false
+}

@@ -1,0 +1,117 @@
+{
+  "schema": "independent-qemu-trace-windows-portability-source-review-v1",
+  "verdict": "PASS_SOURCE_REVIEW_ONLY",
+  "blocking_findings": [],
+  "changed_source_facts": [
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\trace\\meson.build",
+      "bytes": 4604,
+      "sha256": "54e3b77bf8491556b34254b2a8e8f68dad42bdadbc4761777a9018e26cbfef42"
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\scripts\\tracetool\\__init__.py",
+      "bytes": 13782,
+      "sha256": "0ec4c6b3a4c0f25ef988e7783da9067fed6cef11b118d9537ea1903c4f666b51"
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\scripts\\tracetool\\backend\\log.py",
+      "bytes": 2143,
+      "sha256": "2c09cfa0c141e3f0f80d23a931f57823089581c8daa069299a44a09d9c192e46"
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\scripts\\tracetool\\backend\\ftrace.py",
+      "bytes": 1767,
+      "sha256": "dd7855cfd587bf357ec6b40ef7a17f3735ac5d9143fa8a3e3072c459a0a08a29"
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\scripts\\tracetool\\backend\\syslog.py",
+      "bytes": 1468,
+      "sha256": "3d84c50c29cf71c8ece2616504c813d651e6e8b90abba6a78349f4642d675eda"
+    }
+  ],
+  "consumer_and_evidence_facts": [
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\scripts\\tracetool.py",
+      "bytes": 4110,
+      "sha256": "abcaf2b48893963e6513c9a8df4c11c8e77aab25833d165bc7347e9127a16a93"
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\qapi\\meson.build",
+      "bytes": 3484,
+      "sha256": "388c1ec6b3ee86cebb0b39b2116f68d648ee369d38aa16ed691eeb79004e462a"
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\scripts\\qapi\\commands.py",
+      "bytes": 12247,
+      "sha256": "1de1509f5fdff603f7f1bdb5666c23c09a52ada9ccb3e7774a59b7b703301884"
+    },
+    {
+      "path": "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\meson.build",
+      "bytes": 183476,
+      "sha256": "63d97160558b8853c239d0e5d98346dbbe921638f83cdfea33fce4f677b2ca52"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\trace-meson-portability.json",
+      "bytes": 728,
+      "sha256": "000d98ef7d83ef1850b9ae2d172712b808efea01f55747e19eaea28fd71220f5"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\trace-line-portability.json",
+      "bytes": 1186,
+      "sha256": "21c9ebb6282c0df616b7c3716071c4df375d614e5369ebcf4bb4c766531702bf"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\build-command.stdout.log",
+      "bytes": 30311,
+      "sha256": "8504de2bd9c406243e683eef7eb1ce8a2b8df5aa80d5f3013418cabbeee46135"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\build-command-02.stdout.log",
+      "bytes": 50194,
+      "sha256": "b1fa32349b56d5c990d9e98ba658f5b41349d809138d3c9039a509c0a85b39bc"
+    }
+  ],
+  "exact_expected_changes_only": true,
+  "Python_AST_files": 4,
+  "review": [
+    "Meson fs is already imported at meson.build:20. fs.name is the native basename operation; group naming now agrees with qapi generated trace header consumers on Windows. On POSIX it preserves the previous final slash-component behavior for these generated files. The prior basename collision behavior is unchanged; source trace subdirectory groups are untouched.",
+    "tracetool.py passes ordinary argv strings to read_events and out_open. out_open still opens the original filename; only the emitted out_filename metadata is normalized. Every out_filename consumer is a generated #line directive in log/ftrace/syslog.",
+    "Each backend normalizes the existing relpath result only for C #line metadata. Windows native backslashes become forward slashes, preventing unknown C escapes while preserving drive and relative components; existing forward slashes remain. On POSIX os.sep is already slash so paths and literal backslash filename characters are unchanged.",
+    "Backend import os.path already binds the os module, therefore os.sep is available without an additional backend import. The added import os in tracetool/__init__.py supplies the new direct reference there.",
+    "All four changed Python modules are AST-parsed from bytes, without imports/calls. Exact before/after snapshots contain only the requested native-basename or metadata separator changes. No file I/O target, trace event name/payload, guest behavior, peripheral logic or firmware is changed by these five edits.",
+    "Recorded failed build01 matches missing expected trace-qapi_commands_authz_trace_events.h; recorded failed build02 reaches that correctly named generated header and reports unknown escape sequence \\q in #line. This review does not infer build03 success or any emulator/production qualification."
+  ],
+  "scope_limits": [
+    "Source review only: no Meson/tracetool execution, compilation, tests, QEMU, Git or external edits.",
+    "This addresses native path separators in the existing ordinary build paths; general C string escaping for quotes/control characters and relpath across different Windows drives were preexisting unsupported edge cases and are not claimed fixed.",
+    "Actual Windows rebuild and regression results remain root-owned; no POSIX runtime build is claimed."
+  ],
+  "primary_documentation": {
+    "url": "https://mesonbuild.com/Fs-module.html#name",
+    "supports": "Official fs.name documentation defines basename/last-component semantics; fs module exists since0.53.0. QEMU already imports this module."
+  },
+  "actual_failed_build_receipts": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\build-command.json",
+      "bytes": 1098,
+      "sha256": "46122a7c66057a586ab19c3b8b0b3b65c6c49a7a1d28ea11ea22d29cd961617e",
+      "returncode": 1
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-root-01\\build-command-02.json",
+      "bytes": 1103,
+      "sha256": "0fde74e8f777e67f09d43455a3c736766dac591274c5d9497b2603212d80179d",
+      "returncode": 1
+    }
+  ],
+  "full_diffs": {
+    "trace/meson.build": "--- \n+++ \n@@ -6,7 +6,7 @@\n foreach item : [ '.' ] + trace_events_subdirs + qapi_trace_events\n   if item in qapi_trace_events\n     trace_events_file = item\n-    group_name = item.full_path().split('/')[-1].underscorify()\n+    group_name = fs.name(item.full_path()).underscorify()\n   else\n     trace_events_file = meson.project_source_root() / item / 'trace-events'\n     group_name = item == '.' ? 'root' : item.underscorify()\n",
+    "scripts/tracetool/__init__.py": "--- \n+++ \n@@ -12,6 +12,7 @@\n __email__      = \"stefanha@redhat.com\"\n \n \n+import os\n import re\n import sys\n import weakref\n@@ -36,7 +37,7 @@\n \n def out_open(filename):\n     global out_filename, out_fobj\n-    out_filename = filename\n+    out_filename = filename.replace(os.sep, '/')\n     out_fobj = open(filename, 'wt')\n \n def out(*lines, **kwargs):\n",
+    "scripts/tracetool/backend/log.py": "--- \n+++ \n@@ -55,7 +55,7 @@\n         '    }',\n         cond=cond,\n         event_lineno=event.lineno,\n-        event_filename=os.path.relpath(event.filename),\n+        event_filename=os.path.relpath(event.filename).replace(os.sep, '/'),\n         name=event.name,\n         fmt=event.fmt.rstrip(\"\\n\"),\n         argnames=argnames)\n",
+    "scripts/tracetool/backend/ftrace.py": "--- \n+++ \n@@ -47,7 +47,7 @@\n         args=event.args,\n         event_id=\"TRACE_\" + event.name.upper(),\n         event_lineno=event.lineno,\n-        event_filename=os.path.relpath(event.filename),\n+        event_filename=os.path.relpath(event.filename).replace(os.sep, '/'),\n         fmt=event.fmt.rstrip(\"\\n\"),\n         argnames=argnames)\n \n",
+    "scripts/tracetool/backend/syslog.py": "--- \n+++ \n@@ -43,7 +43,7 @@\n         '    }',\n         cond=cond,\n         event_lineno=event.lineno,\n-        event_filename=os.path.relpath(event.filename),\n+        event_filename=os.path.relpath(event.filename).replace(os.sep, '/'),\n         name=event.name,\n         fmt=event.fmt.rstrip(\"\\n\"),\n         argnames=argnames)\n"
+  },
+  "prepared_modules_imported_or_called": false,
+  "tests_build_QEMU_Git_run": false,
+  "external_or_tracked_files_changed": false
+}

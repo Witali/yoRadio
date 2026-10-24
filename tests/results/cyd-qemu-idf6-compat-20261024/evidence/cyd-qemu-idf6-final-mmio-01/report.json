@@ -1,0 +1,1783 @@
+{
+  "schema": "esp32-idf6-paused-qtest-v1",
+  "result": "MMIO_REGRESSIONS_COMPLETED",
+  "command": [
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-05\\qemu-system-xtensa.exe",
+    "-M",
+    "esp32,audiodev=quiet",
+    "-smp",
+    "2",
+    "-accel",
+    "qtest",
+    "-S",
+    "-L",
+    "C:\\Work\\QEMU-ESP32\\pc-bios",
+    "-drive",
+    "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-final-mmio-01\\synthetic-flash.bin,if=mtd,format=raw",
+    "-snapshot",
+    "-nic",
+    "none",
+    "-audiodev",
+    "none,id=quiet",
+    "-display",
+    "none",
+    "-serial",
+    "none",
+    "-monitor",
+    "none",
+    "-qtest",
+    "stdio",
+    "-qtest-log",
+    "none"
+  ],
+  "inputs_before": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-05\\qemu-system-xtensa.exe": {
+      "bytes": 72607617,
+      "sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\tools\\test_esp32_idf6_compat.py": {
+      "bytes": 18203,
+      "sha256": "09146e1c15c90fc2d0b8c81eb0c3c2cbd057ac86254c0069440427a7d0d3f01b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-final-mmio-01\\synthetic-flash.bin": {
+      "bytes": 4194304,
+      "sha256": "ebff6c48c592bc60d6a82c99732e9356f7f446cc5f5483990555dadbed2c4f7f"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": {
+      "bytes": 455722,
+      "sha256": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": {
+      "bytes": 455722,
+      "sha256": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\ssi\\esp32_spi.c": {
+      "bytes": 19735,
+      "sha256": "17e615099f10b035158a7da039c250070890bef2cac9a372aecca301690a375b"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\ssi\\esp32_spi.h": {
+      "bytes": 2907,
+      "sha256": "ab25252111bdb3da962eecfef959b6164b4dc40c357c052fe18a3fddc964dd4e"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\xtensa\\esp32.c": {
+      "bytes": 48859,
+      "sha256": "820de5d5bb015693f64c074e007152c77c2b8d36c28b073a1fd47a94034b0178"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\misc\\esp32_dport.c": {
+      "bytes": 19393,
+      "sha256": "86dc1374bd54e2c95cefddc638de9cc340f04e9b99eba6140a42c2e4e01a663b"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\misc\\esp32_dport.h": {
+      "bytes": 6691,
+      "sha256": "2394758b708ee91f4c635189e6b8ab5d10499a8b13854531ed2290f791c718dd"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\block\\m25p80.c": {
+      "bytes": 63572,
+      "sha256": "7e3999f743d2c9d3c391f54eab2dfb3732b04a16964529258ee822a20f85c9df"
+    }
+  },
+  "checks": [
+    {
+      "case": "DPORT documented reset",
+      "actual": 4294762544,
+      "expected": 4294762544,
+      "passed": true
+    },
+    {
+      "case": "DPORT write/read 0x0",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "case": "DPORT write/read 0x80000010",
+      "actual": 2147483664,
+      "expected": 2147483664,
+      "passed": true
+    },
+    {
+      "case": "DPORT write/read 0xffffffff",
+      "actual": 4294967295,
+      "expected": 4294967295,
+      "passed": true
+    },
+    {
+      "case": "DPORT write/read 0x0",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "case": "DPORT SDK enable common",
+      "actual": 2147484633,
+      "expected": 2147484633,
+      "passed": true
+    },
+    {
+      "case": "DPORT SDK enable wifi",
+      "actual": 2147485663,
+      "expected": 2147485663,
+      "passed": true
+    },
+    {
+      "case": "DPORT SDK enable rng",
+      "actual": 2147518431,
+      "expected": 2147518431,
+      "passed": true
+    },
+    {
+      "case": "DPORT SDK enable bt",
+      "actual": 2147717087,
+      "expected": 2147717087,
+      "passed": true
+    },
+    {
+      "case": "DPORT required PHY clocks enabled",
+      "actual": 36751,
+      "expected": 36751,
+      "passed": true
+    },
+    {
+      "case": "DPORT SDK disable rng",
+      "actual": 2147684319,
+      "expected": 2147684319,
+      "passed": true
+    },
+    {
+      "case": "DPORT SDK disable common",
+      "actual": 2147683350,
+      "expected": 2147683350,
+      "passed": true
+    },
+    {
+      "case": "DPORT PHY mask detects cleared gates",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "case": "qio QE clear produces pulled-up output",
+      "actual": "ffffffffffffffffffffffffffffffff",
+      "expected": "ffffffffffffffffffffffffffffffff",
+      "passed": true
+    },
+    {
+      "case": "qout QE clear produces pulled-up output",
+      "actual": "ffffffffffffffffffffffffffffffff",
+      "expected": "ffffffffffffffffffffffffffffffff",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 initial continuous 2",
+      "actual": "0000",
+      "expected": "0000",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 initial continuous 16",
+      "actual": "00000000000000000000000000000000",
+      "expected": "00000000000000000000000000000000",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 initial continuous 64",
+      "actual": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "expected": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "passed": true
+    },
+    {
+      "case": "GD SR1 WEL continuous",
+      "actual": "02020202020202020202020202020202",
+      "expected": "02020202020202020202020202020202",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 QE write/read",
+      "actual": "02",
+      "expected": "02",
+      "passed": true
+    },
+    {
+      "case": "GD SR1 WEL cleared",
+      "actual": "00000000000000000000000000000000",
+      "expected": "00000000000000000000000000000000",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 QE continuous 2",
+      "actual": "0202",
+      "expected": "0202",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 QE continuous 16",
+      "actual": "02020202020202020202020202020202",
+      "expected": "02020202020202020202020202020202",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 QE continuous 64",
+      "actual": "02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202",
+      "expected": "02020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 after 8 dummy clocks",
+      "actual": "020202",
+      "expected": "020202",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 after 16 dummy clocks",
+      "actual": "020202",
+      "expected": "020202",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 after 256 dummy clocks",
+      "actual": "020202",
+      "expected": "020202",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 clear continuous",
+      "actual": "00000000000000000000000000000000",
+      "expected": "00000000000000000000000000000000",
+      "passed": true
+    },
+    {
+      "case": "GD SR2 restore continuous",
+      "actual": "020202",
+      "expected": "020202",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "slow USR 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "slow READ 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "fast USR 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "fast READ 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "dout USR 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "dout READ 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "qout USR 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "qout READ 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "dio USR 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "dio READ 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "qio USR 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "qio READ 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK qio ADDR28 dummy5 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK dio ADDR28 dummy2 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK slow extra sampling clock 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK fast extra sampling clock 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK dout extra sampling clock 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK qout extra sampling clock 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK dio extra sampling clock 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x123450+2",
+      "actual": "216a",
+      "expected": "216a",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x123450+3",
+      "actual": "216ab3",
+      "expected": "216ab3",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x123450+16",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x123450+64",
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3700fc+2",
+      "actual": "b904",
+      "expected": "b904",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3700fc+3",
+      "actual": "b904cb",
+      "expected": "b904cb",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3700fc+16",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3700fc+64",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3710fc+2",
+      "actual": "a604",
+      "expected": "a604",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3710fc+3",
+      "actual": "a604db",
+      "expected": "a604db",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3710fc+16",
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790",
+      "passed": true
+    },
+    {
+      "case": "SDK qio extra sampling clock 0x3710fc+64",
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "passed": true
+    },
+    {
+      "case": "SDK JEDEC ID with one sampling clock",
+      "actual": "c84016",
+      "expected": "c84016",
+      "passed": true
+    },
+    {
+      "case": "SDK SR2 with one sampling clock",
+      "actual": "020202",
+      "expected": "020202",
+      "passed": true
+    },
+    {
+      "case": "slow read ignores disabled dummy length",
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780",
+      "passed": true
+    },
+    {
+      "case": "fast omitted dummy negative control",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "case": "qio omitted dummy negative control",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    }
+  ],
+  "guest_cpus_resumed": false,
+  "firmware_used": false,
+  "production_boot_qualified": false,
+  "physical_or_radio_qualified": false,
+  "case_execution_completed": true,
+  "qemu_exit_code": 1,
+  "cleanup_method": "terminate-owned-paused-qtest-process",
+  "stdout_actual_eof": true,
+  "stdout_reader_joined": true,
+  "controller_errors": [],
+  "inputs_after": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-05\\qemu-system-xtensa.exe": {
+      "bytes": 72607617,
+      "sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\tools\\test_esp32_idf6_compat.py": {
+      "bytes": 18203,
+      "sha256": "09146e1c15c90fc2d0b8c81eb0c3c2cbd057ac86254c0069440427a7d0d3f01b"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-final-mmio-01\\synthetic-flash.bin": {
+      "bytes": 4194304,
+      "sha256": "ebff6c48c592bc60d6a82c99732e9356f7f446cc5f5483990555dadbed2c4f7f"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": {
+      "bytes": 455722,
+      "sha256": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": {
+      "bytes": 455722,
+      "sha256": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\ssi\\esp32_spi.c": {
+      "bytes": 19735,
+      "sha256": "17e615099f10b035158a7da039c250070890bef2cac9a372aecca301690a375b"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\ssi\\esp32_spi.h": {
+      "bytes": 2907,
+      "sha256": "ab25252111bdb3da962eecfef959b6164b4dc40c357c052fe18a3fddc964dd4e"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\xtensa\\esp32.c": {
+      "bytes": 48859,
+      "sha256": "820de5d5bb015693f64c074e007152c77c2b8d36c28b073a1fd47a94034b0178"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\misc\\esp32_dport.c": {
+      "bytes": 19393,
+      "sha256": "86dc1374bd54e2c95cefddc638de9cc340f04e9b99eba6140a42c2e4e01a663b"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\misc\\esp32_dport.h": {
+      "bytes": 6691,
+      "sha256": "2394758b708ee91f4c635189e6b8ab5d10499a8b13854531ed2290f791c718dd"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\block\\m25p80.c": {
+      "bytes": 63572,
+      "sha256": "7e3999f743d2c9d3c391f54eab2dfb3732b04a16964529258ee822a20f85c9df"
+    }
+  },
+  "inputs_unchanged": true,
+  "error": null
+}

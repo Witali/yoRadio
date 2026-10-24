@@ -1159,3 +1159,30 @@ Stream остаётся на core0, decode/output на core1 с прежними
   не заявляются. Scalar dimension1 не расширяет multidimensional residue0.
   Production source/ABI/core bindings сохранены; старые wide/floor0/sequence1
   NONPASS, codec deferrals, fullG6/radio/physical gates остаются открытыми.
+
+- 2026-10-24, CYD-C3-00/15: [проверки CYD в исправленном QEMU](../tests/results/cyd-qemu-idf6-compat-20261024/CHECKPOINT.md).
+  В отдельной ветке/worktree QEMU исправлены Windows trace generation,
+  хранение DPORT clock register, непрерывный SR2 и SPI dummy/read modes.
+  [Основной тест](../tests/results/cyd-qemu-idf6-compat-20261024/selected-qemu-source/tools/test_esp32_idf6_compat.py)
+  проходит274/274; [задержка входа](../tests/results/cyd-qemu-idf6-compat-20261024/selected-qemu-source/tools/test_esp32_spi_input_delay.py)
+  проходит391/391 для0нс и391/391 для25нс. При80/40/20МГц проверяются2/1/0
+  compensation clocks, PRE/EQU и запрет компенсации MOSI/DOUTDIN.
+  SPI2/SPI3 LCD/SD, CS isolation и неверная GPIO routing проходят в обоих
+  режимах задержки. Реальные контрольные49/187,7/200,73/274 и24/391 NONPASS
+  сохранены; expectations не ослаблялись. Paused QTest использует owner
+  terminate/exit1 с actual EOF/join; это не natural boot exit0.
+  Default input delay0 сохранён; production observation явно выбирает25нс
+  как функциональную модель при фиксированном source80МГц. Произвольные
+  bit waveforms, analog timing и dynamic APB не квалифицированы.
+  Исходный production PDM image3a563/SDK6.0.2/QIO80/CPU240/two-core не менялся:
+  после исправлений достигает app_main/ST7789/Wi-Fi init без прежней ошибки
+  SPIFFS и PHY clock assertion. Затем full RF calibration завершается
+  LoadStorePIFAddrError на неподдерживаемом MMIO0x60033c00. Pipeline/radio/Web
+  readiness остаются false; полного startup PASS нет. Firmware, FS, приоритеты,
+  стеки, core bindings и C3 hardware setup сохранены. Новый production build,
+  radio/audio/network/resource/soak/OTA/physical acceptance этим не выполнены.
+  Архив432 файла, manifest `5b3295b31abd869b7a8e537f8f2161a886e3e2f08999cfdb79c68f5d303ace57`;
+  [автономная проверка](../tests/results/cyd-qemu-idf6-verification-20261024/README.md)
+  проходит до/после byte-exact promotion из другого cwd; устанавливает
+  целостность и согласованность сохранённых
+  отчётов, без повторного исполнения QEMU и без full dependency closure.

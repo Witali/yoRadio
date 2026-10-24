@@ -1,0 +1,30 @@
+--- a/capture.py
++++ b/capture.py
+@@ -17,12 +17,16 @@
+ ORIGINAL_QEMU_SHA256 = 'f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35'
+ ORIGINAL_SOURCE = '3a563324abdca56144a40d5759def0ccfe708b3c'
+ ORIGINAL_APP_SHA256 = '66e99cfb4773bad31cd646ec22e0cdda5d1231bf9b3ea74a6940401aea98ecf3'
+-EXPECTED_NEW_QEMU = ROOT / '.build/cyd-qemu-rebuild-20261024-01/qemu-system-xtensa.exe'
++EXPECTED_NEW_QEMU = ROOT / '.build/cyd-qemu-idf6-build-01/qemu-system-xtensa.exe'
+ ORIGINS = (
+     (ROOT / '.build/cyd-qemu-flash-trace-prep-01/capture.py',
+      'e353d95cfd22faf0282a4357d8d7bea8f7ec82b60e6b38a5a12749a089a5a652'),
+     (ROOT / 'tests/results/cyd-production-radio-boot-20261020/preparation/capture.py',
+      'abc29b18e694d7a48abd5a90ed30da983cfea0650e40ec0a468b0afde2205f80'),
++    (ROOT / '.build/cyd-qemu-production-observer-prep-02/capture.py',
++     'dea7385425b2a05a0d57f769bafb84a00b8dc528ea45681ba190de0391722d7b'),
++    (ROOT / '.build/cyd-qemu-idf6-compat-review-20261024-01/review.json',
++     '2de220f1c540ea4db351b318feee0a256b502f7164ef50badfb2bf583b26480d'),
+ )
+ EVENTS = ('m25p80_command_decoded', 'm25p80_complete_collecting', 'm25p80_select',
+           'm25p80_transfer', 'm25p80_read_data', 'm25p80_reset_done')
+@@ -95,7 +99,8 @@
+                   network_association_qualified=False, network_traffic_qualified=False,
+                   audio_output_qualified=False, physical_qualification=False,
+                   static_rx_loan_exercised=False, reserve_performance_qualified=False,
+-                  firmware_or_model_patched=False, host_network_backend='none',
++                  firmware_patched=False, emulator_model_patched=True,
++                  firmware_or_model_patched=True, host_network_backend='none',
+                   host_audio_backend='none', physical_device=False,
+                   qmp_transport='owned-child-stdio', commands=[],
+                   guest_execution_started=False,

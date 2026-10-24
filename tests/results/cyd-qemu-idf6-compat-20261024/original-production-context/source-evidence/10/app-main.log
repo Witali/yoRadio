@@ -1,0 +1,134 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\srx01\gvp\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .iram0.vectors:
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+400dcba0 <app_main>:
+400dcba0:	00a136        	entry	a1, 80
+400dcba3:	122365        	call8	400eedd8 <native_tls_early_mpi_prepare>
+400dcba6:	b33de5        	call8	4008ff84 <esp_log_timestamp>
+400dcba9:	cfcde1        	l32r	a14, 400d0ae0 <_stext+0xac0> (3f404414 <_esp_trace_encoder_array_end+0x42f4>)
+400dcbac:	cfd5c1        	l32r	a12, 400d0b00 <_stext+0xae0> (3f4044b8 <_esp_trace_encoder_array_end+0x4398>)
+400dcbaf:	0add      	mov.n	a13, a10
+400dcbb1:	0ebd      	mov.n	a11, a14
+400dcbb3:	3a0c      	movi.n	a10, 3
+400dcbb5:	b33125        	call8	4008fec8 <esp_log>
+400dcbb8:	06bf65        	call8	400e37b0 <native_health_start>
+400dcbbb:	011a56        	bnez	a10, 400dcbd0 <app_main+0x30>
+400dcbbe:	b33c65        	call8	4008ff84 <esp_log_timestamp>
+400dcbc1:	cfc7e1        	l32r	a14, 400d0ae0 <_stext+0xac0> (3f404414 <_esp_trace_encoder_array_end+0x42f4>)
+400dcbc4:	cfd0c1        	l32r	a12, 400d0b04 <_stext+0xae4> (3f4044f4 <_esp_trace_encoder_array_end+0x43d4>)
+400dcbc7:	0add      	mov.n	a13, a10
+400dcbc9:	0ebd      	mov.n	a11, a14
+400dcbcb:	2a0c      	movi.n	a10, 2
+400dcbcd:	b32fa5        	call8	4008fec8 <esp_log>
+400dcbd0:	cfc3a1        	l32r	a10, 400d0adc <_stext+0xabc> (3ffb7860 <s_state>)
+400dcbd3:	0652a5        	call8	400e30fc <native_state_init>
+400dcbd6:	faeea5        	call8	400d7ac0 <nvs_flash_init>
+400dcbd9:	da9c      	beqz.n	a10, 400dcbfa <app_main+0x5a>
+400dcbdb:	81a9      	s32i.n	a10, a1, 32
+400dcbdd:	b33a65        	call8	4008ff84 <esp_log_timestamp>
+400dcbe0:	0add      	mov.n	a13, a10
+400dcbe2:	81a8      	l32i.n	a10, a1, 32
+400dcbe4:	81d9      	s32i.n	a13, a1, 32
+400dcbe6:	5b9d65        	call8	401385bc <esp_err_to_name>
+400dcbe9:	cfbde1        	l32r	a14, 400d0ae0 <_stext+0xac0> (3f404414 <_esp_trace_encoder_array_end+0x42f4>)
+400dcbec:	81d8      	l32i.n	a13, a1, 32
+400dcbee:	cfc6c1        	l32r	a12, 400d0b08 <_stext+0xae8> (3f404528 <_esp_trace_encoder_array_end+0x4408>)
+400dcbf1:	0afd      	mov.n	a15, a10
+400dcbf3:	0ebd      	mov.n	a11, a14
+400dcbf5:	1a0c      	movi.n	a10, 1
+400dcbf7:	b32d25        	call8	4008fec8 <esp_log>
+400dcbfa:	19b065        	call8	400f6700 <native_audio_settings_init>
+400dcbfd:	00ea16        	beqz	a10, 400dcc0f <app_main+0x6f>
+400dcc00:	cfc3e1        	l32r	a14, 400d0b0c <_stext+0xaec> (3f404558 <_esp_trace_encoder_array_end+0x4438>)
+400dcc03:	cfc3d1        	l32r	a13, 400d0b10 <_stext+0xaf0> (3f4261e8 <__func__$0>)
+400dcc06:	cfc3b1        	l32r	a11, 400d0b14 <_stext+0xaf4> (3f404578 <_esp_trace_encoder_array_end+0x4458>)
+400dcc09:	6fa0c2        	movi	a12, 111
+400dcc0c:	b02ca5        	call8	4008ced8 <_esp_error_check_failed>
+400dcc0f:	090da5        	call8	400e5ce8 <network_settings_init>
+400dcc12:	da9c      	beqz.n	a10, 400dcc33 <app_main+0x93>
+400dcc14:	81a9      	s32i.n	a10, a1, 32
+400dcc16:	b336e5        	call8	4008ff84 <esp_log_timestamp>
+400dcc19:	0add      	mov.n	a13, a10
+400dcc1b:	81a8      	l32i.n	a10, a1, 32
+400dcc1d:	81d9      	s32i.n	a13, a1, 32
+400dcc1f:	5b99e5        	call8	401385bc <esp_err_to_name>
+400dcc22:	cfafe1        	l32r	a14, 400d0ae0 <_stext+0xac0> (3f404414 <_esp_trace_encoder_array_end+0x42f4>)
+400dcc25:	81d8      	l32i.n	a13, a1, 32
+400dcc27:	cfbcc1        	l32r	a12, 400d0b18 <_stext+0xaf8> (3f40458c <_esp_trace_encoder_array_end+0x446c>)
+400dcc2a:	0afd      	mov.n	a15, a10
+400dcc2c:	0ebd      	mov.n	a11, a14
+400dcc2e:	2a0c      	movi.n	a10, 2
+400dcc30:	b32965        	call8	4008fec8 <esp_log>
+400dcc33:	080c      	movi.n	a8, 0
+400dcc35:	7189      	s32i.n	a8, a1, 28
+400dcc37:	cfb981        	l32r	a8, 400d0b1c <_stext+0xafc> (3f4045bc <_esp_trace_encoder_array_end+0x449c>)
+400dcc3a:	10c1a2        	addi	a10, a1, 16
+400dcc3d:	4189      	s32i.n	a8, a1, 16
+400dcc3f:	cfb881        	l32r	a8, 400d0b20 <_stext+0xb00> (3f4045c4 <_esp_trace_encoder_array_end+0x44a4>)
+400dcc42:	5189      	s32i.n	a8, a1, 20
+400dcc44:	880c      	movi.n	a8, 8
+400dcc46:	6189      	s32i.n	a8, a1, 24
+400dcc48:	1523a5        	call8	400f1e84 <esp_vfs_spiffs_register>
+400dcc4b:	da9c      	beqz.n	a10, 400dcc6c <app_main+0xcc>
+400dcc4d:	81a9      	s32i.n	a10, a1, 32
+400dcc4f:	b33365        	call8	4008ff84 <esp_log_timestamp>
+400dcc52:	0add      	mov.n	a13, a10
+400dcc54:	81a8      	l32i.n	a10, a1, 32
+400dcc56:	81d9      	s32i.n	a13, a1, 32
+400dcc58:	5b9625        	call8	401385bc <esp_err_to_name>
+400dcc5b:	cfa1e1        	l32r	a14, 400d0ae0 <_stext+0xac0> (3f404414 <_esp_trace_encoder_array_end+0x42f4>)
+400dcc5e:	81d8      	l32i.n	a13, a1, 32
+400dcc60:	cfb1c1        	l32r	a12, 400d0b24 <_stext+0xb04> (3f4045cc <_esp_trace_encoder_array_end+0x44ac>)
+400dcc63:	0afd      	mov.n	a15, a10
+400dcc65:	0ebd      	mov.n	a11, a14
+400dcc67:	1a0c      	movi.n	a10, 1
+400dcc69:	b325e5        	call8	4008fec8 <esp_log>
+400dcc6c:	cfa2a1        	l32r	a10, 400d0af4 <_stext+0xad4> (3ffb5030 <s_display>)
+400dcc6f:	053a25        	call8	400e2010 <cyd_display_init>
+400dcc72:	da8c      	beqz.n	a10, 400dcc83 <app_main+0xe3>
+400dcc74:	cfade1        	l32r	a14, 400d0b28 <_stext+0xb08> (3f404600 <_esp_trace_encoder_array_end+0x44e0>)
+400dcc77:	cfa6d1        	l32r	a13, 400d0b10 <_stext+0xaf0> (3f4261e8 <__func__$0>)
+400dcc7a:	cfa6b1        	l32r	a11, 400d0b14 <_stext+0xaf4> (3f404578 <_esp_trace_encoder_array_end+0x4458>)
+400dcc7d:	79a0c2        	movi	a12, 121
+400dcc80:	b02565        	call8	4008ced8 <_esp_error_check_failed>
+400dcc83:	094f65        	call8	400e6178 <time_service_start>
+400dcc86:	020a16        	beqz	a10, 400dccaa <app_main+0x10a>
+400dcc89:	81a9      	s32i.n	a10, a1, 32
+400dcc8b:	b32fa5        	call8	4008ff84 <esp_log_timestamp>
+400dcc8e:	0add      	mov.n	a13, a10
+400dcc90:	81a8      	l32i.n	a10, a1, 32
+400dcc92:	0861d2        	s32i	a13, a1, 32
+400dcc95:	5b9265        	call8	401385bc <esp_err_to_name>
+400dcc98:	cf92e1        	l32r	a14, 400d0ae0 <_stext+0xac0> (3f404414 <_esp_trace_encoder_array_end+0x42f4>)
+400dcc9b:	81d8      	l32i.n	a13, a1, 32
+400dcc9d:	cfa3c1        	l32r	a12, 400d0b2c <_stext+0xb0c> (3f404620 <_esp_trace_encoder_array_end+0x4500>)
+400dcca0:	0afd      	mov.n	a15, a10
+400dcca2:	0ebd      	mov.n	a11, a14
+400dcca4:	02a0a2        	movi	a10, 2
+400dcca7:	b32225        	call8	4008fec8 <esp_log>
+400dccaa:	0d0c      	movi.n	a13, 0
+400dccac:	cfa1c1        	l32r	a12, 400d0b30 <_stext+0xb10> (c00 <UserFrameTotalSize+0xb00>)
+400dccaf:	cfa1b1        	l32r	a11, 400d0b34 <_stext+0xb14> (3f40464c <_esp_trace_encoder_array_end+0x452c>)
+400dccb2:	cfa1a1        	l32r	a10, 400d0b38 <_stext+0xb18> (400dcb38 <display_task>)
+400dccb5:	01d9      	s32i.n	a13, a1, 0
+400dccb7:	0dfd      	mov.n	a15, a13
+400dccb9:	1e0c      	movi.n	a14, 1
+400dccbb:	cd5281        	l32r	a8, 400d0204 <_stext+0x1e4> (401c735c <xTaskCreatePinnedToCore>)
+400dccbe:	0008e0        	callx8	a8
+400dccc1:	0d0c      	movi.n	a13, 0
+400dccc3:	cf9ec1        	l32r	a12, 400d0b3c <_stext+0xb1c> (1800 <UserFrameTotalSize+0x1700>)
+400dccc6:	cf9eb1        	l32r	a11, 400d0b40 <_stext+0xb20> (3f4065e8 <_esp_trace_encoder_array_end+0x64c8>)
+400dccc9:	cf9ea1        	l32r	a10, 400d0b44 <_stext+0xb24> (400dc9fc <network_task>)
+400dcccc:	01d9      	s32i.n	a13, a1, 0
+400dccce:	0dfd      	mov.n	a15, a13
+400dccd0:	3e0c      	movi.n	a14, 3
+400dccd2:	cd4c81        	l32r	a8, 400d0204 <_stext+0x1e4> (401c735c <xTaskCreatePinnedToCore>)
+400dccd5:	0008e0        	callx8	a8
+400dccd8:	f01d      	retw.n

@@ -1,0 +1,65 @@
+{
+  "schema": "cyd-production-observer03-source-provenance-v1",
+  "status": "SOURCE_ONLY_NOT_EXECUTED",
+  "source_origins": [
+    {
+      "path": ".build/cyd-qemu-flash-trace-prep-01/capture.py",
+      "snapshot": "origins/trace-capture01.py",
+      "sha256": "e353d95cfd22faf0282a4357d8d7bea8f7ec82b60e6b38a5a12749a089a5a652",
+      "bytes": 14122
+    },
+    {
+      "path": "tests/results/cyd-production-radio-boot-20261020/preparation/capture.py",
+      "snapshot": "origins/production-boot-capture.py",
+      "sha256": "abc29b18e694d7a48abd5a90ed30da983cfea0650e40ec0a468b0afde2205f80",
+      "bytes": 10414
+    },
+    {
+      "path": "tests/results/cyd-production-radio-boot-20261020/preparation/inputs.json",
+      "snapshot": "origins/production-inputs.json",
+      "sha256": "f9cf237bbbefe7967abbb558b06beb1ed4617035769669bb770223ad01bf5b12",
+      "bytes": 37067
+    },
+    {
+      "path": ".build/cyd-qemu-production-observer-prep-02/capture.py",
+      "snapshot": "origins/observer02-capture.py",
+      "bytes": 21296,
+      "sha256": "dea7385425b2a05a0d57f769bafb84a00b8dc528ea45681ba190de0391722d7b"
+    },
+    {
+      "path": ".build/cyd-qemu-production-observer-prep-02/readiness.json",
+      "snapshot": "origins/observer02-readiness.json",
+      "bytes": 2221,
+      "sha256": "c7d2bf870552c6de44c27f87fe1b6ca19b42fc60b857bc3acf3ccf000f453fba"
+    },
+    {
+      "path": ".build/cyd-qemu-idf6-compat-review-20261024-01/review.json",
+      "snapshot": "origins/qemu-model-review.json",
+      "bytes": 5995,
+      "sha256": "2de220f1c540ea4db351b318feee0a256b502f7164ef50badfb2bf583b26480d"
+    }
+  ],
+  "predecessor_capture_sha256": "dea7385425b2a05a0d57f769bafb84a00b8dc528ea45681ba190de0391722d7b",
+  "predecessor_readiness_sha256": "c7d2bf870552c6de44c27f87fe1b6ca19b42fc60b857bc3acf3ccf000f453fba",
+  "independent_QEMU_model_review": {
+    "path": ".build/cyd-qemu-idf6-compat-review-20261024-01/review.json",
+    "bytes": 5995,
+    "sha256": "2de220f1c540ea4db351b318feee0a256b502f7164ef50badfb2bf583b26480d"
+  },
+  "adapter_kind": "Standalone source successor; ordinary standard-library imports only; no predecessor import/call/rebinding",
+  "source_diff": "capture-vs-02.diff",
+  "exact_source_change_groups": [
+    "Restrict future selected executable to .build/cyd-qemu-idf6-build-01/qemu-system-xtensa.exe.",
+    "Retain both original source origins and add exact observer02 source plus independent QEMU-model review to runtime before/after identity checks.",
+    "Correct emulator_model_patched=True and firmware_patched=False; retain legacy combined firmware_or_model_patched=True because the emulator model changes."
+  ],
+  "all_other_source_bytes_recovered_by_reversing_declared_changes": true,
+  "root_requested_new_qemu_path": ".build/cyd-qemu-idf6-build-01/qemu-system-xtensa.exe",
+  "new_qemu_sha256": "Root must supply actual independently saved successful fixed-build digest at invocation; not invented here.",
+  "original_production_inventory_sha256": "f9cf237bbbefe7967abbb558b06beb1ed4617035769669bb770223ad01bf5b12",
+  "source_AST_parsed": true,
+  "prepared_imports_functions_tests_build_QEMU_Git_executed": false,
+  "external_sources_or_firmware_modified": false,
+  "prior_capture_results_changed": false,
+  "root_source_review_and_actual_fixed_QEMU_regressions_required_before_observation": true
+}

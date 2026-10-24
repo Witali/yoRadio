@@ -1,0 +1,33 @@
+--- observer05/capture.py
++++ observer06/capture.py
+@@ -17,8 +17,10 @@
+ ORIGINAL_QEMU_SHA256 = 'f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35'
+ ORIGINAL_SOURCE = '3a563324abdca56144a40d5759def0ccfe708b3c'
+ ORIGINAL_APP_SHA256 = '66e99cfb4773bad31cd646ec22e0cdda5d1231bf9b3ea74a6940401aea98ecf3'
+-EXPECTED_NEW_QEMU = ROOT / '.build/cyd-qemu-idf6-build-03/qemu-system-xtensa.exe'
++EXPECTED_NEW_QEMU = ROOT / '.build/cyd-qemu-idf6-build-05/qemu-system-xtensa.exe'
+ ORIGINS = (
++    (ROOT / '.build/cyd-qemu-production-observer-prep-05/capture.py',
++     '1d1ef7baa863688d91ebd84133f108d5ac1c2bd4d9e8f0dd9f99381b3a91974b'),
+     (ROOT / '.build/cyd-qemu-production-observer-prep-04/capture.py',
+      '11fec3212e40250ca9e7af1c2225666c1519c18444811d80147ba0f070e16f40'),
+     (ROOT / '.build/cyd-qemu-production-observer-prep-03/capture.py',
+@@ -104,6 +106,8 @@
+                   audio_output_qualified=False, physical_qualification=False,
+                   static_rx_loan_exercised=False, reserve_performance_qualified=False,
+                   firmware_patched=False, emulator_model_patched=True,
++                  emulated_spi_input_delay_ns=25, fixed_flash_source_clock_hz=80000000,
++                  arbitrary_partial_bit_or_analog_timing_qualified=False,
+                   firmware_or_model_patched=True, host_network_backend='none',
+                   host_audio_backend='none', physical_device=False,
+                   qmp_transport='owned-child-stdio', commands=[],
+@@ -177,7 +181,8 @@
+                  'Byte-exact original flash components')
+         serial.touch(exist_ok=False)
+         guest_name = 'cyd-production-observer-' + uuid.uuid4().hex
+-        argv = [str(qemu), '-name', guest_name, '-audiodev', 'none,id=quiet',
++        argv = [str(qemu), '-global', 'driver=ssi.esp32.spi,property=input-delay-ns,value=25',
++                '-name', guest_name, '-audiodev', 'none,id=quiet',
+                 '-M', 'esp32,st7789=on,audiodev=quiet', '-smp', '2',
+                 '-L', str(Path(pins['tools']['rom']['path']).parent),
+                 '-display', 'none', '-monitor', 'none',

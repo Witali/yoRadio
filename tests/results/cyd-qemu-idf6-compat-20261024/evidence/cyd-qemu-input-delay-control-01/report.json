@@ -1,0 +1,2496 @@
+{
+  "schema": "esp32-spi-input-delay-paused-qtest-v1",
+  "result": "MMIO_REGRESSIONS_FAILED",
+  "command": [
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-04\\qemu-system-xtensa.exe",
+    "-M",
+    "esp32,audiodev=quiet",
+    "-smp",
+    "2",
+    "-accel",
+    "qtest",
+    "-S",
+    "-L",
+    "C:\\Work\\QEMU-ESP32\\pc-bios",
+    "-drive",
+    "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-input-delay-control-01\\synthetic-flash.bin,if=mtd,format=raw",
+    "-snapshot",
+    "-nic",
+    "none",
+    "-audiodev",
+    "none,id=quiet",
+    "-display",
+    "none",
+    "-serial",
+    "none",
+    "-monitor",
+    "none",
+    "-qtest",
+    "stdio",
+    "-qtest-log",
+    "none",
+    "-global",
+    "driver=ssi.esp32.spi,property=input-delay-ns,value=25"
+  ],
+  "inputs_before": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-04\\qemu-system-xtensa.exe": {
+      "bytes": 72606593,
+      "sha256": "4f19a3e3889b6136e73144aea785d5b6b5d75b422cd7354880041faba9e82619"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\tools\\test_esp32_spi_input_delay.py": {
+      "bytes": 7655,
+      "sha256": "92b1490561bde34b7d9712ecb765b924faf3ea1f06f99dd2b13ce956f625db5d"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\tools\\test_esp32_idf6_compat.py": {
+      "bytes": 18133,
+      "sha256": "c07cac9b1f980c0a610de1b9487f3d698d08ddd123ad71ccf254d3dbf0eb2f18"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-input-delay-control-01\\synthetic-flash.bin": {
+      "bytes": 4194304,
+      "sha256": "ebff6c48c592bc60d6a82c99732e9356f7f446cc5f5483990555dadbed2c4f7f"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": {
+      "bytes": 455722,
+      "sha256": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": {
+      "bytes": 455722,
+      "sha256": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\ssi\\esp32_spi.c": {
+      "bytes": 18815,
+      "sha256": "6955c4307a780888cfbcd2e3d79402ccab76c9698c7e96123137952e726ef8aa"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\ssi\\esp32_spi.h": {
+      "bytes": 2907,
+      "sha256": "ab25252111bdb3da962eecfef959b6164b4dc40c357c052fe18a3fddc964dd4e"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\xtensa\\esp32.c": {
+      "bytes": 48859,
+      "sha256": "820de5d5bb015693f64c074e007152c77c2b8d36c28b073a1fd47a94034b0178"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\misc\\esp32_dport.c": {
+      "bytes": 19393,
+      "sha256": "86dc1374bd54e2c95cefddc638de9cc340f04e9b99eba6140a42c2e4e01a663b"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\misc\\esp32_dport.h": {
+      "bytes": 6691,
+      "sha256": "2394758b708ee91f4c635189e6b8ab5d10499a8b13854531ed2290f791c718dd"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\block\\m25p80.c": {
+      "bytes": 63572,
+      "sha256": "7e3999f743d2c9d3c391f54eab2dfb3732b04a16964529258ee822a20f85c9df"
+    }
+  },
+  "checks": [
+    {
+      "case": "SPI_CLOCK documented initial reset",
+      "passed": true,
+      "actual": 2147496003,
+      "expected": 2147496003
+    },
+    {
+      "case": "EQU80 full clock write/read",
+      "passed": true,
+      "actual": 2147483648,
+      "expected": 2147483648
+    },
+    {
+      "case": "EQU80 slow 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU80 slow 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU80 slow 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU80 slow 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU80 slow 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU80 slow 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU80 slow 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU80 slow 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU80 slow 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU80 slow 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU80 slow 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU80 slow 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU80 fast 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU80 fast 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU80 fast 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU80 fast 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU80 fast 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU80 fast 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU80 fast 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU80 fast 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU80 fast 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU80 fast 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU80 fast 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU80 fast 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU80 dout 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU80 dout 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU80 dout 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU80 dout 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU80 dout 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU80 dout 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU80 dout 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU80 dout 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU80 dout 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU80 dout 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU80 dout 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU80 dout 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU80 qout 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU80 qout 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU80 qout 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU80 qout 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU80 qout 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU80 qout 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU80 qout 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU80 qout 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU80 qout 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU80 qout 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU80 qout 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU80 qout 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU80 dio 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU80 dio 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU80 dio 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU80 dio 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU80 dio 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU80 dio 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU80 dio 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU80 dio 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU80 dio 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU80 dio 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU80 dio 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU80 dio 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU80 qio 0x123450+2 extra2",
+      "passed": false,
+      "actual": "6ab3",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU80 qio 0x123450+3 extra2",
+      "passed": false,
+      "actual": "6ab3fc",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU80 qio 0x123450+16 extra2",
+      "passed": false,
+      "actual": "6ab3fc458ed72069b2fb448dd61f68b1",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU80 qio 0x123450+64 extra2",
+      "passed": false,
+      "actual": "6ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU80 qio 0x3700fc+2 extra2",
+      "passed": false,
+      "actual": "04cb",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU80 qio 0x3700fc+3 extra2",
+      "passed": false,
+      "actual": "04cb14",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU80 qio 0x3700fc+16 extra2",
+      "passed": false,
+      "actual": "04cb145da6ef3881ca135ca5ee3780c9",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU80 qio 0x3700fc+64 extra2",
+      "passed": false,
+      "actual": "04cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU80 qio 0x3710fc+2 extra2",
+      "passed": false,
+      "actual": "04db",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU80 qio 0x3710fc+3 extra2",
+      "passed": false,
+      "actual": "04db24",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU80 qio 0x3710fc+16 extra2",
+      "passed": false,
+      "actual": "04db246db6ff4891da236cb5fe4790d9",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU80 qio 0x3710fc+64 extra2",
+      "passed": false,
+      "actual": "04db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU80 JEDEC after compensation",
+      "passed": true,
+      "actual": "c84016",
+      "expected": "c84016"
+    },
+    {
+      "case": "EQU80 written QE after compensation",
+      "passed": true,
+      "actual": "020202",
+      "expected": "020202"
+    },
+    {
+      "case": "EQU80 omitted QIO protocol dummy is detected",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "EQU80 full duplex does not compensate",
+      "passed": true,
+      "actual": "401600",
+      "expected": "401600"
+    },
+    {
+      "case": "DIV40 full clock write/read",
+      "passed": true,
+      "actual": 4097,
+      "expected": 4097
+    },
+    {
+      "case": "DIV40 slow 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV40 slow 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV40 slow 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV40 slow 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV40 slow 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV40 slow 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV40 slow 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV40 slow 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV40 slow 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV40 slow 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV40 slow 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV40 slow 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV40 fast 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV40 fast 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV40 fast 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV40 fast 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV40 fast 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV40 fast 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV40 fast 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV40 fast 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV40 fast 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV40 fast 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV40 fast 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV40 fast 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV40 dout 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV40 dout 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV40 dout 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV40 dout 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV40 dout 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV40 dout 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV40 dout 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV40 dout 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV40 dout 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV40 dout 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV40 dout 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV40 dout 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV40 qout 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV40 qout 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV40 qout 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV40 qout 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV40 qout 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV40 qout 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV40 qout 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV40 qout 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV40 qout 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV40 qout 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV40 qout 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV40 qout 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV40 dio 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV40 dio 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV40 dio 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV40 dio 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV40 dio 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV40 dio 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV40 dio 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV40 dio 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV40 dio 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV40 dio 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV40 dio 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV40 dio 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV40 qio 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV40 qio 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV40 qio 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV40 qio 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV40 qio 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV40 qio 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV40 qio 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV40 qio 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV40 qio 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV40 qio 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV40 qio 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV40 qio 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV40 JEDEC after compensation",
+      "passed": true,
+      "actual": "c84016",
+      "expected": "c84016"
+    },
+    {
+      "case": "DIV40 written QE after compensation",
+      "passed": true,
+      "actual": "020202",
+      "expected": "020202"
+    },
+    {
+      "case": "DIV40 omitted QIO protocol dummy is detected",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "DIV40 full duplex does not compensate",
+      "passed": true,
+      "actual": "401600",
+      "expected": "401600"
+    },
+    {
+      "case": "DIV20 full clock write/read",
+      "passed": true,
+      "actual": 12355,
+      "expected": 12355
+    },
+    {
+      "case": "DIV20 slow 0x123450+2 extra0",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV20 slow 0x123450+3 extra0",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV20 slow 0x123450+16 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV20 slow 0x123450+64 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV20 slow 0x3700fc+2 extra0",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV20 slow 0x3700fc+3 extra0",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV20 slow 0x3700fc+16 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV20 slow 0x3700fc+64 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV20 slow 0x3710fc+2 extra0",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV20 slow 0x3710fc+3 extra0",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV20 slow 0x3710fc+16 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV20 slow 0x3710fc+64 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV20 fast 0x123450+2 extra0",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV20 fast 0x123450+3 extra0",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV20 fast 0x123450+16 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV20 fast 0x123450+64 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV20 fast 0x3700fc+2 extra0",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV20 fast 0x3700fc+3 extra0",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV20 fast 0x3700fc+16 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV20 fast 0x3700fc+64 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV20 fast 0x3710fc+2 extra0",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV20 fast 0x3710fc+3 extra0",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV20 fast 0x3710fc+16 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV20 fast 0x3710fc+64 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV20 dout 0x123450+2 extra0",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV20 dout 0x123450+3 extra0",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV20 dout 0x123450+16 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV20 dout 0x123450+64 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV20 dout 0x3700fc+2 extra0",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV20 dout 0x3700fc+3 extra0",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV20 dout 0x3700fc+16 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV20 dout 0x3700fc+64 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV20 dout 0x3710fc+2 extra0",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV20 dout 0x3710fc+3 extra0",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV20 dout 0x3710fc+16 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV20 dout 0x3710fc+64 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV20 qout 0x123450+2 extra0",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV20 qout 0x123450+3 extra0",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV20 qout 0x123450+16 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV20 qout 0x123450+64 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV20 qout 0x3700fc+2 extra0",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV20 qout 0x3700fc+3 extra0",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV20 qout 0x3700fc+16 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV20 qout 0x3700fc+64 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV20 qout 0x3710fc+2 extra0",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV20 qout 0x3710fc+3 extra0",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV20 qout 0x3710fc+16 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV20 qout 0x3710fc+64 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV20 dio 0x123450+2 extra0",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV20 dio 0x123450+3 extra0",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV20 dio 0x123450+16 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV20 dio 0x123450+64 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV20 dio 0x3700fc+2 extra0",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV20 dio 0x3700fc+3 extra0",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV20 dio 0x3700fc+16 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV20 dio 0x3700fc+64 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV20 dio 0x3710fc+2 extra0",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV20 dio 0x3710fc+3 extra0",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV20 dio 0x3710fc+16 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV20 dio 0x3710fc+64 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV20 qio 0x123450+2 extra0",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "DIV20 qio 0x123450+3 extra0",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "DIV20 qio 0x123450+16 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "DIV20 qio 0x123450+64 extra0",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "DIV20 qio 0x3700fc+2 extra0",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "DIV20 qio 0x3700fc+3 extra0",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "DIV20 qio 0x3700fc+16 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "DIV20 qio 0x3700fc+64 extra0",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "DIV20 qio 0x3710fc+2 extra0",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "DIV20 qio 0x3710fc+3 extra0",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "DIV20 qio 0x3710fc+16 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "DIV20 qio 0x3710fc+64 extra0",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "DIV20 JEDEC after compensation",
+      "passed": true,
+      "actual": "c84016",
+      "expected": "c84016"
+    },
+    {
+      "case": "DIV20 written QE after compensation",
+      "passed": true,
+      "actual": "020202",
+      "expected": "020202"
+    },
+    {
+      "case": "DIV20 omitted QIO protocol dummy is detected",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "DIV20 full duplex does not compensate",
+      "passed": true,
+      "actual": "401600",
+      "expected": "401600"
+    },
+    {
+      "case": "PRE2_N0 full clock write/read",
+      "passed": true,
+      "actual": 262144,
+      "expected": 262144
+    },
+    {
+      "case": "PRE2_N0 slow 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "PRE2_N0 slow 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "PRE2_N0 slow 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "PRE2_N0 slow 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "PRE2_N0 slow 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "PRE2_N0 fast 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "PRE2_N0 fast 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "PRE2_N0 fast 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "PRE2_N0 fast 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "PRE2_N0 fast 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "PRE2_N0 dout 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "PRE2_N0 dout 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "PRE2_N0 dout 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "PRE2_N0 dout 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "PRE2_N0 dout 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "PRE2_N0 qout 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "PRE2_N0 qout 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "PRE2_N0 qout 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "PRE2_N0 qout 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "PRE2_N0 qout 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "PRE2_N0 dio 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "PRE2_N0 dio 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "PRE2_N0 dio 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "PRE2_N0 dio 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "PRE2_N0 dio 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "PRE2_N0 qio 0x123450+2 extra1",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "PRE2_N0 qio 0x123450+3 extra1",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "PRE2_N0 qio 0x123450+16 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "PRE2_N0 qio 0x123450+64 extra1",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3700fc+2 extra1",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3700fc+3 extra1",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3700fc+16 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3700fc+64 extra1",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3710fc+2 extra1",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3710fc+3 extra1",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3710fc+16 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "PRE2_N0 qio 0x3710fc+64 extra1",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "PRE2_N0 JEDEC after compensation",
+      "passed": true,
+      "actual": "c84016",
+      "expected": "c84016"
+    },
+    {
+      "case": "PRE2_N0 written QE after compensation",
+      "passed": true,
+      "actual": "020202",
+      "expected": "020202"
+    },
+    {
+      "case": "PRE2_N0 omitted QIO protocol dummy is detected",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PRE2_N0 full duplex does not compensate",
+      "passed": true,
+      "actual": "401600",
+      "expected": "401600"
+    },
+    {
+      "case": "EQU_ignores_PRE_N full clock write/read",
+      "passed": true,
+      "actual": 2148290693,
+      "expected": 2148290693
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU_ignores_PRE_N slow 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU_ignores_PRE_N fast 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dout 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qout 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x123450+2 extra2",
+      "passed": true,
+      "actual": "216a",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x123450+3 extra2",
+      "passed": true,
+      "actual": "216ab3",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x123450+16 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x123450+64 extra2",
+      "passed": true,
+      "actual": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3700fc+2 extra2",
+      "passed": true,
+      "actual": "b904",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3700fc+3 extra2",
+      "passed": true,
+      "actual": "b904cb",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3700fc+16 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3700fc+64 extra2",
+      "passed": true,
+      "actual": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3710fc+2 extra2",
+      "passed": true,
+      "actual": "a604",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3710fc+3 extra2",
+      "passed": true,
+      "actual": "a604db",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3710fc+16 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU_ignores_PRE_N dio 0x3710fc+64 extra2",
+      "passed": true,
+      "actual": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x123450+2 extra2",
+      "passed": false,
+      "actual": "6ab3",
+      "expected": "216a"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x123450+3 extra2",
+      "passed": false,
+      "actual": "6ab3fc",
+      "expected": "216ab3"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x123450+16 extra2",
+      "passed": false,
+      "actual": "6ab3fc458ed72069b2fb448dd61f68b1",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x123450+64 extra2",
+      "passed": false,
+      "actual": "6ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf1861",
+      "expected": "216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089d21b64adf63f88d11a63acf53e87d01962abf43d86cf18"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3700fc+2 extra2",
+      "passed": false,
+      "actual": "04cb",
+      "expected": "b904"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3700fc+3 extra2",
+      "passed": false,
+      "actual": "04cb14",
+      "expected": "b904cb"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3700fc+16 extra2",
+      "passed": false,
+      "actual": "04cb145da6ef3881ca135ca5ee3780c9",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3700fc+64 extra2",
+      "passed": false,
+      "actual": "04cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee73079",
+      "expected": "b904cb145da6ef3881ca135ca5ee3780c9125ba4ed367fc8115aa3ec357ec71059a2eb347dc60f58a1ea337cc50e57a0e9327bc40d569fe8317ac30c559ee730"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3710fc+2 extra2",
+      "passed": false,
+      "actual": "04db",
+      "expected": "a604"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3710fc+3 extra2",
+      "passed": false,
+      "actual": "04db24",
+      "expected": "a604db"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3710fc+16 extra2",
+      "passed": false,
+      "actual": "04db246db6ff4891da236cb5fe4790d9",
+      "expected": "a604db246db6ff4891da236cb5fe4790"
+    },
+    {
+      "case": "EQU_ignores_PRE_N qio 0x3710fc+64 extra2",
+      "passed": false,
+      "actual": "04db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef74089",
+      "expected": "a604db246db6ff4891da236cb5fe4790d9226bb4fd468fd8216ab3fc458ed72069b2fb448dd61f68b1fa438cd51e67b0f9428bd41d66aff8418ad31c65aef740"
+    },
+    {
+      "case": "EQU_ignores_PRE_N JEDEC after compensation",
+      "passed": true,
+      "actual": "c84016",
+      "expected": "c84016"
+    },
+    {
+      "case": "EQU_ignores_PRE_N written QE after compensation",
+      "passed": true,
+      "actual": "020202",
+      "expected": "020202"
+    },
+    {
+      "case": "EQU_ignores_PRE_N omitted QIO protocol dummy is detected",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "EQU_ignores_PRE_N full duplex does not compensate",
+      "passed": true,
+      "actual": "401600",
+      "expected": "401600"
+    }
+  ],
+  "expected_checks": 386,
+  "input_delay_ns": 25,
+  "clock_cases": [
+    [
+      "EQU80",
+      2147483648,
+      2
+    ],
+    [
+      "DIV40",
+      4097,
+      1
+    ],
+    [
+      "DIV20",
+      12355,
+      0
+    ],
+    [
+      "PRE2_N0",
+      262144,
+      1
+    ],
+    [
+      "EQU_ignores_PRE_N",
+      2148290693,
+      2
+    ]
+  ],
+  "fixed_source_clock_hz": 80000000,
+  "guest_cpus_resumed": false,
+  "firmware_used": false,
+  "production_boot_qualified": false,
+  "physical_or_radio_qualified": false,
+  "partial_bit_waveform_or_analog_latency_qualified": false,
+  "case_execution_completed": true,
+  "qemu_exit_code": 1,
+  "cleanup_method": "terminate-owned-paused-qtest-process",
+  "stdout_actual_eof": true,
+  "stdout_reader_joined": true,
+  "controller_errors": [],
+  "inputs_after": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-04\\qemu-system-xtensa.exe": {
+      "bytes": 72606593,
+      "sha256": "4f19a3e3889b6136e73144aea785d5b6b5d75b422cd7354880041faba9e82619"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\tools\\test_esp32_spi_input_delay.py": {
+      "bytes": 7655,
+      "sha256": "92b1490561bde34b7d9712ecb765b924faf3ea1f06f99dd2b13ce956f625db5d"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\tools\\test_esp32_idf6_compat.py": {
+      "bytes": 18133,
+      "sha256": "c07cac9b1f980c0a610de1b9487f3d698d08ddd123ad71ccf254d3dbf0eb2f18"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-input-delay-control-01\\synthetic-flash.bin": {
+      "bytes": 4194304,
+      "sha256": "ebff6c48c592bc60d6a82c99732e9356f7f446cc5f5483990555dadbed2c4f7f"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": {
+      "bytes": 455722,
+      "sha256": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b"
+    },
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": {
+      "bytes": 455722,
+      "sha256": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\ssi\\esp32_spi.c": {
+      "bytes": 18815,
+      "sha256": "6955c4307a780888cfbcd2e3d79402ccab76c9698c7e96123137952e726ef8aa"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\ssi\\esp32_spi.h": {
+      "bytes": 2907,
+      "sha256": "ab25252111bdb3da962eecfef959b6164b4dc40c357c052fe18a3fddc964dd4e"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\xtensa\\esp32.c": {
+      "bytes": 48859,
+      "sha256": "820de5d5bb015693f64c074e007152c77c2b8d36c28b073a1fd47a94034b0178"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\misc\\esp32_dport.c": {
+      "bytes": 19393,
+      "sha256": "86dc1374bd54e2c95cefddc638de9cc340f04e9b99eba6140a42c2e4e01a663b"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\include\\hw\\misc\\esp32_dport.h": {
+      "bytes": 6691,
+      "sha256": "2394758b708ee91f4c635189e6b8ab5d10499a8b13854531ed2290f791c718dd"
+    },
+    "C:\\Work\\QEMU-ESP32\\.worktree\\cyd-idf6-compat\\hw\\block\\m25p80.c": {
+      "bytes": 63572,
+      "sha256": "7e3999f743d2c9d3c391f54eab2dfb3732b04a16964529258ee822a20f85c9df"
+    }
+  },
+  "inputs_unchanged": true,
+  "error": null
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "independent-qemu-idf6-compat-source-review-v1",
+  "verdict": "PASS_SOURCE_REVIEW_ONLY",
+  "readiness_sha256": "77df17e2a99e1801644c06b4e7d8fd719addc5c9dabdb04166b52b28f820bf77",
+  "compat_patch_sha256": "6db7a8aba9711f73996baff42bece144ef2c69199b908cbee00e1965abfd7c78",
+  "driver_sha256": "881f5ae028e962f753cfefae2432b7f8cf46c3f90478e18d6f0aa40c73bb8cda",
+  "source_closure_sha256": "197ea3227d7502f91431772eb2b3f9c1f313d4c3afe4d894a65a86dea119ec78",
+  "primary_web_readback_sha256": "33b54a22e7571de618a6f6758ea02b3125b313d957c960bec3f7026d04f3af95",
+  "blocking_findings": [],
+  "model_semantics_review": [
+    {
+      "location": "overlay/hw/ssi/esp32_spi.c:366-406,423-430,495-516",
+      "finding": "USR_DUMMY independently gates forwarding. CTRL chooses QIO four lanes, DIO two, fast/DOUT/QOUT one. Builtin READ opcode follows CTRL; USR preserves configured opcode. All other zero-initialized transactions retain no dummy by default."
+    },
+    {
+      "location": "overlay/hw/ssi/esp32_spi.c:381-388",
+      "finding": "Combined ceil(addr_bits + clocks*lanes)-ceil(addr_bits) is correct for the current byte-oriented SSI contract. SDK QIO28/5 sends four address bytes plus two dummy bytes, total48 bits; SDK DIO28/2 sends four plus zero, total32 bits. Separate phase rounding would add one byte in both cases."
+    },
+    {
+      "location": "overlay/hw/ssi/esp32_spi.c:339-347; overlay/hw/xtensa/esp32.c:750-755",
+      "finding": "Enabled dummy bytes are transferred while CS stays selected before caller data and their received bytes are discarded. Classic flash selects the existing byte-dummy-cycles contract; shared NOR implementation is unchanged."
+    },
+    {
+      "location": "overlay/hw/misc/esp32_dport.c:125-127,232-234,382-383; overlay/include/hw/misc/esp32_dport.h:131",
+      "finding": "Normal full32-bit backing state at DPORT+0xcc resets to documented0xfffce030. SDK RMW can set and clear real bits; no fabricated0x8f8f, assertion removal or Wi-Fi-success shortcut."
+    }
+  ],
+  "pinned_primary_source_support": [
+    "SDK6.0.2 spi_flash_hal_common.inc:117-132 and239-242 explicitly specify classic ESP32 QIO28/5 and trailing-one address mode bits.",
+    "SDK6.0.2 esp32 spi_flash_ll.h:247-275,364-398 defines mode flags, aligned usr address and dummy-cycle encoding/gate.",
+    "SDK6.0.2 dport_reg.h:1031-1062 defines full32-bit R/W address/reset and common/Wi-Fi/BT/RNG masks; clk_gate_ll.h:86-151 performs real RMW.",
+    "Pinned m25p80.c:1008-1143,1216-1226,1790 defines explicit byte-dummy-cycles fast/DIO/QIO counts and QE-off output. C3 implementation is a comparison, not proof that its bit packing can be copied unchanged."
+  ],
+  "driver_review": {
+    "independent_oracles": "Compares MMIO data to fresh synthetic backing bytes, with two distinct SPIFFS-sized sentinels and three addresses; lengths2/3/16/64 expose partial-word, skipped-byte and address errors. QE-off/readback and omitted-dummy negatives test protocol sensitivity. DPORT expectations cover reset, zero/all/high-bit writes and enable/disable RMW rather than a fixed required mask.",
+    "source_planned_assertions": 187,
+    "assertion_count_derivation": {
+      "DPORT": 13,
+      "QE_off": 2,
+      "QE_status_readback": 1,
+      "six_modes_two_commands_three_addresses_four_lengths": 144,
+      "two_SDK_partial_address_variants_three_addresses_four_lengths": 24,
+      "disabled_stale_dummy": 1,
+      "omitted_dummy_negative_controls": 2
+    },
+    "actual_acceptance_requirement": "Root must require187 saved check rows, zero false rows, unchanged inputs, no controller errors, actual stdout EOF/reader join and owner cleanup. Driver itself does not separately assert len(checks)==187; immutable current loops yield187.",
+    "owned_process": "Fresh subprocess handle; qtest stdio pipes; no socket listener; both CPUs stopped by qtest accelerator/-S; no firmware, serial, NIC, audio or display. Dedicated output is a fresh direct child of an existing .build directory; no path with comma or newline enters QEMU options.",
+    "preservation": "Fresh synthetic4MiB flash, -snapshot, before/after identity for flash, chosen emulator, driver, two ROMs and six selected model sources. This is selected-source preservation, not full build dependency closure.",
+    "lifecycle": "Per-command three-second response wait, MMIO deadline60 seconds, watchdog errors/queue/read errors fail incomplete; closes only owned process with bounded terminate/kill waits. Requires actual b-empty pipe read, no partial line, reader join, and final size checks. Forced owner termination is recorded, not guest natural shutdown.",
+    "bounds": "Deadline covers MMIO phase; bounded cleanup and input hashing follow. 32MiB logs are checked by a20ms polling watchdog and final reject, so this is a monitored soft cap with overshoot rejection, not an OS-enforced hard quota."
+  },
+  "unimplemented_or_unverified_scope": [
+    "No compiler, QTest, negative baseline, SPI2/SPI3 regression or production guest was executed by this reviewer.",
+    "SSI remains byte-oriented; arbitrary partial-bit waveforms, analog latency, every flash manufacturer/mode and complete hardware conformance are not established.",
+    "DPORT storage does not implement RF, calibration, association or real networking; CORE_RST_EN behavior is outside this change.",
+    "Original firmware/image/config and prior captures remain untouched; existing production startup NONPASS is not reclassified.",
+    "Patch application and compilation in a fresh branch/worktree, actual187 MMIO checks, independent unchanged-baseline controls and existing SPI2/SPI3 regressions remain root execution work."
+  ],
+  "prepared_modules_imported_or_functions_called": false,
+  "tests_build_QEMU_guest_Git_device_executed_by_reviewer": false,
+  "external_or_production_files_changed_by_reviewer": false,
+  "execution_pass_claimed": false,
+  "production_startup_qualified": false,
+  "physical_audio_network_performance_qualified": false
+}

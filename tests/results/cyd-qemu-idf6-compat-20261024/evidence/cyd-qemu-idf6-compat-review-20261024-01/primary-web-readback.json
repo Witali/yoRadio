@@ -1,0 +1,25 @@
+{
+  "schema": "qemu-idf6-compat-primary-web-readback-v1",
+  "sources": [
+    {
+      "url": "https://documentation.espressif.com/esp32_technical_reference_manual_en.pdf",
+      "access": "Direct official PDF opened; current service result is version5.9, 791 pages. This readback does not change the preparer previous version5.7 fetch fact.",
+      "locations": [
+        "20.3.2, printed page356: independently enabled command/address/dummy/data phases; dummy phase specified in SPI clocks.",
+        "20.8 register20.8 SPI_USER, printed page371: dummy phase enable bit29.",
+        "20.8 register20.9 SPI_USER1, printed page372: clock count minus one, valid when dummy enabled."
+      ],
+      "supports": "USR_DUMMY gate and hardware clock-count units. Does not independently expose WIFI_CLK_EN in fetched searchable text."
+    },
+    {
+      "url": "https://download.gigadevice.com/Datasheet/DS-00088-GD25Q32C-Rev4.1.pdf",
+      "access": "Official direct PDF fetch timed out. Official-domain search extraction was available.",
+      "locations": [
+        "Table instruction-format notes, printed page15: quad address includes mode bits M7..M0; four further quad clocks precede QIO output.",
+        "Earlier pinned analysis cites section7.11/figure13; this review does not claim a fresh full-PDF extraction."
+      ],
+      "supports": "QIO needs one mode byte plus four quad clocks before data. Pure SSI byte representation is separately checked in pinned m25p80 source."
+    }
+  ],
+  "external_document_source_or_code_executed": false
+}

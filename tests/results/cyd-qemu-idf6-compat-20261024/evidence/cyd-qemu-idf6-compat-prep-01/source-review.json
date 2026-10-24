@@ -1,0 +1,151 @@
+{
+  "schema": "cyd-qemu-idf6-source-only-review-v1",
+  "baseline_head_root_verified": "2a593f8d00c9be312ddc6e600dbb778f0e6459eb",
+  "status": "PREPARED_FOR_ROOT_SOURCE_REVIEW",
+  "diff_stats": [
+    {
+      "path": "hw/misc/esp32_dport.c",
+      "old_lines": 477,
+      "new_lines": 485,
+      "added": 8,
+      "removed": 0,
+      "hunks": 3
+    },
+    {
+      "path": "hw/ssi/esp32_spi.c",
+      "old_lines": 552,
+      "new_lines": 608,
+      "added": 57,
+      "removed": 1,
+      "hunks": 6
+    },
+    {
+      "path": "hw/xtensa/esp32.c",
+      "old_lines": 1187,
+      "new_lines": 1189,
+      "added": 2,
+      "removed": 0,
+      "hunks": 1
+    },
+    {
+      "path": "include/hw/misc/esp32_dport.h",
+      "old_lines": 178,
+      "new_lines": 181,
+      "added": 3,
+      "removed": 0,
+      "hunks": 2
+    },
+    {
+      "path": "include/hw/ssi/esp32_spi.h",
+      "old_lines": 95,
+      "new_lines": 100,
+      "added": 5,
+      "removed": 0,
+      "hunks": 1
+    },
+    {
+      "path": "tools/test_esp32_idf6_compat.py",
+      "old_lines": 0,
+      "new_lines": 362,
+      "added": 362,
+      "removed": 0,
+      "hunks": 1
+    }
+  ],
+  "checks_performed": [
+    "Exact raw copies of the five external original sources",
+    "Manual source review of proposed C/header changes and stdio QTest driver",
+    "Unified-diff operations reconstructed each normalized overlay in memory",
+    "Pinned local SDK source confirms classic ESP32 QIO 28 address bits plus five quad dummy clocks",
+    "Pinned local SDK source confirms DPORT WIFI_CLK_EN address, reset value and full 32-bit RW"
+  ],
+  "not_performed": [
+    "Git operation",
+    "Patch application or apply-check",
+    "Compiler execution",
+    "Python import, parsing, syntax compilation or test execution",
+    "QEMU execution",
+    "Firmware, SDK or external QEMU source modification",
+    "Physical board or COM interaction"
+  ],
+  "proposed_test_assertions": 187,
+  "tested_read_configuration_table": [
+    {
+      "mode": "slow",
+      "address_bits": 24,
+      "dummy_enabled": false,
+      "expected_additional_bytes": 0
+    },
+    {
+      "mode": "fast/dout/qout",
+      "address_bits": 24,
+      "dummy_clocks": 8,
+      "dummy_lanes": 1,
+      "expected_additional_bytes": 1
+    },
+    {
+      "mode": "dio",
+      "address_bits": 24,
+      "dummy_clocks": 4,
+      "dummy_lanes": 2,
+      "expected_additional_bytes": 1
+    },
+    {
+      "mode": "qio",
+      "address_bits": 24,
+      "dummy_clocks": 6,
+      "dummy_lanes": 4,
+      "expected_additional_bytes": 3
+    },
+    {
+      "mode": "classic SDK dio",
+      "address_bits": 28,
+      "dummy_clocks": 2,
+      "dummy_lanes": 2,
+      "expected_additional_bytes": 0
+    },
+    {
+      "mode": "classic SDK qio",
+      "address_bits": 28,
+      "dummy_clocks": 5,
+      "dummy_lanes": 4,
+      "expected_additional_bytes": 2
+    }
+  ],
+  "proposed_regression_sensitivity": [
+    {
+      "mutation": "Dummy phase remains omitted",
+      "expected_failures": "USR fast, DOUT, QOUT, DIO, QIO backing bytes"
+    },
+    {
+      "mutation": "Round each phase separately",
+      "expected_failures": "SDK QIO 28/5 and DIO 28/2 data alignment"
+    },
+    {
+      "mutation": "Use one lane for all dummy phases",
+      "expected_failures": "DIO and QIO backing bytes"
+    },
+    {
+      "mutation": "Ignore CTRL builtin READ opcode",
+      "expected_failures": "Builtin non-slow data alignment when dummy phase is forwarded"
+    },
+    {
+      "mutation": "Always insert stale dummy length",
+      "expected_failures": "Slow read with USER.DUMMY cleared"
+    },
+    {
+      "mutation": "Do not select existing NOR byte-dummy-cycles interface",
+      "expected_failures": "Fast/output and I/O read alignment; QE-off output control"
+    },
+    {
+      "mutation": "Return hard-coded 0x8f8f or zero from DPORT",
+      "expected_failures": "Reset, full-value writes, unrelated bits, clears and SDK RMW mask progression"
+    }
+  ],
+  "limitations": [
+    "Source preparation is not execution validation",
+    "SSI remains byte-oriented and analog input latency is not modeled",
+    "New DPORT backing state does not implement Wi-Fi RF or calibration",
+    "All production boot, audio, radio, network, performance and physical qualification remains false"
+  ]
+}

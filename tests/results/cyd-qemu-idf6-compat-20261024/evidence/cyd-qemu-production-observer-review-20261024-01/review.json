@@ -1,0 +1,63 @@
+{
+  "schema": "production-observer02-independent-source-review-v1",
+  "readiness_sha256": "c7d2bf870552c6de44c27f87fe1b6ca19b42fc60b857bc3acf3ccf000f453fba",
+  "controller_sha256": "dea7385425b2a05a0d57f769bafb84a00b8dc528ea45681ba190de0391722d7b",
+  "source_closure_sha256": "ed0d0924e2235a13c92e940b61f52fa9e183195f193639a77418a2799a701f6f",
+  "counts": {
+    "indexed_members": 7,
+    "physical_members": 8,
+    "exact_source_origins": 3,
+    "original_source_evidence_rows": 18,
+    "selected_profile_file_rows": 13,
+    "original_tool_rows": 4,
+    "AST_sources_parsed": 1
+  },
+  "findings": [],
+  "checks": {
+    "ordinary_stdlib_only_no_predecessor_import_or_rebinding": true,
+    "true_unbuffered_os_read_EOF": true,
+    "incomplete_JSON_or_reader_error_rejected": true,
+    "actual_reader_join_required": true,
+    "forced_stdout_closure_cannot_complete": true,
+    "owned_stdio_QMP_without_sockets": true,
+    "UUID_query_name_before_trace_and_cont": true,
+    "all_six_selected_events_checked_disabled_then_enabled": true,
+    "other_m25p80_events_required_disabled": true,
+    "command_and_transfer_trace_records_required": true,
+    "real_exit_zero_and_exact_single_SHUTDOWN_required": true,
+    "host_quit_ack_required_if_requested": true,
+    "natural_guest_reset_and_host_quit_kept_distinct": true,
+    "original_production_input_bytes_and_offsets_retained": true,
+    "original_emulator_pin_retained_and_new_executable_pin_explicit": true,
+    "all18_source_evidence_rows_checked_before_and_after": true,
+    "runner_and_source_origins_checked_before_and_after": true,
+    "scratch_flash_snapshot_unchanged_required": true,
+    "five_original_startup_marker_meanings_retained_for_PDM": true,
+    "observation_completion_separate_from_boot_and_physical_qualification": true,
+    "no_host_NIC_or_audio_backend": true,
+    "no_production_hardware_configuration_change": true
+  },
+  "limits": {
+    "observation_window_seconds": 20,
+    "panic_grace_seconds": 3,
+    "per_artifact_bytes": 33554432,
+    "artifact_limit_is_polled_soft_stop_not_hard_truncation": true,
+    "terminal_artifact_overshoot_is_rejected": true,
+    "final_process_wait_seconds": 5,
+    "final_reader_join_seconds": 3,
+    "new_executable_hash_not_invented": true,
+    "new_rebuild_success_not_verified_by_this_source_review": true
+  },
+  "not_qualified": [
+    "actual controller execution",
+    "new emulator build outcome or executable identity before root supplies actual SHA",
+    "startup success",
+    "physical audio or networking",
+    "full radio or performance",
+    "deferred codec work"
+  ],
+  "prepared_modules_imported": false,
+  "prepared_functions_executed": false,
+  "guest_compiler_SDK_QEMU_Git_or_tests_executed": false,
+  "verdict": "SOURCE REVIEW PASS for this bounded diagnostic observer. Actual new-executable provenance and one root-owned run remain required; OBSERVATION_COMPLETED must not be reported as boot PASS."
+}

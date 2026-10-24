@@ -1,0 +1,80 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:1
+load:0x3fff0040,len:5380
+load:0x40078000,len:16216
+load:0x40080400,len:3800
+entry 0x400805e0
+I (1267) cpu_start: Multicore app
+I (3180) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (3186) cpu_start: Pro cpu start user code
+I (3186) cpu_start: cpu freq: 240000000 Hz
+I (3187) app_init: Application information:
+I (3188) app_init: Project name:     yoradio_cyd2usb_native
+I (3189) app_init: App version:      v0.9.693-1940-g3a563324a
+I (3189) app_init: Compile time:     Oct 20 2026 17:04:29
+I (3190) app_init: ELF file SHA256:  1a7a09139...
+I (3190) app_init: ESP-IDF:          v6.0.2
+I (3191) efuse_init: Min chip rev:     v0.0
+I (3191) efuse_init: Max chip rev:     v3.99 
+I (3191) efuse_init: Chip rev:         v0.0
+I (3192) heap_init: Initializing. RAM available for dynamic allocation:
+I (3193) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (3194) heap_init: At 3FFC2868 len 0001D798 (117 KiB): DRAM
+I (3194) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (3194) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (3194) heap_init: At 40098818 len 000077E8 (29 KiB): IRAM
+I (3225) spi_flash: detected chip: gd
+I (3234) spi_flash: flash io: qio
+I (3250) main_task: Started on CPU0
+I (3254) main_task: Calling app_main()
+I (3254) yoradio_native: Starting pure ESP-IDF yoRadio (Arduino-free)
+I (3768) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (6969) display: ST7789: SPI2 DMA, 80000000 Hz, double 320x16-row buffers
+I (7024) wifi:wifi driver task: 3ffcd654, prio:23, stack:3584, core=0
+I (7060) wifi:wifi firmware version: 00ad238
+I (7063) wifi:wifi certification version: v7.0
+I (7063) wifi:config NVS flash: enabled
+I (7063) wifi:config nano formatting: disabled
+I (7063) wifi:Init data frame dynamic rx buffer num: 32
+I (7063) wifi:Init static rx mgmt buffer num: 5
+I (7066) wifi:Init management short buffer num: 32
+I (7066) wifi:Init dynamic tx buffer num: 32
+I (7067) wifi:Init static rx buffer size: 1600
+I (7067) wifi:Init static rx buffer num: 10
+I (7068) wifi:Init dynamic rx buffer num: 32
+I (7071) wifi_init: rx ba win: 6
+I (7071) wifi_init: accept mbox: 6
+I (7071) wifi_init: tcpip mbox: 32
+I (7071) wifi_init: udp mbox: 6
+I (7073) wifi_init: tcp mbox: 10
+I (7073) wifi_init: tcp tx win: 5760
+I (7073) wifi_init: tcp rx win: 11520
+I (7073) wifi_init: tcp mss: 1440
+I (7073) wifi_init: WiFi IRAM OP enabled
+I (7073) wifi_init: WiFi RX IRAM OP enabled
+W (10442) network: Active Wi-Fi profiles unavailable: ESP_ERR_NOT_FOUND
+I (10453) phy_init: phy_version 4863,a3a4459,Oct 28 2025,14:30:06
+W (10453) phy_init: failed to load RF calibration data (0x1102), falling back to full calibration
+Guru Meditation Error: Core  0 panic'ed (LoadStorePIFAddrError). Exception was unhandled.
+
+Core  0 register dump:
+PC      : 0x40178e64  PS      : 0x00060b30  A0      : 0x801a7377  A1      : 0x3ffcd3d0  
+A2      : 0x3f45da14  A3      : 0x3ffd5054  A4      : 0x00000002  A5      : 0x60033c00  
+A6      : 0x00000000  A7      : 0x00000000  A8      : 0x00000000  A9      : 0x3ffcd460  
+A10     : 0x00000000  A11     : 0x3ffcd4b0  A12     : 0x3ffcd490  A13     : 0x0000000c  
+A14     : 0x3ffb4124  A15     : 0x3f42097c  SAR     : 0x00000000  EXCCAUSE: 0x0000000f  
+EXCVADDR: 0x60033c00  LBEG    : 0x4000c2e0  LEND    : 0x4000c2f6  LCOUNT  : 0xffffffff  
+
+
+Backtrace: 0x40178e61:0x3ffcd3d0 0x401a7374:0x3ffcd4d0 0x401a745a:0x3ffcd500 0x401c4aa1:0x3ffcd520 0x4018d311:0x3ffcd540 0x4018dc73:0x3ffcd560 0x4018ba82:0x3ffcd580 0x4009278d:0x3ffcd5a0
+
+
+
+
+ELF file SHA256: 1a7a09139
+
+Rebooting...
