@@ -279,7 +279,10 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 Найти full-image xrefs NETWORK/SLOW flags, `browser_time`, `clickCount` и JPEG
 flash-output branch. Не придумывать функционал по неиспользуемому полю и не
 объявлять ветку мёртвой по отсутствию caller в выбранном экспорте.
-Исправить устаревшую навигацию symbol-map/reference/organizer. Расширять полные
+Навигация symbol-map/reference/organizer исправлена2026-10-24:176явных function
+links,74исправленных module summaries, original pseudocode bodies сохранены,
+13existing inventory controls и reject-before/idempotent-after проверки pass.
+Это не закрывает полноту образа или неизвестные indirect calls. Расширять полные
 кадры на цвета/яркость, длинные поля и переходы тем; известные factory corrections
 документировать, не скрывать несовпадения масками.
 

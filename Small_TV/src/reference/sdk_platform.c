@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: ESP-IDF / libc (not ported).
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: lwip_socket; entry: ram:4201ab6e; name: lwip_socket

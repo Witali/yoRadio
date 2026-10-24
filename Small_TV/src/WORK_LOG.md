@@ -4230,3 +4230,20 @@ network lifecycle/churn, whole-image/full/24h/hardware остаются в пл�
 Offline verifier повторно проверил source/frame/journal, целый diagnostic из RAM,
 heap/task fields и factory baseline oracle. Full4parts в этот accepted proof не
 включены: они пока работают; окончательные результаты сохранять после terminal.
+
+## 2026-10-24 — исправлены ссылки на разделённые модули
+
+74из176symbol-map module summaries указывали старые файлы. Теперь точные
+native_targets берутся из reviewed correspondence; file summary выводится из
+них.16reference headers направляют к per-function mapping. Organizer умеет
+--refresh-navigation без регенерации псевдокода и не придумывает файл для новых
+непроверенных адресов. Audit отвергает старую навигацию и pins обоих tools.
+
+До исправления реальный audit падает на0x4200826a/native_module. После — pass,
+повторный refresh idempotent;13existing controls pass. Тела/имена/calls176reference
+функций побайтно/по SHA сохранены; длина header может сдвинуть line numbers.
+Inventory176/219/535, production app9C1A83BD и ELF76B5CE37 прежние. Запущенные
+JPEG ВМ продолжают свои неизменённые workloads. Полнота factory image, indirect
+callbacks, flags и остальные проверки плана этим не закрываются.
+Before/after, SHA/call tables, original rejection и13-test log сохранены в
+reference-navigation-validation-20261024.json с compressed raw metadata.

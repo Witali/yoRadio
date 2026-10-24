@@ -55,9 +55,28 @@ def inputs(root: Path) -> dict[str, str]:
     paths.update(root/name for name in ('symbol-map.json', 'CMakeLists.txt', 'build.ps1',
                  'sdkconfig.defaults', 'partitions.csv', 'tools/prepare_resources.py',
                  'tools/prepare_timezones.py', 'tools/build_jpeg_library.py', 'tools/jpeg_cache_layout.py',
-                 'tools/jpeg_guard_layout.py', 'tools/jpeg_storage_layout.py', 'cmake/debug_logging.cmake'))
+                 'tools/jpeg_guard_layout.py', 'tools/jpeg_storage_layout.py',
+                 'tools/audit_correspondence.py', 'tools/organize_decompilation.py', 'cmake/debug_logging.cmake'))
     return {p.relative_to(root.parent).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(paths)}
+
+
+def reconstruction_targets(row: dict) -> dict:
+    """Derive navigation from reviewed function links, never a category guess."""
+    targets = list(row['native'])
+    modules = sorted({target.split('#', 1)[0] for target in targets})
+    return dict(native_module=' + '.join(modules) if modules else 'ESP-IDF / libc (not ported)',
+                native_targets=targets)
+
+
+def check_navigation(symbols: dict, manifest: dict) -> None:
+    """Reject stale file summaries even when the function inventory is valid."""
+    reviewed = {row['address']: row for row in manifest['factory']}
+    for key in ('native_module', 'native_targets'):
+        for symbol in symbols['functions']:
+            expected = reconstruction_targets(reviewed[symbol['address']])
+            if symbol.get(key) != expected[key]:
+                raise ValueError('Stale reconstruction navigation: '+symbol['address']+' '+key)
 
 
 def audit(root: Path, manifest: dict) -> dict:
@@ -132,6 +151,7 @@ def audit(root: Path, manifest: dict) -> dict:
     reference = '\n'.join(path.read_text(encoding='utf-8') for path in sorted((root/'reference').glob('*.c')))
     missing_calls = sorted(set('0x'+a for a in re.findall(r'\bFUN_ram_([0-9a-f]{8})\s*\(', reference))-
                            set(exported))
+    check_navigation(symbols, manifest)
     return dict(schema=1, passed=True, semantic_equivalence_proved=False,
                 factory_export_functions=len(original), factory_dispositions=dict(Counter(r['status'] for r in original)),
                 native_source_functions=len(indexed), native_app_functions=sum(r['symbol'].startswith('app/') for r in indexed),

@@ -2944,3 +2944,25 @@ from accepted evidence until they terminate; don't capture a live backing as
 terminal output. Current owned VM locators: part0 PID4920 SmallTV-d66e31d2e749;
 part1 PID21724 SmallTV-f83944d60067; part2 PID36888 SmallTV-fef47653c41e;
 part3 PID28724 SmallTV-5f583294c6f3. Validate handles/process identity on resume.
+
+## CHECKPOINT 2026-10-24 — stale reference navigation repaired
+
+symbol-map native_module was still guessed from a broad category.74of176module
+summaries were stale (e.g glyph ->SPI driver, classic ->dispatcher only). It now
+contains exact native_targets and derives file summaries from reviewed factory
+rows. All16reference headers link there. Organizer --refresh-navigation preserves
+the decompiled function bodies/names/calls; default export also uses the reviewed
+links, and newly discovered addresses stay explicitly unreviewed. Audit rejects
+stale navigation and pins both tools. Before fails at0x4200826a native_module;
+after passes, refresh idempotent,13existing omission controls pass. Library/app
+source inventory176/219/535 unchanged. Header line numbers can shift; function
+body SHA/name/calls are unchanged. Historical misleading aliases remain documented.
+
+Only navigation and review metadata changed; app/ELF/codec/layout remain fixed.
+The four JPEG VM inputs do not include these navigation files; do not restart
+them. Earlier pilot proof e5d708b49 is bound to pre-refresh review metadata and
+must be replayed at that revision (or with its archived source view), not claimed
+to pin today's updated comments/map. The current app bytes are identical.
+Whole-image xrefs/indirect callbacks/flags and other plan items remain open.
+Proof qemu/parity/reference-navigation-validation-20261024.json retains old map,
+old/new function SHA/call tables, actual rejection, current inventory and13-test log.

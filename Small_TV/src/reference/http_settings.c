@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/web/settings_api.c.
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: http_restart_at_4200d34a; entry: ram:4200d34a; name: http_restart_at_4200d34a

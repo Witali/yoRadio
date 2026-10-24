@@ -104,12 +104,19 @@ host, RV32 linked. В UI inventory ещё не входит. См.
    включает pull-up, наша оставляет их выключенными. Кадры в QEMU не проверяют
    электрическое состояние при старте/reset. Без проверки не считать эту разницу
    ни доказанной поломкой, ни доказанной эквивалентностью.
-5. **STALE-MAP, устаревшая навигация.** `symbol-map.json.native_module`,
-   заголовки reference и старый `organize_decompilation.py` указывают файлы до
-   разделения модулей. Пользоваться новой картой конкретных функций.
+5. **STALE-MAP, исправлена навигация2026-10-24.** Все176записей
+   `symbol-map.json.native_module/native_targets` берутся из проверенной карты
+   конкретных функций;74старых module summaries были неверны. Заголовки reference
+   теперь указывают на эти per-function links, а organizer имеет
+   `--refresh-navigation` без повторного создания псевдокода. Тела/имена/calls
+   всех176reference functions сохранены; header length может сдвинуть line numbers.
+   Audit проверяет навигацию и хеши обоих tools,13existing controls pass.
+   Это не новые claims semantic equivalence/full-image completeness.
    `send_http_json_number` в действительности заменяет `{{STATE}}` в HTML;
    `draw_large_digit` рисует температурную единицу; `load_animation_frame_table`
-   также выбирает и рисует кадр. Адреса надёжнее этих старых названий.
+   также выбирает и рисует кадр. Это сохранённые исторические Ghidra aliases;
+   для назначения пользоваться адресами и конкретными native_targets.
+   [Before/after и сохранённые проверки](../../qemu/parity/reference-navigation-validation-20261024.json).
 
 ## Обратная проверка
 
