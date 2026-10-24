@@ -3407,7 +3407,7 @@ before H10. Whole-image xref audit, SDK I/O/allocation/NVS-internal/electrical
 publication faults, full current regression, known CYD IDF6 PHY assert and
 hardware H01-H09 remain open. Goal not complete/blocked/paused.
 
-## CURRENT 2026-10-24 — current-image churn passed; one H10 is live
+## Checkpoint 2026-10-24 — runtime qualification (newer CURRENT below)
 
 Goal remains active and unbounded, no blocker or physical actions/push. Prior
 turn progress677defd qualified stalled-peer/combined loss and QEMU21a8d6dd8c.
@@ -3476,3 +3476,78 @@ root SDK. Do not overwrite frozenD64 or edit live-H10 pinned weather/time/runtim
 helpers; use an appropriate isolated snapshot or defer changes until it ends.
 Actual SDK I/O/allocation/NVS-internal/electrical publication faults and hardware
 H01-H09 still open. Goal not complete, blocked or paused.
+
+## CURRENT 2026-10-24 — complete-database xref inventory; H10 still live
+
+Previous goal turn was PROGRESS: deda58625 qualified current-image runtime,
+00096f882 candidate selection,677defd99 stalled-peer tests/QEMU21a8d6dd8c.
+This turn is PROGRESS, no blocker; broad goal remains active/unbounded.
+New independent reverse tools/typed evidence, no native firmware/SDK/QEMU
+source changes and no physical actions or push. Root/main untouched.
+
+New files tools/reverse/ExportFactoryXrefs.java, tools/audit_factory_xrefs.py,
+tests/factory_xrefs_test.py. Java reads existing Ghidra12.0.4 project SmallTV
+(.build/small-tv-reverse/ghidra-project on dependency root), -readOnly -noanalysis.
+5140 analysed functions,286384 instructions; full GNU executable-section stream
+287952 records. Actual immutable factory ELF SHA8C9FD166; all5 initialized payload
+blocks/ELF metadata and17215 code references checked. Also475literal data pointers and3metadata refs
+match actual four-byte values; the synthetic Entry Point matches ELF entry. GNU canonical map SHA
+67f4f41f9e2e5f398e7dcee65f4ca854d810e6ad4ed3efe010c5dff05fb7b81f.
+
+GP startup AUIPC/ADDI4038046c/40380470 derives3fcb49c0. Existing Ghidra refsTo
+browser active3fcb41f0(gp-2000) empty, but four actual memory instructions exist:
+4200ee60 WRITE1,4200ee6c READ1,4200eef8 WRITE1,4200efd2 WRITE1. Owners GETsettings
+4200ee02/POSTsettings4200ef62. Stored browser3fcb7d14 has2READ+3WRITE. NETWORK
+3fcc39f0 onlyknownWRITE42008356; SLOW3fcc39f4 onlyknownWRITE42008382; click3fcc3a90
+onlyknownWRITE4200ec0c. JPEG flag3fcc3a6c READ4200c432/zeroWRITE4200c54c. Do not
+infer whole-program deadness or add/remove app behavior based only on this.
+Bulk settings I/O/computed aliases still open. Timer callback pointer42008468,
+JPEG output callback param4200c50c, app_main caller420b1e70 in420b1e4e recorded.
+
+393 Ghidra GP integer memory instructions vs396GNU. Real omitted sites:
+42058280 READ32 3fcb4858;420662da READ32 same;420757d2 READ8 3fcb4b0c. These are
+explicit database_gp_gaps, gp_coverage_agrees=false, not suppressed mismatches.
+Crosschecker intentionally rejects any NEW gap until reviewed; known gaps are
+profile facts, not completeness acceptance. Current Ghidra DB has 4964RAM
+functions outside selected export;1162pointer candidate edges/772targets outside
+export. No new found pointer targets in review window4200826a..42011040 outside
+176, but window is not a proven whole-application boundary.3327computed-call
+EDGES (not necessarily distinct call instructions) remain for reachability audit.
+
+Proof full-image-xrefs-validation-20261024.json:7gzip payloads/361910bytes. Raw
+Ghidra address graph +audit+Java/Python/test/symbol-map snapshots and sessionmeta.
+No full dump/ELF/DROM data/VMflash/RAM/UART. GNU14MB text stays ignored at
+.build/factory-all-executable-20261024.asm, can regenerate via local objdump.
+Replay factory_xrefs_test.py --proof ... --elf C:/Work/yoRadio/.build/small-tv-
+reverse/factory-analysis.elf --assembly .build/factory-all-executable-20261024.asm
+passed,9actual-report negative controls rejected. All three semantic/full-image/
+physical claims false. Source revision replay currently needs matching source
+checkout/snapshots; no --source-revision option in this new tool yet.
+
+Local .build/full-image-xrefs-20261024: initialghidra-refs.json had0xram: format;
+v2 script failed on EXTERNAL refs despite headless exit0; v3 repaired namespaces;
+v4 adds GP instruction export and is acceptance. Preserve prototypes, do not
+mix them with v4. audit-final4.json is final core report, controls-final2.json
+records final positive/9controls; committed archive replay reruns
+all9 with final sources. archive.py regenerates proof; replaced draft payloads
+are ignored under replaced-evidence. Ghidra native jobs all terminal, no GUI.
+Docs reference/FULL_IMAGE_XREFS.md +BIDIRECTIONAL_AUDIT/plan/markers/worklog updated.
+
+ONE H10 STILL LIVE: see preceding runtime checkpoint for full preservation rules.
+Run .build/runtime-h10-current-20261024, supervisor34280/workload34996/guard13180/
+VM1512 SmallTV-dc56f2b7a572. Host CIM verified same creation times twice this turn;
+last observed42cycles, oneROMboot/no guarderrors. Requested86400guestseconds,
+interval15,outageEvery60. Pending, not terminal. Never restart it on polling
+failure, never open second QMP/RSP, and do not edit its pinned runtime/weather/
+time helpers or rebuild/overwrite app/QEMU. Early start record is sibling
+.build/runtime-h10-current-20261024-start.json. After terminal use analyze_runtime
+with start record and allowed dependency/QEMU roots, as previous checkpoint.
+Sandbox Get-Process and qemu-system-* name filters cannot establish its liveness.
+
+NEXT independent work: inspect three GNU-only sites and their function boundaries/
+callers; classify SDK vs application callback/task/timer targets, then follow
+computed aliases. Could extend read-only Ghidra observation or use an isolated
+analysis copy, never edit original factory bytes or claim5140equalsall functions.
+Known CYD IDF6 PHY issue still open; separate full current network/display/suite,
+SDK I/O/allocation/NVS internal/electrical cuts and hardwareH01-H09 remain open.
+All full plan requirements persist; goal not complete/blocked/paused.

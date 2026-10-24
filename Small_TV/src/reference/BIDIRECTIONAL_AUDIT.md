@@ -120,6 +120,12 @@ host, RV32 linked. В UI inventory ещё не входит. См.
 
 ## Обратная проверка
 
+Дополнение2026-10-24: выполнен адресный поиск по полной существующей базе
+Ghidra (5140functions), с независимой сверкой ELF/GNU и 396GP accesses.
+Восстановлены четыре ранее неиндексированных обращения рабочего `browser_time`.
+Три GNU участка отсутствуют в базе; полнота остаётся недоказанной. См.
+[FULL_IMAGE_XREFS.md](FULL_IMAGE_XREFS.md) и сохранённый proof с9negative controls.
+
 - Отдельные timer/photo/GIF, UI, UTF-8, цвета, JSON/body, raw settings и
   mutex/atomic helpers реализуют разделение по назначению. Отношение функций
   один-к-одному здесь не требуется.

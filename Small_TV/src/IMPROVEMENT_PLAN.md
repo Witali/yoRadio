@@ -364,6 +364,17 @@ links,74исправленных module summaries, original pseudocode bodies с
 кадры на цвета/яркость, длинные поля и переходы тем; известные factory corrections
 документировать, не скрывать несовпадения масками.
 
+Full-image xrefs checkpoint24Oct: 5140knownGhidrafunctions/17215code refs сверены
+с исходным ELF; GNU287952records/396GP memory accesses,393изних естьвбазе.
+У browser_time восстановлены4обращениячерезgp, прежний DBxref былпуст.
+NETWORK/SLOW/clickCount/JPEGflag directrefs и1162pointercandidates учтены;
+триGNUsites42058280/420662da/420757d2 пропущеныбазой иявносохраненыкакgaps.
+475literal function pointers и3metadata refs также совпали с bytes ELF.
+Proof full-image-xrefs-validation-20261024.json,9negativecontrols pass.
+См. [FULL_IMAGE_XREFS.md](reference/FULL_IMAGE_XREFS.md). Инвентаризациярасширена;
+computed aliases, границыпропущенныхfunctions, task/timer registrations иполная
+достижимостьостаютсяоткрытыми. Полнотаобраза/semantic equivalence не заявлены.
+
 ## 6. Приёмка окончательной версии и правила работы
 
 Для завершённого исправления — focused commit, failing test и проверка исправления,

@@ -4484,3 +4484,47 @@ App9C1A83BD/ELF76B5CE37/QEMUa5be14c5 иproducer c8c77409 неизменны. Э�
 запуск; результатpending. Earlystartcapture/живость уточняютсявCURRENT notes.
 Общийпланостаётсяактивным,fullnetwork/display/fullsuite/CYD-PHY/audit/hardware
 остаютсянезавершёнными. Нельзя переноситькороткийpass на24h.
+
+## 2026-10-24 — ссылки полной базы Ghidra и пропущенные GP accesses
+
+Предыдущий goal turn дал progress: исправление AP bridge QEMU, commits
+677defd99/00096f882/deda58625 и запуск H10. В начале текущего продолжения
+Windows CIM подтвердил живость тех же supervisor/workload/guard/VM; результат
+H10 остаётся pending, повторный запуск и второй debugger не использовались.
+
+Добавлен read-only ExportFactoryXrefs.java и отдельный audit_factory_xrefs.py.
+Экспорт полной существующей базы: 5140 функций, 286384 инструкции, 1162
+кандидата указателей. GNU из всех 3 executable sections дал 287952 records;
+17215 code references и все разобранные instruction bytes совпали с ELF8C9F.
+Дополнительно475literal function pointers и3metadata refs совпали с данными ELF;
+synthetic Entry Point согласован с ELF entry.
+Проверены также SHA пяти initialized payload blocks и ELF metadata. Full raw
+flash/ELF/DROM data не копировались в новый архив. Исходная база readOnly,
+noanalysis; production app, SDK и QEMU source/binary не изменены.
+
+Startup bytes дают gp=3fcb49c0. Обычная база не индексировала рабочий
+browser_time по3fcb41f0; найдены четыре реальные GP-relative инструкции в
+GET/POST settings: 3 WRITE и1 READ. У NETWORK/SLOW иclickCount прямые чтения
+не найдены; JPEG flag имеет READ в callback и zero WRITE в draw_jpeg. Это не
+доказательство отсутствия computed aliases, поэтому функции/поля не удалялись
+и новый функционал из этих полей не придумывался.
+
+GNU видит396 GP integer load/store, Ghidra393. Сохранены реальные пробелы
+42058280/420662da/420757d2, а не искусственное согласие двух инструментов.
+Whole-image completeness и semantic equivalence остаются false. В окне
+4200826a..42011040 нет новых найденных pointer targets вне выбранного экспорта;
+772 targets вне экспорта по всему образу требуют классификации, многие могут
+быть SDK. Scope не приравнивает окно просмотра ко всей application boundary.
+
+Replay полного адресного архива и 9 negative controls pass. Proof
+full-image-xrefs-validation-20261024.json:7payloads/361910gzipbytes. Есть raw
+address export, audit, producer snapshots, symbol map и typed session metadata.
+Полный14MB GNU текст остаётся в ignored .build и воспроизводится из ELF;
+canonical instruction-map SHA67F4F41F сохранён. Ошибки первых прототипов (ram:
+в numeric addresses и External namespace) исключены из приёмки и оставлены
+локально. Ghidra code0 при Java error не считался успехом. Нельзя считать этот
+inventory proof доказательством всей программы. Детали FULL_IMAGE_XREFS.md.
+
+H10 повторно подтверждён на тех же4 живых процессах; наблюдалось42 завершённых
+цикла, один ROM boot, guard без ошибок. Это продолжающийся тест, не pass24h.
+Общий план активен; новые изменения сохраняются focused commit, push нет.
