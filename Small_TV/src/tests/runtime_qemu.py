@@ -28,6 +28,7 @@ def main():
     parser.add_argument('--yoradio', type=Path, required=True)
     parser.add_argument('--dependency-root', type=Path, help='Shared SDK/ROM/oracle packages for an isolated worktree')
     parser.add_argument('--qemu-root', type=Path, default=Path('C:/Work/QEMU-ESP32'))
+    parser.add_argument('--qemu', type=Path, help='Explicit candidate executable; preserve the tool bundle')
     parser.add_argument('--output', type=Path, required=True)
     length = parser.add_mutually_exclusive_group()
     length.add_argument('--cycles', type=int)
@@ -88,12 +89,14 @@ def main():
         'components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos/portmacro.h')]
     files += [args.qemu_root / 'tools' / name for name in
               ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'small_tv_display.py', 'esp_elf.py')]
-    executable = args.qemu_root / 'bin/qemu-system-riscv32.exe'
+    # FIXED_TEST: qualify a candidate without replacing the frozen tool bundle's binary.
+    executable = (args.qemu or args.qemu_root / 'bin/qemu-system-riscv32.exe').resolve()
     files.append(executable)
     inputs = {str(path.resolve()): digest(path) for path in files}
-    result = {'schema_version': 4, 'passed': False, 'all_functionality_verified': False,
+    result = {'schema_version': 5, 'passed': False, 'all_functionality_verified': False,
               'scope': __doc__, 'native_elf_sha256': layout['elf_sha256'],
-              'app_sha256': digest(app), 'qemu_sha256': digest(executable), 'cycles_requested': args.cycles,
+              'app_sha256': digest(app), 'qemu_sha256': digest(executable),
+              'qemu_executable': str(executable), 'cycles_requested': args.cycles,
               'duration_requested_guest_seconds': args.duration_seconds,
               'interval_guest_seconds': args.interval_seconds,
               'outage_every_cycles': args.outage_every, 'outage_guest_seconds': args.outage_seconds,

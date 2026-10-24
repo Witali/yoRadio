@@ -7,6 +7,7 @@
 param(
     [Parameter(Mandatory)][string]$YoradioRoot,
     [Parameter(Mandatory)][string]$QemuRoot,
+    [string]$QemuExecutable,
     [Parameter(Mandatory)][string]$OutputDirectory,
     [string]$DependencyRoot = $YoradioRoot,
     [ValidateRange(0,100000)][int]$Cycles = 0,
@@ -70,6 +71,8 @@ try {
         '--qemu-root', $QemuRoot, '--output', $OutputDirectory,
         '--interval-seconds', $IntervalSeconds.ToString([Globalization.CultureInfo]::InvariantCulture),
         '--outage-every', "$OutageEvery", '--outage-seconds', '1') + $length
+    # FIXED_TEST: pass a candidate by its own path, leaving frozen tools untouched.
+    if ($QemuExecutable) {$arguments += @('--qemu', [IO.Path]::GetFullPath($QemuExecutable))}
     $workload = Start-Child $arguments 'workload'
     $state.workload_pid=$workload.process.Id
     $state.workload_started_utc=$workload.process.StartTime.ToUniversalTime().ToString('o')

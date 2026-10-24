@@ -4440,3 +4440,22 @@ Offline proof network-stalled-peer-validation-20261024.json:57raw/44payloads,
 before failure сохранён как passed=false. Full flash/RAM/UART не копируются.
 См. tests/NETWORK_STALLED_PEER.md. Общий план, длительный churn/soak, full network,
 fullsuite/24h/hardware и остальные пункты остаются открытыми. Push не выполнялся.
+
+## 2026-10-24 — выбор отдельного QEMU для runtime-проверок
+
+runtime_qemu.py принимает --qemu, PowerShell launcher/supervisor передают
+-QemuExecutable. Default binary path сохранён, frozenD64 не заменяется. Schema5
+связывает конкретный candidate path с pinned inputs/SHA; auditor сохраняет
+schema3/4 и все weather checks. Новый negative test отвергает неприкреплённый
+кандидат, неверный SHA и start record другой сборки. 25analysis/16memory/4ROM/
+6clock-journal/8weather tests pass (59); PowerShell parsing pass. Первый запуск
+unit tests упёрся в sandbox TEMP ACL; с task TEMP внутри .build все25pass,
+изменение самих тестовых критериев не потребовалось.
+
+На неизменённом native9C1A83BD/ELF76B5CE37 и QEMU A5BE14C5 прошёл supervised
+preflight4cycles/2outages:22.569796guest s, actual weather, photos/HTTP/themes,
+terminal workload/guard/supervisor0, exact inputs unchanged. Local audit_run
+проверил journal/UART/ROM counters/guard; всеchild/VM завершены. Это неH10.
+Изменённый detached launcher запустил отдельный40cycle/20outage run churn-40;
+его результат ещё pending и не считается приёмкой. Early start record сохранён
+при completed_cycles0. Production/SDK/physical не менялись, push не выполнялся.
