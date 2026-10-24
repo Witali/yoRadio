@@ -76,9 +76,15 @@ verifier: [JPEG_WRITE_BUDGET.md](tests/JPEG_WRITE_BUDGET.md).
 CMYK12progressive/lossless-gray16, write-limit/source-slot/SOF5 refusals и3реальных
 успешных recovery. Saved-byte checker пересчитывает physical source/frame/journal,
 полный diagnostic из RAM и task/heap measurements; observed worker margin5012.
-Полный корпус70 выполняется4independent parts18/18/17/17. Пока все части не
-terminal pass и union не проверен, это не полный target matrix pass. Faults/
-publication cuts, lifecycle/churn, whole-image/full/24h/hardware остаются открытыми.
+Полный корпус70 завершён4independent parts18/18/17/17: всеexec0/VMreaped,
+union70/92workflows independently verified.48primary pixels exact,17finishrefusals,
+5sourceadmissionrefusals и22successful immediate recoveries.192physical images/
+174RAM snapshots подтверждают source/frame/journal и returneddiagnostic/task/heaps.
+Worker untouched5012/8192; pool47983max observed/context4984, heap-minima sum
+lowerbound15468 не является simultaneous whole-app peak. Два losslessRGB6/CMYK6
+вектора превышают source slot: меньшие fixtures для исполнения этих путей ещё
+нужны. Current actual I/O/allocation faults, publication cuts, lifecycle/churn,
+whole-image/full/24h/hardware остаются открытыми.
 
 Checkpoint 2026-10-23: реальные upload/UI используют общего владельца codec и
 проверенный RGB565 cache. Фоновая очередь и SDK async HTTP освобождают HTTP task;

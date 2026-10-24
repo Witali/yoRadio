@@ -1,16 +1,19 @@
 """Replay archived production JPEG format/RAM evidence without launching a VM."""
 import argparse
+from collections import Counter
 import gzip
 import json
 from pathlib import Path
 
 from photo_format_matrix_contract import validate,sha
 from photo_format_matrix_qemu import fixtures,factory_pixels
+from verify_jpeg_clock_evidence import protected
 
 
 def verify(path,root):
     """Reconstruct all saved physical images and validate independent format oracles."""
     proof=json.loads(path.read_text());assert proof['passed'] and not proof['all_functionality_verified']
+    assert proof['schema_version'] in (1,2)
     assert not proof['physical_hardware_tested'] and not proof['network_acceptance'] and not proof['lcd_acceptance']
     blobs={}
     for row in proof['blobs']:
@@ -22,15 +25,20 @@ def verify(path,root):
     for row in proof['raw']:
         assert row['source'] not in raw;raw[row['source']]=blobs[row['sha256']]
     base=blobs[proof['flash_base_sha256']];assert len(base)==0x400000
-    images={}
+    images={};resolved={proof['flash_base_sha256']:base}
     for row in proof['images']:
-        data=bytearray(base);previous=-4096
+        # Schema2 bases are earlier complete images: reject cycles/forward refs.
+        if proof['schema_version']==2:assert 'base_sha256' in row
+        parent=row.get('base_sha256',proof['flash_base_sha256'])
+        assert parent in resolved and len(resolved[parent])==0x400000
+        data=bytearray(resolved[parent]);previous=-4096
         for sector in row['sectors']:
             offset=sector['offset'];payload=blobs[sector['sha256']]
             assert len(payload)==4096 and offset%4096==0 and previous<offset<=len(data)-4096
             data[offset:offset+4096]=payload;previous=offset
         key=row['profile'],row['when'];assert key not in images and sha(data)==row['sha256']
         images[key]=bytes(data)
+        resolved[row['sha256']]=images[key]
     corpus,rows,_=fixtures();oracles={r['name']:r for r in rows}
     reports=[json.loads(raw[r['prefix']+'/report.json']) for r in proof['runs']]
     if any(row['name']=='rich-baseline-8.jpg' for report in reports for row in report['cases']):
@@ -50,6 +58,13 @@ def verify(path,root):
         assert prepared['rom']['elf_sha256']==proof['rom_elf_sha256']
         app=next(row for row in prepared['sources']['images'] if row['file']=='app.bin')
         start=int(app['offset'],0);assert sha(images[name,'before'][start:start+app['bytes']])==proof['app_sha256']
+        if proof.get('stopped_process_images'):
+            owned=[*plan['backing']['extents'],*plan['metadata']['extents'],*plan['caches'][4]['extents']]
+            mutable=([(0x9000,0xf000),(0x3e7000,0x3e8000),(0x264000,0x27d000)]+
+                [(r['offset'],r['offset']+r['bytes']) for r in owned])
+            protected(images[name,'before'],images[name,'after'],mutable)
+            last=report['cases'][-1]
+            assert images[name,'after']==images[name+'/'+last['directory'],'after']
         summaries.append(validate(report,corpus,oracles,plan,json.loads(read('resource-layout.json')),
             json.loads(read('diagnostic-layout.json')),read))
         covered += [r['name'] for r in report['cases'] if 'recovery_for' not in r]
@@ -57,6 +72,21 @@ def verify(path,root):
         assert not any(s in uart for s in (b'Guru Meditation',b'assert failed',b'abort() was called',b'watchdog got triggered'))
     assert len(covered)==len(set(covered))==proof['corpus_vectors']
     assert (set(covered)==corpus.keys())==proof['complete_corpus']
+    if 'primary_outcomes' in proof:
+        outcomes=Counter();recoveries=0;workflows=0
+        keys={'flash-write-limit':'flash_write_limit','heap-headroom':'heap_headroom',
+            'backing-capacity':'backing_capacity','unsupported-jpeg':'unsupported',
+            'truncated-jpeg':'truncated','invalid-jpeg':'invalid'}
+        for report in reports:
+            workflows+=len(report['cases'])
+            for row in report['cases']:
+                if 'recovery_for' in row:recoveries+=1;continue
+                if row['start']['status']!=200:key='source_slot_limit'
+                elif row['finish']['status']==200:key='accepted'
+                else:key=keys[row['finish']['body'].split(';')[0]]
+                outcomes[key]+=1
+        assert dict(outcomes)==proof['primary_outcomes']
+        assert recoveries==proof['successful_recoveries'] and workflows==proof['workflows']
     for name,digest in proof['source_pins'].items():assert sha((root/name).read_bytes())==digest,name
     manifest=json.loads((root/'firmware/development/small-tv-esp32c2-reconstructed/manifest.json').read_text())
     assert manifest['elf_sha256']==proof['elf_sha256'] and manifest['source_sha256']==proof['source_sha256']

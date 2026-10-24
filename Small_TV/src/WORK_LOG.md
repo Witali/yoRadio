@@ -4247,3 +4247,28 @@ JPEG ВМ продолжают свои неизменённые workloads. По
 callbacks, flags и остальные проверки плана этим не закрываются.
 Before/after, SHA/call tables, original rejection и13-test log сохранены в
 reference-navigation-validation-20261024.json с compressed raw metadata.
+
+## 2026-10-24 — завершён полный70-vector current JPEG corpus
+
+Все4exec terminal0, четыре owned VM stopped/reaped. Independent aggregate
+проверил exact union70 без duplicates на одном app9C1A83BD/ELF76B5CE37/source7D95.
+92workflows:48primary accepted,17finish refusals,5source refusals,22successful
+immediate gray recoveries. Причины primary refusals:8write budget,5heap,
+1backing,1unsupportedSOF5,1truncated,1invalid и5source capacity. Program limit200KiB
+не ослаблен; source upload отдельно. Exact physical pixels/source/journal и
+nested diagnostic из RAM проверены независимо от HTTP status flags.
+
+Worker untouched5012/8192; observed pool max47983 +context4984отдельно. Сумма
+individual heap minima15468 — lowerbound, не simultaneous whole-app peak.
+192physical images и174RAM snapshots/raw logs/layouts сохраняются как
+jpeg-format-matrix-validation-20261024.json. Parent-image deltas уменьшают
+повторение неизменённого кода без потери какого-либо physical byte/SHA.
+
+Это приёмка корпуса, не всех возможных JPEG. LosslessRGB6/CMYK6 оказались больше
+source slot; для исполнения этих путей нужны меньшие дополнительные fixtures.
+Current actual I/O/allocation fault injection/publication cuts, network lifecycle/
+churn, whole-image/full/24h/hardware остаются открытыми. SDK/frozen QEMU/production
+firmware неизменны, physical/push нет. Цель всего плана остаётся активной.
+Schema2/3574sector references сохраняют full hashes и запрещают cycles/forward
+bases; новые compressed payloads около12.3MB. Числа primary outcomes и recoveries
+verifier заново считает из raw reports, не доверяя summary полям.

@@ -2966,3 +2966,32 @@ to pin today's updated comments/map. The current app bytes are identical.
 Whole-image xrefs/indirect callbacks/flags and other plan items remain open.
 Proof qemu/parity/reference-navigation-validation-20261024.json retains old map,
 old/new function SHA/call tables, actual rejection, current inventory and13-test log.
+
+## CURRENT 2026-10-24 — full seventy-vector JPEG corpus finished
+
+All four original handles have now returned TERMINAL0:29480/11839/7249/62925.
+Their VM4920/21724/36888/28724 are stopped/reaped. Do NOT restart these completed
+runs or treat earlier LIVE notes as current. Outputs part0..3 under
+.build/photo-format-matrix-20261024. Independent aggregate.json proves disjoint
+union70 with same app9C1A83BD/ELF76B5CE37/source7D95988C.92actual workflows:
+48primary accepted,17finish refusals,5source admissions rejected,22immediate
+successful gray recoveries. Primary reasons8write cap,5heap,1backing,1unsupported,
+1truncated,1invalid,5source. Exact physical source/frame/journal +nested diagnostic
+RAM, task/heap counters passed. Worker untouched minimum5012/8192; maximum
+observed librarypool47983/context4984; sum individual heap minima lowerbound15468,
+NOT simultaneous whole-app peak. No current owned VM remains from this matrix.
+
+Full proof qemu/parity/jpeg-format-matrix-validation-20261024.json archives192
+physical images and174RAM snapshots plus raw logs/layouts. Delta images can use
+an earlier fully reconstructed SHA as parent, avoiding repeated immutable code
+sector lists. Complete4MiB hash still checked for each image. Earlier pilot bound
+to e5dmetadata remains historical; full proof uses updated navigation source view.
+
+This closes the70-vector corpus gate, not all possible format/fault/RAM paths.
+RGB6/CMYK6 lossless samples were source-slot refusals; smaller qualifying fixtures
+needed to execute those precision/color paths on target. Next actual I/O/allocator
+faults and publication cuts, then network lifecycle/churn/whole-image/full/24h/
+hardware. Preserve fixed app/ELF during any newly launched run. No physical/push.
+Archive schema2: only earlier full images may be delta parents; verifier also
+recounts primary outcomes/recoveries/workflows from raw reports. Around12.3MBnew
+compressed payloads,3574sector references, with old immutable/code payload reuse.

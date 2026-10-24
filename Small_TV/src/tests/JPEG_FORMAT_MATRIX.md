@@ -63,10 +63,30 @@ Proof: [jpeg-format-pilot-validation-20261024.json](../../qemu/parity/jpeg-forma
 `verify_photo_format_matrix_evidence.py --proof ...` заново проверяет archive,
 пиксели, diagnostic/heap/stack; QEMU при этом не запускается.
 
-Полный70-vector прогон запущен четырьмя непересекающимися частями18/18/17/17;
-до завершения всех частей и проверки union70 полного target matrix pass нет.
-Их текущие live handles/папки сохраняются в WORKING_NOTES; файлы отчёта сами по
-себе не доказывают, что процесс жив. Физическая плата не затрагивалась.
+Полный70-vector прогон **завершён и independently verified** четырьмя
+непересекающимися частями18/18/17/17.92реальных workflows:48primary images приняты,
+17finish refusals,5source admission refusals,22немедленных successful recoveries.
+Primary outcomes: write-limit8, heap-headroom5, backing-capacity1, unsupported1,
+truncated1, invalid1 и source-slot5. Все4exec terminal0, owned VM stopped/reaped;
+union70, actual source/frame/journal и RAM fields проверены offline.
+
+Приняты baseline8с factory IDCT и baseline12, neutral CMYKprogressive8/12,
+grayprogressive8 и43lossless gray/RGB/CMYK cases. Векторы lossless RGB6/CMYK6
+превысили source slot: их refusal проверен, исполнение этих двух precision/color
+paths требует меньших дополнительных fixtures. Тяжёлые progressive получили
+точный отказ по текущей политике; это не отключение режима по имени. Список
+успешных файлов не означает приёмку всех возможных JPEG streams.
+
+Untouched worker minimum5012/8192 во всех4частях; наибольший observed decoder
+pool47983bytes, context4984отдельно. Lower bound суммы individual heap minima
+15468bytes; это не simultaneous aggregate minimum или whole-app requested peak.
+Proof: [jpeg-format-matrix-validation-20261024.json](../../qemu/parity/jpeg-format-matrix-validation-20261024.json).
+Сохранены192полных физических образа и174RAM snapshots. Lossless sector deltas
+могут ссылаться на уже сохранённый полный образ: before часто совпадает с
+предыдущим after. Полные SHA проверяются при восстановлении каждого4MiB image.
+Schema2 запрещает forward/cyclic bases. Новые compressed payloads занимают
+примерно12.3MB вместо хранения всех4MiB images/RAM без дедупликации.
+Физическая плата не затрагивалась; app9C1A83BD остаётся прежней.
 
 ## Воспроизведение
 
