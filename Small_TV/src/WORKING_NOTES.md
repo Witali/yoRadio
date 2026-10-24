@@ -3355,7 +3355,7 @@ Then combined/repeated losses and prolonged churn/soak, full network gate.
 Known CYDIDF6PHY gap, wholeimage audit, SDK I/O/allocation/NVSinternal faults,
 fullsuite/24h/H01-H09 still open. Goal not complete/blocked/paused.
 
-## CURRENT 2026-10-24 — stalled primary bridge corrected; combined losses pass
+## Checkpoint 2026-10-24 — stalled bridge (newer CURRENT below)
 
 Broad goal remains active, no blocker, physical action or new push request.
 Previous checkpoint 98fedc62f qualified individual packet loss/DHCP retries.
@@ -3406,3 +3406,73 @@ do not overwrite frozenD64. Inspect code first, run bounded qualification
 before H10. Whole-image xref audit, SDK I/O/allocation/NVS-internal/electrical
 publication faults, full current regression, known CYD IDF6 PHY assert and
 hardware H01-H09 remain open. Goal not complete/blocked/paused.
+
+## CURRENT 2026-10-24 — current-image churn passed; one H10 is live
+
+Goal remains active and unbounded, no blocker or physical actions/push. Prior
+turn progress677defd qualified stalled-peer/combined loss and QEMU21a8d6dd8c.
+Feature commit00096f882 adds --qemu to runtime and -QemuExecutable to both PS
+launchers, preserving default/frozen D64. Schema5 binds exact candidate path
+and pinned SHA; auditor retains schemas3/4 and all weather requirements.
+25audit/16memory/4ROM/6state/8weather tests passed (59). Sandbox TEMP ACL
+initially blocked fixtures; a task TEMP fixed the environment, no weakened tests.
+
+Current native app9C1A83BD/ELF76B5CE37/source7D95988C, SDK, production files and
+frozen47/D64 unchanged. QEMU v8 A5BE14C5 after21a8d6dd8c; Xtensa821D unchanged.
+No new build, SDK writes, physical flash/reset/serial or push. QEMU tree clean.
+Runtime source/test helpers below are now pinned by a live H10; do not edit them,
+rebuild/replace its executable or connect a second debugger/QMP observer.
+
+Completed two runtime qualification VMs: preflight4cycles/2outages/32HTTP/
+22.569796guest s; detached churn40cycles/20outages/320HTTP/200.910826guest s.
+Churn exercises all4themes/5GIF, real city/weather, concurrent settings requests,
+10ordinary JPEG uploads, external AP offline/recovery. MaxHTTP4.084654s<6;
+minimum sampled free54688B, sum of SDK per-heap minima23180B (not simultaneous
+whole-app minimum), stack-fill minimum332B. All positive, no ROM reset/panic;
+not proof of no possible leak. Both workload/guard/supervisor terminal0, pinned
+inputs unchanged. Host CIM explicitly found all8 qualification PIDs absent.
+Do not infer host liveness from sandbox Get-Process or qemu-system-* name: this
+candidate is named clients-v8-riscv32.exe and sandbox may hide detached workers.
+
+verify_runtime_candidate_evidence.py replays numeric journals/ROM counts,
+SDK heap arithmetic/task headroom/HTTP/outages/weather/UART summaries and guards,
+checks app/ELF/source pins, early40cycle start record captured atcycle0, link to
+exact archived network-model proof. The archived model JSON bytes carry its SHA;
+working checkout JSON is compared as parsed data to tolerate Git line endings.
+16actual-report negative controls rejected. Proof runtime-candidate-validation-
+20261024.json:34raw/34payloads,114908newgzipbytes, no fullVMflash/RAM/UART.25unit
+log included; other34unit results recorded in worklog. Earlier draft payloads
+preserved in ignored .build/runtime-candidate-20261024/replaced-evidence, unstaged.
+Docs RUNTIME_MEMORY.md/plan/worklog updated; evidence commit follows this note.
+
+ONE NEW H10 LIVE, launched24Oct10:41:38UTC after qualification, pending:
+run .build/runtime-h10-current-20261024
+supervisor34280, workload34996, guard13180, VM1512 / SmallTV-dc56f2b7a572.
+Windows CIM checked exact commands/creation times after launch; supervisor
+CREATE_BREAKAWAY_FROM_JOB verified outside caller Job. Early start identities
+captured atcycle0 in .build/runtime-h10-current-20261024-start.json. Requested
+86400guestseconds, interval15, externalSTA outageEvery60, 1guestsecond outage.
+Report/JSONL/UART guard are in that run, supervisor heartbeat in sibling
+runtime-h10-current-20261024-supervisor/supervisor.json. Initial guard reports
+oneROMboot/noerrors. Only read status files/OS identities; do NOT pause/reset,
+restart it on observation timeouts or open another debugger. Preserve original
+older H10 evidence. A started/pending flag is not 24h acceptance.
+
+After terminal H10, run tools/analyze_runtime.py with --run that directory,
+--repository-root current worktree, --start-record early-start JSON, allow roots
+C:/Work/yoRadio and C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients, output OUTSIDE
+run. Auditor schema5 accepts explicit filename. It requires actual86400guest s,
+terminal guard/start/source match, weather throughout, phase-complete trend
+windows; do not shorten the goal or claim H10 passed from 40cycles.
+
+NEXT independent work while H10 runs: whole-image xrefs/callback/task/timer audit
+outside176selected exports (NETWORK/SLOW/browser_time/clickCount/JPEG flash-output),
+CYD IDF6 PHY assert in existing tools/test_esp_legacy.py (docs/ESP_FLASH_WRITE.md
+records phy_module_has_clock_bits(PHY_INIT_MODEM_CLOCK_REQUIRED_BITS), phy_init.c332).
+Current candidate Xtensa is byte-identical, not CYD acceptance. Full current
+network/display/regression suite still needs separate gates and candidate/deps
+selection: qemu_suite.py and several older scripts hardcode frozenRoot/bin and
+root SDK. Do not overwrite frozenD64 or edit live-H10 pinned weather/time/runtime
+helpers; use an appropriate isolated snapshot or defer changes until it ends.
+Actual SDK I/O/allocation/NVS-internal/electrical publication faults and hardware
+H01-H09 still open. Goal not complete, blocked or paused.

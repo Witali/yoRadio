@@ -372,6 +372,13 @@ links,74исправленных module summaries, original pseudocode bodies с
 После интеграции — native/artifact/browser/flash, отдельные network/display gates,
 full suite и 24h H10 с heap/stack. Связывать отчёты с точными app/ELF/source/QEMU
 hashes; успех старой сборки или короткого прогона не переносить на новую.
+Runtime checkpoint2026-10-24: текущие9C1A83BD/76B5CE37 на QEMU A5BE14C5 прошли
+4cycle/2outage и40cycle/20outage нагрузки (32+320HTTP, 10повторных JPEG uploads
+во втором run), реальные ROM heap counters/stack fill, fresh weather и UART guards.
+Оба workload/guard/supervisor terminal0; архив/16negative controls pass. См.
+[RUNTIME_MEMORY.md](tests/RUNTIME_MEMORY.md). Закрыт selected 40-cycle churn;
+продолжительные churn/soak и H10 этим не закрыты. Отдельный H10 на той же паре
+запущен24Oct10:41UTC:86400guest s/interval15/outageEvery60, результат pending.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.

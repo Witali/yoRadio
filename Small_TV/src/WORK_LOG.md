@@ -4459,3 +4459,28 @@ terminal workload/guard/supervisor0, exact inputs unchanged. Local audit_run
 Изменённый detached launcher запустил отдельный40cycle/20outage run churn-40;
 его результат ещё pending и не считается приёмкой. Early start record сохранён
 при completed_cycles0. Production/SDK/physical не менялись, push не выполнялся.
+
+## 2026-10-24 — завершённый churn текущей сборки; H10 запущен отдельно
+
+Detached launcher после выхода вызывающего процесса завершил40cycles/20реальных
+STA disconnect/reconnect,320HTTP и10JPEGuploads,200.910826guest s. Все4темы/5GIF,
+города/свежаяпогода и2параллельныхsettings GET сохранялись. MaxHTTP4.084654s<6,
+minsampledfree54688B, суммаperheapSDKmin23180B, minstackfill332B. Это разные
+heapметрики; короткийscope не доказывает отсутствие всехутечек. OneROMboot,
+noPANIC, terminalworkload/guard/supervisor0, входыunchanged. Host CIM проверка
+подтвердила отсутствие всех8qualification PID; обеVM завершены. Ранееpreflight4cycles/
+2outages/32HTTP/22.569796s также прошёл. Всего44cycles/22outages/352HTTP.
+
+Runtimecandidateproof:34raw/34payloads,114908newgzipbytes; полныеnumericjournals,
+report/guard/supervisor, earlystartrecord наcycle0,25unitlog иsources. Replay
+точныхapp/ELF/source/modelref проверяетjournal/ROM/HTTP/outages/weather/guards
+и отвергает16negative controls. FullVMflash/RAM/UART не копируются, толькоtyped
+UARTsummary изactualaudit. Деталиtests/RUNTIME_MEMORY.md. Feature commit00096f882;
+этотevidencecheckpoint следуетотдельно. No firmware/SDK/physical/push changes.
+
+24Oct10:41:38UTC detached supervisor34280 запустил новыйH10, не заменяястарыеruns:
+.build/runtime-h10-current-20261024,86400guestseconds/interval15/outageEvery60.
+App9C1A83BD/ELF76B5CE37/QEMUa5be14c5 иproducer c8c77409 неизменны. Это только
+запуск; результатpending. Earlystartcapture/живость уточняютсявCURRENT notes.
+Общийпланостаётсяактивным,fullnetwork/display/fullsuite/CYD-PHY/audit/hardware
+остаютсянезавершёнными. Нельзя переноситькороткийpass на24h.

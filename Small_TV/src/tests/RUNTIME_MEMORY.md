@@ -55,6 +55,42 @@ guest disconnect/reconnect состояния и доступность station 
 создаёт только собственную локальную ВМ без SDL и закрывает её в `finally`.
 Ни прошивка платы, ни NVS/flash физического устройства не затрагиваются.
 
+## Результат на текущей прошивке, 24 октября
+
+Checkpoint 2026-10-24 на app `9c1a83bd…`, ELF `76b5ce37…`, QEMU `a5be14c5…`:
+
+| Запуск | Циклы / Wi-Fi outages | HTTP | Гостевое время | Минимум sampled free heap | Минимум stack fill |
+|---|---|---|---|---|---|
+| Preflight | 4 / 2 | 32 | 22,569796 s | 54820 B | 476 B |
+| Churn | 40 / 20 | 320 | 200,910826 s | 54688 B | 332 B |
+
+Все запросы уложились в прежний предел 6 guest s; максимум 4,084654 s.
+Десять повторных загрузок JPEG в 40-cycle run прошли обычный HTTP upload path.
+Независимые UART guards наблюдали один ROM boot без panic; workload, guard и
+supervisor завершились с code 0 и неизменными входами. Оба owned VM остановлены.
+Сумма накопленных минимумов отдельных heaps в churn достигла 23180 B;
+это другая метрика, чем минимум sampled free heap, и не одновременный global peak.
+Это две короткие проверки, а не доказательство отсутствия любой утечки или H10.
+
+[`runtime-candidate-validation-20261024.json`](../../qemu/parity/runtime-candidate-validation-20261024.json)
+содержит 34 typed raw items / 34 payloads, 114908 новых gzip bytes. Сохранены
+полные численные журналы, отчёты/guard/supervisor, early start record 40-cycle
+run, исходники и unit log; полные VM flash/RAM/UART не копируются. Replay
+пересчитывает журнал и отвергает 16 испорченных отчётов. Отдельные 59 unit tests
+для audit/memory/ROM/clock/weather прошли; в этом архиве сохранён log 25 audit tests.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_runtime_candidate_evidence.py `
+  --proof Small_TV/qemu/parity/runtime-candidate-validation-20261024.json
+```
+
+Исторический replay принимает `--source-revision`; source snapshots и точные
+app/ELF identities обязательны. В архиве есть ссылка по SHA на отдельный
+network-stalled-peer checkpoint новой модели QEMU. Полные display и network
+gates, 24h и аппаратная приёмка остаются самостоятельными этапами.
+
 ## Разделение модулей и способ измерения
 
 - `runtime_memory.py` извлекает размеры/поля из DWARF текущего ELF, обходит
