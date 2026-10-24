@@ -276,6 +276,16 @@ privacy и codec support. [Проверки](tests/JPEG_PRIVACY.md).
 Сетевой gate — без LCD, display gate — без сетевого критерия. QEMU TCP clients
 не выдавать за реальную RF/WPA association; ограничения модели указывать явно.
 
+2026-10-24: проверены реальные SDK events двух виртуальных AP peers для обеих
+прошивок: 1→2→1→0→1, четыре HTTP-запроса на каждый run. Native — один start,
+ноль stop; factory — повторный start затирает handle при listen(112), и stop
+после этого не достигает оставшегося сервера. QEMU DHCP исправлен: bounded
+parser/identity/server selection/ACK-before-ready, отдельные protocol tests.
+См. [NETWORK_CLIENTS.md](tests/NETWORK_CLIENTS.md) и сохранённый offline proof.
+Остаются уход **первого** при подключённом втором, корректная Ethernet
+маршрутизация/endpoint selection, scan/upload/weather/theme/reconnect/churn.
+Этот checkpoint не закрывает весь `HTTP-LIFETIME`.
+
 ## 4. Электрические и аппаратные различия
 
 Статус: **аппаратная приёмка не выполнена**. Исследовать RESET/DC pull-ups:

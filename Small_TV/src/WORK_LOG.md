@@ -4322,3 +4322,25 @@ host recovery timeout. Они не засчитаны. Final900s host observer �
 guest time/write policies. No app/SDK/frozenQEMU/physical/push changes. Проверены
 selected completed-operation boundaries; actual in-page electrical cuts, SDK I/O/
 allocation/NVS-internal faults и остальные требования плана остаются открытыми.
+
+
+## 2026-10-24 — два AP-клиента и исправления QEMU
+
+В отдельной QEMU branch codex/small-tv-ap-clients сохранены fdb97bef73
+(Windows trace paths),6324e5e152 (independent virtual AP peers),d49be39d77
+(безопасный DHCP и ожидание ACK). Full targets build успешен; protocol349cases,
+905guard-page truncations/10000bad inputs, C3 default/modular60s boot pass.
+Xtensa binary identical baseline, известный CYD PHY gap этим не закрыт.
+
+Actual factory/native SDK events1→2→1→0→1 прошли на двух QEMU binaries.
+Наша прошивка1start/0stop; factory3starts/2stop wrappers, первый handle потерян
+при повторном listen112, listener остаётся живым. Это уточнение прежней гипотезы
+про остановку сервера на каждом уходе. 16HTTP200 всего в4принятых runs.
+Offline proof network-peer-validation-20261024.json повторно сверяет ABIobject,
+точные ELF/SDK event bytes/handles и24negativecontrols. Новый архив не копирует
+полную заводскую flash/RAM/UART. Все8C2 и2C3 VMs остановлены/reaped, живых нет.
+Два observer pilots не засчитаны. Production app/SDK/frozenQEMU unchanged.
+
+HTTP-LIFETIME всё ещё открыт: уход первого/маршрутизация через второго,
+per-client endpoints/scan/upload/weather/theme/reconnect/churn. Общая цель
+активна, physical actions/push не выполнялись. Детали tests/NETWORK_CLIENTS.md.

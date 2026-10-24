@@ -3068,3 +3068,78 @@ format harness; guest quotas/timeouts не менялись. Final обаrun suc
 Functional NOR/WIP timing не electrical partial-page power loss. Actual SDK I/O/
 malloc faults, NVS-internal publication cuts, exhaustive timing, network lifecycle/
 churn, whole-image/full/24h/hardware remain. No app/SDK/QEMU edits, physical/push нет.
+
+## CURRENT 2026-10-24 — network peers checkpoint and QEMU DHCP fixed
+
+Goal remains broad/active, no blocker, no new push request. Latest user explicitly
+requests fixing QEMU emulation bugs when found. No app/SDK/physical changes.
+Production9C1A83BD/ELF76B5CE37/source7D95988C and frozenD64 snapshot unchanged.
+
+QEMU task worktree C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients,
+branch codex/small-tv-ap-clients, base0860e568d4. Completed focused commits:
+- fdb97bef73: native Windows trace generation fix (Meson fs.name + C filename
+  escaping); actual C runtime12cases/6unsafe controls, full two-target build.
+- 6324e5e152: independent3virtual AP clients, masks and packet queue identity;
+  actual two-peer guest events, defaultone preserved. Ethernet initially primary.
+- d49be39d77: bounded shared DHCP reply parser + acquisition state module;
+  identity/server selection, ACK-before-ready, NAK restart. 349cases/905guard-page
+  truncations/10000bad packets; factory/native integration pass; C3 default and
+  modular60s boot checks pass. Xtensa unchanged821D9807 (not full CYD acceptance).
+QEMU rootmain2a593f8d00, flash-write-audit0860, other worktrees untouched.
+
+Build path taskworktree/build, local MSYS2 GCC16.1/Meson1.5/Python3.14.6,
+DEBUGoff/staticSDL/slirp/internaldtc/downloads disabled. Preserve baseline
+binaries; NEVER rerun resume-baseline.sh after model changes (overwrites control).
+Baseline-riscv32 SHA4e283d9b197d3716bda77a4da54ec92da8e83b352b190ad546e7f1060559237e.
+Baseline-xtensa821d98070aa131ccdc5c7ccd87336c90c13a7c205dfe991404ed242f9da0f0e1.
+clients-v1-riscv32 SHA288478784db0281c33b605a781d70c6b18c6ce5ef17667d21f8b04049127df00.
+clients-v2-riscv32 SHA128d0d75316eeb2a33e7c527ce3cb71cbf9158b9e3062fe1a23c7bcccbf610f5.
+No active build/process remains. Old Windows trace verifier needs
+--source-revision fdb97bef73 after model changes; no hash skips.
+
+New Small_TV/src/tests/network_event_abi.py derives real RV32 SDK14/15/scan1,
+connect8/MAC0/AID6, disconnect10/reason8size2 from separate ET_REL object using
+exact production flags, original object/app/ELF unchanged. Probe under
+.build/small-tv-ap-clients-20261024/event-abi-final. Do not edit this producer
+without regenerating ABI report; it pins its own source. Factory old ABI only
+first7bytes MAC/AID used, not unverified native reason layout.
+
+network_clients_qemu.py uses immutable47file tools snapshot plus explicit
+separately-pinned candidate. Read-only hardware RSP observes actual events and
+httpd_start out-pointer/returns, handles tail-call/nested return ownership. No
+register/memory/PC/code writes. Actual DHCP relay ready wait before first SYN.
+Native wifi_event1107363056, WIFI_EVENT1007921672, httpd_start1107554060,
+httpd_stop1107555256. Factory AP event handlerCORRECT0x4200c6e2 (STA C602 wrong),
+base object0x3c0f1eb8, startwrapperC5EC/stopC578, globalhandle0x3fcc3a70.
+3fcc3a78 is retry counter, NOTserver. Literal AP branch14start/15stop.
+
+Eight C2 VMs (pilots included) all stopped/reaped; current process inventory no
+QEMU. native-v1 failed initial observer status after HTTP before DHCP; factory-v2
+wrong handler never collected AP events. Both not accepted. native-v1-relay and
+native-v2 old prototypes passed but only final native-v3/factory-v3 and
+native-dhcp-v2/factory-dhcp-v2 archived as4acceptedruns. Two C3 VMs also reaped.
+Factory real nuance: second start overwrites first nonzero global handle with0
+on listen112; subsequent stop cannot reach still-live listener. Returned client
+repeats listen112. Final factory each3starts/2stopwrappers/handles[nonzero,0,0],
+HTTP200atall4nonemptyphases. Native each1start/0stop, sameHTTP. Do not assert
+that every factory disconnect necessarily kills HTTP in this sequence.
+
+Proof Small_TV/qemu/parity/network-peer-validation-20261024.json:40raw/37gzip,
+121065compressedbytes, source observers/ABIobject+exactQEMU Gitblobs. Full new
+factory flash/RAM/UART not archived. Independent network_clients_contract.py +
+verify_network_clients_evidence.py pass4runs,24unsafecontrols rejected. Native
+exact ELF symbols/entry instructions/base object, factory exact ELF addresses,
+raw SDK MAC/AID/reason, DHCP states/distinctIP and handles rechecked. Historical
+--source-revision supported without resetting. See tests/NETWORK_CLIENTS.md.
+
+NEXT: fix host Ethernet routing when primary virtual client leaves while the
+secondary stays. Currently select_ethernet_interface always primary. Need actual
+primary-departure HTTP proof (including ARP state), cannot call full lifecycle
+from secondary-only case. Consider carrier selection or per-client NIC/backend,
+then test any-one departure/zero->one, default mask/invalid masks/reset/APSTA,
+scan/upload/weather/theme/churn. RF/WPA and full network acceptance distinct.
+Do not overwrite clients-v1/v2 EXEs; new iterations unique names.
+Known earlier CYD IDF6 esp_phy_enable assert is still open; identical Xtensa
+binary only demonstrates these RISC-V Wi-Fi edits do not change it. No fresh
+CYD run in this checkpoint, no complete hardware claim. Other whole-image,
+SDK I/O/allocation/NVS-internal cuts/full regression/24h/H01-H09 remain.
