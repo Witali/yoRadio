@@ -332,3 +332,37 @@ Fresh same-loader raw/format
 reports explicitly describe shared-renderer handle parity; they cannot prove
 unchanged vendor PCM. The full G6 and other outstanding/deferred gates above
 remain open. No production firmware or physical-board acceptance is claimed.
+
+## Public raw registered dispatch, 2026-10-24
+
+The [registered caller](../tests/target/vorbis_floor1_positions_qemu/main/registered.c)
+exercises `esp_vorbis_dec_register` and generic `esp_audio_dec_open`,
+`esp_audio_dec_process`, `esp_audio_dec_get_info` and void `esp_audio_dec_close`
+on both architectures. Public `get_ops` checks select the checked open/decode
+callbacks and vendor reset/close callbacks; reset behavior is not exercised.
+The API contract comes from the pinned Espressif codec 2.6.2 public headers,
+which are retained with the [execution evidence](../tests/results/vorbis-registered-raw-20261024/README.md).
+
+Each target completes14 registration/unregistration cycles, accepts8 setups,
+rejects6 with actual FAIL/null, and captures112 packets/225280 PCM bytes.
+Before every nonempty packet, three one-byte output retries require
+BUFF_NOT_ENOUGH, zero consumed/decoded bytes, exact needed capacity and
+untouched guarded output:312 retries per target. Every nonempty accepted
+packet requires stereo48kHz/S16 public metadata; the zero-output primer may
+report NOT_FOUND. Independent whole-PCM comparison with retained Xiph output
+has maximum error1 under the unchanged project bound2, without signal
+adjustment. Five ordinary cases remain byte-exact to the frozen old images.
+
+Two separately built ESP32 controls fail at case0 before open/decode:
+omitting the registration wrap reaches `registry_open_binding`; selecting
+the real decode callback reaches `registry_decode_binding`. Both retain the
+exact ordered prefix, public registry cleanup and terminal controlled stop.
+Panics, timeouts and unrelated failures cannot qualify these controls.
+
+Twelve protocol host tests and eight real CMake script-mode tests pass. The
+latter reproduce the misplaced binding guard in a frozen control and verify
+early component discovery without option cache variables. Both first SDK
+configuration failures are preserved; neither reached QEMU. This advances
+the selected public callback path within G1. Full G1/G6, reset, Ogg,
+allocation/lifetime/SMP service, radio integration and physical resource
+acceptance remain open. Production source and task affinity are unchanged.

@@ -187,7 +187,12 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   Возврат только старого вычисления хвоста в отдельном образе воспроизводит
   все исходные PCM и три ошибки до65535. Старый NONPASS сохранён;
   реализация внутри vendor из этого функционального контроля не выводится.
-  Полное G6 открыто; bridge в radio не подключён.
+  [Public raw registry](../tests/results/vorbis-registered-raw-20261024/README.md)
+  дополнительно проверяет generic open/process/get_info/close на CYD и C3:
+  по14 циклов регистрации,112 пакетов/225280 PCM байт и312 повторных отказов
+  малому выходному буферу. Checked open/decode выбираются через public ops;
+  весь PCM имеет max1 относительно Xiph. Reset проверен только как указатель.
+  Полные G1/G6 открыты; bridge в radio не подключён.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
   Xtensa векторов; host331 точный вектор и34 UBSan NONPASS остаются отдельно.
@@ -1231,3 +1236,21 @@ Stream остаётся на core0, decode/output на core1 с прежними
   ABI, allocations и task/core/stack/priority не менялись. Wide/floor0/
   sequence1, полное G6 и прочие интеграционные/аппаратные gates остаются;
   CYD bridge в radio не включён, отложенные работы не возобновлялись.
+
+- 2026-10-24, CYD-C3-14/G1: [public raw registry checkpoint](../tests/results/vorbis-registered-raw-20261024/README.md)
+  проверяет путь регистрации → generic open/process/get_info/close на CYD и C3.
+  [Точка входа](../tests/target/vorbis_floor1_positions_qemu/main/registered.c)
+  использует только публичный API и один generic handle. На каждой цели
+  выполнены14 циклов регистрации/проверки ops/удаления регистрации,
+  8 допустимых и6 отклонённых настроек,112 пакетов/225280 PCM байт и312
+  undersized retries без потребления входа или изменения выходного буфера.
+  Проверены checked open/decode и vendor reset/close pointers; reset не вызывался.
+  Полное сравнение PCM с сохранённым Xiph даёт max1 при прежнем пределе2;
+  пять обычных случаев побайтно совпадают со старыми target images.
+  Два отдельных ESP32 controls достигают точных ранних отказов
+  `registry_open_binding` и `registry_decode_binding` на case0 до open/decode,
+  очищают public registry и штатно завершаются. Проходят12 protocol host-тестов
+  и8 реальных CMake phase-тестов, включая воспроизведение прежнего неверного
+  положения проверки. Первые configure-only отказы обеих целей сохранены;
+  QEMU в них не запускался. Это частичная квалификация G1. Полные G1/G6,
+  reset/Ogg/OOM/SMP, radio/resource/physical gates остаются открытыми.

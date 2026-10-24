@@ -75,3 +75,39 @@ includes a portable offline verifier for the published evidence. Both banks
 now have maximum error 1 on both architectures, while the original setup-only
 NONPASS remains historical evidence. Full G6, radio and physical acceptance
 remain separate.
+
+## Registered public raw dispatch
+
+`--dispatch registered --renderer on` selects [registered.c](main/registered.c).
+It uses one generic handle per valid case through public registration,
+`open`, `process`, `get_info` and void `close`. Every case checks public
+operation-table pointers and removes the registration afterward. Reset is
+checked only as a callback pointer and is never called. This path has no
+second vendor handle as a numerical oracle.
+
+The14-case protocol requires8 valid decodes,6 actual FAIL/null opens,
+112 complete packets/225280 PCM bytes and312 one-byte retries. Rejected
+retries leave all4096 output bytes and canaries unchanged, consume no input
+and publish the exact needed size. Metadata is checked after every accepted
+packet; only the zero-output primer may return NOT_FOUND. A complete capture
+reports `registered_callbacks_qualified=true`; `RENDER_CAPTURED` remains
+separate from independent numerical acceptance.
+
+`--control register-open` and `--control register-decode` are early binding
+controls. They require `registry_open_binding` or `registry_decode_binding`
+respectively at case0, no open/PCM events, verified registry cleanup and a
+controlled stop. A panic, timeout or generic failure is not an effective
+control. Both controls, both architectures' captures and the independent
+Xiph comparison passed for this finite corpus; see the
+[saved evidence](../../results/vorbis-registered-raw-20261024/README.md).
+
+```text
+python -B tests/test-vorbis-registered-protocol.py -v
+python -B tests/test-vorbis-registered-cmake.py --output .build/vorbis-registered-cmake-host-02 -v
+```
+
+The12 protocol methods and8 real script-mode phase tests pass. The CMake
+test requires a fresh output directory; supply `--cmake` when the pinned
+default executable is unavailable. First SDK configure failures are retained;
+their misplaced discovery guard was fixed before the successful captures.
+Full G1/G6, reset/Ogg, production radio and physical acceptance remain open.

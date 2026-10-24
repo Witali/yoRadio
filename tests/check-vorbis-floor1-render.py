@@ -245,7 +245,11 @@ class Checker:
         need(len(rows) == 2 and {Path(row['file']).name for row in rows} == {'setup.c', 'output.c'} and
              all(Path(row['file']).resolve().is_relative_to(path.parent / 'variant') for row in rows),
              'actual variant compilation rows')
-        source = project['project/main/' + ('main.c' if role == 'baseline' else 'render.c')]
+        dispatch = report.get('dispatch', 'direct')
+        need(dispatch in ('direct', 'registered'), 'known raw API dispatch')
+        need(dispatch != 'registered' or role == 'candidate', 'registered dispatch candidate only')
+        source_name = 'main.c' if role == 'baseline' else 'registered.c' if dispatch == 'registered' else 'render.c'
+        source = project['project/main/' + source_name]
         if role == 'baseline':
             tokens = (b'a_info.sample_rate==48000 && b_info.sample_rate==48000',
                       b'a_info.channel==2 && b_info.channel==2',
@@ -256,6 +260,21 @@ class Checker:
             tokens = (b'info.sample_rate==48000 && info.channel==2 && info.bits_per_sample==16',
                       b'guard();', b'"output_canaries"', b'ESP_AUDIO_ERR_FAIL && !checked',
                       b'"invalid_setup_rejected"', b'"public_metadata"', b'"rejected_heap_integrity"')
+            if dispatch == 'registered':
+                need(argument(build_argv, '-Dispatch') == 'registered' and
+                     argument(build_argv, '-BindingControl') == 'none' and
+                     report['registered_callbacks_qualified'] is True, 'registered public API build/capture')
+                compile_commands = json.loads(outputs['build/compile_commands.json'])
+                compiled = [row for row in compile_commands
+                            if Path(row['file']).resolve() == path.parent/'project/main/registered.c']
+                need(len(compiled) == 1 and compiled == report['harness_compile_rows'],
+                     'actual compiled registered fixture binding')
+                tokens = (b'esp_audio_dec_open(', b'esp_audio_dec_process(', b'esp_audio_dec_get_info(',
+                          b'esp_audio_dec_close(', b'esp_audio_dec_unregister(', b'guard();',
+                          b'"output_canaries"', b'"invalid_setup_rejected"', b'"public_metadata"')
+                for symbol in ('__wrap_esp_vorbis_dec_register', 'esp_audio_dec_get_ops', 'esp_audio_dec_open',
+                               'esp_audio_dec_process', 'esp_audio_dec_get_info', 'esp_audio_dec_close'):
+                    need(re.search(r'\b' + symbol + r'$', symbols, re.M), 'registered public API linked symbol')
             for name in report['variant_sources']:
                 relative = name.replace('\\', '/').removeprefix('variant/')
                 original = self.freeze(safe(path.parent, 'sources/main/' + relative))
@@ -271,6 +290,13 @@ class Checker:
         log, stderr = logs['qemu'][1:]
         need(not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP|FLOOR1_FAILURE', log + stderr),
              'no target panic or semantic failure')
+        if dispatch == 'registered':
+            protocol = ROOT / 'tests/vorbis_registered_protocol.py'
+            need(self.freeze(protocol) == snapshots.get(str(protocol.resolve())), 'executed registered protocol source')
+            from vorbis_registered_protocol import validate_log
+            actual = validate_log(log, matrix, platform, returncode=logs['qemu'][0]['exit_status'],
+                                  timed_out=logs['qemu'][0]['state'] != 'complete', interrupted=False)
+            need(actual == report['observed_registry'], 'independent registered protocol replay')
         need(re.findall(r'^FLOOR1_START coordinator=0 decoder=(\d+)$', log, re.M) == [str(core)] and
              log.count('FLOOR1_CONTROLLED_STOP') == 1, 'coordinator/decoder cores and controlled terminal')
         summary = ['8', '6', '112', '225280', str(core)]
@@ -308,7 +334,9 @@ class Checker:
                  'complete transcript/raw PCM/hash equality')
             pcm[i] = raw
         need(sum(map(len, pcm.values())) == 225280, 'complete target PCM byte count')
-        return dict(target=platform, core=core, role=role, report=str(path), report_sha256=digest(path.read_bytes()),
+        return dict(target=platform, core=core, role=role, dispatch=dispatch,
+                    registered_callbacks_qualified=dispatch == 'registered',
+                    report=str(path), report_sha256=digest(path.read_bytes()),
                     pcm_bytes=225280, pcm_sha256={str(i): digest(raw) for i, raw in pcm.items()},
                     metadata_evidence='Frozen executable harness checks stereo48k/S16 and canaries before PCM publication.'), pcm
 
