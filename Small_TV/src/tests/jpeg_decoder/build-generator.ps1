@@ -1,9 +1,12 @@
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$LibraryBuild,[Parameter(Mandatory)][string]$OutputDirectory,
-      [string]$VsDevCmd='C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat')
+      [string]$VsDevCmd='C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat',
+      [string]$GeneratorSource)
 $ErrorActionPreference='Stop';$library=[IO.Path]::GetFullPath($LibraryBuild);$output=[IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Path $output -ErrorAction Stop | Out-Null
-$source=Join-Path $PSScriptRoot 'generate.c';$archive=Join-Path $library 'library/jpeg-static.lib'
+# Keep one compiler recipe for the sampling and additional lossless fixtures.
+$source=if($GeneratorSource){[IO.Path]::GetFullPath($GeneratorSource)}else{Join-Path $PSScriptRoot 'generate.c'}
+$archive=Join-Path $library 'library/jpeg-static.lib'
 $record=Get-Content (Join-Path $library 'build.json') -Raw | ConvertFrom-Json
 if((Get-FileHash -LiteralPath $archive).Hash.ToLower() -ne $record.library_sha256){throw 'Generator library hash differs'}
 $pins=[ordered]@{}

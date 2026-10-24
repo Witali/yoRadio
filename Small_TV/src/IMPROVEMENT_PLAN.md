@@ -82,8 +82,10 @@ union70/92workflows independently verified.48primary pixels exact,17finishrefusa
 174RAM snapshots подтверждают source/frame/journal и returneddiagnostic/task/heaps.
 Worker untouched5012/8192; pool47983max observed/context4984, heap-minima sum
 lowerbound15468 не является simultaneous whole-app peak. Два losslessRGB6/CMYK6
-вектора превышают source slot: меньшие fixtures для исполнения этих путей ещё
-нужны. Current actual I/O/allocation faults, publication cuts, lifecycle/churn,
+вектора превышают source slot; дополнительные27754/36999-byte gradient fixtures
+на том же app/ELF/source прошли настоящий decode и exact physical pixel/RAM gate.
+Теперь исполнены все45precision/color pairs2..16×gray/RGB/CMYK; это не все
+возможные JPEG streams. Current actual I/O/allocation faults, publication cuts, lifecycle/churn,
 whole-image/full/24h/hardware остаются открытыми.
 
 Checkpoint 2026-10-23: реальные upload/UI используют общего владельца codec и

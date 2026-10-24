@@ -34,7 +34,7 @@ def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def fixtures():
+def fixtures(extra_manifest=None):
     """Read the committed corpus without extracting paths or regenerating entropy."""
     parity=ROOT/'Small_TV/qemu/parity'
     proof_path=parity/'jpeg-cache-pipeline-validation-20261020.json'
@@ -59,6 +59,11 @@ def fixtures():
     rows += [dict(name=r['name'],expected=r['status']) for r in contract['negative']]
     assert len(rows)==len(images)==70
     pins={str(p.resolve()):sha(p.read_bytes()) for p in [proof_path,*[r[0] for r in selected.values()]]}
+    if extra_manifest is not None:
+        from jpeg_lossless_fixtures import load
+        additional,extra_rows,extra_pins=load(extra_manifest)
+        assert not images.keys()&additional.keys(),'Additional corpus cannot replace archived vectors'
+        images.update(additional);rows.extend(extra_rows);pins.update(extra_pins)
     return images,rows,pins
 
 
@@ -140,9 +145,10 @@ def main():
     parser.add_argument('--qemu-root',type=Path,required=True)
     parser.add_argument('--dependency-root',type=Path,default=Path('C:/Work/yoRadio'))
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--fixture-manifest',type=Path,help='Additional independently qualified fixtures; archived corpus stays intact')
     parser.add_argument('--names',nargs='+',help='Explicit pilot selection; not a complete corpus gate')
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=False)
-    images,cases,pins=fixtures()
+    images,cases,pins=fixtures(args.fixture_manifest)
     if args.names:
         assert set(args.names)<=set(images);cases=[r for r in cases if r['name'] in args.names]
         assert len(cases)==len(set(args.names))
@@ -170,6 +176,7 @@ def main():
         source_sha256=manifest['source_sha256'],qemu_sha256=sha((args.qemu_root/'bin/qemu-system-riscv32.exe').read_bytes()),
         program_limit_kib=200,inputs_sha256=pins,cases=[],owners_stopped=False,
         interpretation='Returned transport ledger plus physical source/frame/journal; not an independent raw callback trace or network/LCD acceptance')
+    if args.fixture_manifest:report['fixture_manifest']=str(args.fixture_manifest.resolve())
     server=weather.WeatherFixture();server.set_response(200)
     executor=ThreadPoolExecutor(max_workers=1);session=observer=kernel=handle=None;folder=args.output/'vm'
     try:

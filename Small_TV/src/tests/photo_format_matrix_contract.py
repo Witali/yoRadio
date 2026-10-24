@@ -29,6 +29,14 @@ def fields(ram,address,layout,base=metrics.BASE):
     return members(0,layout)
 
 
+def require_lossless_modes(oracles,manifest_path):
+    """Additional color/precision coverage requires decoding, not a resource refusal."""
+    manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+    for row in manifest['fixtures']:
+        oracles[row['name']].update(require_success=True,
+            privacy=dict(process=0xc3,precision=manifest['precision'],components=row['channels']))
+
+
 def validate(report,corpus,oracles,plan,resource_layout,diagnostic_layout,read):
     """Require corpus coverage, exact pixel references, resource reasons and reuse."""
     assert report['passed'] and report['owners_stopped']
@@ -40,7 +48,7 @@ def validate(report,corpus,oracles,plan,resource_layout,diagnostic_layout,read):
         [(r['offset'],r['offset']+r['bytes']) for r in owned])
     cases=report['cases'];primary=[r for r in cases if 'recovery_for' not in r]
     names=[r['name'] for r in primary];assert len(names)==len(set(names)) and set(names)<=corpus.keys()
-    if report['complete_corpus']:assert len(names)==70 and set(names)==corpus.keys()
+    if report['complete_corpus']:assert set(names)==corpus.keys()
     accepted=refused=source_limits=recoveries=0;stacks=[];heap_lower_bounds=[]
     for index,row in enumerate(cases):
         assert row['passed'];assert row['source_sha256']==sha(corpus[row['name']])
@@ -54,6 +62,10 @@ def validate(report,corpus,oracles,plan,resource_layout,diagnostic_layout,read):
             source_limits+=1;failed=True
         else:
             assert row['start']==dict(status=200,body='OK');result=row['finish'];d=result['diagnostic']
+            if oracle.get('require_success'):
+                assert result['status']==200,'Required target format path was not executed'
+                assert all(d['privacy'][key]==value for key,value in oracle['privacy'].items())
+                assert not d['cached'] and not d['baseline'] and d['decode']['context_bytes']>0
             assert 0<=d['program_bytes']<=204800
             protected(before,after,mutable)
             for phase in ('entry','exit'):
@@ -106,9 +118,11 @@ def validate(report,corpus,oracles,plan,resource_layout,diagnostic_layout,read):
 def main():
     """Inspect files only; no running guest or physical device is required."""
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--run',type=Path,nargs='+',required=True)
+    parser.add_argument('--fixture-manifest',type=Path)
     args=parser.parse_args()
     from photo_format_matrix_qemu import fixtures,factory_pixels
-    corpus,rows,_=fixtures();oracles={r['name']:r for r in rows}
+    corpus,rows,_=fixtures(args.fixture_manifest);oracles={r['name']:r for r in rows}
+    if args.fixture_manifest:require_lossless_modes(oracles,args.fixture_manifest)
     reports=[json.loads((run/'report.json').read_text()) for run in args.run]
     archive=Path(__file__).resolve().parents[3]/'firmware/development/small-tv-esp32c2-reconstructed'
     if any(r['name']=='rich-baseline-8.jpg' for report in reports for r in report['cases']):
@@ -116,6 +130,7 @@ def main():
     plan=json.loads((archive/'jpeg-cache-plan.json').read_text())
     results=[];covered=[]
     for run,report in zip(args.run,reports):
+        if report.get('fixture_manifest'):assert args.fixture_manifest and Path(report['fixture_manifest'])==args.fixture_manifest.resolve()
         for name in ('app_sha256','elf_sha256','source_sha256'):assert report[name]==reports[0][name]
         for name,digest in report['inputs_sha256'].items():assert sha(Path(name).read_bytes())==digest,name
         read=lambda name:(run/name).read_bytes()

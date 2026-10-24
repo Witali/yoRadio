@@ -4272,3 +4272,28 @@ firmware неизменны, physical/push нет. Цель всего план�
 Schema2/3574sector references сохраняют full hashes и запрещают cycles/forward
 bases; новые compressed payloads около12.3MB. Числа primary outcomes и recoveries
 verifier заново считает из raw reports, не доверяя summary полям.
+
+## 2026-10-24 — проверены оставшиеся lossless RGB6/CMYK6 paths
+
+Не повышая limits, созданы27754/36999-byte240×240gradient JPEG,predictor4, source
+formula(x+2*y+3*c)&63 со всеми64значениями каждого канала. Encoder — unmodified
+upstream; decoder восстановил original samples exactly; RGB565 — independent
+Python arithmetic. Shared generator recipe воспроизвёл exact compressed bytes.
+Первый predictor1/rich опыт остался слишком большим141194/188235 и не засчитан.
+
+На неизменённой9C1A83BD оба приняты actual HTTP owner: full physical source/frame/
+journal и saved RAM processSOF3/precision6/components3/4/240rows совпали. Не cache
+hit и не baseline fallback.116736programbytes каждый, default200KiB сохраняется.
+Worker untouched5320/8192,pools12901/15198/context4984 отдельно; heap-minima lower
+bound41044 не whole-app peak. VM27340 stopped/reaped,exec80350=0. Дополнение
+jpeg-lossless6-validation-20261024.json +base70 на тех же app/ELF/source закрывает
+45lossless precision/color pairs. Все possible streams/faults это не покрывает.
+
+QEMU читался без изменений: frozen D64 имеет operation-timing; reference79badcba
+прямо ограничивает модель functional contents/WIP timing, не electrical power
+failure. В отдельной branch0860e568d4 есть newer shared NOR/cache fixes. Actual
+target faults/publication cuts и остальные пункты плана остаются открытыми.
+Supplement verifier повторно проверил весьbase70 archive и historical source
+pins из Git05da без reset рабочей копии; неверныйE5D (24pin differences) отклонён.
+Exact45lossless pairs выведены изactual successful SOF3 RAM diagnostics, не списка
+генерируемых файлов. Producer inputs/current app identity сохраняются отдельно.

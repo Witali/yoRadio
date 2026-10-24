@@ -2995,3 +2995,43 @@ hardware. Preserve fixed app/ELF during any newly launched run. No physical/push
 Archive schema2: only earlier full images may be delta parents; verifier also
 recounts primary outcomes/recoveries/workflows from raw reports. Around12.3MBnew
 compressed payloads,3574sector references, with old immutable/code payload reuse.
+
+## CURRENT 2026-10-24 — six-bit RGB/CMYK lossless target paths closed
+
+HEAD before this work05da1950f; prior goal turn progressed through full70 corpus
+and74navigation fixes. New generated gradient source formula(x+2*y+3*c)&63 covers
+all64samples/channel; files RGB27754/CMYK36999 fit102400slot at240×240,predictor4.
+Unmodified upstream encoder library867C/exe referenceEC59, known original samples
+exact after upstream decode; Python RGB565 independent. New host-only generator
+tests/jpeg_decoder/generate_lossless6.c uses shared build-generator.ps1 optional
+GeneratorSource; reproducible JPEG bytes verified. Old predictor1 rich experiment
+still141194/188235 oversized, failed admission qualification, preserved separately.
+
+Optional fixture-manifest adds the2JPEGs; base70 archive never replaced. Real
+QEMU .build/jpeg-lossless6-20261024/qemu, exec80350 TERMINAL0, VM27340
+SmallTV-414c845e6332 stopped/reaped. Both actual decoded, not cached/baseline,
+processSOF3/precision6/components3&4/rows240 from saved RAM. Full source/frame/
+journal exact;116736programbytes each incl invalidation/publication, limit200KiB
+unchanged. Worker untouched5320/8192; pools12901/15198/context4984; heap-minima
+sum lowerbound41044 NOT simultaneous whole-app peak. Independent-final.json pass.
+No owned VM remains. Current production9C1A83BD/76B5CE37/7D95988C unchanged.
+Proof qemu/parity/jpeg-lossless6-validation-20261024.json supplements the original
+70-vectors on the same firmware; it is not a rerun of the old harness, whose
+source pins require checkout05da. Both proofs jointly cover all45lossless
+precision/color pairs, not every predictor/transform/entropy pattern.
+
+NEXT actual target faults/publication boundary cuts, network lifecycle/churn,
+whole-image audit/full/24h/hardware. Read-only QEMU inspection found main2a593f8d00
+clean and flash-write-audit branch0860e568d4 (shared NOR/cache fixes, not merged
+here). Frozen D64 help exposes operation-timing, no dedicated fault property.
+Referenced79badcba source says functional contents/not electrical power failure;
+program/erase storage changes immediately, WIP delay is tracked separately.
+Do not claim partial in-page brownout from operation-timing. Need inspect/test
+the newer shared-core revision before implementing model fault injection.
+No QEMU/SDK files edited, no physical action/push. Goal remains broad/active.
+Historical source replay now supported by verifier --source-revision. It reads
+committed bytes/LFS identities with git cat-file, never resets files and never
+skips hash verification. Base70 source357pins match05da, wrongE5D differs24files.
+Supplement recursively rechecks all192base images/RAM +6additional images/4RAM,
+then derives exact45modes from actual successful SOF3 diagnostics. This proves
+joint coverage without pretending the old producer was today's changed harness.

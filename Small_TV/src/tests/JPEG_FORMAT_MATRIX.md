@@ -72,8 +72,8 @@ union70, actual source/frame/journal и RAM fields проверены offline.
 
 Приняты baseline8с factory IDCT и baseline12, neutral CMYKprogressive8/12,
 grayprogressive8 и43lossless gray/RGB/CMYK cases. Векторы lossless RGB6/CMYK6
-превысили source slot: их refusal проверен, исполнение этих двух precision/color
-paths требует меньших дополнительных fixtures. Тяжёлые progressive получили
+превысили source slot: их refusal проверен; эти precision/color paths затем
+исполнены на дополнительных gradient fixtures ниже. Тяжёлые progressive получили
 точный отказ по текущей политике; это не отключение режима по имени. Список
 успешных файлов не означает приёмку всех возможных JPEG streams.
 
@@ -88,11 +88,48 @@ Schema2 запрещает forward/cyclic bases. Новые compressed payloads 
 примерно12.3MB вместо хранения всех4MiB images/RAM без дедупликации.
 Физическая плата не затрагивалась; app9C1A83BD остаётся прежней.
 
+## Дополнение lossless RGB6/CMYK6
+
+`generate_lossless6.c` связан с unmodified upstream encoder, без изменения
+библиотеки. Source samples заданы формулой `(x + 2*y + 3*channel) & 63`;
+каждый канал содержит все64значения. Unmodified upstream decoder восстановил
+все samples побайтно; независимая Python формула дала RGB565 эталон. Shared
+`build-generator.ps1 -GeneratorSource ...` повторно создал те же JPEG bytes.
+RGB27754bytes/CMYK36999bytes,240×240,predictor4; старые oversized inputs сохранены.
+Первый опыт predictor1 со старым rich-pattern дал141194/188235bytes и не прошёл
+admission qualification; это не успешный target run и не повод повысить лимит.
+
+Оба новых JPEG приняты реальным HTTP owner на той же9C1A83BD: физические full
+source/frame/journal совпали. Raw RAM подтверждает processSOF3,precision6,
+components3/4,240rows,uncached libjpeg path. Каждый116736programbytes including
+invalidation/publication, внутри200KiB. Worker untouched5320/8192, observed pools
+12901/15198 +context4984 отдельно. Heap-minima sum lowerbound41044 не является
+whole-app simultaneous peak. Единственная VM27340 stopped/reaped;exec80350=0.
+
+Optional `--fixture-manifest` добавляет файлы без замены committed70-vector
+корпуса. Independent checker требует успешного decode этих двух paths: ресурсный
+отказ не считается их исполнением. Это отдельное дополнение, не повтор старых70
+на новом harness. Together with the pinned prior proof на том же app/ELF/source
+проверены все45lossless precision/color pairs2..16×gray/RGB/CMYK. Все возможные
+predictor/transform/entropy streams этим не покрыты.
+
+Proof: [jpeg-lossless6-validation-20261024.json](../../qemu/parity/jpeg-lossless6-validation-20261024.json).
+Verifier повторно восстанавливает и проверяет старый70-vector proof. Его source
+pins читаются из Git05da1950f через cat-file без переключения рабочей копии;
+это проверка исторического producer source, не игнорирование несовпавших hashes.
+Ошибочная revisionE5D отвергнута (24различающихся pins). По фактическим SOF3 RAM
+diagnostics обоих запусков заново получен exact set45precision/color pairs.
+
 ## Воспроизведение
 
 ```powershell
 python -B Small_TV/src/tests/photo_format_matrix_qemu.py --qemu-root FROZEN_QEMU --output NEW_FORMAT_RUN
 python -B Small_TV/src/tests/photo_format_matrix_contract.py --run NEW_FORMAT_RUN
+pwsh -File Small_TV/src/tests/jpeg_decoder/build-generator.ps1 -LibraryBuild UPSTREAM_BUILD -OutputDirectory NEW_GENERATOR -GeneratorSource Small_TV/src/tests/jpeg_decoder/generate_lossless6.c
+python -B Small_TV/src/tests/jpeg_lossless_fixtures.py --reference-build UPSTREAM_BUILD --generator NEW_GENERATOR/generate.exe --output NEW_FIXTURES
+python -B Small_TV/src/tests/photo_format_matrix_qemu.py --qemu-root FROZEN_QEMU --output NEW_LOSSLESS --fixture-manifest Small_TV/src/tests/fixtures/jpeg_extended/lossless6-manifest.json --names gradient-lossless-rgb-6-p4.jpg gradient-lossless-cmyk-6-p4.jpg
+python -B Small_TV/src/tests/photo_format_matrix_contract.py --run NEW_LOSSLESS --fixture-manifest Small_TV/src/tests/fixtures/jpeg_extended/lossless6-manifest.json
+python -B Small_TV/src/tests/verify_photo_format_matrix_evidence.py --proof Small_TV/qemu/parity/jpeg-lossless6-validation-20261024.json
 ```
 
 `--names` выполняет явно выбранный pilot/subset. Несколько независимо завершённых
