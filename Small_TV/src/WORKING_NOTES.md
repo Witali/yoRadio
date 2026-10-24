@@ -3242,7 +3242,7 @@ productionapp/SDK/frozenD64 unchanged. KnownCYDIDF6PHYassert, wholeimage audit,
 SDKI/O/allocation/NVSinternalcuts/fullsuite/24h/H01-H09 stillopen.
 
 
-## CURRENT 2026-10-24 — station weather during disconnect/recovery passed
+## Checkpoint 2026-10-24 — station weather (newer CURRENT below)
 
 Previous goal turn progress: committed3aedd9bb1 APactivity tests/actual12ops.
 This turn inspected clean3aedd9bb1 and QEMU7a9764712b before work. Goal broad/active,
@@ -3285,3 +3285,72 @@ scan/photo/theme activity andnowSTAweather selectedrecovery covered. No complete
 HTTP-LIFETIME/RF/24h acceptanceclaim. KnownCYDIDF6PHY, wholeimage audit, SDKI/O/
 allocation/NVSinternalpublicationfaults/fullsuite/H01-H09 remainopen. NoQEMU
 process should remain beforecommit. Goal notcomplete orblocked.
+
+
+## CURRENT 2026-10-24 — controlled packet loss and DHCP retry fixed
+
+Previous goal turn progressed: baf6969b3 committed real STA/weather recovery.
+This turn started from clean baf6969b3 / QEMU7a9764712b and found an actual model
+bug. The broad goal remains active. No blocker, push request or physical action.
+Production app9C1A83BD / ELF76B5CE37 / source7D95988C and SDK/frozenD64 unchanged.
+
+QEMU task worktree now HEAD b85483c98d (Retry virtual DHCP acquisition with
+backoff and per-peer transactions), after focused commit287d95e1b1 (one-shot
+virtual AP protocol packet loss controls). Before executable clients-v6-riscv32
+SHA51b6746191d5dc910487ab1540b4279979f50a30eeec5da7fa74054f0674fb1a; final
+clients-v7-riscv32 SHA6d9d82665330a6f567d04eac9563ed05d2d14bdb47329d78e9f306fce3761a90.
+Xtensa v6/v7 still821D9807, byte-identical baseline. Both target builds terminal0.
+
+New QMP softap-drop-next: 21bits = 3peers x7stages (probe/auth/assoc/discover/
+request/offer/ACK). External one-shot loss at virtual client protocol boundary,
+not physical RF/802.11 ACK. Counter/time getter softap-client-faults stores no
+payload and formats only on query. Defaultmask0 exits before parsing/clockread;
+STA excluded. Invalid mask bit21 rejected without mutation. Existing random
+link loss remains separate. Fault policy/counters persist guest reset as external
+harness state. Sources separated into esp32c3_wifi_fault.c/.h.
+
+Before v6: three management losses recover (old1s retry), four DHCP losses remain
+state6(discover/offer) or7(request/ack) for >=12guestseconds, while first peer
+and HTTP200 work. New network_loss_qemu.py records before_control=true and
+recovery_acceptance=false for these4; do not count them as recovery passes.
+All seven v6 runs passed their intended oracle and reaped (including4failcontrols).
+
+v7 adds per-peer acquisition deadline/backoff4/8/16/32/64s, uniform ms jitter
++-1s with rejection sampling, actual cap64s. Existing guestAPbeacon events check
+deadline, no guest delay/busywait. ACK clears it; NAK/reassociation new transaction.
+Fresh random per-peer XIDs (also distinct from existing peers), stable during
+retry, parser matches lease.xid. Previous single constant XID removed. DHCP
+constructors BOOTREQUEST/chaddr/clientID agree, also legacy model client mode.
+Lease renewal/rebinding not implemented. Pure C lease struct now13bytes (adds
+xid4); unit ctypes layout updated before execution. Unit351cases +905guard-page
+prefixes +10000random non-DHCP +14007backoff/jitter combinations passed. Old9byte
+lease reports remain historical, do not mix their ABI with new code.
+
+All seven after runs pass. DHCP target has1retry, healthy peer0; both bound5,
+nextdeadline/nominal cleared, two distinct stable XIDs. Native oneHTTPstart/0stop.
+Factory primary-departure regression passed onv7 (known handle-loss remains).
+C3 default/modular v7 each60s boot/console/panic/immutable-input check pass.
+All15C2 +2C3 owned processes stopped/reaped; builds/sessions terminal. No liveQEMU.
+Original worktrees/rootmain untouched. QEMU taskworktree clean after both commits.
+
+Independent network_loss_contract.py replays14reports and112unsafecontrols.
+verify_network_loss_evidence.py rechecks exactELF/APABI/modelGitblobs, Cunit
+sources/report, factory typedevents and legacy boot reports. Proof
+Small_TV/qemu/parity/network-loss-validation-20261024.json passed offline:
+61raw/54payloads,116266newgzipbytes; oldpayloads reused, nofullVMflash/RAM/UART.
+Docs tests/NETWORK_LOSS.md and IMPROVEMENT_PLAN updated. Newproducer source
+network_loss_qemu.py is self-pinned across all14runs; do not edit without rerun.
+Historical replay supports --source-revision. No push performed.
+
+NEXT: remaining bridge liveness during a permanently stalled primary DHCP needs
+an actual repro. Source select_ethernet_interface compares targetIP with only
+s->softap.ipaddr. If slot0 never saw a DHCP reply, slot1 may have learned guestAP
+IP while slot0 ipaddr iszero. Broadcast hostARP then may select STA wrongly.
+This is a code observation, not yet runtime diagnosis. Use controlled repeated
+DISCOVER loss on peer0, keep peer1 healthy, observe ordinary HTTP before allowing
+peer0 recovery; fix if reproduced. Single-shot peer0 would recover in3..5s and
+mask the demux issue. Could need a dedicated bounded rearm test, not a fake SDK
+callback or PC/RAM mutation. Keep task worktree/model source isolated.
+Then combined/repeated losses and prolonged churn/soak, full network gate.
+Known CYDIDF6PHY gap, wholeimage audit, SDK I/O/allocation/NVSinternal faults,
+fullsuite/24h/H01-H09 still open. Goal not complete/blocked/paused.

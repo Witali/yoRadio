@@ -318,6 +318,17 @@ weather/recovery теперь проверены. Остались prolonged chu
 loss, полный network gate и физическая RF/WPA приёмка; весь `HTTP-LIFETIME`
 по-прежнему не закрыт.
 
+Controlled-loss checkpoint: найдена ошибка QEMU — без повторной отправки один
+потерянный DHCP пакет оставлял peer в state6/7. Отдельные QEMU commits
+`287d95e1b1` (одноразовые protocol faults) и `b85483c98d` (backoff/jitter,
+per-peer XID, acquisition retries) проверены 7 cases до и 7 после. Четыре before
+controls воспроизводят проблему; все after recover, сосед и HTTP не прерываются.
+Offline proof `network-loss-validation-20261024.json`, 112 negative controls;
+pure-C351cases/905guard prefixes/14007jitter combinations. Factory regression
+и C3 default/modular boot checks pass. См. [NETWORK_LOSS.md](tests/NETWORK_LOSS.md).
+Selected одиночные потери проверены; совмещённые потери, liveness при stalled
+primary DHCP, prolonged churn/soak, full network/RF gate остаются открытыми.
+
 ## 4. Электрические и аппаратные различия
 
 Статус: **аппаратная приёмка не выполнена**. Исследовать RESET/DC pull-ups:

@@ -4400,3 +4400,23 @@ Proof station-weather-validation-20261024.json:32raw/32payloads,30274newgzipbyte
 старыеpayloads reused,fullVMflash/RAM/UART не копируются. Production/SDK/QEMU
 source/physicalнеизменны,pushнет. SelectedSTAweather/recovery теперьпроверен;
 prolongedchurn/loss/полныйnetwork/fullsuite/24h/hardware иостальнойплан ещёоткрыты.
+
+
+## 2026-10-24 — точечные потери и исправление DHCP-повторов QEMU
+
+В QEMU добавлен отключаемый one-shot fault mask для7protocol stages каждого
+peer (287d95e1b1), без payload logs или изменений guest RAM/SDK callbacks.
+Контрольная потеря DHCP Discover/Request/Offer/ACK показала зависание state6/7
+на12guest s при живом соседе/HTTP. b85483c98d добавляет acquisition retry deadlines,
+backoff/jitter и отдельные свежие XID, сохранённые при повторах. RFC2131§4.1
+проверен по первичному источнику; lease renewal/rebinding не заявляются.
+
+14live runs:7before (4expectedfailcontrols) и7after recoveries, плюс factory
+primary-departure regression; все15C2 процессов остановлены/reaped. C3default/
+modular60sboot checks тоже pass и reaped; Xtensa unchanged821D. Native app и SDK
+не изменялись, physical/push нет. PureC351cases/905guard prefixes/10000non-DHCP/
+14007jitter combinations pass. Offline14reports +112negative controls pass.
+Proof network-loss-validation-20261024.json:61raw/54payloads,116266newgzipbytes,
+старыеpayloads reused, полныеVMflash/RAM/UART не добавлены. Детали NETWORK_LOSS.md.
+Следующие проверки: liveness моста при stalled primaryDHCP (пока code hypothesis),
+combined/repeated loss и prolonged churn/soak. Общий план остаётся активным.
