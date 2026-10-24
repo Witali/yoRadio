@@ -329,6 +329,17 @@ pure-C351cases/905guard prefixes/14007jitter combinations. Factory regression
 Selected одиночные потери проверены; совмещённые потери, liveness при stalled
 primary DHCP, prolonged churn/soak, full network/RF gate остаются открытыми.
 
+Stalled-peer checkpoint: зависание DHCP первого peer действительно блокировало
+HTTP через здорового второго. QEMU `21a8d6dd8c` исправляет общий AP address в
+IP demux. Сохранены настоящий failed before run, здоровый before control и два
+after pass с задержкой каждого клиента. Дополнительно обе последовательности
+из 7 потерь подряд прошли: 4 DHCP retries у цели, 0 у соседа, HTTP доступен.
+Proof `network-stalled-peer-validation-20261024.json`, 44 negative controls;
+factory regression/C3 boot checks pass. См.
+[NETWORK_STALLED_PEER.md](tests/NETWORK_STALLED_PEER.md). Эти selected stalled/
+combined cases закрыты; prolonged churn/soak, произвольные сочетания потерь,
+full network/RF gate и остальные пункты плана остаются открытыми.
+
 ## 4. Электрические и аппаратные различия
 
 Статус: **аппаратная приёмка не выполнена**. Исследовать RESET/DC pull-ups:

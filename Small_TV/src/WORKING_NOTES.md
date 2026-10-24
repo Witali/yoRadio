@@ -3287,7 +3287,7 @@ allocation/NVSinternalpublicationfaults/fullsuite/H01-H09 remainopen. NoQEMU
 process should remain beforecommit. Goal notcomplete orblocked.
 
 
-## CURRENT 2026-10-24 — controlled packet loss and DHCP retry fixed
+## Checkpoint 2026-10-24 — DHCP retry (newer CURRENT below)
 
 Previous goal turn progressed: baf6969b3 committed real STA/weather recovery.
 This turn started from clean baf6969b3 / QEMU7a9764712b and found an actual model
@@ -3354,3 +3354,55 @@ callback or PC/RAM mutation. Keep task worktree/model source isolated.
 Then combined/repeated losses and prolonged churn/soak, full network gate.
 Known CYDIDF6PHY gap, wholeimage audit, SDK I/O/allocation/NVSinternal faults,
 fullsuite/24h/H01-H09 still open. Goal not complete/blocked/paused.
+
+## CURRENT 2026-10-24 — stalled primary bridge corrected; combined losses pass
+
+Broad goal remains active, no blocker, physical action or new push request.
+Previous checkpoint 98fedc62f qualified individual packet loss/DHCP retries.
+Current production app9C1A83BD/ELF76B5CE37/source7D95988C, SDK and frozenD64
+unchanged. QEMU task worktree HEAD21a8d6dd8c is clean; root/main untouched.
+
+Actual v7 primary-probe failed AssertionError: peer0 held state6/no lease by
+repeated Discover loss, peer1 bound5, HTTP still pending after >=10 guest s.
+After release normal DHCP/pending+new HTTP200. Before secondary-control passes.
+Bug: esp32_wifi_learn_guest_ip stored guest AP IP only in sending peer, but
+Ethernet selector used primary.ipaddr. If primary never sends Discover it is
+zero; host broadcast ARP goes to STA despite bound secondary. FIXED_EMULATION
+shares learned AP interface IP across all AP peers, keeps leases independent;
+STA/legacy path unchanged. QEMU marker policy docs/CORRECTION_MARKERS.md added.
+
+v8 clients-v8-riscv32.exe SHA
+a5be14c545fd2dffec145473429686b9a667735a8fb6f0226c5c60034ac3785f.
+Before v7 SHA6d9d82665330a6f567d04eac9563ed05d2d14bdb47329d78e9f306fce3761a90.
+Both targets build terminal0, Xtensa byte-identical821D9807. All original
+baseline/v1-v7 executables preserved. New stalled producer self-pinned unchanged
+across 4 runs; do not edit without rerun. After v8 peer0 and peer1 stalls both
+serve HTTP200 through healthy neighbor while target still state6/no lease.
+
+network_loss_qemu.py now supports --all-stages; two v8 runs target either peer,
+seven actual losses each, target4DHCP retries/healthy0, distinct stable XIDs.
+Healthy HTTP ready before target finishes, then post-recovery HTTP200. Producer
+same exact hash in both. Generic contract retains single-case result keys;
+old 14-run proof supports historical replay --source-revision98fedc62f.
+Factory primary departure/zero-survivor regression passes, handle-loss still
+observed. C3 default/modular each60s boot/console/panic/input checks pass; not
+full OLED/RF acceptance. All7C2+2C3 owned VMs stopped/reaped, process inventory
+empty. No firmware rebuild. No physical flashing/reset/serial or SDK writes.
+
+New verify_network_stalled_peer_evidence.py checks exact ELF/AP ABI/symbols,
+Git model blobs/source pins, real failed before run, recovery and combined
+losses. 44 semantic negative controls rejected; hold mutations update matching
+sample too so rejection does not rely on duplicated summary inconsistency.
+Proof network-stalled-peer-validation-20261024.json:57raw/44payloads,
+100050newgzipbytes, existing blobs reused; no fullVMflash/RAM/UART archived.
+Docs NETWORK_STALLED_PEER.md, NETWORK_LOSS.md and plan updated. QEMU focused
+commit21a8d6dd8c; yoRadio checkpoint commit follows this working note.
+
+NEXT: qualify prolonged AP/STA churn and current-image runtime/soak. Existing
+runtime_qemu.py supports --duration-seconds/--cycles and actual ROM heap/stack,
+but executable is hardcoded to frozenRoot/bin/qemu-system-riscv32.exe. Add an
+explicit candidate --qemu option preserving default and separate binary pins;
+do not overwrite frozenD64. Inspect code first, run bounded qualification
+before H10. Whole-image xref audit, SDK I/O/allocation/NVS-internal/electrical
+publication faults, full current regression, known CYD IDF6 PHY assert and
+hardware H01-H09 remain open. Goal not complete/blocked/paused.

@@ -1,4 +1,4 @@
-"""Drop one specified virtual AP peer packet and observe real SDK/DHCP recovery."""
+"""Drop selected virtual AP peer packets and observe real SDK/DHCP recovery."""
 import argparse
 import json
 from pathlib import Path
@@ -19,17 +19,20 @@ STAGES=('probe','authentication','association','discover','request','offer','ack
 
 
 def main():
-    """Require one consumed fault and an unaffected peer; keep failed recovery visible."""
+    """Require consumed faults and an unaffected peer; keep failed recovery visible."""
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--qemu-root',type=Path,required=True)
     parser.add_argument('--qemu',type=Path,required=True)
     parser.add_argument('--abi',type=Path,required=True)
-    parser.add_argument('--stage',choices=STAGES,required=True)
+    selection=parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument('--stage',choices=STAGES)
+    selection.add_argument('--all-stages',action='store_true',help='Lose one packet at every handshake/DHCP stage')
     parser.add_argument('--peer',type=int,choices=(0,1),default=1)
     parser.add_argument('--expect-timeout',action='store_true',help='Before-fix control only, never recovery acceptance')
     parser.add_argument('--dependency-root',type=Path,default=Path('C:/Work/yoRadio'))
     parser.add_argument('--output',type=Path,required=True)
-    args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=False)
+    args=parser.parse_args();assert not (args.all_stages and args.expect_timeout)
+    args.output.mkdir(parents=True,exist_ok=False)
     sys.path.insert(0,str(args.qemu_root/'tools'));import small_tv_vm as vm
     from small_tv_http_test import http,wait_http,clean_uart
     frozen=json.loads((args.qemu_root/'frozen-inputs.json').read_text())
@@ -40,10 +43,12 @@ def main():
     files=[Path(__file__),args.qemu,args.abi,elf,*[Path(__file__).with_name(n) for n in
         ('network_clients_qemu.py','network_event_abi.py','gdb_observer.py','photo_owner_qemu.py','control_oracle.py','weather_qemu.py')]]
     pins={str(p.resolve()):sha(p) for p in files}
-    bit=1<<(args.peer*7+STAGES.index(args.stage))
+    indices=list(range(7)) if args.all_stages else [STAGES.index(args.stage)]
+    bit=sum(1<<(args.peer*7+index) for index in indices)
     report=dict(passed=False,recovery_acceptance=False,before_control=args.expect_timeout,
         network_lifecycle_complete=False,all_functionality_verified=False,lcd_acceptance=False,
-        rf_acceptance=False,hardware_tested=False,stage=args.stage,peer=args.peer,drop_bit=bit,
+        rf_acceptance=False,hardware_tested=False,stage='all' if args.all_stages else args.stage,
+        peer=args.peer,drop_bit=bit,
         app_sha256=verify_inputs(ROOT,args.dependency_root),elf_sha256=sha(elf),qemu_sha256=sha(args.qemu),
         inputs_sha256=pins,wire=abi['wire'],entries=entries,event_base_object=base,samples=[],owners_stopped=False)
     with socket.socket() as reservation:
@@ -76,17 +81,19 @@ def main():
                 seconds=weather.virtual_seconds(qmp)
             sample=dict(guest_seconds=seconds,clients=clients,faults=faults,pending=pending)
             report['samples'].append(sample)
-            count=faults[args.peer]['dropped'][STAGES.index(args.stage)]
-            if count:
-                assert count==1 and pending==0
-                if drop_started is None:drop_started=faults[args.peer]['last_drop_us'][STAGES.index(args.stage)]/1e6
+            counts=[faults[args.peer]['dropped'][index] for index in indices]
+            if any(counts):
+                assert all(count in (0,1) for count in counts)
+                if drop_started is None:
+                    drop_started=min(faults[args.peer]['last_drop_us'][index] for index in indices
+                        if faults[args.peer]['dropped'][index])/1e6
                 good=all(r['model_state']==5 and r['offered_ipv4']!='0.0.0.0' for r in clients[:2])
-                if good:report['recovery_acceptance']=True;break
-                if seconds-drop_started>=12:break
+                if good and all(counts):report['recovery_acceptance']=True;break
+                if seconds-drop_started>=(45 if args.all_stages else 12):break
             assert time.monotonic()<host_deadline,sample
             time.sleep(.1)
         assert drop_started is not None
-        assert sum(sum(peer['dropped']) for peer in faults)==1
+        assert pending==0 and sum(sum(peer['dropped']) for peer in faults)==len(indices)
         assert clients[1-args.peer]['model_state']==5
         result=http(url,'/getclocktype');report['http']=dict(status=result[0],body_hex=result[1].hex())
         assert result==(200,b'0')
@@ -104,7 +111,7 @@ def main():
             if handle:assert kernel.WaitForSingleObject(handle,10000)==0;kernel.CloseHandle(handle)
             report['owners_stopped']=True
         vm.save_json(args.output/'report.json',report)
-    print('PASS',args.stage,'before-control' if args.expect_timeout else 'actual-recovery',flush=True)
+    print('PASS',report['stage'],'before-control' if args.expect_timeout else 'actual-recovery',flush=True)
 
 
 if __name__=='__main__':main()

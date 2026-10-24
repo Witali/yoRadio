@@ -4420,3 +4420,23 @@ Proof network-loss-validation-20261024.json:61raw/54payloads,116266newgzipbytes,
 старыеpayloads reused, полныеVMflash/RAM/UART не добавлены. Детали NETWORK_LOSS.md.
 Следующие проверки: liveness моста при stalled primaryDHCP (пока code hypothesis),
 combined/repeated loss и prolonged churn/soak. Общий план остаётся активным.
+
+## 2026-10-24 — исправление AP bridge QEMU и совмещённые потери
+
+Повторная потеря Discover у первого peer воспроизвела настоящую ошибку модели:
+HTTP pending при готовом втором peer. До исправления run завершился AssertionError;
+после снятия потерь DHCP и HTTP восстановились. Задержка второго peer не ломала
+HTTP. QEMU21a8d6dd8c распространяет выученный guest AP address на все AP peers,
+сохраняя отдельные leases; функция и отдельная политика отмечены FIXED_EMULATION.
+После исправления оба stalled-peer runs обслуживают HTTP во время задержки.
+
+Добавлены --all-stages и два запуска с семью потерями подряд, для каждого peer.
+В обоих 7 потерь/4 DHCP retries цели/0 у соседа, HTTP доступен до и после recovery.
+Factory regression и C3 default/modular60s boot checks pass, Xtensa unchanged821D.
+Все7C2+2C3 VM остановлены/reaped; production app/SDK/frozen tools неизменны.
+
+Offline proof network-stalled-peer-validation-20261024.json:57raw/44payloads,
+100050newgzipbytes, exact ABI/ELF/Git blobs и 44 negative controls pass. Реальный
+before failure сохранён как passed=false. Full flash/RAM/UART не копируются.
+См. tests/NETWORK_STALLED_PEER.md. Общий план, длительный churn/soak, full network,
+fullsuite/24h/hardware и остальные пункты остаются открытыми. Push не выполнялся.

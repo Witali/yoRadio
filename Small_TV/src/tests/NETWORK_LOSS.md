@@ -78,11 +78,15 @@ raw counters/time/state/SDK observations, unit report/source и regression repor
 $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/verify_network_loss_evidence.py `
-  --proof Small_TV/qemu/parity/network-loss-validation-20261024.json
+  --proof Small_TV/qemu/parity/network-loss-validation-20261024.json `
+  --source-revision 98fedc62f
 ```
 
-Для исторических producer bytes используйте `--source-revision` с коммитом этого
-checkpoint. Остались совмещённые/повторные потери, prolonged churn/soak, полный
-сетевой gate и аппаратная RF/WPA приёмка. Отдельно стоит проверить liveness моста,
-если первый peer не получил DHCP, а второй уже готов: IP demux пока использует
-адрес, выученный в primary slot. Это наблюдение по коду, ещё не runtime diagnosis.
+Исторический replay использует исходники `98fedc62f`. Следующий checkpoint
+добавляет `--all-stages` и проверяет семь потерь подряд для любого из двух peer.
+Повторная потеря Discover воспроизвела ошибку IP demux при задержанном первом
+клиенте; она исправлена в QEMU `21a8d6dd8c`. Обе проверки задержки и обе
+совмещённые последовательности после исправления прошли. См.
+[NETWORK_STALLED_PEER.md](NETWORK_STALLED_PEER.md). Prolonged churn/soak,
+произвольные последовательности потерь, полный network gate и аппаратная
+RF/WPA приёмка остаются открытыми.

@@ -11,9 +11,10 @@ def validate(report,read_code):
     assert report['passed'] and report['owners_stopped'] and report['invalid_mask_rejected']
     assert not any(report[k] for k in ('network_lifecycle_complete','all_functionality_verified',
         'lcd_acceptance','rf_acceptance','hardware_tested'))
-    stage=STAGES.index(report['stage']);peer=report['peer'];assert peer==1
-    assert report['drop_bit']==1<<(peer*7+stage)
-    before=report['before_control'];assert not before or stage>=3
+    stages=list(range(7)) if report['stage']=='all' else [STAGES.index(report['stage'])]
+    peer=report['peer'];assert peer in (0,1)
+    assert report['drop_bit']==sum(1<<(peer*7+stage) for stage in stages)
+    before=report['before_control'];assert not before or len(stages)==1 and stages[0]>=3
     assert report['recovery_acceptance'] is (not before)
     events=report['events'];wire=report['wire'];macs=set()
     base=int.from_bytes(read_code(report['event_base_object'],4),'little')
@@ -45,29 +46,38 @@ def validate(report,read_code):
             assert len(loss['dropped'])==len(loss['last_drop_us'])==7
             for number,count in enumerate(loss['dropped']):
                 assert type(count) is int and count in (0,1)
-                if index!=peer or number!=stage:assert count==0
+                if index!=peer or number not in stages:assert count==0
             if index<2 and client.get('xid','00000000')!='00000000':
                 assert len(bytes.fromhex(client['xid']))==4;ids[index].add(client['xid'])
-        count=faults[peer]['dropped'][stage]
-        assert sample['pending']==(0 if count else report['drop_bit'])
+        remaining=sum(1<<(peer*7+stage) for stage in stages if not faults[peer]['dropped'][stage])
+        assert sample['pending']==remaining
     last=samples[-1];clients=last['clients'];loss=last['faults'][peer]
-    assert loss['dropped'][stage]==1 and sum(sum(x['dropped']) for x in last['faults'])==1
-    assert clients[0]['model_state']==5 and clients[0]['offered_ipv4']!='0.0.0.0'
+    assert all(loss['dropped'][stage]==1 for stage in stages)
+    assert sum(sum(x['dropped']) for x in last['faults'])==len(stages)
+    assert clients[1-peer]['model_state']==5 and clients[1-peer]['offered_ipv4']!='0.0.0.0'
     if before:
-        assert clients[1]['model_state']==(6 if stage in (3,5) else 7)
+        stage=stages[0]
+        assert clients[peer]['model_state']==(6 if stage in (3,5) else 7)
         assert last['guest_seconds']-loss['last_drop_us'][stage]/1e6>=12
     else:
-        assert clients[1]['model_state']==5 and clients[1]['offered_ipv4']!='0.0.0.0'
+        assert clients[peer]['model_state']==5 and clients[peer]['offered_ipv4']!='0.0.0.0'
         assert clients[0]['offered_ipv4']!=clients[1]['offered_ipv4']
         # Older before-build management runs lack the newer XID observations.
         if 'xid' in clients[0]:
             assert all(len(values)==1 for values in ids) and ids[0]!=ids[1]
-            assert clients[0]['dhcp_retries']==0
-            assert clients[1]['dhcp_retries']==(1 if stage>=3 else 0)
+            assert clients[1-peer]['dhcp_retries']==0
+            assert clients[peer]['dhcp_retries']==sum(stage>=3 for stage in stages)
             assert all(c['dhcp_next_retry_us']==c['dhcp_nominal_seconds']==0 for c in clients[:2])
-    return dict(stage=report['stage'],before_control=before,
-        recovery_acceptance=report['recovery_acceptance'],one_actual_loss=True,
-        unaffected_peer_http=True,owners_stopped=True)
+    if len(stages)>1:
+        # wait_http completed before the first sample: the healthy peer served
+        # it while the selected peer was still acquiring its lease.
+        assert samples[0]['clients'][peer]['model_state']!=5
+        assert samples[0]['clients'][1-peer]['model_state']==5
+    result=dict(stage=report['stage'],before_control=before,
+        recovery_acceptance=report['recovery_acceptance'],unaffected_peer_http=True,owners_stopped=True)
+    if len(stages)==1:result['one_actual_loss']=True
+    else:result['actual_losses']=len(stages)
+    return result
 
 
 def rejection_checks(report,read_code):
@@ -77,9 +87,9 @@ def rejection_checks(report,read_code):
                  'http-error','wrong-recovery','mask-not-validated','not-reaped'):
         wrong=copy.deepcopy(report);final=wrong['samples'][-1]
         if case=='peer-bytes':next(e for e in wrong['events'] if 'kind' in e)['event_data_hex']='00'*8
-        elif case=='no-fault':final['faults'][wrong['peer']]['dropped'][STAGES.index(wrong['stage'])]=0
+        elif case=='no-fault':final['faults'][wrong['peer']]['dropped'][0 if wrong['stage']=='all' else STAGES.index(wrong['stage'])]=0
         elif case=='pending-fault':final['pending']=wrong['drop_bit']
-        elif case=='healthy-peer-offline':final['clients'][0]['model_state']=0
+        elif case=='healthy-peer-offline':final['clients'][1-wrong['peer']]['model_state']=0
         elif case=='http-error':wrong['http']['status']=500
         elif case=='wrong-recovery':wrong['recovery_acceptance']=not wrong['recovery_acceptance']
         elif case=='mask-not-validated':wrong['invalid_mask_rejected']=False
