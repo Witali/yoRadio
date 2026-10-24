@@ -2896,3 +2896,51 @@ cuts, lifecycle/churn, whole-image/full/24h/hardware. Earlier unlimited heavy
 JPEG passes are not new default-policy acceptance. Shared SDK/frozen QEMU
 unchanged; no physical flashing/UART/reset, no push. Broader goal status is
 controlled by the user; this checkpoint completes the requested budget feature.
+
+## ACTIVE 2026-10-24 — current-image JPEG format/resource matrix
+
+Previous goal turn made progress: production configurable budget committed
+db738ea51, clean worktree. Goal explicitly resumed/active; do not shrink it to
+this matrix. App9C1A83BD/ELF76B5CE37/source7D95988C unchanged, default200KiB.
+
+New tests/photo_format_matrix_qemu.py reads committed old cache corpus70 via
+verified fixture tar, uses actual HTTP async owner, full physical source/frame/
+journal oracle and immediate gray recovery after every refusal.59host positives,
+5source capacity,6negative/sampling cases. Extended expected SHA from original
+upstream+Python conversion; rich baseline8 oracle recomputed literal factoryRV32
+for preserved IDCT/clipping. No guest code/PC/RAM writes. Full diagnostic address
+is now saved alongside entry/exit RAM, allowing independent nested field check.
+photo_format_matrix_contract.py independently derives stored RAM fields, protected
+bytes, physical pixels and precise failure reasons; union70 enforcement across
+independent parts. No general network or LCD acceptance criterion.
+
+Pilot .build/photo-format-matrix-20261024/pilot TERMINAL0 (exec38491), VM23772
+SmallTV-6db847ce76bf stopped/reaped.6primary/9workflows:6accepted incl3recoveries,
+2finish failures (write cap,unsupportedSOF5),1oversize source admission. Stack
+untouched5012/8192; sum individual heap minima10548 is conservative lower bound,
+NOT simultaneous aggregate/worst-case. Pilot contract passes, exact pixels good.
+
+FULL RUN NOW LIVE, do not rebuild/apply source changes to pinned inputs or restart
+because of an observation timeout. Four disjoint groups18/18/17/17, explicit names
+in .build/photo-format-matrix-20261024/shards.json. Fresh owned VM per process.
+exec handles part0=29480, part1=11839, part2=7249, part3=62925. Outputs
+.build/photo-format-matrix-20261024/part-N, logs part-N.log; all four last polled
+live by write_stdin. To continue poll the same handles; inspect session.json only
+as locator, not liveness proof. No second debugger. Runtime uses Frozen QEMU
+jpeg-selector-qemu-complete-20261019 and unchanged SDK; active processes retain
+their exact input hashes. Contract/doc changes not consumed by these VM drivers.
+
+NEXT: wait for all terminal; preserve failures truthfully, validate union70+
+RAM/frame/protected data, capture raw reports/physical deltas and update status.
+Then real target allocation/I/O failures, publication cuts and remaining broader
+network/whole-image/full/24h/hardware. Do not claim this pilot completed the plan.
+No push/physical actions. Whole-image/stale-navigation investigation was read-only
+only: no new assertions or source fixes have been made in that category yet.
+
+Pilot evidence saved as qemu/parity/jpeg-format-pilot-validation-20261024.json:
+19lossless physical images,16RAM snapshots, raw diagnostic layouts/logs and
+independent verify_photo_format_matrix_evidence.py. Full parts still excluded
+from accepted evidence until they terminate; don't capture a live backing as
+terminal output. Current owned VM locators: part0 PID4920 SmallTV-d66e31d2e749;
+part1 PID21724 SmallTV-f83944d60067; part2 PID36888 SmallTV-fef47653c41e;
+part3 PID28724 SmallTV-5f583294c6f3. Validate handles/process identity on resume.

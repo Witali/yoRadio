@@ -4203,3 +4203,30 @@ images (13current+2failingbefore), PNG/RAM/trace/mutants и independent offline
 verifier. Legacy factory dump не добавлялся. SDK/frozen QEMU не менялись, physical
 flash/UART/reset и push не выполнялись. Полная новая target matrix, publication
 cuts, network lifecycle/churn, whole-image/full/24h/hardware остаются в плане.
+
+## 2026-10-24 — текущая JPEG format/resource проверка
+
+Production app9C1A83BD не менялась. Новый runner читает committed70-vector corpus
+с SHA checks и выполняет реальную HTTP загрузку, полный physical cache hash и
+канонический journal. Для baseline8 эталон — буквальные factoryRV32 instructions,
+для extended — закреплённый upstream samples+PythonRGB565. After refusal следующий
+gray progressive реально обрабатывается. Entry/exit RAM и адрес diagnostic дают
+независимую offline проверку nested fields/task stack/heaps. Отдельные network и
+LCD gates этой проверкой не заменяются.
+
+Pilot6primary/9workflows terminal pass: CMYK12progressive/lossless-gray16/baseline8
+точные; richprogressive12 write-limit205056/204800, oversizedsource admission и
+SOF5 unsupported, после каждого recoveryOK.6accepted/2finishrefused/1sourcefail,
+worker untouched5012/8192, heap minima sum lowerbound10548. Это не измерение
+одновременного whole-app peak. Pilot VM stopped/reaped; saved-byte checker pass.
+
+Полные70primary запущены4disjoint parts18/18/17/17, handles/paths в WORKING_NOTES.
+На момент checkpoint они живы, полного matrix pass пока нет. Application/SDK/
+frozen QEMU не менялись, физической платы/push нет. Full fault/publication,
+network lifecycle/churn, whole-image/full/24h/hardware остаются в плане.
+
+Сохранён pilot proof jpeg-format-pilot-validation-20261024.json:19physical images
+и16RAM snapshots в lossless/deduplicated gzip, около1.3MBновых compressed bytes.
+Offline verifier повторно проверил source/frame/journal, целый diagnostic из RAM,
+heap/task fields и factory baseline oracle. Full4parts в этот accepted proof не
+включены: они пока работают; окончательные результаты сохранять после terminal.

@@ -1,6 +1,6 @@
 # План улучшения восстановленной Small TV
 
-Обновлено: 2026-10-23. База: `main` / `51cd114f9`.
+Обновлено: 2026-10-24. База: `main` / `51cd114f9`.
 
 Цель — восстановить полезное поведение заводской прошивки ESP32-C2, исправляя
 её подтверждённые ошибки. Сопоставлять ассемблер, декомпиляцию и наш C-код в обе
@@ -70,6 +70,15 @@ bug сохранён как failing before control. Подробности и н
 verifier: [JPEG_WRITE_BUDGET.md](tests/JPEG_WRITE_BUDGET.md).
 Полная target format/fault/RAM/stack матрица под новой политикой ещё открыта;
 прежние unlimited JPEG результаты не подменяют приёмку current default policy.
+
+2026-10-24: [production format matrix](tests/JPEG_FORMAT_MATRIX.md) начат на
+неизменённой9C1A83BD с200KiB. Pilot6vectors/9workflows проверил точные baseline8,
+CMYK12progressive/lossless-gray16, write-limit/source-slot/SOF5 refusals и3реальных
+успешных recovery. Saved-byte checker пересчитывает physical source/frame/journal,
+полный diagnostic из RAM и task/heap measurements; observed worker margin5012.
+Полный корпус70 выполняется4independent parts18/18/17/17. Пока все части не
+terminal pass и union не проверен, это не полный target matrix pass. Faults/
+publication cuts, lifecycle/churn, whole-image/full/24h/hardware остаются открытыми.
 
 Checkpoint 2026-10-23: реальные upload/UI используют общего владельца codec и
 проверенный RGB565 cache. Фоновая очередь и SDK async HTTP освобождают HTTP task;
