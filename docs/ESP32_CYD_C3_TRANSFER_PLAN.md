@@ -212,6 +212,12 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   значений под ASan/UBSan в native-long/int32 профилях; SDK/QEMU по2179
   точных граничных значений на Xtensa/core1 и RV32/core0. Весь setup и native
   ABI assertions компилируются; это не повторная квалификация PCM/G6.
+  [Собственная численная основа floor0](../tests/results/vorbis-floor0-numeric-20261025/CHECKPOINT.md)
+  реализована отдельным компонентом: 60541 host-операция под ASan/UBSan,
+  независимый Decimal120 oracle и по327 native coefficient/gain случаев.
+  [Широкий путь](VORBIS_WIDE_NUMERIC_DESIGN.md) по-прежнему требует исходных
+  углов, residue/coupling, IMDCT/overlap и public raw integration; компонент
+  не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
   Xtensa векторов; host331 точный вектор и34 UBSan NONPASS остаются отдельно.
@@ -1361,3 +1367,21 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Это исправление helper, а не полная raw/PCM/G6 приёмка; прежний full31
   NONPASS не переквалифицирован. Wide/sequence1/floor0, deferred scopes,
   final Clang/exports, radio/resources и physical остаются в плане.
+
+- 2026-10-25, CYD-C3-14: [owned scaled floor0 core](../tests/results/vorbis-floor0-numeric-20261025/CHECKPOINT.md)
+  добавлен по [проекту широкого пути](VORBIS_WIDE_NUMERIC_DESIGN.md), отдельно
+  от vendor ABI и production registration. Host60541 операций/60471 численное
+  сравнение/49 metadata controls проходят ASan/UBSan; Decimal120 проверяет
+  прямые произведения/sqrt, а cosine1145/Bark25542 проверяются отдельно.
+  Все168 прежних unit-входов/58368 bins сохранены. Новые SDK/QEMU каждой
+  архитектуры захватывают327 случаев/347 событий/16 API-групп, все9 команд
+  завершаются нормально; warnings0, cores1/0, coordinator0. Отдельный numerical
+  checker проходит654 native coefficient/gain значения с прежними заранее
+  выбранными пределами. Capture сам не объявляет numerical PASS.
+  Compiler .su показывает максимум208B собственного frame на обеих целях;
+  callee/libm/task high-water и физическая производительность не измерены.
+  Component сохраняет raw-amplitude до63 бит и диапазон scaled polynomial/log
+  gain, не делает Q24 clipping и не ограничивает положительное усиление unity.
+  Это численный строительный блок: stable angle path и весь wide synthesis,
+  public raw lifecycle/integration, PCM/G6/G8 ещё открыты. Прежний full31
+  NONPASS не переобъявлен исправленным; deferred scopes не возобновлялись.

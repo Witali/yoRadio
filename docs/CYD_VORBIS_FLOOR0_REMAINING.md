@@ -44,3 +44,28 @@ performance measurement.
 
 No new floor0 renderer, private backend inspection, deferred public-book guard,
 Ogg or AAC work is enabled by this analysis.
+
+## Owned scaled coefficient core, 2026-10-25
+
+The [wide numerical design](VORBIS_WIDE_NUMERIC_DESIGN.md) now defines the
+precision boundary and the continuation through owned public raw operations.
+Its first [implemented component](../idf/components/native_vorbis_numeric/README.md)
+evaluates floor0 polynomials and amplitude/gain with normalized mantissas and
+separate exponents. A scaled-denominator entry point allows the later stable
+angle path to bypass irreversible cosine rounding. The module is not connected
+to either radio application or the vendor inverse2 callback.
+
+The [numerical checkpoint](../tests/results/vorbis-floor0-numeric-20261025/CHECKPOINT.md)
+passes 60541 host operations with ASan/UBSan and a Decimal120 direct polynomial
+oracle, including all 168 retained owned unit inputs. Separate native captures
+and comparisons pass 327 exact-coefficient/gain cases on each architecture.
+All original and expected data and the predeclared error policy are retained.
+Host cosine/Bark approximation tests are a distinct layer; native finite API
+groups do not qualify the complete angle-domain curve. Compiler frames are
+recorded separately from complete task/libm stack usage.
+
+This is an implemented numerical building block, not a complete floor0 decoder.
+Stable original-angle evaluation, owned dequantization/residue/coupling,
+IMDCT/overlap, final PCM conversion and raw lifetime/retry/reset/integration
+still need implementation and qualification. The historical full31 PCM
+NONPASS remains open and is not requalified by coefficient-only tests.

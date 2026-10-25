@@ -522,3 +522,30 @@ G6 qualification. Inherited parser limits remain. The retained full31 PCM
 NONPASS predates this arithmetic edit and is not requalified by the helper
 test. Wide/sequence1/floor0 correctness, deferred scopes, final Clang/exports,
 radio integration, resources and physical acceptance remain open.
+
+## Owned wide coefficient arithmetic, 2026-10-25
+
+The [new numerical design](VORBIS_WIDE_NUMERIC_DESIGN.md) separates the owned
+precision-preserving synthesis path from the existing int32 vendor callback
+boundary. Its first [floor0 numerical component](../idf/components/native_vorbis_numeric/README.md)
+implements even/odd polynomials, full raw-amplitude metadata and scaled log2
+gain, with no unity ceiling, fixed Q24 conversion, allocation or vendor types.
+It remains outside both production component lists and decoder registration.
+
+The [finite checkpoint](../tests/results/vorbis-floor0-numeric-20261025/CHECKPOINT.md)
+passes 60541 host operations, including 60471 numerical comparisons, 49 metadata
+controls, 1145 cosine values and 25542 Bark bins. ASan/UBSan and a separate
+Decimal120 direct-product/sqrt oracle retain all 168 old unit inputs/58368
+scalar bins. Both native whole-component captures finish 327 cases, 16 API
+groups, 347 events and nine commands without compiler warnings. An independent
+separate comparison accepts all 654 native coefficient/gain values under the
+unchanged predeclared relative/absolute policy. Native structural captures alone
+retain numerical-qualified false; the accepted finite result is separate.
+
+Whole-module compiler frames have a maximum of 208 bytes in both targets;
+these are not task high-water or complete callee/libm stack measurements.
+Production cores/priorities/stacks, display and audio backends are unchanged.
+Cosine preparation remains approximate and cannot establish the stable
+original-angle path. Wide residue/coupling, IMDCT/overlap and public raw decoder
+integration remain required. This does not fix or requalify the old full31 PCM
+failures, enable the bridge, resume deferred scopes or close G6/G8.
