@@ -16,6 +16,8 @@ C files, all four public headers, component CMake, JSON/header and QEMU, plus
 explicit ROM and pinned SDK/tool locations. Every literal input byte and every
 C descriptor field is read back before SDK configuration; the complete source
 closure, fixture and original data are frozen.
+When present, `floor_packet.c` and its header are also frozen and hashed as build
+dependencies; this runner's checks remain limited to setup/getter/prefix values.
 
 The 60 shared API controls exercise identification, invalid contexts, all four
 caller-array capacity/NULL cases, error precedence, typed getter preservation,

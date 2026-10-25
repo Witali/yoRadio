@@ -10,7 +10,7 @@ then invoke `tests/run-vorbis-floor0-numeric-qemu.py` with explicit source,
 public-header, component-CMake, JSON/header and QEMU hashes and an explicit ROM
 directory. The controller freezes all three pinned component files and this
 fixture before SDK configuration. When present, `quant.c`, `codebook.c`,
-`setup.c` and their public headers are frozen and hashed as build dependencies.
+`setup.c`, `floor_packet.c` and their headers are frozen and hashed as build dependencies.
 This runner's API/numerical checks still cover its floor0 subset only.
 Production components/configuration are not edited.
 
