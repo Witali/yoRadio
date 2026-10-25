@@ -9,8 +9,9 @@ The five public entry points are declared in
 `native_vorbis_floor0_packet`, `native_vorbis_floor1_packet`,
 `native_vorbis_floor1_reconstruct`, `native_vorbis_floor1_curve` and
 `native_vorbis_floor0_packet_gain`.
-Finite qualification is pending actual checks. No residue/spectrum
-value is rounded or multiplied here, and this document does not qualify full
+The [finite host and emulator checkpoint](../tests/results/vorbis-floor-packet-20261025/CHECKPOINT.md)
+records exact packet/index comparisons. No residue/spectrum value is rounded
+or multiplied here, and this document does not qualify full
 floor0 synthesis, a complete stream decoder, PCM, or a physical board.
 
 Primary sources are [Vorbis I sections4.3,6.2,7.2 and9.2](https://www.xiph.org/vorbis/doc/Vorbis_I_spec.html),

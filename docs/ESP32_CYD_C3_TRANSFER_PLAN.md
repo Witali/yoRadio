@@ -1480,3 +1480,23 @@ Stream остаётся на core0, decode/output на core1 с прежними
   целей; прежний bounded warning floor0 остаётся. Полные floor/residue packets,
   wide synthesis/PCM, raw lifetime и active zero-floor0 domains ещё нужны;
   full31 PCM NONPASS/G6/G8, deferred scopes и physical acceptance не закрыты.
+
+- 2026-10-25, CYD-C3-14: [собственные floor0/floor1 packets и floor1 curve](../tests/results/vorbis-floor-packet-20261025/CHECKPOINT.md)
+  добавлены по [спецификации и проекту](VORBIS_FLOOR_PACKET_DESIGN.md).
+  [Пять API](../idf/components/native_vorbis_numeric/include/native_vorbis_floor_packet.h)
+  сохраняют полный amplitude/selector, точные affine LSP и широкие scalar Y;
+  различают fatal prefix EOP, nominal floor EOP, явный UNUSED и INVALID.
+  Order0 потребляет одно слово, gain использует D=1; floor1 выполняет поздний
+  clamp, повторную активацию соседей и рисует исходный наклон с endpoint tail.
+  ASan/UBSan: 7345 rows/46 controls, 1297 affine/949 raw/83962 bins;
+  239 prefix EOP и 6814 nominal floor EOP проверены отдельными входами.
+  Native SDK/QEMU: по 200 cases/46 controls/2388 events/9 commands, warnings0;
+  независимое сравнение принимает все 400 native cases. Worker cores1/0,
+  coordinator0, priority3/stack16384; production affinity не менялась.
+  Новый compiler own frame максимум1184B не включает callee/libm/task high-water.
+  Clang-Tidy новых units проходит обе цели; прежний bounded warning floor0
+  сохранён. General floor0 gain здесь проверяет внутреннюю композицию, кроме
+  точных ABSENT/order0 unity identities. Остались residue/coupling, широкое
+  умножение spectrum, IMDCT/overlap, production/raw integration и полный PCM;
+  full31 NONPASS/G6/G8, zero-domain curve, deferred scopes и physical acceptance
+  не переобъявлены закрытыми.
