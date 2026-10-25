@@ -133,9 +133,44 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 ```
 
 Исторический replay принимает `--source-revision`; нужен соответствующий app/ELF.
-Main QEMU9135fc89ce/2DF90327 закреплён отдельным `main-9135-riscv32.exe`; старыйV8
-и frozen tools сохранены. Новый4-cycle preflight прошёл,40-cycle qualification
-запущена отдельно. Это не H10 и не объяснение прежних memory flags.
+Переход на main QEMU проверен следующим отдельным checkpoint; он не объясняет
+прежние memory flags.
+
+## Квалификация main QEMU, 2026-10-25
+
+Неизменённые app9C1A83BD/ELF76B5CE37/source7D95988C проверены с QEMU main9135fc89ce
+(compiled modelcb9deafd83), executable2DF903276E66AFE0095AD19AFD6D8B7201BCCA3FBDA073F3EDB958934AEF0001.
+Отдельный pin `C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients/build/main-9135-riscv32.exe`
+сохраняет прежнийV8 и frozen47-file tools. Исходники модели совпали с pins
+сохранённого QEMU main integration report; само слияние здесь не переигрывается.
+
+Preflight4cycles/2outages/32HTTP/22.790034guest s и detached40cycles/20outages/
+320HTTP/201.050119guest s завершились с workload/guard/supervisor0. Во втором run
+10повторных JPEG uploads, все темы/города/погода и concurrent GET. Один ROM boot,
+неизменённые входы,8owner PIDs отсутствуют по последующему CIM. MaxHTTP4.043722guest s
+при прежней границе6; min sampled heap54816B, SDK sum-of-per-heap-minima20348B,
+наименьший task stack fill332B. Это разные метрики и короткие нагрузки, не H10.
+
+[`runtime-main-validation-20261025.json`](../../qemu/parity/runtime-main-validation-20261025.json):
+34raw/payload references,30741newgzipbytes с reuse старых producer payloads.
+Новый schema2 replay привязывает main manifest к точному executable; schema1
+сохранён. На текущем reader старый checkpoint отдельно прошёл с source-revision
+deda58625/16negative controls. Новый checkpoint отвергает20controls:16workload/
+guard mutations и4самосогласованно rehashed, но ложных model manifests. Также
+прошли25audit/trend unit tests. Полные RAM/flash/UART не добавлены.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_runtime_candidate_evidence.py `
+  --proof Small_TV/qemu/parity/runtime-main-validation-20261025.json
+```
+
+Новый H10 `.build/runtime-h10-main-20261025` запущен25Oct11:23:20UTC на полные
+86400guest s, interval15/outageEvery60. Старые7часов к нему не прибавляются.
+Early record сохранён наcycle0; после присоединения guard CIM подтвердил всех
+четырёх владельцев. Это пока running, не terminal result. Данные прежних
+retained-loss flags остаются открытым исследованием и не смягчают приёмку.
 
 ## Разделение модулей и способ измерения
 

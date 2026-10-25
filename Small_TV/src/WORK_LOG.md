@@ -4597,3 +4597,31 @@ Main QEMU2DF90327 сохранён отдельным build/main-9135-riscv32.ex
 qualification на той же app запущена отдельно; early capture наcycle0 выполнен.
 Её результат покаpending, новая24h приёмка не заявлена. Физическая плата не тронута,
 goal active. Продолжить разбор retained loss и остальные пункты полного плана.
+
+## 2026-10-25 — runtime current app на слитом QEMU main и новый H10
+
+QEMU main9135fc89ce/compiledmodelCB9DEAFD/executable2DF90327 проверен отдельно от
+прежнего V8. Все current model files совпали с сохранёнными source pins main
+integration report. Frozen47files/SDK/app/ELF/source не менялись; executable
+скопирован под отдельное имя main-9135-riscv32.exe.
+
+Preflight4/2outages/32HTTP/22.790034guest s и detached40/20outages/320HTTP/
+201.050119guest s завершены workload/guard/supervisor0. TenactualJPEGuploads,
+freshweather, concurrentGET, oneROMboot/noUARTerrors, inputsunchanged; все8ownerIDs
+затем отсутствовали поCIM. MaxHTTP4.043722guest s<6, minsampledfree54816B,
+SDKsummin20348B, minstackfill332B. Короткийscope не объясняет прежний retained loss.
+
+Schema2 verify_runtime_candidate_evidence принимает main manifest как отдельный
+явный тип идентичности и сохраняет schema1. Старый proof+16controls replay pass;
+новый proof runtime-main-validation-20261025.json:34raw/refs,30741newgzipbytes,
+20rejected controls. Четыре новых controls rehash ложные main manifests, поэтому
+ловится не только checksum mismatch.25audit/trend unit tests pass. Fullphysical
+dump/RAM/UART не копируются. Изменение касается tooling/evidence, не firmware.
+
+После terminalqualification запущен новый detachedH10 в .build/runtime-h10-main-
+20261025:25Oct11:23:20UTC,86400guest s/15s/outageEvery60. Earlyidentity0 сохранён;
+четыре live owners подтверждены CIM после появления guard. Самый ранний неполный
+process probe исключён/сохранён отдельно: guard PID ещё не был опубликован,
+null нельзя считать PID0. Новая запись хранит только четыре положительных ownerID.
+Это запуск, не24h pass. H10 и объяснение7memoryflags, whole-image/fullsuite/fault/
+hardware пункты остаются открытыми; цель active, без физического вмешательства.

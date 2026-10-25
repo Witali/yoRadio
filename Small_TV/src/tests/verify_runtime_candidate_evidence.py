@@ -5,6 +5,7 @@ import gzip
 import hashlib
 import json
 from pathlib import Path
+import re
 import sys
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
@@ -15,6 +16,45 @@ from verify_photo_format_matrix_evidence import source_hashes
 def sha(data):
     """Bind every archived typed observation and source snapshot to its bytes."""
     return hashlib.sha256(data).hexdigest()
+
+
+def validate_model(data, proof, model_path=None):
+    """Bind the executable to either its AP fix or the merged QEMU checkpoint."""
+    identity = proof['network_model_evidence']
+    assert sha(data) == identity['sha256']
+    model = json.loads(data)
+    kind = identity.get('kind', 'network-stalled-peer-v1')
+    if kind == 'qemu-main-merge-v1':
+        assert proof['schema_version'] == 2
+        assert model['schema'] == 'qemu-main-merge-validation-v1'
+        assert model['passed'] and not model['all_functionality_verified']
+        assert re.fullmatch('[0-9a-f]{40}', model['compiled_source_commit'])
+        assert model['executables']['riscv32']['sha256'] == proof['qemu_sha256']
+        pins = model['model_source_sha256']
+        assert pins and all(re.fullmatch('[0-9a-f]{64}', value) for value in pins.values())
+    else:
+        assert kind == 'network-stalled-peer-v1' and proof['schema_version'] == 1
+        assert model_path is not None and json.loads(model_path.read_text()) == model
+        assert model['builds']['after']['sha256'] == proof['qemu_sha256']
+
+
+def model_rejections(data, proof):
+    """Reject internally rehashed but unqualified or mismatched main manifests."""
+    if proof['schema_version'] == 1:
+        return []
+    rejected = []
+    for case in ('model-failed', 'model-emulator', 'model-commit', 'model-scope'):
+        changed, candidate = copy.deepcopy(json.loads(data)), copy.deepcopy(proof)
+        if case == 'model-failed': changed['passed'] = False
+        elif case == 'model-emulator': changed['executables']['riscv32']['sha256'] = '00' * 32
+        elif case == 'model-commit': changed['compiled_source_commit'] = 'unknown'
+        else: changed['all_functionality_verified'] = True
+        raw = json.dumps(changed).encode()
+        candidate['network_model_evidence']['sha256'] = sha(raw)
+        try: validate_model(raw, candidate)
+        except AssertionError: rejected.append(case)
+        else: raise AssertionError('Invalid merged QEMU identity accepted: ' + case)
+    return rejected
 
 
 def validate(report,evidence,guard,supervisor,uart,cycles):
@@ -79,10 +119,12 @@ def rejections(report,evidence,guard,supervisor,uart,cycles):
 
 def verify(path,root,revision=None):
     """Recompute journals and check archived sources; no VM or firmware writes."""
-    proof=json.loads(path.read_text());assert proof['schema_version']==1 and proof['passed'] and not proof['h10_checks_passed']
+    proof=json.loads(path.read_text());assert proof['schema_version'] in (1,2) and proof['passed'] and not proof['h10_checks_passed']
     assert not proof['all_functionality_verified'] and not proof['physical_hardware_tested']
-    model=proof['network_model_evidence'];model_path=(path.parent/model['file']).resolve()
-    assert model_path.is_relative_to(path.parent.resolve())
+    model=proof['network_model_evidence'];model_path=None
+    if proof['schema_version']==1:
+        model_path=(path.parent/model['file']).resolve()
+        assert model_path.is_relative_to(path.parent.resolve())
     app=(root/'firmware/development/small-tv-esp32c2-reconstructed/app.bin').read_bytes()
     elf=(root/'.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()
     assert sha(app)==proof['app_sha256'] and sha(elf)==proof['elf_sha256']
@@ -95,9 +137,9 @@ def verify(path,root,revision=None):
         blobs[row['sha256']]=data
     files={row['source']:blobs[row['sha256']] for row in proof['raw']};assert len(files)==len(proof['raw'])
     # The archived bytes preserve the exact SHA; a checkout may change JSON line endings.
-    model_bytes=files['model/evidence.json'];assert sha(model_bytes)==model['sha256']
-    model_data=json.loads(model_bytes);assert json.loads(model_path.read_text())==model_data
-    assert model_data['builds']['after']['sha256']==proof['qemu_sha256']
+    model_bytes=files['model/evidence.json'];validate_model(model_bytes,proof,model_path)
+    model_controls=model_rejections(model_bytes,proof)
+    assert model_controls==proof.get('model_rejected_controls',[])
     assert source_hashes(root,proof['source_pins'],revision)==proof['source_pins']
     for name,digest in proof['source_pins'].items():assert sha(files['producer/'+name])==digest
     assert proof['photo_chunks']==(len(files['producer/Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg'])+4095)//4096
@@ -129,7 +171,7 @@ def verify(path,root,revision=None):
         rejected=rejections(report,evidence,guard,supervisor,uart,run['cycles'])
         assert result==run['result'] and rejected==run['rejected_controls'];controls+=len(rejected);results.append(result)
     assert {r['cycles'] for r in results}=={4,40}
-    return dict(passed=True,runs=results,unsafe_controls_rejected=controls,h10_checks_passed=False)
+    return dict(passed=True,runs=results,unsafe_controls_rejected=controls+len(model_controls),h10_checks_passed=False)
 
 
 def main():

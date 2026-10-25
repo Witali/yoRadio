@@ -407,8 +407,10 @@ Runtime checkpoint2026-10-24: текущие9C1A83BD/76B5CE37 на QEMU A5BE14C5
 retained median loss12..220B и требуют объяснения; пороги не менялись. Причина
 остановки неизвестна. Сохранены numeric prefix и12negative controls:
 [RUNTIME_MEMORY.md](tests/RUNTIME_MEMORY.md). Для слитого QEMU main9135fc89ce
-отдельный pin2DF90327:4-cycle preflight прошёл,40-cycle qualification пока идёт.
-H10/retained-loss investigation и полный прежний scope остаются открытыми.
+отдельный pin2DF90327:4-cycle preflight и40-cycle qualification прошли с22actual
+outages/352HTTP и terminalguards. Новый H1025Oct11:23UTC запущен отдельно на
+полные86400guest s; earlyrecord0 сохранён. H10/retained-loss investigation и весь
+прежний scope остаются открытыми. Детали runtime-main-validation-20261025.json.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.

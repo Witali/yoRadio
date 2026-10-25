@@ -3674,3 +3674,53 @@ churn-40-start.json. No new H10 yet. Never restart from a polling timeout.
 Next: finish candidate qualification/preserve evidence, investigate retained loss,
 then caller4207b120/undefined7581e..75896/fullsuite/fault matrix/hardware as planned.
 No physical reset/flash, no OTA; full goal active, not complete/blocked/paused.
+
+## CURRENT 2026-10-25 — main qualified; ONE new H10 live
+
+This turn is PROGRESS (committed interrupted soak, qualified current app on QEMU
+main, launched a fresh full H10). Old interrupted run/V8 and all original raw
+files are intact. No physical action or push in this continuation. Goal active.
+
+40-cycle main qualification is now TERMINAL SUCCESS, not live: all workload/
+guard/supervisor0,4+40cycles/22outages/352HTTP;40-cycle run201.050119guest s,
+10JPEGuploads, maxHTTP4.043722<6, minsampledfree54816B, SDKsummin20348B,
+minstackfill332B. All8savedowner IDs absent viaCIM. Proof runtime-main-validation-
+20261025.json:34raw/refs,30741newgzipbytes,20negative controls. Current reader
+supports explicit schema2 main manifest identity and old schema1; old proof replay
+--source-revisiondeda58625/16controls pass.25audit/trend units pass. Model source
+pins equal actual QEMU main9135 files. This does NOT explain the old memory flags.
+
+ONE H10 RUNNING:
+* run .build/runtime-h10-main-20261025, VM SmallTV-530edfe0517b.
+* supervisor19884 created2026-10-25T11:23:20.860023Z.
+* workload8080 created2026-10-25T11:23:22.225068Z.
+* guard18380 created2026-10-25T11:24:04.818320Z.
+* VM18652/main-9135-riscv32.exe created2026-10-25T11:23:29.720127Z.
+Host CIM confirms all four exact processes; last1cycle/oneROMboot/noerrors.
+Requested86400guest s/interval15/outageEvery60, app9C1A83BD/ELF76B5CE37/source7D95988C,
+QEMU2df903276e66afe0095ad19afd6d8b7201bcca3fbda073f3edb958934aef0001.
+Pin C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients/build/main-9135-riscv32.exe.
+Frozen bundle remains C:/Work/yoRadio/.worktree/small-tv-jpeg-selectors/.build/
+jpeg-selector-qemu-complete-20261019. Do not overwrite binary/app/ELF/assets or
+edit pinned runtime/weather/time helpers/SDK. No second QMP/RSP connection.
+
+Early cycle0 .build/runtime-h10-main-20261025-start.json. Actual all-positive CIM
+identities in sibling -processes.json. -processes-initial-incomplete.json is an
+EXCLUDED early probe: guard PID not published yet, null converted to zero and
+System Idle appeared; never use that as an owner. Corrected observation keeps
+four positive PIDs and creation times, first record itself remains genuine0.
+Never restart on a polling timeout; check current CIM identities against above.
+After actual terminal, analyze_runtime with new run/start record, --allow-root
+C:/Work/yoRadio and C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients; output outside
+run. No24h or memory-trend acceptance yet. Old7h never combines with the new run.
+
+NEXT: investigate retained losses12..220B without weakening thresholds. Consider
+read-only allocator block/free-fragment metadata in a SEPARATE owned control VM;
+do not attach another observer to H10 or infer leak/no-leak from free-size alone.
+New firmware builds must use an independent worktree/artifact location while H10
+pins the current app. Broader SDK/application reachability (4207b120 and7581e..
+75896), target actual I/O/allocation/NVS/electrical faults, independent current
+network/display/fullsuite and hardwareH01-H09 remain open. QEMU main fixed earlier
+classic SPI/clock issues; full CYD RF still unqualified at MMIO60033c00 (main docs),
+so do not keep treating the old PHY assertion as the current proven fault.
+No OTA, no serial reset/flash; full objective not complete/blocked/paused.
