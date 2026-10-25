@@ -419,6 +419,11 @@ outages/352HTTP и terminalguards. Новый H1025Oct11:23UTC запущен о
 объясняет прежний H10. Далее typed TCP PCB/TIME_WAIT attribution и длительный
 контроль с обычным cadence; thresholds и требования 24h не меняются. Отдельно
 исправить idempotent cleanup уже закрытой driver ВМ. Main H10 не изменять.
+TCP prerequisite готов отдельно: [mailbox gate](tests/TCP_HEAP_ATTRIBUTION.md),
+15host tests/real4cycles/5quiet snapshots/12negative controls. Для текущего ELF
+native core-locking выключен, поэтому чтение TCP lists допускается только при
+подтверждённом ожидании его task на empty mailbox. PCB/pbuf attribution и долгий
+контроль ещё не выполнены; этот gate не закрывает retained-loss warnings.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.

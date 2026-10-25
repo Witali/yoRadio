@@ -4679,3 +4679,38 @@ replay сsource-revision79594bd02/20controls pass. ПолныеRAM/flash/UART/SD
 Следующий шаг — typedTCP PCB/TIME_WAIT attribution и долгий диагностический
 контроль обычногоcadence; основной24hH10 и остальные пункты полного плана
 остаются открытыми. Внешняя физическая плата не затронута, goalactive.
+
+## 2026-10-25 — mailbox gate перед будущим TCP inventory
+
+TLSF checkpoint сохранён focusedcommit135e61860, рабочая копия была clean.
+Следующее исследование нашло synchronization prerequisite: native core-locking
+выключен, поэтому vTaskDelay чужой задачи не гарантирует quiescent TCP lists.
+Assembly linked sys_thread_tcpip42034632/132bytes сверена с sys_arch.c; DWARF
+lwip_task exprloc подтверждён независимо от compiler suffix. tcpip_mbox — pointer
+на sys_mbox_s с embedded queue, а не pointer на ещё один queue handle.
+
+runtime_tcp_gate.py использует ELF-specific qualified policy76B5CE37 и selected
+native fields. Empty mailbox, TCB event container, currenttask, полный owner/list
+и exacteventitem проверяются read-only. Busy возвращает явный отказ от дальнейшего
+walk, corrupt metadata — ошибку. Packet/queue-storage/TCB-context не читаются.
+Сохраняется scalar/list transcript с точным replay. Предварительный exploratory
+DWARF script попытался вычислить размер чужого flexible array и получил KeyError;
+новый parser читает только нужные поля. Actual QueueDefinition tag вместо xQUEUE.
+
+15hosttests pass. В отдельной настоящей QEMU VM unchanged runtime4cycles/
+2STAoutages/32HTTP/23.110207guest s,5same-stop samples, все5quiet. Underlying heap
+instruction replay pass, oneROMboot/noerrors; отдельный UARTguard не запускался.
+Foregroundprobe0, PID39284 и same-run Python/QEMU processes отсутствуют поCIM.
+Это gateprobe, не новая40cycle/H10 qualification и не TCP attribution.
+
+tcp-mailbox-gate-validation-20261025.json:27raw/payloadrefs/45308newgzipbytes,
+12semantic negative controls; verifier перепроверяет layout, source/unit/app/
+ELF/ROM, exactsame-stop SHA и raw reads, actual heap inventories. FullRAM/flash/
+UART/ELF не добавлялись. tests/TCP_HEAP_ATTRIBUTION.md фиксирует actualPCB/seg/
+pbuf ABI и оставшиеся steps, включая shared pbuf и containing allocation mapping.
+
+Основной H10 повторно проверен по4PID и exactcreationUTC:203cycles,
+lastsample3535.629206guest s, start25.097679, guardrunning, oneROMboot/noerrors.
+Это около3510guest seconds prefix, не24hpass. Ни его VM/inputs, ни физическое
+устройство не менялись. Продолжить TCP attribution, обычный длинный контроль,
+idempotent cleanup и весь оставшийся IMPROVEMENT_PLAN; goalactive.

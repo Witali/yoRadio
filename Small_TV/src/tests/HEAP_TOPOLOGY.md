@@ -128,6 +128,11 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 короткому тесту. Память нового observer не определяет owner/requested size
 каждого allocator блока и сама по себе этого не доказывает.
 
+Первый этап TCP observer теперь проверен отдельно:
+[mailbox quiescence gate](TCP_HEAP_ATTRIBUTION.md),15host tests и5same-stop
+наблюдений в отдельной QEMU ВМ. Сам PCB/segment/pbuf walk ещё не реализован;
+безопасная точка чтения не заменяет attribution и долгий контроль.
+
 Сохранены также исключённые exploratory runs: первый prototype завершился
 ошибкой dispatch qualification; отдельный успешный 40-cycle run был замечен
 слишком поздно для genuine cycle-zero capture. Они не подменяют qualification.

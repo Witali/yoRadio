@@ -9,7 +9,8 @@ main-9135/2DF90327. Не менять его runtime helpers, SDK, ROM, app/ELF,
 assets или frozen47files, не добавлять второй QMP/RSP client и не перезапускать.
 PID19884/8080/18380/18652 с creationUTC сохранены в исходном early process record;
 проверять реальные процессы, не один JSON status. Latest observation этой работы
-подтвердила все четыре owner и 152cycles; это не terminal H10 pass.
+подтвердила все четыре owner/creationUTC и203cycles, oneROMboot/noerrors;
+это не terminal H10 pass.
 
 Opt-in `-HeapTopology` квалифицирован отдельно: реальные C2 ROM и linked SDK
 walkers, metadata-only allocation geometry, 11+8 новых tests, базовые16+25,
@@ -19,6 +20,11 @@ controls pass. Архив heap-topology-validation-20261025.json; детали
 ROM контроль показывает возможный padding12B при тех же requested sizes, но
 семь retained-loss warnings12..220B прежнего прерванного H10 пока не объяснены.
 
+TCP mailbox gate уже готов:15host tests, real4cycles/2outages/32HTTP и5quiet
+same-stop samples,12negative archive controls pass. ELF-specific policy,
+DWARF task identity/embedded mailbox queue и обе стороны receive list links;
+busy возвращает пропуск, не ложный empty TCP inventory. Сам TCP walk пока нет.
+Детали/actual native ABI и дальнейшая реализация: tests/TCP_HEAP_ATTRIBUTION.md.
 Следом добавить typed TCP PCB/TIME_WAIT attribution, затем диагностический
 длительный контроль с interval15/outageEvery60. Не заменять им основной H10 и
 не смягчать thresholds. Исправить отдельным изменением redundant cleanup, когда
