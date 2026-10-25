@@ -403,6 +403,17 @@ Dispatch checkpoint25Oct: [WIFI_TIMER_DISPATCH.md](tests/WIFI_TIMER_DISPATCH.md)
 wdev_funcs_init pointer registration после link, invalid IDs и прежние valid IDs.
 Отдельно разобрать событие11: factory max_idle/native keep_alive wrappers
 соответствуют по форме, transitive callee semantics пока не подтверждены.
+Event11 checkpoint25Oct: [WIFI_TIMER_EVENT11.md](tests/WIFI_TIMER_EVENT11.md)
+проверяет восемь полных тел против собственных версий SDK и 9776 исполнений
+реальных инструкций: wrapper, handler, rearm и parameter setter в каждом образе.
+Все 186 instruction starts покрыты, 11 static и 5 evidence controls отвергнуты.
+Подтверждены различия pending latch, дополнительных state writes, rearm gating,
+fallback и представления периода. OSI ABI8/9 и три forwarding slots проверены;
+runtime binding, timer initialization/flag producers, допустимые protocol ranges
+и влияние на часы ещё не доказаны. Переполнение не принимать за требуемую норму.
+По указанию пользователя сначала продолжаем этот factory/whole-image пункт;
+CODEC-REPRO и остальные пункты предыдущего списка отложены. Уже запущенные
+duration/control ВМ сохраняются без изменения producer inputs и перезапуска.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

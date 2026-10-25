@@ -82,3 +82,9 @@ Output должен быть новым файлом. Factory ELF, SDK archives 
 выполняет точные dispatcher instructions. Найдены явное различие имён/callee
 для события 11 и недочёт pre-bound table read при некорректном ID; production
 исправление и transitive review остаются в плане.
+
+Последующие checkpoints: [WIFI_TIMER_GUARD.md](../tests/WIFI_TIMER_GUARD.md)
+исправляет invalid-ID read; [WIFI_TIMER_EVENT11.md](../tests/WIFI_TIMER_EVENT11.md)
+сопоставляет восемь тел, включая обе версии handler/rearm/parameter setter,
+и исполняет 9776 cases. Transitive equivalence не подтверждена: найдены реальные
+различия двух SDK, для которых ещё нужны registration/producer/reachability checks.

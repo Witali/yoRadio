@@ -4132,3 +4132,52 @@ NEXT: revalidate owners/status, inspect any genuine failure-state snapshot;
 meanwhile advance CODEC-REPRO or selected whole-image/ID11 analysis independently.
 HTTP timeout cause, long acceptance, retained loss, actual I/O/power fault matrix,
 queued guest TCP samples, final independent gates and hardware remain open.
+
+## CURRENT 2026-10-25 — factory comparison takes priority; event 11 characterized
+
+User explicitly requested continuing item4 (factory firmware), then returning to
+items1–3. Do not advance CODEC-REPRO/JPEG fault/retained-memory fixes ahead of this
+factory audit. Existing three duration/control VMs remain protected and running.
+Created a clean worktree from d0c82d127, then renamed its unused initial CODEC
+branch/path to `.worktree/small-tv-factory-audit`, `codex/small-tv-factory-audit`.
+This tree is the active editable analysis tree. Frozen timer-bounds and memory-
+retention producer trees, SDK/ROM/helpers/QEMU executables stay read-only.
+
+Progress: timer_event11_match + independent model/instruction/test/consumer
+modules. Factory8C9F/native9E4E and exact old/new libpp archives pinned. Six event
+bodies plus two parameter setters matched completely, boundaries/data/calls bound
+to actual bytes. Factory setter starts74c12 after the intervening getter74c08;
+its encoding of the period differs from native. Finding raw delay formulas alone
+was insufficient. OSI480-byte tables are ABI8/9, not one shared ABI; three slots
+and whole forwarding wrappers checked. Legacy timer bodies are linked IRAM code,
+not ROM. Runtime OSI binding/complete timer backend still unqualified.
+
+9776 private RV32 executions pass:4632 event states per image plus128 setter+
+event states per image. All186 instruction starts in8 selected bodies visited.
+Caller-saved poison, preserved ABI/stack, exact SRAM writes/call arguments/order
+checked against independent models. 11 static and5 evidence mutations rejected.
+Raw-state pairs4344different/288equal are synthetic coverage, NOT a compatibility
+percentage. Native adds pending-action suppression, byte15-zero flag writes and
+fallback/changed rearm. Factory setter10 stores12 and later arms slot224 with6144;
+native stores10/adjustment2000000 and arms slot240 with8240000. Timer units differ.
+Documented wrap edges as observations, not desired behavior or a proven bug in a
+reachable clock path. Do not copy SDK bugs or revert modern SDK without evidence.
+
+Proof factory-event11-validation-20261025.json pins9 sources and7630-byte result
+gzip. Consumer reexecutes exact original code; final replay passed all5 controls.
+See tests/WIFI_TIMER_EVENT11.md. No firmware rebuild/change, VM launch, physical
+flashing, QEMU edit, long-run acceptance or whole-image equivalence in this step.
+
+Read-only CIM17:11:26–28UTC matched all12 original owner PID/name/creation times.
+Diagnostic-main64cycles; old metadata main/V8 controls505/498. Supervisors/guards
+running, no workload error. Diagnostic UART guard last observation one ROM boot,
+no errors. Details ignored `.build/factory-event11-20261025/live-observation.json`.
+These are pending prefixes, never H10/8h pass; do not combine durations.
+
+NEXT factory work: verify actual OSI pointer binding; match timer initialization/
+post11 and follow pm_set_bss_max_idle inputs, flag producers and valid protocol
+period ranges (including overflow boundaries). Then compare corresponding clock
+behavior, preserving improvements and correcting confirmed defects. Remaining
+whole-image computed aliases/function boundaries/SDK-application transitions are
+open. User-deferred items1–3 and final independent gates/hardware still remain.
+Broad goal remains active; this is a progress checkpoint, not completion.
