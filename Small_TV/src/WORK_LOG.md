@@ -4632,3 +4632,23 @@ oneROMboot/noUARTerrors. Один ad-hoc probe ошибочно сравнил D
 String подтвердил все4совпадения; VM не перезапускалась. Это ошибка представления
 в пробе, не потеря процесса и не runtime-helper defect. У старогоH10 PID реально
 отсутствовали независимо от времени. Рекомендация сохранена вWORKING_NOTES.
+
+## 2026-10-25 — разработка перенесена без изменения H10 inputs
+
+В отдельной codex/small-tv-memory-retention завершены commits135e61860 и82d901e2d.
+Первый квалифицирует exact ROM/linked TLSF metadata walk:11+8новыхhost tests,
+16+25baseline,4+40actualcycles/22outages/352HTTP,46snapshots/92inventories и
+38semanticnegativecontrols. Второй добавляет prerequisite безопасного TCP walk:
+15hosttests,actual4cycles/2outages/32HTTP,5blocked-empty-mailbox samples и
+12archivecontrols. Подробные proof/docs/log/полныйплан находятся в новой копии.
+Прошивка и QEMU source не менялись; physical device не тронут.
+
+Retained-loss12..220B прежнего прерванногоH10 не объяснён. ROMfixture доказывает
+возможность12Bpadding при тех жеlive requests, но не его участие в старыхflags.
+Следом nativeTCP PCB/pbuf attribution с gate, длинный контроль обычногоcadence,
+idempotentalready-stoppedVMcleanup и остальные пункты полного плана.
+
+ОсновнойmainH10 остаётся здесь:4ownerPID/creationUTC повторно подтверждены,
+203cycles/lastsample3535.629206guest s/start25.097679,oneROMboot/noerrors,
+guardrunning. Эти runtime inputs не изменялись; новыхhelpers сюда не сливать до
+terminal result. Здесь обновлены только notes/log pointers, goalactive.

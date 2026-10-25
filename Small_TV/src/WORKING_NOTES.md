@@ -1,5 +1,23 @@
 # Контекст работы над восстановленной Small TV
 
+## Продолжение в отдельной рабочей копии — 2026-10-25
+
+Текущая разработка: `.worktree/small-tv-memory-retention`, ветка
+`codex/small-tv-memory-retention`, commits `135e61860` (exact TLSF metadata replay)
+и `82d901e2d` (TCP/IP mailbox gate). Там обновлены полный IMPROVEMENT_PLAN,
+WORK_LOG и tests/HEAP_TOPOLOGY.md / tests/TCP_HEAP_ATTRIBUTION.md. 4+40-cycle
+heap qualification,46snapshots/92inventories и38negative controls pass;
+TCP prerequisite15host tests/real4cycles/5quiet samples/12controls pass.
+Сам TCP PCB/pbuf attribution ещё не реализован, старые7memorywarnings не закрыты.
+
+Эту рабочую копию пока сохранять как pinned input основного
+`.build/runtime-h10-main-20261025`. Не cherry-pick/merge сюда новые runtime
+helpers, не менять app/ELF/SDK/ROM/profile/assets/frozen47files и не присоединять
+второй observer. При последней CIM-проверке203cycles,4originalowners и точные
+creationUTC совпали; oneROMboot/noUARTerrors, H10 ещё running. Дополнительные
+короткие ВМ завершены. После настоящего terminal H10 выполнять полный audit,
+а не принимать старый JSON status за liveness или дополнять24h прежними7часами.
+
 Актуальные решения и рекомендации для продолжения сравнения заводской прошивки
 ESP32-C2 с собираемым C-проектом в `Small_TV/src`. История действий и результатов
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
