@@ -4961,3 +4961,30 @@ changes. Эта оптимизация записана в плане и пок�
 Следом commit проверенного guard/build/artifacts, отдельный current QEMU preflight
 4/40, затем остальные runtime/full-image/fullsuite/hardware пункты. Старые7memory
 findings не объясняются этим invalid-ID исправлением; весь goal active.
+## 2026-10-25 — QEMU runtime qualification of Wi-Fi timer guard
+
+- Revalidated actual Git/worktree state after QEMU main audit/push. Last guard
+  preflight had genuinely finished; truncated launch output did not justify a
+  restart. Replayed its full journal, exact inputs and genuine cycle-zero record.
+- Launched one owned schema5 churn40 on unchanged appC91294FC/ELF9E4EC88D and
+  main9135 executable2DF90327. Captured four original owners after guard attachment.
+  It completed40cycles/320HTTP/20outages in161.595062guest seconds; preflight was
+  4cycles/32HTTP/2outages/17.959790seconds. Both workloads+guards exit0, supervisors
+  complete, inputs unchanged, one ROM boot and no UART panic/reset each.
+- Added offline reader schema4: exact arbitrary producer prefix, actual UART
+  replay, start evidence for both runs, typed original PID/name/creationUTC exit
+  verification. A distinct process reusing a PID remains acceptable; a still-live
+  original owner is rejected. No running producer sources or binaries changed.
+- Saved47payloadrefs with37241new gzip bytes. Replayed new proof/28negative
+  controls and previous schema2 main proof/20controls;25analysis tests also pass.
+  This only qualifies short ordinary runtime of the new build. No new live invalid
+  ID injection, H10, independent display/network or physical acceptance claim.
+- Found old mainH10 terminal failed at526cycles, timeout waiting for/start_upload.
+  Its complete journal independently yields4207HTTP/8outages/4pendingevents,
+  2108ROMcrosschecks and9040.980895observed seconds; inputs unchanged, no panic.
+  First diagnostic used an incorrect guessed chunk count and was rejected; rerun
+  derived10chunks from the actual fixture and preserved the original sequence.
+  QEMU log535WSAEventSelect invalid-socket warnings are a lead, not proven cause.
+  All4oldowners absent, supervisorworkloadexit1/guardexit0 plus cleanup refused.
+  Save the failed artifact and investigate before any replacement H10; two matched
+  schema7 controls remain running and protected.

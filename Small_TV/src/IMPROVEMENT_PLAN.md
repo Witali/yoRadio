@@ -409,8 +409,10 @@ Guard46B отсекает14..255 до vendor entry, сохраняет free owne
 paths. Найденный в ELF ppTask — ROM trampoline, поэтому отдельно проверен
 настоящий event8/table+356 путь и весь successful-allocation initializer tail
 для4feature combinations. 518compiled-instruction cases и replay pass,
-unguarded control воспроизводит OOB. Actual QEMU preflight/churn и final gates
-нового build ещё нужны; прежние9C1A/76B5 long runs не заменять и не суммировать.
+unguarded control воспроизводит OOB. QEMU preflight4/churn40 на main9135 завершены:
+32/320HTTP,2/20outages, обе supervision/guard пары exit0; runtime replay отвергает
+28controls. Независимые network/display/final gates и H10 нового build ещё нужны;
+прежние9C1A/76B5 long runs не заменять и не суммировать.
 Дополнительный CODEC-REPRO follow-up: свежий jconfigint BUILD20→25Oct меняет
 library SHA и cache codec ID при тех жеcodec sources. Зафиксировать reproducible
 build inputs/date, проверить два paths/dates и отсутствие лишней Flash cache

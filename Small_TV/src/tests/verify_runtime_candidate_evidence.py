@@ -1,6 +1,7 @@
 """Replay completed candidate-QEMU workloads without promoting them to H10."""
 import argparse
 import copy
+from datetime import datetime
 import gzip
 import hashlib
 import json
@@ -10,6 +11,7 @@ import sys
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 from runtime_evidence import journal_evidence,require
+from runtime_run_guard import inspect_uart
 from verify_photo_format_matrix_evidence import source_hashes
 
 
@@ -163,9 +165,57 @@ def topology_rejections(snapshot,topology):
     return rejected
 
 
+def validate_owners(before, after, session, guard, supervisor):
+    """Distinguish exited original owners from unrelated processes reusing a PID."""
+    roles = {'supervisor', 'workload', 'guard', 'vm'}
+    require(set(before) >= {'vm_name', 'observed_utc', 'processes'} and
+            before['vm_name'] == session['name'] == guard['vm_name'], 'Changed VM ownership')
+    first = {row['role']: row for row in before['processes']}
+    last = {row['role']: row for row in after['processes']}
+    require(len(first) == len(before['processes']) == len(last) == len(after['processes']) == 4 and
+            set(first) == set(last) == roles, 'Missing or duplicate owner')
+    expected = {'supervisor': supervisor['supervisor_pid'], 'workload': supervisor['workload_pid'],
+                'guard': supervisor['guard_pid'], 'vm': session['pid']}
+    require(len(set(expected.values())) == 4 and all(type(pid) is int and pid > 0 for pid in expected.values()),
+            'Invalid original owner IDs')
+    captured = datetime.fromisoformat(before['observed_utc'])
+    checked = datetime.fromisoformat(after['observed_utc'])
+    require(captured.tzinfo is not None and checked.tzinfo is not None and checked > captured,
+            'Owner exit predates its live observation')
+    for role, row in first.items():
+        require(row['pid'] == last[role]['pid'] == expected[role] and row['name'] and
+                datetime.fromisoformat(row['created_utc']) <= captured, 'Changed original owner identity')
+        current = last[role]
+        require((current['name'] is None) == (current['created_utc'] is None), 'Partial terminal identity')
+        require(current['name'] != row['name'] or current['created_utc'] != row['created_utc'],
+                'Original owner is still alive')
+    return True
+
+
+def owner_rejections(before, after, session, guard, supervisor):
+    """Reject live or unbound owners and accept a distinct process reusing a PID."""
+    rejected = []
+    for case in ('live-original-owner', 'missing-original-owner', 'changed-vm-name', 'wrong-workload-pid'):
+        b, a, s, g, p = copy.deepcopy((before, after, session, guard, supervisor))
+        if case == 'live-original-owner':
+            role = b['processes'][0]['role']
+            target = next(row for row in a['processes'] if row['role'] == role)
+            target.update(b['processes'][0])
+        elif case == 'missing-original-owner': b['processes'].pop()
+        elif case == 'changed-vm-name': s['name'] += '-different'
+        else: p['workload_pid'] += 1
+        try: validate_owners(b, a, s, g, p)
+        except ValueError: rejected.append(case)
+        else: raise AssertionError('Invalid owner exit accepted: ' + case)
+    reused = copy.deepcopy(after)
+    reused['processes'][0].update(name='unrelated-process.exe', created_utc=after['observed_utc'])
+    validate_owners(before, reused, session, guard, supervisor)
+    return rejected
+
+
 def verify(path,root,revision=None,rom=None):
     """Recompute journals and check archived sources; no VM or firmware writes."""
-    proof=json.loads(path.read_text());assert proof['schema_version'] in (1,2,3) and proof['passed'] and not proof['h10_checks_passed']
+    proof=json.loads(path.read_text());assert proof['schema_version'] in (1,2,3,4) and proof['passed'] and not proof['h10_checks_passed']
     assert not proof['all_functionality_verified'] and not proof['physical_hardware_tested']
     model=proof['network_model_evidence'];model_path=None
     if proof['schema_version']==1:
@@ -195,8 +245,9 @@ def verify(path,root,revision=None,rom=None):
     for name,digest in proof['source_pins'].items():assert sha(files['producer/'+name])==digest
     assert proof['photo_chunks']==(len(files['producer/Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg'])+4095)//4096
     assert b'Ran 25 tests' in files['unit/analysis-tests.log'] and b'OK' in files['unit/analysis-tests.log']
-    stopped=json.loads(files['unit/qualification-processes.json'])
-    assert stopped['passed'] and stopped['all_absent'] and len(set(stopped['checked_process_ids']))==8
+    if proof['schema_version'] < 4:
+        stopped=json.loads(files['unit/qualification-processes.json'])
+        assert stopped['passed'] and stopped['all_absent'] and len(set(stopped['checked_process_ids']))==8
     if topology:
         assert b'Ran 16 tests' in files['unit/memory-tests.log'] and b'OK' in files['unit/memory-tests.log']
         for name,count in (('unit/instructions.json',11),('unit/topology.json',8)):
@@ -217,18 +268,23 @@ def verify(path,root,revision=None,rom=None):
     for run in proof['runs']:
         prefix=run['name']+'/';read=lambda name:json.loads(files[prefix+name])
         report=read('report.json');guard=read('uptime-guard.json');supervisor=read('supervisor.json');uart=read('uart-summary.json')
-        if run['cycles']==40:
+        if proof['schema_version']==4:
+            require(inspect_uart(files[prefix+'uart.log'])==uart, 'Typed UART summary differs from actual bytes')
+        if run['cycles']==40 or proof['schema_version']==4:
             start=read('start.json');assert start['completed_cycles_at_capture']==0
             for key in ('app_sha256','native_elf_sha256','qemu_sha256','inputs_sha256','duration_requested_guest_seconds'):
                 assert start[key]==report[key]
             assert start['guard']['source_sha256']==proof['source_pins']['Small_TV/src/tools/runtime_run_guard.py']
-            if topology:
+            if proof['schema_version']==4:
+                assert start['capture_script_sha256']==sha(files[prefix+'capture-start.ps1'])
+                assert start['producer_commit']==proof['producer_commit']
+            elif topology:
                 assert start['capture_script_sha256']==sha(files['unit/capture-start.ps1'])
         assert report['app_sha256']==proof['app_sha256'] and report['native_elf_sha256']==proof['elf_sha256']
         assert report['qemu_sha256']==proof['qemu_sha256']
         for name,digest in report['inputs_sha256'].items():
             normalized=name.replace('\\','/')
-            if proof['schema_version']==3:
+            if proof['schema_version'] in (3,4):
                 # FIXED_TEST: keep the run prefix intact when resolving producer inputs.
                 producer_prefix=proof['producer_root'].replace('\\','/').rstrip('/')+'/'
                 relative=normalized[len(producer_prefix):] if normalized.startswith(producer_prefix) else ''
@@ -246,12 +302,19 @@ def verify(path,root,revision=None,rom=None):
         schema=6 if topology else 5
         result=validate(report,evidence,guard,supervisor,uart,run['cycles'],schema)
         rejected=rejections(report,evidence,guard,supervisor,uart,run['cycles'],schema)
+        if proof['schema_version']==4:
+            before,after,session=read('processes.json'),read('processes-after.json'),read('session.json')
+            validate_owners(before,after,session,guard,supervisor)
+            owner_controls=owner_rejections(before,after,session,guard,supervisor)
+            assert owner_controls==run['owner_rejected_controls']
+            controls+=len(owner_controls)
         if topology:
             rejected_topology=topology_rejections(evidence['summary']['first_snapshot'],topology)
             assert rejected_topology==run['topology_rejected_controls']
             controls+=len(rejected_topology)
         assert result==run['result'] and rejected==run['rejected_controls'];controls+=len(rejected);results.append(result)
     assert {r['cycles'] for r in results}=={4,40}
+    assert source_hashes(root,proof['source_pins'],revision)==proof['source_pins']
     return dict(passed=True,runs=results,unsafe_controls_rejected=controls+len(model_controls),h10_checks_passed=False)
 
 

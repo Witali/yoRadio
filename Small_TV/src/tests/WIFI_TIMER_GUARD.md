@@ -81,6 +81,44 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
   --rom C:/Work/yoRadio/.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf
 ```
 
+## QEMU preflight и переподключения
+
+Тот же app `c91294fc…` / ELF `9e4ec88d…` проверен на закреплённом QEMU main
+`9135fc89ce`, executable SHA `2df90327…`. Два самостоятельных запуска schema 5
+завершились вместе с supervisor и UART guard, оба exit code 0; входы неизменны.
+
+| Прогон | Циклы | Отключения/восстановления Wi-Fi | HTTP | Гостевое время |
+| --- | ---: | ---: | ---: | ---: |
+| preflight | 4 | 2 | 32 | 17,959790 с |
+| churn | 40 | 20 | 320 | 161,595062 с |
+
+Проверены upload JPEG, темы/анимации, settings, параллельные HTTP-клиенты,
+разобранная синтетическая погода и самостоятельное переподключение SDK.
+В каждом запуске одна загрузка ROM, без UART panic/reset. Это проверка обычных
+сценариев новой сборки; некорректные timer IDs проверялись отдельным host CPU
+тестом, а в работающую ВМ не внедрялись.
+
+Настоящие start records сняты на cycle 0. Сохранены PID/name/creation UTC всех
+четырёх исходных владельцев и последующее наблюдение их завершения. Новый
+schema-4 reader различает завершившийся процесс и повторное использование PID,
+сверяет UART summary с исходными байтами и повторно проверяет source pins.
+
+[Runtime-архив](../../qemu/parity/wifi-timer-runtime-validation-20261025.json)
+содержит 47 payload references, включая прежние неизменённые blobs; новые gzip
+занимают 37241 байт. Реальный replay пересчитал оба журнала и отверг 28 controls.
+25 analysis tests и replay прежнего main checkpoint (20 controls) также pass.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_runtime_candidate_evidence.py `
+  --proof Small_TV/qemu/parity/wifi-timer-runtime-validation-20261025.json
+```
+
+Короткий churn не заменяет H10, независимые network/display gates и физическую
+приёмку. Для нового ELF ещё не квалифицирован observer TCP topology; прежний
+SHA allowlist не ослаблен. Никаких физических flash/reset действий не было.
+
 ## Сопутствующий build follow-up
 
 При свежей сборке libjpeg `jconfigint.h` изменил `BUILD` с 20261020 на 20261025.

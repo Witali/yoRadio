@@ -3953,3 +3953,38 @@ archive d690..→9c009.. and codecID6b537..→2a6d6... Normalize reproducible re
 inputs/date with cross-path/date tests; do not remove library SHA ownership guard.
 This is separate from timer fix and not yet implemented. ID11 max_idle/keep_alive
 callee review, old retained losses, three long runs, cleanup/fullsuite/hardware open.
+
+## CURRENT 2026-10-25 — timer guard qualified in short QEMU workloads
+
+Active tree small-tv-timer-bounds, producer2b036586e; appC91294FC/ELF9E4EC88D
+unchanged. Last turn QEMU merge/push audit confirmed all useful branches already
+in main9135fc89ce. This continuation PROGRESS: actual completed preflight inspected,
+then ONE separate churn40 launched, genuine cycle-zero/owners captured, both ended.
+Do not rerun either run due to the earlier truncated launcher output.
+
+Runtime schema5 preflight4/churn40: 32/320HTTP,2/20outages,17.959790/161.595062
+guest seconds. Workload/guard exit0, supervisors complete/inputs unchanged, UART
+one ROM boot/no reset or panic. All8 original PID/name/creationUTC owners exited;
+their live and terminal records are archived. No TCP topology allowlist change.
+Reader schema4 validates exact producer prefix, actual UART bytes, both early
+captures and original-owner exit (PID reuse is not an original owner). New proof
+wifi-timer-runtime-validation-20261025.json:47refs,37241new gzip bytes,28rejections.
+Actual consumer replay and old main schema2 replay pass (old20controls);25analysis
+tests pass. See tests/WIFI_TIMER_GUARD.md. This is NOT H10/fullsuite/hardware.
+
+IMPORTANT: original H10/main9135 OLDapp9C1A is now AUTHORITATIVELY FAILED, not live.
+Supervisor terminal at2026-10-25T14:53:49.5005313Z/workloadexit1/guardexit0, all4
+original PIDs absent. 526cycles/4207HTTP/8outages, last guest9066.078574,
+9040.980895observed seconds from start,4pending HTTP events. Timeout during
+/start_upload response. Journal aggregates+2108ROM crosschecks agree; no panic.
+QEMU log has535 WSAEventSelect invalid-socket warnings. Cause NOT established;
+do not call a firmware bug or excuse the failure, and do not accept as24h.
+Supervisor cleanup also reported connection refused after workload closed VM:
+known separate cleanup issue. Preserve complete failure before a diagnostic run.
+Two schema7 OLDapp controls remain active; revalidate identities before using.
+
+NEXT: archive failed H10 and investigate Windows slirp socket lifecycle/HTTP
+timeout, with a separate QEMU task worktree/build and owned diagnostic VM. Current
+long controls and pinned executables must remain untouched. Then cleanup helper,
+CODEC-REPRO, ID11 callee/full-image reachability, new-image independent gates and
+hardware remain open. Full goal active; do not combine old/new run durations.
