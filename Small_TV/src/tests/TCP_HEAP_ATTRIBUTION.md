@@ -62,34 +62,94 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/verify_tcp_gate_evidence.py `
   --proof Small_TV/qemu/parity/tcp-mailbox-gate-validation-20261025.json `
+  --source-revision 82d901e2d `
   --rom C:/Work/yoRadio/.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf
 ```
 
-## Следующая реализация
+## Выполнено: TCP inventory и отнесение памяти
 
-Сам TCP inventory ещё не реализован. Нужен отдельный module, который читает
-только selected fields и исполняет gate **до** обхода четырёх lists:
-`tcp_bound_pcbs`, `tcp_listen_pcbs`, `tcp_active_pcbs`, `tcp_tw_pcbs`.
-Снимать native `tcp_ticks` и при возможности `num_tcp_pcb`; последний не следует
-автоматически приравнивать к числу зарегистрированных nodes: возможны CLOSED,
-ещё не зарегистрированные PCB. Если gate busy, сохранять пропуск и его причину,
-не объявлять пустой список/нулевые allocations.
+Опция `-TcpTopology` у launcher/supervisor и `--tcp-topology` у Python runner
+включает schema7 и подразумевает heap topology. Обычные schema5/6 сохранены.
+Гость, его firmware и QEMU model не меняются. Модули разделены по назначению:
 
-Предварительно прочитанный DWARF текущего ELF: `tcp_pcb`208bytes,
-`tcp_pcb_listen`76, `tcp_seg`16, `pbuf`16. `pbuf.ref` здесь **один** байт;
-не предполагать стандартный u16 ABI. State enum также брать из ELF: CLOSED0,
-LISTEN1, SYN_SENT2, SYN_RCVD3, ESTABLISHED4, FIN_WAIT_1=5, FIN_WAIT_2=6,
-CLOSE_WAIT7, CLOSING8, LAST_ACK9, TIME_WAIT10. Эти цифры — сведения о текущем
-ELF, не универсальная таблица offsets для будущих builds.
+- `runtime_tcp_layout.py` извлекает selected fields, native state enum и globals
+  четырёх списков: bound/listen/active/TIME_WAIT. Ненужные IP/port/callback fields
+  не читаются. Native `pbuf.ref` здесь один байт, ABI проверяется явно.
+- `runtime_tcp_allocations.py` получает живые ranges из callbacks **точных**
+  ROM/linked walker instructions. Metadata object должен целиком помещаться в
+  живой allocation; интерпретация свободной памяти, чужого payload или переход
+  через конец блока отклоняется до чтения. Shared ranges учитываются один раз.
+- `runtime_tcp_snapshot.py` сначала исполняет mailbox gate, затем читает PCB,
+  unsent/unacked/ooseq segments и pbuf chains/refused data. Проверяет ownership,
+  циклы, state/list agreement, packet/chain lengths, send queue count, refs и
+  wrapped `tcp_ticks` ages. Busy сохраняет явный пропуск, без ложных нулей.
+- `runtime_tcp_journal.py` повторно проверяет каждое наблюдение и сохраняет
+  небольшой ряд: TCP/unclassified capacity с headers, block counts и состояния.
+  Непривязанные allocations не объявляются TCP или утечкой.
 
-Проверить finite/cyclic lists, однократное membership PCB, state/list agreement,
-segment/pbuf chains и длины. При допустимом shared pbuf не удваивать память;
-отличать shared reference от цикла внутри цепи. TCP buffer payload не нужен.
+Current native ABI: `tcp_pcb`208bytes, listen76, segment16, pbuf16. Путь
+`do_memp_malloc_pool`→`mem_malloc`→`malloc` сверён с assembly; pool size округляется
+до4 без prefix, helper возвращает исходный pointer. Heap task tracking/poisoning
+и lwIP stats выключены. Для **этого ELF** qualified metadata offset равен нулю;
+другие layouts нельзя угадывать. Header/PBUF pointer должен начинаться в живом
+allocation; payload reference может указывать на отдельную RAM/ROM область,
+содержимое которой не читается. Contiguous pbuf обязан ссылаться на свой block.
 
-Связать metadata object с **фактическим содержащим живым TLSF allocation** по
-результатам ROM/linked instruction walker, сохраняя unclassified allocations.
-Не угадывать скрытый malloc prefix и не считать requested size равным capacity.
-Один allocation нельзя приписать нескольким owners без явного shared accounting.
-Проверить allocator/list corruption и попытки dereference payload. Затем actual
-QEMU positive/negative probes, archive/replay и длинный контроль обычного cadence
-15s/outageEvery60. Полная цель, H10, whole-image audit и аппаратные gates открыты.
+`num_tcp_pcb` может включать ещё не зарегистрированные CLOSED objects. Остаток
+сохраняется отдельно; отсутствующие PCB не выдумываются. State enum и offsets
+взяты из ELF, а не из таблицы предполагаемой версии lwIP. Внутри pbuf chain
+разрешены документированные packet boundaries; shared references отличаются от
+цикла и не удваивают allocated capacity. Исходный requested size из block size
+не восстанавливается.
+
+33 host tests используют настоящий ROM allocator и native ABI: четыре списка,
+shared buffers, RAM/ROM references, free/crossing/interior pointers, metadata
+alias в packet data, corrupted queues/lengths/refs, wrap и future timer, busy
+actor, точный read transcript и additive partition с unclassified памятью.
+31 исходный тест прошёл до добавления двух journal tests; accepted report — v2
+с33тестами. Дополнительно прошли25 прежних audit/trend tests.
+
+| Нагрузка | Guest seconds | STA outages | HTTP | TCP snapshots |
+| --- | ---: | ---: | ---: | ---: |
+| Preflight4 | 22.240650 | 2 | 32 | 5 / 5 observed |
+| Churn40 | 203.479499 | 20 | 320 | 41 / 41 observed |
+
+Оба workload/guard/supervisor завершились с0, sources unchanged, один ROM boot,
+noUARTerrors. Min sampled free heap второго run54672B, SDK sum minima20308B,
+min task fill428B; maxHTTP4.118874guest s при прежнем limit6. Все92heap inventories
+и46TCP snapshots воспроизведены. В этих снимках были LISTEN/FIN_WAIT_2, максимум
+три PCB: listener76+4=80B и закрывающиеся208+4=212B каждый; TCP consumed80..504B.
+У наблюдавшихся PCB capacity padding равен0. Это не объясняет старые7flags.
+
+Живых segments/pbufs в моменты этих коротких снимков не было. Их сложные chains
+проверены на real-ROM host fixtures, **не** на реальном queued guest traffic.
+Нужен отдельный controlled pending-traffic probe; краткий idle/churn не закрывает
+его, полный сетевой lifecycle, длинный soak или аппаратную приёмку.
+
+[Архив](../../qemu/parity/tcp-inventory-validation-20261025.json):54raw/payload
+references,242895newgzipbytes с reuse прежних producers. Отдельный consumer
+перепроверяет оба полных журнала, source/unit/model/app/ELF/ROM, early0, ABI,
+typed TCP reads и additive series;76semantic negative controls отвергнуты.
+Старые heap/gate checkpoints отдельно воспроизведены с их source revisions.
+
+При cleanup check Windows уже переиспользовала preflight workload/guard PID
+для других images, созданных **после** успешного terminal supervision. Новый
+owner record различает отсутствие исходного процесса и отсутствие самого номера
+PID. Сверяются4roles, retained supervisor IDs, VM identity и immutable creation
+time; alive/before-terminal/replaced-role controls отклоняются. Чужие процессы
+не останавливались. В следующем run все4PID действительно отсутствовали.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_tcp_inventory_evidence.py `
+  --proof Small_TV/qemu/parity/tcp-inventory-validation-20261025.json `
+  --rom C:/Work/yoRadio/.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf
+```
+
+Далее — сопоставимые длительные metadata controls с interval15/outageEvery60
+на main и прежнем V8, controlled queued traffic, разбор unclassified deltas и
+retained-loss flags. Не складывать короткие runs с основным24hH10, не смягчать
+thresholds и не считать новый контроль объяснением старого run без воспроизведения.
+Idempotent already-stopped-VM cleanup также остаётся отдельным follow-up. Полная
+цель, whole-image audit, final full suite и аппаратные gates остаются открытыми.

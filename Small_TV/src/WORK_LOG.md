@@ -4714,3 +4714,51 @@ lastsample3535.629206guest s, start25.097679, guardrunning, oneROMboot/noerrors.
 Это около3510guest seconds prefix, не24hpass. Ни его VM/inputs, ни физическое
 устройство не менялись. Продолжить TCP attribution, обычный длинный контроль,
 idempotent cleanup и весь оставшийся IMPROVEMENT_PLAN; goalactive.
+
+## 2026-10-25 — TCP lists, buffer metadata и exact allocation attribution
+
+Предыдущий goal turn дал progress:135e61860/82d901e2d и pointer983313540,
+real host/VM checks. Новое продолжение сначала проверило currentcleanbranch и
+4originalH10PID/creationUTC:210cycles,oneROMboot/noerrors. Его inputs не менялись.
+
+Добавлены runtime_tcp_layout, runtime_tcp_allocations, runtime_tcp_snapshot и
+runtime_tcp_journal; native ABI/state enum, fourPCBlists, send/ooseq/refused
+segments/pbufs, distinct sharing/refcounts/queue lengths/timers. Actual live
+block bounds получены callbacks точных ROM/linked instructions. Qualified
+metadata prefix0 проверен по linked do_memp_malloc_pool→mem_malloc→malloc и
+SDK/config(no tasktracking/poisoning/stats). Packet payload не читается; metadata
+alias/free/interior/cross-boundary pointers отвергаются до transport read.
+
+Новые -TcpTopology/--tcp-topology даютschema7, imply heap; старые5/6 сохранены.
+Mailbox gate вызывается до TCP walk, busy не становится нулевым TCP расходом.
+Отдельная replay/coverage class сохраняет additive TCP/unclassified consumed
+series, не приписывает неизвестные allocations сети и не обещает requested size.
+31initialhosttests pass; после двух journal cases acceptedv2 содержит33pass.
+Все используют actualROM malloc/free и native fields.25baseline audit/trend pass.
+
+Actualpreflight4/22.240650guest s иchurn40/203.479499guest s завершены:
+22STAoutages/352HTTP,10JPEGuploads во втором, workload/guard/supervisor0,
+sourceunchanged,oneROMboot/noerrors. MaxHTTP4.118874<6, minsampledfree54672,
+SDKsummin20308,minstackfill428 во втором.46TCP samples observed/92heapinventories
+replay. Только LISTEN/FIN_WAIT_2, peak3PCBs, TCP consumed80..504B. ActualPCB
+capacities76/208, headers4each,padding0; никакого queuedpbuf/segment в этих
+моментах не было. Реальная pending-traffic qualification остаётся отдельной.
+
+Первый ad-hoc cleanup probe ошибочно считал живыми любые процессы с прежними
+PID. CIM показал2повторноиспользованных PID(другие images,creationпослеterminal
+13:04:15UTC). Ничего не остановлено и VM не перезапущена; до nextlaunch
+проверены original owner exits. Новый scoped owner record/consumer различает
+originalexit/PIDabsence, проверяет roles, retained IDs/VM identity и UTCcreation.
+8negativeownercontrols/run включают живого исходного владельца и falseabsence.
+У churn40 все4PID после выхода действительно отсутствовали.
+
+tcp-inventory-validation-20261025.json:54raw/payloadrefs/242895newgzipbytes;
+полный replay source/unit/model/app/ELF/ROM/early0/typedreads/series и76semantic
+negativecontrols. Shared producer payloads reused, fullRAM/flash/UART/ELF/SDK
+archives не добавлены. Heap/gate legacy readers проверяются с135e61860/82d901e2d;
+новаяschema4 evidence использует отдельный verify_tcp_inventory_evidence.
+
+Старые7retained-loss flags12..220B не закрыты. Далее matched longcontrols на
+main2DF90327 и прежнемV8A5BE14C5, обычный15s/outageEvery60; затем pendingtraffic,
+unclassified deltas и cleanup уже закрытойVM. Полныйплан/fullimage/final/hardware
+scope и основнойH10 остаются активными, physicaldevice не тронут.

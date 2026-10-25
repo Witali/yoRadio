@@ -38,7 +38,11 @@ def main():
     parser.add_argument('--outage-seconds', type=float, default=1)
     parser.add_argument('--heap-topology', action='store_true',
                         help='Read/replay allocator metadata in this owned diagnostic VM')
+    parser.add_argument('--tcp-topology', action='store_true',
+                        help='Observe quiet TCP lists and attribute their allocations; implies heap topology')
     args = parser.parse_args()
+    if args.tcp_topology:
+        args.heap_topology = True
     if args.cycles is None and args.duration_seconds is None:
         args.cycles = 20
     if args.cycles is not None and not 1 <= args.cycles <= 100000:
@@ -100,8 +104,14 @@ def main():
         topology = HeapTopology(rom, elf, layout)
         files += [Path(__file__).with_name(name) for name in
                   ('runtime_heap_topology.py', 'runtime_tlsf_instructions.py', 'runtime_instruction_image.py')]
+    tcp = None
+    if args.tcp_topology:
+        from runtime_tcp_snapshot import TcpSnapshot
+        tcp = TcpSnapshot(elf)
+        files += [Path(__file__).with_name(name) for name in
+                  ('runtime_tcp_snapshot.py', 'runtime_tcp_layout.py', 'runtime_tcp_allocations.py', 'runtime_tcp_gate.py')]
     inputs = {str(path.resolve()): digest(path) for path in files}
-    result = {'schema_version': 6 if topology else 5, 'passed': False, 'all_functionality_verified': False,
+    result = {'schema_version': 7 if tcp else 6 if topology else 5, 'passed': False, 'all_functionality_verified': False,
               'scope': __doc__, 'native_elf_sha256': layout['elf_sha256'],
               'app_sha256': digest(app), 'qemu_sha256': digest(executable),
               'qemu_executable': str(executable), 'cycles_requested': args.cycles,
@@ -113,6 +123,9 @@ def main():
                               'Short workload is not the 24-hour H10 or physical-board acceptance.',
                               'Stack fill is a historical SDK watermark; sampled frames do not prove all execution peaks.',
                               'Sum of per-heap minimum counters follows SDK semantics, not a simultaneous global minimum.']}
+    if tcp:
+        result['tcp_layout'] = tcp.layout
+        result['tcp_gate_layout'] = tcp.gate.layout
     fixture = weather.WeatherFixture(['Shenzhen,CN', 'Fixture,CN'])
     fixture.set_response(200)
     with socket.socket() as reservation:
@@ -170,6 +183,8 @@ def main():
                     row['weather'] = weather_reader.sample(row['guest_seconds'])
                     if topology:
                         row['heap_topology'] = topology.sample(reader, row['heap'])
+                    if tcp:
+                        row['tcp_topology'] = tcp.sample(reader.memory, row, topology)
                     journal.append('snapshot', row)
                     result['summary'] = journal.summary()
                     if row['heap']['minimum_free_bytes'] == 0 or any(

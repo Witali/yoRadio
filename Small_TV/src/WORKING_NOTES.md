@@ -20,13 +20,24 @@ controls pass. Архив heap-topology-validation-20261025.json; детали
 ROM контроль показывает возможный padding12B при тех же requested sizes, но
 семь retained-loss warnings12..220B прежнего прерванного H10 пока не объяснены.
 
-TCP mailbox gate уже готов:15host tests, real4cycles/2outages/32HTTP и5quiet
-same-stop samples,12negative archive controls pass. ELF-specific policy,
-DWARF task identity/embedded mailbox queue и обе стороны receive list links;
-busy возвращает пропуск, не ложный empty TCP inventory. Сам TCP walk пока нет.
-Детали/actual native ABI и дальнейшая реализация: tests/TCP_HEAP_ATTRIBUTION.md.
-Следом добавить typed TCP PCB/TIME_WAIT attribution, затем диагностический
-длительный контроль с interval15/outageEvery60. Не заменять им основной H10 и
+TCP gate **и inventory/attribution** готовы:33real-ROM host tests+25baseline,
+actual4+40cycles/22outages/352HTTP,46observed snapshots и76semantic controls pass.
+Schema7/-TcpTopology подразумевает heap topology; gate/layout/allocations/walk/
+journal разделены. Qualified zero metadata prefix проверен по assembly текущего
+ELF, unknown ABI и free/interior/alias pointers отвергаются до чтения. Shared
+pbuf не удваивает capacity, busy остаётся явным пропуском. Source/app/QEMU не
+менялись. Документ/оставшиеся gates: tests/TCP_HEAP_ATTRIBUTION.md; архив
+tcp-inventory-validation-20261025.json (54refs/242895newgzipbytes).
+
+Actual sampled states только LISTEN/FIN_WAIT_2: listener80B, closingPCB212B с
+headers, TCP consumed80..504B, padding0 в этих46snapshots. Queued segments/pbufs
+пока проверены real-ROM host fixtures, не pending guest traffic. Старые7flags
+по-прежнему не объяснены. Windows переиспользовала2preflightPID послеterminal:
+новый owner record различает original exit и исчезновение PID,8controls/run.
+Ни чужие процессы, ни живые ВМ из-за этого не останавливались/перезапускались.
+
+Следом matched длинные controls main/V8 с interval15/outageEvery60, controlled
+queued traffic и unclassified deltas. Не заменять ими основной H10 и
 не смягчать thresholds. Исправить отдельным изменением redundant cleanup, когда
 driver уже закрыл ВМ: prototype получил connection refused, все owners отсутствуют.
 Failed prototype и exploratory40 без early0 не включены в qualification. Полный

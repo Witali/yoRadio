@@ -174,6 +174,13 @@ retained-loss flags остаются открытым исследованием
 
 ## Разделение модулей и способ измерения
 
+Schema7 (`-TcpTopology`) добавляет [typed TCP attribution](TCP_HEAP_ATTRIBUTION.md).
+33real-ROM host tests,4+40cycles/22outages/352HTTP и76negative controls pass;
+все46snapshots replay. Считаются фактические live capacities и headers без
+double counting shared buffers. Busy samples остаются пропусками. Короткие
+снимки показали PCB, а реальные queued segments/pbufs и длинный matched control
+ещё не квалифицированы. Прежние7retained-loss warnings остаются открытыми.
+
 Дополнительная opt-in schema 6 описана в [HEAP_TOPOLOGY.md](HEAP_TOPOLOGY.md).
 Точные ROM/linked TLSF instructions воспроизводят чтения только block headers,
 считают live capacity/headers и free block geometry; counters проверяются тем же

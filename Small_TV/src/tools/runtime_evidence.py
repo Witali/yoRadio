@@ -228,7 +228,7 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
     """Bind final journal, UART guard, source files, image/ELF and elapsed guest time."""
     folder, repository_root = Path(folder).resolve(), Path(repository_root).resolve()
     report = decode((folder / 'report.json').read_bytes())
-    require(report['schema_version'] in (3, 4, 5, 6), 'Unsupported runtime report schema')
+    require(report['schema_version'] in (3, 4, 5, 6, 7), 'Unsupported runtime report schema')
     terminal = 'journal' in report and 'inputs_unchanged' in report
     require(terminal or allow_progress, 'Runtime workload has not finished')
     roots = (repository_root, *map(Path, extra_roots))
@@ -258,7 +258,7 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
     every = integer(report['outage_every_cycles'], 'outage cadence')
     weather_required = report['schema_version'] >= 4
     topology = None
-    if report['schema_version'] == 6:
+    if report['schema_version'] >= 6:
         tests = str(Path(__file__).resolve().parents[1] / 'tests')
         if tests not in sys.path:
             sys.path.insert(0, tests)
@@ -266,12 +266,27 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
         for source in ('runtime_heap_topology.py', 'runtime_tlsf_instructions.py', 'runtime_instruction_image.py'):
             named(source)
         topology = HeapTopology(named('esp32c2_rev200_rom.elf'), elf)
+    tcp = None
+    tcp_coverage = None
+    if report['schema_version'] == 7:
+        from runtime_tcp_snapshot import TcpSnapshot
+        for source in ('runtime_tcp_snapshot.py', 'runtime_tcp_layout.py', 'runtime_tcp_allocations.py', 'runtime_tcp_gate.py'):
+            named(source)
+        tcp = TcpSnapshot(elf)
+        require(report['tcp_layout'] == tcp.layout and report['tcp_gate_layout'] == tcp.gate.layout,
+                'TCP observation ABI differs from the actual ELF')
+        from runtime_tcp_journal import TcpCoverage
+        tcp_coverage = TcpCoverage(topology, tcp)
     evidence = journal_evidence(folder / 'events.jsonl', chunks, every, allow_partial=not terminal,
                                 require_weather=weather_required,
-                                snapshot_check=topology.validate if topology else None)
+                                snapshot_check=tcp_coverage if tcp_coverage else topology.validate if topology else None)
     result = {'terminal': terminal, 'inputs_verified': len(inputs), 'evidence': evidence, 'report': report,
               'uart': inspect_uart((folder / 'vm/uart.log').read_bytes()), 'weather_evidence_verified': False}
     result['heap_topology_verified'] = topology is not None
+    if tcp:
+        result['tcp_topology_verified'] = True
+        result['tcp_coverage'] = evidence['tcp_coverage'] = tcp_coverage.summary()
+        result['tcp_series'] = tcp_coverage.series
     require(result['uart']['passed'], 'UART contains a reset, panic or incomplete boot capture')
     if terminal:
         require(report['passed'] is True and report['inputs_unchanged'] is True and report['no_panic'] is True and

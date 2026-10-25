@@ -25,7 +25,7 @@ def validate_model(data, proof, model_path=None):
     model = json.loads(data)
     kind = identity.get('kind', 'network-stalled-peer-v1')
     if kind == 'qemu-main-merge-v1':
-        assert proof['schema_version'] in (2, 3)
+        assert proof['schema_version'] in (2, 3, 4)
         assert model['schema'] == 'qemu-main-merge-validation-v1'
         assert model['passed'] and not model['all_functionality_verified']
         assert re.fullmatch('[0-9a-f]{40}', model['compiled_source_commit'])
@@ -59,7 +59,7 @@ def model_rejections(data, proof):
 
 def validate(report,evidence,guard,supervisor,uart,cycles,expected_schema=5):
     """Require complete workload, real reconnects, memory headroom and UART guard."""
-    require(expected_schema in (5,6) and report['schema_version']==expected_schema,
+    require(expected_schema in (5,6,7) and report['schema_version']==expected_schema,
         'Expected matching runtime observation schema')
     require(report['passed'] and report['inputs_unchanged'] and report['no_panic'] and
         not report.get('error') and not report.get('cleanup_error'),'Failed workload')
@@ -97,10 +97,15 @@ def validate(report,evidence,guard,supervisor,uart,cycles,expected_schema=5):
         minimum_sdk_sum_of_per_heap_minima_bytes=summary['minimum_sdk_sum_of_per_heap_minima_bytes'],
         minimum_task_stack_fill_bytes=min(summary['minimum_task_stack_fill_bytes_by_name'].values()),
         maximum_http_or_batch_guest_seconds=summary['maximum_http_or_batch_guest_seconds'],h10_checks_passed=False)
-    if expected_schema==6:
+    if expected_schema>=6:
         require(evidence.get('verified_snapshots')==summary['snapshots'],'Missing topology instruction replay')
         result.update(heap_topology_snapshots=summary['snapshots'],
             heap_header_inventories=summary['snapshots']*len(summary['first_snapshot']['heap']['heaps']))
+    if expected_schema==7:
+        coverage=evidence.get('tcp_coverage',{})
+        require(coverage.get('snapshots')==summary['snapshots'] and coverage.get('observed',0)>0,
+            'Missing complete TCP replay or observed quiet TCP samples')
+        result['tcp_coverage']=coverage
     return result
 
 
@@ -108,7 +113,8 @@ def rejections(report,evidence,guard,supervisor,uart,cycles,expected_schema=5):
     """Reject altered identities, missing work and false guard conclusions."""
     rejected=[]
     cases=['emulator-identity','cycles','rom-counters','weather','duration','guard','uart-reset','supervisor']
-    if expected_schema==6:cases.append('skipped-topology-replay')
+    if expected_schema>=6:cases.append('skipped-topology-replay')
+    if expected_schema==7:cases.append('skipped-tcp-replay')
     for case in cases:
         r,e,g,s,u=copy.deepcopy((report,evidence,guard,supervisor,uart))
         if case=='emulator-identity':r['qemu_sha256']='00'*32
@@ -119,7 +125,8 @@ def rejections(report,evidence,guard,supervisor,uart,cycles,expected_schema=5):
         elif case=='guard':g['passed']=False
         elif case=='uart-reset':u['rom_boots']=2;g['last_observation']=u
         elif case=='supervisor':s['sources_unchanged']=False
-        else:e.pop('verified_snapshots',None)
+        elif case=='skipped-topology-replay':e.pop('verified_snapshots',None)
+        else:e.pop('tcp_coverage',None)
         try:validate(r,e,g,s,u,cycles,expected_schema)
         except ValueError:rejected.append(case)
         else:raise AssertionError('Invalid runtime evidence accepted: '+case)

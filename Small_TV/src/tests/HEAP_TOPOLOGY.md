@@ -112,6 +112,7 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/verify_runtime_candidate_evidence.py `
   --proof Small_TV/qemu/parity/heap-topology-validation-20261025.json `
+  --source-revision 135e61860 `
   --rom C:/Work/yoRadio/.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf
 ```
 
@@ -128,10 +129,11 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 короткому тесту. Память нового observer не определяет owner/requested size
 каждого allocator блока и сама по себе этого не доказывает.
 
-Первый этап TCP observer теперь проверен отдельно:
-[mailbox quiescence gate](TCP_HEAP_ATTRIBUTION.md),15host tests и5same-stop
-наблюдений в отдельной QEMU ВМ. Сам PCB/segment/pbuf walk ещё не реализован;
-безопасная точка чтения не заменяет attribution и долгий контроль.
+TCP observer теперь проверен отдельно:
+[gate и attribution](TCP_HEAP_ATTRIBUTION.md),33host tests и4+40actualcycles,
+46observed snapshots/76negative controls. PCB/segment/pbuf walk реализован;
+в sampled QEMU traffic видны LISTEN/FIN_WAIT_2 PCB без queued buffers, поэтому
+real guest segment/pbuf и длительный контроль остаются отдельными пунктами.
 
 Сохранены также исключённые exploratory runs: первый prototype завершился
 ошибкой dispatch qualification; отдельный успешный 40-cycle run был замечен
