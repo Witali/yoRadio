@@ -3988,3 +3988,13 @@ timeout, with a separate QEMU task worktree/build and owned diagnostic VM. Curre
 long controls and pinned executables must remain untouched. Then cleanup helper,
 CODEC-REPRO, ID11 callee/full-image reachability, new-image independent gates and
 hardware remain open. Full goal active; do not combine old/new run durations.
+
+Failure archive now saved: runtime-main-failure-validation-20261025.json,
+19 payload references, 64787 new compressed bytes. Actual consumer replay with
+--recheck-inputs passed and rejected seven false-success/ownership controls.
+The first reader prototype expected an explicit null elapsed field; the real
+terminal failure omits it. Fixed the reader to accept absence or null while still
+rejecting any invented elapsed/end time. No producer or report was changed.
+See tests/RUNTIME_MAIN_FAILURE.md. Next priority is bounded pre-cleanup failure
+state capture and an owned diagnostic reproduction. Invalid-socket warnings may
+come from callback registration or unregistration; causation remains unknown.

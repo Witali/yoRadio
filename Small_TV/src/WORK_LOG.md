@@ -4988,3 +4988,25 @@ findings не объясняются этим invalid-ID исправление�
   All4oldowners absent, supervisorworkloadexit1/guardexit0 plus cleanup refused.
   Save the failed artifact and investigate before any replacement H10; two matched
   schema7 controls remain running and protected.
+
+## 2026-10-25 — preserve the failed main H10 before reproduction
+
+- Saved report, complete events, UART, QEMU warnings, traceback, cleanup error,
+  supervisor, genuine start and original/final process identities in a distinct
+  historical failure archive. It has 19 payload references and 64787 new gzip
+  bytes; no duplicate ELF, SDK or full Flash/RAM dump.
+- Added an offline reader that recomputes the exact observed prefix, original
+  trend algorithm and UART bytes while requiring terminal workload failure.
+  Seven actual negative controls reject false success, full-scope/duration claims,
+  missing work, altered journal, successful supervisor and a live original owner.
+- Actual replay with --recheck-inputs passed. All original absolute inputs were
+  rehashed, including the pinned QEMU executable. The prototype expected an
+  explicit null elapsed field; the real failure omits it. Corrected the reader
+  without editing the report or inventing an end time.
+- Documented that 535 invalid-socket warnings do not establish the HTTP timeout's
+  cause. The existing finally block already closed the VM, so failure PC/memory
+  were not available. Next diagnostic must capture bounded state before cleanup;
+  no automatic timeout increase or fresh H10 was used to hide this failure.
+- At 15:55:40/41 UTC, CIM matched all eight original owners of the separate main
+  and V8 metadata controls. They had 323/317 cycles, running UART guards, one ROM
+  boot each and no guard errors. Their input trees and executables remain frozen.

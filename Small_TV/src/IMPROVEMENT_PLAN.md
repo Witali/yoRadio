@@ -440,9 +440,14 @@ retained median loss12..220B и требуют объяснения; порог�
 остановки неизвестна. Сохранены numeric prefix и12negative controls:
 [RUNTIME_MEMORY.md](tests/RUNTIME_MEMORY.md). Для слитого QEMU main9135fc89ce
 отдельный pin2DF90327:4-cycle preflight и40-cycle qualification прошли с22actual
-outages/352HTTP и terminalguards. Новый H1025Oct11:23UTC запущен отдельно на
-полные86400guest s; earlyrecord0 сохранён. H10/retained-loss investigation и весь
-прежний scope остаются открытыми. Детали runtime-main-validation-20261025.json.
+outages/352HTTP и terminalguards. Новый H10 от 25Oct11:23UTC запрашивал полные
+86400 guest seconds, но завершился неуспешно: 526 циклов, 4207 HTTP, 8 outages,
+9040.980895 наблюдённых секунд и timeout на `/start_upload`. Supervisor terminal
+failed, workload exit 1; исходные владельцы завершились. Архив и replay:
+[RUNTIME_MAIN_FAILURE.md](tests/RUNTIME_MAIN_FAILURE.md). Сохранены 535 Windows
+WSAEventSelect warnings, причина timeout пока неизвестна. До нового H10 добавить
+bounded pre-cleanup failure-state capture и воспроизвести ошибку в отдельной ВМ.
+H10, retained-loss investigation и весь прежний scope остаются открытыми.
 Для разбора retained loss добавлен отдельный opt-in metadata observer:
 [HEAP_TOPOLOGY.md](tests/HEAP_TOPOLOGY.md). Exact ROM/linked TLSF replay, 11+8
 новых host tests и базовые 16+25 tests pass. 4+40 cycles / 22 outages / 352 HTTP,
@@ -450,7 +455,8 @@ outages/352HTTP и terminalguards. Новый H1025Oct11:23UTC запущен о
 контроль доказывает возможность 12-byte padding при тех же запросах, но не
 объясняет прежний H10. Далее typed TCP PCB/TIME_WAIT attribution и длительный
 контроль с обычным cadence; thresholds и требования 24h не меняются. Отдельно
-исправить idempotent cleanup уже закрытой driver ВМ. Main H10 не изменять.
+исправить idempotent cleanup уже закрытой driver ВМ. Сохранённый failed H10
+и его pinned inputs не изменять.
 TCP [gate и attribution](tests/TCP_HEAP_ATTRIBUTION.md) готовы: native selected
 fields, exact live allocations, PCB/segment/pbuf chains и shared accounting,
 33host tests+25baseline,4+40actualcycles/22outages/352HTTP,46observed snapshots и
@@ -461,7 +467,9 @@ actual sampled queued segments/pbufs не было, их target traffic probe о
 Matched metadata controls запущены25Oct13:40/13:42UTC вsoak-main/soak-v8,
 по28800guest seconds/interval15/outageEvery60 наproducer23b641680. Early0 и
 4owneridentities каждый сохранены. Это pending, не8hpass; их producer inputs
-в текущей копии не менять. Основной24hH10 идёт в своей прежней копии отдельно.
+в текущей копии не менять. Основной H10 уже завершился с ошибкой; эти отдельные
+controls его не заменяют. CIM recheck 25Oct15:55UTC подтвердил все восемь исходных
+владельцев controls, 323/317 циклов и running guards; это ещё не terminal 8h pass.
 Диагностический слой [TCP_TREND_ATTRIBUTION.md](tests/TCP_TREND_ATTRIBUTION.md)
 проверен на исходных завершённых 4+40 циклах, с 22 math и 8 CLI host-тестами.
 Он использует те же центральные снимки, что исходные медианы, явно сохраняет
