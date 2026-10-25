@@ -4800,3 +4800,38 @@ Guardrunning/oneROMboot/noerrors каждый; это pending prefixes, не8h/2
 не складывать независимые medians. Old7flags, pending guestbuffer probes,
 idempotent already-deadVMcleanup и fullimage/final/hardware scope открыты.
 Frozen47files/SDK/ROM/app/assets/ELF/три protected VMs не менялись; goalactive.
+
+## 2026-10-25 — офлайн-компоненты исходных медиан памяти
+
+Предыдущий запрос о QEMU завершён проверкой всех пяти worktrees/веток и реальным
+push main: 9135fc89ce уже опубликован. Единственная резервная ветка дублирует
+962cda7a6f с устаревшим README-путём; уникальных model/test changes в ней нет.
+Новые фиктивные merges не создавались.
+
+При возобновлении плана authoritative CIM подтвердил все 12 исходных owners с
+точными creation UTC: основной H10 410 cycles, controls main/V8 61/57 cycles.
+Supervisor running; сами JSON-файлы не считались доказательством liveness.
+Все три ВМ, producer inputs, app/ELF и frozen tools сохранены без изменений.
+
+Добавлены runtime_tcp_trend и analyze_tcp_runtime. Полный schema7 replay
+предшествует расчёту. Исходный runtime_trend и его критерии не изменены:
+3600s warmup/window, lcm(20,outage cadence), полное покрытие фаз и прежние flags
+по последовательному спаду/разбросу первого окна. Компоненты берутся из тех же
+центральных снимков; независимые медианы не складываются. Equal-free ties
+сохраняют ranges и distinct observations; busy не превращается в нулевой расход.
+TCP release и unclassified growth остаются знаковыми и точно дают исходную loss.
+
+22 math + 8 real CLI protection tests pass. Реальные CLI на завершённых 4+40
+cycles воспроизвели 46 снимков и прежний insufficient_steady_state_data. На
+live prefixes main/V8 проверены 67/62 cycles, 68/63 snapshots, 1167.278640/
+1069.220519 guest seconds; pending и до конца прогрева, не 8h или H10 pass.
+
+Архив tcp-trend-validation-20261025: 26 refs, 14 новых gzip / 24760 bytes,
+12 reused payloads. Consumer повторяет исходный ROM/TCP replay и 76 controls,
+потом сверяет paired series и новые CLI findings; 16 новых altered-report
+controls отвергаются. Описание и команды в tests/TCP_TREND_ATTRIBUTION.md.
+Неизменяемый архив не содержит изменяющихся soak prefixes или полных RAM/flash.
+
+Старые 7 retained-loss flags не объяснены, пороги не ослаблены. Дальше полные
+controls и unclassified deltas, реальные queued buffers, cleanup закрытой ВМ,
+whole-image/full suite/24h/physical gates. Весь исходный scope и goal активны.

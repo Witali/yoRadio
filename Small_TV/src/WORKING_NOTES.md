@@ -3806,3 +3806,35 @@ This does not explain the OLD interrupted run: its four PIDs and same-run/V8
 scan were truly absent, independently of timestamp comparison. Pinned runtime
 helper sources use held process handles/command identities, not this ad-hoc
 timestamp comparison. Do not edit them for a probe-only formatting mistake.
+
+## CURRENT 2026-10-25 — TCP median diagnostics; producers remain frozen
+
+Worktree small-tv-memory-retention, producer23b641680, prior docs67556af2b.
+This turn is PROGRESS: read-only QEMU branch audit/push verified main9135fc89ce,
+then new offline attribution, host tests and real saved-journal CLI checks.
+No producer, firmware, SDK, frozen helper or live VM input changed.
+
+At resume CIM matched all12 original PID/name/creationUTC identities. Main H10
+had410 cycles; main/V8 controls61/57. Later offline prefix replays verified67/62
+cycles and68/63 snapshots,1167.278640/1069.220519 guest seconds. These remain
+pending prefixes before3600s warmup, never terminal8h/24h qualification.
+
+runtime_tcp_trend annotates the UNCHANGED original runtime_trend: same3600s
+warmup/windows, lcm(20,outage cadence), phase coverage and dynamic initial
+variation criteria. Use the SAME one/two central free-heap observations for
+both components. Equal-free ties retain ranges; even centers are distinct.
+Busy central candidates mean unknown attribution and remain in original free
+statistics. Signed TCP release can coexist with positive unclassified growth.
+No component ownership automatically excuses a retained-loss flag.
+
+22 math +8 CLI preservation/rejection tests passed. New CLI fully verified
+preflight4/churn40,5+41 snapshots; both correctly insufficient for steady-state
+trend. See tests/TCP_TREND_ATTRIBUTION.md and tcp-trend-validation-20261025.json:
+26 refs,14newgzip/24760bytes,12reused payloads. Reader replays original76controls
+and16new controls. Live prefixes are deliberately excluded from immutable proof.
+
+Do not modify live producer sources in this tree or the original H10 tree.
+Producer fixes need another task worktree. Remaining: full matched controls,
+old7loss flags12..220B, real queued guest buffers, already-dead VM cleanup,
+whole-image caller4207b120/undefined7581e..75896, final full suite and physical
+gates. No goal completion, no physical reset/flash and no automatic OTA addition.

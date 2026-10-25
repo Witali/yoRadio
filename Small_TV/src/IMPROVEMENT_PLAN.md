@@ -430,6 +430,12 @@ Matched metadata controls запущены25Oct13:40/13:42UTC вsoak-main/soak-v
 по28800guest seconds/interval15/outageEvery60 наproducer23b641680. Early0 и
 4owneridentities каждый сохранены. Это pending, не8hpass; их producer inputs
 в текущей копии не менять. Основной24hH10 идёт в своей прежней копии отдельно.
+Диагностический слой [TCP_TREND_ATTRIBUTION.md](tests/TCP_TREND_ATTRIBUTION.md)
+проверен на исходных завершённых 4+40 циклах, с 22 math и 8 CLI host-тестами.
+Он использует те же центральные снимки, что исходные медианы, явно сохраняет
+неоднозначность и busy, не меняет warmup/windows/phase coverage/flags. Архив
+воспроизводит 76 прежних и 16 новых rejection controls. Длительные controls,
+объяснение прежних потерь и все остальные gates остаются открытыми.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.
