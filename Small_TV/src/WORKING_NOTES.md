@@ -3643,3 +3643,34 @@ build a DISTINCT candidate filename and separate CYD/C3/C2 regression. Full
 current network/display/suite, SDK I/O/allocation/NVSinternal/electrical faults,
 H10 and hardwareH01-H09 remain open. Hardware requires identified intended board,
 no unsolicited serial resets/flashes. Goal not complete/blocked/paused.
+
+## CURRENT 2026-10-25 — H10 interrupted; main qualification live
+
+Previous turn PROGRESS: QEMU main9135fc89ce merged/pushed. Current turn also
+PROGRESS. Older LIVE notes above are historical: CIM now confirms all old IDs
+34280/34996/13180/1512 absent and no same-run/V8 processes. Stale running JSON
+stopped24Oct19:57:54UTC. Termination cause unknown; no matching app crash events
+in checked20-minute window, host last boot14Oct. Do not invent a clean finish or
+firmware failure. Original run/pinned sources remain intact.
+
+Old .build/runtime-h10-current-20261024 audited read-only. Strict rejects missing
+footer; diagnostic replays1488cycles (saved counter1487 lags),4pendingevents,
+25560.689541guest s,11909HTTP incl partialcycle,24outages,1ROMboot/noUARTerrors,
+minsampledfree55116B,1482validweathergenerations/maxfreshgap68.579137s. Seven
+flags remain: phases1/13/25/33/37/49/59 losses16/18/16/20/12/12/220B. Investigate;
+no leak/no-leak conclusion or weakened thresholds. Diagnostic pending means a
+prefix, not liveness. H10 unaccepted. New proof runtime-interrupted-validation-
+20261025.json:24raw/refs,167082newgzipbytes,12rejected controls; no rawUART/RAM/flash.
+Replay supports --source-revision and needs matching app/ELF. Details RUNTIME_MEMORY.
+
+App9C1A83BD/ELF76B5CE37/source7D95988C/SDK unchanged. Current QEMU main9135fc89ce,
+compiled modelcb9deafd83, SHA2df903276e66afe0095ad19afd6d8b7201bcca3fbda073f3edb958934aef0001.
+Separate pin C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients/build/main-9135-riscv32.exe;
+preserve it, old V8 and frozen47-file tools. Preflight4/2outages/22.790034guest s
+passed terminalguard/supervisor0. ONE40-cycle/outageEvery2 qualification RUNNING:
+.build/runtime-main-20261025/churn-40, supervisor30164 created25Oct11:15:03.325607Z,
+workload37400/guard24956; live viaCIM, last2cycles. Cycle0 captured at sibling
+churn-40-start.json. No new H10 yet. Never restart from a polling timeout.
+Next: finish candidate qualification/preserve evidence, investigate retained loss,
+then caller4207b120/undefined7581e..75896/fullsuite/fault matrix/hardware as planned.
+No physical reset/flash, no OTA; full goal active, not complete/blocked/paused.

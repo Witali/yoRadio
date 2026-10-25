@@ -91,6 +91,52 @@ app/ELF identities обязательны. В архиве есть ссылка
 network-stalled-peer checkpoint новой модели QEMU. Полные display и network
 gates, 24h и аппаратная приёмка остаются самостоятельными этапами.
 
+## Прерванный H10, проверка 2026-10-25
+
+H10 `.build/runtime-h10-current-20261024` на app9C1A83BD/ELF76B5CE37 и
+QEMU A5BE14C5 не завершился. Windows CIM подтвердил отсутствие всех четырёх
+владельцев и других процессов того же запуска. Supervisor и guard остались со
+статусом `running`; это устаревшие файлы, а не живые процессы. Последний heartbeat
+—24Oct19:57:54UTC. Причина завершения неизвестна. В ограниченном20-minute окне
+Application1000/1001 подходящих crash events не найдено, хост загружен14Oct.
+Это не устанавливает ни ошибку прошивки, ни конкретную причину остановки.
+
+Пересчитан весь численный журнал:1488 полных циклов, ещё4 незавершённых события,
+25560.689541 гостевых секунд (7ч6мин),11909 HTTP requests с учётом частичного
+цикла и24 настоящих STA outages. Промежуточный `completed_cycles=1487` отстаёт
+от snapshot на один цикл; он не заменяет разбор журнала. Min sampled heap55116B,
+один ROM boot/нет UART panic,1482 разных valid weather generations, максимальный
+наблюдаемый интервал свежей погоды68.579137guest s. Нет terminal footer или
+успешного terminal guard: строгая приёмка правильно отвергает run. `--diagnostic`
+возвращает `pending` для проверенного **префикса**, а не утверждает живость.
+В отдельном архиве этот случай классифицирован как `interrupted`.
+
+Неизменённый анализ после часового warm-up дал6 полных часовых окон/60 фаз и
+семь retained-loss warnings. По фазам1/13/25/33/37/49/59 разница первой/последней
+медиан равна16/18/16/20/12/12/220B. Объяснение этих различий и отсутствие утечки
+не установлены. Пороги не смягчались; soak этим не принимается.
+
+[`runtime-interrupted-validation-20261025.json`](../../qemu/parity/runtime-interrupted-validation-20261025.json)
+сохраняет24 raw/payload references,167082 новых gzip bytes: numeric journal,
+report/guard/supervisor, early record, наблюдение владельцев, исходники и оба
+offline результата. Full UART/RAM/flash не копируются. Независимый
+`verify_interrupted_runtime_evidence.py` пересчитывает журнал/trend, сохраняет
+все warnings и отвергает12 controls, включая ложный H10 pass, живого владельца,
+скрытые flags, HTTP503 и неверную сумму heap. `evidence_verified=true` означает
+проверенные данные прерванного запуска; workload/H10 passed остаются false.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_interrupted_runtime_evidence.py `
+  --proof Small_TV/qemu/parity/runtime-interrupted-validation-20261025.json
+```
+
+Исторический replay принимает `--source-revision`; нужен соответствующий app/ELF.
+Main QEMU9135fc89ce/2DF90327 закреплён отдельным `main-9135-riscv32.exe`; старыйV8
+и frozen tools сохранены. Новый4-cycle preflight прошёл,40-cycle qualification
+запущена отдельно. Это не H10 и не объяснение прежних memory flags.
+
 ## Разделение модулей и способ измерения
 
 - `runtime_memory.py` извлекает размеры/поля из DWARF текущего ELF, обходит

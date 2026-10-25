@@ -1,6 +1,6 @@
 # План улучшения восстановленной Small TV
 
-Обновлено: 2026-10-24. База: `main` / `51cd114f9`.
+Обновлено: 2026-10-25. База: `main` / `51cd114f9`.
 
 Цель — восстановить полезное поведение заводской прошивки ESP32-C2, исправляя
 её подтверждённые ошибки. Сопоставлять ассемблер, декомпиляцию и наш C-код в обе
@@ -12,9 +12,10 @@
 read-only таблицы, RGB565 converter, host/RV32 проверки и план flash layout.
 Рабочая app `54f441af…` пока использует исправленный TJpgd. Объединённая версия
 прошла 5608 native checks, 10 controls карты и 6 artifact checks. Это не полная
-аппаратная или суточная приёмка. Full regression прежней B50D завершён; идущий
-H10 относится к B50D. Его frozen source/SDK/snapshot и владельцев QMP/RSP не
-менять. Новые исправления выполнять в отдельной рабочей копии.
+аппаратная или суточная приёмка. Full regression прежней B50D завершён;
+исторический H10 относился к B50D. Его frozen source/SDK/snapshot сохранять.
+Текущие runtime checkpoints приведены в п.6; новые исправления выполнять
+в отдельной рабочей копии.
 
 ## 1. Переинициализация темы при смене города
 
@@ -400,7 +401,14 @@ Runtime checkpoint2026-10-24: текущие9C1A83BD/76B5CE37 на QEMU A5BE14C5
 Оба workload/guard/supervisor terminal0; архив/16negative controls pass. См.
 [RUNTIME_MEMORY.md](tests/RUNTIME_MEMORY.md). Закрыт selected 40-cycle churn;
 продолжительные churn/soak и H10 этим не закрыты. Отдельный H10 на той же паре
-запущен24Oct10:41UTC:86400guest s/interval15/outageEvery60, результат pending.
+запущен24Oct10:41UTC:86400guest s/interval15/outageEvery60. Проверка25Oct выявила
+прерывание: все4владельца отсутствуют, terminal footer нет. Журнал подтверждает
+1488полныхциклов/25560.689541guest s/24STAoutages; это не24h. Семь фаз показывают
+retained median loss12..220B и требуют объяснения; пороги не менялись. Причина
+остановки неизвестна. Сохранены numeric prefix и12negative controls:
+[RUNTIME_MEMORY.md](tests/RUNTIME_MEMORY.md). Для слитого QEMU main9135fc89ce
+отдельный pin2DF90327:4-cycle preflight прошёл,40-cycle qualification пока идёт.
+H10/retained-loss investigation и полный прежний scope остаются открытыми.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.

@@ -4569,3 +4569,31 @@ factory-sdk-gaps-validation-20261024.json:24payload references,50296newgzipbytes
 H10 на прежних4процессах продолжает работу: последнее подтверждение145cycles,
 2реальныхSTAoutages, oneROMboot/noerrors. Это pending24h, не completed pass.
 Source/main и physical device не менялись; push не выполнялся. Общий план активен.
+
+## 2026-10-25 — прерванный H10 и сохранённые memory warnings
+
+Предыдущая работа дала progress: QEMU improvements слиты/проверены и отправлены
+в main9135fc89ce. Новое продолжение проверило процессы, а не старые state files:
+supervisor34280/workload34996/guard13180/VM1512 отсутствуют, других процессов run
+нет. Status running остался в stale JSON; heartbeat24Oct19:57:54UTC. Причина
+неизвестна; хост не перезагружался после14Oct, matching crash events1000/1001
+в проверенном20-minute окне не найдены.
+
+Strict audit отверг незавершённый run. Diagnostic пересчитал1488completecycles/
+4pendingevents/25560.689541guest s/11909HTTP/24STAoutages, одинROMboot/noUARTerrors,
+minsampledfree55116B,1482validweathergenerations. Семь прежних phase-aware
+retained-loss flags12..220B сохранены и пока не объяснены. Ни утечка, ни её
+отсутствие, ни24h pass не заявлены. Snapshot/report counter lag на1цикл учтён.
+
+Новый replay verify_interrupted_runtime_evidence пересчитывает actual journal/
+trend, проверяет source/app/ELF/early record/owners и отвергает12negative cases.
+Proof runtime-interrupted-validation-20261025.json:24raw/payloadreferences,
+167082newgzipbytes, частьproducerpayloads reused; fullUART/RAM/flash нет.
+Evidence_verified отличается от workload/H10pass. App/ELF/source/SDK/старыйV8
+не менялись. План иRUNTIME_MEMORY уточнены.
+
+Main QEMU2DF90327 сохранён отдельным build/main-9135-riscv32.exe. Preflight4cycles/
+2outages/22.790034guest s с terminalguard/supervisor прошёл. Detached40-cycle
+qualification на той же app запущена отдельно; early capture наcycle0 выполнен.
+Её результат покаpending, новая24h приёмка не заявлена. Физическая плата не тронута,
+goal active. Продолжить разбор retained loss и остальные пункты полного плана.
