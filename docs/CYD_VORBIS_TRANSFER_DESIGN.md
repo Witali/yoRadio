@@ -596,3 +596,35 @@ section/value APIs from complete Huffman/entropy/setup/audio parsing. Wide
 synthesis, public raw integration, full31 reference PCM/G6/G8 and physical
 acceptance remain open. Neither production component registration nor any
 deferred source is changed by this numerical/data layer.
+
+## Complete owned codebooks, 2026-10-25
+
+The [codebook checkpoint](../tests/results/vorbis-codebook-20261025/CHECKPOINT.md)
+connects complete descriptors and Huffman audio words to exact VQ/floor0 LSP
+reconstruction. The [public API](../idf/components/native_vorbis_numeric/include/native_vorbis_codebook.h)
+and [implementation](../idf/components/native_vorbis_numeric/codebook.c) retain
+original sparse indexes, follow entry-order lexical assignment and implement
+the current one-bit singleton erratum. Caller storage, sticky EOP and aggregate
+capacity/failure transactions preserve data and cursor position.
+
+An independent greedy-interval/tree oracle accepts 382 sanitized host cases,
+719 controls, 24603 affine values and all 318030 setup/31580 payload cut points.
+Each pinned SDK/QEMU capture finishes 200 cases/719 controls without build
+warnings; separate exact comparison accepts all 400 native cases, 10930 words,
+6378 decoded entries/positions and 26990 affine values. Compiler own LSP-wrapper
+frames are 1120/1104 bytes, excluding callees and task high-water. Cross-target
+Clang-Tidy reports no warning in the new codebook or existing quantization;
+the retained floor0 widening warning has a bounded signed32 operand range.
+
+A separate sanitized host supplement covers 140 malformed fixtures/290 guarded
+status assertions and full 16-bit dimension/24-bit sparse metadata. The maximum
+declared entry count needs only one active word and decodes the original last
+index; a complete 32768-entry tree is measured before a guarded capacity refusal.
+This does not expand the frozen native campaign or claim exhaustive conformance.
+
+The [design](VORBIS_CODEBOOK_DESIGN.md) distinguishes explicit empty-book Xiph
+compatibility from normative nonempty tree requirements. This per-codebook
+implementation remains outside production registration. Other setup structures,
+complete floor/residue packet handling, wide coupling/IMDCT/overlap, final PCM,
+raw lifecycle and original full31 PCM/G6/G8 still require implementation and
+qualification. Deferred items and production task/audio/display setup remain.

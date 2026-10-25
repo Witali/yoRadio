@@ -1,11 +1,49 @@
-# Floor0 arithmetic for an owned wide synthesis path
+# Owned Vorbis codebooks and wide floor0 arithmetic
 
 This component implements the polynomial and amplitude equations from
 [Vorbis I 6.2.3](https://xiph.org/vorbis/doc/Vorbis_I_spec.html), with the
 straightforward [Xiph v1.3.7 LSP implementation](https://raw.githubusercontent.com/xiph/vorbis/v1.3.7/lib/lsp.c)
 as an independent source of the parity equations. It is not connected to either
 radio application's component list or decoder registration. No vendor callback,
-private handle, codebook consumer, packet parser or PCM conversion is replaced.
+private handle, existing decoder state or PCM conversion is replaced.
+
+## Complete codebooks and packet reads
+
+The [codebook API](include/native_vorbis_codebook.h) parses a complete descriptor
+from its public sync field through ordered/unordered/sparse codeword lengths
+and quantization values. A fixed33-slot frontier assigns the lowest unused
+lexical prefix in original entry order; lengths are not sorted before assignment.
+Caller-owned active words retain original sparse indexes and are sorted together
+for binary-search decoding. Materialization validates the full packet and both
+required capacities before writing. There is no heap or entries-sized scratch
+array inside the component.
+
+The sticky-EOP packet cursor reads integers0..64 bits. A decoder can consume a
+complete short word at packet end without demanding maximum-length lookahead.
+The2015 singleton erratum requires length1 and one consumed bit, accepting0/1.
+Empty descriptors follow the public Xiph setup behavior but provide no symbol.
+For transported Vorbis packets the valid extent includes every final octet and
+its padding; shorter explicit extents support controlled/internal spans.
+
+Audio codewords can feed exact VQ prefixes or complete floor0 LSP reconstruction,
+including cross-vector carry and a partial final vector. Aggregate failures
+preserve output and cursor position; truncation sets sticky EOP. Capacity retry
+consumes no audio. The [design](../../../docs/VORBIS_CODEBOOK_DESIGN.md) states
+the immutable-view, storage, range, empty-book and dimension0 contracts.
+
+This completes the per-codebook layer. Remaining setup structures, floor/residue
+packet handling, synthesis and registered raw lifetime integration are separate
+requirements before either production decoder can use it.
+
+The [codebook checkpoint](../../../tests/results/vorbis-codebook-20261025/CHECKPOINT.md)
+retains 382 sanitized host cases/719 API controls, 318030 setup cuts and 31580
+payload cuts. Separate exact comparison accepts all 400 SDK/QEMU cases,
+including 26990 affine values. The parser and quantization have zero warnings
+in separate cross-target Clang-Tidy analyses; the checkpoint records the
+remaining bounded floor0 warning and the finite scope of every check.
+A separate host supplement adds 140 malformed fixtures/290 guarded assertions
+and checks the complete 16-bit dimension/24-bit sparse-entry boundary without
+allocating a declared-entry-sized row table.
 
 ## Numerical contract
 
@@ -80,8 +118,9 @@ VQ values and floor0 LSP carries without an early floating sum. Its affine floor
 entry points reduce the two exact terms separately. It supports lazy vector
 prefixes and single components with caller-owned storage and transactional
 capacity/error behavior. The [quantization design](../../../docs/VORBIS_QUANTIZATION_DESIGN.md)
-defines the field/range/ownership boundary; complete entropy and setup parsing
-remain separate.
+defines the field/range/ownership boundary. Complete descriptors and their audio
+codewords now enter through the codebook API; remaining setup structures and
+full audio-packet parsing are separate.
 
 The [quantization checkpoint](../../../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
 retains actual 6572 host cases/79834 exact values and 200 SDK/QEMU cases per
@@ -90,7 +129,7 @@ floor comparisons. Both earlier host binary output streams remain identical.
 The enlarged phase grid has a separate exact-rational certificate; complete
 libm/codec/PCM/physical qualification remains outside that proof.
 
-The complete correction still needs owned raw setup, entropy, residue,
+The complete correction still needs remaining owned raw setup, floor/residue,
 coupling, IMDCT and overlap with adequate precision and
 range. It must preserve retry/reset/EOF and public registration contracts and
 be qualified against independent reference PCM on both targets. Inserting this

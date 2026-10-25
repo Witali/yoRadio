@@ -221,7 +221,10 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   [Quantization/VQ/LSP слой](../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
   сохраняет исходные packed fields и точные affine значения; 6572 host-случая,
   по200 native случаев и отдельное сравнение всех значений проходят.
-  Широкий путь по-прежнему требует полного entropy/setup и audio packet parsing,
+  [Полный codebook/Huffman слой](../tests/results/vorbis-codebook-20261025/CHECKPOINT.md)
+  связывает исходные setup descriptors и audio words с точными VQ/LSP:
+  382 host-сценария под ASan/UBSan и 400 native сравнений проходят.
+  Широкий путь по-прежнему требует остальных setup и полного audio packet parsing,
   residue/coupling, IMDCT/overlap и public raw integration; компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
@@ -1422,3 +1425,30 @@ Stream остаётся на core0, decode/output на core1 с прежними
   проходят с byte-identical outputs. Это самостоятельный слой: полный entropy/
   setup/audio parser, residue/coupling/IMDCT/overlap, PCM/raw integration ещё
   нужны; production cores/display/audio и deferred scopes не менялись.
+
+- 2026-10-25, CYD-C3-14: [полные собственные codebooks/Huffman](../tests/results/vorbis-codebook-20261025/CHECKPOINT.md)
+  реализованы по [спецификации и проекту](VORBIS_CODEBOOK_DESIGN.md).
+  [Точки входа](../idf/components/native_vorbis_numeric/include/native_vorbis_codebook.h)
+  и [реализация](../idf/components/native_vorbis_numeric/codebook.c) разбирают
+  sync, ordered/unordered/sparse lengths и quantization, сохраняют исходные
+  sparse entry indexes и присваивают коды в порядке записей. Учтена поправка
+  2015 года: singleton length1, расход одного бита, оба значения допустимы.
+  Sticky EOP, caller storage и проверки capacity до чтения сохраняют retry;
+  VQ/floor0 LSP получают настоящие audio words, включая final partial vector.
+  Независимый greedy-interval/tree oracle проходит 382 host-сценария, 719 API
+  controls, 24603 affine values, 318030 setup и 31580 payload truncation points
+  под ASan/UBSan. Оба SDK/QEMU: по 200 cases/1405 events/719 controls/9 commands,
+  без предупреждений сборки, worker core1/core0. Отдельное сравнение принимает
+  все 400 native cases: 10930 words, 6378 entry/position и 26990 affine values.
+  Отдельный ASan/UBSan supplement проходит 140 ошибочных fixtures/290 guarded
+  status checks: ordered overrun/length33, reserved lookup3..15, singleton2..32,
+  sync/flag truncation и lookup1/dim0. Полный sparse entries16777215/dim65535
+  разбирается с одной активной записью и возвращает исходный индекс16777214;
+  complete tree32768/dim65535 проходит measure и безопасный capacity refusal.
+  Собственный compiler frame LSP wrapper1120/1104B не включает callees/task
+  high-water. Clang-Tidy нового parser и quantization проходит без предупреждений
+  для обеих архитектур; прежний bounded-int warning floor0 сохранён и разобран.
+  Это завершённый слой codebook, а не весь decoder: остальные setup structures,
+  floor/residue packet handling, wide coupling/synthesis/PCM и raw lifecycle
+  ещё нужны. Прежний full31 PCM NONPASS/G6/G8 и physical acceptance остаются;
+  production cores/display/audio и deferred scopes не менялись.

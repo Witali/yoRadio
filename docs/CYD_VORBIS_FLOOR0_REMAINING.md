@@ -116,3 +116,20 @@ This is an owned data-preservation layer. It does not validate a Huffman length
 list, parse complete setup/audio packets, replace residue/transform/overlap or
 register a production decoder. Historical full31 PCM failures, complete
 floor0/G6/G8 and physical/radio acceptance remain open.
+
+## Complete codebook and audio-word handoff, 2026-10-25
+
+The [owned codebook checkpoint](../tests/results/vorbis-codebook-20261025/CHECKPOINT.md)
+now supplies complete setup descriptors, entry-order Huffman assignment and
+audio codeword decoding to the exact VQ/LSP layer. Original sparse indexes,
+one-bit singleton behavior, partial vectors and aggregate cursor/output
+transactions are covered by independent exact comparison. All 382 sanitized
+host cases/719 controls and all 400 native cases pass. The host additionally
+checks every setup and consumed-payload cut point for its finite input corpus.
+
+This closes the standalone per-codebook dependency. Remaining floor/residue,
+mapping/mode setup and audio packet handling must use that dependency through
+an owned decoder. Wide coupling, floor multiplication, IMDCT/overlap, final
+PCM and public raw lifetime/retry/reset/EOF integration are still required.
+The historical full31 PCM NONPASS and complete floor0/G6/G8 are not requalified
+by exact codeword/VQ checks; physical throughput and radio acceptance remain.

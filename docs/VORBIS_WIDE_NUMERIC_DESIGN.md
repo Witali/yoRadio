@@ -70,8 +70,10 @@ The [owned quantization section and lazy VQ/LSP reconstruction](VORBIS_QUANTIZAT
 retain original packed minimum/delta words and integer multipliers. The affine
 floor APIs reduce both individually exact terms separately, before any floating
 sum. This preserves small terms and cancellation across the packed exponent
-range. Complete entropy/setup, audio packet handling and synthesis remain
-required before this layer can replace a production decoder.
+range. The [owned codebook layer](VORBIS_CODEBOOK_DESIGN.md) now parses complete
+descriptors, decodes their audio words and feeds exact VQ/LSP reconstruction.
+Remaining setup structures, audio packet handling and synthesis are required
+before this layer can replace a production decoder.
 
 ## Required continuation through public raw operations
 
@@ -84,8 +86,9 @@ packets between implementations would leave incompatible overlap histories.
 
 The remaining implementation must:
 
-- Connect the quantization/LSP layer to complete owned entropy/setup and audio
-  packet parsing, retaining full amplitude metadata and partial final vectors.
+- Extend the completed codebook/quantization/LSP layer through remaining owned
+  setup structures and full audio packet parsing, retaining full amplitude
+  metadata and partial final vectors.
 - Decode residue and inverse coupling without a premature int32/Q8 narrowing.
 - Feed the original-angle floor APIs without narrowing setup/dequantized LSPs,
   preserving range through floor multiplication, IMDCT and overlap.

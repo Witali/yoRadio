@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT/'tests/target/vorbis_floor0_numeric_qemu'
 COMPONENT = ROOT/'idf/components/native_vorbis_numeric'
 PARTS = {'source': 'floor0.c', 'header': 'include/native_vorbis_floor0.h', 'component': 'CMakeLists.txt'}
-DEPENDENCIES = ('quant.c', 'include/native_vorbis_quant.h')
+DEPENDENCIES = ('quant.c', 'include/native_vorbis_quant.h', 'codebook.c', 'include/native_vorbis_codebook.h')
 SDK_HEAD = {'esp32': '7101770dc6db2667b3c477cc31365dd1acd6db4e',
             'esp32c3': '9a97f6c54ec638111ce55cd36581b3c192f15207'}
 API = ('prepare_valid', 'prepare_in_place', 'prepare_invalid', 'denominator_invalid',

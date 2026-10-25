@@ -16,6 +16,8 @@ with explicit hashes for both component C files, both public headers, component
 CMake, JSON/header and QEMU, plus explicit ROM and pinned SDK/tool locations.
 The controller reads back every literal packet byte, entry, affine field and
 descriptor before configuration, then freezes component, fixture and data.
+When present, `codebook.c` and its public header are also frozen and hashed as
+build dependencies; this runner's checks still cover its quantization subset.
 
 The 152 copied API controls exercise lookup0/reserved metadata, bounded and
 maximum counts, truncation, capacity, invalid indices, vector/scalar/floor
