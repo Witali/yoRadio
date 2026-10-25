@@ -215,8 +215,11 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   [Собственная численная основа floor0](../tests/results/vorbis-floor0-numeric-20261025/CHECKPOINT.md)
   реализована отдельным компонентом: 60541 host-операция под ASan/UBSan,
   независимый Decimal120 oracle и по327 native coefficient/gain случаев.
-  [Широкий путь](VORBIS_WIDE_NUMERIC_DESIGN.md) по-прежнему требует исходных
-  углов, residue/coupling, IMDCT/overlap и public raw integration; компонент
+  [Расчёт из исходных LSP-углов](../tests/results/vorbis-floor0-angles-20261025/CHECKPOINT.md)
+  также реализован: 2376 host-случаев и по200 SDK/QEMU, отдельные точные
+  phase checks и независимый Decimal oracle проходят. [Широкий путь](VORBIS_WIDE_NUMERIC_DESIGN.md)
+  по-прежнему требует setup/dequantization без потери исходных значений,
+  residue/coupling, IMDCT/overlap и public raw integration; компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
@@ -1385,3 +1388,17 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Это численный строительный блок: stable angle path и весь wide synthesis,
   public raw lifecycle/integration, PCM/G6/G8 ещё открыты. Прежний full31
   NONPASS не переобъявлен исправленным; deferred scopes не возобновлялись.
+
+- 2026-10-25, CYD-C3-14: [original-angle floor0](../tests/results/vorbis-floor0-angles-20261025/CHECKPOINT.md)
+  добавлен отдельными API к собственному numeric component. Integer phase
+  reduction и scaled sine products сохраняют minsub/малые ненулевые углы;
+  принимаются все finite binary64, включая отрицательные и DBL_MAX, orders1..255.
+  Независимый Chudnovsky/Decimal800..1184 oracle проходит2376 host-случаев
+  и28 metadata controls под ASan/UBSan. Точная рациональная проверка Machin/CF
+  подтверждает2304-bit2/pi и достаточность1152-bit phase grid; она не подменяет
+  проверку libm/всей арифметики. Оба SDK/QEMU проходят200 cases/212 events/8 API
+  groups/9 commands, warnings0; отдельный checker повторно вычисляет весь host
+  и принимает400 native значений. Собственные compiler frames максимум800/784B
+  не включают callee/libm/task high-water. Прежние60541 outputs byte-identical.
+  Новые API не подключены к production; сохранение исходных setup/dequantization
+  данных, wide synthesis, raw integration и прежние full31 PCM/G6/G8 остаются.

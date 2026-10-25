@@ -65,7 +65,30 @@ groups do not qualify the complete angle-domain curve. Compiler frames are
 recorded separately from complete task/libm stack usage.
 
 This is an implemented numerical building block, not a complete floor0 decoder.
-Stable original-angle evaluation, owned dequantization/residue/coupling,
+Original-angle evaluation was the next numerical layer at that checkpoint;
+the implementation below now provides it. Owned dequantization/residue/coupling,
 IMDCT/overlap, final PCM conversion and raw lifetime/retry/reset/integration
 still need implementation and qualification. The historical full31 PCM
 NONPASS remains open and is not requalified by coefficient-only tests.
+
+## Original-angle arithmetic, 2026-10-25
+
+The [original-angle checkpoint](../tests/results/vorbis-floor0-angles-20261025/CHECKPOINT.md)
+adds denominator/gain entry points accepting all finite binary64 LSP angles
+and the mathematical Bark-bin angle `pi*bin/map`. Fixed-size integer phase
+reduction and scaled half-angle sine products avoid cosine subtraction and
+subnormal halving. Exact-rational Machin/continued-fraction checks independently
+certify the phase constant and grid; a separate Chudnovsky/Decimal direct-cosine
+oracle checks the compiled arithmetic.
+
+All 2376 host cases and 28 metadata controls pass ASan/UBSan. Both SDK/QEMU
+captures finish 200 cases and eight API groups; separate comparison accepts
+all 400 native values. The previous 60541-operation coefficient regression
+also passes, with its complete output byte-identical to the prior checkpoint.
+The composed gain uses a combined absolute/relative bound; a very large
+relative error near zero is retained, not hidden or treated as exact gain.
+
+This completes the standalone angle calculation, not the complete decoder.
+Owned setup/dequantization must still supply the original values without Q24
+narrowing, and residue/coupling/IMDCT/overlap must retain their range. Full31
+reference PCM, public raw lifecycle/integration and G6/G8 remain required.

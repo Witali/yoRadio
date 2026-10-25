@@ -87,6 +87,24 @@ native_vorbis_numeric_status_t native_vorbis_floor0_gain_at_bin(
     const double *coefficients, size_t order, uint32_t bin,
     uint32_t bark_map_size, native_vorbis_floor0_gain_t *gain);
 
+// Original-angle path: theta is mathematical pi*bin/bark_map_size, not a
+// rounded binary64 bin cosine. All finite binary64 angles are accepted,
+// including negatives, subnormals and angles outside [0,pi]. The internal
+// fixed-point phase reduction and sine products avoid cosine cancellation.
+// order is 1..255; bin < bark_map_size, with map size 1..65535. Inputs remain
+// unchanged and an invalid call leaves the output unchanged. No allocation.
+native_vorbis_numeric_status_t native_vorbis_floor0_denominator_at_bin(
+    const double *angles, size_t order, uint32_t bin, uint32_t bark_map_size,
+    native_vorbis_scaled_t *denominator);
+
+// Raw zero returns ABSENT without reading angles, after validating amplitude,
+// order and bin metadata. Otherwise evaluate the original-angle denominator
+// and the same full-width amplitude / scaled-log2 gain as the coefficient API.
+native_vorbis_numeric_status_t native_vorbis_floor0_gain_from_angles(
+    const native_vorbis_floor0_amplitude_t *amplitude,
+    const double *angles, size_t order, uint32_t bin, uint32_t bark_map_size,
+    native_vorbis_floor0_gain_t *gain);
+
 #ifdef __cplusplus
 }
 #endif

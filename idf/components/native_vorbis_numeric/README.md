@@ -9,14 +9,16 @@ private handle, codebook consumer, packet parser or PCM conversion is replaced.
 
 ## Numerical contract
 
-The [API](include/native_vorbis_floor0.h) separates three operations:
+The [API](include/native_vorbis_floor0.h) separates four operations:
 
 1. Compute the polynomial denominator from supplied binary64 cosine
    coefficients and `w`, all in `[-2,2]`, for orders 1 through 255.
 2. Evaluate amplitude and gain from a nonnegative scaled denominator. This
-   entry point also accepts a denominator supplied by a future precision
-   preserving angle implementation, without first rounding angles to cosines.
+   entry point also accepts a denominator from the original-angle path,
+   without first rounding angles to cosines.
 3. Provide separate Bark mapping and approximate libm cosine helpers.
+4. Evaluate the denominator and gain directly from finite binary64 LSP angles
+   at mathematical `theta = pi * bin / bark_map_size`.
 
 Products, squares and their positive sum use normalized mantissas and signed
 32-bit exponents. Empty products equal one, zero factors stay zero, and a
@@ -50,13 +52,30 @@ no heap, no variable-length arrays and no mutable global state.
 Cosine preparation is explicitly approximate. For example, a tiny nonzero
 angle can round `2*cos(angle)` to exactly 2 and lose information. Exact
 coefficient-domain checks cannot qualify the original angle-domain curve. The
-separate scaled-denominator entry point is needed so a stable angle path can
-avoid this irreversible conversion. Bark mapping uses floating half-rate for
+original-angle APIs avoid this conversion: they form cosine differences as
+products of half-angle sines, retaining their scale. A fixed-size integer phase
+reduction supports all finite binary64 angles, including subnormals, negatives
+and values outside `[0,pi]`. It retains 1152 fractional phase bits and uses a
+2304-bit `2/pi` constant; the bin phase is an integer division of `2*bin/map`.
+No rounded binary64 multiple of pi is subtracted. Small sines stay scaled, so
+halving a subnormal cannot silently turn an LSP into zero. This is still rounded
+numerical arithmetic, not an exact symbolic curve.
+
+Bark mapping uses floating half-rate for
 odd declared rates, and exact cardinal cosine points are retained for Bark
 indices with cosine 0 or ±1/2.
 
+The [original-angle checkpoint](../../../tests/results/vorbis-floor0-angles-20261025/CHECKPOINT.md)
+retains the actual host and native results. Denominator acceptance uses relative
+error `2e-12`; composed log2 gain uses absolute error
+`2e-12 * max(1, abs(reference))`. Near-zero gain relative errors are retained
+and can be large; the tests do not promise a relative bound or an exact sign
+through an approximate denominator. Very large scaled logarithms likewise do
+not imply a universal absolute error bound. Exact supplied-D amplitude tests
+remain a separate layer.
+
 The complete correction still needs owned raw setup, dequantization, residue,
-coupling, stable angle handling, IMDCT and overlap with adequate precision and
+coupling, IMDCT and overlap with adequate precision and
 range. It must preserve retry/reset/EOF and public registration contracts and
 be qualified against independent reference PCM on both targets. Inserting this
 module into the existing int32/Q24 inverse2 callback would not recover

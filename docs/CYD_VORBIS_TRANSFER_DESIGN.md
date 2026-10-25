@@ -545,7 +545,30 @@ retain numerical-qualified false; the accepted finite result is separate.
 Whole-module compiler frames have a maximum of 208 bytes in both targets;
 these are not task high-water or complete callee/libm stack measurements.
 Production cores/priorities/stacks, display and audio backends are unchanged.
-Cosine preparation remains approximate and cannot establish the stable
-original-angle path. Wide residue/coupling, IMDCT/overlap and public raw decoder
+Cosine preparation remains approximate; the subsequent angle checkpoint
+provides a separate calculation from original angles. Wide residue/coupling, IMDCT/overlap and public raw decoder
 integration remain required. This does not fix or requalify the old full31 PCM
 failures, enable the bridge, resume deferred scopes or close G6/G8.
+
+## Original-angle floor0 calculation, 2026-10-25
+
+The [angle checkpoint](../tests/results/vorbis-floor0-angles-20261025/CHECKPOINT.md)
+implements `native_vorbis_floor0_denominator_at_bin()` and
+`native_vorbis_floor0_gain_from_angles()` in the
+[owned numerical component](../idf/components/native_vorbis_numeric/floor0.c).
+It uses scaled sine-product identities and integer phase reduction rather than
+rounding LSP angles and the bin angle to cosines. All finite binary64 angles,
+full-width amplitude metadata and orders 1..255 remain accepted. No heap,
+variable-length stack array, epsilon pole test or vendor type is introduced.
+
+The independent Decimal800..1184 direct-cosine oracle passes all 2376 host
+cases under ASan/UBSan, and separate replay/comparison passes 200 captured
+values on each native architecture. Exact-rational phase certification and
+12 pure protocol tests pass separately. Both native builds have zero warnings;
+maximum own compiler frames are 800/784 bytes, excluding callee/libm/task
+high-water. The 60541-operation coefficient regression remains byte-identical.
+
+The new layer is outside production registration. Original setup/dequantization,
+wide residue/coupling, IMDCT/overlap, final PCM and raw integration still need
+implementation and qualification. Original full31 PCM failures remain open;
+deferred scopes and production task/audio/display configuration are unchanged.

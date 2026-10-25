@@ -37,9 +37,32 @@ than an invented PCM policy.
 The exact supplied-coefficient domain and the approximate cosine/Bark helpers
 are separate test layers. In particular, a tiny nonzero angle can round
 `2*cos(angle)` to exactly 2. The scaled-denominator entry point deliberately
-allows a future stable angle implementation to bypass that conversion.
+allows the original-angle implementation to bypass that conversion.
 Coefficient-domain accuracy does not prove angle-domain or complete decoded
 PCM accuracy.
+
+The original-angle entry points now compute the same polynomial directly at
+`theta=pi*bin/map`. The identity
+`abs(2*cos(theta)-2*cos(phi)) = 4*abs(sin((phi+theta)/2)*sin((phi-theta)/2))`
+avoids subtracting rounded cosines. Both endpoint factors use corresponding
+half-angle squares. Phase reduction uses exact integer products/division,
+1152 fractional bits and a 2304-bit `2/pi` constant; all finite binary64 LSPs
+are accepted. Negative, tiny and very large angles do not require a floating
+periodic remainder. A small sine remains scaled instead of underflowing during
+halving or squaring. This solves a numerical layer; preserving the original
+setup/dequantization inputs and propagating the floor through wide synthesis
+remain separate requirements.
+
+The [angle checkpoint](../tests/results/vorbis-floor0-angles-20261025/CHECKPOINT.md)
+retains 2376 sanitized host cases, 28 metadata controls and 200 SDK/QEMU cases
+per architecture. Its oracle independently derives pi with directed Chudnovsky
+intervals and evaluates the direct cosine polynomial at Decimal800..1184.
+A separate exact-rational Machin/continued-fraction certificate verifies all
+72 constant limbs and the nonzero phase separation; it makes no libm/complete
+floating error claim. Separate replay accepts every host and all 400 native
+results computed from the supplied angles under the predeclared bounds. The preceding
+60541-operation coefficient output is byte-identical. These checks establish
+the standalone numerical layer, not setup preservation, wide synthesis or PCM.
 
 ## Required continuation through public raw operations
 
@@ -55,7 +78,7 @@ The remaining implementation must:
 - Preserve original quantization fields, amplitude metadata and sufficient LSP
   precision during owned setup/dequantization, including partial final vectors.
 - Decode residue and inverse coupling without a premature int32/Q8 narrowing.
-- Compute the floor from the original angles with stable handling near roots,
+- Feed the original-angle floor APIs without narrowing setup/dequantized LSPs,
   preserving range through floor multiplication, IMDCT and overlap.
 - Convert and clip only at the requested final PCM boundary.
 - Keep capacity refusals before state advancement and preserve the registered
