@@ -3864,3 +3864,43 @@ Latest authoritative CIM recheck25Oct14:24:02UTC: all12original identities match
 mainH10=454cycles, schema7main/V8=105/100. All supervisors/guards running,
 oneROMboot/noUARTerrors each. Saved ignored owners-after-static-checks.json.
 No terminal result yet, and no durations are combined.
+
+## CURRENT 2026-10-25 — dispatch recovered; vendor invalid-ID defect to fix next
+
+Previous turn PROGRESS:e572291ef/c473d3caa. At resume all12CIM original identities
+matched; H10=457cycles, metadata main/V8=107/103, all guards running/oneboot/noerrors.
+No producer/firmware/SDK/frozen helper/live VM input changed this turn.
+
+audit_timer_dispatch links initial120B table14events+sentinel and17complete bodies
+per image. Factory table3FCB52F8/postslot3FCC3100/dispatcher420ACC28; native
+table3FCAC978/postslot3FCB5D98/dispatcher420D1486. Four register-shaped candidates
+reduced to one by the shared post slot. Native ID11 has explicit version names
+pp_timer_keep_alive/pm_keep_alive_timeout_process vs old max_idle names. A direct
+probe rejected old100B callee model against native128B body; review remains open.
+
+Transient Ghidra RecoverFactoryTimers +old3gap recovery, readOnly/noanalysis:
+21 qualified bodies,18created/3renamed,14callbackowners,global/local instruction
+delta143. Enumerable5143→5161,manager5148→5166. Both persistent projects'10files
+unchanged. v2 adds before-range counts; initial successful observation retained.
+
+New private CPU fixtures execute exact178B dispatcher bodies with declared
+callback/log/free stubs:1002cases, all256IDs+poison15..255/null/fallback/nullcb/ret0.
+REPRODUCED VENDOR DEFECT, NOT FIXED: table[id].id read precedes bounds checking;
+15..255 read one byte outside120B table at PCs420ACC62/420D14C0, then correctly
+reject/free. No out-of-table reads for0..14 (14 accesses the in-table sentinel).
+Do not preserve this known error in our final firmware. Tests are characterization.
+
+NEXT: new task worktree for a pre-dispatch ID guard preserving Wi-Fi message ABI
+and free ownership. Verify both ppTask direct reference and wdev_funcs_init
+function-pointer registration actually enter the guard after linking; a wrap flag
+alone is insufficient. Keep active app/ELF and producer trees frozen. Then review
+ID11 callee semantics and continue other computed aliases/callback/event sources.
+
+Evidence timer-dispatch-validation-20261025.json:28refs,15newgzip47112bytes,
+13reused payloads. Actual consumer replay:20ancestor+15newcontrols/1002cases,
+396GP/no gaps,5161enumerated. See tests/WIFI_TIMER_DISPATCH.md. Full goal stays
+active; retained-loss flags, H10/matched controls, cleanup/fullsuite/hardware open.
+
+LatestCIM25Oct14:47:09UTC: all12original owners live, H10=511cycles,
+schema7main/V8=162/158; guardsrunning/oneROMboot/noerrors. Ignored
+factory-timer-dispatch-20261025/owners-after-audit.json retains observation.

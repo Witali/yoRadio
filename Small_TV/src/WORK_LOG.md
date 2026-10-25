@@ -4868,3 +4868,46 @@ retained loss/длительные runs и final/hardware scope остаются
 H10 —454 complete cycles, metadata main/V8 —105/100. Все supervisor/guards
 running, по одному ROM boot, UART errors пусты. Запись owners-after-static-checks
 в ignored tcp-trend-analysis-20261025; это liveness/prefix, не итог qualification.
+
+## 2026-10-25 — timer table, dispatcher и bounded transient recovery
+
+Предыдущий goal turn дал progress: e572291ef/c473d3caa. На старте снова CIM
+подтвердил все12 original owner identities; H10=457 cycles, schema7 main/V8=
+107/103. Три guards/supervisors running, один ROM boot и no UART errors.
+Pinned app/ELF/SDK/producers/frozen tools и ВМ в этом продолжении не менялись.
+
+Новый audit_timer_dispatch связал initialized SDK table120B/14event IDs плюс
+sentinel с17 полными телами на каждый образ. Все SDK relocation masks/local
+branches и shared anchors проверены. Из четырёх setter lookalikes единственная
+register/post пара использует один slot: factory3FCC3100/native3FCB5D98.
+Table addresses3FCB52F8/3FCAC978, dispatcher420ACC28/420D1486. Native event11
+имеет явные names pp_timer_keep_alive/pm_keep_alive_timeout_process вместо
+старых max_idle names; transitive equivalence не заявлена. Предварительный
+full-body probe старой100B callee model не совпал с новым128B телом; нужен review.
+
+RecoverFactoryTimers в новой disposable copy с -readOnly/-noanalysis:
+18 created+3 existing renamed, 21 qualified bodies и14 table owners. Enumerated
+5143→5161, manager5148→5166; global+local instruction deltas ровно143, program
+memory hashes unchanged. Повторный headless добавил точный before-range count;
+это осмысленная проверка границ, не перезапуск firmware/ВМ. Оба runs завершились,
+все10 исходных и10 copied project files остались прежними. Full graph хранится
+ignored; архив использует только delta и старые адресные payloads.
+
+Приватный host Unicorn выполнил1002 случая точных178B dispatcher bodies:
+все256 IDs, poison prefetch для15..255, null, permutation fallback, null callback
+и callback return0. Callback/log/free — declared external stubs. Обнаружен SDK
+defect в обоих образах: pre-bound byte read за table для15..255, PC420ACC62/
+420D14C0. После него invalid message отвергается и освобождается; valid0..13
+не проявляют OOB. Production bug пока НЕ исправлен, tests это characterization,
+не разрешение переносить ошибку. Guard нужно делать в другой firmware worktree,
+с проверкой всех direct/pointer входов и free/ABI ownership.
+
+timer-dispatch-validation-20261025:28refs,15newgzip/47112bytes,13reused payloads.
+Consumer реально воспроизвёл ancestor20controls,1002instructioncases и15 новых
+table/recovery controls; bounded metadata и full xref audit396GP прошли.
+Детали/команда в tests/WIFI_TIMER_DISPATCH.md. Цель, прочие whole-image gaps,
+старые memory losses, текущие длительные tests, full suite и hardware открыты.
+
+Повторная CIM-проверка14:47:09UTC подтвердила все12 original owners: H10=511
+complete cycles, schema7 main/V8=162/158. Guards running, oneboot/noUARTerrors.
+owners-after-audit.json сохранён в ignored base; elapsed durations не складываются.

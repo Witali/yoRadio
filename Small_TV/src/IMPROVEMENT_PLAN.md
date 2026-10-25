@@ -391,6 +391,18 @@ caller4207b120/другие undefined functions, SDK/application boundary ипо
 4207581e..42075896. Девять полных SDK тел проверены и в factory, и в native ELF;
 10 отрицательных controls pass. Регистрация/достижимость callback dispatch,
 transient Ghidra metadata recovery и остальные whole-image gaps остаются открытыми.
+Dispatch checkpoint25Oct: [WIFI_TIMER_DISPATCH.md](tests/WIFI_TIMER_DISPATCH.md)
+подтверждает initial table14 и 17 полных тел на каждый образ; transient recovery
+создал18/уточнил3 функции,143 инструкции только внутри qualified ranges,
+5161enumerated/396GP без изменения saved projects. 1002 host instruction cases,
+15новых и20прежних controls replay pass. Это не весь event lifecycle.
+Следующее исправление: guard ID до vendor pp_timer_do_process. Сейчас обе версии
+читают table[id].id до bounds check; ID15..255 дают OOB byte read, хотя затем
+отвергаются и освобождаются. Этот SDK defect намеренно не принимается как норма.
+В другой task worktree проверить ABI/free ownership, ppTask direct call и
+wdev_funcs_init pointer registration после link, invalid IDs и прежние valid IDs.
+Отдельно разобрать событие11: factory max_idle/native keep_alive wrappers
+соответствуют по форме, transitive callee semantics пока не подтверждены.
 
 ## 6. Приёмка окончательной версии и правила работы
 

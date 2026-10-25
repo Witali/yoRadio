@@ -76,3 +76,9 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 Output должен быть новым файлом. Factory ELF, SDK archives и native ELF
 привязаны к точным identities. Команда повторно строит все match traces и
 проверяет source hashes, а не доверяет архивному `passed`.
+
+Следующий checkpoint: [WIFI_TIMER_DISPATCH.md](../tests/WIFI_TIMER_DISPATCH.md)
+связывает все 14 событий с register/post/dispatch, уточняет 21 Ghidra body и
+выполняет точные dispatcher instructions. Найдены явное различие имён/callee
+для события 11 и недочёт pre-bound table read при некорректном ID; production
+исправление и transitive review остаются в плане.
