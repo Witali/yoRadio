@@ -16,6 +16,8 @@ component C files, all three public headers, component CMake, JSON/header and
 QEMU, plus explicit ROM and pinned SDK/tool locations. The controller reads
 back every literal input byte and descriptor before SDK configuration, then
 freezes the complete component, fixture and original data.
+When present, `setup.c` and its public header are also frozen and hashed as build
+dependencies; this runner's checks still cover its codebook/Huffman subset.
 
 Guards surround caller-owned state and outputs; input packets, setup metadata
 and materialized book state are checked for preservation. The 719 copied API controls

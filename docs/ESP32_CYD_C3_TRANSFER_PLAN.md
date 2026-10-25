@@ -224,7 +224,11 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   [Полный codebook/Huffman слой](../tests/results/vorbis-codebook-20261025/CHECKPOINT.md)
   связывает исходные setup descriptors и audio words с точными VQ/LSP:
   382 host-сценария под ASan/UBSan и 400 native сравнений проходят.
-  Широкий путь по-прежнему требует остальных setup и полного audio packet parsing,
+  [Полный setup и начало аудиопакета](../tests/results/vorbis-setup-20261025/CHECKPOINT.md)
+  также реализованы: 300 host-сценариев, 60 API controls и 400 native сравнений,
+  включая все таблицы и getters, проходят. Исходные raw headers отдельно
+  проверены на host, прежние PCM этим не переквалифицированы.
+  Широкий путь по-прежнему требует полного floor/residue audio packet parsing,
   residue/coupling, IMDCT/overlap и public raw integration; компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
@@ -1452,3 +1456,27 @@ Stream остаётся на core0, decode/output на core1 с прежними
   floor/residue packet handling, wide coupling/synthesis/PCM и raw lifecycle
   ещё нужны. Прежний full31 PCM NONPASS/G6/G8 и physical acceptance остаются;
   production cores/display/audio и deferred scopes не менялись.
+
+- 2026-10-25, CYD-C3-14: [собственный полный setup и audio prefix](../tests/results/vorbis-setup-20261025/CHECKPOINT.md)
+  реализованы по [спецификации и проекту](VORBIS_SETUP_DESIGN.md).
+  [Входы API](../idf/components/native_vorbis_numeric/include/native_vorbis_setup.h)
+  и [реализация](../idf/components/native_vorbis_numeric/setup.c) сохраняют
+  identification, все 256 books/64 floor-residue-mapping-mode descriptors и
+  полный configured graph; проверяют scalar/VQ contexts, floor1 65 posts,
+  residue powers/divisibility и ссылки. Игнорируемый mapping time byte может
+  быть ненулевым; residue bounds и сырые zero floor0 metadata сохранены без
+  придуманного constant-floor результата. Четыре caller-owned массива и
+  компактный uint32 pool имеют preflight до записи; prefix читает mode/window
+  без расхода данных при отказе и сохраняет sticky EOP.
+  ASan/UBSan: все 300 host rows/60 controls, 855 books, 28270 config и 26212
+  getter words проходят; 67570 ID/304814 setup/775 audio-prefix cut points.
+  Все 255 generated positive и 2 retained real-header случая приняты;
+  43 malformed остаются в полном сравнении (10 ID/30 setup/3 audio).
+  Native SDK/QEMU: по 200 cases/60 controls/3551 events/9 commands, warnings0,
+  worker core1/core0. Отдельный checker принимает все 400 native: 1310 books,
+  42580 configuration и 39370 getter words; counters per-input cuts на native0.
+  Compiler own setup frame2832B на обеих архитектурах не включает callees/task
+  high-water. Clang-Tidy setup/codebook/quant проходит без предупреждений обеих
+  целей; прежний bounded warning floor0 остаётся. Полные floor/residue packets,
+  wide synthesis/PCM, raw lifetime и active zero-floor0 domains ещё нужны;
+  full31 PCM NONPASS/G6/G8, deferred scopes и physical acceptance не закрыты.

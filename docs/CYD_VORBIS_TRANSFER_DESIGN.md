@@ -628,3 +628,30 @@ implementation remains outside production registration. Other setup structures,
 complete floor/residue packet handling, wide coupling/IMDCT/overlap, final PCM,
 raw lifecycle and original full31 PCM/G6/G8 still require implementation and
 qualification. Deferred items and production task/audio/display setup remain.
+
+## Complete owned setup and audio prefix, 2026-10-25
+
+The [setup checkpoint](../tests/results/vorbis-setup-20261025/CHECKPOINT.md)
+adds a complete public header graph with
+[typed APIs](../idf/components/native_vorbis_numeric/include/native_vorbis_setup.h)
+and [caller-owned implementation](../idf/components/native_vorbis_numeric/setup.c).
+It retains identification hints/rate, every configured descriptor, scalar/VQ
+links and original mapped-book data. Audio-prefix decoding selects mode,
+block size and window flags transactionally. The
+[design](VORBIS_SETUP_DESIGN.md) states domain and lifetime contracts, including
+same-owner getter views and preservation of raw zero floor0 metadata.
+
+All 300 sanitized host cases/60 controls pass, including 43 retained malformed
+rows and two stored encoder-header/prefix cases. Exact comparison covers 855
+books, 28270 configuration words, 26212 getter words and every successful-input
+header/prefix cutoff. Both SDK/QEMU captures finish 200 cases/3551 events with
+zero build warnings; separate replay accepts all 400 native cases, 1310 books,
+42580 configuration and 39370 getter words. Setup/codebook/quantization have
+zero cross-target Clang-Tidy warnings. Own setup compiler frames are 2832B on
+each architecture, excluding callees/task high-water and physical performance.
+
+This completes standalone configuration and packet-prefix parsing. Full floor/
+residue packets, wide coupling/floor multiplication/IMDCT/overlap, final PCM,
+header ordering/comments and raw lifecycle/integration remain. Active zero-
+floor0 curve domains and original full31 PCM/G6/G8 require separate work;
+production registration and all explicitly deferred items remain unchanged.

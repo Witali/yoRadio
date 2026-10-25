@@ -31,9 +31,9 @@ preserve output and cursor position; truncation sets sticky EOP. Capacity retry
 consumes no audio. The [design](../../../docs/VORBIS_CODEBOOK_DESIGN.md) states
 the immutable-view, storage, range, empty-book and dimension0 contracts.
 
-This completes the per-codebook layer. Remaining setup structures, floor/residue
-packet handling, synthesis and registered raw lifetime integration are separate
-requirements before either production decoder can use it.
+This completes the per-codebook layer. The complete setup parser below now
+provides the other descriptors; floor/residue packet handling, synthesis and
+registered raw lifetime integration remain required for production use.
 
 The [codebook checkpoint](../../../tests/results/vorbis-codebook-20261025/CHECKPOINT.md)
 retains 382 sanitized host cases/719 API controls, 318030 setup cuts and 31580
@@ -44,6 +44,44 @@ remaining bounded floor0 warning and the finite scope of every check.
 A separate host supplement adds 140 malformed fixtures/290 guarded assertions
 and checks the complete 16-bit dimension/24-bit sparse-entry boundary without
 allocating a declared-entry-sized row table.
+
+## Identification, complete setup and audio prefix
+
+The [setup API](include/native_vorbis_setup.h) reads complete type1/type5 header
+packets, retains all signed bitrate hint bit patterns and the full positive
+uint32 sample rate, and validates the configured graph. It supports 256 books,
+64 time/floor/residue/mapping/mode descriptors, both floors, all three residues
+and mapping0 with up to 256 coupling pairs. It validates scalar/VQ book contexts,
+floor1's normative 65 unique posts, bounded integer classification capacity,
+residue vector dimensions and every declared link/reserved field.
+
+Four caller-owned arrays hold book views, active Huffman words, original
+multiplicands and compact uint32 configuration records. Only actual descriptor
+counts consume configuration space. The conservative full-format pool bound is
+112960 words; it may exceed a target's available RAM. Measurement preserves full
+requirements, while materialization distinguishes invalid input, unaddressable
+objects and capacity shortage before any write. There is no expanded residue
+classification map or maximum-sized descriptor union.
+
+Typed getters expose floor, class, residue, mapping and mode views. Audio-prefix
+decode reads packet type, mode and long-block window flags transactionally;
+short blocks read no window flags and a single mode needs zero mode bits.
+The [setup design](../../../docs/VORBIS_SETUP_DESIGN.md) documents the exact
+representation, immutable lifetimes, scope and consuming-context decisions.
+
+Unsigned floor0 order/rate/Bark-map metadata, including zero, is preserved here;
+active zero-domain curve behavior is a separate unresolved synthesis requirement.
+This differs from Xiph's header-time rejection and does not invent a constant
+floor. A mapping's ignored time byte may be nonzero; a reversed/oversized residue
+range remains metadata for later empty-range/clamping behavior. Header ordering,
+comment handling and raw ownership remain part of the future decoder open path.
+
+The [setup checkpoint](../../../tests/results/vorbis-setup-20261025/CHECKPOINT.md)
+retains all 300 sanitized host rows/60 controls and every header/prefix cutoff,
+including 43 malformed inputs and two retained encoder-header cases. Separate
+exact comparison accepts all 400 SDK/QEMU rows, 1310 book configurations and
+42580 configuration words. Setup/codebook/quantization have zero cross-target
+Clang-Tidy warnings; the existing bounded floor0 warning remains documented.
 
 ## Numerical contract
 
@@ -119,8 +157,8 @@ entry points reduce the two exact terms separately. It supports lazy vector
 prefixes and single components with caller-owned storage and transactional
 capacity/error behavior. The [quantization design](../../../docs/VORBIS_QUANTIZATION_DESIGN.md)
 defines the field/range/ownership boundary. Complete descriptors and their audio
-codewords now enter through the codebook API; remaining setup structures and
-full audio-packet parsing are separate.
+codewords now enter through the codebook API, and the setup parser supplies
+the complete configured graph. Full floor/residue audio parsing remains.
 
 The [quantization checkpoint](../../../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
 retains actual 6572 host cases/79834 exact values and 200 SDK/QEMU cases per
@@ -129,8 +167,8 @@ floor comparisons. Both earlier host binary output streams remain identical.
 The enlarged phase grid has a separate exact-rational certificate; complete
 libm/codec/PCM/physical qualification remains outside that proof.
 
-The complete correction still needs remaining owned raw setup, floor/residue,
-coupling, IMDCT and overlap with adequate precision and
+The complete correction still needs header-order/comment handling, floor/residue
+audio decoding, coupling, IMDCT and overlap with adequate precision and
 range. It must preserve retry/reset/EOF and public registration contracts and
 be qualified against independent reference PCM on both targets. Inserting this
 module into the existing int32/Q24 inverse2 callback would not recover

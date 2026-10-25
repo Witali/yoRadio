@@ -72,8 +72,11 @@ floor APIs reduce both individually exact terms separately, before any floating
 sum. This preserves small terms and cancellation across the packed exponent
 range. The [owned codebook layer](VORBIS_CODEBOOK_DESIGN.md) now parses complete
 descriptors, decodes their audio words and feeds exact VQ/LSP reconstruction.
-Remaining setup structures, audio packet handling and synthesis are required
-before this layer can replace a production decoder.
+The [complete setup graph and audio prefix](VORBIS_SETUP_DESIGN.md) now retain
+all descriptors and select packet modes/windows. Floor/residue audio handling
+and synthesis are still required before this layer can replace a production
+decoder. Raw zero-valued floor0 metadata is retained by setup; active arithmetic
+for those domains remains an explicit subsequent requirement.
 
 ## Required continuation through public raw operations
 
@@ -86,9 +89,9 @@ packets between implementations would leave incompatible overlap histories.
 
 The remaining implementation must:
 
-- Extend the completed codebook/quantization/LSP layer through remaining owned
-  setup structures and full audio packet parsing, retaining full amplitude
-  metadata and partial final vectors.
+- Extend the completed setup/codebook/quantization/LSP layers through full
+  floor/residue audio parsing, retaining amplitude metadata, partial final
+  vectors and the specified nominal floor/residue EOP behavior.
 - Decode residue and inverse coupling without a premature int32/Q8 narrowing.
 - Feed the original-angle floor APIs without narrowing setup/dequantized LSPs,
   preserving range through floor multiplication, IMDCT and overlap.

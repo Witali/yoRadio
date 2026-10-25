@@ -133,3 +133,20 @@ an owned decoder. Wide coupling, floor multiplication, IMDCT/overlap, final
 PCM and public raw lifetime/retry/reset/EOF integration are still required.
 The historical full31 PCM NONPASS and complete floor0/G6/G8 are not requalified
 by exact codeword/VQ checks; physical throughput and radio acceptance remain.
+
+## Owned full setup and mode/window selection, 2026-10-25
+
+The [complete setup checkpoint](../tests/results/vorbis-setup-20261025/CHECKPOINT.md)
+now supplies floor/residue/mapping/mode configuration and audio-prefix selection
+above the codebook layer. Independent exact comparison accepts all 300 sanitized
+host rows and 400 native rows, including complete configuration/getter values.
+The retained real encoder-derived header cases are host-only and preserve their
+stored bodies; no new reference decoder or PCM process is implied.
+
+Configuration preserves unsigned floor0 zero metadata because section6.2.1
+does not state positive header minima; Xiph rejects those values earlier.
+Active zero-order/rate/Bark-map arithmetic and packet treatment remain explicit
+subsequent requirements, without an invented constant-floor policy. Other
+remaining work is complete floor/residue audio decoding, wide synthesis/final
+PCM and public raw lifecycle/ownership integration. This does not requalify
+historical full31 failures, full floor0/G6/G8, physical or radio behavior.
