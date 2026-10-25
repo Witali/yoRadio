@@ -4181,3 +4181,62 @@ behavior, preserving improvements and correcting confirmed defects. Remaining
 whole-image computed aliases/function boundaries/SDK-application transitions are
 open. User-deferred items1–3 and final independent gates/hardware still remain.
 Broad goal remains active; this is a progress checkpoint, not completion.
+
+## CURRENT 2026-10-25 — event-11 registration and actual OSI binding verified
+
+Previous turn classified PROGRESS:7d8b50d88. Continue factory item4 first. Active
+editable tree remains small-tv-factory-audit. Producer trees/QEMU/SDK/helpers
+unchanged; appC912/ELF9E4E retained. This turn is another progress checkpoint.
+
+New static registration qualifier pins old/new libnet80211 and prior libpp;
+six complete SDK bodies per image (init, OSI register, pm_attach, timeout11,
+post, post-register) matched, plus actual timer_setfn forwarding adapters.
+Factory attach76792..76978, init68a9a..68bbc, register6819e..68206.
+Setfn is in flash962d0 / native9378c, forwarding to ets_timer_setfn; do not guess
+an IRAM wrapper. Actual old/new local cfg anchor names differ; bind addresses
+and object context, not identical .LANCHOR names across SDK versions.
+
+96 registration/gateway cases pass, including bad ABI/magic/null, already-bound
+pointer idempotence and real init error propagation. All five other selected
+SDK bodies plus setfn adapters covered completely. Init gateway intentionally
+exits at a stubbed API-lock error:26/99old,25/98new instructions only. Its later
+branches are statically matched but NOT dynamically covered in this checkpoint.
+pm_attach direct stores match independent model and registers ten timers;492
+is timeout11 with null arg. Invoke captured callback through real post body:
+outer8/{11,0}; absent callback returnsffffffff, installed callback status
+0/1/fffffffb propagated, remove/reset exercised. Backend helpers explicit stubs.
+
+Ran owned factory/native station VM pair twice: first observation passed; final
+pair adds retained raw typed reads so offline replay is independent of decoded
+passed fields. Final session98016 terminal0. FactoryPID43028/SmallTV-50e01a6c9d49,
+nativePID6280/SmallTV-b44080cb0c48; both absent by CIM17:27:06UTC after owned quit.
+Initial pair20828/22872 likewise absent. No leftover short VM or restarted long VM.
+
+Actual OSI global selects factoryABI8/nativeABI9 table, all480bytes match known
+SHA. One UART boot/no errors each. Connected PM bytes1/14/15/16/488=0/1/1/0/0,
+word36=1, configenable52=0 both, fallback28=10000000. Factorystoredperiod60 /
+adjustment0, native30/500000. These fields are inactive here; do not label them
+an observed timing regression. Timer word4=12121212 and word16 SRAM handle read;
+backend callback/queue delivery/RF still not proven. Source/firmware pins unchanged.
+
+Proof factory-timer-registration-validation-20261025.json:14 source pins,5gzip/
+27614bytes, no complete RAM/credentials/stack/payload. First consumer exposed
+JSON int-address keys vs serialized string keys; fixed canonical comparison,
+kept previous prototype proof in ignored scratch. Final consumer session10021
+ended0: all96 cases and both native observations replayed, four static mutations
+and six raw-runtime/owner/UART mutation controls rejected. Archive session71047
+ended1 for the diagnosed JSON comparison issue; no live process from either.
+
+Latest CIM17:28:21–27UTC matched all12 protected original process identities.
+Diagnostic-main99cycles, metadata main/V8 controls540/533; all supervisors/guards
+running, one ROM boot each/no UART errors, no workload error. Ignored snapshot:
+.build/factory-event11-registration-20261025/long-owners-after-short-tests.json.
+Not H10/8h acceptance and no duration aggregation. No launcher/poll timeout was
+treated as completion: sessions51918/78286/95000/98016/43387 inspected to terminal.
+
+NEXT: follow pm_start/stop and pending-flag writers, old separate pm_keep_alive /
+pm_reset_keep_alive path versus native unified fallback, then protocol period
+range validation and timer cancellation. Real post callback/backend ownership
+also open. Continue remaining full-image computed aliases/functions/SDK boundary
+audit. User-deferred1–3, final independent gates/H10 and physical gates remain;
+the broad goal remains ACTIVE. Do not edit frozen long-run producer inputs.

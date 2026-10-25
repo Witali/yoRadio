@@ -414,6 +414,14 @@ runtime binding, timer initialization/flag producers, допустимые proto
 По указанию пользователя сначала продолжаем этот factory/whole-image пункт;
 CODEC-REPRO и остальные пункты предыдущего списка отложены. Уже запущенные
 duration/control ВМ сохраняются без изменения producer inputs и перезапуска.
+Registration checkpoint25Oct: [WIFI_TIMER_REGISTRATION.md](tests/WIFI_TIMER_REGISTRATION.md)
+сопоставляет ещё шесть SDK тел на каждый образ, проверяет96 registration/gateway
+states и реальную timer+492→producer→post8/{11,0} цепочку в приватном RV32 CPU.
+Два настоящих station boot подтвердили OSI pointer/480byte table и timer metadata;
+сырые ограниченные typed reads сохранены для replay. Инициализация исследованных
+флагов совпала; stored period60/30 не активен (enable52=0 в обоих). Следом сравнить
+старый отдельный pm_keep_alive/reset со свежим fallback, pm_start/stop и writers
+pending flag. Все initialization branches, queue delivery и RF ещё не доказаны.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

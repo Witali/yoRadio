@@ -118,3 +118,8 @@ timer registration/posting; follow the setters and PM flag producers to determin
 which differences affect the clocks. Continue the remaining computed aliases,
 undefined function boundaries and SDK/application transitions in the whole-image
 inventory. Do not revert modern SDK behavior solely to match synthetic states.
+
+Next checkpoint: [WIFI_TIMER_REGISTRATION.md](WIFI_TIMER_REGISTRATION.md) binds
+the OSI registration and actual timer+492/posting chain. Two real QEMU station
+boots also confirm the observed OSI pointers and tables. Full backend/RF and
+connected/disconnected flag producer analysis remain open.
