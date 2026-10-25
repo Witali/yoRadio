@@ -450,6 +450,14 @@ HTTP после возврата AP не прошло, общий runtime report
 application state2 не считать connectivity bit; причина stall/роль QEMU открыты.
 Typed replay и9 evidence controls проходят; прочие callers/lifecycle/RF/hardware
 не закрываются этим опытом. Продолжить factory stall и остальные whole-image gaps.
+Factory-disconnect checkpoint25Oct: полные cnx_sta_leave сопоставлены с точными
+SDK wl_cnx.o (662/628 linked bytes). В новой factory VM наблюдены10 границ:
+pm_stop/leave/ROMcrypto/SDKcallback вернулись, event-post ID5/41B вернул0, но
+прикладной callback не достигнут в ограниченном окне после APreturn. См.
+[трассу](tests/WIFI_PM_RUNTIME.md#factory-follow-up-event-post-return-observed).
+Дальше event delivery/предшествующие appcallback обработчики; не объявлять
+потерю события, ошибку QEMU или блокировку конкретной задачи без наблюдения.
+Replay и9 controls проходят; factory recovery по-прежнему не принят.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

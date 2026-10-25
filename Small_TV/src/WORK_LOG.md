@@ -5105,3 +5105,19 @@ findings не объясняются этим invalid-ID исправление�
 - CIM18:37:44UTC: all12protected originalowners match, pending diagnostic243 /
   matchedmain682/V8=674cycles, runningguards/noUARTerrors. Not final duration
   acceptance; frozen sources unchanged. Points1–3 remain deferred.
+
+## 2026-10-25 — factory item4: narrowed disconnect stall beyond station leave
+
+- Matched entire factory/native cnx_sta_leave against exact wl_cnx.o archives:
+  662/628 linked bytes and PMstop binding. All caller branches/lifetimes remain
+  outside this static identity result.
+- Final new owned factory trace observes ten boundaries. PMstop and complete
+  leave/tail-helper return, as do ROM crypto and indirect SDKcallback. SDK event
+  post with ID5/41bytes returns0; application callback isn't reached in bounded
+  observation after APreturn. Cause and actual queue/delivery remain open.
+- Corrected an exploratory observer's uncleared hardware breakpoint; excluded
+  that invalid run and all prototypes from final evidence. No firmware patch.
+- FinalVM37708 absent at18:55:01UTC, oneROMboot/no panic; owned cleanup/controller
+  completion/source rehash pass. Saved four raw records/12414gzipbytes; offline
+  replay and nine rejection controls pass. Continue event delivery/preceding
+  handlers, with no assumption that the driver or QEMU caused the stall.

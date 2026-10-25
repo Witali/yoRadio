@@ -4401,3 +4401,39 @@ NEXT item4: actual factory callback/SDK boundaries at reconnect stall; other
 cnx_sta_leave callers, TIM/null-failure, station+820lifetime, negotiated BSS
 validation/overflow and remaining whole-image computed aliases/gaps. Otherplan
 items and final independent network/display/full/H10/physical gates stay open.
+
+## CURRENT 2026-10-25 — factory event-post returns; application callback not observed
+
+Previous checkpoint1599acede. Continue item4. New factory_disconnect_qemu.py
+uses explicit immutable CLI inputs, one owned RSP connection and one QMP owner
+thread. One-shot breakpoints are removed before resume. Initial ignoredv1
+forgot removal and repeatedly hitret, preventing guesttime/APrestore; invalid
+observer control, NOT firmware evidence. V2–6 exploratory; finalv7 is archived.
+
+Final originalexec42947 terminal0, PID37708/SmallTV-5671e7f01262 absent by actual
+CIM18:55:01UTC. OneROMboot/no panic, owned stop/controller join/input rehash pass.
+Ten observed boundaries: PMret42076790→4206c1d2; leave-tail4206c438→4206dfa4;
+ROM crypto call4206dfb2/return4206dfba (40001e68 is hal_crypto_enable entry,
+not coexistence as an exploratory label guessed); SDKcallback at42085452
+returns via4206dfd8; event-postcall4206e03e→42067b46 id5,length41 returns0 at
+4206e042. Actual payload/stack neverread. Appentry4200c602 and connect-return
+4200c656 armed but nothit in10hostsecond inactivity window. Controller restored
+AP afterguest1.007137seconds; lastguest snapshot later, hint2/PM0/alarm0.
+No claim of lost event/blocked thread/app-or-QEMU cause from idlePC or timeout.
+
+New station_leave_match requalifies old/new libnet80211 SHA and complete
+wl_cnx.o::cnx_sta_leave, factory4206c1ae..4206c444/662linkedB and native
+42070aac..42070d20/628B. PMstop binding checked; not parent state-machine or
+all branch/lifetime semantics. Initial ignoredqualifier guessed cnx.o name;
+actual archive is wl_cnx.o, corrected before final match. No SDK input changes.
+
+Proof factory-disconnect-validation-20261025.json: fourgzip12414B/14sourcepins.
+Reader repeats completebodymatches, checks realcallerJALs/metadata and rejects
+9 alterations. Event-postreturn0 is observed; actual event queue/delivery not
+yet qualified. Final observer additionally bounds diagnostic interrupt and
+exits nonzero on controller/transport/cleanup/UART/hash errors; v6 archive kept
+in ignored archive-v6 rather than relabelled as final. Consumer finalsession
+terminal0; all10boundaries and9controls replay. NEXT inspect real default event-loop dispatch and netif/other
+handlers preceding the factory appcallback, then remaining TIM/null/lifetime/
+negotiated-period/whole-image gaps. Preserve both failed recovery and native
+cancellation resolution. No firmware rebuild, protectedinput change or boardI/O.

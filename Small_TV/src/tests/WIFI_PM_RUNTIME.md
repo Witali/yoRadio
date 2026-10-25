@@ -93,3 +93,40 @@ This is one observed disconnect/reconnect path. Other callers of `pm_stop`,
 TIM and null-completion branches, station object lifetime, negotiated BSS
 period validation, full-image equivalence, RF and physical hardware remain
 separate work. The existing long-run VMs were neither attached nor restarted.
+
+## Factory follow-up: event-post return observed
+
+`factory_disconnect_qemu.py` follows ten actual boundaries in a new factory
+VM. `pm_stop` returns to `0x4206c1d2`; complete station leave and its tail-called
+helper return to `0x4206dfa4`. The ROM crypto call and the indirect SDK callback
+at `0x42085452` also return. The driver then calls the event-post wrapper at
+`0x42067b46` with event ID **5** and length **41**; the call returns **zero**
+at `0x4206e042`. No event payload is exported.
+
+The application callback at `0x4200c602` and its reconnect return at
+`0x4200c656` were armed as hardware breakpoints but were not reached in the
+bounded observation window. The AP was restored after one guest second and
+the guest ran for more than another second before the final snapshot. The
+factory hint remained two, PM inactive and timer unarmed. This narrows the
+next investigation to event delivery and handlers preceding the application
+callback. It does not prove the callback can never run, identify a blocked
+thread, or attribute the stall to QEMU.
+
+`station_leave_match.py` independently matches **all 662 factory / 628 native
+linked bytes** of `cnx_sta_leave` against the respective exact `wl_cnx.o`
+archives, including relocation/relaxation and the bound PM stop call. Matching
+complete code bodies is static evidence; the ten observations do not execute
+all their branches or qualify the complete parent state machine.
+
+[Disconnect evidence](../../qemu/parity/factory-disconnect-validation-20261025.json)
+stores four raw records / 12414 gzip bytes. The offline verifier requalifies
+both whole bodies, checks actual caller instructions and replays every typed
+read. Nine mutation controls reject altered return codes, event IDs, callers,
+read lengths/order, missing boundaries, live owner and reset, as well as a
+fabricated recovery pass. The final VM exited with one ROM boot and no panic.
+
+The first exploratory tracer repeatedly stopped at an uncleared hardware
+breakpoint. That observer defect was corrected by removing each reached
+one-shot breakpoint before continuing. Its run and subsequent exploratory
+versions remain excluded from this final evidence. No vendor patch follows
+from the bounded absence of an application callback.
