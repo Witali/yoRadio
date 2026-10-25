@@ -411,6 +411,14 @@ retained median loss12..220B и требуют объяснения; порог�
 outages/352HTTP и terminalguards. Новый H1025Oct11:23UTC запущен отдельно на
 полные86400guest s; earlyrecord0 сохранён. H10/retained-loss investigation и весь
 прежний scope остаются открытыми. Детали runtime-main-validation-20261025.json.
+Для разбора retained loss добавлен отдельный opt-in metadata observer:
+[HEAP_TOPOLOGY.md](tests/HEAP_TOPOLOGY.md). Exact ROM/linked TLSF replay, 11+8
+новых host tests и базовые 16+25 tests pass. 4+40 cycles / 22 outages / 352 HTTP,
+46 snapshots / 92 inventories и 38 negative controls квалифицированы. ROM
+контроль доказывает возможность 12-byte padding при тех же запросах, но не
+объясняет прежний H10. Далее typed TCP PCB/TIME_WAIT attribution и длительный
+контроль с обычным cadence; thresholds и требования 24h не меняются. Отдельно
+исправить idempotent cleanup уже закрытой driver ВМ. Main H10 не изменять.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.

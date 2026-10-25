@@ -5,6 +5,7 @@ import json
 import math
 from pathlib import Path
 import re
+import sys
 
 from runtime_run_guard import inspect_uart
 
@@ -87,7 +88,7 @@ def validate_snapshot(row):
                 integer(task['recorded_stack_span_bytes'], 'stack span', 1), 'Stack headroom exceeds its observed span')
 
 
-def journal_evidence(path, chunks, outage_every, allow_partial=False, require_weather=False):
+def journal_evidence(path, chunks, outage_every, allow_partial=False, require_weather=False, snapshot_check=None):
     """Stream complete events, recompute aggregates, and retain a lean time series."""
     summary = {'events': 0, 'snapshots': 0, 'http_requests': 0, 'outages': 0,
                'minimum_sampled_free_heap_bytes': None, 'minimum_sdk_sum_of_per_heap_minima_bytes': None,
@@ -95,6 +96,7 @@ def journal_evidence(path, chunks, outage_every, allow_partial=False, require_we
                'first_snapshot': None, 'snapshot_tail': []}
     tail, series, pending = deque(maxlen=32), [], []
     digest, rom_calls, cycle, partial = hashlib.sha256(), 0, 0, 0
+    verified_snapshots = 0
     heap_shape, last_minimum, last_time, recovery = None, None, None, None
     weather = {'snapshots': 0, 'quiescent_samples': 0, 'valid_samples': 0, 'distinct_valid_generations': 0,
                'first_fresh_guest_seconds': None, 'last_fresh_guest_seconds': None,
@@ -114,6 +116,9 @@ def journal_evidence(path, chunks, outage_every, allow_partial=False, require_we
             summary['events'] += 1
             if kind == 'snapshot':
                 validate_snapshot(row)
+                if snapshot_check:
+                    snapshot_check(row)
+                    verified_snapshots += 1
                 when = row['guest_seconds']
                 require(not require_weather or 'weather' in row, 'Missing weather observation')
                 if 'weather' in row:
@@ -212,15 +217,18 @@ def journal_evidence(path, chunks, outage_every, allow_partial=False, require_we
     require(allow_partial or not pending, 'Unfinished workload cycle')
     summary['snapshot_tail'] = list(tail)
     weather['distinct_valid_generations'] = len(generations)
-    return {'summary': summary, 'series': series, 'cycles': cycle, 'rom_calls': rom_calls,
-            'sha256': digest.hexdigest(), 'trailing_partial_bytes': partial, 'pending_events': len(pending), 'weather': weather}
+    result = {'summary': summary, 'series': series, 'cycles': cycle, 'rom_calls': rom_calls,
+              'sha256': digest.hexdigest(), 'trailing_partial_bytes': partial, 'pending_events': len(pending), 'weather': weather}
+    if snapshot_check:
+        result['verified_snapshots'] = verified_snapshots
+    return result
 
 
 def audit_run(folder, repository_root, start_record=None, allow_progress=False, extra_roots=()):
     """Bind final journal, UART guard, source files, image/ELF and elapsed guest time."""
     folder, repository_root = Path(folder).resolve(), Path(repository_root).resolve()
     report = decode((folder / 'report.json').read_bytes())
-    require(report['schema_version'] in (3, 4, 5), 'Unsupported runtime report schema')
+    require(report['schema_version'] in (3, 4, 5, 6), 'Unsupported runtime report schema')
     terminal = 'journal' in report and 'inputs_unchanged' in report
     require(terminal or allow_progress, 'Runtime workload has not finished')
     roots = (repository_root, *map(Path, extra_roots))
@@ -249,10 +257,21 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
     chunks = (named('rgb-420.jpg').stat().st_size + 4095) // 4096
     every = integer(report['outage_every_cycles'], 'outage cadence')
     weather_required = report['schema_version'] >= 4
+    topology = None
+    if report['schema_version'] == 6:
+        tests = str(Path(__file__).resolve().parents[1] / 'tests')
+        if tests not in sys.path:
+            sys.path.insert(0, tests)
+        from runtime_heap_topology import HeapTopology
+        for source in ('runtime_heap_topology.py', 'runtime_tlsf_instructions.py', 'runtime_instruction_image.py'):
+            named(source)
+        topology = HeapTopology(named('esp32c2_rev200_rom.elf'), elf)
     evidence = journal_evidence(folder / 'events.jsonl', chunks, every, allow_partial=not terminal,
-                                require_weather=weather_required)
+                                require_weather=weather_required,
+                                snapshot_check=topology.validate if topology else None)
     result = {'terminal': terminal, 'inputs_verified': len(inputs), 'evidence': evidence, 'report': report,
               'uart': inspect_uart((folder / 'vm/uart.log').read_bytes()), 'weather_evidence_verified': False}
+    result['heap_topology_verified'] = topology is not None
     require(result['uart']['passed'], 'UART contains a reset, panic or incomplete boot capture')
     if terminal:
         require(report['passed'] is True and report['inputs_unchanged'] is True and report['no_panic'] is True and

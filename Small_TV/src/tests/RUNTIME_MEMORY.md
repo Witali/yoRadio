@@ -174,6 +174,14 @@ retained-loss flags остаются открытым исследованием
 
 ## Разделение модулей и способ измерения
 
+Дополнительная opt-in schema 6 описана в [HEAP_TOPOLOGY.md](HEAP_TOPOLOGY.md).
+Точные ROM/linked TLSF instructions воспроизводят чтения только block headers,
+считают live capacity/headers и free block geometry; counters проверяются тем же
+ROM getter. Qualification 4+40 cycles / 22 outages / 352 HTTP завершилась,
+46 snapshots / 92 inventories replay и 38 negative controls pass. Это инструмент
+для расследования семи прежних retained-loss flags, а не объяснение их причины.
+Основной H10 на исходных schema 5 helpers не изменялся.
+
 - `runtime_memory.py` извлекает размеры/поля из DWARF текущего ELF, обходит
   зарегистрированные heaps и все FreeRTOS state lists. Он отвергает неверные
   адреса, циклы, несовпадение количества задач, владельцев, ссылок и размеров.

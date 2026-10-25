@@ -4632,3 +4632,50 @@ oneROMboot/noUARTerrors. Один ad-hoc probe ошибочно сравнил D
 String подтвердил все4совпадения; VM не перезапускалась. Это ошибка представления
 в пробе, не потеря процесса и не runtime-helper defect. У старогоH10 PID реально
 отсутствовали независимо от времени. Рекомендация сохранена вWORKING_NOTES.
+
+## 2026-10-25 — точный TLSF inventory для расследования retained heap
+
+Работа изолирована в codex/small-tv-memory-retention от b4a851041. Исходные
+4owners основного H10 подтверждены CIM с теми же creationUTC; 152cycles и
+один ROM boot/noerrors на первой проверке. Его sources/SDK/app/ELF/frozen47files
+не менялись, VM не перезапускалась и второй observer не подключался.
+
+Добавлены runtime_instruction_image/runtime_tlsf_instructions/runtime_heap_topology
+и opt-in -HeapTopology. Exact C2 ROM geometry1604/4/8 и настоящий linked SDK
+walker исполняются в private host RV32. Дополнительные guest reads ограничены
+typed heap/vtable headers и size words; payload reads/heap writes/code escapes
+запрещены hooks. Full dispatch80bytes квалифицируется как ROM default +2patches;
+reserved size/alignment slots действительно zero. Schema6 archivable transcript
+replay балансирует live capacity+4bytes/block с настоящим free counter.
+
+11ROM/linked instruction tests, включая180random allocation/free/realloc steps,
+и8native-layout/topology tests прошли; baseline16memory/25analysis pass. ROM
+control показал12byte capacity padding при одинаковых live requests/count;
+после полного free исходный counter восстановился. Это возможный механизм,
+не доказательство причины7прежних12..220byte H10 warnings. Thresholds прежние.
+
+Prototype с ошибочным nonzero dispatch-slot expectation провалился, исправление
+квалифицировано заново. Его driver закрыл VM; redundant supervisor cleanup затем
+получил connection refused, все4ownerIDs отсутствовали. Этот harness cleanup
+defect остаётся отдельным follow-up. Exploratory40completed/208.439375guest s
+не имеет genuineearly0 и не включён в qualification; повторный независимый run
+снимает early0 автоматически в той же launch invocation. Работавшая ВМ ради
+пропущенного capture не прерывалась, zero не подделывался.
+
+Qualifiedpreflight4cycles/22.839657guest s и bound40cycles/203.530398guest s:
+22STAoutages/352HTTP/10JPEGuploads, oneROMboot/noerrors, inputsunchanged,
+workload/guard/supervisor0. Затем CIM подтвердил отсутствие8directowners и
+same-run Python/QEMU children. MaxHTTPsecond4.038217guest s<6, minsampledfree54804,
+SDKsummin27104, minstackfill428B. Все46snapshots/92heapinventories replay pass.
+
+Proof heap-topology-validation-20261025.json:44raw/payloadrefs,196599newgzipbytes,
+reuseпрежнихpayloads. Consumer проверяет source/unit/ROM/ELF/app identity, настоящее
+early0 и38negativecontrols; самосогласованно falsecounter, ROMwalkersubstitution,
+missingheaders/replay и rehashed falseQEMUmanifest отвергнуты. Исправлена ошибка
+run-prefix переменной в новом schema3 consumer. Старый schema2 checkpoint отдельно
+replay сsource-revision79594bd02/20controls pass. ПолныеRAM/flash/UART/SDKarchives
+не добавлялись, firmware/QEMU source не менялись. См.tests/HEAP_TOPOLOGY.md.
+
+Следующий шаг — typedTCP PCB/TIME_WAIT attribution и долгий диагностический
+контроль обычногоcadence; основной24hH10 и остальные пункты полного плана
+остаются открытыми. Внешняя физическая плата не затронута, goalactive.

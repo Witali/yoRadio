@@ -1,5 +1,31 @@
 # Контекст работы над восстановленной Small TV
 
+## Текущий checkpoint — heap metadata, 2026-10-25
+
+Разработка продолжена в `.worktree/small-tv-memory-retention`, ветка
+`codex/small-tv-memory-retention`, от `b4a851041`. Основной H10 остаётся в
+`.worktree/small-tv-improvement-plan/.build/runtime-h10-main-20261025`, pin
+main-9135/2DF90327. Не менять его runtime helpers, SDK, ROM, app/ELF, profile,
+assets или frozen47files, не добавлять второй QMP/RSP client и не перезапускать.
+PID19884/8080/18380/18652 с creationUTC сохранены в исходном early process record;
+проверять реальные процессы, не один JSON status. Latest observation этой работы
+подтвердила все четыре owner и 152cycles; это не terminal H10 pass.
+
+Opt-in `-HeapTopology` квалифицирован отдельно: реальные C2 ROM и linked SDK
+walkers, metadata-only allocation geometry, 11+8 новых tests, базовые16+25,
+actual4+40cycles/22outages/352HTTP; replay46snapshots/92inventories и38negative
+controls pass. Архив heap-topology-validation-20261025.json; детали
+[HEAP_TOPOLOGY.md](tests/HEAP_TOPOLOGY.md). Factory/production binaries не менялись.
+ROM контроль показывает возможный padding12B при тех же requested sizes, но
+семь retained-loss warnings12..220B прежнего прерванного H10 пока не объяснены.
+
+Следом добавить typed TCP PCB/TIME_WAIT attribution, затем диагностический
+длительный контроль с interval15/outageEvery60. Не заменять им основной H10 и
+не смягчать thresholds. Исправить отдельным изменением redundant cleanup, когда
+driver уже закрыл ВМ: prototype получил connection refused, все owners отсутствуют.
+Failed prototype и exploratory40 без early0 не включены в qualification. Полный
+план, whole-image/fullsuite/fault/hardware scope остаются открытыми.
+
 Актуальные решения и рекомендации для продолжения сравнения заводской прошивки
 ESP32-C2 с собираемым C-проектом в `Small_TV/src`. История действий и результатов
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после

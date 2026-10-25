@@ -36,6 +36,8 @@ def main():
     parser.add_argument('--interval-seconds', type=float, default=1.2)
     parser.add_argument('--outage-every', type=int, default=0)
     parser.add_argument('--outage-seconds', type=float, default=1)
+    parser.add_argument('--heap-topology', action='store_true',
+                        help='Read/replay allocator metadata in this owned diagnostic VM')
     args = parser.parse_args()
     if args.cycles is None and args.duration_seconds is None:
         args.cycles = 20
@@ -92,8 +94,14 @@ def main():
     # FIXED_TEST: qualify a candidate without replacing the frozen tool bundle's binary.
     executable = (args.qemu or args.qemu_root / 'bin/qemu-system-riscv32.exe').resolve()
     files.append(executable)
+    topology = None
+    if args.heap_topology:
+        from runtime_heap_topology import HeapTopology
+        topology = HeapTopology(rom, elf, layout)
+        files += [Path(__file__).with_name(name) for name in
+                  ('runtime_heap_topology.py', 'runtime_tlsf_instructions.py', 'runtime_instruction_image.py')]
     inputs = {str(path.resolve()): digest(path) for path in files}
-    result = {'schema_version': 5, 'passed': False, 'all_functionality_verified': False,
+    result = {'schema_version': 6 if topology else 5, 'passed': False, 'all_functionality_verified': False,
               'scope': __doc__, 'native_elf_sha256': layout['elf_sha256'],
               'app_sha256': digest(app), 'qemu_sha256': digest(executable),
               'qemu_executable': str(executable), 'cycles_requested': args.cycles,
@@ -160,6 +168,8 @@ def main():
                     row = {'label': label, 'guest_seconds': guest_seconds(),
                            'heap': reader.heaps(), 'tasks': reader.tasks()}
                     row['weather'] = weather_reader.sample(row['guest_seconds'])
+                    if topology:
+                        row['heap_topology'] = topology.sample(reader, row['heap'])
                     journal.append('snapshot', row)
                     result['summary'] = journal.summary()
                     if row['heap']['minimum_free_bytes'] == 0 or any(
