@@ -454,9 +454,13 @@ H10, retained-loss investigation и весь прежний scope остаютс
 46 snapshots / 92 inventories и 38 negative controls квалифицированы. ROM
 контроль доказывает возможность 12-byte padding при тех же запросах, но не
 объясняет прежний H10. Далее typed TCP PCB/TIME_WAIT attribution и длительный
-контроль с обычным cadence; thresholds и требования 24h не меняются. Отдельно
-исправить idempotent cleanup уже закрытой driver ВМ. Сохранённый failed H10
-и его pinned inputs не изменять.
+контроль с обычным cadence; thresholds и требования 24h не меняются.
+Повторный cleanup уже закрытой driver ВМ исправлен:
+[RUNTIME_CLEANUP.md](tests/RUNTIME_CLEANUP.md), 13 actual Windows cases,
+10 прежних supervisor cases, реальная QEMU filesystem fault и replay закрытой
+H10 session прошли. Diagnostic identity error не отменяет попытку helper.
+Pre-cleanup failure-state capture и причина HTTP timeout ещё открыты.
+Сохранённый failed H10 и его pinned inputs не изменять.
 TCP [gate и attribution](tests/TCP_HEAP_ATTRIBUTION.md) готовы: native selected
 fields, exact live allocations, PCB/segment/pbuf chains и shared accounting,
 33host tests+25baseline,4+40actualcycles/22outages/352HTTP,46observed snapshots и

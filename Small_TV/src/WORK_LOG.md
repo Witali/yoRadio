@@ -5010,3 +5010,31 @@ findings не объясняются этим invalid-ID исправление�
 - At 15:55:40/41 UTC, CIM matched all eight original owners of the separate main
   and V8 metadata controls. They had 323/317 cycles, running UART guards, one ROM
   boot each and no guard errors. Their input trees and executables remain frozen.
+
+## 2026-10-25 — fix redundant cleanup without hiding workload failure
+
+- Added a process-identity check to the host cleanup module. The session timestamp
+  is an upper bound on original creation; a later or different process at the PID
+  is left alone. Retain the original kernel handle during helper execution and
+  accept an already-exited original without a second QMP stop. Preserve real
+  helper exit codes and both logs. Existing workload failure stays failed.
+- Inspection failures initially bypassed helper execution in the prototype.
+  Corrected this before final qualification: record the diagnostic error, retain
+  unknown liveness, and still attempt the existing nonce-checking helper. A
+  nonzero helper result with unknown/live ownership remains an error.
+- Added 13 real OS canary cases, including successful helper cleanup despite
+  malformed identity. The stale-time case is a controlled live-canary identity
+  fixture, not an actual kernel PID-reuse event. Live canaries remain intact.
+- Initial harness failed on a transient sharing conflict reading a new JSON.
+  Stopped the exact remaining fixture through its verified nonce protocol and
+  confirmed both wrapper/child gone before rerun. Added bounded same-file retry
+  and cached identity. V2 passed 12 cases; final V3 passed 13 cases after the
+  inspection-error fix. All 10 previous supervisor tests also passed again.
+- Final real QEMU fault test used the pinned main executable and unchanged C912
+  image. It stopped all three owned processes and required no test fallback kill.
+  Replayed cleanup of the actual retained closed H10 session: owner absent,
+  helper skipped, no added cleanup error, original passed=false preserved.
+- Saved four final reports / 8314 gzip bytes with seven source pins. Updated
+  historical runtime replay to use d7dccb92f source revision; actual replay passed
+  after cleanup source changes. No firmware, SDK, frozen helper or live matched
+  control input changed. Failure-state capture and timeout cause remain open.

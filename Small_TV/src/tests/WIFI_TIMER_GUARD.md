@@ -112,12 +112,15 @@ schema-4 reader различает завершившийся процесс и 
 $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/verify_runtime_candidate_evidence.py `
-  --proof Small_TV/qemu/parity/wifi-timer-runtime-validation-20261025.json
+  --proof Small_TV/qemu/parity/wifi-timer-runtime-validation-20261025.json `
+  --source-revision d7dccb92f
 ```
 
 Короткий churn не заменяет H10, независимые network/display gates и физическую
 приёмку. Для нового ELF ещё не квалифицирован observer TCP topology; прежний
 SHA allowlist не ослаблен. Никаких физических flash/reset действий не было.
+Runtime producer snapshot сохранён в `d7dccb92f`; historical source revision
+нужен после последующих исправлений host cleanup tools. Такой replay тоже прошёл.
 
 ## Сопутствующий build follow-up
 

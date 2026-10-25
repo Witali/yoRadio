@@ -1,0 +1,63 @@
+{
+  "schema": "small-tv-runtime-cleanup-v1",
+  "passed": true,
+  "all_functionality_verified": false,
+  "h10_checks_passed": false,
+  "physical_hardware_tested": false,
+  "source_pins": {
+    "Small_TV/src/tools/runtime_cleanup.psm1": "86cec17ca752b01dd4f5ba447856fbdb8934b2f01df4a43c3f1391a62cb9cf2a",
+    "Small_TV/src/tools/runtime_supervisor.ps1": "6ddd98e9518d1b9701d526ca93703d14568673e779f319f9bfc9bc6c071bf08b",
+    "Small_TV/src/tools/runtime_state_io.psm1": "bc4a8255a8b682ffd3dbae98652e9250af60659e16f769e153dba41f47536535",
+    "Small_TV/src/tests/runtime_cleanup_test.py": "60446adb376aba57af26ba2f5a5d34e72c2164e83d1e3c25be05e122abdfc2fb",
+    "Small_TV/src/tests/runtime_supervisor_test.py": "87255113c060e0de7bf00b05927ac877cf99283aff20a779912c08d62510e717",
+    "Small_TV/src/tests/runtime_supervisor_fixture.py": "1416aa25b621c797f0dc4fe34e1f0f269b63e478aee9ae2008d23d1aabb7d909",
+    "Small_TV/src/tests/runtime_supervisor_qemu_test.py": "4e38c74beba7bf9679c358976438d8f5706d4d7a5454618f9d2027e06b0ec3f3"
+  },
+  "reports": [
+    {
+      "name": "identity",
+      "file": "runtime-cleanup-20261025/identity.json.gz",
+      "sha256": "4819495e98b98328a6684a18c9b6fb7b65592892b20429ee08679ef1f35f5048",
+      "gzip_sha256": "580021f8cff6ca58b700ec6bd3e3df4fa5dd4b1cc339b90c015cf84a8d5f3e59",
+      "bytes": 6053,
+      "gzip_bytes": 1295
+    },
+    {
+      "name": "supervisor",
+      "file": "runtime-cleanup-20261025/supervisor.json.gz",
+      "sha256": "f721140dfbc9b3a4f70e4b5b6b52655154bd9eecb655459c474eb72da9203f22",
+      "gzip_sha256": "540645d7a29ec6974ab0e0f8dbb5de1be87fb598ee0873a90932bbdee80d7862",
+      "bytes": 34208,
+      "gzip_bytes": 3946
+    },
+    {
+      "name": "qemu",
+      "file": "runtime-cleanup-20261025/qemu.json.gz",
+      "sha256": "1eac076b03aa8b0b1db303c05a6fe2419684464f28eef1e4a3bb4704c7f20a0c",
+      "gzip_sha256": "e5cbc940d9bb0eefccb059f22b6b750064f61095dfc1ec0932f6e17cd712161b",
+      "bytes": 8700,
+      "gzip_bytes": 2654
+    },
+    {
+      "name": "closed-h10",
+      "file": "runtime-cleanup-20261025/closed-h10.json.gz",
+      "sha256": "46d2609195f1a42a4e676c098fce00e666b466ae17441f30ddbdad416f7cfc5a",
+      "gzip_sha256": "093a21b41e32aac89fbaf14ab32d5d635871d59a4d60a61098969e655247b589",
+      "bytes": 700,
+      "gzip_bytes": 419
+    }
+  ],
+  "identity_cases": 13,
+  "supervisor_cases": 10,
+  "qemu_owned_processes_stopped": {
+    "workload": true,
+    "guard": true,
+    "vm": true
+  },
+  "closed_original_h10_cleanup_verified": true,
+  "limitations": [
+    "No actual kernel PID-reuse event was induced; stale-time and different-image cases use real live canaries.",
+    "The original H10 remains failed. This only fixes redundant cleanup and does not explain its HTTP timeout.",
+    "No new firmware, display/network acceptance, long-duration or physical-hardware qualification."
+  ]
+}

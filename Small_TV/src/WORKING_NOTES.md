@@ -3998,3 +3998,50 @@ rejecting any invented elapsed/end time. No producer or report was changed.
 See tests/RUNTIME_MAIN_FAILURE.md. Next priority is bounded pre-cleanup failure
 state capture and an owned diagnostic reproduction. Invalid-socket warnings may
 come from callback registration or unregistration; causation remains unknown.
+
+## CURRENT 2026-10-25 — idempotent host VM cleanup fixed and qualified
+
+Active branch codex/small-tv-timer-bounds. Previous progress committed as
+d7dccb92f (short timer-guard runtime) and 421291ab5 (failed H10 preservation).
+Firmware app C91294FC / ELF 9E4EC88D remains unchanged; no rebuild or flashing.
+
+runtime_cleanup.psm1 now checks production session PID, executable and launch
+timestamp before a redundant helper call. The session time is an upper bound
+on original creation, not the exact creation timestamp. Absent/exited originals
+or a demonstrably later/different process need no stop. For a matching live
+process, hold its kernel handle through helper completion. A helper error is
+benign only if that original has exited; keep its actual nonzero code and logs.
+Unknown liveness never excuses failure. Inspection errors are recorded but do
+not bypass the existing nonce-checking helper. No new PID-based kill operation.
+
+Final module SHA 86cec17ca752b01dd4f5ba447856fbdb8934b2f01df4a43c3f1391a62cb9cf2a.
+13 real Windows canary cases, 10 old supervisor cases and a real main-QEMU
+filesystem-fault run passed. Native workload/guard/VM stopped by the supervisor;
+test fallback cleanup was unnecessary. Replay against the retained closed H10
+session chose absent/original-already-exited, no new cleanup error, passed=false.
+Four final reports saved, 8314 compressed bytes, seven source pins:
+runtime-cleanup-validation-20261025.json; tests/RUNTIME_CLEANUP.md explains scope.
+
+Initial test harness hit an actual Windows sharing race in vm-ready.json; the
+remaining owned canary was stopped by verified nonce and confirmed gone before
+rerun. Added bounded same-file read retry and cached identity. V2 had 12 cases;
+final V3 has 13 after strengthening inspection-error cleanup continuation. Only
+final reports are accepted. All test sessions have finished; none needs polling.
+
+Historical timer runtime replay now needs --source-revision d7dccb92f because
+the cleanup producer file changed after its qualification. That replay passed;
+the original archives were not rewritten. Two metadata-control producer trees
+and their pinned executables are still protected and must be revalidated.
+
+NEXT: implement bounded failure-state capture before runtime_qemu finally closes
+its RSP/QMP and VM, then an owned diagnostic reproduction of the HTTP timeout.
+Do not increase the timeout or infer causation from WSAEventSelect warnings.
+Afterward CODEC-REPRO, ID11 callee review, real queued TCP buffers, full-image
+reachability, final independent network/display/full suite, H10 and hardware
+gates remain open. The broad goal remains active, with no duration aggregation.
+
+Latest authoritative observation, 25 Oct 16:08:50/51 UTC: all eight original
+metadata-control owner identities still match. Main/V8 have 357/352 cycles,
+running guards, one ROM boot each, no guard errors. No cleanup-test processes
+remain. Saved ignored remaining-controls-after-cleanup-20261025.json. These are
+pending prefixes, not 8-hour or H10 acceptance.
