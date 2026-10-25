@@ -5068,3 +5068,20 @@ findings не объясняются этим invalid-ID исправление�
   unchanged blobs and moved an unreferenced reader prototype to ignored build.
   Actual reader replay recomputed journal, UART and exact ELF layout;11 rejection
   controls passed. Normal-path preflight and an owned long diagnostic run follow.
+
+## 2026-10-25 — normal path passed; one diagnostic duration run started
+
+- Committed the complete diagnostic feature as70cd3e5be before launching its
+  ordinary schema5 preflight. Genuine cycle-zero and all four owners captured.
+  It completed4 cycles/32HTTP/2outages in18.816259 guest seconds; workload/guard
+  exit0, supervisor complete, inputs rehashed and original owners exited.
+- Verified no failure file/metadata on success. Independently recomputed full
+  journal/UART and12 workload/owner rejection controls. Saved nine raw records,
+  10446 gzip bytes, under runtime-failure-capture-preflight-20261025.json.
+- Launched exactly one separate diagnostic-main with86400 guest seconds,
+  interval15/outage60, same committed producer and unchanged C912/9E4E app/ELF.
+  Captured genuine start0 and four exact owner identities, not a recreated start.
+- CIM at16:45:03UTC verified all four original owners;3 cycles complete, one ROM
+  boot and running guards. Old main/V8 metadata controls retain all eight original
+  identities and444/437 cycles. These pending prefixes do not establish H10/8h.
+  Source trees, shared SDK/ROM/helpers and pinned executables are now protected.

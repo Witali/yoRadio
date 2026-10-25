@@ -74,7 +74,18 @@ python -B -X utf8 Small_TV/src/tests/verify_runtime_failure_capture_evidence.py 
 коммита этого checkpoint, сохраняя соответствующие app/ELF. Это offline replay;
 он не подключается к работающим ВМ.
 
-Далее проверить обычный успешный runtime с новым observer и запустить отдельное
-длительное диагностическое воспроизведение исходного timeout. Суточная приёмка,
-разбор retained memory, независимые network/display gates и hardware остаются
-отдельными открытыми пунктами.
+Обычный preflight закоммиченного producer `70cd3e5be` также прошёл: четыре цикла,
+32 HTTP, два переподключения, 18,816259 guest seconds. Workload/guard exit 0,
+supervisor complete, все входы повторно хешированы, исходные четыре владельца
+завершились. Ни failure-state file, ни `failure_capture` field на успехе не созданы.
+Пересчитаны журнал/UART и 12 workload/ownership rejection controls.
+[Девять raw records](../../qemu/parity/runtime-failure-capture-preflight-20261025.json)
+занимают 10446 gzip bytes и сохраняют genuine cycle-zero и process observations.
+
+25 октября в 16:42 UTC запущен один отдельный диагностический run с запросом
+86400 guest seconds, interval 15, outage every 60; cycle-zero и четыре исходных
+владельца сохранены. Это pending reproduction, не успешный H10. При проверке
+16:45 UTC владельцы живы, три цикла завершены, UART guard без ошибок.
+Исторические failed H10 и два matched controls сохранены отдельно.
+Суточная приёмка, причина timeout, разбор retained memory, независимые
+network/display gates и hardware остаются открытыми пунктами.

@@ -4094,3 +4094,41 @@ outage60 run with genuine cycle-zero and four original owner observations.
 Do not overwrite failed H10 or protected old controls; their durations never
 combine. Current tree must stay frozen once a new diagnostic run uses it.
 Independent CODEC-REPRO/new source changes then need another task worktree.
+
+## CURRENT 2026-10-25 16:45 UTC — producer frozen for the diagnostic duration run
+
+Feature committed as 70cd3e5bef443c772a714a826ab6a72ea69e38de. The ordinary
+schema5 preflight finished: 4 cycles,32 HTTP,2 outages,18.816259 guest seconds.
+Workload/guard exit0, supervisor complete, all inputs rehashed, original owners
+exited. No failure file/field on success. Journal/UART and 8 workload +4 owner
+controls independently verified. Nine raw records /10446 gzip bytes saved in
+runtime-failure-capture-preflight-20261025.json, including genuine start0.
+
+ONE diagnostic-main run was launched after that pass. Preserve exactly this run:
+root .build/failure-capture-runtime-20261025/diagnostic-main
+request86400 guest seconds, interval15, outage60, schema5, no TCP topology.
+VM name SmallTV-ee01f5c96c24; appC91294FC/ELF9E4EC88D; main QEMU2DF90327.
+Producer70cd3e5be. Genuine cycle-zero and all four original owners captured.
+
+Original owner identities (name, PID, exact creation UTC):
+- supervisor pwsh.exe,31368,2026-10-25T16:42:18.2230720Z
+- workload python.exe,16156,2026-10-25T16:42:18.6920630Z
+- guard python.exe,19100,2026-10-25T16:42:55.3108110Z
+- VM main-9135-riscv32.exe,20424,2026-10-25T16:42:24.5192390Z
+
+Last CIM16:45:03UTC matched all four,3 cycles, guards/supervisor running, one ROM
+boot/no UART guard errors. Old metadata main/V8 controls also still match all8
+original owners,444/437 cycles at16:45:04UTC, guards running. Saved ignored
+failure-capture-final-owner-observation-20261025.json. All three are pending;
+never call them H10/8h pass or combine their durations with earlier failed runs.
+Both launcher execs22039/15764 are terminal; their detached owners are live.
+
+DO NOT change producer/runtime/helper/profile/compiled inputs in this tree or
+the old metadata-control tree. Documentation/offline analysis may be updated.
+For CODEC-REPRO or firmware/producer fixes, create a separate branch/worktree
+under repo/.worktree from this completed source state. Shared SDK/ROM, frozen
+helper bundle and both pinned main/V8 executables remain read-only.
+NEXT: revalidate owners/status, inspect any genuine failure-state snapshot;
+meanwhile advance CODEC-REPRO or selected whole-image/ID11 analysis independently.
+HTTP timeout cause, long acceptance, retained loss, actual I/O/power fault matrix,
+queued guest TCP samples, final independent gates and hardware remain open.

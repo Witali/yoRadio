@@ -463,8 +463,11 @@ H10, retained-loss investigation и весь прежний scope остаютс
 [RUNTIME_CLEANUP.md](tests/RUNTIME_CLEANUP.md), 13 actual Windows cases,
 10 прежних supervisor cases, реальная QEMU filesystem fault и replay закрытой
 H10 session прошли. Diagnostic identity error не отменяет попытку helper.
-Pre-cleanup failure-state capture проверен отдельно; обычный успешный runtime
-нового observer и причина исторического HTTP timeout ещё требуют проверки.
+Pre-cleanup failure-state capture проверен отдельно; обычный preflight нового
+observer тоже прошёл: 4 цикла, 32 HTTP, 2 outages, terminal guards/supervisor,
+без diagnostic artifact на успехе. Новая отдельная diagnostic ВМ запущена
+25Oct16:42UTC на 86400 guest seconds, interval15/outage60. Это pending:
+cycle-zero/owners сохранены, причина исторического timeout ещё не установлена.
 Сохранённый failed H10 и его pinned inputs не изменять.
 TCP [gate и attribution](tests/TCP_HEAP_ATTRIBUTION.md) готовы: native selected
 fields, exact live allocations, PCB/segment/pbuf chains и shared accounting,
