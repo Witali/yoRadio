@@ -4352,3 +4352,52 @@ reconnect, then TIM/full null-failure branches, station+820lifetime, negotiated
 BSS period validation/overflow and remaining whole-image aliases/gaps. Deferred
 1–3 and final independent network/display/full/H10/hardware gates remain open.
 Broad goal stays ACTIVE. Preserve all frozen producer/helper/QEMU inputs.
+
+## CURRENT 2026-10-25 — native cancellation resolved; factory recovery still fails
+
+Previous checkpoint1007938ae. Continue factory item4; deferred1–3 untouched.
+Editable tree small-tv-factory-audit. NativeC912/ELF9E4E, SDK/ROM/QEMU and all
+protected long-run producer inputs unchanged. No firmware build or board I/O.
+
+New modules separate qualification, bounded decoder, literal predicate tests,
+live observer and offline evidence verifier. Native DWARF: esp_timer32B/alarmu64
+at0, legacy20B/marker4/handle16. Factory independently qualified14B/18B predicates
+and handle load; only8B backendprefix claimed. Eight literal predicate cases,
+eight metadata cases, ten rejection cases and four uninitialized/ROM-unbound
+cases pass. Follow handle only if real ROMg_pm_ptr equals SDKPM and marker valid.
+Metadata only/max32requests/256bytes; no stack/payload/credentials.
+
+Final qemu-v4 session7708 terminal1, deliberately MIXED OUTCOME. FactoryPID6112/
+SmallTV-252af7b44bc1, nativePID28832/SmallTV-9f08cc5692fa. CIM18:36:25UTC confirms
+both absent; oneROMboot/no panic each. FactoryHTTP did not recover within30host
+seconds after APonline; PMactive0/apphint2 persisted. Factory baseline alarm0
+cannot prove armed cancellation. Actual handler4200c652 callsconnect before
+state1 store4200c66a; GOT_IP doesn't directlywrite2. Hint isn't a live link bit.
+No blocked callbackPC/stack captured; idlePC doesn't establish cause/app/QEMU.
+
+Native PMstop epilogue4207bcca still hasalarm17535664. Natural cancelhelper
+4207a0e6 enters atguest7791516us withsamealarm, returns7791544us/alarm0 BEFORE
+deadline. RA42070ad4 identifies cnx_sta_leave42070aac/628B. ELFcheckedcalls:
+42070acc->pm_stop,42070ad0->pm_disable_keep_alive_timer. Same initializedbackend
+1070352264, realROM/OSI bindings throughout. Then appflag0; APreturn restores
+actualHTTP/PMactive/flag1, newalarm20137076. No missing-cancellation patch needed
+on this leave path; other callers/lifecycle/RF/hardware remain open.
+
+Proof factory-pm-runtime-validation-20261025.json: fivegzip9956B/13sourcepins.
+Consumer terminal0 repeats predicates/rawreads, callerJALs, preserves factory
+passedfalse and rejects9evidence mutations. See tests/WIFI_PM_RUNTIME.md.
+qemu-v1 failed obsolete apphint assumption, v2 factoryHTTP, v3nativeonly passed;
+all remain ignored scratch, not paired acceptance. Finalhostunits terminal0.
+Original24209 handle absent, but persistedv2failure/ownerexit inspected before
+new run. No restart based solely on observing a timeout or missing output.
+
+CIM18:37:44UTC matches all12original PID/name/creationUTC. Diagnostic243cycles,
+oldmatchedmain/V8=682/674; allguardsrunning, oneROMboot/noUART/workloaderrors.
+Snapshot long-owner-observation-final.json. Concurrent reportwrite truncated
+an earlier read; bounded retry succeeded, earlier stalePS variable not evidence.
+Pending prefixes only, not8h/H10. No secondQMP/RSP or protectedinput changes.
+
+NEXT item4: actual factory callback/SDK boundaries at reconnect stall; other
+cnx_sta_leave callers, TIM/null-failure, station+820lifetime, negotiated BSS
+validation/overflow and remaining whole-image computed aliases/gaps. Otherplan
+items and final independent network/display/full/H10/physical gates stay open.

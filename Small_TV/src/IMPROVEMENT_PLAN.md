@@ -440,6 +440,16 @@ sleep-delay trampoline/body исполнены. Повторные start/stop и
 квалифицировать layout перед чтением alarm; не вызывать отсутствующий linked API.
 TIM, null-failure, lifetime, negotiated ranges/overflow и прочие whole-image gaps
 сохраняются. Пункты1–3 по-прежнему отложены по приоритету пользователя.
+Runtime checkpoint25Oct: [WIFI_PM_RUNTIME.md](tests/WIFI_PM_RUNTIME.md) проверяет
+реальные ROM/OSI bindings и backend alarm на естественном station disconnect.
+В native отмена вынесена в cnx_sta_leave сразу после pm_stop: настоящий helper
+и его возврат наблюдены, alarm очищается до срока, затем STA/HTTP восстанавливаются.
+Отсутствие прямого disarm492 в pm_stop не требует исправления на этом пути.
+Factory baseline уже inactive и не доказывает armed cancellation; восстановление
+HTTP после возврата AP не прошло, общий runtime report остаётся failed. Устаревший
+application state2 не считать connectivity bit; причина stall/роль QEMU открыты.
+Typed replay и9 evidence controls проходят; прочие callers/lifecycle/RF/hardware
+не закрываются этим опытом. Продолжить factory stall и остальные whole-image gaps.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

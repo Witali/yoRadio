@@ -5085,3 +5085,23 @@ findings не объясняются этим invalid-ID исправление�
   boot and running guards. Old main/V8 metadata controls retain all eight original
   identities and444/437 cycles. These pending prefixes do not establish H10/8h.
   Source trees, shared SDK/ROM/helpers and pinned executables are now protected.
+
+## 2026-10-25 — factory item4: real PM cancellation and recovery comparison
+
+- Qualified native timer layouts from linked DWARF and factory alarm/marker
+  predicates independently. Eight literal RV32 predicate cases, eight decoder
+  cases, ten rejection cases and four uninitialized/ROM-unbound cases pass.
+- Observed natural station disconnects on fresh factory/native QEMU copies.
+  Native keep-alive is armed at pm_stop exit, then cancelled by the immediately
+  following cnx_sta_leave call. Hardware entry/return observations show alarm
+  cleared before deadline. ROM/OSI/backend ownership remains bound; native HTTP
+  recovers. No SDK patch justified for this path.
+- Factory baseline already inactive: armed cancellation not proved. FactoryHTTP
+  did not recover after APreturn; PMinactive/apphint2 persisted. Combined report
+  stays failed. Exact stall cause and QEMU dependence remain open.
+- Archived five bounded raw records/9956gzipbytes and exact input pins. Offline
+  replay passes/nine altered-evidence controls rejected, including forgedfactory
+  pass/full-lifecycleclaim. Both finalVMs absent, oneROMboot/no panic each.
+- CIM18:37:44UTC: all12protected originalowners match, pending diagnostic243 /
+  matchedmain682/V8=674cycles, runningguards/noUARTerrors. Not final duration
+  acceptance; frozen sources unchanged. Points1–3 remain deferred.

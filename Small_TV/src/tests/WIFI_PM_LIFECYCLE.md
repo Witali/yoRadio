@@ -76,6 +76,11 @@ The native SDK source defines the timer's `alarm` field at offset zero and
 `timer_armed` as `alarm > 0`; derive the actual DWARF/layout before interpreting
 any backend handle. The factory layout needs its own qualification.
 
+Follow-up: [real station-loss observations](WIFI_PM_RUNTIME.md) now confirm
+the native caller cancels keep-alive immediately after `pm_stop`. No timer
+patch is needed for that path. Factory recovery failed in the paired QEMU
+scenario and remains explicitly unqualified.
+
 ## Tests and evidence
 
 **5224 private RV32 executions** cover 1440 start cases and 1152 stop cases per
