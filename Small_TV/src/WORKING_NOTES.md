@@ -4,16 +4,22 @@
 
 Текущая разработка: `.worktree/small-tv-memory-retention`, ветка
 `codex/small-tv-memory-retention`, commits `135e61860` (exact TLSF metadata replay)
-и `82d901e2d` (TCP/IP mailbox gate). Там обновлены полный IMPROVEMENT_PLAN,
+и `82d901e2d` (TCP/IP mailbox gate), затем `23b641680` (typed TCP inventory и
+live-allocation attribution). Там обновлены полный IMPROVEMENT_PLAN,
 WORK_LOG и tests/HEAP_TOPOLOGY.md / tests/TCP_HEAP_ATTRIBUTION.md. 4+40-cycle
 heap qualification,46snapshots/92inventories и38negative controls pass;
 TCP prerequisite15host tests/real4cycles/5quiet samples/12controls pass.
-Сам TCP PCB/pbuf attribution ещё не реализован, старые7memorywarnings не закрыты.
+TCP PCB/segment/pbuf attribution готов:33real-ROM hosttests+25baseline,
+4+40actualcycles/46observed snapshots/76negativecontrols. Actualguest samples
+далиLISTEN/FIN_WAIT_2 PCB80..504B; queuedbuffer targetprobe и старые7warnings
+не закрыты. Там запущеныsoak-main/soak-v8 по28800guest seconds/15s/outageEvery60,
+25Oct13:40/13:42UTC,early0 и4positiveowneridentities каждый. Теперь runtime inputs
+обеих рабочих копий pinned; дальнейшие producer изменения — новая task worktree.
 
 Эту рабочую копию пока сохранять как pinned input основного
 `.build/runtime-h10-main-20261025`. Не cherry-pick/merge сюда новые runtime
 helpers, не менять app/ELF/SDK/ROM/profile/assets/frozen47files и не присоединять
-второй observer. При последней CIM-проверке203cycles,4originalowners и точные
+второй observer. При последней CIM-проверке362cycles,4originalowners и точные
 creationUTC совпали; oneROMboot/noUARTerrors, H10 ещё running. Дополнительные
 короткие ВМ завершены. После настоящего terminal H10 выполнять полный audit,
 а не принимать старый JSON status за liveness или дополнять24h прежними7часами.
