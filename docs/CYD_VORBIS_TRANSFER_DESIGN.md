@@ -1,5 +1,11 @@
 # CYD Vorbis/Ogg repair transfer
 
+Ogg/Vorbis radio playback already exists in the original CYD runtime and in
+`main`; see the [all-branch source audit](CYD_OGG_VORBIS_BRANCH_AUDIT_20261025.md).
+Statements below about an isolated or disabled bridge refer to the additional
+repair layer, not to basic codec availability. The original Espressif decoder
+remains registered in production.
+
 Stage CYD-C3-14 of the [transfer plan](ESP32_CYD_C3_TRANSFER_PLAN.md) remains
 open. The [read-only Xtensa audit](../tests/results/cyd-vorbis-xtensa-audit-20261020/README.md)
 examines the actual installed Espressif 2.6.2 ESP32 archives, rather than

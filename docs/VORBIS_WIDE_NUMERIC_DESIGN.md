@@ -1,5 +1,27 @@
 # Owned wide Vorbis synthesis: numerical boundary
 
+## Reuse-first decision, 2026-10-25
+
+The user approved testing a ready complete upstream decoder before continuing
+custom synthesis. The [branch audit](CYD_OGG_VORBIS_BRANCH_AUDIT_20261025.md)
+confirms that basic Ogg/Vorbis playback is already implemented through the
+Espressif package. A complete source-buildable Xiph port is an investigation
+into the retained failures, not a prerequisite for adding that existing feature.
+
+Next, pin the upstream source and dependencies, compile an essentially unchanged
+decode path for ESP32, adapt only public input/output/allocation integration,
+and run the original failing corpus. Record PCM, memory and target execution
+evidence before choosing it as a replacement. Emulator results do not establish
+physical real-time performance. Preserve the existing tests and owned numeric
+components as diagnostics; do not add a new custom IMDCT or synthesis stage
+until the ready implementation has been evaluated. Any required deviations
+must address a demonstrated requirement, without discarding failing cases or
+weakening the declared standard/conformance criteria. Deferred scopes stay
+deferred, and production selection changes require their own completed gates.
+
+The numerical analysis below records requirements and implemented components;
+it does not make a complete custom rewrite mandatory.
+
 Full floor0 correctness requires a precision and range design for the complete
 synthesis path. The public low-memory implementation stores Q4 amplitude and
 Q24 LSP values; the current bridge delegates residue, coupling, IMDCT, overlap
