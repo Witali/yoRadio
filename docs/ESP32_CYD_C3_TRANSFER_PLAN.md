@@ -89,8 +89,17 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 Его обеспечивает существующий декодер Espressif. Ниже остаются исправления
 надёжности/соответствия формату и подключение дополнительного repair, а не
 первичное добавление поддержки Vorbis. По принятому пользователем подходу
-следующий шаг — проверить готовый полный upstream-декодер с минимальной
-адаптацией, прежде чем продолжать собственный синтез.
+готовый upstream-декодер уже проверен с минимальной адаптацией:
+[Xiph на ESP32](../tests/results/vorbis-xiph-20261025/CHECKPOINT.md) проходит
+все исходные 31 случая, 434 пакета и 738560 PCM байт с побитным совпадением;
+максимальная ошибка 0 при прежнем допуске 2, все 14 отношений проходят.
+Новый собственный IMDCT/синтез пока не нужен. Следующие программные проверки —
+отказ allocation/recovery, большие codebooks и стек, оставшиеся format/range
+границы. В upstream найдены unchecked realloc arena и два entry-sized stack
+массива; до их квалификации новый кандидат не подключается к радио. Старые
+NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также
+не закрывает deferred scopes, physical acceptance или полное соответствие
+стандарту за пределами измеренного корпуса.
 
 - **Этап 13, память:** завершить radio-boot/board и сетевую приёмку
   статического CYD TLS RX reserve, завершить radio-boot/board квалификацию [ранней MPI](CYD_EARLY_MPI_DESIGN.md)
@@ -116,9 +125,12 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   завершился nonpass в SDK SPI flash init до `app_main`: reserve ON/OFF дают
   одинаковый QIE/QIO отказ. Ранняя MPI и radio startup этим не квалифицированы;
   исходные образы и конфигурации сохранены, аппаратная приёмка остаётся.
-- **Этап 14, Vorbis/Ogg:** завершить [изолированный ESP32 bridge](CYD_VORBIS_TRANSFER_DESIGN.md)
-  и подключить к actual audio task после Ogg EOF/reset, allocation failure/reopen,
-  concurrent scopes, полной callback ABI и format/conformance проверок. Raw PCM
+- **Этап 14, Vorbis/Ogg:** выбрать и подключить проверенный путь к actual audio
+  task после необходимых lifecycle, allocation failure/reopen, concurrent scopes
+  и format/conformance проверок. Готовый Xiph теперь основной кандидат на
+  дальнейшую квалификацию; [прежний ESP32 bridge](CYD_VORBIS_TRANSFER_DESIGN.md)
+  остаётся изолированной альтернативой со своими callback ABI/Ogg EOF/reset gates.
+  Deferred scopes этим не возобновляются. Для прежнего repair Raw PCM
   и undersized retries проверены отдельно; [raw8192 regression](../tests/results/cyd-vorbis-format-20261020/README.md)
   снимает только одно rate/block ограничение: 340 точных пакетных сравнений,
   четыре malformed-header controls и точный old-guard отказ. Дополнительная

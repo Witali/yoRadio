@@ -8,10 +8,10 @@ confirms that basic Ogg/Vorbis playback is already implemented through the
 Espressif package. A complete source-buildable Xiph port is an investigation
 into the retained failures, not a prerequisite for adding that existing feature.
 
-Next, pin the upstream source and dependencies, compile an essentially unchanged
-decode path for ESP32, adapt only public input/output/allocation integration,
-and run the original failing corpus. Record PCM, memory and target execution
-evidence before choosing it as a replacement. Emulator results do not establish
+The approved experiment pins the upstream source and dependencies, compiles an
+essentially unchanged decode path for ESP32, adapts only public input/output
+and platform integration, and runs the original failing corpus. Its PCM, memory
+and target execution evidence is recorded below. Emulator results do not establish
 physical real-time performance. Preserve the existing tests and owned numeric
 components as diagnostics; do not add a new custom IMDCT or synthesis stage
 until the ready implementation has been evaluated. Any required deviations
@@ -21,6 +21,19 @@ deferred, and production selection changes require their own completed gates.
 
 The numerical analysis below records requirements and implemented components;
 it does not make a complete custom rewrite mandatory.
+
+The [unchanged Xiph ESP32 evaluation](../tests/results/vorbis-xiph-20261025/CHECKPOINT.md)
+now completes all 31 original cases, 434 audio packets and 738560 PCM bytes.
+Every signed16 sample is bit-identical to the retained Xiph reference, and all
+14 original relations pass at the unchanged bound2 (observed maximum0).
+Only IDF build/type configuration and the public raw fixture were adapted;
+upstream C/header arithmetic remains byte-identical to the pinned releases.
+This finite gate is complete. Continue with allocation-failure recovery,
+large-book scratch/stack bounds, remaining format/range coverage and production
+integration gates. Unchecked realloc and entry-sized stack scratch are concrete
+open source-review findings. Neither the isolated QEMU resource observations
+nor this corpus qualifies physical performance or universal standard coverage.
+Do not resume custom IMDCT/synthesis merely because the earlier repair failed.
 
 Full floor0 correctness requires a precision and range design for the complete
 synthesis path. The public low-memory implementation stores Q4 amplitude and
