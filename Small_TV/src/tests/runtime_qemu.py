@@ -20,6 +20,8 @@ from urllib.parse import urlsplit
 from runtime_memory import MemorySnapshot, native_layout
 from runtime_state import GuestMicroseconds, RuntimeJournal
 from runtime_weather import WeatherSnapshot
+from runtime_failure_capture import FailureCapture
+from runtime_failure_layout import failure_layout
 
 
 def main():
@@ -75,6 +77,7 @@ def main():
     app = root / 'firmware/development/small-tv-esp32c2-reconstructed/app.bin'
     profile = root / 'Small_TV/qemu/profiles/small-tv-c2.json'
     layout = native_layout(elf)
+    photo_failure_layout = failure_layout(elf)
     weather_layout = weather.native_layout()
     weather_objects = object_symbols(elf.read_bytes(), ('cached_weather', 'request_state'))
     rom = deps / '.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
@@ -83,7 +86,9 @@ def main():
         raise ValueError('Archived app and inspected ELF do not match')
     files = [Path(__file__), Path(__file__).with_name('runtime_memory.py'),
              Path(__file__).with_name('runtime_heap_rom.py'), Path(__file__).with_name('runtime_state.py'),
-             Path(__file__).with_name('runtime_weather.py'), elf, app, profile, rom,
+             Path(__file__).with_name('runtime_weather.py'),
+             Path(__file__).with_name('runtime_failure_capture.py'),
+             Path(__file__).with_name('runtime_failure_layout.py'), elf, app, profile, rom,
              root / 'Small_TV/qemu/parity/compare.py',
              root / 'Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg']
     files += [root / 'Small_TV/src/tests' / name for name in ('gdb_observer.py', 'weather_qemu.py', 'time_qemu.py')]
@@ -154,7 +159,10 @@ def main():
         symbols = {name: row['address'] for name, row in layout['symbols'].items()}
         if layout['symbols']['connected']['size'] != 1:
             raise ValueError('Expected a one-byte atomic station connection flag')
-        with vm.QMP(session['qmp_port'], session['name']) as qmp:
+        # FIXED_TEST: the right-hand context saves failures before QMP __exit__
+        # and before the outer finally closes RSP/the owned VM.
+        with vm.QMP(session['qmp_port'], session['name']) as qmp, \
+                FailureCapture(observer, qmp, layout, photo_failure_layout, args.output, result, session) as failure:
             def guest_seconds():
                 """Unwrap the radio's low 32 bits without changing guest clock state."""
                 raw = int.from_bytes(weather.read_bytes(qmp, 0x6004d000, 4), 'little')
@@ -171,6 +179,7 @@ def main():
 
             def capture(label):
                 """Pause at an SDK entry where allocator/state-list edits are complete."""
+                failure.operation = {'kind': 'snapshot', 'label': label}
                 observer.interrupt()
                 try:
                     address = symbols['vTaskDelay']
@@ -196,6 +205,7 @@ def main():
 
             def request(path, payload=None, content_type='application/json'):
                 """Record only method/path/status/timing, never HTTP contents."""
+                failure.operation = {'kind': 'http', 'path': path}
                 started = guest_seconds()
                 if isinstance(payload, bytes):
                     endpoint = urlsplit(url)
@@ -239,6 +249,7 @@ def main():
                     request('/setclocktype', {'clocktype': cycle % 4})
                     request('/setgifvalue', {'gif': cycle % 5})
                     request('/updateCity', {'city': ['Shenzhen,CN', 'Fixture,CN'][cycle % 2]})
+                    failure.operation = {'kind': 'concurrent-http', 'paths': ['/getsettings', '/get_checkbox_state']}
                     # Two clients are real concurrent network requests; their results
                     # are recorded outside this worker pool to keep QMP framing serial.
                     started = guest_seconds()
@@ -256,6 +267,7 @@ def main():
                     if cycle % 4 == 2:
                         upload_photo()
                     if args.outage_every and (cycle + 1) % args.outage_every == 0:
+                        failure.operation = {'kind': 'station-outage', 'cycle': cycle}
                         def station_connected():
                             """Read the guest's actual atomic flag, independent of UART verbosity."""
                             value = weather.read_bytes(qmp, symbols['connected'], 1)[0]
@@ -286,6 +298,7 @@ def main():
                             'guest_reconnected': reconnected})
                         if not ap_online or not disconnected or not reconnected:
                             raise AssertionError('No real guest disconnect/reconnect observed')
+                    failure.operation = {'kind': 'guest-interval', 'cycle': cycle}
                     target = guest_seconds() + args.interval_seconds
                     if until is not None:
                         target = min(target, until)

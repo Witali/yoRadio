@@ -445,8 +445,12 @@ outages/352HTTP и terminalguards. Новый H10 от 25Oct11:23UTC запра�
 9040.980895 наблюдённых секунд и timeout на `/start_upload`. Supervisor terminal
 failed, workload exit 1; исходные владельцы завершились. Архив и replay:
 [RUNTIME_MAIN_FAILURE.md](tests/RUNTIME_MAIN_FAILURE.md). Сохранены 535 Windows
-WSAEventSelect warnings, причина timeout пока неизвестна. До нового H10 добавить
-bounded pre-cleanup failure-state capture и воспроизвести ошибку в отдельной ВМ.
+WSAEventSelect warnings, причина timeout пока неизвестна. Bounded pre-cleanup
+failure-state capture реализован: [RUNTIME_FAILURE_CAPTURE.md](tests/RUNTIME_FAILURE_CAPTURE.md),
+20 host tests, actual QEMU ordering/identity/read-only probe и 11 rejection controls
+pass. Файл сохранён до stop, 96 reads / 2230 bytes / 0,047 host seconds.
+Это намеренная host failure после настоящего HTTP 200; исходный timeout ещё нужно
+воспроизвести в отдельной длительной ВМ с этим observer.
 H10, retained-loss investigation и весь прежний scope остаются открытыми.
 Для разбора retained loss добавлен отдельный opt-in metadata observer:
 [HEAP_TOPOLOGY.md](tests/HEAP_TOPOLOGY.md). Exact ROM/linked TLSF replay, 11+8
@@ -459,7 +463,8 @@ H10, retained-loss investigation и весь прежний scope остаютс
 [RUNTIME_CLEANUP.md](tests/RUNTIME_CLEANUP.md), 13 actual Windows cases,
 10 прежних supervisor cases, реальная QEMU filesystem fault и replay закрытой
 H10 session прошли. Diagnostic identity error не отменяет попытку helper.
-Pre-cleanup failure-state capture и причина HTTP timeout ещё открыты.
+Pre-cleanup failure-state capture проверен отдельно; обычный успешный runtime
+нового observer и причина исторического HTTP timeout ещё требуют проверки.
 Сохранённый failed H10 и его pinned inputs не изменять.
 TCP [gate и attribution](tests/TCP_HEAP_ATTRIBUTION.md) готовы: native selected
 fields, exact live allocations, PCB/segment/pbuf chains и shared accounting,

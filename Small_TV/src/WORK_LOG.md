@@ -5038,3 +5038,33 @@ findings не объясняются этим invalid-ID исправление�
   historical runtime replay to use d7dccb92f source revision; actual replay passed
   after cleanup source changes. No firmware, SDK, frozen helper or live matched
   control input changed. Failure-state capture and timeout cause remain open.
+
+## 2026-10-25 — preserve bounded failure state before cleanup
+
+- Added failure capture inside the existing QMP context so actual typed state is
+  saved before closing QMP/RSP/the owned VM. Initial HTTP exception is preserved
+  even if diagnostic transport, bounds or output fail. No normal-path extra stop.
+- Kept type conversion in a separate native-DWARF module: compilation-unit scoped
+  photo globals, nested queue offsets, scalar sizes and signedness. No old-ELF
+  offsets or relaxation of the TCP synchronization allowlist.
+- Added a shared RSP deadline and bounded existing-QMP stream. Caps: five seconds,
+  192 memory requests, 32768 requested bytes, per-read SRAM bounds, 64-KiB artifact
+  and 16-KiB serialized usernet component. Record PC/SP/RA and typed counters,
+  task metadata, queue/mutex owners; no raw stack, allocator or HTTP payload.
+- First localhost socketpair test blocked during Windows fixture setup. Inspected
+  original Python processes/TCP state, stopped only verified PID45000 with held
+  handle/creation identity, and polled its original exec to terminal. Replaced
+  setup with explicit bounded IPv4 connect/accept, then ran normally authorized
+  local-network tests. No production VM or live long-run input was touched.
+- 10 real-socket RSP deadline tests and 10 diagnostic failure/file/budget tests
+  passed, including partial replies/events, oversized metadata and original-error
+  preservation. Read request and byte limits stop before issuing the next read.
+- Final real C912/main9135 run injected a host timeout only after actual guest
+  /start_upload HTTP200. Snapshot existed before stop with matching final SHA;
+  original exception and kernel process identity preserved. Capture complete in
+  0.047 s / 96 requests / 2230 bytes. No test fallback cleanup needed. This is a
+  diagnostic-path test, not the historical timeout's cause or H10 acceptance.
+- Archived31 payload references/22 source pins,17 new gzip/37969 bytes, reused
+  unchanged blobs and moved an unreferenced reader prototype to ignored build.
+  Actual reader replay recomputed journal, UART and exact ELF layout;11 rejection
+  controls passed. Normal-path preflight and an owned long diagnostic run follow.

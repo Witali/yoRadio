@@ -71,5 +71,6 @@ python -B -X utf8 Small_TV/src/tests/runtime_supervisor_qemu_test.py `
 
 Каждая команда требует нового output directory. Использовать указанный в рабочих
 заметках Python/PowerShell runtime и не заменять pinned executables живых controls.
-Следующий этап — bounded failure-state capture до cleanup и воспроизведение
-HTTP-таймаута. Этот механизм ещё не реализован данным изменением.
+Следующий этап реализован отдельно:
+[bounded failure-state capture](RUNTIME_FAILURE_CAPTURE.md) сохраняет наблюдения
+до cleanup. Воспроизведение и причина исходного HTTP-таймаута ещё открыты.

@@ -4045,3 +4045,52 @@ metadata-control owner identities still match. Main/V8 have 357/352 cycles,
 running guards, one ROM boot each, no guard errors. No cleanup-test processes
 remain. Saved ignored remaining-controls-after-cleanup-20261025.json. These are
 pending prefixes, not 8-hour or H10 acceptance.
+
+## CURRENT 2026-10-25 — bounded failure capture implemented and native-tested
+
+Active tree/branch remains small-tv-timer-bounds, last prior commit 6da615e3c.
+This goal turn is PROGRESS. Firmware remains C91294FC / 9E4EC88D, source 04B19378;
+no firmware rebuild, SDK/frozen-helper change or physical device operation.
+User asked what remains: answered with H10/retained memory, actual JPEG I/O and
+power faults/CODEC-REPRO, remaining whole-image/ID11 paths, final independent
+network/display/full regression, and hardware H01-H09. Broad scope stays active.
+
+Added runtime_failure_capture + separate DWARF layout module. Context captures
+before existing QMP __exit__ and outer RSP/VM cleanup. Actual arbitrary-PC stop,
+no advance to SDK entry, no guest writes/calls. Read CPU PC/SP/RA, heap/task
+metadata, upload/worker flags and queue/mutex counters/owners only, never payload
+or used stack bytes. Partial components remain explicitly diagnostic, not quiet
+TCP/allocator qualification. TCP topology allowlist for the new ELF unchanged.
+
+RSP has a shared deadline; QMP uses the existing bounded stream. Five seconds,
+192 requests, 32768 requested SRAM bytes, 4096 per read, metadata file 64 KiB.
+Usernet serialized component <=16 KiB so a large connection inventory cannot
+crowd out CPU/photo data. Normal context exit performs no diagnostic I/O.
+
+Final native test .build/runtime-failure-capture-qemu-v2-20261025 completed:
+intentional host TimeoutError after real /start_upload HTTP200, original error
+object preserved. File SHA observed before actual stop, original kernel VM
+object exited, no fallback cleanup. Complete snapshot 0.047000 seconds,
+96 requests / 2230 bytes, errors empty. Two prior cycles/four pending events;
+this is NOT a reproduction or explanation of the historical H10 timeout.
+Earlier first native probe passed at 0.016 s; final adds usernet size protection.
+
+10 deadline +10 capture/error/budget tests pass. First socketpair fixture hung
+during Windows local setup; inspected real processes and TCP bound/listen state,
+stopped only the verified own Python PID45000/creation16:15:43.253067UTC, then
+confirmed the same exec session ended. Replaced that unbounded startup with
+explicit bounded IPv4 connect/accept and used the normal approved local-network
+execution context. No live QEMU was restarted from an observation timeout.
+
+Proof runtime-failure-capture-validation-20261025.json: 31 references,22 source
+pins,17 new gzip/37969 bytes. Actual consumer replay recomputes journal/UART/
+native DWARF and rejects11 controls. An unused reader prototype blob was moved
+into ignored .build after confirming no JSON proof referenced it. All unit,
+native and archive replay sessions are terminal; none needs more polling.
+
+NEXT: commit the complete feature, then ONE ordinary schema5 preflight4 using
+the committed producer and one separate diagnostic duration86400/interval15/
+outage60 run with genuine cycle-zero and four original owner observations.
+Do not overwrite failed H10 or protected old controls; their durations never
+combine. Current tree must stay frozen once a new diagnostic run uses it.
+Independent CODEC-REPRO/new source changes then need another task worktree.
