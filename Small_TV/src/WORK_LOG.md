@@ -4835,3 +4835,36 @@ controls отвергаются. Описание и команды в tests/TCP
 Старые 7 retained-loss flags не объяснены, пороги не ослаблены. Дальше полные
 controls и unclassified deltas, реальные queued buffers, cleanup закрытой ВМ,
 whole-image/full suite/24h/physical gates. Весь исходный scope и goal активны.
+
+## 2026-10-25 — selected PM/timer gaps сверены в обе стороны
+
+После e572291ef продолжен whole-image пункт, без изменения pinned producers.
+В libpp.a/pp_timer.o relocation pm_coex_slice_timeout_process указала на
+pp_timer_coex_slice. Полные factory bytes уточнили caller4207b120: это call
+в wrapper4207b11a..4207b12c. При пробе обнаружилась важная неоднозначность:
+такой же shape matcher принимает соседний wrapper4207b108 с другим callee.
+Новый match_factory_timers требует реальные callee/shared state anchors,
+включая scoped object-local .LANCHOR0; одним совпадением fixed bits не ограничен.
+
+Четыре тела4207581e..42075896 определены как pm_dream_timeout_process,
+pm_sleep_delay_timeout_process, pm_disconnected_sleep_delay_timeout_process и
+pm_coex_restart_timeout_process. Вместе с пятью timer wrappers: 238 SDK bytes,
+210 linked factory bytes, 4 local branches. Предыдущие три SDK anchors заново
+проверяются по тем же immutable libraries, исходные/установленные SDK не меняются.
+
+Новый reverse/native_timer_match проверил эти же девять моделей на native
+ELF76B5CE37: полные тела, реальные ELF callee/global names и shared local state
+совпали после permitted relocation/relaxation. Разница sleep-delay32/28 bytes —
+разрешённое call relaxation. Transitive SDK implementations не приравниваются.
+Восемь factory и две native подмены отвергнуты, включая настоящего соседнего
+двойника и изменённое return value. Артефакты — два gzip / 6438 bytes; источники,
+точные replay-команды и ограничения в reference/SDK_TIMER_GAPS.md.
+
+Persistent Ghidra DB и firmware не изменены. Уточнены имена/границы выбранных
+SDK gaps; callback registration, достижимость, другие whole-image gaps,
+retained loss/длительные runs и final/hardware scope остаются открытыми.
+
+На 14:24:02 UTC повторно сверены все 12 исходных PID/name/creationUTC. Основной
+H10 —454 complete cycles, metadata main/V8 —105/100. Все supervisor/guards
+running, по одному ROM boot, UART errors пусты. Запись owners-after-static-checks
+в ignored tcp-trend-analysis-20261025; это liveness/prefix, не итог qualification.

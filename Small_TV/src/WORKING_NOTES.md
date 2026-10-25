@@ -3838,3 +3838,29 @@ Producer fixes need another task worktree. Remaining: full matched controls,
 old7loss flags12..220B, real queued guest buffers, already-dead VM cleanup,
 whole-image caller4207b120/undefined7581e..75896, final full suite and physical
 gates. No goal completion, no physical reset/flash and no automatic OTA addition.
+
+## CURRENT 2026-10-25 — selected timer gaps identified in factory and native
+
+After e572291ef, added separate match_factory_timers and reverse/native_timer_match.
+Actual call4207b120 belongs to pp_timer_coex_slice4207b11a..4207b12c.
+Four PM bodies4207581e..42075896 now matched by complete SDK models, plus five
+timer wrappers:9 bodies/238SDKbytes/210factorybytes/4localbranches. All9 native
+counterparts also matched the same full models and real ELF symbol targets.
+The32/28byte sleep-delay difference is permitted call relaxation, not omitted code.
+
+IMPORTANT: the shape matcher alone accepts a REAL neighboring timer wrapper.
+Require bound callee/global anchors, and local anchors scoped to object/section.
+Eight factory and two native controls rejected. See reference/SDK_TIMER_GAPS.md;
+two small evidence gzip files under parity/factory-timers-20261025 total6438bytes.
+No ELF/SDK/project/VM/producer modifications. Existing PM coexistence callees
+can differ across SDKs; no transitive/whole-image semantic equivalence claimed.
+
+Remaining immediate whole-image step: transient Ghidra metadata recovery for
+these bodies, timer dispatch callback registration/reachability, then other gaps.
+Main H10 and matched schema7 controls continue protected; old memory findings,
+cleanup fix, final suite and physical gates remain open. Keep full goal active.
+
+Latest authoritative CIM recheck25Oct14:24:02UTC: all12original identities match;
+mainH10=454cycles, schema7main/V8=105/100. All supervisors/guards running,
+oneROMboot/noUARTerrors each. Saved ignored owners-after-static-checks.json.
+No terminal result yet, and no durations are combined.

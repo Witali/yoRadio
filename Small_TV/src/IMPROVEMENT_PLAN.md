@@ -386,6 +386,11 @@ gapsпусты; firmware bytes и10файлов обоихпроектов не�
 См. [SDK_GAP_RECOVERY.md](reference/SDK_GAP_RECOVERY.md). Этот selected gap закрыт;
 caller4207b120/другие undefined functions, SDK/application boundary иполная
 достижимость остаютсяоткрытыми. Равенство разныхверсийSDK не заявлено.
+25Oct: [SDK_TIMER_GAPS.md](reference/SDK_TIMER_GAPS.md) закрывает selected
+идентификацию caller4207b120 как pp_timer_coex_slice и четырёх функций
+4207581e..42075896. Девять полных SDK тел проверены и в factory, и в native ELF;
+10 отрицательных controls pass. Регистрация/достижимость callback dispatch,
+transient Ghidra metadata recovery и остальные whole-image gaps остаются открытыми.
 
 ## 6. Приёмка окончательной версии и правила работы
 
