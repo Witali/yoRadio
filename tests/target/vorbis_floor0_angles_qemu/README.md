@@ -41,3 +41,5 @@ The test alone adds `-fstack-usage` to the frozen component and retains `.su`
 compiler frame estimates. These exclude callee/libm stacks, task high-water
 measurements and physical performance. Production code/configuration and the
 previous numeric fixtures/archives remain unchanged by this new test project.
+
+The launcher also snapshots optional `residue.c` and `include/native_vorbis_residue.h` when present, so a future run can compile the current six-source component. This adds dependency closure only; this fixture retains its documented capture scope, and historical receipts describe their frozen sources.

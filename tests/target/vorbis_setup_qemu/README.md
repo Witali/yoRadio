@@ -40,3 +40,5 @@ Only the fixture adds `-fstack-usage` to all four compilation units. Retained
 `.su` files estimate compiler frames, excluding callees/libm, task high-water
 and physical performance. No full decoder, PCM, radio or device qualification
 follows from these finite parser/descriptor checks.
+
+The launcher also snapshots optional `residue.c` and `include/native_vorbis_residue.h` when present, so a future run can compile the current six-source component. This adds dependency closure only; this fixture retains its documented capture scope, and historical receipts describe their frozen sources.

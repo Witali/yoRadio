@@ -228,8 +228,10 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   также реализованы: 300 host-сценариев, 60 API controls и 400 native сравнений,
   включая все таблицы и getters, проходят. Исходные raw headers отдельно
   проверены на host, прежние PCM этим не переквалифицированы.
-  Широкий путь по-прежнему требует полного floor/residue audio packet parsing,
-  residue/coupling, IMDCT/overlap и public raw integration; компонент
+  [Floor0/floor1 packets](../tests/results/vorbis-floor-packet-20261025/CHECKPOINT.md)
+  и [точные residue0/1/2 с inverse coupling](../tests/results/vorbis-residue-20261025/CHECKPOINT.md)
+  также реализованы и проверены как отдельные компоненты. Широкий путь требует
+  сборки полного frame decoder, умножения floor, IMDCT/overlap и public raw integration; компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
@@ -1500,3 +1502,21 @@ Stream остаётся на core0, decode/output на core1 с прежними
   умножение spectrum, IMDCT/overlap, production/raw integration и полный PCM;
   full31 NONPASS/G6/G8, zero-domain curve, deferred scopes и physical acceptance
   не переобъявлены закрытыми.
+
+- 2026-10-25, CYD-C3-14: [точные residue0/1/2 и inverse coupling](../tests/results/vorbis-residue-20261025/CHECKPOINT.md)
+  реализованы по [проекту и первичным источникам](VORBIS_RESIDUE_DESIGN.md).
+  [Три API](../idf/components/native_vorbis_numeric/include/native_vorbis_residue.h)
+  измеряют общий dyadic grid по mapped books, декодируют все submaps и сохраняют
+  точный знак после cancellation. Нормативные classword modulo, нулевые cascades,
+  unaligned type2 и per-word residue0 EOP не заменены упрощениями reference.
+  Caller storage имеет динамические 0..34 uint32 limbs/sample и byte scratch;
+  capacity проверяется до чтения/записи, INVALID сохраняет cursor/output/state.
+  ASan/UBSan проходят 10980 rows/37 controls и 7143388 точных limb сравнений;
+  полный host VQ word65535, восемь passes, channel255/coupling256 и signed границы
+  включены. Оба SDK/QEMU: по200 cases/37 controls/1353 events/9 commands,
+  warnings0; отдельный oracle принимает все400 native и57120 limb значений.
+  Новые собственные frames максимум800/768B не включают callee/task high-water.
+  Clang всех шести units проходит обе цели без новых warnings; семь protocol
+  suites проходят. Сохраняются stream core0/decode-output core1 на CYD и core0 C3.
+  Frame orchestration, floor multiplication, IMDCT/overlap, raw/production
+  integration, исходный full31 PCM/G6/G8 и physical acceptance остаются.

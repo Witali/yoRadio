@@ -73,9 +73,12 @@ sum. This preserves small terms and cancellation across the packed exponent
 range. The [owned codebook layer](VORBIS_CODEBOOK_DESIGN.md) now parses complete
 descriptors, decodes their audio words and feeds exact VQ/LSP reconstruction.
 The [complete setup graph and audio prefix](VORBIS_SETUP_DESIGN.md) now retain
-all descriptors and select packet modes/windows. Floor/residue audio handling
-and synthesis are still required before this layer can replace a production
-decoder. Raw zero-valued floor0 metadata is retained by setup; active arithmetic
+all descriptors and select packet modes/windows. The
+[floor-packet layer](VORBIS_FLOOR_PACKET_DESIGN.md) and
+[exact residue/coupling layer](VORBIS_RESIDUE_DESIGN.md) now decode those audio
+portions separately. They still require frame orchestration, floor application
+and synthesis before replacing a production decoder.
+Raw zero-valued floor0 metadata is retained by setup; active arithmetic
 for those domains remains an explicit subsequent requirement.
 
 ## Required continuation through public raw operations
@@ -89,10 +92,11 @@ packets between implementations would leave incompatible overlap histories.
 
 The remaining implementation must:
 
-- Extend the completed setup/codebook/quantization/LSP layers through full
-  floor/residue audio parsing, retaining amplitude metadata, partial final
-  vectors and the specified nominal floor/residue EOP behavior.
-- Decode residue and inverse coupling without a premature int32/Q8 narrowing.
+- Compose the existing prefix/floor/residue/coupling components into a frame
+  decoder, retaining amplitude metadata, partial final vectors and the distinct
+  nominal floor/residue EOP behavior across channels and submaps.
+- Connect the exact shared-grid residue/coupling output to floor application
+  without premature int32/Q8 narrowing or cancellation loss.
 - Feed the original-angle floor APIs without narrowing setup/dequantized LSPs,
   preserving range through floor multiplication, IMDCT and overlap.
 - Convert and clip only at the requested final PCM boundary.

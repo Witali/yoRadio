@@ -32,3 +32,5 @@ qualification follows from a passing arithmetic subset.
 The fixture adds `-fstack-usage` only to its frozen numerical component and
 retains the compiler `.su` file. These per-function frame estimates exclude
 callee/libm stacks, task high-water measurements and physical performance.
+
+The launcher also snapshots optional `residue.c` and `include/native_vorbis_residue.h` when present, so a future run can compile the current six-source component. This adds dependency closure only; this fixture retains its documented capture scope, and historical receipts describe their frozen sources.

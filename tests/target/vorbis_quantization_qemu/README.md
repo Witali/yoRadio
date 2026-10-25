@@ -37,3 +37,5 @@ There is no synthesis, PCM, radio, real-time or physical qualification here.
 The fixture alone adds `-fstack-usage` to both component compilation units.
 Retained `.su` files are compiler per-function frame estimates, excluding
 callee/libm stacks, task high-water measurements and physical performance.
+
+The launcher also snapshots optional `residue.c` and `include/native_vorbis_residue.h` when present, so a future run can compile the current six-source component. This adds dependency closure only; this fixture retains its documented capture scope, and historical receipts describe their frozen sources.

@@ -655,3 +655,29 @@ residue packets, wide coupling/floor multiplication/IMDCT/overlap, final PCM,
 header ordering/comments and raw lifecycle/integration remain. Active zero-
 floor0 curve domains and original full31 PCM/G6/G8 require separate work;
 production registration and all explicitly deferred items remain unchanged.
+
+## Owned floor and residue packet layers, 2026-10-25
+
+The [floor-packet checkpoint](../tests/results/vorbis-floor-packet-20261025/CHECKPOINT.md)
+now covers floor0 amplitude/exact affine LSPs, floor1 raw/reconstructed Y,
+integer curve indices and their separate EOP behavior. The subsequent
+[residue checkpoint](../tests/results/vorbis-residue-20261025/CHECKPOINT.md)
+adds [three public APIs](../idf/components/native_vorbis_numeric/include/native_vorbis_residue.h)
+and [owned implementation](../idf/components/native_vorbis_numeric/residue.c)
+for mapping-wide residue0/1/2 and exact inverse coupling.
+
+The [residue design](VORBIS_RESIDUE_DESIGN.md) records the common dyadic grid,
+conservative dynamic width, normative packet ordering and differences from
+public-reference shortcuts. ASan/UBSan passes 10,980 rows and 37 controls;
+independent Fraction arithmetic accepts 7,143,388 limb values before/after
+coupling. Both SDK/QEMU captures pass 200 originals, 37 controls and 1,353
+events with zero build warnings, followed by separate exact comparison of all
+400 native cases. Compiler frames and isolated workspace measurements are
+distinct from task high-water and physical throughput.
+
+These components preserve exact residue cancellation and signs through
+coupling. They still need frame orchestration, floor multiplication,
+IMDCT/overlap, final PCM conversion and public raw lifecycle integration.
+The original complete31 PCM NONPASS and G6/G8 gates remain open; no production
+registration, task affinity, audio/display configuration or deferred scope is
+changed by these component checkpoints.

@@ -50,3 +50,5 @@ task high-water and physical timing. Chunked captures preserve conditional
 UNUSED/error/raw-helper records. `CHECKED_FLOOR_PACKET_CAPTURED` means capture
 only; the separate oracle comparison must qualify exact packet/index results.
 Full decoder/PCM/device qualification does not follow from these finite tests.
+
+The launcher also snapshots optional `residue.c` and `include/native_vorbis_residue.h` when present, so a future run can compile the current six-source component. This adds dependency closure only; this fixture retains its documented capture scope, and historical receipts describe their frozen sources.

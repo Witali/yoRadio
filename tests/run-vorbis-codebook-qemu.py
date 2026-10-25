@@ -20,7 +20,7 @@ COMPONENT = ROOT/'idf/components/native_vorbis_numeric'
 PARTS = {'source':'floor0.c','header':'include/native_vorbis_floor0.h','quant-source':'quant.c',
          'quant-header':'include/native_vorbis_quant.h','codebook-source':'codebook.c',
          'codebook-header':'include/native_vorbis_codebook.h','component':'CMakeLists.txt'}
-DEPENDENCIES = ('setup.c', 'include/native_vorbis_setup.h', 'floor_packet.c', 'include/native_vorbis_floor_packet.h')
+DEPENDENCIES = ('setup.c', 'include/native_vorbis_setup.h', 'floor_packet.c', 'include/native_vorbis_floor_packet.h', 'residue.c', 'include/native_vorbis_residue.h')
 SDK_HEAD = {'esp32':'7101770dc6db2667b3c477cc31365dd1acd6db4e',
             'esp32c3':'9a97f6c54ec638111ce55cd36581b3c192f15207'}
 OPS = {'decode':1,'vector':2,'floor':3}
