@@ -430,6 +430,16 @@ Keep-alive checkpoint25Oct: [WIFI_KEEP_ALIVE.md](tests/WIFI_KEEP_ALIVE.md) св�
 timestamp/rearm. Нулевой/удалённый station object и поле820 требуют дальнейшего
 lifetime/reachability анализа. TIM/start/stop и остальные null/failure branches
 ещё не исполнялись полностью; negotiated BSS ranges/overflow и RF остаются открытыми.
+PM lifecycle checkpoint25Oct: [WIFI_PM_LIFECYCLE.md](tests/WIFI_PM_LIFECYCLE.md)
+добавляет5224 исполнения полных start/stop и малых cancellation helpers. Все628
+instruction starts двух fixtures посещены; реальные SDK active-cancel и ROM
+sleep-delay trampoline/body исполнены. Повторные start/stop и8 сохранённых
+цепочек проверены. Прямой disarm492 есть в factory stop и отсутствует в native
+при явных platform stubs; это ещё не доказательство полной runtime-ошибки.
+Далее наблюдать настоящий g_pm_ptr и backend timer при естественном разрыве STA,
+квалифицировать layout перед чтением alarm; не вызывать отсутствующий linked API.
+TIM, null-failure, lifetime, negotiated ranges/overflow и прочие whole-image gaps
+сохраняются. Пункты1–3 по-прежнему отложены по приоритету пользователя.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

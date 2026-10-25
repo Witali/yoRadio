@@ -4294,3 +4294,61 @@ null-failure branches, station object+820 lifetime; trace setter callers and
 negotiated BSS period bounds before deciding overflow fixes. Then remaining
 whole-image computed aliases/functions/SDK-application boundaries. Independent
 network/display/final/H10/hardware and deferred1–3 stay open. Broad goal ACTIVE.
+
+## CURRENT 2026-10-25 — full start/stop bodies tested; cancellation question retained
+
+Previous turn PROGRESS:7a9b2f830. Continue factory item4 first. Active worktree
+small-tv-factory-audit, firmwareC912/ELF9E4E unchanged, no SDK/QEMU/physical change
+or new VM. New source modules separate static qualification, reference model,
+private instruction probe, case matrix and archive consumer by purpose.
+
+5224 executions pass:1440start+1152stop perimage,40retained-state invocations in
+8 chains(start,start,stop,stop,start). All319old/309new instruction starts visited
+across main bodies/selected SDK helpers/shared ROM helper. Full PM/configuration
+bytes and direct writes/global writes/call order/log numeric arguments match
+independent models. Read-only callback data, saved registers/stack and caller-
+saved poison verified. Cases include optional beacon callbacks, all local branch
+choices, integer narrowing/shift wrap and 32/64-bit clock boundaries.
+
+New qualifier reuses exact prior bodies and adds active-cancel22B perSDK and
+factorymaxidle-cancel22B. Active object is PM+200, not guessed220. The actual
+ROM4Bentry40001b74→40043cae/30B executes: clearbyte440,disarm260. Synthetic
+g_pm_ptr at3fcdfd7c explicitly bound to corresponding private PM object; actual
+guest binding still open. Existing external platform calls remain declared
+stubs; complete transitive platform or RF effects are NOT claimed.
+
+First fixture needed missing numeric word reader; added locally. Then actual
+callback incominga5 was its JALR target, not original argument5 (already saved
+in s4). Corrected model from actual instruction order; this is no firmware bug.
+Final v3/final producers terminal0, earlier v1/v2 terminal1 fixture/model issues.
+Proof factory-pm-lifecycle-validation-20261025.json pins15 sources,39281byte gzip.
+Consumer recomputed all5224 cases and rejected5evidence controls;5staticcontrols
+also pass. No need to rerun absent a new source change or unresolved concern.
+
+Direct stop disarm sequence with declared platform boundaries:
+factory260/200/180/492, native260/200/180. Configenable52 cleared in both; native
+has no direct keep-alive disable call in this body. Need real runtime ownership/
+cancel evidence before any vendor patch. Inspected shared ROMconnectionless
+body40045d68/374B behind40001f70: directly disarms316/336, conditional ROM-table
+calls still external here. Native ELF's entry symbol size388 is not actual ROM
+body extent. pm_disable_sleep_delay uses actual ROM g_pm_ptr rather than ELF
+g_pm address; don't equate a synthetic pointer assignment with runtime proof.
+
+Runtime follow-up preparation: native SDK esp_timer struct has alarmu64 at0 and
+timer_armed returnsalarm>0; must derive actual ELF/DWARF layout before backend
+metadata reads. Linked esp_timer_is_active/timer_armed symbols were absent in
+current ELF; do NOT invent/call those guest APIs. Factory needs independent
+layout qualification. Natural QEMU station loss with read-only metadata is
+next, using new owned VM copies and pinned helper/QEMU, not protected runs.
+
+Latest authoritative CIM18:06:16–17UTC matches all12 original protected owners.
+Diagnostic-main177cycles; old metadata main/V8 controls617/609. All supervisor/
+guard states running, one ROM boot/no UART errors, no workload error. Ignored
+.build/factory-pm-lifecycle-20261025/long-owner-observation.json. These remain
+pending prefixes, never H10/8h acceptance, and durations must not combine.
+
+NEXT: real ROM binding/backend timer state around natural disconnect and
+reconnect, then TIM/full null-failure branches, station+820lifetime, negotiated
+BSS period validation/overflow and remaining whole-image aliases/gaps. Deferred
+1–3 and final independent network/display/full/H10/hardware gates remain open.
+Broad goal stays ACTIVE. Preserve all frozen producer/helper/QEMU inputs.

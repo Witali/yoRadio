@@ -117,3 +117,9 @@ station object/flag lifetime and negotiated BSS period validation. The observed
 changes are consistent with a refactored SDK keep-alive mechanism; this is an
 inference, not proof of full radio or clock equivalence. Whole-image aliases,
 undefined-function gaps, independent final gates and hardware remain open.
+
+Continuation: [WIFI_PM_LIFECYCLE.md](WIFI_PM_LIFECYCLE.md) now executes the full
+start/stop bodies and selected real cancellation helpers, including the ROM
+sleep-delay entry. 5224 cases cover repeated calls and retained-state restarts.
+Transitive cancellation of modern timer 492 and actual ROM binding still need
+runtime evidence; TIM and other null-completion branches remain open.
