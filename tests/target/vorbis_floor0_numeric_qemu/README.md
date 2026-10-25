@@ -8,8 +8,11 @@ core1 worker; C3 uses core0 for both. The worker has priority3/stack16384.
 Generate the bounded JSON/header corpus using the independent host oracle,
 then invoke `tests/run-vorbis-floor0-numeric-qemu.py` with explicit source,
 public-header, component-CMake, JSON/header and QEMU hashes and an explicit ROM
-directory. The controller freezes all three component files and this fixture
-before SDK configuration. Production components/configuration are not edited.
+directory. The controller freezes all three pinned component files and this
+fixture before SDK configuration. When present, `quant.c` and its public header
+are also frozen and hashed as build dependencies of the expanded component.
+This runner's API/numerical checks still cover its floor0 subset only.
+Production components/configuration are not edited.
 
 Each curve row captures the scaled denominator and logarithmic gain as exact
 IEEE binary64 mantissa bits plus signed32 exponents and the returned kind.

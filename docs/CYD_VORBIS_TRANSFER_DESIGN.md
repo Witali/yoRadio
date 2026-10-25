@@ -572,3 +572,27 @@ The new layer is outside production registration. Original setup/dequantization,
 wide residue/coupling, IMDCT/overlap, final PCM and raw integration still need
 implementation and qualification. Original full31 PCM failures remain open;
 deferred scopes and production task/audio/display configuration are unchanged.
+
+## Exact owned quantization and affine handoff, 2026-10-25
+
+The [quantization checkpoint](../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
+adds [raw quantization fields and lazy VQ/LSP reconstruction](../idf/components/native_vorbis_numeric/quant.c)
+under the [documented API](../idf/components/native_vorbis_numeric/include/native_vorbis_quant.h).
+It retains the full packed-float words, declared lookup1/2 rows and integer
+weights through sequence and the reference floor0 carry. The affine floor
+entry points preserve the exact two-term input through integer phase addition.
+The larger phase constant/grid is independently certified before numerical tests.
+
+Host 6572 cases/152 controls/79834 exact values and 92 independent floor
+comparisons pass ASan/UBSan. Each native capture finishes 200 cases/1061 events/
+152 controls/nine commands without compiler warnings; separate replay accepts
+all 400 cases, 15036 exact values and 184 floor comparisons. Maximum compiler
+own frames are floor1104/1072 and quant144/128 bytes; these do not measure
+callee/libm/task high-water or physical throughput. Both preceding host output
+streams remain byte-identical under the current arithmetic sources.
+
+The [quantization design](VORBIS_QUANTIZATION_DESIGN.md) separates the completed
+section/value APIs from complete Huffman/entropy/setup/audio parsing. Wide
+synthesis, public raw integration, full31 reference PCM/G6/G8 and physical
+acceptance remain open. Neither production component registration nor any
+deferred source is changed by this numerical/data layer.

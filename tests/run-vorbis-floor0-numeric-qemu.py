@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT/'tests/target/vorbis_floor0_numeric_qemu'
 COMPONENT = ROOT/'idf/components/native_vorbis_numeric'
 PARTS = {'source': 'floor0.c', 'header': 'include/native_vorbis_floor0.h', 'component': 'CMakeLists.txt'}
+DEPENDENCIES = ('quant.c', 'include/native_vorbis_quant.h')
 SDK_HEAD = {'esp32': '7101770dc6db2667b3c477cc31365dd1acd6db4e',
             'esp32c3': '9a97f6c54ec638111ce55cd36581b3c192f15207'}
 API = ('prepare_valid', 'prepare_in_place', 'prepare_invalid', 'denominator_invalid',
@@ -214,6 +215,8 @@ def main():
         need(run('sdk-head', [git, '-c', 'core.longpaths=true', '-C', sdk, 'rev-parse', 'HEAD']).strip() == SDK_HEAD[a.target], 'SDK revision')
         need(not run('sdk-clean', [git, '-c', 'core.longpaths=true', '-C', sdk, 'status', '--porcelain', '--untracked-files=no']).strip(), 'SDK clean')
         for name in PARTS.values(): freeze(COMPONENT/name, Path('components/native_vorbis_numeric')/name)
+        for name in DEPENDENCIES:
+            if (COMPONENT/name).is_file(): freeze(COMPONENT/name, Path('components/native_vorbis_numeric')/name)
         freeze(Path(__file__), Path('controller.py'))
         for path in sorted(PROJECT.rglob('*')):
             if path.is_file(): freeze(path, Path('project')/path.relative_to(PROJECT))

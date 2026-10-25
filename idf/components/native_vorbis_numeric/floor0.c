@@ -236,16 +236,29 @@ native_vorbis_numeric_status_t native_vorbis_floor0_gain_at_bin(
     return native_vorbis_floor0_gain_at_cosine(amplitude, coefficients, order, w, gain);
 }
 
-// Phase = (2*angle/pi) modulo 8. Keep 1152 fractional bits so even DBL_TRUE_MIN
-// retains more than 77 significant bits before conversion to a scaled sine.
-// A 2304-bit 2/pi constant also leaves >127 guard bits at DBL_MAX. No rounded
+// Phase = (2*angle/pi) modulo 8. Keep 2304 fractional bits for exact two-term packed VQ angles as well as
+// binary64 input. A 4096-bit 2/pi constant leaves >767 guard bits at DBL_MAX. No rounded
 // multiple of pi, half of a subnormal, or large floating remainder is formed.
-enum { PHASE_FRACTION_WORDS = 36, PHASE_WORDS = 37, PHASE_TABLE_WORDS = 72 };
+enum { PHASE_FRACTION_WORDS = 72, PHASE_WORDS = 73, PHASE_TABLE_WORDS = 128 };
 typedef struct { uint32_t word[PHASE_WORDS]; } floor0_phase_t;
 
-// floor((2/pi)*2^2304), least-significant limb first. Generated with Machin's
-// pi formula at 840 decimal digits; the independent tests rederive the value.
+// floor((2/pi)*2^4096), least-significant limb first. Generated with directed
+// Chudnovsky bounds at 1440 digits; exact-rational Machin checks rederive it.
 static const uint32_t floor0_two_over_pi[PHASE_TABLE_WORDS] = {
+    UINT32_C(0xa8288d61), UINT32_C(0x36d9cad2), UINT32_C(0x2645ca55), UINT32_C(0x818d67c1),
+    UINT32_C(0xcbbff4ef), UINT32_C(0x6f63a62d), UINT32_C(0x8cafbdd7), UINT32_C(0x78738a5a),
+    UINT32_C(0xa3883c61), UINT32_C(0x775c83c2), UINT32_C(0xf2a6067f), UINT32_C(0x0ab499d3),
+    UINT32_C(0x616aa428), UINT32_C(0x425faece), UINT32_C(0x10d8ddaa), UINT32_C(0x4a48d367),
+    UINT32_C(0xf2e91e43), UINT32_C(0xf57fb0ad), UINT32_C(0x48835b8e), UINT32_C(0x62128301),
+    UINT32_C(0x1834132e), UINT32_C(0x1df35be0), UINT32_C(0x50c017a7), UINT32_C(0x08cb7de0),
+    UINT32_C(0xcac616e3), UINT32_C(0x4d58e232), UINT32_C(0xd2e88628), UINT32_C(0x9bde2822),
+    UINT32_C(0xde3b5892), UINT32_C(0x5dd7de16), UINT32_C(0x366cd43f), UINT32_C(0xcdc4ef09),
+    UINT32_C(0x3260bfe6), UINT32_C(0x652289e8), UINT32_C(0xd87f7eb7), UINT32_C(0x9947fbac),
+    UINT32_C(0x1e666157), UINT32_C(0xff319f6a), UINT32_C(0xf1dfce19), UINT32_C(0x1f001b0a),
+    UINT32_C(0x23545ab9), UINT32_C(0x24778ad6), UINT32_C(0x84a7cb23), UINT32_C(0xd9d63b38),
+    UINT32_C(0x175649c0), UINT32_C(0xb07ae715), UINT32_C(0xf87c6357), UINT32_C(0x64abd770),
+    UINT32_C(0x764d2a9d), UINT32_C(0x1810a3fc), UINT32_C(0x37f63ed7), UINT32_C(0xa7b4d555),
+    UINT32_C(0x7cd2b497), UINT32_C(0x9b006233), UINT32_C(0x71e39ac6), UINT32_C(0x467d862d),
     UINT32_C(0x2c5d000c), UINT32_C(0xc4ad414d), UINT32_C(0x9d19c3c2), UINT32_C(0x15c614b5),
     UINT32_C(0x2d30433b), UINT32_C(0xfa6ed577), UINT32_C(0x7c7c246a), UINT32_C(0x87f12190),
     UINT32_C(0xcaf27f1d), UINT32_C(0x9f3a1f35), UINT32_C(0x6b1e5ef8), UINT32_C(0xc33d26ef),
@@ -311,7 +324,7 @@ static void phase_from_angle(double angle, floor0_phase_t *result) {
         }
         product[PHASE_TABLE_WORDS + j] = (uint32_t)carry;
     }
-    // Right shift is 181..2226 across the complete finite binary64 domain.
+    // Right shift is 821..2866 across the complete finite binary64 domain.
     unsigned shift = (unsigned)(32 * (PHASE_TABLE_WORDS - PHASE_FRACTION_WORDS) - power);
     size_t first = shift / 32;
     unsigned offset = shift % 32;
@@ -335,6 +348,23 @@ static void phase_from_bin(uint32_t bin, uint32_t size, floor0_phase_t *result) 
         result->word[i - 1] = (uint32_t)(numerator / size);
         remainder = (uint32_t)(numerator % size);
     }
+}
+
+static double affine_term(uint32_t packed, uint32_t multiplier) {
+    // Every integer product is <2^53, so both conversion and binary scaling
+    // are exact. Preserve the two terms separately until integer phase addition.
+    uint64_t magnitude = (uint64_t)(packed & UINT32_C(0x1fffff)) * multiplier;
+    double signed_magnitude = (double)magnitude;
+    if (packed & UINT32_C(0x80000000)) signed_magnitude = -signed_magnitude;
+    int exponent = (int)((packed >> 21) & 1023U) - 788;
+    return scalbn(signed_magnitude, exponent);
+}
+
+static void phase_from_affine(const native_vorbis_affine_t *value, floor0_phase_t *result) {
+    floor0_phase_t delta;
+    phase_from_angle(affine_term(value->minimum_bits, value->minimum_multiplier), result);
+    phase_from_angle(affine_term(value->delta_bits, value->delta_multiplier), &delta);
+    phase_combine(result, &delta, false, result);
 }
 
 static bool phase_sine_magnitude(const floor0_phase_t *phase,
@@ -374,13 +404,15 @@ static bool phase_squared_factor(const floor0_phase_t *phase,
            scaled_normalize(result->mantissa, (int64_t)result->exponent + 2, result);
 }
 
-native_vorbis_numeric_status_t native_vorbis_floor0_denominator_at_bin(
-    const double *angles, size_t order, uint32_t bin, uint32_t bark_map_size,
+static native_vorbis_numeric_status_t floor0_from_inputs(
+    const double *angles, const native_vorbis_affine_t *affine,
+    size_t order, uint32_t bin, uint32_t bark_map_size,
     native_vorbis_scaled_t *denominator) {
-    if (!angles || !denominator || !order || order > 255 || !bark_map_size ||
+    if ((!angles && !affine) || !denominator || !order || order > 255 || !bark_map_size ||
         bark_map_size > 65535 || bin >= bark_map_size) return NATIVE_VORBIS_NUMERIC_INVALID;
-    for (size_t i = 0; i < order; ++i)
-        if (!isfinite(angles[i])) return NATIVE_VORBIS_NUMERIC_INVALID;
+    if (angles)
+        for (size_t i = 0; i < order; ++i)
+            if (!isfinite(angles[i])) return NATIVE_VORBIS_NUMERIC_INVALID;
 
     floor0_phase_t bin_phase;
     phase_from_bin(bin, bark_map_size, &bin_phase);
@@ -388,7 +420,8 @@ native_vorbis_numeric_status_t native_vorbis_floor0_denominator_at_bin(
     for (size_t i = 0; i < order; ++i) {
         floor0_phase_t angle_phase, combined;
         native_vorbis_scaled_t sum_sine, difference_sine, factor;
-        phase_from_angle(angles[i], &angle_phase);
+        if (affine) phase_from_affine(&affine[i], &angle_phase);
+        else phase_from_angle(angles[i], &angle_phase);
         phase_combine(&angle_phase, &bin_phase, false, &combined);
         if (!phase_sine_magnitude(&combined, &sum_sine)) return NATIVE_VORBIS_NUMERIC_RANGE;
         phase_combine(&angle_phase, &bin_phase, true, &combined);
@@ -410,6 +443,18 @@ native_vorbis_numeric_status_t native_vorbis_floor0_denominator_at_bin(
     return NATIVE_VORBIS_NUMERIC_OK;
 }
 
+native_vorbis_numeric_status_t native_vorbis_floor0_denominator_at_bin(
+    const double *angles, size_t order, uint32_t bin, uint32_t bark_map_size,
+    native_vorbis_scaled_t *denominator) {
+    return floor0_from_inputs(angles, NULL, order, bin, bark_map_size, denominator);
+}
+
+native_vorbis_numeric_status_t native_vorbis_floor0_denominator_from_affine(
+    const native_vorbis_affine_t *angles, size_t order, uint32_t bin,
+    uint32_t bark_map_size, native_vorbis_scaled_t *denominator) {
+    return floor0_from_inputs(NULL, angles, order, bin, bark_map_size, denominator);
+}
+
 native_vorbis_numeric_status_t native_vorbis_floor0_gain_from_angles(
     const native_vorbis_floor0_amplitude_t *amplitude,
     const double *angles, size_t order, uint32_t bin, uint32_t bark_map_size,
@@ -421,6 +466,22 @@ native_vorbis_numeric_status_t native_vorbis_floor0_gain_from_angles(
         return native_vorbis_floor0_gain_from_denominator(amplitude, NULL, gain);
     native_vorbis_scaled_t denominator;
     native_vorbis_numeric_status_t status = native_vorbis_floor0_denominator_at_bin(
+        angles, order, bin, bark_map_size, &denominator);
+    if (status != NATIVE_VORBIS_NUMERIC_OK) return status;
+    return native_vorbis_floor0_gain_from_denominator(amplitude, &denominator, gain);
+}
+
+native_vorbis_numeric_status_t native_vorbis_floor0_gain_from_affine(
+    const native_vorbis_floor0_amplitude_t *amplitude,
+    const native_vorbis_affine_t *angles, size_t order, uint32_t bin,
+    uint32_t bark_map_size, native_vorbis_floor0_gain_t *gain) {
+    if (!gain || !amplitude_valid(amplitude) || !order || order > 255 ||
+        !bark_map_size || bark_map_size > 65535 || bin >= bark_map_size)
+        return NATIVE_VORBIS_NUMERIC_INVALID;
+    if (!amplitude->raw_amplitude)
+        return native_vorbis_floor0_gain_from_denominator(amplitude, NULL, gain);
+    native_vorbis_scaled_t denominator;
+    native_vorbis_numeric_status_t status = native_vorbis_floor0_denominator_from_affine(
         angles, order, bin, bark_map_size, &denominator);
     if (status != NATIVE_VORBIS_NUMERIC_OK) return status;
     return native_vorbis_floor0_gain_from_denominator(amplitude, &denominator, gain);

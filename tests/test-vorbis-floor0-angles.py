@@ -181,20 +181,27 @@ def oracle_case(case):
 
 
 def check_phase_table(source):
+    dimensions = []
+    for name in ('PHASE_FRACTION_WORDS','PHASE_WORDS','PHASE_TABLE_WORDS'):
+        values=re.findall(r'\b'+name+r'\s*=\s*(\d+)\b',source)
+        need(len(values)==1,'one literal production phase dimension')
+        dimensions.append(int(values[0]))
+    need(tuple(dimensions) in ((36,37,72),(72,73,128)),'supported production phase dimensions')
+    count=dimensions[2];table_bits=32*count;precision=840 if count==72 else 1440
     arrays=re.findall(r'static const uint32_t floor0_two_over_pi\[PHASE_TABLE_WORDS\]\s*=\s*\{(.*?)\};',source,re.S)
     need(len(arrays)==1,'one inline production phase table')
     words=[int(value,16) for value in re.findall(r'UINT32_C\(0x([0-9a-fA-F]{8})\)',arrays[0])]
-    need(len(words)==72,'all72 phase table limbs')
-    lo,hi=pi_interval(840)
-    floor,ceiling=context(840,ROUND_FLOOR),context(840,ROUND_CEILING)
-    scale=Decimal(1<<2304)
+    need(len(words)==count,'all declared phase table limbs')
+    lo,hi=pi_interval(precision)
+    floor,ceiling=context(precision,ROUND_FLOOR),context(precision,ROUND_CEILING)
+    scale=Decimal(1<<table_bits)
     lower=floor.multiply(floor.divide(Decimal(2),hi),scale)
     upper=ceiling.multiply(ceiling.divide(Decimal(2),lo),scale)
     left=int(lower.to_integral_value(rounding=ROUND_FLOOR))
     right=int(upper.to_integral_value(rounding=ROUND_FLOOR))
     need(left==right==sum(word<<(32*i) for i,word in enumerate(words)),
-         'independent directed Chudnovsky interval proves every72 phase limb')
-    return dict(limbs=72,bits=2304,independent_interval_floor_unique=True,
+         'independent directed Chudnovsky interval proves every declared phase limb')
+    return dict(limbs=count,bits=table_bits,independent_interval_floor_unique=True,
                 pi_lower=str(lo),pi_upper=str(hi),algorithm='Chudnovsky directed rational sums + integer sqrt')
 
 

@@ -1,6 +1,6 @@
-"""Exact-rational certificate for the finite-binary64 floor0 phase grid.
+"""Exact-rational certificates for the owned floor0 phase grids.
 
-This proves the 2304-bit 2/pi table and a uniform nonzero phase separation;
+This proves the source-selected 2/pi table and uniform nonzero phase separation;
 source reduction equivalence remains a separate review/runtime check. It does
 not prove libm sine accuracy or the complete floating error budget.
 No SDK, compiler, decoder or external program is used.
@@ -53,7 +53,16 @@ def pi_interval(precision_bits=3200):
 
 
 def fraction_record(value):
-    return dict(numerator=str(value.numerator), denominator=str(value.denominator))
+    # Exact interval denominators can exceed Python's decimal-string limit;
+    # format bounded chunks instead of changing the process-wide setting.
+    def decimal_integer(number):
+        sign = '-' if number < 0 else ''
+        number, chunks = abs(number), []
+        while number >= 1000000000:
+            number, remainder = divmod(number, 1000000000)
+            chunks.append(remainder)
+        return sign+str(number)+''.join(format(part, '09d') for part in reversed(chunks))
+    return dict(numerator=decimal_integer(value.numerator), denominator=decimal_integer(value.denominator))
 
 
 def cf_linear_form_certificate(pi_lower, pi_upper, bound):
@@ -89,12 +98,21 @@ def cf_linear_form_certificate(pi_lower, pi_upper, bound):
 
 def certify_source(source, precision_bits=3200):
     """Pure source-text/table certificate, never compile/import its contents."""
+    dimensions = []
+    for name in ('PHASE_FRACTION_WORDS', 'PHASE_WORDS', 'PHASE_TABLE_WORDS'):
+        values = re.findall(r'\b'+name+r'\s*=\s*(\d+)\b', source)
+        need(len(values) == 1, 'one literal C phase dimension')
+        dimensions.append(int(values[0]))
+    need(tuple(dimensions) in ((36, 37, 72), (72, 73, 128)), 'supported C phase dimensions')
+    fractional_words, phase_words, table_words = dimensions
+    table_bits, phase_bits = 32*table_words, 32*fractional_words
+    need(type(precision_bits) is int and precision_bits > 0, 'positive exact pi precision')
+    precision_bits = max(precision_bits, table_bits+900)
     lower, upper, counts = pi_interval(precision_bits)
-    table_bits, phase_bits = 2304, 1152
     scale = 1 << (table_bits+1)
     table_lower = scale*upper.denominator//upper.numerator
     table_upper = scale*lower.denominator//lower.numerator
-    need(table_lower == table_upper, 'strict interval uniquely determines floor((2/pi)*2^2304)')
+    need(table_lower == table_upper, 'strict interval uniquely determines the complete 2/pi floor')
     arrays = re.findall(r'static\s+const\s+uint32_t\s+floor0_two_over_pi\s*\[\s*PHASE_TABLE_WORDS\s*\]\s*=\s*\{(.*?)\};', source, re.S)
     need(len(arrays) == 1, 'one exact C 2/pi limb array')
     pattern = re.compile(r'UINT32_C\(\s*0x([0-9a-fA-F]{8})\s*\)')
@@ -102,10 +120,9 @@ def certify_source(source, precision_bits=3200):
     for match in pattern.finditer(arrays[0]):
         need(re.fullmatch(r'\s*' if not limbs else r'\s*,\s*', arrays[0][cursor:match.start()]), 'literal C limb separators')
         limbs.append(int(match[1], 16)); cursor = match.end()
-    need(len(limbs) == 72 and re.fullmatch(r'\s*,?\s*', arrays[0][cursor:]) and
-         sum(word << (32*i) for i, word in enumerate(limbs)) == table_lower, 'all72 exact little-endian limbs')
-    for name, value in (('PHASE_FRACTION_WORDS', 36), ('PHASE_WORDS', 37), ('PHASE_TABLE_WORDS', 72)):
-        need(re.findall(r'\b'+name+r'\s*=\s*(\d+)\b', source) == [str(value)], 'fixed C phase dimensions')
+    need(len(limbs) == table_words and re.fullmatch(r'\s*,?\s*', arrays[0][cursor:]) and
+         sum(word << (32*i) for i, word in enumerate(limbs)) == table_lower, 'all exact little-endian limbs')
+    need(phase_words == fractional_words+1, 'fractional grid and modulo-eight word')
     large = cf_linear_form_certificate(lower, upper, 1 << 1042)
     small = cf_linear_form_certificate(lower, upper, 1 << 88)
     # Let epsilon=2*phi/pi +/- 2*k/L -4*n in [-2,2] after folding,
@@ -121,8 +138,8 @@ def certify_source(source, precision_bits=3200):
     # bound is |epsilon|>2^-(17+69)*delta_small.
     global_gap_exponent = max(1075, 17+large['strict_power_two_lower_bound_exponent'],
                               86+small['strict_power_two_lower_bound_exponent'])
-    need(global_gap_exponent <= 1100, 'global nonzero phase separation insufficient for fixed1152 grid')
-    # The table truncation contributes <2^-128 FIXED units at DBL_MAX.
+    need(global_gap_exponent <= 1100, 'binary64 CF nonzero phase separation bound')
+    # Table truncation contributes <2^(1024+F-P) FIXED units at DBL_MAX.
     # Angle and rational-bin truncations each contribute <1 unit. Folding
     # is 1-Lipschitz on the phase circle, so 3 fixed units suffice.
     rho = Fraction(3, 1 << (phase_bits-global_gap_exponent))
@@ -132,19 +149,45 @@ def certify_source(source, precision_bits=3200):
     # endpoints. Their positive sum inherits the same relative bound.
     phase_only_denominator_bound = (1+rho)**512-1
     need(phase_only_denominator_bound < Fraction(1, 10**12), 'phase-only denominator budget exceeds1e-12')
-    return dict(schema='native-vorbis-floor0-phase-certificate-v1', completed=True,
+    result = dict(schema='native-vorbis-floor0-phase-certificate-v1', completed=True,
                 source_sha256=hashlib.sha256(source.encode('utf-8')).hexdigest(),
                 pi_precision_bits=precision_bits, pi_interval_strict=True, pi_series_counts=counts,
                 pi_lower=fraction_record(lower), pi_upper=fraction_record(upper),
                 table_bits=table_bits, phase_fraction_bits=phase_bits,
-                exact_2_over_pi_floor_hex=format(table_lower, '0576x'), little_endian_limb_count=72,
-                table_truncation_max_fixed_units_less_than_power_two=-128,
+                exact_2_over_pi_floor_hex=format(table_lower, '0'+str(table_bits//4)+'x'), little_endian_limb_count=table_words,
+                table_truncation_max_fixed_units_less_than_power_two=1024+phase_bits-table_bits,
                 cf_large=large, cf_small=small, full_finite_binary64_nonzero_gap_exponent=global_gap_exponent,
                 retained_nonzero_phase_significant_bits_at_least=phase_bits-global_gap_exponent,
                 phase_relative_error_upper=dict(numerator=3, power_two_denominator=phase_bits-global_gap_exponent),
                 phase_only_denominator_relative_error_less_than='1e-12',
                 compiled_reduction_qualified=False, libm_or_total_floating_error_qualified=False,
                 decoder_or_PCM_qualified=False)
+    if table_words == 128:
+        affine = cf_linear_form_certificate(lower, upper, 1 << 1095)
+        # Every packed term is sign*M*C*2^(E-788), with M<2^21,
+        # C<2^32 and 0<=E<=1023. Thus each term is exact binary64,
+        # |term|<2^288 and their exact sum phi=N*2^-788 has |phi|<2^289.
+        # For epsilon=2*phi/pi +/-2*k/L-4*n folded into[-2,2], set
+        # t=2*n*L-/+k. Then |t|<=|phi|*L/pi+L<2^304 using pi>3,L<2^16.
+        # If t!=0, Q=|t|*2^788<2^1092<2^1095 and P=sign(t)*N*L:
+        # |epsilon|=2/(pi*L*2^788)*|Q*pi-P|>2^-(805+j).
+        # If t=0 then k=n=0, so nonzero phi gives |epsilon|>2^-789.
+        # Exact phi=0/bin0 is a true zero, outside the nonzero-gap assertion.
+        affine_gap = max(789, 805+affine['strict_power_two_lower_bound_exponent'])
+        need(affine_gap < phase_bits, 'exact affine nonzero separation fits the grid')
+        # Two signed term truncations, bin truncation and both table errors
+        # (<2^-1504 each) fit four fixed units, including severe cancellation.
+        affine_rho = Fraction(4, 1 << (phase_bits-affine_gap))
+        need((1+affine_rho)**512-1 < Fraction(1, 10**12), 'affine phase-only denominator budget exceeds1e-12')
+        result.update(cf_affine=affine, full_exact_affine_nonzero_gap_exponent=affine_gap,
+                      affine_common_dyadic_unit_exponent=-788, affine_multiplier_bits=32,
+                      affine_exact_terms=2, affine_angle_absolute_upper_power_two=289,
+                      affine_table_truncation_max_fixed_units_less_than_power_two=288+phase_bits-table_bits,
+                      retained_nonzero_affine_phase_significant_bits_at_least=phase_bits-affine_gap,
+                      affine_phase_relative_error_upper=dict(numerator=4, power_two_denominator=phase_bits-affine_gap),
+                      affine_phase_only_denominator_relative_error_less_than='1e-12',
+                      compiled_affine_reduction_qualified=False)
+    return result
 
 
 def main():

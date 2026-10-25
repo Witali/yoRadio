@@ -16,6 +16,8 @@ angle host oracle. Run `tests/run-vorbis-floor0-angles-qemu.py` with explicit
 source, public-header, component-CMake, JSON/header and QEMU hashes plus the
 explicit ROM directory. The controller reads back every descriptor and angle
 bit before SDK configuration, then freezes the complete component/fixture.
+When present, `quant.c` and its public header are frozen and hashed as build
+dependencies; this runner's checks still cover its original-angle subset only.
 
 Every scientific case captures denominator/gain status, normalized binary64
 mantissa bits, signed32 exponent and gain kind. Guards surround inputs and all

@@ -1,0 +1,88 @@
+// Verbatim owned host controls; no host file/heap driver is included.
+// Source tests/native/vorbis_quantization_test.c SHA256 4e34f90c8a9cd6c212d8ae9b3e123bb80749f7ee80f44a85ef45845247ad3a42
+static const uint64_t CANARY=UINT64_C(0x71a50c389d42ef06);
+static void write_bits(uint8_t *p,uint64_t *at,uint32_t x,unsigned n) {for(unsigned i=0;i<n;i++,(*at)++)if((x>>i)&1)p[*at/8]|=(uint8_t)(1u<<(*at%8));}
+static unsigned controls(void) {
+    unsigned n=0;uint64_t required=CANARY;
+#define CHECK(call,code,object) do { unsigned char saved[sizeof(object)];memcpy(saved,&(object),sizeof(object));assert((call)==(code));assert(!memcmp(saved,&(object),sizeof(object)));n++;}while(0)
+    CHECK(native_vorbis_quantization_count(65536,1,1,&required),NATIVE_VORBIS_NUMERIC_INVALID,required);
+    CHECK(native_vorbis_quantization_count(1,0x1000000,1,&required),NATIVE_VORBIS_NUMERIC_INVALID,required);
+    CHECK(native_vorbis_quantization_count(0,1,1,&required),NATIVE_VORBIS_NUMERIC_INVALID,required);
+    CHECK(native_vorbis_quantization_count(1,1,3,&required),NATIVE_VORBIS_NUMERIC_INVALID,required);
+    assert(native_vorbis_quantization_count(65535,0xffffff,2,&required)==0 && required==UINT64_C(1099494785025));n++;
+    assert(native_vorbis_quantization_count(65535,2,1,&required)==0 && required==1);n++;
+    assert(native_vorbis_quantization_count(0,0,2,&required)==0 && required==0);n++;
+    CHECK(native_vorbis_quantization_count(1,1,1,NULL),NATIVE_VORBIS_NUMERIC_INVALID,required);
+    uint8_t packet[16]={0};uint64_t end=5;write_bits(packet,&end,2,4);write_bits(packet,&end,0x80000000,32);
+    write_bits(packet,&end,UINT32_C(0x62800001),32);write_bits(packet,&end,2,4);write_bits(packet,&end,1,1);
+    for(unsigned i=1;i<=6;i++)write_bits(packet,&end,i,3);
+    struct {uint64_t a;native_vorbis_quant_layout_t x;uint64_t z;} l;memset(&l,0xa5,sizeof(l));l.a=l.z=CANARY;
+    assert(native_vorbis_quantization_measure(packet,sizeof(packet),end,5,3,2,&l.x)==0);n++;
+    native_vorbis_quant_layout_t layout=l.x;
+    assert(layout.multiplicand_count==6 && layout.minimum_bits==0x80000000 && layout.delta_bits==UINT32_C(0x62800001));
+    for(uint64_t cut=9;cut<end;cut++)CHECK(native_vorbis_quantization_measure(packet,sizeof(packet),cut,5,3,2,&l.x),NATIVE_VORBIS_NUMERIC_TRUNCATED,l);
+    CHECK(native_vorbis_quantization_measure(packet,sizeof(packet),129,5,3,2,&l.x),NATIVE_VORBIS_NUMERIC_INVALID,l);
+    CHECK(native_vorbis_quantization_measure(NULL,sizeof(packet),end,5,3,2,&l.x),NATIVE_VORBIS_NUMERIC_INVALID,l);
+    CHECK(native_vorbis_quantization_measure(packet,sizeof(packet),end,5,3,2,NULL),NATIVE_VORBIS_NUMERIC_INVALID,l);
+    struct {uint64_t a;uint16_t x[6];uint64_t z;} s;memset(&s,0xa5,sizeof(s));s.a=s.z=CANARY;
+    struct {uint64_t a;native_vorbis_quantization_t x;uint64_t z;} b;memset(&b,0xa5,sizeof(b));b.a=b.z=CANARY;
+    unsigned char ss[sizeof(s)];memcpy(ss,&s,sizeof(s));
+    CHECK(native_vorbis_quantization_materialize(packet,sizeof(packet),end,&layout,s.x,5,&b.x),NATIVE_VORBIS_NUMERIC_CAPACITY,b);assert(!memcmp(ss,&s,sizeof(s)));
+    CHECK(native_vorbis_quantization_materialize(packet,sizeof(packet),end-1,&layout,NULL,0,&b.x),NATIVE_VORBIS_NUMERIC_TRUNCATED,b);assert(!memcmp(ss,&s,sizeof(s)));
+    native_vorbis_quant_layout_t wrong=layout;wrong.minimum_bits^=1;
+    CHECK(native_vorbis_quantization_materialize(packet,sizeof(packet),end,&wrong,s.x,6,&b.x),NATIVE_VORBIS_NUMERIC_INVALID,b);assert(!memcmp(ss,&s,sizeof(s)));
+    assert(native_vorbis_quantization_materialize(packet,sizeof(packet),end,&layout,s.x,6,&b.x)==0);n++;
+    for(unsigned i=0;i<6;i++)assert(s.x[i]==i+1);
+    native_vorbis_quantization_t book=b.x;
+    struct {uint64_t a;native_vorbis_affine_t x[255];uint64_t z;} out;memset(&out,0xa5,sizeof(out));out.a=out.z=CANARY;
+    CHECK(native_vorbis_quantization_vector(&book,2,1,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_quantization_vector(&book,0,4,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_quantization_vector(&book,0,3,out.x,2),NATIVE_VORBIS_NUMERIC_CAPACITY,out);
+    CHECK(native_vorbis_quantization_vector(&book,0,1,NULL,1),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    assert(native_vorbis_quantization_vector(&book,0,0,NULL,0)==0);n++;
+    CHECK(native_vorbis_quantization_scalar(&book,0,3,&out.x[0]),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_quantization_scalar(&book,2,0,&out.x[0]),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_quantization_scalar(&book,0,0,NULL),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_quantization_scalar(NULL,0,0,&out.x[0]),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    assert(native_vorbis_quantization_scalar(&book,0,2,&out.x[0])==0);n++;
+    uint8_t no_packet=0;native_vorbis_quant_layout_t no_layout;native_vorbis_quantization_t no_book;
+    assert(native_vorbis_quantization_count(0,0,0,&required)==0 && required==0);n++;
+    assert(native_vorbis_quantization_measure(&no_packet,1,4,0,0,0,&no_layout)==0);n++;
+    assert(native_vorbis_quantization_materialize(&no_packet,1,4,&no_layout,NULL,0,&no_book)==0);n++;
+    CHECK(native_vorbis_quantization_vector(&no_book,0,0,NULL,0),NATIVE_VORBIS_NUMERIC_NO_LOOKUP,out);
+    CHECK(native_vorbis_quantization_scalar(&no_book,0,0,&out.x[0]),NATIVE_VORBIS_NUMERIC_NO_LOOKUP,out);
+    CHECK(native_vorbis_floor0_lsp_from_entries(&no_book,NULL,0,1,out.x,255),NATIVE_VORBIS_NUMERIC_NO_LOOKUP,out);
+    for(uint8_t lookup=3;lookup<16;lookup++)CHECK(native_vorbis_quantization_measure(&lookup,1,4,0,1,1,&l.x),NATIVE_VORBIS_NUMERIC_INVALID,l);
+    s.x[5]=8;
+    assert(native_vorbis_quantization_vector(&book,1,1,out.x,255)==0);n++;
+    CHECK(native_vorbis_quantization_vector(&book,1,3,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    uint32_t entries[2]={0,1};
+    assert(native_vorbis_floor0_lsp_from_entries(&book,entries,2,4,out.x,255)==0);n++;
+    CHECK(native_vorbis_floor0_lsp_from_entries(&book,entries,2,6,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    s.x[5]=6;entries[1]=2;
+    CHECK(native_vorbis_floor0_lsp_from_entries(&book,entries,2,4,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    entries[1]=1;
+    CHECK(native_vorbis_floor0_lsp_from_entries(&book,entries,1,4,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_floor0_lsp_from_entries(&book,entries,2,4,out.x,3),NATIVE_VORBIS_NUMERIC_CAPACITY,out);
+    CHECK(native_vorbis_floor0_lsp_from_entries(&book,NULL,2,4,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_floor0_lsp_from_entries(&book,entries,0,0,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    CHECK(native_vorbis_floor0_lsp_from_entries(&book,entries,2,256,out.x,255),NATIVE_VORBIS_NUMERIC_INVALID,out);
+    native_vorbis_affine_t angle={0,0,UINT32_MAX,UINT32_MAX};
+    struct {uint64_t a;native_vorbis_scaled_t x;uint64_t z;} d;memset(&d,0xa5,sizeof(d));d.a=d.z=CANARY;
+    struct {uint64_t a;native_vorbis_floor0_gain_t x;uint64_t z;} g;memset(&g,0xa5,sizeof(g));g.a=g.z=CANARY;
+    native_vorbis_floor0_amplitude_t amp={1,1,255},absent={0,0,255};
+    CHECK(native_vorbis_floor0_denominator_from_affine(NULL,1,0,1,&d.x),NATIVE_VORBIS_NUMERIC_INVALID,d);
+    CHECK(native_vorbis_floor0_denominator_from_affine(&angle,0,0,1,&d.x),NATIVE_VORBIS_NUMERIC_INVALID,d);
+    CHECK(native_vorbis_floor0_denominator_from_affine(&angle,256,0,1,&d.x),NATIVE_VORBIS_NUMERIC_INVALID,d);
+    CHECK(native_vorbis_floor0_denominator_from_affine(&angle,1,0,0,&d.x),NATIVE_VORBIS_NUMERIC_INVALID,d);
+    CHECK(native_vorbis_floor0_denominator_from_affine(&angle,1,0,65536,&d.x),NATIVE_VORBIS_NUMERIC_INVALID,d);
+    CHECK(native_vorbis_floor0_denominator_from_affine(&angle,1,1,1,&d.x),NATIVE_VORBIS_NUMERIC_INVALID,d);
+    CHECK(native_vorbis_floor0_denominator_from_affine(&angle,1,0,1,NULL),NATIVE_VORBIS_NUMERIC_INVALID,d);
+    CHECK(native_vorbis_floor0_gain_from_affine(&amp,NULL,1,0,1,&g.x),NATIVE_VORBIS_NUMERIC_INVALID,g);
+    CHECK(native_vorbis_floor0_gain_from_affine(NULL,&angle,1,0,1,&g.x),NATIVE_VORBIS_NUMERIC_INVALID,g);
+    assert(native_vorbis_floor0_gain_from_affine(&absent,NULL,1,0,1,&g.x)==0 && g.x.kind==NATIVE_VORBIS_FLOOR0_ABSENT);n++;
+    assert(l.a==CANARY && l.z==CANARY && s.a==CANARY && s.z==CANARY && b.a==CANARY && b.z==CANARY);
+    assert(out.a==CANARY && out.z==CANARY && d.a==CANARY && d.z==CANARY && g.a==CANARY && g.z==CANARY);
+#undef CHECK
+    return n;
+}

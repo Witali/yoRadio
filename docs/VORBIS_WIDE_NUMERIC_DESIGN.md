@@ -46,7 +46,7 @@ The original-angle entry points now compute the same polynomial directly at
 `abs(2*cos(theta)-2*cos(phi)) = 4*abs(sin((phi+theta)/2)*sin((phi-theta)/2))`
 avoids subtracting rounded cosines. Both endpoint factors use corresponding
 half-angle squares. Phase reduction uses exact integer products/division,
-1152 fractional bits and a 2304-bit `2/pi` constant; all finite binary64 LSPs
+2304 fractional bits and a 4096-bit `2/pi` constant; all finite binary64 LSPs
 are accepted. Negative, tiny and very large angles do not require a floating
 periodic remainder. A small sine remains scaled instead of underflowing during
 halving or squaring. This solves a numerical layer; preserving the original
@@ -63,6 +63,15 @@ floating error claim. Separate replay accepts every host and all 400 native
 results computed from the supplied angles under the predeclared bounds. The preceding
 60541-operation coefficient output is byte-identical. These checks establish
 the standalone numerical layer, not setup preservation, wide synthesis or PCM.
+Those historical results used the smaller preceding phase grid; the newer grid
+also supports exact affine VQ values described below.
+
+The [owned quantization section and lazy VQ/LSP reconstruction](VORBIS_QUANTIZATION_DESIGN.md)
+retain original packed minimum/delta words and integer multipliers. The affine
+floor APIs reduce both individually exact terms separately, before any floating
+sum. This preserves small terms and cancellation across the packed exponent
+range. Complete entropy/setup, audio packet handling and synthesis remain
+required before this layer can replace a production decoder.
 
 ## Required continuation through public raw operations
 
@@ -75,8 +84,8 @@ packets between implementations would leave incompatible overlap histories.
 
 The remaining implementation must:
 
-- Preserve original quantization fields, amplitude metadata and sufficient LSP
-  precision during owned setup/dequantization, including partial final vectors.
+- Connect the quantization/LSP layer to complete owned entropy/setup and audio
+  packet parsing, retaining full amplitude metadata and partial final vectors.
 - Decode residue and inverse coupling without a premature int32/Q8 narrowing.
 - Feed the original-angle floor APIs without narrowing setup/dequantized LSPs,
   preserving range through floor multiplication, IMDCT and overlap.

@@ -55,8 +55,8 @@ coefficient-domain checks cannot qualify the original angle-domain curve. The
 original-angle APIs avoid this conversion: they form cosine differences as
 products of half-angle sines, retaining their scale. A fixed-size integer phase
 reduction supports all finite binary64 angles, including subnormals, negatives
-and values outside `[0,pi]`. It retains 1152 fractional phase bits and uses a
-2304-bit `2/pi` constant; the bin phase is an integer division of `2*bin/map`.
+and values outside `[0,pi]`. It now retains 2304 fractional phase bits and uses a
+4096-bit `2/pi` constant; the bin phase is an integer division of `2*bin/map`.
 No rounded binary64 multiple of pi is subtracted. Small sines stay scaled, so
 halving a subnormal cannot silently turn an LSP into zero. This is still rounded
 numerical arithmetic, not an exact symbolic curve.
@@ -74,7 +74,23 @@ through an approximate denominator. Very large scaled logarithms likewise do
 not imply a universal absolute error bound. Exact supplied-D amplitude tests
 remain a separate layer.
 
-The complete correction still needs owned raw setup, dequantization, residue,
+The [quantization API](include/native_vorbis_quant.h) now preserves original
+packed minimum/delta and integer multiplicands, reconstructing exact symbolic
+VQ values and floor0 LSP carries without an early floating sum. Its affine floor
+entry points reduce the two exact terms separately. It supports lazy vector
+prefixes and single components with caller-owned storage and transactional
+capacity/error behavior. The [quantization design](../../../docs/VORBIS_QUANTIZATION_DESIGN.md)
+defines the field/range/ownership boundary; complete entropy and setup parsing
+remain separate.
+
+The [quantization checkpoint](../../../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
+retains actual 6572 host cases/79834 exact values and 200 SDK/QEMU cases per
+architecture. Separate replay accepts all 15036 native affine values and 184
+floor comparisons. Both earlier host binary output streams remain identical.
+The enlarged phase grid has a separate exact-rational certificate; complete
+libm/codec/PCM/physical qualification remains outside that proof.
+
+The complete correction still needs owned raw setup, entropy, residue,
 coupling, IMDCT and overlap with adequate precision and
 range. It must preserve retry/reset/EOF and public registration contracts and
 be qualified against independent reference PCM on both targets. Inserting this

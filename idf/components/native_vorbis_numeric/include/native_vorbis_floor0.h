@@ -11,7 +11,10 @@ extern "C" {
 typedef enum {
     NATIVE_VORBIS_NUMERIC_OK = 0,
     NATIVE_VORBIS_NUMERIC_INVALID = -1,
-    NATIVE_VORBIS_NUMERIC_RANGE = -2
+    NATIVE_VORBIS_NUMERIC_RANGE = -2,
+    NATIVE_VORBIS_NUMERIC_TRUNCATED = -3,
+    NATIVE_VORBIS_NUMERIC_CAPACITY = -4,
+    NATIVE_VORBIS_NUMERIC_NO_LOOKUP = -5
 } native_vorbis_numeric_status_t;
 
 // Value = mantissa * 2^exponent. Zero is {0,0}; a nonzero finite mantissa
@@ -20,6 +23,15 @@ typedef struct {
     double mantissa;
     int32_t exponent;
 } native_vorbis_scaled_t;
+
+// Exact affine VQ value: unpack(minimum_bits)*minimum_multiplier +
+// unpack(delta_bits)*delta_multiplier. Packed words use Vorbis I 9.2.2,
+// not IEEE float32; all 32-bit words and multipliers are accepted. Each term
+// is exactly representable as binary64, but their floating sum need not be.
+typedef struct {
+    uint32_t minimum_bits, delta_bits;
+    uint32_t minimum_multiplier, delta_multiplier;
+} native_vorbis_affine_t;
 
 typedef struct {
     uint64_t raw_amplitude;
@@ -104,6 +116,17 @@ native_vorbis_numeric_status_t native_vorbis_floor0_gain_from_angles(
     const native_vorbis_floor0_amplitude_t *amplitude,
     const double *angles, size_t order, uint32_t bin, uint32_t bark_map_size,
     native_vorbis_floor0_gain_t *gain);
+
+// Evaluate original exact affine LSPs without rounding the sum of their two
+// terms. Terms are reduced separately and combined in the integer phase grid.
+// The same order/bin/output-preservation and absent-floor contracts apply.
+native_vorbis_numeric_status_t native_vorbis_floor0_denominator_from_affine(
+    const native_vorbis_affine_t *angles, size_t order, uint32_t bin,
+    uint32_t bark_map_size, native_vorbis_scaled_t *denominator);
+native_vorbis_numeric_status_t native_vorbis_floor0_gain_from_affine(
+    const native_vorbis_floor0_amplitude_t *amplitude,
+    const native_vorbis_affine_t *angles, size_t order, uint32_t bin,
+    uint32_t bark_map_size, native_vorbis_floor0_gain_t *gain);
 
 #ifdef __cplusplus
 }

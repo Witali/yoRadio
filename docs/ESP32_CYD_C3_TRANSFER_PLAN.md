@@ -218,7 +218,10 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   [Расчёт из исходных LSP-углов](../tests/results/vorbis-floor0-angles-20261025/CHECKPOINT.md)
   также реализован: 2376 host-случаев и по200 SDK/QEMU, отдельные точные
   phase checks и независимый Decimal oracle проходят. [Широкий путь](VORBIS_WIDE_NUMERIC_DESIGN.md)
-  по-прежнему требует setup/dequantization без потери исходных значений,
+  [Quantization/VQ/LSP слой](../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
+  сохраняет исходные packed fields и точные affine значения; 6572 host-случая,
+  по200 native случаев и отдельное сравнение всех значений проходят.
+  Широкий путь по-прежнему требует полного entropy/setup и audio packet parsing,
   residue/coupling, IMDCT/overlap и public raw integration; компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
@@ -1402,3 +1405,20 @@ Stream остаётся на core0, decode/output на core1 с прежними
   не включают callee/libm/task high-water. Прежние60541 outputs byte-identical.
   Новые API не подключены к production; сохранение исходных setup/dequantization
   данных, wide synthesis, raw integration и прежние full31 PCM/G6/G8 остаются.
+
+- 2026-10-25, CYD-C3-14: [точные quantization/VQ/LSP значения](../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
+  реализованы по [проекту](VORBIS_QUANTIZATION_DESIGN.md): исходные minimum/delta
+  words, lookup1/2, sequence и отдельный floor0 carry сохраняются без раннего
+  Q24/double sum. Measure/materialize и vector/scalar/partial LSP APIs используют
+  caller storage, uint64 counts/spans и проверку до записи. Lazy scalar проходит
+  dimension65535 без полного выходного массива. Affine floor API получает два
+  точных слагаемых; phase grid2304/table4096 подтверждены отдельным рациональным
+  сертификатом1904/400 bits, без заявления о полной libm/FP точности.
+  Host6572/152 controls/79834 exact values/92 math проходят ASan/UBSan; оба native
+  SDK/QEMU проходят200 cases/1061 events/152 controls/9 commands, warnings0.
+  Отдельный checker повторяет весь host и принимает15036 exact values/184 math
+  на400 native случаях. Compiler own frames floor1104/1072B, quant144/128B;
+  callee/libm/task high-water не измерены. Обе прежние host-регрессии60541/2376
+  проходят с byte-identical outputs. Это самостоятельный слой: полный entropy/
+  setup/audio parser, residue/coupling/IMDCT/overlap, PCM/raw integration ещё
+  нужны; production cores/display/audio и deferred scopes не менялись.

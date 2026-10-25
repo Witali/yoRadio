@@ -89,6 +89,30 @@ The composed gain uses a combined absolute/relative bound; a very large
 relative error near zero is retained, not hidden or treated as exact gain.
 
 This completes the standalone angle calculation, not the complete decoder.
-Owned setup/dequantization must still supply the original values without Q24
-narrowing, and residue/coupling/IMDCT/overlap must retain their range. Full31
+The quantization/LSP stage below now supplies exact symbolic values without Q24
+narrowing; complete owned entropy/setup and audio packet parsing are still
+required. Residue/coupling/IMDCT/overlap must retain their range. Full31
 reference PCM, public raw lifecycle/integration and G6/G8 remain required.
+
+## Exact quantization/LSP handoff, 2026-10-25
+
+The [quantization checkpoint](../tests/results/vorbis-quantization-20261025/CHECKPOINT.md)
+implements raw quantization-section parsing/materialization and exact lazy
+vector/scalar/LSP reconstruction. Original packed words plus integer multipliers
+preserve values across the full exponent range; affine floor APIs consume the
+two exact terms before a floating sum. Final partial vectors and the reference
+cross-vector carry are retained. The [design](VORBIS_QUANTIZATION_DESIGN.md)
+defines caller-owned storage, uint64 counts, error and lifetime contracts.
+
+All 6572 host cases, 152 API controls and 79834 exact values pass (77573
+reconstructed and 2261 direct affine inputs retained through floor calls);
+92 affine floor comparisons pass against independent Fraction/Decimal1440
+equations. Both native captures finish 200 cases/152 controls with zero warnings;
+separate comparison accepts 15036 exact values and 184 floor results. The phase
+constant/grid proof is separate from complete libm/FP accuracy. Previous
+60541 coefficient and 2376 angle host output streams remain byte-identical.
+
+This is an owned data-preservation layer. It does not validate a Huffman length
+list, parse complete setup/audio packets, replace residue/transform/overlap or
+register a production decoder. Historical full31 PCM failures, complete
+floor0/G6/G8 and physical/radio acceptance remain open.
