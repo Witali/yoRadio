@@ -329,39 +329,24 @@ static int _make_decode_table(codebook *s,char *lengthlist,long quantvals,
   return 0;
 }
 
-/* most of the time, entries%dimensions == 0, but we need to be
-   well defined.  We define that the possible vales at each
-   scalar is values == entries/dim.  If entries%dim != 0, we'll
-   have 'too few' values (values*dim<entries), which means that
-   we'll have 'left over' entries; left over entries use zeroed
-   values (and are wasted).  So don't generate codebooks like
-   that */
-/* there might be a straightforward one-line way to do the below
-   that's portable and totally safe against roundoff, but I haven't
-   thought of it.  Therefore, we opt on the side of caution */
+/* Vorbis I 9.2.3: greatest integer v with v^dim <= entries. Both
+   fields are positive here. Compare before multiplying: even tiny books
+   with a large legal dimension can overflow an ILP32 power accumulator. */
 static long _book_maptype1_quantvals(codebook *b){
-  /* get us a starting hint, we'll polish it below */
-  int bits=_ilog(b->entries);
-  int vals=b->entries>>((bits-1)*(b->dim-1)/b->dim);
-
-  while(1){
+  long low=1,high=b->entries;
+  if(b->dim==1)return b->entries;
+  while(low<high){
+    long candidate=low+(high-low+1)/2;
     long acc=1;
-    long acc1=1;
-    int i;
+    long i;
     for(i=0;i<b->dim;i++){
-      acc*=vals;
-      acc1*=vals+1;
+      if(acc>b->entries/candidate)break;
+      acc*=candidate;
     }
-    if(acc<=b->entries && acc1>b->entries){
-      return(vals);
-    }else{
-      if(acc>b->entries){
-        vals--;
-      }else{
-        vals++;
-      }
-    }
+    if(i==b->dim)low=candidate;
+    else high=candidate-1;
   }
+  return low;
 }
 
 static void repair_vorbis_book_clear(codebook *b){

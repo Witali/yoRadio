@@ -1,6 +1,6 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-10-24. Ветка: `codex/esp32-cyd-c3-review`.
+Обновлено: 2026-10-25. Ветка: `codex/esp32-cyd-c3-review`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
@@ -207,6 +207,11 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   15 случаев max1, wide4 и floor0×12 нарушают предел2; target12/14 relations.
   [Следующий floor0 шаг](CYD_VORBIS_FLOOR0_REMAINING.md) требует сохранения
   точности и диапазона всей цепочки, а не отдельной подгонки inverse2.
+  [Точный lookup1 root](../tests/results/vorbis-quantvals-20261025/CHECKPOINT.md)
+  исправляет отдельное переполнение степеней в обоих setup: host по35975
+  значений под ASan/UBSan в native-long/int32 профилях; SDK/QEMU по2179
+  точных граничных значений на Xtensa/core1 и RV32/core0. Весь setup и native
+  ABI assertions компилируются; это не повторная квалификация PCM/G6.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
   Xtensa векторов; host331 точный вектор и34 UBSan NONPASS остаются отдельно.
@@ -1340,3 +1345,19 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Production source/task bindings не менялись, bridge не включён в radio.
   [Floor0 precision/range](CYD_VORBIS_FLOOR0_REMAINING.md) зафиксированы как
   требования следующей реализации. Полные G6/прочие gates и physical остаются.
+
+- 2026-10-25, CYD-C3-14: [lookup1 integer root](../tests/results/vorbis-quantvals-20261025/CHECKPOINT.md)
+  исправлен в обоих canonical setup. Вместо unchecked степеней используется
+  точный целочисленный поиск с проверкой до умножения; размерности не урезаются.
+  Host native-long/int32 дают по35975 точных значений под ASan/UBSan; старый
+  helper отдельно воспроизводит signed overflow на native64/entries2/dim64.
+  Обе отдельные SDK/QEMU сборки whole setup/native ABI проходят по2179
+  значений и9 команд, warnings0: Xtensa/core1 и RV32/core0, coordinator0.
+  Codec archive и raw decoder не подключены; production core/priority/stack
+  не менялись. Двенадцать reader/protocol тестов выявили и закрыли проверку
+  пропущенной запятой в C row; final reader повторно проверен на реальных
+  сохранённых данных/логах, отдельно от immutable исполнявшегося controller.
+  Первые host LF/CRLF и WSL-launch отказы сохранены как отдельные попытки.
+  Это исправление helper, а не полная raw/PCM/G6 приёмка; прежний full31
+  NONPASS не переквалифицирован. Wide/sequence1/floor0, deferred scopes,
+  final Clang/exports, radio/resources и physical остаются в плане.

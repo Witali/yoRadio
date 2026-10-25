@@ -49,3 +49,12 @@ covers all observed allocation positions in eight finite setups on both targets,
 560 failures/recoveries per target, six malformed setups, four nested pairs and
 two task-isolation scenarios. Full allocation/lifetime, Ogg, radio integration
 and physical resource qualification remain open; TLS cost is not measured.
+
+Lookup1 value counts use the exact integer root required by Vorbis I 9.2.3.
+The previous unchecked power accumulators could overflow for positive encoded
+fields, including entries2/dimension32 on ILP32. Both CYD and C3 now compare
+against the entry bound before multiplication and use a converging integer
+search. No dimension is clipped and no floating approximation is used. The
+[arithmetic regression](../../../../tests/test-vorbis-quantvals.py) uses an
+independent arbitrary-precision oracle; whole-source/native ABI compilation and
+target arithmetic are separate from raw decoder/PCM and full G6 qualification.

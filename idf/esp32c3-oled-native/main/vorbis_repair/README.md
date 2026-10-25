@@ -84,3 +84,12 @@ position in eight finite setups, and passes 560 failures/recoveries per target,
 six malformed setups, four nested pairs and two task-isolation scenarios.
 No allocator calls, ABI fields or task bindings are added. TLS storage cost and
 full allocation/lifetime, Ogg, radio and physical qualification remain open.
+
+Lookup1 value counts now use a bounded exact integer-root search, shared in
+behavior with the CYD implementation. The previous unchecked power products
+could overflow at valid positive dimensions; entries2/dimension32 already
+exceeds ILP32. The search checks the entry bound before multiplying, preserves
+all dimensions and avoids floating rounding. The
+[arithmetic regression](../../../../tests/test-vorbis-quantvals.py) separates
+native-long sanitizer tests, the explicit int32 model and whole-source native
+target checks. These checks do not qualify a complete raw decoder or PCM path.

@@ -498,3 +498,27 @@ why an inverse2-only change cannot establish general precision/range support.
 This checkpoint extends current-source regression evidence. Full G6, wide/
 sequence1/floor0 correctness, callbacks/lifetime/SMP, deferred work, radio,
 resources and physical acceptance remain open.
+
+## Exact lookup1 value counts, 2026-10-25
+
+The [lookup1 regression](../tests/results/vorbis-quantvals-20261025/CHECKPOINT.md)
+fixes a separate shared setup arithmetic defect. The old Tremor-derived integer
+root helper multiplies unchecked powers; entries2/dimension32 can overflow
+ILP32 although its correct root is1. Both canonical setup files now use a
+converging exact integer search with a pre-multiply division check. Positive
+16/24-bit fields require no floating approximation or dimension clipping.
+Allocations, ABI fields and production task bindings are unchanged.
+
+ASan/UBSan checks35975 independent arbitrary-precision roots in each of the
+native-long and explicitly modelled int32 profiles. The frozen old helper
+reproduces signed overflow at entries2/dimension64 on the native64-bit host.
+Both whole-source SDK/QEMU tests pass all2179 boundary cases: SDK6.0.2/Xtensa
+machine94/core1 and pinnedSDK6.1/RV32 machine243/core0. Native ABI assertions,
+actual compile/dependency/symbol/map evidence and9 normally completed commands
+per target are retained; no codec archive is linked and compiler warnings are0.
+
+This advances the lookup1 helper's correctness, not complete raw setup/PCM or
+G6 qualification. Inherited parser limits remain. The retained full31 PCM
+NONPASS predates this arithmetic edit and is not requalified by the helper
+test. Wide/sequence1/floor0 correctness, deferred scopes, final Clang/exports,
+radio integration, resources and physical acceptance remain open.
