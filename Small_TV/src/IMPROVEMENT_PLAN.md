@@ -422,6 +422,14 @@ states и реальную timer+492→producer→post8/{11,0} цепочку в
 флагов совпала; stored period60/30 не активен (enable52=0 в обоих). Следом сравнить
 старый отдельный pm_keep_alive/reset со свежим fallback, pm_start/stop и writers
 pending flag. Все initialization branches, queue delivery и RF ещё не доказаны.
+Keep-alive checkpoint25Oct: [WIFI_KEEP_ALIVE.md](tests/WIFI_KEEP_ALIVE.md) связывает
+12 полных SDK тел (4502bytes), включая старые predicate/reset и TIM/start/stop,
+с обоими TX-completion путями. 12108 private instruction executions проходят;
+граница rearm100000/100001us и 64-bit rollover проверены, 6 static controls.
+В выбранном null-completion family проверены условия очистки488 и связанные
+timestamp/rearm. Нулевой/удалённый station object и поле820 требуют дальнейшего
+lifetime/reachability анализа. TIM/start/stop и остальные null/failure branches
+ещё не исполнялись полностью; negotiated BSS ranges/overflow и RF остаются открытыми.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

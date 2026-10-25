@@ -116,3 +116,8 @@ overflow boundaries. Full event delivery, actual backend callback ownership,
 all initialization branches, RF, whole-image aliases/function gaps, long-run
 acceptance and physical-board gates remain unproven. No firmware behavior was
 changed solely to reproduce an older SDK implementation.
+
+Continuation: [WIFI_KEEP_ALIVE.md](WIFI_KEEP_ALIVE.md) matches the old predicate,
+reset, TIM/start/stop and both TX-completion bodies. It adds 12108 instruction
+executions for time boundaries, data completion and selected pending-clear
+branches; full transition/reachability coverage remains explicitly open.

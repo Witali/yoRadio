@@ -4240,3 +4240,57 @@ range validation and timer cancellation. Real post callback/backend ownership
 also open. Continue remaining full-image computed aliases/functions/SDK boundary
 audit. User-deferred1–3, final independent gates/H10 and physical gates remain;
 the broad goal remains ACTIVE. Do not edit frozen long-run producer inputs.
+
+## CURRENT 2026-10-25 — old keep-alive path and TX/pending boundaries characterized
+
+Previous turn PROGRESS:dfb452cce. Factory item4 remains first; no return to the
+user-deferred1–3. Active editable tree small-tv-factory-audit, current firmware
+C912/9E4E and frozen producers/SDK/QEMU/helpers unchanged. No new VM this turn.
+
+New timer_keep_alive qualifier matches12 full bodies/4502linkedbytes from exact
+old/new pm.o. Factory predicate40390590..4039061c, reset42074c5c/82B, TXdata
+42075896/196B, TIM4039061c/488B, start420763d8/580B, stop4207661c/374B,
+TXnull420759cc/514B. Native equivalents except absent predicate/reset:
+TXdata4207ad48/218B,TIM420d1b6a/356B,start4207b93e/568B,stop4207bb76/352B,
+TXnull4207ae8c/634B. Shared globals/calls and pm.o-scoped local anchors cross-
+checked against previous PM/configuration bodies. This prevents relocated data
+lookalikes from silently binding another configuration struct.
+
+Predicate is boolean elapsed-time check, called by real factory pm_process_tim;
+factory instructions4207a020/24 materialize/store its pointer in another table
+(full initializer/indirect caller table still to qualify).
+It compares fallback28 vs timestamp88, or sign-extended wrapped BSS product vs
+timestamp480. Document overflow as observed code, not a requirement to copy it.
+TXdata modern path coalesces rearm at elapsed>100000us; exactly100000 skips,
+100001 rearms. This is a comparison, not an explicit sleep/delay. Old reset and
+new rearm paths tested with actual child bodies, OSI clock paira0/a1 stub only.
+
+12108 executions:2664 oldpredicate,36 oldreset,4608 TXdata perimage and96 selected
+TXnull perimage. Four whole dynamic bodies cover213instruction starts; partial
+null61/174old,92/213new. TIM/start/stop statically matched only,0dynamic visits.
+No claim of full lifecycle/reachability/RF. New pending clear checks g_ic+16,
+second pointer+228 and byte820; ifbyte820 nonzero, nonzero third argument permits
+the clear. A first model inverted that last branch; literal CPU mismatch exposed
+it, fixed against actual beqz at4207af54, final matrix then passed. Missing first
+object logs/returns, missing second skips clear. Older clear additionally gates
+on BSS enabled. Selected fixtures do not establish these states as reachable.
+
+Proof factory-keep-alive-validation-20261025.json pins12 sources and33297byte gzip.
+Six static mutations reject wrongSDK, truncation, neighbor, PM/config anchors,
+100-msconstant. Consumer session37767 ended0: all12108 cases recomputed and five
+evidence mutations rejected. Main test sessions45970/96044/96167/63506 terminal0;
+49901 terminal1 for corrected reference-model branch, not a firmware failure.
+Readonly assembly session47608 and owner session93137 terminal0. Preserve
+intermediate results in ignored .build/factory-keep-alive-20261025.
+
+Latest CIM17:39:06–12UTC matched all12 protected original PID/name/creation UTC
+identities. Diagnostic-main118cycles, metadata main/V8 controls559/552; all
+supervisors/guards running, one ROM boot/no UART errors, no workload errors.
+Ignored long-owner-observation.json retains readings. Pending prefixes only;
+not H10/8h pass and never aggregate their durations with failed/interrupted runs.
+
+NEXT factory scope: TIM/start/stop dynamic state/cancellation paths, remaining
+null-failure branches, station object+820 lifetime; trace setter callers and
+negotiated BSS period bounds before deciding overflow fixes. Then remaining
+whole-image computed aliases/functions/SDK-application boundaries. Independent
+network/display/final/H10/hardware and deferred1–3 stay open. Broad goal ACTIVE.
