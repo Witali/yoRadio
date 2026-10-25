@@ -94,9 +94,14 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 все исходные 31 случая, 434 пакета и 738560 PCM байт с побитным совпадением;
 максимальная ошибка 0 при прежнем допуске 2, все 14 отношений проходят.
 Новый собственный IMDCT/синтез пока не нужен. Следующие программные проверки —
-отказ allocation/recovery, большие codebooks и стек, оставшиеся format/range
-границы. В upstream найдены unchecked realloc arena и два entry-sized stack
-массива; до их квалификации новый кандидат не подключается к радио. Старые
+общая обработка allocation/recovery, packet-sized scratch и оставшиеся format/range
+границы. [Отдельный ресурсный порт](../tests/results/vorbis-xiph-resources-20261025/CHECKPOINT.md)
+уже исправляет optional realloc arena и переносит book-init scratch в проверяемый
+heap. ASan/UBSan и ESP32 QEMU проходят 11 arena-сценариев, 200864 book-проверки,
+124754 bit-пробы и все исходные 31 случая с max0; dense4096 помещается в worker
+со стеком 16 КБ. Общий OOM и стеки всех decode-путей ещё не квалифицированы;
+в residue0 остаются два partition-sized массива. Новый кандидат пока не подключён
+к радио. Старые
 NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также
 не закрывает deferred scopes, physical acceptance или полное соответствие
 стандарту за пределами измеренного корпуса.

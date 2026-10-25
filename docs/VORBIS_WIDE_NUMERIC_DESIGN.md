@@ -35,6 +35,20 @@ open source-review findings. Neither the isolated QEMU resource observations
 nor this corpus qualifies physical performance or universal standard coverage.
 Do not resume custom IMDCT/synthesis merely because the earlier repair failed.
 
+The next [focused resource port](../tests/results/vorbis-xiph-resources-20261025/CHECKPOINT.md)
+now qualifies optional arena-consolidation failure recovery and checked heap
+scratch for decode-book initialization. It also backports official unsigned
+libogg byte shifts exposed by UBSan, and defines the first-table word shift.
+Host ASan/UBSan and ESP32 SDK/QEMU complete 11 arena scenarios, 200864 book
+checks, 124754 bit probes and every original31 PCM byte with maximum0. The
+selected dense4096 book fits the16KiB worker; all explicit hook ownership is
+released after every case. Original source remains byte-identical in the
+baseline sibling; only three generated units carry eight exact edits.
+General OOM propagation, packet-arena and DSP/header allocation failures,
+residue0 partition-sized stack scratch and remaining range/format gates are
+still open. This finite resource result does not qualify the whole decoder or
+physical production performance.
+
 Full floor0 correctness requires a precision and range design for the complete
 synthesis path. The public low-memory implementation stores Q4 amplitude and
 Q24 LSP values; the current bridge delegates residue, coupling, IMDCT, overlap
