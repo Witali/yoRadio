@@ -101,3 +101,7 @@ $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 Структура и выбранные инструкции проверены; весь runtime event lifecycle,
 transitive callback effects, исправление prefetch, RF, whole-image equivalence,
 24h и аппаратная приёмка остаются открытыми.
+
+Продолжение: [WIFI_TIMER_GUARD.md](WIFI_TIMER_GUARD.md) исправляет native вход
+в отдельном build и проверяет также настоящий ROM/table ingress. Этот baseline
+archive по-прежнему характеризует исходную ошибку прежнего ELF.

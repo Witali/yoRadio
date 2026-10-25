@@ -4911,3 +4911,53 @@ table/recovery controls; bounded metadata и full xref audit396GP прошли.
 Повторная CIM-проверка14:47:09UTC подтвердила все12 original owners: H10=511
 complete cycles, schema7 main/V8=162/158. Guards running, oneboot/noUARTerrors.
 owners-after-audit.json сохранён в ignored base; elapsed durations не складываются.
+
+## 2026-10-25 — production guard до Wi-Fi SDK table prefetch
+
+Аудит сохранён cdd3646f9 в memory-retention. Для firmware исправления создана
+codex/small-tv-timer-bounds в repo/.worktree, от этого commit; /.worktree/ уже
+tracked ignore. Старые три runs и их inputs не менялись. Новый wifi_timer.c
+в network category помечен FIXED_FACTORY, ID14..255 отсекаются до vendor code,
+message освобождается тем же OSI->_free один раз. Валидные/null paths делегируются.
+Version/target/pointer/adapter layout compile assertions; DEBUG не отключает guard.
+
+Первая линковка не извлекала wrapper object из static app archive. Добавлен
+explicit undefined symbol к wrap option. Следующий post-link prototype выявил
+реальную ошибку предположения: ppTask SHN_ABS40001C44 — ROM trampoline, SDK522B
+symbol не является ROM554B function. Ошибка checker не была пропущена/объявлена
+pass: выстроена проверка pinned ROM289CE00E, event8 jump table и поля+356.
+Native wdev_funcs_init3386B целиком совпал с текущим SDK object и записал guard
+через настоящий function-pointer relocation. В source archives3refs, но ppTask
+body из archive здесь не linked; реальный вход подтверждён через ROM/table.
+
+Final DEBUGoff build V3 успешен. Архив appC91294FC/ELF9E4EC88D/source04B19378,
+1476480bytes (+48), guard body46B. Путь firmware/development/small-tv-esp32c2-
+reconstructed в ЭТОЙ новой копии; старые app9C1A/ELF76B5 в protected копиях целы.
+build.ps1 теперь проверяет реальные link/table/ROM identities перед archive;
+checker sources входят в compiled-source manifest, trace сохранён с firmware.
+
+Private instruction fixture:258direct cases +256ROMevent cases +4feature init
+tails =518pass. Последний initializer tail выполняется от успешного calloc до
+реального return, проверяется финальный guard slot. Сначала fixture не имел
+beacon callback precondition от предшествующего wdev_data_init и ловил read0x10;
+теперь реальные initialized ELF data и явно declared opaque beacon table stubs
+дают корректный контекст. Никаких unknown reads не игнорируется. Scheduler,
+earlier APIs и реальные child callbacks этим не квалифицированы.
+
+All242invalid byte IDs: vendor не вызывается, timer table/OOB reads0, free1.
+Valid14 IDs и null возвращают прежнее; bare vendor control всё ещё ловит OOB255.
+Consumer пересчитывает source ledger, actual SDK bodies/ROM и все518cases;
+source identities проверяются до/после. Proof wifi-timer-guard-validation-
+20261025.json и1902B gzip,12source pins. Initial prefix-only successes сохранены
+в ignored logs; acceptedv2 включает полный initializer return. Source/CMake comment
+pin изменился между ранними probes, поэтому final unit был повторён на exact inputs.
+
+Build follow-up: прежний cached JPEG jconfigint BUILD20261020, fresh20261025.
+Codec sources/patches одинаковы, raw archive SHA d690..→9c009.. и cache codec ID
+6b537..→2a6d6.. отличаются. Не маскировать SHA: нужен отдельный reproducible
+recipe fix и тесты cache reuse across paths/dates, с invalidation реальных codec
+changes. Эта оптимизация записана в плане и пока не выполнена.
+
+Следом commit проверенного guard/build/artifacts, отдельный current QEMU preflight
+4/40, затем остальные runtime/full-image/fullsuite/hardware пункты. Старые7memory
+findings не объясняются этим invalid-ID исправлением; весь goal active.

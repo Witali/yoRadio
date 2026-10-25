@@ -56,6 +56,12 @@ try {
     # Recheck the imported archive/private headers after the SDK's compile/link.
     & $python -B (Join-Path $PSScriptRoot 'tools/build_jpeg_library.py') --output (Join-Path $BuildDirectory 'jpeg-library') --toolchain-bin (Split-Path $jpegTools['riscv32-esp-elf-gcc.exe']) --cmake $jpegTools['cmake.exe'] --ninja $jpegTools['ninja.exe']
     if ($LASTEXITCODE -ne 0) { throw 'JPEG dependency changed during firmware build' }
+    # Qualify the actual linked ingress paths before archiving a timer-guard build.
+    $smallTvGuardTemporary = Join-Path $BuildDirectory ('wifi-timer-guard-' + [Guid]::NewGuid().ToString('N') + '.json')
+    $smallTvGuardRom = Join-Path $env:IDF_TOOLS_PATH 'tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
+    & $python -B (Join-Path $PSScriptRoot 'tools/verify_wifi_timer_guard.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --sdk-libraries (Join-Path $idf 'components/esp_wifi/lib/esp32c2') --rom $smallTvGuardRom --output $smallTvGuardTemporary
+    if ($LASTEXITCODE -ne 0) { throw 'Wi-Fi timer guard linkage qualification failed' }
+    Move-Item -LiteralPath $smallTvGuardTemporary -Destination (Join-Path $BuildDirectory 'wifi-timer-guard.json') -Force
 } finally {
     foreach ($key in $saved.Keys) { [Environment]::SetEnvironmentVariable($key,$saved[$key]) }
 }
@@ -70,6 +76,7 @@ if (!$NoArchive) {
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\assets-manifest.json") -Destination (Join-Path $destination "assets-manifest.json")
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\source-manifest.json") -Destination (Join-Path $destination "source-manifest.json")
     Copy-Item -LiteralPath (Join-Path $jpegSelection.build_directory 'report.json') -Destination (Join-Path $destination 'jpeg-library-build.json')
+    Copy-Item -LiteralPath (Join-Path $BuildDirectory 'wifi-timer-guard.json') -Destination (Join-Path $destination 'wifi-timer-guard.json')
     foreach ($name in @('jpeg_layout.h','jpeg_cache_layout.h','jpeg-cache-plan.json')) {
         Copy-Item -LiteralPath (Join-Path $BuildDirectory ('resources/'+$name)) -Destination (Join-Path $destination $name)
     }

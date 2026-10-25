@@ -403,6 +403,19 @@ Dispatch checkpoint25Oct: [WIFI_TIMER_DISPATCH.md](tests/WIFI_TIMER_DISPATCH.md)
 wdev_funcs_init pointer registration после link, invalid IDs и прежние valid IDs.
 Отдельно разобрать событие11: factory max_idle/native keep_alive wrappers
 соответствуют по форме, transitive callee semantics пока не подтверждены.
+Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
+task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
+Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null
+paths. Найденный в ELF ppTask — ROM trampoline, поэтому отдельно проверен
+настоящий event8/table+356 путь и весь successful-allocation initializer tail
+для4feature combinations. 518compiled-instruction cases и replay pass,
+unguarded control воспроизводит OOB. Actual QEMU preflight/churn и final gates
+нового build ещё нужны; прежние9C1A/76B5 long runs не заменять и не суммировать.
+Дополнительный CODEC-REPRO follow-up: свежий jconfigint BUILD20→25Oct меняет
+library SHA и cache codec ID при тех жеcodec sources. Зафиксировать reproducible
+build inputs/date, проверить два paths/dates и отсутствие лишней Flash cache
+перезаписи; настоящее изменение codec должно сохранять invalidation. Не убирать
+library identity из ownership guard ради совпадения. Пока это не исправлено.
 
 ## 6. Приёмка окончательной версии и правила работы
 

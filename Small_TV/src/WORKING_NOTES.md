@@ -3904,3 +3904,52 @@ active; retained-loss flags, H10/matched controls, cleanup/fullsuite/hardware op
 LatestCIM25Oct14:47:09UTC: all12original owners live, H10=511cycles,
 schema7main/V8=162/158; guardsrunning/oneROMboot/noerrors. Ignored
 factory-timer-dispatch-20261025/owners-after-audit.json retains observation.
+
+## CURRENT 2026-10-25 — active tree is small-tv-timer-bounds
+
+Continuing turn PROGRESS:cdd3646f9 audit committed in small-tv-memory-retention,
+then new branch codex/small-tv-timer-bounds at repo/.worktree/small-tv-timer-bounds.
+Do not edit the original H10 or matched-control producer trees. All three old
+VMs/app9C1A83BD/ELF76B5CE37 remain protected; their runs do not qualify a new image.
+
+Implemented network/wifi_timer.c FIXED_FACTORY: reject ID14..255 before vendor
+table read, free once through the same g_osi_funcs_p adapter, delegate valid/null.
+Pinned target6.1/C2/ABI compile assertions; wrap+undefined ensures archive extraction.
+ROM complication was real: native ppTask at40001C44 is a trampoline to40046EEC,
+not its archive522B body. Actual ROM554B/event8 jumps through pp_wdev_funcs+356;
+full current SDK wdev_funcs_init writes the guard to that slot. Three archive
+refs are catalogued, but the ppTask archive body is not a linked ingress.
+
+Build V3 COMPLETE SUCCESS, DEBUGoff, saved production development files:
+app c91294fca6acb16283605eef8aedcf98102d7a8ad42076c09b058594a5c97e93
+ELF 9e4ec88d6e85ae58fa3e164362f1b10491f9edef0feaa4af8c52c9fa88446e24
+source04b19378061ef5cdad4fd56f27477cafb4d454f58b0767df30eba66384333bcd
+App1476480bytes,+48;guard46B. Exact ELF under this tree's .build/small-tv-esp32c2.
+Post-link ROM/table/library verification mandatory in build.ps1; source ledger
+includes checker modules. Do not rebuild/change compiled inputs while a new VM
+qualification is using them. Current prototype/unit artifact names listed below.
+
+Final unit .build/wifi-timer-guard-tests-v2-20261025.json:518cases=258direct+
+256exactROMblock+4complete successful-allocation initializer tails. Actual final
+slot remains guarded through SDK return. Earlier tail fixture missed a beacon
+callback data precondition supplied by wdev_data_init; it failed on0x10, never
+silently zero-filled. Now initialized ELF data +declared opaque beacon stubs;
+these callbacks and earlier APIs/scheduler remain outside this host fixture.
+All242invalid IDs avoid vendor/table/OOB and free1; valid/null preserved.
+Bare vendor control reproduces OOB. No software delays/Flash writes/allocations
+added by guard. tests/WIFI_TIMER_GUARD.md documents exact scope and replay.
+
+Proof wifi-timer-guard-validation-20261025.json,1902B packed transcript,12source
+pins; consumer fully replays source ledger/link/ROM/518cases and rechecks sources.
+Two early build failures were extraction and incorrect ROM assumption, not passed
+qualifications. Final artifacts/static/probe SHA all agree. No physical actions.
+
+NEXT: commit complete guard change, run ONE schema5 preflight4/current-main and
+guard/supervisor; then40cycle qualification and independent network/display/final
+gates. Never use TcpTopology yet: its ABI policy is pinned to OLD76B5 and needs
+separate qualification for a new ELF, not a weakened SHA check.
+Also new CODEC-REPRO plan item: same JPEG code got BUILD20261020→20261025,
+archive d690..→9c009.. and codecID6b537..→2a6d6... Normalize reproducible recipe
+inputs/date with cross-path/date tests; do not remove library SHA ownership guard.
+This is separate from timer fix and not yet implemented. ID11 max_idle/keep_alive
+callee review, old retained losses, three long runs, cleanup/fullsuite/hardware open.

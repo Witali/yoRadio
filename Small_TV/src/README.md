@@ -181,6 +181,12 @@ Running plain `idf.py` requires copying successful hand-off artifacts there
 as required by the repository rules. The wrapper only builds and archives;
 it has no flash operation.
 
+The wrapper also qualifies the Wi-Fi timer guard's actual linked table and
+ROM ingress before saving `wifi-timer-guard.json`. It requires the pinned
+`esp-rom-elfs/20260528/esp32c2_rev200_rom.elf` tool package. A manual `idf.py`
+build must run `tools/verify_wifi_timer_guard.py` separately before claiming
+the same qualification. See [the guard checks and limits](tests/WIFI_TIMER_GUARD.md).
+
 ## Hardware and memory
 
 - ESP32-C2 / ESP8684H, 120 MHz, **26 MHz crystal**, 4 MiB flash, DIO at 30 MHz.

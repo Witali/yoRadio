@@ -1,0 +1,38 @@
+{
+  "schema": "wifi-timer-guard-evidence-v1",
+  "passed": true,
+  "all_functionality_verified": false,
+  "h10_checks_passed": false,
+  "physical_hardware_tested": false,
+  "runtime_qualification_completed": false,
+  "producer_root": "C:\\Work\\yoRadio\\.worktree\\small-tv-timer-bounds",
+  "source_pins": {
+    "Small_TV/src/app/CMakeLists.txt": "72fcd1a027a02a0d489ccafa0c84d19f5533ba180c649205c97f319cb5420743",
+    "Small_TV/src/app/network/wifi_timer.c": "d0ab82b004647fb369350afab245baf98b9b08b93236dfd5860acd29196d8350",
+    "Small_TV/src/build.ps1": "ef9dc8108080f5d7156cc37c818fc458c5ff2ec444e581263a36fa5ca9bb3603",
+    "Small_TV/src/tests/timer_dispatch_instructions.py": "de7af5c9f7d868711f3878b93f0d545e5afc5b7e4d77e84e555095b7f0d0cdf3",
+    "Small_TV/src/tests/verify_photo_format_matrix_evidence.py": "5448f379eb03db12d2846b038c3c1aac97305dbc8fe4e324b9d0ecca9c708198",
+    "Small_TV/src/tests/verify_wifi_timer_guard_evidence.py": "b13af4665a371211d8fed96002dcca8604e3821955d1cdcf715c373c4b7027ef",
+    "Small_TV/src/tests/wifi_timer_guard_rom.py": "9aa611572659623916ceb58966b4bf6563472dedc2fca64f2ff02036679978e9",
+    "Small_TV/src/tests/wifi_timer_guard_test.py": "57224625dc285acdebd58ac104560492ef3253c782b7d340b32c628022ab465c",
+    "Small_TV/src/tools/prepare_resources.py": "53d204ede49615c6dcefc37d972d68898f080e1641d1f43ebee4b5ad545bbd1d",
+    "Small_TV/src/tools/reverse/elf_archive.py": "8229e872a677fbbcdb25fcb62c3de5f216bf36b3cde4420249b72a2f02dc887a",
+    "Small_TV/src/tools/reverse/rv32_link_match.py": "dbe79ffa1da1cd773460fa44359bf92da0e1b2e4bba3ab0902979f2636a35150",
+    "Small_TV/src/tools/verify_wifi_timer_guard.py": "78244d3ece2c9d79a66866d0822d55aa064348f7ca4db471859f6a60d2c52073"
+  },
+  "app_sha256": "c91294fca6acb16283605eef8aedcf98102d7a8ad42076c09b058594a5c97e93",
+  "elf_sha256": "9e4ec88d6e85ae58fa3e164362f1b10491f9edef0feaa4af8c52c9fa88446e24",
+  "source_sha256": "04b19378061ef5cdad4fd56f27477cafb4d454f58b0767df30eba66384333bcd",
+  "unit": {
+    "file": "wifi-timer-guard-tests-20261025.json.gz",
+    "sha256": "30c8ec060484136cf512ba0e3b117665490fadd24b0ab6650b059aabafa0743c",
+    "gzip_sha256": "0717c68803653218ae863f2e0fd14039be6d68a5dcba982068cd6c1ac4f1aaed",
+    "bytes": 9117
+  },
+  "limitations": [
+    "Guard and ROM/table initialization are executed in private host fixtures with declared transitive stubs.",
+    "The initializer executes from successful calloc return to its real return; prior calls and unrelated beacon callback data are explicitly stubbed.",
+    "The archived compiled image still needs actual network preflight/churn and other final gates.",
+    "JPEG library build date changed its archive and cache codec identity; reproducible build identity is a separate follow-up."
+  ]
+}
