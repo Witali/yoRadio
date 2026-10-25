@@ -4762,3 +4762,41 @@ archives не добавлены. Heap/gate legacy readers проверяютс�
 main2DF90327 и прежнемV8A5BE14C5, обычный15s/outageEvery60; затем pendingtraffic,
 unclassified deltas и cleanup уже закрытойVM. Полныйплан/fullimage/final/hardware
 scope и основнойH10 остаются активными, physicaldevice не тронут.
+
+## 2026-10-25 — producer23b641680 и два сопоставимых8h controls
+
+TCP checkpoint закоммичен23b6416805c3a5c00db179ab3a094eabdc402758.
+Отдельные CLI replay нового76controls, старогоheap38controls с135e61860 и
+старогоgate12controls с82d901e2d прошли. Workingcopy была clean; QEMU binaries
+перед запуском вновь совпали сmain2DF90327 иV8A5BE14C5. OriginalmainH10 на тех
+же4PID/creationUTC,341cycles/guest5904.619039,oneROMboot/noerrors.
+
+Запущены matched metadata controls на unchanged app/ELF9C1A83BD/76B5CE37,
+по28800guest seconds,interval15/outageEvery60,schema7. Earlyrecords captured0
+в той же launch invocation, затем CIM подтвердил4positive owners каждого.
+Run folders `.build/tcp-inventory-qemu-20261025/soak-main` и `soak-v8`; sibling
+`-start.json`/`-processes.json`/`-supervisor/` сохранять. Producer inputs в этой
+копии теперь pinned; новые их исправления/firmware builds — другая task worktree.
+
+| Run | Role | PID | Creation UTC |
+| --- | --- | ---: | --- |
+| main | supervisor | 40876 | 2026-10-25T13:40:41.8450240Z |
+| main | workload | 10056 | 2026-10-25T13:40:42.3564590Z |
+| main | guard | 2560 | 2026-10-25T13:41:25.1035970Z |
+| main | VM | 37236 | 2026-10-25T13:40:54.8297010Z |
+| V8 | supervisor | 27244 | 2026-10-25T13:42:23.9677670Z |
+| V8 | workload | 1044 | 2026-10-25T13:42:24.3646190Z |
+| V8 | guard | 10128 | 2026-10-25T13:43:06.7923920Z |
+| V8 | VM | 10776 | 2026-10-25T13:42:36.0331800Z |
+
+VMnames SmallTV-6ff6545a23db иSmallTV-6ebdccab147c. Повторная CIM-проверка на
+13:47:42UTC подтвердила все12originalowners трёхruns:mainH10362cycles/
+guest6272.078252,soak-main13cycles/guest265.678434,soak-v8=9/guest197.138608.
+Guardrunning/oneROMboot/noerrors каждый; это pending prefixes, не8h/24hpass.
+Метаданные наблюдения three-runs-owners.json в ignored runbase. Старые7часов,
+новые8+8 и основной24h не складывать. Не рестартовать из-за probe timeout.
+
+Далее full-journal matched comparison и разбор additive TCP/unclassified loss;
+не складывать независимые medians. Old7flags, pending guestbuffer probes,
+idempotent already-deadVMcleanup и fullimage/final/hardware scope открыты.
+Frozen47files/SDK/ROM/app/assets/ELF/три protected VMs не менялись; goalactive.

@@ -9,7 +9,7 @@ main-9135/2DF90327. Не менять его runtime helpers, SDK, ROM, app/ELF,
 assets или frozen47files, не добавлять второй QMP/RSP client и не перезапускать.
 PID19884/8080/18380/18652 с creationUTC сохранены в исходном early process record;
 проверять реальные процессы, не один JSON status. Latest observation этой работы
-подтвердила все четыре owner/creationUTC и203cycles, oneROMboot/noerrors;
+подтвердила все четыре owner/creationUTC и362cycles, oneROMboot/noerrors;
 это не terminal H10 pass.
 
 Opt-in `-HeapTopology` квалифицирован отдельно: реальные C2 ROM и linked SDK
@@ -42,6 +42,34 @@ queued traffic и unclassified deltas. Не заменять ими основн
 driver уже закрыл ВМ: prototype получил connection refused, все owners отсутствуют.
 Failed prototype и exploratory40 без early0 не включены в qualification. Полный
 план, whole-image/fullsuite/fault/hardware scope остаются открытыми.
+
+## Два действующих metadata controls — producer23b641680, 2026-10-25
+
+В **этой** рабочей копии запущены отдельные `soak-main` и `soak-v8` в
+`.build/tcp-inventory-qemu-20261025/`, каждый28800guest seconds/interval15/
+outageEvery60/schema7. Main started13:40:41UTC, V8started13:42:23UTC; оба имеют
+genuine `-start.json` наcycle0 и `-processes.json` со всеми4positive owners/
+creationUTC. Pins:main2DF90327 иV8A5BE14C5, app9C1A83BD/ELF76B5CE37/ROM289CE00E,
+frozen47files без изменений. Actualinputs перечислены в каждом start/report.
+Не менять их, не перезапускать runs и не подключать второй QMP/RSP. Изменения
+producer или новые firmware builds выполнять в другой task worktree; новые
+offline analysis files/notes допустимы, если не меняют pinned inputs.
+
+Main owners supervisor40876/workload10056/guard2560/VM37236;
+V8owners27244/1044/10128/10776. Создание сверять **по файлам identity**, не только
+PID. На13:47:42UTC CIM подтвердил все12originalowners трёхruns:mainH10362cycles,
+soak-main13,soak-v8=9;oneROMboot/noerrors каждый. Это pending prefixes, не8h/24h
+приёмка. Не складывать их длительности. Сопоставимые controls нужны для воспроизведения
+старых7warnings на том же V8 и сравнения с main, а не для автоматического waiver.
+
+После terminal анализировать каждый fulljournal отдельно через current
+runtime_evidence.audit_run (extra roots C:/Work/yoRadio и C:/Work/QEMU-ESP32),
+tcp_coverage/tcp_series и runtime_trend. Сохранять вывод вне run directories.
+Для8h существующий analyze_runtime запускать с --diagnostic: это не H10.
+В объяснении median-loss не складывать независимые component medians: выбирать
+те же центральные observations, чтобы TCP+unclassified точно давали total loss.
+Thresholds/warmup/phases прежние. Реальный queuedtraffic, idempotentcleanup и
+whole-image/fullsuite/fault/hardware пункты остаются открытыми.
 
 Актуальные решения и рекомендации для продолжения сравнения заводской прошивки
 ESP32-C2 с собираемым C-проектом в `Small_TV/src`. История действий и результатов

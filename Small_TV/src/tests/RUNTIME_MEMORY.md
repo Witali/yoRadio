@@ -163,7 +163,8 @@ guard mutations и4самосогласованно rehashed, но ложных 
 $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/verify_runtime_candidate_evidence.py `
-  --proof Small_TV/qemu/parity/runtime-main-validation-20261025.json
+  --proof Small_TV/qemu/parity/runtime-main-validation-20261025.json `
+  --source-revision 79594bd02
 ```
 
 Новый H10 `.build/runtime-h10-main-20261025` запущен25Oct11:23:20UTC на полные

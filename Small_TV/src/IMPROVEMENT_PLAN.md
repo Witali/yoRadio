@@ -426,6 +426,10 @@ fields, exact live allocations, PCB/segment/pbuf chains и shared accounting,
 actual sampled queued segments/pbufs не было, их target traffic probe открыт.
 Далее matched длительные controls main/V8 и разбор unclassified deltas; старые
 7flags и full/24h/hardware scope не закрываются короткой qualification.
+Matched metadata controls запущены25Oct13:40/13:42UTC вsoak-main/soak-v8,
+по28800guest seconds/interval15/outageEvery60 наproducer23b641680. Early0 и
+4owneridentities каждый сохранены. Это pending, не8hpass; их producer inputs
+в текущей копии не менять. Основной24hH10 идёт в своей прежней копии отдельно.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.

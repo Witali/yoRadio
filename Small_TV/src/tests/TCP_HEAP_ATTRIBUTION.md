@@ -153,3 +153,19 @@ retained-loss flags. Не складывать короткие runs с осно
 thresholds и не считать новый контроль объяснением старого run без воспроизведения.
 Idempotent already-stopped-VM cleanup также остаётся отдельным follow-up. Полная
 цель, whole-image audit, final full suite и аппаратные gates остаются открытыми.
+
+## Запущенные matched controls
+
+После commit23b641680 запущены `.build/tcp-inventory-qemu-20261025/soak-main`
+и `soak-v8`:по28800guest seconds, interval15/outageEvery60/schema7. Первый
+started25Oct13:40:41UTC, второй13:42:23UTC;app/ELF/ROM и observers одинаковы,
+исполняемые QEMU соответственно2DF90327/A5BE14C5. Early0 и4positive process
+identities сохранены отдельно для каждого. На13:47:42UTC процессы ещё те же,
+13/9completecycles,oneROMboot/noerrors. Это запуск/префиксы, не итог сравнения
+и не объяснение7retained-loss flags. Основной H10 остаётся отдельным run.
+
+Pinned inputs здесь не менять; дальнейшие producer changes делать в другой
+task worktree. По завершении нужны полный журнал, guard/supervisor exit0,
+источники и разбор TCP/unclassified по тем же phases/warmup, что runtime_trend.
+Суммы отдельных medians не равны median суммы: для additive attribution нужно
+брать одинаковые центральные snapshots. Никакие thresholds этим не меняются.
