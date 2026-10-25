@@ -3724,3 +3724,14 @@ network/display/fullsuite and hardwareH01-H09 remain open. QEMU main fixed earli
 classic SPI/clock issues; full CYD RF still unqualified at MMIO60033c00 (main docs),
 so do not keep treating the old PHY assertion as the current proven fault.
 No OTA, no serial reset/flash; full objective not complete/blocked/paused.
+
+Latest H10 identity recheck: all4savedPID+creationUTC pairs match, last11cycles,
+oneROMboot/noUARTerrors, request86400 unchanged. IMPORTANT for pwsh7.5 probes:
+read -processes.json with ConvertFrom-Json -DateKind String before exact ISO
+comparisons. Default JSON date conversion produced one false string/DateTime
+mismatch even though supervisor19884 was alive. Immediate re-query of the SAME
+four IDs with string timestamps confirmed all identities; no restart occurred.
+This does not explain the OLD interrupted run: its four PIDs and same-run/V8
+scan were truly absent, independently of timestamp comparison. Pinned runtime
+helper sources use held process handles/command identities, not this ad-hoc
+timestamp comparison. Do not edit them for a probe-only formatting mistake.

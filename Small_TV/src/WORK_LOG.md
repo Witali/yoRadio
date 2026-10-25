@@ -4625,3 +4625,10 @@ process probe исключён/сохранён отдельно: guard PID ещ
 null нельзя считать PID0. Новая запись хранит только четыре положительных ownerID.
 Это запуск, не24h pass. H10 и объяснение7memoryflags, whole-image/fullsuite/fault/
 hardware пункты остаются открытыми; цель active, без физического вмешательства.
+
+Повторная проверка нового H10 подтвердила4точныхPID/creationUTC,11cycles,
+oneROMboot/noUARTerrors. Один ad-hoc probe ошибочно сравнил DateTime, автоматически
+полученный ConvertFrom-Json, со строкойISO. Повторный запрос тех жеPID с-DateKind
+String подтвердил все4совпадения; VM не перезапускалась. Это ошибка представления
+в пробе, не потеря процесса и не runtime-helper defect. У старогоH10 PID реально
+отсутствовали независимо от времени. Рекомендация сохранена вWORKING_NOTES.
