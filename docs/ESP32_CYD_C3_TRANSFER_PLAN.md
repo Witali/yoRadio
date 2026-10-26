@@ -106,7 +106,14 @@ heap. ASan/UBSan и ESP32 QEMU проходят 11 arena-сценариев, 200
 по спецификации, без новых аллокаций. ASan/UBSan и ESP32 QEMU проходят 3997
 новых сценариев; partition4096/dim1 работает в том же worker16КБ, собственный
 compiler frame32B static. Все прежние31 PCM остаются побитно точными.
-Дальше — общая OOM propagation/recovery, остальные channel-sized scratch,
+В [разборе заголовков](../tests/results/vorbis-xiph-headers-20261026/CHECKPOINT.md)
+проверены все прямые выделения памяти: ASan/UBSan и ESP32 QEMU проходят 1598
+сценариев отказа, очистки, повторного открытия и классификации ошибок.
+Проверены оба floor, все три residue, несколько comment strings и zero-size
+book allocations; все прежние31 PCM остаются точными. Ошибка памяти возвращает
+`OV_EFAULT`, ошибочный заголовок — прежний `OV_EBADHEADER`; public ABI сохранён.
+Дальше — OOM propagation/recovery при DSP init и packet decode, выделяющие память
+comment query/add helpers, остальные channel-sized scratch,
 границы uint32 rate/floor0 amplitude/VQ range и runtime integration.
 Новый кандидат пока не подключён к радио. Старые
 NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также

@@ -60,6 +60,20 @@ now carry nine exact edits, while the original sibling is unchanged. General
 OOM propagation, other channel-sized stack scratch, remaining format/range and
 production/physical gates remain open.
 
+The [checked-header stage](../tests/results/vorbis-xiph-headers-20261026/CHECKPOINT.md)
+now covers direct allocations in info initialization and comment/book/floor/
+residue/mapping/mode parsing. Local explicit status-carrying variants propagate
+OV_EFAULT for allocation refusal while preserving malformed-header statuses.
+Original callback wrappers and public codec.h remain unchanged; fixed dispatch
+tables are compile-time bound to the upstream registries. No shared error flag,
+TLS or errno inference is used. Host ASan/UBSan and ESP32 QEMU pass1598 scenarios,
+including all31 header allocation sweeps, six synthetic backend combinations,
+zero-size book policies and fresh-header recovery. All original31 PCM samples
+remain exact. The port now has16 exact edits across9 C units plus one owned
+private interface header. DSP/MDCT/look initialization, packet arena/floor/
+residue propagation, allocating comment utilities, other stack scratch and
+the remaining format/range and production gates are still open.
+
 Full floor0 correctness requires a precision and range design for the complete
 synthesis path. The public low-memory implementation stores Q4 amplitude and
 Q24 LSP values; the current bridge delegates residue, coupling, IMDCT, overlap
