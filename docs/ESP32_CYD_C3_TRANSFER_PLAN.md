@@ -123,8 +123,20 @@ book allocations; все прежние31 PCM остаются точными. �
 сценариев. Поиск тегов не выделяет память, добавление сохраняет прежнее состояние
 при отказе любой из трёх аллокаций; указатели существующих значений и binary
 metadata сохранены. DSP/декодер в этом target не исполняются; отложенный DSP gate
-не возобновлялся и его NONPASS остаётся. Дальше — завершение DSP target gate,
-OOM propagation/recovery при packet decode, остальные channel-sized scratch,
+не возобновлялся и его NONPASS остаётся.
+[Packet allocation/recovery](../tests/results/vorbis-xiph-packets-20261026/CHECKPOINT.md)
+теперь проходит отдельные host ASan/UBSan проверки: 41086 сценариев, включая
+27875 исходного корпуса, 13188 synthetic/no-work и 23 arena. Все прежние31 PCM
+сохраняют max0 и все14 relations; возврат только прежнего кода выделения PCM
+воспроизводит UBSan NULL store. Arena growth сохраняет прежние owners и данные
+при отказе node/buffer, floor/residue передают required OOM до synthesis как
+явное расширение OV_EFAULT; nominal EOP остаётся успешным. 48 прямых no-work
+controls проверяют отсутствие scratch allocation attempts и сохранение armed
+refusal. Clang всех25 library/fixture units: 308 предупреждений/0 ошибок,
+диагностики сохранены. [Подготовка отдельного packet target отложена](CYD_XIPH_PACKET_TARGET_DEFERRED_20261026.md):
+инструмент вернул «aborted before dispatch» без причины; проект не создан,
+SDK/QEMU не запускались. Это не подтверждённый отказ по кибербезопасности.
+Дальше — оба незавершённых native gates, остальные channel-sized scratch,
 границы uint32 rate/floor0 amplitude/VQ range и runtime integration.
 Новый кандидат пока не подключён к радио. Старые
 NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также
@@ -1570,3 +1582,18 @@ Stream остаётся на core0, decode/output на core1 с прежними
   suites проходят. Сохраняются stream core0/decode-output core1 на CYD и core0 C3.
   Frame orchestration, floor multiplication, IMDCT/overlap, raw/production
   integration, исходный full31 PCM/G6/G8 и physical acceptance остаются.
+
+- 2026-10-26, CYD-C3-14: [пакетная обработка отказов памяти Xiph](../tests/results/vorbis-xiph-packets-20261026/CHECKPOINT.md)
+  добавлена отдельными exact edits поверх неизменённой upstream базы: всего33
+  фрагмента, 11 изменённых C units и четыре private headers. Host41086 проходит
+  ASan/UBSan, исходные31/434/738560 PCM bytes имеют max0 при прежнем допуске2;
+  все14 relations сохранены. Есть оба floor × все3 residue, arena-cold/warm,
+  оба zero-size allocator policies, каждый наблюдаемый allocation ordinal,
+  nominal floor/residue EOP, optional realloc refusal и full close/header replay.
+  Прямые48 no-work controls не допускают ненужного scratch allocation;
+  counterfactual с исходным synthesis.c воспроизводит NULL store.
+  Clang Xtensa/Picolibc проверяет25 units с308 warnings/0errors; это source
+  analysis, а не SDK build. [Новый packet target не подготовлен](CYD_XIPH_PACKET_TARGET_DEFERRED_20261026.md)
+  после «aborted before dispatch» без указанной причины, новых native случаев0.
+  Старый DSP watchdog NONPASS, прочие deferred scopes, format/range,
+  channel-sized stacks, radio integration и physical acceptance остаются.
