@@ -55,7 +55,7 @@ def main():
         for folder,label in((BASE,'components/native_vorbis_xiph'),(PORT,'components/native_vorbis_xiph_port')):
             for path in sorted(folder.rglob('*')):
                 if path.is_file():freeze(path,label+'/'+path.relative_to(folder).as_posix())
-        for name in('vorbis_xiph_alloc.h','vorbis_xiph_alloc_inject.h','vorbis_xiph_alloc.c','vorbis_xiph_arena.c','vorbis_xiph_books.c','vorbis_xiph_bits.c','vorbis_xiph_residue.c','vorbis_xiph_headers.c','vorbis_xiph_host.c'):freeze(ROOT/'tests/native'/name,'native/'+name)
+        for name in('vorbis_xiph_alloc.h','vorbis_xiph_alloc_inject.h','vorbis_xiph_alloc.c','vorbis_xiph_arena.c','vorbis_xiph_books.c','vorbis_xiph_bits.c','vorbis_xiph_residue.c','vorbis_xiph_headers.c','vorbis_xiph_dsp.c','vorbis_xiph_host.c'):freeze(ROOT/'tests/native'/name,'native/'+name)
         origin=freeze(ROOT/'tests/test-vorbis-floor1-render.py','supervisor-origin.py');tree=ast.parse(origin)
         supervisors=[ast.literal_eval(n.value)for n in tree.body if isinstance(n,ast.Assign)and any(isinstance(t,ast.Name)and t.id=='SUPERVISOR'for t in n.targets)]
         need(len(supervisors)==1,'one reviewed nonce-owned Linux supervisor');(out/'supervisor.py').write_text(supervisors[0],encoding='utf-8',newline='\n');report['supervisor_sha256']=sha((out/'supervisor.py').read_bytes())
@@ -74,12 +74,12 @@ def main():
         for index,unit in enumerate(porting['compiled_units']):
             obj=out/'objects'/f'library-{index:02d}.o';objects.append(obj)
             run('compile-library-'+str(index).zfill(2),[*common,'-include',linux(native/'vorbis_xiph_alloc_inject.h'),'-c',linux(generated/unit['compiled']),'-o',linux(obj)])
-        for stem in('alloc','arena','books','bits','residue','headers','host'):
+        for stem in('alloc','arena','books','bits','residue','headers','dsp','host'):
             obj=out/'objects'/('fixture-'+stem+'.o');objects.append(obj)
             run('compile-fixture-'+stem,[*common,'-Wall','-Wextra','-Werror','-c',linux(native/('vorbis_xiph_'+stem+'.c')),'-o',linux(obj)])
         binary=out/'resource-tests';run('link',['gcc','-fsanitize=address,undefined','-fno-sanitize-recover=all','-no-pie','-Wl,--gc-sections',*[linux(p)for p in objects],'-lm','-o',linux(binary)])
         output=out/'pcm.bin';text=run('execute',['env','ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:allocator_may_return_null=1','UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1',linux(binary),linux(output)])
-        result=re.fullmatch(r'RESOURCE_CHECKS arena=11 books=(200864) bits=(124754) residue=(3997) headers=([1-9][0-9]*) live=0\s+RESOURCE_PASS arena=11 books=\1 cases=31 packets=434 pcm_bytes=738560 live=0\s*',text);need(result is not None,'complete asserted resource and raw corpus result')
+        result=re.fullmatch(r'RESOURCE_CHECKS arena=11 books=(200864) bits=(124754) residue=(3997) headers=(1598) dsp=([1-9][0-9]*) live=0\s+RESOURCE_PASS arena=11 books=\1 cases=31 packets=434 pcm_bytes=738560 live=0\s*',text);need(result is not None,'complete asserted resource and raw corpus result')
         data=output.read_bytes();need(data[:8]==b'XIPHRES1','complete binary capture signature');at=8
         def u32():
             nonlocal at
@@ -100,7 +100,7 @@ def main():
         for relation in model['relations']:
             names=relation['cases'];equal=all(targets[n]==targets[names[0]]for n in names[1:]);need(equal==(relation['kind']=='equal'),'all14 original exact relations')
         need(all(sha(Path(path).read_bytes())==pin['sha256']==sha((out/pin['snapshot']).read_bytes())for path,pin in ledger.items()),'all original/frozen inputs unchanged')
-        report.update(completed=True,passed=True,arena_scenarios=11,book_assertions=int(result[1]),bitreader_assertions=int(result[2]),residue_scenarios=int(result[3]),header_scenarios=int(result[4]),relations=14,binary_sha256=sha(binary.read_bytes()),capture_sha256=sha(data));save();print(json.dumps({k:report[k]for k in('completed','passed','arena_scenarios','book_assertions','bitreader_assertions','residue_scenarios','header_scenarios','cases','packets','pcm_bytes','max_abs_error')}));return 0
+        report.update(completed=True,passed=True,arena_scenarios=11,book_assertions=int(result[1]),bitreader_assertions=int(result[2]),residue_scenarios=int(result[3]),header_scenarios=int(result[4]),dsp_scenarios=int(result[5]),relations=14,binary_sha256=sha(binary.read_bytes()),capture_sha256=sha(data));save();print(json.dumps({k:report[k]for k in('completed','passed','arena_scenarios','book_assertions','bitreader_assertions','residue_scenarios','header_scenarios','dsp_scenarios','cases','packets','pcm_bytes','max_abs_error')}));return 0
     except BaseException as error:report.update(completed=report.get('measurement_completed',False),passed=False,error=repr(error));save();raise
 
 if __name__=='__main__':raise SystemExit(main())

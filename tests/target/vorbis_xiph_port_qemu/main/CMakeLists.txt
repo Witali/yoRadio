@@ -2,6 +2,7 @@ idf_component_register(SRCS "main.c" "vorbis_xiph_alloc.c"
                            "vorbis_xiph_arena.c" "vorbis_xiph_books.c" "vorbis_xiph_bits.c"
                            "vorbis_xiph_residue.c"
                            "vorbis_xiph_headers.c"
+                           "vorbis_xiph_dsp.c"
                       INCLUDE_DIRS "."
                       REQUIRES freertos esp_system heap native_vorbis_xiph_port)
 if(CMAKE_BUILD_EARLY_EXPANSION)

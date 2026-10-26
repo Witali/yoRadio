@@ -2,7 +2,7 @@
 
 This separate candidate preserves the pinned `native_vorbis_xiph` baseline.
 Its generator validates both complete manifests, retains every original byte
-under `base/`, and creates only nine modified translation units and one owned private header under `ported/`.
+under `base/`, and creates only ten modified translation units and two owned private headers under `ported/`.
 Each declared before fragment must match exactly once. `PORTING.json` records
 all edits and compiled file hashes. No fuzzy patching or external patch tool is
 used. The source version and successful decoding arithmetic remain upstream's.
@@ -37,9 +37,18 @@ no shared mutable error state, TLS, errno inference, public ABI change, or
 modified baseline header. Legal zero-size NULL allocations are preserved.
 The generated private header declares only these checked entry points.
 
+Seven additional edits check the shared decoder DSP, MDCT and floor/residue
+lookup initialization, with partial-owned arrays safe for cleanup. The PCM
+pointer array is zero-initialized; pcmret is freed independently. A private
+checked MDCT initializer preserves the original void wrapper and transform
+arithmetic. Public synthesis initialization retains its documented 0/1 return
+contract. Failed initialization may have consumed static books; callers close
+the entire stream and replay headers to recover. Encoder-only paths and packet
+allocations are not covered by this decoder-init change.
+
 Neither production application selects this component. The previous unchanged
 31-case numerical checkpoint remains separate. Resource tests must not imply
-general OOM recovery or a complete decoder stack bound: other block, DSP,
-packet floor and residue allocations still require qualification. Channel-sized mapping/residue scratch and unchecked allocations elsewhere
+general OOM recovery or a complete decoder stack bound: packet arena/floor/residue and allocating comment utilities still require
+qualification. Channel-sized mapping/residue scratch and unchecked allocations elsewhere
 still require work. No deferred vendor/Ogg scope is
 reopened, and no physical performance claim is made.

@@ -14,9 +14,9 @@ ROOT=Path(__file__).resolve().parents[1]
 BASE=ROOT/'idf/components/native_vorbis_xiph'
 PORT=ROOT/'idf/components/native_vorbis_xiph_port'
 GENERATOR=PORT/'prepare.py'
-GENERATOR_SHA='8a67802770fe4bc6cbe0f85514041ee811596466f28a65cd12e28f5cbc3c03d4'
+GENERATOR_SHA='8e48c251b3df4feda8bc1753db332dae0d9a4d4ed4e7eaca530cfbeff36a1e3d'
 BASE_SHA='897096caf216de0e161f4fd833037863f8e2dc3da0531e34b851503f932f4b14'
-PORT_SHA='a5e00f16d4584cd16d5da327e552163002dfbc494a4b47ca309738c9201ae894'
+PORT_SHA='33931bdee52616bfcd87b10d9dbe6e872d1648e718ea0b3ff93e460240d2482f'
 
 def sha(body):return hashlib.sha256(body).hexdigest()
 def files(root):return {p.relative_to(root).as_posix():p.read_bytes()for p in root.rglob('*')if p.is_file()}
@@ -55,17 +55,18 @@ class PortGeneration(unittest.TestCase):
         manifest['files']={name:sha(value)for name,value in files(self.port_copy).items()if name!='port-manifest.json'}
         path.write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n',encoding='utf-8',newline='\n')
 
-    def test_complete_exact_sixteen_edit_nine_unit_and_private_header_output(self):
+    def test_complete_exact_twenty_three_edit_ten_unit_and_private_headers_output(self):
         upstream_before=files(self.upstream);port_before=files(self.port_copy);record=self.generate();result=files(self.output)
         self.assertEqual(len(upstream_before),116)
         self.assertEqual({name[5:]:value for name,value in result.items()if name.startswith('base/')},upstream_before)
-        expected_ports={'ported/'+name+'.c'for name in('block','sharedbook','codebook','floor0','floor1','res0','mapping0','info','bitwise')}
-        expected_ports.add('ported/native_vorbis_xiph_header_error.h')
+        expected_ports={'ported/'+name+'.c'for name in('block','sharedbook','codebook','floor0','floor1','res0','mapping0','info','bitwise','mdct')}
+        private_headers=('native_vorbis_xiph_header_error.h','native_vorbis_xiph_dsp_error.h')
+        expected_ports.update('ported/'+name for name in private_headers)
         self.assertEqual({name for name in result if name.startswith('ported/')},expected_ports)
-        self.assertEqual(len(result),127);self.assertEqual(json.loads(result['PORTING.json']),record)
-        self.assertEqual(result['ported/native_vorbis_xiph_header_error.h'],port_before['include/native_vorbis_xiph_header_error.h'])
+        self.assertEqual(len(result),129);self.assertEqual(json.loads(result['PORTING.json']),record)
+        for name in private_headers:self.assertEqual(result['ported/'+name],port_before['include/'+name])
         self.assertEqual(record['base_manifest_sha256'],BASE_SHA);self.assertEqual(record['port_manifest_sha256'],PORT_SHA)
-        changes=json.loads(port_before['edits.json'])['edits'];self.assertEqual(len(changes),16);self.assertEqual(len(record['edits']),16)
+        changes=json.loads(port_before['edits.json'])['edits'];self.assertEqual(len(changes),23);self.assertEqual(len(record['edits']),23)
         # Independently splice the declared fragments at their unique split;
         # verify complete result bodies and every before/after identity.
         expected={}
@@ -133,7 +134,7 @@ class PortGeneration(unittest.TestCase):
 
     def test_resealed_wrong_edit_count_is_rejected(self):
         path=self.port_copy/'edits.json';changes=json.loads(path.read_bytes());changes['edits'].pop();path.write_text(json.dumps(changes),encoding='utf-8');self.reseal_port()
-        with self.assertRaisesRegex(ValueError,'sixteen exact reviewed edits'):self.generate()
+        with self.assertRaisesRegex(ValueError,'twenty-three exact reviewed edits'):self.generate()
         self.assertFalse(self.output.exists())
 
     def test_resealed_source_escape_is_rejected(self):
