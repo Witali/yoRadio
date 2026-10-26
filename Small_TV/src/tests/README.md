@@ -9,6 +9,10 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Storage fix](NVS_STORAGE_FIX.md) исправляет верхний I/O contract и temporary
+OOM leak в согласованной локальной SDK copy. Before/after fault matrix, Page
+regressions, native tests и отдельные сеть/LCD gates проверены; широкий scope открыт.
+
 [Full Storage before](NVS_STORAGE.md) квалифицирует замыкание init/read,
 исполняет межсекторные сценарии и подтверждает исправление BLOB. 460 fault/retry cases
 воспроизводят оставшийся верхний I/O error contract false; это следующий fix.

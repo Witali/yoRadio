@@ -112,6 +112,23 @@ class ArtifactTests(unittest.TestCase):
             if key[0] == 'POST' and key[1] != '/restart':
                 self.assertGreater(row['errors'], 0, key)
 
+    def test_nvs_component_overlay(self):
+        """Keep the new private-header correction tied to the actual archived app/ELF."""
+        manifest = json.loads((ARCHIVE / 'manifest.json').read_bytes())
+        linked = json.loads((ARCHIVE / 'nvs-storage-linkage.json').read_bytes())
+        overlay = json.loads((ARCHIVE / 'nvs-storage-overlay.json').read_bytes())
+        self.assertTrue(linked['passed'])
+        self.assertEqual(linked['app_sha256'], sha((ARCHIVE / 'app.bin').read_bytes()))
+        self.assertEqual(linked['elf_sha256'], manifest['elf_sha256'])
+        self.assertEqual(linked['overlay'], overlay)
+        self.assertEqual(linked['local_translation_units'], 17)
+        self.assertTrue(linked['complete_direct_init_read_closure'])
+        self.assertFalse(linked['semantic_tests_executed'])
+        self.assertFalse(overlay['shared_sdk_modified'])
+        self.assertEqual(overlay['source_manifest_sha256'], sha((PROJECT / 'tools/nvs_component_sources.json').read_bytes()))
+        for name, digest in overlay['fragments'].items():
+            self.assertEqual(digest, sha((PROJECT / 'storage/nvs' / name).read_bytes()))
+
 
 def main():
     """Write a fresh result on success and fail the caller on any integrity mismatch."""

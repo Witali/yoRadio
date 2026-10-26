@@ -353,6 +353,15 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [Storage fix](tests/NVS_STORAGE_FIX.md) возвращает точные ошибки через
+PageManager/Storage и освобождает temporary indices при каждом выходе.
+Локальный SDK component:45pinned files/35copies/17TUs,56native bodies7776B;
+app8758/ELFDA1E архивированы.236native fault/retry cases теперь без скрытых ошибок,
+4customOOM без40Bleak; before134failures сохранён. Native6300, Page652, отдельные
+network/LCD и overlay controls проходят. Не считать этим принятым весь public
+NVS/API/powercut. Далее TIM/null-completion/station+820/BSS/aliases и оставшиеся
+whole-image gaps; deferred1–3/full/24h/hardware scope сохраняется.
+
 26Oct: [full Storage before](tests/NVS_STORAGE.md) квалифицирует71factory/
 53native функций и исполняет Storage.init/read с реальными PageManager/Page/CRC.
 18baseline+18reopen,460fault/retry и6six-sector cases подтверждают прошлый BLOBfix,

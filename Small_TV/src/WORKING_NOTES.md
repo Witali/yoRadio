@@ -2,6 +2,17 @@
 
 ## Текущий приоритет — заводской образ, 2026-10-26
 
+Текущая рабочая копия `.worktree/small-tv-storage-fixes`, ветка
+`codex/small-tv-storage-fixes`, создана отa3ebb45d0. Локальная NVS component copy
+исправляет upper I/O errors и temporary40Bleak;45vendor SHA/35copies/17TUs.
+App8758/ELFDA1E сохранены и проходят236fault/retry,4OOM,compat/geometry/Page652,
+native6300 и отдельные network/LCD checks. Old34CB/73BE оставлены неизменными в
+small-tv-nvs-fixes. См. [NVS_STORAGE_FIX.md](tests/NVS_STORAGE_FIX.md).
+Final proof reader59401/fd6be3 terminal0: before/after,8input+8overlay+5report
+controls,6300native и network/LCD witnesses повторно проверены.
+NEXT — TIM/null-completion/station+820/BSS/aliases; full NVS API/powercut и
+deferred1–3/full/24h/hardware остаются открытыми. Shared SDK/QEMU не менять.
+
 Новый analysis checkpoint в той же `small-tv-nvs-fixes`: полный Storage.init/read
 qualified71factory/53native.18baseline+18reopen,460fault/retry+6six-sector cases
 подтвердили BLOBfix, но верхние PageManager/Storage ещё скрывают134native I/O
@@ -4968,3 +4979,74 @@ station+820/BSS/aliases and deferred1–3/full/24h/hardware remain open. Goal AC
 OOM checkpoint:4custom malloc failures reproduce40Btemporary leak at second BlobIndex allocation, both factory/native. Proof10gzip539365B/61pins; finalreader47042 pending. Add cleanup-on-all-exits to next correction. Firstreader53022 failed only numeric-key vsJSON string-key equality, canonicalized without changing archived bytes.
 
 Final reader47042/2a9a74 terminal0, all18+18+460+460+6+4cases and8+6controls reproduced. Native upper-error and temporary-cleanup false; data preserved in selected retries. No pending exec/VM. Stage scan26files/10gzip/61pins clean; ready for focused baseline commit, then production fix in a separate worktree preserving this snapshot.
+
+## 26 October 2026 — fix upper Storage recovery errors and temporary ownership
+
+Previous goal turn made progress in a3ebb45d0 with a complete failing-before
+Storage witness. Verified clean HEAD; created .worktree/small-tv-storage-fixes /
+codex/small-tv-storage-fixes from a3ebb45d0. Old small-tv-nvs-fixes remains frozen
+with34CB/73BE, source pins and full before proofs. No shared SDK/QEMU mutation.
+
+Five C++ fragments in storage/nvs correct PageManager.load, Storage index
+collection/mismatch/orphan cleanup and init. PageManager consolidates predecessor
+erase with preserved FREEING skip, first match, TYPE_MISMATCH miss and legacy
+BLOB fallback. All failed scans/erases return the original status. Storage stays
+INVALID until all recovery succeeds. Cleanup helpers return esp_err_t; local
+scope guard frees every temporary index even after a later OOM/I/O failure.
+No global error slot or overloaded enum state is used. FIXED_FACTORY comments
+mark the corrected functions and explain ownership/nontrivial cases.
+
+prepare_nvs_component checks45source/header SHA and exactly5fragments, copies35
+src files locally, patches the private header consistently, retains the oldPage
+patch/report, and redirects all17component TUs. Postlink guard verifies allinput
+bytes, compile commands and56native bodies7776B; factory71bodies8750B. No private
+header disagreement across TUs or vendor checkout edits. Unsafe source/report
+outputs are rejected. Full normal I/O sequences in9native baselines remain
+byte-identical to before (1bbe8e), so no added flash operations in those paths.
+
+First patch application was rejected atomically for duplicate CMake patch
+operations; corrected before any generator write. First build33896 failed
+configure because3target_sources paths were relative; resolve them against the
+pinned component directory, retain strict source containment. Build15955/0d74c2
+completed0. Added output-path/fragment-inventory guards, then final build97551/
+e9a7e4 completed0 and archived app8758BD09/ELFDA1ED0CE/sourceF2699B39. App1476112B,
+144Bmore than34CB,59888Bpartition free. Existing WARN/DEBUGoff/JPEG policy remains.
+JPEG long try-compile path warnings did not cause a failed dependency build.
+
+Producer19839/bacb08 completed0: all236native I/O failures now0x104/INVALID with
+no further I/O; all retained-media retries preserve values. Before replay still
+reproduces134native false successes. Four customOOM failures leave0temporary
+bytes native; two replacement cases + two same-object retries pass. Sixgeometry
+cases and previousPage records/652partial executions pass. Standard arrayOOM is
+an explicit nullable fixture boundary, not a new full-VM OOM claim.
+
+Native40197/710c8d completed0:6300checks/3727privacy/26nothrow, mapping controls.
+Artifact681d8c completed0 with7tests including component metadata consistency.
+Overlay62988/3b14e6 completed0: unchanged private copied fixture passes,8real
+vendor/header/TU/app/archive/output mutations reject, original SDK/overlay intact.
+Network45257/972668 completed0: setup/HTTP/NVS persistence/reboot/coldboot/reset/
+3fresh SNTP phases, no LCD. Display48754/a34d42 completed0:1factory+1native cold
+frame exact. CIM a73edb verified all4matching owners absent. No physical board,
+serial/reset/flash or outside process touched. No push.
+
+Inspected raw-settings witnesses locally without printing suspected values:
+password empty, SSID synthetic, country/city compiled defaults, unused bytes only
+zero/erased. Weather field is the fixed8B test token at offset0x11c/width65 in
+pinned small_tv_network.seed_network, not a user key; NTP is private VM service
+address. Initial empty-key/zero-tail assumptions rejected and were replaced by
+exact fixture comparison plus padding check; all3phases pass d6980d. No user
+credential values were printed or exported by this inspection.
+
+Proof nvs-storage-fix-validation-20261026.json:23newgzip405247B/74sourcepins.
+Final reader59401/fd6be3 terminal0: complete before/after CPU rerun, Page652,
+8input+8overlay+5report/runtime controls, full production source/resource hashes,
+6300native/3727privacy and independent3network/2LCD witnesses. Allthree native
+contracts pass; physical/full-VM powercut/whole-image flags remain false.
+
+NEXT factory TIM/null-completion/station+820/BSSoverflow/aliases and remaining
+whole-image gaps; fullpublicNVS/API/arbitrary physical cuts and deferred1–3,
+fullsuite/24h/hardware acceptance remain open. Preserve allold/new proof inputs;
+no long VM is pending. Goal ACTIVE. Stage exact focused fix, inspect archives/
+LFS/metadata locally and commit after clean staged checks; do not push implicitly.
+
+Staged57files/23expandedgzip/2LFS/74pins checked clean (dd2404), plus decoded synthetic settings check d6980d. Finalreader59401/fd6be3 terminal0, no pending exec or ownedVM. Ready for focused commit; next factory TIM/null/lifetime/BSS/aliases.

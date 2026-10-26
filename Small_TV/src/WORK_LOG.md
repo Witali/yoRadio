@@ -5548,3 +5548,74 @@ private header declarations across all component TUs are required; use local
 source/header overlay, retain shared SDK and frozen before inputs.
 
 Final reader47042/2a9a74 completed0:71/53full bodies;18baseline+18reopen+460fault+460retry+6geometry+4customOOM;8actualinput+6report controls. Desired upper I/O/temporary cleanup contracts remain explicitly false. App SHA34CB unchanged. Staged confidentiality scan a05408 checked26files/10expandedarchives/61pins with no findings; final docs/status refresh then repeat scan before focused commit.
+
+## 26 October 2026 — fix upper Storage recovery errors and temporary ownership
+
+Previous goal turn made progress in a3ebb45d0 with a complete failing-before
+Storage witness. Verified clean HEAD; created .worktree/small-tv-storage-fixes /
+codex/small-tv-storage-fixes from a3ebb45d0. Old small-tv-nvs-fixes remains frozen
+with34CB/73BE, source pins and full before proofs. No shared SDK/QEMU mutation.
+
+Five C++ fragments in storage/nvs correct PageManager.load, Storage index
+collection/mismatch/orphan cleanup and init. PageManager consolidates predecessor
+erase with preserved FREEING skip, first match, TYPE_MISMATCH miss and legacy
+BLOB fallback. All failed scans/erases return the original status. Storage stays
+INVALID until all recovery succeeds. Cleanup helpers return esp_err_t; local
+scope guard frees every temporary index even after a later OOM/I/O failure.
+No global error slot or overloaded enum state is used. FIXED_FACTORY comments
+mark the corrected functions and explain ownership/nontrivial cases.
+
+prepare_nvs_component checks45source/header SHA and exactly5fragments, copies35
+src files locally, patches the private header consistently, retains the oldPage
+patch/report, and redirects all17component TUs. Postlink guard verifies allinput
+bytes, compile commands and56native bodies7776B; factory71bodies8750B. No private
+header disagreement across TUs or vendor checkout edits. Unsafe source/report
+outputs are rejected. Full normal I/O sequences in9native baselines remain
+byte-identical to before (1bbe8e), so no added flash operations in those paths.
+
+First patch application was rejected atomically for duplicate CMake patch
+operations; corrected before any generator write. First build33896 failed
+configure because3target_sources paths were relative; resolve them against the
+pinned component directory, retain strict source containment. Build15955/0d74c2
+completed0. Added output-path/fragment-inventory guards, then final build97551/
+e9a7e4 completed0 and archived app8758BD09/ELFDA1ED0CE/sourceF2699B39. App1476112B,
+144Bmore than34CB,59888Bpartition free. Existing WARN/DEBUGoff/JPEG policy remains.
+JPEG long try-compile path warnings did not cause a failed dependency build.
+
+Producer19839/bacb08 completed0: all236native I/O failures now0x104/INVALID with
+no further I/O; all retained-media retries preserve values. Before replay still
+reproduces134native false successes. Four customOOM failures leave0temporary
+bytes native; two replacement cases + two same-object retries pass. Sixgeometry
+cases and previousPage records/652partial executions pass. Standard arrayOOM is
+an explicit nullable fixture boundary, not a new full-VM OOM claim.
+
+Native40197/710c8d completed0:6300checks/3727privacy/26nothrow, mapping controls.
+Artifact681d8c completed0 with7tests including component metadata consistency.
+Overlay62988/3b14e6 completed0: unchanged private copied fixture passes,8real
+vendor/header/TU/app/archive/output mutations reject, original SDK/overlay intact.
+Network45257/972668 completed0: setup/HTTP/NVS persistence/reboot/coldboot/reset/
+3fresh SNTP phases, no LCD. Display48754/a34d42 completed0:1factory+1native cold
+frame exact. CIM a73edb verified all4matching owners absent. No physical board,
+serial/reset/flash or outside process touched. No push.
+
+Inspected raw-settings witnesses locally without printing suspected values:
+password empty, SSID synthetic, country/city compiled defaults, unused bytes only
+zero/erased. Weather field is the fixed8B test token at offset0x11c/width65 in
+pinned small_tv_network.seed_network, not a user key; NTP is private VM service
+address. Initial empty-key/zero-tail assumptions rejected and were replaced by
+exact fixture comparison plus padding check; all3phases pass d6980d. No user
+credential values were printed or exported by this inspection.
+
+Proof nvs-storage-fix-validation-20261026.json:23newgzip405247B/74sourcepins.
+Final reader59401/fd6be3 terminal0: complete before/after CPU rerun, Page652,
+8input+8overlay+5report/runtime controls, full production source/resource hashes,
+6300native/3727privacy and independent3network/2LCD witnesses. Allthree native
+contracts pass; physical/full-VM powercut/whole-image flags remain false.
+
+NEXT factory TIM/null-completion/station+820/BSSoverflow/aliases and remaining
+whole-image gaps; fullpublicNVS/API/arbitrary physical cuts and deferred1–3,
+fullsuite/24h/hardware acceptance remain open. Preserve allold/new proof inputs;
+no long VM is pending. Goal ACTIVE. Stage exact focused fix, inspect archives/
+LFS/metadata locally and commit after clean staged checks; do not push implicitly.
+
+Staged audit27964/dd2404:57files,23decompressed archives,2actualLFS payloads,74sourcepins and all payload hashes match index. Four standalone PEM parser markers classified against official SDK pk_internal.h; no unresolved sensitive findings. Decoded raw-settings privacy check d6980d confirms fixed seed_network token, empty password, compiled location defaults and VM/padding fields; no values printed. Final focused commit follows, no push.
