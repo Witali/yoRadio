@@ -9,6 +9,10 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Full Storage before](NVS_STORAGE.md) квалифицирует замыкание init/read,
+исполняет межсекторные сценарии и подтверждает исправление BLOB. 460 fault/retry cases
+воспроизводят оставшийся верхний I/O error contract false; это следующий fix.
+
 [NVS recovery](NVS_RECOVERY.md) исправляет унаследованные счётчики, hash/chunk
 identity и скрытые I/O ошибки в локальной SDK source copy. Машинные fault/reopen
 checks, новая production app и отдельные сеть/LCD gates проходят. Full Storage/

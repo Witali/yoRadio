@@ -5469,3 +5469,82 @@ aliases. Deferred1–3/full/24h/hardware remain open, goal ACTIVE.
 Final evidence reader62193/e7059c terminal0: all CPU phases repeated exactly,51sourcepins,7input+5source+6report/runtime controls,6298native/3727privacy/3networkphases/2exactLCDframes. Goal remains active; ready for staged confidentiality/pin checks and focused commit.
 
 Staged confidentiality check1686ee:52files,23expanded gzip,2actualLFS payloads,51sourcepins and all archived payload hashes match index. Four PEM header matches are individually confirmed NUL-terminated parser format constants from official tf-psa-crypto/extras/pk_internal.h, without key bodies; no unresolved sensitive findings. No push.
+
+## 26 October 2026 — full Storage init/read and multi-sector before evidence
+
+Previous goal turn made concrete progress in c95e3674b. Verified clean HEAD and
+continued user factory item4 in small-tv-nvs-fixes without changing production
+34CB/73BE or any existing proof/build/network/LCD input. Added only analysis
+sources/tests/docs, source SDK5.5.4/6.1 and QEMU remain unchanged.
+
+Compiled unchanged SDK5.5.4 PageManager/Storage twice with the same qualified
+GCC14 profile; objects5bcb5625/aed3fbcf, canonical provenance and resolved DWARF
+carrier ELF are byte-identical. The full factory Storage.init is42041d38/314B,
+PageManager.load42043314/620B, Storage.readItem42041740. New strict qualification
+follows every named direct call from init/read,71factory bodies8750B and53native
+7630B; no unqualified NVS algorithm/relaxed identity. Standard array new/delete,
+allocator/string copies and synthetic Partition API are explicit boundaries;
+actual C2 ROM CRC code/table executed. Factory array OOM abort is not replaced
+by a claimed real NULL path; this fixture boundary is explicitly synthetic.
+
+Resolved DWARF independently verifies Storage104B/PageManager40B/Page84B/
+NamespaceEntry28B/BlobIndexNode40B and all used offsets/virtualslots. First CPU
+prototype used get_readonly slot36, reached PC0, and was corrected to real slot40
+before accepted runs; actual slot guards and offset mutants prevent recurrence.
+No QEMU emulation defect or production SDK fix was inferred from that fixture bug.
+
+Full literal CPU baseline:9wire images pervariant plus fresh stable reopens,
+ordering/duplicates/FREEING before and after target activation/BLOB publication/
+two-chunk reads. Real Storage.readItem returns factoryNOT_FOUND for old valid
+BLOB + uncommitted new generation in the same page; current returns oldA.
+Cross-page uncommitted generation retainsA, published new index returnsB,
+two-chunk returnsAB. Thus prior Page fix now has a complete Storage witness.
+Six additional cases use sixactualNVS sectors24576B:5used+reserve,6writable
+NO_FREE_PAGES,6readonly successful unchanged reads. No fabricated sector size.
+
+460actual faults (224factory/236native) cover every observed non-512-byte I/O
+ordinal on4new inter-sector paths, each before/half-transfer. Retained media
+is independently replayed from issued physical program/erase prefixes. All460
+fresh Storage retries retain expected values. However higher layers hide130
+factory and134native errors: error contract false. PageManager ignores some
+search/erase returns; Storage lookup loops and private void cleanup helpers lose
+I/O errors, init can become ACTIVE despite an underlying failure. This is new
+unfinished corrective work, not a pass waived by successful fresh retry.
+
+8actual source/frame/call/ABI mutations are rejected. Repeated analysis builds
+13e573 and public strict closure90cd77 completed0. Producer24173/0c164f completed0;
+geometry29546/bb5f43 completed0. Proof nvs-storage-before-validation-20261026.json
+archives9newgzip536773B/60sourcepins and reuses prior3objects/config/ROM witness.
+Consumer53022 is replaying; require terminal0 including5report controls before
+staging/committing. No new firmware build, VM, board/serial/reset/flash or push.
+
+NEXT exact I/O propagation through PageManager/Storage, no subsequent I/O,
+INVALID storage, preserve normal NOT_FOUND. Return status from private cleanup
+helpers with consistent declarations/definitions. Use exact-SHA guarded local
+NVS component source/header copy; do not patch shared SDK, invent global error
+state, misuse enum fields, or leave inconsistent class declarations across TUs.
+Preserve all34CB/73BE before inputs in this worktree; create separate task
+worktree for the production correction. Then rerun before/after fault matrix,
+archive new app, independent native/network/LCD checks. Remaining TIM/null/
+station+820/BSS/aliases and deferred1–3/full/24h/hardware remain open. Goal ACTIVE.
+
+Reader53022/e75c1c replayed both460fault matrices correctly but rejected JSON
+comparison: private retained_allocations had numeric Python keys, decoded JSON
+has strings. Canonicalize only those dictionary keys to str in fixture output;
+archived serialized wire evidence remains byte-identical. No oracle/body matcher
+was weakened. Final source pins refreshed and reader47042 launched against the
+same exact34CB/73BE/ROM/NVS inputs; await terminal0.
+
+Additional full-Storage OOM investigation found a real temporary-list leak.
+Two independent BLOB indices allocate40B at ordinals6/7 after Page/namespace
+setup. At second NULL, both factory/native return0x101/INVALID but retain the
+first40Btemporary node; successful init frees both. Four custom malloc failures
+in nvs_storage_oom.py prove this; standard array-new abort/NULL not claimed.
+These nodes belong to the automatic BlobIndex list, not persistent namespace/
+Page/cache members. No attribution to old unexplained H10 warnings is claimed.
+Newproof now10gzip539365B/61pins. Next production correction must clean temporary
+nodes on every early return as well as propagate exact I/O errors. Consistent
+private header declarations across all component TUs are required; use local
+source/header overlay, retain shared SDK and frozen before inputs.
+
+Final reader47042/2a9a74 completed0:71/53full bodies;18baseline+18reopen+460fault+460retry+6geometry+4customOOM;8actualinput+6report controls. Desired upper I/O/temporary cleanup contracts remain explicitly false. App SHA34CB unchanged. Staged confidentiality scan a05408 checked26files/10expandedarchives/61pins with no findings; final docs/status refresh then repeat scan before focused commit.
