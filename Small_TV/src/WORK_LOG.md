@@ -5344,3 +5344,45 @@ findings не объясняются этим invalid-ID исправление�
   replay852092 also completed0 with20controls. Staged-source check99e25a confirms
   all20pins equal Git index bytes and production app SHA unchanged. No pending
   process from this checkpoint; no push performed.
+
+## 26 October 2026 — actual partial-record NVS repair and writes
+
+- Previous turn made progress in eede53e52. Continued factory item4 into actual
+  mLoadEntryTable/bitmap/purge instructions. Added separate helper qualification,
+  private Partition API fixture, partial-record CPU suite, mutation controls and
+  evidence reader. Factory3bodies1106B/native6bodies1108B fully matched existing
+  source objects; prior decoder/source/ELF pins remain unchanged.
+- All126slots pass in both images. Factory programs one4B bitmap word; native
+  also programs32zero bytes for the recovered slot. Full4096B sector comparison
+  proves other payloads/reserved bits unchanged.252fresh reopens and12clean
+  ACTIVE/FULL/FREEING baseline runs cause no additional program/erase operations.
+- 68failures cover each observed API ordinal for slots0/15/16/125, both failure
+  before transfer and half-transfer/error.68new private Page instances reuse
+  the real altered bytes and recover logical capacity. Return0x104/INVALID,
+  used/erased/first/next counters, ABI and unrelated Page fields are checked.
+  Total252repair+252reopen+12baseline+68fault+68recovery=652CPU executions.
+- Physical NOR1->0 programming, retained partial bytes and bounds are enforced
+  at the Partition API fixture. This is not a new generic SPI model or a claim
+  about WIP/timing/arbitrary bit cuts. No firmware, SDK, QEMU or physical action.
+- Ten native error cases leave16..32nonzero synthetic payload bytes after retry:
+  bitmap is alreadyERASED, so reopening skips cleanup. Includes partial bitmap
+  programming and purge failures. Original operation returns an error. No full
+  secure deletion guarantee or automatic purge-disable change is introduced.
+- Prototype fixtures initially omitted native outlined bitmap get/set helpers;
+  actual PCs42008276/42008390 identified the missing code and both complete
+  helpers were qualified. The last-slot oracle also needed the exact distinction:
+  in-flight repair ends at126, a fresh all-non-EMPTY scan leaves INVALID_ENTRY.
+  Assertion now derives this from retained bitmap bytes, not a relaxed range.
+  A JALR target mutant first toggled ignored bit0; corrected it to bit1 so the
+  actual address changes. These were fixture/control corrections, not app fixes.
+- Final target-v6 run cbd9d2 completed0. Source/fixture mutation run4fcf20 rejects
+  11actual inputs. Initial consumer57870/596e0b completed0, recomputing all652
+  executions and7report controls. Threegzip44243B/25sourcepins reuse the prior
+  factory object and base qualification. Updated plan preserves remaining
+  ILLEGAL/WRITTEN/corrupt/span/duplicate/HashList/eraseEntryAndSpan branches,
+  then TIM/null/station/BSS/aliases and deferred1–3/full/24h/hardware scope.
+- Final reader20605/226540 completed0 after report-control refinement. It rejects
+  an actual pre-program-media rollback and a forged successful32Bpurge failure,
+  not arbitrary unrelated records. All652executions/11input/7report controls pass.
+  Staged check27baf6 confirms all25pins equal Git index bytes and appSHA unchanged.
+  No current exec/VM or physical process from this checkpoint; no push performed.

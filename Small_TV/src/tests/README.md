@@ -9,6 +9,10 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Partial-record repair](NVS_PARTIAL_REPAIR.md) исполняет bitmap/purge, сохраняет
+частичные flash effects и проверяет652CPU executions. Остальные типы записей,
+полный entry-table loader и full VM power cuts остаются открытыми.
+
 [Factory NVS](FACTORY_NVS.md) связывает весь312-byte caller с Page::load source:
 394caller +442find +2actual OOM cases, полные120/118caller instruction starts.
 Source Page::load/CRC совпадает; новая entry-table purge policy требует отдельной

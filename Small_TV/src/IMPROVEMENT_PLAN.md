@@ -353,6 +353,15 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [partial NVS repair](tests/NVS_PARTIAL_REPAIR.md) проходит652CPU cases:
+все126slots обеихверсий, повторное открытие, clean states и68fault/recovery pairs.
+Factory программирует4Bbitmap, native ещё32Bданных; erase0/reopen writes0.
+Частичные физические эффекты сохраняются. В10native failures повторный scan
+пропускает ужеERASED payload16..32B: secureerase не заявлен, ошибки не скрыты.
+11input+7report controls pass. App4F2C/EB20/SDK/QEMU не менялись. Следующие
+factory ветки: ILLEGAL/WRITTEN/corrupt/span/duplicate и реальный eraseEntryAndSpan/
+HashList; после них TIM/null/station/BSS/aliases. Остальные gates сохраняются.
+
 26Oct: [factory NVS](tests/FACTORY_NVS.md) полностью идентифицирует caller
 42040efc как Page::load42040e56..42040f8e/312B. Статически matched4factory тела/
 1442B и4native/1158B.197cases на каждом caller покрывают все120/118instruction

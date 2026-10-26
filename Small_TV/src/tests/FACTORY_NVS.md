@@ -108,3 +108,8 @@ $taskBuild='C:/Work/yoRadio/.worktree/small-tv-factory-audit/.build/small-tv-not
 Production bytes и source inputs остаются прежними. Полнота всего образа,
 full VM fault injection, весь NVS backend, full/24h и аппаратная приёмка
 этим checkpoint не закрываются.
+
+Следующий [partial-record repair checkpoint](NVS_PARTIAL_REPAIR.md) исполняет
+bitmap update и purge: подтверждены дополнительные32байта программы на repair,
+нулевые повторные writes и recovery из частичных физических результатов.
+Другие ветки entry-table loader остаются открытыми.

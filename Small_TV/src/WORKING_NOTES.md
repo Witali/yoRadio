@@ -9,8 +9,10 @@
 Все12 прежних duration владельцев отсутствуют по CIM26Oct; прогоны не приняты.
 NTH-ALLOC-FAIL исправлен: app4F2C / ELFEB20. Десять runtime ranges восстановлены
 в transient read-only Ghidra: все453C.JALrefs есть,20negativecontrols pass.
-Factory caller теперь qualified как Page::load312B; далее actual NVS entry-table
-repair/flash faults, TIM/null/lifetime/BSS/aliases. Текущие документы:
+Factory caller qualified как Page::load312B. Partial-record bitmap/purge repair
+проверен652CPU executions; далее ILLEGAL/WRITTEN/corrupt/span/duplicate NVS
+и TIM/null/lifetime/BSS/aliases. Текущие документы:
+[NVS_PARTIAL_REPAIR.md](tests/NVS_PARTIAL_REPAIR.md),
 [FACTORY_NVS.md](tests/FACTORY_NVS.md),
 [RUNTIME_METADATA.md](tests/RUNTIME_METADATA.md),
 [NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md),
@@ -4757,3 +4759,44 @@ remain open. Goal ACTIVE. No push requested/performed this checkpoint.
 Final replay78978/e4246d terminal0 after source-pin refresh; metadata replay852092
 also terminal0 with20controls. Staged check99e25a: all20pins equal Git index bytes,
 production appSHA unchanged. No pending exec/VM. Ready for focused NVS commit.
+
+## Latest checkpoint — partial-record repair, 26 October 2026
+
+Actual TABLE/bitmap/purge instructions tested, factory3bodies1106B/native6bodies
+1108B. New files: reverse/nvs_repair_linkage.py, nvs_partition_fixture.py,
+nvs_partial_repair.py, nvs_repair_controls.py, verify_nvs_partial_repair_evidence.py.
+No changes to previous source pins, production4F2C/EB20, SDK or QEMU.
+
+All126slots eachvariant: factory4Bbitmap, native additional32Bzero payload.
+Sector bytes/other records/reserved bits checked.252reopen+12clean baselines
+issue no writes/erases.68faults (4boundaryslots/everyactualAPIordinal/before or
+half-transfer) retain actual physical prefixes;68new Page instances recover.
+Total652CPU executions, ABI/fields/counters/error checked. This is private
+PartitionAPI byte fixture, not live flash/SPI/WIP/fullVM power cut acceptance.
+
+10native failure/retry cases retain16..32nonzero payload bytes because bitmap
+alreadyERASED: includes partial bitmap and purge failures. Original operation
+returns0x104; no invented secureerase guarantee, no automatic purge disabling.
+Last-slot RAM sentinel depends on retained bitmap: in-flightrepair126 vs fresh
+allnonEMPTY INVALID_ENTRY. Old simplistic oracle corrected, not widened.
+Initial missing outlined nativeGET/SET helpers now fully qualified; prototypes
+preserved ignored. JALR mutant corrected to change bit1, since bit0 is ignored.
+
+Scratch .build/factory-nvs-repair-20261026; target-final-v6 cbd9d2 terminal0,
+11input controls4fcf20 pass. Proof nvs-partial-repair-validation-20261026.json:
+3gzip44243B/25pins; initial reader57870/596e0b terminal0 with652CPU+11+7controls.
+Prior factory object/basequalification reused, no new full dumps. Update source
+pins/final replay after last report-control edit before commit.
+
+NEXT item4: other actual entry-table branches (ILLEGAL/WRITTEN/corrupt headers,
+variable spans/duplicates, HashList allocations, eraseEntryAndSpan/purge ranges),
+including return/error and physical writes. Factory page object already contains
+several full helpers (diagnostic repair-factory-probe.json in oldfactory-NVS
+scratch), but HashList/Item need their own SDK5.5.4 objects and strict bindings.
+Do not stub these algorithms and call the whole loader tested. Then pending
+TIM/null/station+820/BSSoverflow/aliases. Old1–3/full/24h/physical remain open.
+GoalACTIVE. No VM, board, serial/reset/flash or push from this checkpoint.
+
+Final reader20605/226540 terminal0 after refined actual-rollback/purge-error report
+controls:652executions/11input/7report controls pass. Staged27baf6 confirms25pins
+equal Git index bytes/appSHA unchanged. No pending exec/VM; ready for focused commit.
