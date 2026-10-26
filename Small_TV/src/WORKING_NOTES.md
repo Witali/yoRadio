@@ -9,7 +9,9 @@
 Все12 прежних duration владельцев отсутствуют по CIM26Oct; прогоны не приняты.
 NTH-ALLOC-FAIL исправлен: app4F2C / ELFEB20. Десять runtime ranges восстановлены
 в transient read-only Ghidra: все453C.JALrefs есть,20negativecontrols pass.
-Дальше factory caller, TIM/null/lifetime/BSS/aliases. Текущие документы:
+Factory caller теперь qualified как Page::load312B; далее actual NVS entry-table
+repair/flash faults, TIM/null/lifetime/BSS/aliases. Текущие документы:
+[FACTORY_NVS.md](tests/FACTORY_NVS.md),
 [RUNTIME_METADATA.md](tests/RUNTIME_METADATA.md),
 [NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md),
 [RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md),
@@ -4710,3 +4712,48 @@ No active exec/VM from this checkpoint. Broad goal ACTIVE; no push performed.
 Final staged-source check aacd3a confirms all17 source pins equal Git index bytes
 and production app4F2C SHA is unchanged. Final consumer2ef9bb terminal0 repeats
 the scoped validation and all20 rejection controls. Ready for focused commit.
+
+## Latest checkpoint — factory NVS caller, 26 October 2026
+
+Factory call42040efc fully identified as Page::load42040e56..42040f8e/312B.
+Four complete factory bodies1442B, four native1158B matched strict unchanged
+objects. Clean SDK5.5.4/735507283d5b + officialGCC14 esp-14.2.0_20260121,
+RV32IMC/Newlib/Og/no-shrink-wrap is a sufficient matching profile; factory
+compiler/config identity still unproved. Toolchain isolated under this worktree
+.build/factory-nvs-20261026/idf-tools; archiveSHAc2734714… verified from SDKmanifest.
+No sharedSDK/QEMU/production changes or physical action.
+
+Public tools/compile_factory_nvs_fixture.py produces source object and an
+analysis-only DWARF carrier. Qualified and qualified-replay are byte-identical
+object9ed443fe…/carrier314324a8…/provenance258dependencies(34SDK), bothexec0.
+Newlib fixture config is derived from the existing native profile with libc
+selection changed; it is not a recovered factory sdkconfig. Original mixed
+Picolibc/Newlib failures and rejected optimization prototypes remain ignored.
+Current/factory sourcePage::load and CRC exactly equal; entry-table source differs.
+page_layout sees Page84B/offsets8,12,16,20,64,66,80/read_raw-vslot12 in both ELFs.
+
+197caller cases pervariant(394) reached every120/118caller instruction starts,
+checked all84pagebytes/return/ABI/read sequence/ownership.442directfind cases
+reach all51starts, including all tails and length0 bounds. Normal allocator,
+partitionI/O, ROMCRC arithmetic and entry-table are explicit boundaries;
+NULL-return factorycase is synthetic. Two separate actual allocator cases
+follow factoryNVS→abort vs currentNVS→NO_MEM through real runtime instructions.
+Do not call the factory fixed. Upper app_main NVSinit error stillfatal.
+
+Proof factory-nvs-validation-20261026.json:11gzip185441B/20pins, oldruntime and
+currentwrapper qualifications reused. Consumer83649/bf8c31 terminal0 recomputes
+394+442+2cases and13input+5report controls. SDKs remain clean and production4F2C/
+EB20unchanged; no current VM or exec session from these finished runs.
+
+NEXT user item4: actual mLoadEntryTable execution for corrupt/incomplete/duplicate
+records and read/write/erase faults. Its bodies are statically matched970Bfactory/
+822Bnative, but SDK6.1 DEFAULT_PURGE_AFTER_ERASE=true adds purgeEntry and extra
+purge arguments vs5.5.4. This is a real unverified repair/write policy difference,
+not covered by caller delegation tests. Do not automatically disable purge to
+match old bytes. Then TIM/null-completion/station+820 lifetime/BSSoverflow/aliases.
+Deferred1–3, H10/currentABI observer qualification, CODEC-REPRO, full/24h/physical
+remain open. Goal ACTIVE. No push requested/performed this checkpoint.
+
+Final replay78978/e4246d terminal0 after source-pin refresh; metadata replay852092
+also terminal0 with20controls. Staged check99e25a: all20pins equal Git index bytes,
+production appSHA unchanged. No pending exec/VM. Ready for focused NVS commit.

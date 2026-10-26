@@ -9,6 +9,11 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Factory NVS](FACTORY_NVS.md) связывает весь312-byte caller с Page::load source:
+394caller +442find +2actual OOM cases, полные120/118caller instruction starts.
+Source Page::load/CRC совпадает; новая entry-table purge policy требует отдельной
+проверки repair/writes/faults. Весь NVS и whole-image этим не объявляются принятыми.
+
 [Разметка runtime](RUNTIME_METADATA.md) восстанавливает десять проверенных полных
 тел в отдельном read-only сеансе Ghidra. Все 453 C.JAL получили точные call edges;
 20 altered-input controls проходят. Полнота образа и всех indirect calls остаётся

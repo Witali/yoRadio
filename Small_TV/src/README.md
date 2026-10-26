@@ -114,6 +114,12 @@ zero-size requests and returning new-handler retries are preserved. Post-link
 checks match the actual NVS caller to its wrapper. This is a no-exceptions C2
 profile, not a replacement for throwing or over-aligned allocation semantics.
 
+The factory's complete 312-byte NVS caller is now identified as `nvs::Page::load`.
+Its C++ source matches the current caller; 394 caller cases and 442 factory
+find-helper cases exercise the actual compiled code. The SDK6.1 entry-table
+repair policy differs and remains a separate flash/fault gate. See the
+[source/assembly comparison and limitations](tests/FACTORY_NVS.md).
+
 The broader export used for organization came from the existing analyzed
 factory ELF, including application functions and SDK callers. Its SHA-256
 and the immutable flash-dump SHA-256 are recorded in the symbol map. To

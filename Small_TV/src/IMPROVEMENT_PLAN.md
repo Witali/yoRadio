@@ -353,6 +353,17 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [factory NVS](tests/FACTORY_NVS.md) полностью идентифицирует caller
+42040efc как Page::load42040e56..42040f8e/312B. Статически matched4factory тела/
+1442B и4native/1158B.197cases на каждом caller покрывают все120/118instruction
+starts,442find-helper cases покрывают все51starts, два real allocator OOMcases
+подтверждают factoryabort/nativeNO_MEM.13input+5report controls pass; повторные
+analytical builds byte-identical. Page::load/CRC source bodies одинаковы, но
+SDK6.1 entry-table repair добавляет DEFAULT_PURGE_AFTER_ERASE=true. Его actual
+algorithm/flash-fault matrix ещё не исполнен: это следующий factory шаг перед
+TIM/null/station/BSS/aliases. Не отключать новый purge ради паритета. App4F2C/EB20
+не менялся; whole-image/full/24h/hardware и отложенные1–3 остаются открытыми.
+
 26Oct: [runtime metadata](tests/RUNTIME_METADATA.md) закрывает пять конкретных
 C.JAL reference gaps. В transient read-only копии Ghidra восстановлены десять
 object-qualified тел / 508B, три новые функции и 116 инструкций. Все453 compact

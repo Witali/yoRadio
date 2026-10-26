@@ -87,3 +87,8 @@ recovery.json`, `ExportFactoryXrefs.java after.json` с `-readOnly -noanalysis`.
 `0x42040efc` (Ghidra приписывает его телу `0x42040e56..0x42040f8e`, 312 байт,
 но SDK-source identity ещё не доказана), TIM/null-completion, station lifetime,
 BSS periods/overflow и computed aliases. Приоритет и оставшиеся gates не меняются.
+
+Следующий checkpoint закрыл source identity caller и исполнил все его
+instruction starts: [FACTORY_NVS.md](FACTORY_NVS.md). Новый открытый путь —
+реальная entry-table repair/purge policy SDK6.1; прежние пределы этого отчёта
+сохранены.

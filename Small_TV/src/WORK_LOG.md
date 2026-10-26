@@ -5289,3 +5289,58 @@ findings не объясняются этим invalid-ID исправление�
 - Final staged-source check aacd3a confirmed all 17 pins equal Git index bytes
   and production app SHA is unchanged. Final consumer 2ef9bb completed with exit
   0 and repeated all 20 rejection controls. No active process from this checkpoint.
+
+## 26 October 2026 — full factory NVS caller and actual OOM path
+
+- Previous goal turn made progress in 9ef0130b1. Continued user item4 in the same
+  clean factory-audit worktree. Identified the complete factory caller42040efc
+  as nvs::Page::load42040e56..42040f8e,312B. Four factory bodies1442B and four
+  native bodies1158B fully match unchanged source objects with strict local
+  control flow/relocation/RELAX handling; no matcher or old ELF pin was weakened.
+- Downloaded the official GCC14 Win64 package only under this task's ignored
+  build directory. Its705866147B archive SHA c2734714… matches SDK5.5.4 tools.json.
+  Clean SDK735507283d5b, GCC14 esp-14.2.0_20260121, RV32IMC/Newlib/Og/no-shrink-wrap
+  produce the full match. This is a sufficient matching profile, not proof of
+  the factory compiler version or complete configuration.
+- Early exploratory GCC15/14 compiles mixed the current Picolibc config with
+  Newlib headers and failed. Consistent Newlib succeeded. Standard Os/O1/O2/Og
+  alternatives did not fully match; Og with shrink wrapping disabled did.
+  Diagnostics remain ignored, not promoted as successful proof. The public
+  fixture compiler now uses eight SDK include roots and explicit inputs.
+- Two clean analytical builds0b2052/a3b38d finished0. Object9ed443fe… and
+  layout-carrier314324a8…, plus canonical provenance, are byte-identical in
+  separate output directories.258dependencies/34SDK files pinned. Source SDK
+  and current SDK6.1 remain clean; no production/bootloader/flash image built.
+  GNU ld resolves debug relocations in the carrier because this elftools version
+  cannot relocate RV32 ET_REL DWARF; carrier code is not executed as a firmware.
+- Both DWARF profiles show Page84B/base8/state12/seq16/version20/used64/erased66/
+  partition80/read_raw-slot12. Source Page::load and CRC bodies are identical
+  across SDK versions. Current C2 code is304B with out-of-line Header constructor;
+  factory is312B with an inline reserved-byte loop and separate find helper.
+- 394 actual caller cases (197 each) passed every full Page-byte/return/ABI/
+  ownership check and reached all120/118caller instruction starts.442 direct
+  factory find cases reach all51helper starts, covering0..9/127/128/129 lengths,
+  every dirty index and all-erased, with an independent bounds-read hook.
+  Normal caller matrix uses explicit nullable allocator, partition, ROM CRC and
+  entry-table boundaries. The factory NULL allocation case is synthetic.
+- Two additional cases run real allocator/helper/throw-stub instructions from
+  the actual NVS caller: factory mallocNULL/no-handler reaches abort before its
+  NULL branch; current wrapper returns ESP_ERR_NO_MEM with preserved ABI. This
+  extends the prior4bb10a376 fix witness; it is not a new app change/global OOM
+  recovery or full-VM fault injection. No VM, board/serial/reset/flash touched.
+- Found an actual source difference behind the entry-table delegation:
+  SDK6.1 DEFAULT_PURGE_AFTER_ERASE=true adds purgeEntry and purge arguments.
+  Its970B factory/822B native bodies match statically; their repair algorithms
+  and flash-fault behavior were not executed here. Preserve the difference and
+  test it next rather than silently disabling the current purge behavior.
+- Proof factory-nvs-validation-20261026.json archives11gzip185441B/20sourcepins,
+  reusing previous runtime/wrapper qualifications. Consumer83649/bf8c31 finished0:
+  394+442+2CPUcases,13actual input mutations and5report mutations all pass/reject.
+  Package provenance, source identity and explicit scope limitations are checked.
+  Plan/notes updated: actual entry-table repair/writes/faults next within item4,
+  then TIM/null/station/BSS/aliases. Deferred1–3 and full/24h/hardware remain open.
+- Final replay78978/e4246d completed0 after the last source-pin refresh; all
+  394+442+2 cases and13+5 controls repeat successfully. Earlier metadata proof
+  replay852092 also completed0 with20controls. Staged-source check99e25a confirms
+  all20pins equal Git index bytes and production app SHA unchanged. No pending
+  process from this checkpoint; no push performed.

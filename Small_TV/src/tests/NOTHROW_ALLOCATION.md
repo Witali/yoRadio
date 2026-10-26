@@ -124,3 +124,7 @@ $taskOld='C:/Work/yoRadio/.worktree/small-tv-timer-bounds/.build/small-tv-esp32c
 Дальше по factory пункту: Ghidra metadata ranges, точная идентификация factory
 NVS caller, оставшиеся TIM/null-completion/station lifetime/BSS ranges/aliases.
 Пункты1–3 прошлого списка и все финальные gates сохраняются в плане.
+
+Следующий [factory NVS checkpoint](FACTORY_NVS.md) установил полное312-byte
+source identity заводского caller и подтвердил integrated factoryabort/nativeNO_MEM
+через реальные allocator instructions. Он не меняет production build этого fix.
