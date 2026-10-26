@@ -195,6 +195,16 @@ residue сохраняет завершённые VQ-слова. Исходны�
 coupling. Host ASan/UBSan проходят; C/C++ source-only GCC для LX6 и RV32IMC
 также проходят. Это граница до умножения floor/IMDCT/PCM, а не готовый raw
 decoder или native runtime gate. Выбор числового пути и подключение остаются.
+Следующий [точный product floor1](CYD_VORBIS_FLOOR1_PRODUCT_DESIGN.md) также
+реализован: неизменённая таблица Xiph умножается на широкий residue без
+предварительного float-округления. [Host-квалификация](../tests/results/vorbis-floor1-product-20261026/CHECKPOINT.md)
+проверяет 619 540 произведений для всех 256 коэффициентов и ширин 1–1087,
+а интеграция — 1 313 пакетов, включая все 434 исходных, 1 750 каналов floor1
+и 297 056 точных слов результата. Отсутствующий floor обнуляет канал даже
+после coupling; тихий индекс0 остаётся ненулевым. ASan/UBSan проходят,
+новый компонент Clang без предупреждений; C/C++ GCC LX6/RV32IMC компилируется.
+Floor0 product, IMDCT/window/overlap/PCM, полная native квалификация и radio
+integration остаются открытыми; прежние отложенные пункты этим не закрыты.
 Дальше — незавершённые native gates, общие stack/resource проверки,
 floor0 amplitude/VQ range и runtime integration с unsigned rate API.
 Новый кандидат пока не подключён к радио. Старые
@@ -352,7 +362,8 @@ NONPASS относятся к прежнему repair и не переобъяв
   [Floor0/floor1 packets](../tests/results/vorbis-floor-packet-20261025/CHECKPOINT.md)
   и [точные residue0/1/2 с inverse coupling](../tests/results/vorbis-residue-20261025/CHECKPOINT.md)
   также реализованы и проверены как отдельные компоненты. Широкий путь требует
-  сборки полного frame decoder, умножения floor, IMDCT/overlap и public raw integration; компонент
+  сборки полного frame decoder, применения floor0, IMDCT/overlap и public raw integration; точное
+  применение floor1 отдельно квалифицировано на host, но ещё не на SDK/QEMU. Компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
@@ -1724,3 +1735,14 @@ Stream остаётся на core0, decode/output на core1 с прежними
   показывает static собственные frames 464/544 B; полный task stack и SDK/QEMU
   этим не квалифицированы. Перед публикацией выполняется локальная проверка
   staged/outgoing файлов, архивов и новой Git-истории по новым правилам privacy.
+
+- 2026-10-26, CYD-C3-14: добавлено точное применение floor1 после inverse
+  coupling. Все 256 коэффициентов скопированы из Xiph с исходной лицензией;
+  диапазон не сужается до float. Независимая rational/integer модель проверяет
+  11 816 765 слов произведений; packet-интеграция сохраняет все прежние 1 311
+  сценариев и добавляет два сценария с тихими/связанными каналами. Проверены отказы ёмкости,
+  крайние экспоненты, signed domain, неизменность исходников и повтор после
+  отказа. Полные исходные captures, диагностики и первые отказы запуска
+  инструментов сохранены. Новый компонент Clang0/0; десять предупреждений
+  тестовых fixtures разобраны без подавления. SDK/QEMU, floor0 и PCM ещё впереди;
+  production CMake, affinity, стеки, backend и отложенные scopes не менялись.
