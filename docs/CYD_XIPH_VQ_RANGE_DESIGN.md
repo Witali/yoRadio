@@ -95,10 +95,12 @@ No speculative integer fix was applied.
 
 ## Remaining implementation sequence
 
-1. Define a decoder-owned immutable setup view and its lifetime. Preserve raw
-   words, actual multiplicands and original active-entry indexes before Xiph
-   initialization consumes static books. Reuse the complete owned setup and
-   codebook APIs, and retain their measured capacity requirements.
+1. The [exact setup owner](CYD_VORBIS_SETUP_OWNER_DESIGN.md) now provides the
+   immutable lifetime primitive using the existing parser. Host qualification
+   retains raw words, actual multiplicands and original active-entry indexes;
+   [native preparation remains incomplete](CYD_VORBIS_SETUP_OWNER_TARGET_DEFERRED_20261026.md).
+   Qualify its target resource/lifetime behavior and connect it before Xiph
+   initialization consumes static books. Full measured requirements stay intact.
 2. Define selection of the complete numeric route before float expansion.
    Checking only whether packed exponents fit`[-63,63]` is insufficient to
    prove a final PCM error bound. An exceptional table must not be converted
