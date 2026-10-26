@@ -1,6 +1,6 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-10-25. Ветка: `codex/esp32-cyd-c3-review`.
+Обновлено: 2026-10-26. Ветка: `codex/esp32-cyd-c3-review`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
@@ -100,8 +100,15 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 heap. ASan/UBSan и ESP32 QEMU проходят 11 arena-сценариев, 200864 book-проверки,
 124754 bit-пробы и все исходные 31 случая с max0; dense4096 помещается в worker
 со стеком 16 КБ. Общий OOM и стеки всех decode-путей ещё не квалифицированы;
-в residue0 остаются два partition-sized массива. Новый кандидат пока не подключён
-к радио. Старые
+два partition-sized массива residue0 теперь убраны в
+[следующем исправлении](../tests/results/vorbis-xiph-residue-20261026/CHECKPOINT.md).
+Однопроходное размещение значений сохраняет полные VQ-слова при nominal EOP
+по спецификации, без новых аллокаций. ASan/UBSan и ESP32 QEMU проходят 3997
+новых сценариев; partition4096/dim1 работает в том же worker16КБ, собственный
+compiler frame32B static. Все прежние31 PCM остаются побитно точными.
+Дальше — общая OOM propagation/recovery, остальные channel-sized scratch,
+границы uint32 rate/floor0 amplitude/VQ range и runtime integration.
+Новый кандидат пока не подключён к радио. Старые
 NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также
 не закрывает deferred scopes, physical acceptance или полное соответствие
 стандарту за пределами измеренного корпуса.

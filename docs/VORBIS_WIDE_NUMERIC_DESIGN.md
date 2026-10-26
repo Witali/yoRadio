@@ -45,9 +45,20 @@ selected dense4096 book fits the16KiB worker; all explicit hook ownership is
 released after every case. Original source remains byte-identical in the
 baseline sibling; only three generated units carry eight exact edits.
 General OOM propagation, packet-arena and DSP/header allocation failures,
-residue0 partition-sized stack scratch and remaining range/format gates are
-still open. This finite resource result does not qualify the whole decoder or
+remaining range/format gates are still open. This finite resource result does not qualify the whole decoder or
 physical production performance.
+
+The subsequent [residue0 port](../tests/results/vorbis-xiph-residue-20261026/CHECKPOINT.md)
+removes both partition-sized stack arrays by directly scattering each complete
+VQ word, as Vorbis I section 8.6.3 specifies. It also retains that complete-word
+prefix on nominal EOP, fixing the original reference's partition-discard
+behavior. No heap or second entropy pass is added. ASan/UBSan and ESP32 QEMU
+pass 3997 independent scatter/truncation scenarios, including partition4096
+with dimension1 on the same16KiB worker. The helper's own compiler frame is
+32 bytes, static; all original31 PCM samples remain exact. Four generated units
+now carry nine exact edits, while the original sibling is unchanged. General
+OOM propagation, other channel-sized stack scratch, remaining format/range and
+production/physical gates remain open.
 
 Full floor0 correctness requires a precision and range design for the complete
 synthesis path. The public low-memory implementation stores Q4 amplitude and
