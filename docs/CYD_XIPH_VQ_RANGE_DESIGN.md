@@ -106,10 +106,12 @@ No speculative integer fix was applied.
    prove a final PCM error bound. An exceptional table must not be converted
    back to float before residue addition or coupling. Preserve the ordinary
    Xiph path's measured bit patterns while qualifying the selection contract.
-3. Connect existing exact VQ, floor-packet, residue and coupling views with
-   transactional capacity/OOM cleanup and complete packet-end semantics.
-   Qualify original input consumption, unused tails, sparse indexes, recovery
-   and concurrent stream ownership. Deferred gates remain separate.
+3. The [exact packet front end](CYD_VORBIS_PACKET_FRAME_DESIGN.md) now connects
+   VQ, floor packets, residue and inverse coupling without float conversion.
+   Host qualification retains all434 original packets and covers global floor
+   EOP, partial residue EOP, actual capacity refusal/retry and preserved floor
+   flags. Qualify its full native resource/lifetime behavior and wire the raw
+   audio owner; concurrent stream integration and deferred gates remain separate.
 4. Specify the floor-to-IMDCT representation, scaling, rounding and exceptional
    arithmetic contract. Wide floor0 gains and cancellation across bins mean
    that merely choosing double for`valuelist` or clipping before the transform

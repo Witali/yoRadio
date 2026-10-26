@@ -186,6 +186,15 @@ refusals; Clang шести модулей — 0 предупреждений / 0
 native случаев нет. Семь файлов первоначального прототипа сохранены в архиве,
 но его subset без prefix sweeps не закрывает полный target gate. Подключение
 владельца к декодеру и полная native проверка остаются открытыми.
+Поверх него реализован [общий точный разбор аудиопакета](CYD_VORBIS_PACKET_FRAME_DESIGN.md):
+mode/window → floor по каналам → residue по submap → обратный coupling.
+Проверены 1 311 сценариев и все 434 исходных пакета: 411 520 точных слов residue,
+2 769 affine-значений и 2 224 raw Y; 3 332 отказа ёмкости с восстановлением.
+Окончание внутри floor обнуляет все каналы по спецификации; окончание внутри
+residue сохраняет завершённые VQ-слова. Исходные floor-флаги не меняются из-за
+coupling. Host ASan/UBSan проходят; C/C++ source-only GCC для LX6 и RV32IMC
+также проходят. Это граница до умножения floor/IMDCT/PCM, а не готовый raw
+decoder или native runtime gate. Выбор числового пути и подключение остаются.
 Дальше — незавершённые native gates, общие stack/resource проверки,
 floor0 amplitude/VQ range и runtime integration с unsigned rate API.
 Новый кандидат пока не подключён к радио. Старые
@@ -1703,3 +1712,15 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Native подготовка остановилась до SDK/QEMU без объяснения причины инструмента;
   это не подтверждённый отказ по кибербезопасности. Полный target gate,
   выбор числового пути и подключение к аудиодекодеру остаются.
+
+- 2026-10-26, CYD-C3-14: добавлен allocation-free
+  [точный packet front end](CYD_VORBIS_PACKET_FRAME_DESIGN.md), использующий
+  существующие публичные setup/floor/residue APIs. Оба полных host прогона
+  совпадают с независимой моделью; сохранены все 434 исходных пакета и различия
+  prefix/floor/residue EOP. При отказах workspace metadata/cursor сохраняются;
+  результат занимает отдельные compact pools и точный residue grid.
+  Новый компонент без Clang-предупреждений; тестовый аллокатор получил явные
+  snapshot-инварианты без suppression. GCC LX6/RV32IMC компилирует C/C++ и
+  показывает static собственные frames 464/544 B; полный task stack и SDK/QEMU
+  этим не квалифицированы. Перед публикацией выполняется локальная проверка
+  staged/outgoing файлов, архивов и новой Git-истории по новым правилам privacy.
