@@ -581,6 +581,18 @@ build inputs/date, проверить два paths/dates и отсутствие
 перезаписи; настоящее изменение codec должно сохранять invalidation. Не убирать
 library identity из ownership guard ради совпадения. Пока это не исправлено.
 
+Checkpoint26Oct: [WIFI_TIM.md](tests/WIFI_TIM.md) закрывает прежние нулевые
+динамические visits обоих TIM bodies: 2404 cases/image,4808executions,
+168/168factory и128/128native instruction starts, exact PM/counter writes/ABI,
+64-bit clock/deadline и counter-wrap boundaries. Девять current SDK bodies заново
+matched к сохранённым app8758BD09/ELFDA1ED0CE, старые ELF guards не ослаблены.
+9static+6evidence controls и independent replay pass. Factory TIM predicate/null
+requests отличаются от modern отдельного keep-alive; нового production defect
+в этих сценариях не найдено. Transitive RF/slice/sleep semantics, remaining
+null/failure branches, station+820 lifetime, BSS setters/overflow, aliases и
+whole-image reachability открыты. Приоритет factory сравнения сохраняется;
+пункты1–3/full/24h/hardware не закрываются этим checkpoint.
+
 ## 6. Приёмка окончательной версии и правила работы
 
 Для завершённого исправления — focused commit, failing test и проверка исправления,

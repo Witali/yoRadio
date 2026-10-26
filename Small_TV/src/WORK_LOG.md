@@ -5619,3 +5619,28 @@ no long VM is pending. Goal ACTIVE. Stage exact focused fix, inspect archives/
 LFS/metadata locally and commit after clean staged checks; do not push implicitly.
 
 Staged audit27964/dd2404:57files,23decompressed archives,2actualLFS payloads,74sourcepins and all payload hashes match index. Four standalone PEM parser markers classified against official SDK pk_internal.h; no unresolved sensitive findings. Decoded raw-settings privacy check d6980d confirms fixed seed_network token, empty password, compiled location defaults and VM/padding fields; no values printed. Final focused commit follows, no push.
+
+## 26 October 2026 — execute the complete factory/current TIM bodies
+
+Continued factory comparison after671ecdf59. Preserved all current app/ELF and
+source-overlay inputs; added only analysis/tests/docs/evidence. Requalified the
+old9E reference, independently rebound9full native SDK bodies to current
+8758BD09/DA1ED0CE and checked local anchors, absolute/public symbols, PM/config
+sizes, OSI wrappers and timer11 table. The first attempt used a helper excluding
+absolute symbols for g_osi_funcs_p; switched this new qualifier to the existing
+unique-symbol reader, without changing old guards or SDK bytes.
+
+Literal2404cases/image,4808executions pass: every TIM instruction (168old/128new),
+exact PM/counters, untouched buffers/config and ABI, clock/deadline widths,
+counter wrap and oldpredicate boundaries. Models/probes/linkage are separate
+modules with function comments. Factorypredicate/null requests differ from the
+modern event11 mechanism; no new production defect established. RF/slice/sleep
+boundaries remain external and full path/physical equivalence is not claimed.
+
+Producerfa341c and independent readercb431f both terminal0.9static controls
+reject bad identities/SDK/reference and4private code mutations;6evidence controls
+reject changed effects/counts/coverage/pair. Proof16sourcepins,1gzip33240B,
+458146Bexpanded. Updated plan/readme and WIFI_TIM with exact limitations.
+No liveVM, physicalboard, serial/reset/flash, SDK/QEMU mutation or push.
+Next null/failure completions, station+820 lifetime, BSS ranges/overflow,
+aliases/whole-image gaps; deferred1–3 and finalfull/24h/hardware remain open.

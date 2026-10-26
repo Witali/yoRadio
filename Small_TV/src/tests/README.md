@@ -9,6 +9,11 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[TIM](WIFI_TIM.md): 4808 literal RV32 executions покрывают все инструкции обоих
+обработчиков (168/168 factory, 128/128 native), clock/counter boundaries и все
+записи PM/counters. Native привязан к app8758BD09/ELFDA1ED0CE после Storage fix;
+9 static и 6 evidence controls проходят. Transitive RF/slice/lifetime ещё открыты.
+
 [Storage fix](NVS_STORAGE_FIX.md) исправляет верхний I/O contract и temporary
 OOM leak в согласованной локальной SDK copy. Before/after fault matrix, Page
 regressions, native tests и отдельные сеть/LCD gates проверены; широкий scope открыт.

@@ -5050,3 +5050,37 @@ no long VM is pending. Goal ACTIVE. Stage exact focused fix, inspect archives/
 LFS/metadata locally and commit after clean staged checks; do not push implicitly.
 
 Staged57files/23expandedgzip/2LFS/74pins checked clean (dd2404), plus decoded synthetic settings check d6980d. Finalreader59401/fd6be3 terminal0, no pending exec or ownedVM. Ready for focused commit; next factory TIM/null/lifetime/BSS/aliases.
+
+## 26 October 2026 — complete TIM instruction comparison
+
+Previous goal turn made progress in671ecdf59: Storage propagation and temporary
+index cleanup fixed, archived current app8758BD09/ELFDA1ED0CE, clean HEAD verified.
+Continued factory priority with TIM; no production/source-overlay/sharedSDK/QEMU
+or physical device changes. Existing production proof source pins are preserved.
+
+New reverse/timer_tim requalifies the old reference9E4EC88D without relaxing its
+guards, then independently matches9complete native SDK bodies to the saved
+current app/ELF. Checks data geometry/local anchors/public callees, actual OSI
+wrappers and event11 entry. Absolute g_osi_funcs_p is intentionally resolved by
+the existing unique-symbol reader; LinkedRuntime.symbol excludes SHN_ABS and
+was unsuitable for that ROM-global lookup. No existing helper was weakened.
+
+New separate tim_model/tim_instructions/tim_test cover2404cases per image,
+4808executions, full TIM168/168factory and128/128native instruction starts.
+Exact PM/counter stores, whole remaining buffers/config, stack/callee-saved ABI,
+caller-register poisoning,64-bit clock/deadline, capped/lowword OSI408delay,
+32-bitcounterwrap, truthy flags and originalpredicate boundaries all pass.
+Real old predicate executes; RF/slice/sleep/dream/wake/platform helpers remain
+explicit boundaries. Complete instruction coverage is not all RF paths.
+
+Factory computes predicate even before unrelated early returns and can set488/
+request null instead of sleep; native TIM relies on separateevent11 keepalive.
+No production bug found in these cases. Do not restore factory requests into
+modern TIM based only on this difference. BSS negotiated ranges still unproven.
+
+Producerfa341c terminal0; independent readercb431f terminal0.9staticcontrols
+including4actual body mutations below whole-image hash guard,6reportcontrols.
+Prooffactory-tim-validation-20261026.json:16pins,1gzip33240B /458146Bexpanded.
+No pending exec/VM; no push. NEXT remaining null/failure completions, actual
+station/peer+820 lifetime, BSS producers/overflow, aliases/whole-image gaps.
+Deferred1–3/fullsuite/24h/hardware stay open. Goal ACTIVE.
