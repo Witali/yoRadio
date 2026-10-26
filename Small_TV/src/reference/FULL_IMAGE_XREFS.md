@@ -141,3 +141,8 @@ references и452известныецели. Открыты40380180→40380584,40
 Новый proof и29tests/9negativecontrols:
 [RV32_DISASSEMBLY.md](../tests/RV32_DISASSEMBLY.md). Полнота всего образа,
 семантическое равенство и физическая приёмка по-прежнему не доказаны.
+
+Follow-up26Oct: пять выбранных call sites получили qualified SDK/runtime owners;
+10factory/9nativeполныхтел сопоставлены. Среди new[] paths найден общий OOM→abort
+defect; исправление открыто. Before tests и неизменность persistent graph:
+[RUNTIME_CALL_GAPS.md](../tests/RUNTIME_CALL_GAPS.md).

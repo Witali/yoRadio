@@ -7,7 +7,9 @@
 позже. Последний checkpoint и NEXT сохранены в конце этого файла. Ниже остаётся
 исторический контекст; старые `running` JSON не подтверждают живые процессы.
 Все12 прежних duration владельцев отсутствуют по CIM26Oct; прогоны не приняты.
-Текущие документы: [RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md),
+Следующий шаг — NTH-ALLOC-FAIL: исправить подтверждённый nothrow OOM→abort
+в нашей сборке. Текущие документы: [RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md),
+[RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md),
 [WIFI_EVENT_LIFETIME.md](tests/WIFI_EVENT_LIFETIME.md).
 
 ## Исторический checkpoint — heap metadata, 2026-10-25
@@ -4564,3 +4566,47 @@ NEXT item4: qualify five remaining call candidates, revisit GNU mnemonic-depende
 searches, then TIM/null-completion/station+820 lifetime/BSS negotiated ranges and
 other aliases/startup error branches. Retaining Wi-Fi callbacks remains verified
 intentional factory-bug correction. All broader goal and acceptance gates persist.
+
+## CURRENT 2026-10-26 — five runtime gaps identified; FIX NTH-ALLOC-FAIL NEXT
+
+Previous goal turn PROGRESS79fc5c424. Factory item4 priority persists. New
+runtime_call_gaps module qualifies19completebodies/1004linkedB:10factory508B,
+9native496B. Seven pinned objects (vectors, C++stubs, GCC15new_op/new_opv/
+new_opvnt/eh_globals/eh_catch) and named bindings, not guessed function labels.
+Factory compiler version not established. Persistent Ghidra projects untouched.
+
+Five sites:40380180/18e→xt_unhandled_exception/panicHandler in fullpanic214B;
+420a3a12/14→begin/endcatch in20Barraynothrownew;420a3e32→UnwindDeleteException
+in48Behglobalsdtor. Scalar/array similar-byte trap resolved via actual_Znaj
+veneer→_Znwj and native symbols. Native arraynothrow DOES exist at420a413e;
+only_Unwind_Resume absent. Do not repeat the exploratory scalar absence claim.
+
+Confirmed actual bug in BOTH factory/native frozen images: new[](nothrow)→new[]
+→scalarnew→cxaAllocateException abortstub when mallocNULL/no new-handler. Does
+NOT returnnullptr or enter landingpad. Caller42040efc requests512B and checks
+NULL at42040f02→42040f80. Name/fullbody not yet SDK-qualified; likely-NVS source
+similarity is not proof. NEXT fix native nothrow failure paths safely, including
+zero-size/newhandler/ownership, fail-before/pass-after/source+target tests, new
+production app under firmware/development and actual NVS/network workflow.
+Don't patch shared SDK or any frozen old ELF/build/helper. Ordinary throwing new
+and all exception semantics are not implicitly fixed by nothrow-only wrappers.
+
+176privateRV32 cases pass as observation:132panic fullframes/return/mret,
+allocsizes0/1/512/ffffffff, handlerretry, cleanupnull/empty/one/two, nothrow
+success/abort/directlandingpad in BOTH images. Desired nothrowOOM contractfalse
+is explicitly retained. Panic callbackreturn/directEHentry synthetic; full
+endcatch internals/naturalEHdelivery unproved. Valid ret at external private
+stub entries required before Unicorn codehooks, fixed before final capture.
+
+Proof runtime-call-gaps-validation-20261026.json:10gzip62267B/12sourcepins;
+consumer redoes19bodymatches,176cases,13input/7reportmutations (forgedfix too).
+Source modules separate qualification/instructions/controls/consumer. Original
+images/library/selectedbuildobjects rehashed; no app/SDK/QEMU/sourceproducer
+mutation, VM or physicalI/O. Broad compilerarchive exploratory scan90076 stopped
+via verifiedownedhandle, terminal1; narrowed EH/new members completed normally.
+All12old durationowners remain historicallyabsent/unaccepted; don'trestart
+or accept stale statuses. GoalACTIVE, full original scope/points1–3 deferred.
+After NTHfix: transient Ghidra ranges, actualcaller matching, remaining TIM/null/
+station+820 lifetime/BSS negotiated period/aliases and final acceptance gates.
+Final consumer exec3a80d5 terminal0 repeats176cases and13+7controls after adding
+the exact512-byte caller input. Desired OOM contract staysfalse, not accepted.

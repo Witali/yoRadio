@@ -100,3 +100,8 @@ $objdump='C:/Work/yoRadio/.idf/tools-v6.1/tools/riscv32-esp-elf/esp-15.2.0_20251
 Новый export детерминирован: временные host paths исключаются из текста, bytes
 нулевых областей печатаются явно. Полный assembly остаётся в ignored build;
 в evidence не добавляются DROM, settings, credentials или RAM ВМ.
+
+Следующий checkpoint установил владельцев пяти выбранных call sites и нашёл
+общий factory/native OOM defect: [RUNTIME_CALL_GAPS.md](RUNTIME_CALL_GAPS.md).
+Исправление nothrow allocation failure остаётся следующим шагом. Прежний Ghidra
+snapshot сохранён; полнота образа этим не закрывается.

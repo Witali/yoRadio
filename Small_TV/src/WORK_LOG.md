@@ -5171,3 +5171,32 @@ findings не объясняются этим invalid-ID исправление�
   NEXT qualify five call sites and SDK boundaries, then remaining TIM/null,
   station+820 lifetime and negotiated-period ranges. Whole-image/final full/
   independent network/display/duration/hardware acceptance remains open.
+
+## 2026-10-26 — five runtime call owners qualified; shared nothrow OOM defect found
+
+- Previous goal turn PROGRESS79fc5c424. Continued factory item4 in the same task
+  worktree. Factory/native ELF, app, SDK, QEMU and frozen inputs intact; no VM,
+  physical I/O or firmware rebuild.
+- Qualified10factory/508B and9native/496B complete SDK/runtime bodies. All five
+  compact-call sites bind named relocations to checked targets. Seven pinned
+  objects used; factory compiler identity and whole-SDK equivalence not claimed.
+- Scalar/array nothrow bodies look alike. Resolved the exploratory naming trap:
+  actual _ZnajRKSt9nothrow_t→_Znaj veneer→_Znwj, verified against native symbols.
+  Only native Unwind_Resume absent. Tiny body-only matches cannot name callees.
+- Executed176literalRV32 cases:132panic frames/restore/mret, allocations0/1/512/
+  UINT32_MAX, handler retry, TLS null/empty/one/two and explicit landing pads.
+  Returning panic callback/direct EH entry are artificial controls. Invalid empty
+  private stub bytes fixed before final execution; not a firmware CPU exception.
+- NTH-ALLOC-FAIL confirmed in both images: mallocNULL/no-handler makes nothrow
+  array new abort before returningNULL. Factorycaller42040efc requests512B and
+  has a NULL branch. Desired contract stays false. Fix this next, preserving
+  shared SDK/frozen builds and testing actual NVS/network error handling.
+- Saved10gzip62267B/12sourcepins. Consumer recomputes19bodymatches/176cases,
+  13inputrejections and7reportcontrols, including forgedOOMfix. Original images,
+  library and object pins rechecked. No persistent Ghidra recovery yet.
+- Broad exploratory compiler scan stopped by verified process handle/creation
+  identity; originalexec90076 terminal1, no pass claimed. Narrow object scan
+  completed normally. NEXT safe nothrow path, source/target tests/production app;
+  then remaining TIM/lifetime/BSS/aliases and wider deferred acceptance gates.
+  Final offline consumer exec3a80d5 terminal0 with all176cases and13+7controls;
+  desired OOM contract staysfalse. Firmware fix and acceptance remain open.

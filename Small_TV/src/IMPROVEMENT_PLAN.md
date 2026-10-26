@@ -353,6 +353,17 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+**Следующий приоритет NTH-ALLOC-FAIL:** пять C.JAL gaps идентифицированы,
+но найден общий factory/native дефект: `new[](nothrow)` при mallocNULL/no-handler
+доходит до abort вместо nullptr. Caller42040efc запрашивает512B и проверяетNULL;
+literal RV32 before cases показывают обход его error branch. Проверены
+10factory/9nativeполныхтел,176cases,13input и7report negativecontrols.
+`desired_nothrow_oom_contract_passed=false`; это ещё не fix. Исправить nothrow
+allocation без патча shared SDK, проверить zero-size/new-handler/ownership и
+реальный NVS/network workflow; сохранить новую app. См.
+[RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md). Остальной factory scope и
+отложенные1–3 сохраняются. Transient Ghidra metadata recovery ещё открыто.
+
 Checkpoint26Oct: [RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md) исправляет
 декодирование factory C.JAL: ISA-less GNU ошибочно выдавал443c.addiw и10.insn.
 Теперь все813936codebytes экспортируются непрерывно;287952прежнихrows/396GP
