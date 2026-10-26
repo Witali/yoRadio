@@ -112,7 +112,13 @@ compiler frame32B static. Все прежние31 PCM остаются поби�
 Проверены оба floor, все три residue, несколько comment strings и zero-size
 book allocations; все прежние31 PCM остаются точными. Ошибка памяти возвращает
 `OV_EFAULT`, ошибочный заголовок — прежний `OV_EBADHEADER`; public ABI сохранён.
-Дальше — OOM propagation/recovery при DSP init и packet decode, выделяющие память
+[DSP init кандидат](../tests/results/vorbis-xiph-dsp-20261026/CHECKPOINT.md)
+проверяет частичные MDCT/floor/residue/PCM allocations; ASan/UBSan проходят 3584
+сценария и все прежние31 PCM с max0. ESP32 SDK сборка завершилась, но QEMU gate
+остаётся NONPASS: длинная серия тестов вызвала watchdog на IDLE1.
+[Доработка scheduling теста отложена](CYD_XIPH_DSP_TARGET_DEFERRED_20261026.md)
+после автоматического отказа; повторный target/PCM gate и Clang ещё нужны.
+Дальше — завершение DSP target gate, OOM propagation/recovery при packet decode, выделяющие память
 comment query/add helpers, остальные channel-sized scratch,
 границы uint32 rate/floor0 amplitude/VQ range и runtime integration.
 Новый кандидат пока не подключён к радио. Старые

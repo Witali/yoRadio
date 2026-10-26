@@ -74,6 +74,18 @@ private interface header. DSP/MDCT/look initialization, packet arena/floor/
 residue propagation, allocating comment utilities, other stack scratch and
 the remaining format/range and production gates are still open.
 
+The [DSP-init candidate](../tests/results/vorbis-xiph-dsp-20261026/CHECKPOINT.md)
+checks constructor allocations, partial lookup/PCM cleanup and a checked MDCT
+initializer retaining the void wrapper and all successful transform arithmetic.
+Host ASan/UBSan passes3584 scenarios and every original31 PCM sample exactly.
+Its first ESP32 SDK build completes, but the unchanged strict reader rejects
+the QEMU run for idle-core watchdog diagnostics during the long test sweep.
+The [fixture scheduling change is deferred](CYD_XIPH_DSP_TARGET_DEFERRED_20261026.md)
+after automatic review stopped its preparation; no rerouted request or watchdog
+suppression followed. Native qualification, independent native PCM comparison
+and post-change Clang remain open. This candidate now has23 exact edits across
+10 C units and two owned private headers; it is not selected by the radio.
+
 Full floor0 correctness requires a precision and range design for the complete
 synthesis path. The public low-memory implementation stores Q4 amplitude and
 Q24 LSP values; the current bridge delegates residue, coupling, IMDCT, overlap
