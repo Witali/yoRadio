@@ -12,6 +12,7 @@
 extern int xiph_arena_tests(void);
 extern int xiph_book_tests(void);
 extern int xiph_bitreader_tests(void);
+extern int xiph_residue_tests(void);
 static int16_t samples[32768];
 static const uint64_t canary=UINT64_C(0xa194d6f02b387c55);
 _Static_assert(__BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__,"S16LE capture");
@@ -81,10 +82,10 @@ static void capture(FILE *out,uint32_t index){
 }
 int main(int argc,char **argv){
     assert(argc==2 && !xiph_port_test_live() && !xiph_port_test_bytes());
-    int arena=xiph_arena_tests(),books=xiph_book_tests(),bits=xiph_bitreader_tests();
-    assert(arena==11 && books>0 && bits>0);
+    int arena=xiph_arena_tests(),books=xiph_book_tests(),bits=xiph_bitreader_tests(),residue=xiph_residue_tests();
+    assert(arena==11 && books>0 && bits>0 && residue>0);
     assert(!xiph_port_test_live() && !xiph_port_test_bytes());xiph_port_test_reset(0);
-    printf("RESOURCE_CHECKS arena=%d books=%d bits=%d live=0\n",arena,books,bits);fflush(stdout);
+    printf("RESOURCE_CHECKS arena=%d books=%d bits=%d residue=%d live=0\n",arena,books,bits,residue);fflush(stdout);
     FILE *out=fopen(argv[1],"wb");assert(out);assert(fwrite("XIPHRES1",1,8,out)==8);write32(out,XIPH_CASE_COUNT);
     for(uint32_t i=0;i<XIPH_CASE_COUNT;i++)capture(out,i);
     assert(!fclose(out) && !xiph_port_test_live() && !xiph_port_test_bytes());

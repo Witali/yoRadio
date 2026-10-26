@@ -18,11 +18,11 @@ ROOT=Path(__file__).resolve().parents[1]
 EXPORTER=ROOT/'tests/prepare-vorbis-xiph.py'
 EXPORTER_SHA='04507fa0ab9425e6f77b3c268b4ddfd5b3ac4af35c1d27dd438157f246d8acb6'
 CONTROLLER=ROOT/'tests/run-vorbis-xiph-port-qemu.py'
-CONTROLLER_SHA='949a3a8aa2baec7bc8d2de1f9a1df2cfa23ea7edaa47fcdae1c41466c1a51b5b'
+CONTROLLER_SHA='31a6bb1b303bf934739cc8502f2b8cdab2a40e1f21089f4b2e91fbe09807a182'
 BASE_COMPARATOR=ROOT/'tests/test-vorbis-xiph-pcm.py'
 BASE_COMPARATOR_SHA='a1aa58104aecdedf58047ffa314cf90096aa03c79cb1900b990cf34f424318dc'
 BASE_MANIFEST_SHA='897096caf216de0e161f4fd833037863f8e2dc3da0531e34b851503f932f4b14'
-PORT_MANIFEST_SHA='9103e35103d6a19fc3532a82eacc48a9c951685033cb7759f6c79a517af4a079'
+PORT_MANIFEST_SHA='d56dbee024e53940b5551bd53a52fcf5139cd6f90e2f01184c872da296abfeab'
 PREPARATION_RECEIPTS=ROOT/'.build/vorbis-xiph-validation-20261025-01'
 MODEL_SHA='a12fcb6fea905027f9af4b1d1e5b5b561fa447f457d236cd5d004fd948b07883'
 def need(ok,reason):
@@ -144,16 +144,16 @@ def main():
             snapshot=(capture/pin['snapshot']).resolve();need(snapshot.is_relative_to(capture),'contained native source snapshot');body=read(snapshot,pin['sha256']);need(body==read(Path(path),pin['sha256'])and len(body)==pin['bytes'],'same original/frozen native source')
         need(read(capture/'sources/controller.py')==read(CONTROLLER,CONTROLLER_SHA)and read(capture/'sources/cases/cases.json')==read(prepared/'cases.json')and read(capture/'sources/cases/cases.h')==header,'executed controller and original raw data bodies')
         base=capture/'sources/components/native_vorbis_xiph';port=capture/'sources/components/native_vorbis_xiph_port';manifest=controller.validate_manifest(json.loads(read(base/'component-manifest.json',BASE_MANIFEST_SHA)));adaptation=controller.validate_port_manifest(json.loads(read(port/'port-manifest.json',PORT_MANIFEST_SHA)),BASE_MANIFEST_SHA)
-        need(len(manifest['files'])==115 and len(adaptation['files'])==21,'complete reviewed sibling component sizes')
+        need(len(manifest['files'])==115 and len(adaptation['files'])==23,'complete reviewed sibling component sizes')
         for frozen,original,document,name in((base,ROOT/'idf/components/native_vorbis_xiph',manifest,'component-manifest.json'),(port,ROOT/'idf/components/native_vorbis_xiph_port',adaptation,'port-manifest.json')):
             tree(frozen,document,name);tree(original,document,name);need(read(frozen/name)==read(original/name),'same sibling manifest bytes')
         generated=captured['generated_porting'];porting_path=(capture/generated['path']).resolve();need(porting_path.is_relative_to(capture),'contained actual PORTING record');read(porting_path,generated['sha256'])
         for path,digest in captured['generated_sources'].items():
             source=(capture/path).resolve();need(source.is_relative_to(capture),'contained actual generated source');read(source,digest)
         porting=controller.validate_generated(porting_path,manifest,adaptation,base,port,BASE_MANIFEST_SHA,PORT_MANIFEST_SHA);need(porting==generated['record'],'reported and independently replayed PORTING record');generated_root=porting_path.parent
-        expected_generated={str((generated_root/name).relative_to(capture).as_posix()):digest for name,digest in porting['files'].items()};expected_generated[porting_path.relative_to(capture).as_posix()]=sha(read(porting_path));need(captured['generated_sources']==expected_generated and len(expected_generated)==120,'all actual generated source bytes, record and no omissions')
+        expected_generated={str((generated_root/name).relative_to(capture).as_posix()):digest for name,digest in porting['files'].items()};expected_generated[porting_path.relative_to(capture).as_posix()]=sha(read(porting_path));need(captured['generated_sources']==expected_generated and len(expected_generated)==121,'all actual generated source bytes, record and no omissions')
         fixtures={'fixture':capture/'project/main/main.c',**{name:capture/'project/main'/name for name in controller.HELPERS if name.endswith('.c')}};expected_compile={**fixtures,**{row['original']:generated_root/row['compiled']for row in porting['compiled_units']}}
-        need(captured['component_compile_sources']==manifest['compile_sources']and set(captured['compile_rows'])==set(expected_compile)and len(fixtures)==5,'all22 library and5 fixture compile rows')
+        need(captured['component_compile_sources']==manifest['compile_sources']and set(captured['compile_rows'])==set(expected_compile)and len(fixtures)==6,'all22 library and6 fixture compile rows')
         project=capture/'sources/project';project_paths=list(project.rglob('*'));need(not any(path.is_symlink()for path in project_paths),'regular frozen fixture tree')
         expected_project={'project/'+path.relative_to(project).as_posix():read(path)for path in project_paths if path.is_file()};expected_project['project/main/cases.h']=header;expected_project['project/sdkconfig.defaults']=read(project/'sdkconfig.esp32.defaults')
         for name in controller.HELPERS:expected_project['project/main/'+name]=read(capture/'sources/helpers'/name)
@@ -185,7 +185,7 @@ def main():
         for flag,value in(('-M','esp32,audiodev=quiet'),('-smp','2'),('-nic','none'),('-display','none'),('-monitor','none'),('-serial','stdio')):need(qargs.count(flag)==1 and qargs[qargs.index(flag)+1]==value,'actual isolated QEMU profile '+flag)
         need(qargs.count('-L')==1 and '-no-reboot'in qargs and '-snapshot'in qargs,'explicit ROM and finite isolated QEMU execution')
         source_rows=controller.validate_cases(model,header.decode('ascii'));rawlog=read(capture/'qemu.stdout.log').decode('utf-8',errors='replace')+'\n'+read(capture/'qemu.stderr.log').decode('utf-8',errors='replace');replayed=controller.validate_log(rawlog,source_rows,'esp32',pins['cases'],pins['base-manifest']);rows=replayed.pop('rows');need(rows==captured['rows']and replayed==captured['observed'],'all actual ordered public API/PCM/guard events replayed')
-        resources=controller.validate_resource_log(rawlog,source_rows,pins['base-manifest'],pins['port-manifest']);need(resources==captured['resource_observed']and resources==dict(arena_checks=11,book_checks=200864,bit_checks=124754,records=38,per_case_zero_live=31,final_live=0,final_bytes=0,core=1),'all38 actual focused resource and cleanup records')
+        resources=controller.validate_resource_log(rawlog,source_rows,pins['base-manifest'],pins['port-manifest']);need(resources==captured['resource_observed']and resources==dict(arena_checks=11,book_checks=200864,bit_checks=124754,residue_checks=controller.RESIDUE_CHECKS,records=40,per_case_zero_live=31,final_live=0,final_bytes=0,core=1),'all40 actual focused resource and cleanup records')
         for row in rows:need(read(capture/'pcm'/('%02d-'%row['case']+row['id']+'.s16le'))==bytes.fromhex(row['pcm_hex']),'saved PCM equals every actual capture byte')
         measured=compare_rows(model,rows,references)
         need(all(sha(Path(path).read_bytes())==pin['sha256']and sha((out/pin['snapshot']).read_bytes())==pin['sha256']for path,pin in ledger.items()),'every consumed source/input unchanged')

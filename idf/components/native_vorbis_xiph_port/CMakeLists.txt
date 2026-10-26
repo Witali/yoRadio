@@ -25,7 +25,7 @@ set(vorbis_units
     floor1 floor0 res0 mapping0 registry codebook sharedbook lookup bitrate)
 set(xiph_sources)
 foreach(unit IN LISTS vorbis_units)
-    if(unit STREQUAL "block" OR unit STREQUAL "sharedbook")
+    if(unit STREQUAL "block" OR unit STREQUAL "sharedbook" OR unit STREQUAL "codebook")
         list(APPEND xiph_sources "${xiph_generated}/ported/${unit}.c")
     else()
         list(APPEND xiph_sources "${xiph_generated}/base/upstream/libvorbis/lib/${unit}.c")

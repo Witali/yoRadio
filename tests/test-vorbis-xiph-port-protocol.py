@@ -16,6 +16,7 @@ PORT='b'*64
 ROWS=[dict(id='case%02d'%i)for i in range(31)]
 BOOKS=123
 BITS=456
+RESIDUE=789
 
 @contextmanager
 def workspace_temporary():
@@ -33,14 +34,14 @@ def workspace_temporary():
 
 def resource_log():
     def record(**fields):return 'PORT_RESOURCE '+' '.join(k+'='+str(v)for k,v in dict(fields,live=0,bytes=0,core=1).items())
-    lines=['XIPH_WORKER core=1 priority=3 stack=16384',record(phase='arena_before',base=BASE,port=PORT),record(phase='arena_after',checks=11),record(phase='books_before'),record(phase='books_after',checks=BOOKS),record(phase='bits_before'),record(phase='bits_after',checks=BITS),'XIPH_CONTROLS checks=17 core=1']
+    lines=['XIPH_WORKER core=1 priority=3 stack=16384',record(phase='arena_before',base=BASE,port=PORT),record(phase='arena_after',checks=11),record(phase='books_before'),record(phase='books_after',checks=BOOKS),record(phase='bits_before'),record(phase='bits_after',checks=BITS),record(phase='residue_before'),record(phase='residue_after',checks=RESIDUE),'XIPH_CONTROLS checks=17 core=1']
     for i in range(31):lines+=['XIPH_CASE case='+str(i)+' id=case%02d'%i,'XIPH_CASE_END case='+str(i)+' guards=1',record(phase='case',case=i)]
     return '\n'.join(lines+[record(phase='complete'),'XIPH_COMPLETE cases=31 controls=17 core=1'])+'\n'
 
 def source_fixture(folder):
     base_root,port_root,generated=folder/'base',folder/'port',folder/'generated';base_root.mkdir();port_root.mkdir();generated.mkdir()
     units=['upstream/libvorbis/lib/'+name+'.c'for name in subject.VORBIS_UNITS]+['upstream/libogg/src/bitwise.c','upstream/libogg/src/framing.c']
-    sources=['upstream/libvorbis/lib/block.c']+['upstream/libvorbis/lib/sharedbook.c']*3+['upstream/libogg/src/bitwise.c']*4
+    sources=['upstream/libvorbis/lib/block.c']+['upstream/libvorbis/lib/sharedbook.c']*3+['upstream/libogg/src/bitwise.c']*4+['upstream/libvorbis/lib/codebook.c']
     original={name:('// '+name+'\n').encode()for name in units};port_bodies={'CMakeLists.txt':b'# test only\n','prepare.py':b'# no execution\n'};changes=[]
     for i,source in enumerate(sources):
         before,after=('before_'+str(i)+'\n').encode(),('after_'+str(i)+'\n').encode();original[source]+=before;before_name='edits/'+str(i)+'.before.c';after_name='edits/'+str(i)+'.after.c';port_bodies[before_name]=before;port_bodies[after_name]=after;changes.append(dict(source=source,before=before_name,after=after_name))
@@ -69,19 +70,44 @@ class Protocol(unittest.TestCase):
         for begin,end,new_end in (('static int convert(','static void controls(','static void controls('),('static void capture(','static void worker(','static void port_resource_tests(')):
             self.assertEqual(baseline[baseline.index(begin):baseline.index(end)],ported[ported.index(begin):ported.index(new_end)])
     def test_complete_resource_sequence_binds_all_case_cleanup(self):
-        value=subject.validate_resource_log(resource_log(),ROWS,BASE,PORT,BOOKS,BITS);self.assertEqual((value['records'],value['arena_checks'],value['per_case_zero_live']),(38,11,31))
+        value=subject.validate_resource_log(resource_log(),ROWS,BASE,PORT,BOOKS,BITS,RESIDUE);self.assertEqual((value['records'],value['arena_checks'],value['per_case_zero_live']),(40,11,31))
         self.assertFalse(any('XIPH_'in line for line in resource_log().splitlines()if line.startswith('PORT_RESOURCE ')))
     def test_missing_duplicate_reordered_and_foreign_records_fail(self):
         lines=resource_log().splitlines()
         for changed in (lines[:2]+lines[3:],lines[:2]+[lines[2]]+lines[2:],lines[:2]+[lines[3],lines[2]]+lines[4:],['I '+lines[1]]+lines[:1]+lines[2:],lines[:-2]+lines[-1:],lines+['PORT_RESOURCE other=1']):
-            with self.subTest(text=changed),self.assertRaises(ValueError):subject.validate_resource_log('\n'.join(changed),ROWS,BASE,PORT,BOOKS,BITS)
+            with self.subTest(text=changed),self.assertRaises(ValueError):subject.validate_resource_log('\n'.join(changed),ROWS,BASE,PORT,BOOKS,BITS,RESIDUE)
+    def test_residue_phase_missing_duplicate_and_reordered_records_fail(self):
+        lines=resource_log().splitlines()
+        before=next(i for i,line in enumerate(lines)if 'phase=residue_before 'in line)
+        after=next(i for i,line in enumerate(lines)if 'phase=residue_after 'in line)
+        variants=[lines[:before]+lines[before+1:],lines[:after]+lines[after+1:],lines[:after]+[lines[after]]+lines[after:],lines[:before]+[lines[after],lines[before]]+lines[after+1:]]
+        for changed in variants:
+            with self.subTest(text=changed),self.assertRaises(ValueError):subject.validate_resource_log('\n'.join(changed),ROWS,BASE,PORT,BOOKS,BITS,RESIDUE)
+    def test_nonpositive_declared_residue_count_fails(self):
+        for count in(0,-1):
+            with self.subTest(count=count),self.assertRaises(ValueError):subject.validate_resource_log(resource_log(),ROWS,BASE,PORT,BOOKS,BITS,count)
     def test_wrong_counts_ownership_core_source_or_case_order_fail(self):
         text=resource_log()
-        for changed in (text.replace('checks=11','checks=10'),text.replace('checks=123','checks=124'),text.replace('checks=456','checks=455'),text.replace('live=0','live=1'),text.replace('bytes=0','bytes=1'),text.replace('core=1','core=0'),text.replace(BASE,'c'*64),text.replace(PORT,'c'*64),text.replace('phase=case case=0','phase=case case=1')):
-            with self.subTest(text=changed),self.assertRaises(ValueError):subject.validate_resource_log(changed,ROWS,BASE,PORT,BOOKS,BITS)
+        for changed in (text.replace('checks=11','checks=10'),text.replace('checks=123','checks=124'),text.replace('checks=456','checks=455'),text.replace('checks=789','checks=788'),text.replace('live=0','live=1'),text.replace('bytes=0','bytes=1'),text.replace('core=1','core=0'),text.replace(BASE,'c'*64),text.replace(PORT,'c'*64),text.replace('phase=case case=0','phase=case case=1')):
+            with self.subTest(text=changed),self.assertRaises(ValueError):subject.validate_resource_log(changed,ROWS,BASE,PORT,BOOKS,BITS,RESIDUE)
     def test_complete_exact_generated_tree(self):
         with workspace_temporary()as folder:
-            args=source_fixture(Path(folder));value=subject.validate_generated(*args,BASE,PORT);self.assertEqual(len(value['edits']),8);self.assertEqual(len(value['compiled_units']),22);self.assertEqual(sum(x['compiled'].startswith('ported/')for x in value['compiled_units']),3)
+            args=source_fixture(Path(folder));value=subject.validate_generated(*args,BASE,PORT);self.assertEqual(len(value['edits']),9);self.assertEqual(len(value['compiled_units']),22);self.assertEqual(sum(x['compiled'].startswith('ported/')for x in value['compiled_units']),4)
+    def test_all_twenty_eight_actual_compile_sources_are_unique_and_complete(self):
+        with workspace_temporary()as folder:
+            args=source_fixture(Path(folder));porting=json.loads(args[0].read_bytes());generated=args[0].parent
+            fixtures=[('fixture',Path(folder)/'project/main/main.c')]+[(name,Path(folder)/'project/main'/name)for name in subject.HELPERS if name.endswith('.c')]
+            sources=fixtures+[(unit['original'],generated/unit['compiled'])for unit in porting['compiled_units']]
+            database=[dict(file=str(path),command='unit-only',output=str(i)+'.o')for i,(_,path)in enumerate(sources)]
+            selected=subject.validate_compile_sources(database,fixtures,porting,generated)
+            self.assertEqual(set(selected),{name for name,_ in sources});self.assertEqual(len(selected),28)
+            self.assertIn('vorbis_xiph_residue.c',selected)
+            self.assertEqual(Path(selected['upstream/libvorbis/lib/codebook.c']['file']),generated/'ported/codebook.c')
+            for changed in(database[:-1],database+[database[-1]],database[:4]+database[5:]):
+                with self.subTest(database=changed),self.assertRaises(ValueError):subject.validate_compile_sources(changed,fixtures,porting,generated)
+            with self.assertRaises(ValueError):subject.validate_compile_sources(database,fixtures[:-1],porting,generated)
+            changed=copy.deepcopy(porting);changed['compiled_units'][-1]['compiled']='ported/extra.c'
+            with self.assertRaises(ValueError):subject.validate_compile_sources(database,fixtures,changed,generated)
     def test_generated_byte_metadata_and_inventory_tampering_fail(self):
         for kind in range(4):
             with self.subTest(kind=kind),workspace_temporary()as folder:

@@ -9,7 +9,7 @@ from pathlib import Path
 import struct
 import unittest
 PATH=Path(__file__).with_name('test-vorbis-xiph-port-pcm.py')
-PIN='592b7e3fa9189e29ceb64eaa4d4d7c447e08b955cf565333d231ae4ac989be10'
+PIN='9fc1d0cfa2eec511bdc0ce94f86929971b69eac1b0adbd5243f5946d7cace5df'
 if hashlib.sha256(PATH.read_bytes()).hexdigest()!=PIN:raise RuntimeError('Frozen pure comparator source changed')
 spec=importlib.util.spec_from_file_location('xiph_pcm_unit_subject',PATH)
 subject=importlib.util.module_from_spec(spec);spec.loader.exec_module(subject)
