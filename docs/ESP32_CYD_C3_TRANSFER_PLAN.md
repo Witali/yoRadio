@@ -203,8 +203,18 @@ decoder или native runtime gate. Выбор числового пути и п
 и 297 056 точных слов результата. Отсутствующий floor обнуляет канал даже
 после coupling; тихий индекс0 остаётся ненулевым. ASan/UBSan проходят,
 новый компонент Clang без предупреждений; C/C++ GCC LX6/RV32IMC компилируется.
-Floor0 product, IMDCT/window/overlap/PCM, полная native квалификация и radio
+Floor0 product, window/overlap/PCM, полная native квалификация и radio
 integration остаются открытыми; прежние отложенные пункты этим не закрыты.
+Для IMDCT реализован [адаптер существующего алгоритма Xiph](CYD_VORBIS_TRANSFORM_DESIGN.md):
+вычислительные тела скопированы без изменения, используются double и отдельная
+степень двойки. [Host-проверка](../tests/results/vorbis-transform-20261026/CHECKPOINT.md)
+проходит 3 084 случая, 465 958 точных входных преобразований и 881 216 временных
+отсчётов при прежней нормовой границе 5e-12. Проверены все восемь размеров блока,
+1 750 прежних каналов floor1 и 266 исходных пакетов с floor1; остальные 168
+исходных пакетов требуют floor0. Все 434 исходные модели сохранены. Это ещё
+не полный PCM или native/runtime gate. C/C++ GCC LX6/RV32IMC проходит,
+оба новых C модуля Clang0/0; пять предупреждений fixture относятся к проверке
+собственных byte snapshots. Window/overlap, floor0 и подключение остаются.
 Дальше — незавершённые native gates, общие stack/resource проверки,
 floor0 amplitude/VQ range и runtime integration с unsigned rate API.
 Новый кандидат пока не подключён к радио. Старые
@@ -362,8 +372,10 @@ NONPASS относятся к прежнему repair и не переобъяв
   [Floor0/floor1 packets](../tests/results/vorbis-floor-packet-20261025/CHECKPOINT.md)
   и [точные residue0/1/2 с inverse coupling](../tests/results/vorbis-residue-20261025/CHECKPOINT.md)
   также реализованы и проверены как отдельные компоненты. Широкий путь требует
-  сборки полного frame decoder, применения floor0, IMDCT/overlap и public raw integration; точное
+  сборки полного frame decoder, применения floor0, window/overlap и public raw integration; точное
   применение floor1 отдельно квалифицировано на host, но ещё не на SDK/QEMU. Компонент
+  IMDCT повторно использует тела Xiph с binary64 и прошёл host/source-profile gates;
+  полная native/resource/PCM проверка пока не завершена. Компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
   [Public owned-book baseline](../tests/results/cyd-vorbis-public-book-consumer-baseline-20261023/CHECKPOINT.md)
   сохранён с воспроизводимой standalone проверкой:36 публикаций/365 точных
@@ -1746,3 +1758,15 @@ Stream остаётся на core0, decode/output на core1 с прежними
   инструментов сохранены. Новый компонент Clang0/0; десять предупреждений
   тестовых fixtures разобраны без подавления. SDK/QEMU, floor0 и PCM ещё впереди;
   production CMake, affinity, стеки, backend и отложенные scopes не менялись.
+
+- 2026-10-26, CYD-C3-14: добавлен отдельный адаптер IMDCT с неизменёнными
+  butterfly/bitreverse/backward телами Xiph и явным power-of-two масштабом.
+  Не добавлен новый алгоритм преобразования или float32 valuelist. Однократное
+  округление limb-спектра проверено побитово для всех ширин1–1151; независимый
+  complex FFT подтверждён 286 Decimal/rational anchors. Host3 084 случая проходят
+  ASan/UBSan, максимальная нормированная ошибка 2.6506574712925612e-15 при
+  границе5e-12. Первые отказы WSL и лишнего signed-zero assertion сохранены;
+  данные корпуса, ожидания и capture при исправлении comparator не менялись.
+  Оба C модуля Clang0/0, C/C++ GCC двух ISA и static frame records сохранены.
+  Точная floor0 provenance и её отдельные численные домены, window/overlap,
+  full31 PCM bound2/all14 relations, native integration и плата остаются.
