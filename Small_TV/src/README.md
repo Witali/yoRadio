@@ -97,6 +97,14 @@ for manual review. The tool reports control-flow facts; instruction bodies and
 external calls still need a C implementation and behavior comparison. See the
 [command examples and tests](reference/assembly/README.md#control-flow-review-tool).
 
+Factory disassembly now uses explicit RV32 ISA metadata. This corrects GNU's
+RV64 interpretation of compressed link-producing jumps in ISA-less exports.
+The assistant also recovers old C.JAL entries from their bytes, with visible
+warnings, and rejects other RV64 input. The complete code-only export preserves
+813,936 original bytes; 453 call candidates include five Ghidra-reference gaps
+requiring further boundary/reachability analysis. See
+[decoder checks and remaining candidates](tests/RV32_DISASSEMBLY.md).
+
 The broader export used for organization came from the existing analyzed
 factory ELF, including application functions and SDK callers. Its SHA-256
 and the immutable flash-dump SHA-256 are recorded in the symbol map. To

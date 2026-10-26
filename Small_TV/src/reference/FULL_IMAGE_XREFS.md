@@ -72,6 +72,12 @@ registrations вне найденных связей и сопоставлени
 
 ## Воспроизведение
 
+Ниже сохранён способ воспроизведения исторического byte-map checkpoint.
+Для новых mnemonic/call searches использовать ISA-qualified exporter из
+[RV32_DISASSEMBLY.md](../tests/RV32_DISASSEMBLY.md): исходный ELF без ISA attributes
+вызывал неверную RV64 интерпретацию коротких вызовов GNU. Это не меняет прежнюю
+побайтовую проверку GP accesses.
+
 [`full-image-xrefs-validation-20261024.json`](../../qemu/parity/full-image-xrefs-validation-20261024.json)
 содержит 7 payloads, 361910 gzip bytes: полный адресный экспорт базы, проверенный
 отчёт, исходники, symbol map и typed session metadata. Не добавлены полный dump,
@@ -119,3 +125,19 @@ Production app, SDK и QEMU в этом checkpoint не изменены. Дли
 Там все396GP accesses согласованы, bytes исходной прошивки и обоих проектов
 неизменны. Это дополнение не переписывает первоначальный результат и не
 доказывает полноту всего образа. См. [SDK_GAP_RECOVERY.md](SDK_GAP_RECOVERY.md).
+
+## Дополнение 2026-10-26: RV32 и пропущенные короткие вызовы
+
+Новый ISA-qualified экспорт непрерывно покрывает 813936 bytes трёх code sections:
+288036 records вместо287952. Все старые rows/bytes/boundaries сохранены; `-z`
+добавил84нулевых halfwords/168B. Все396GP accesses идентичны прежним.
+GNU теперь верно показывает453C.JAL candidates: раньше443 были `c.addiw`,10 —
+`.insn`. Это исправление интерпретации, не изменение заводского образа.
+
+Сравнение с сохранённым snapshot5143функции (не новым5161) находит448совпадающих
+references и452известныецели. Открыты40380180→40380584,4038018e→40380566,
+420a3a12→420a3d32,420a3a14→420a3da2,420a3e32→420a3fd4. Нужны реальные границы/
+достижимость/SDK matching; само отсутствие reference не доказывает баг прошивки.
+Новый proof и29tests/9negativecontrols:
+[RV32_DISASSEMBLY.md](../tests/RV32_DISASSEMBLY.md). Полнота всего образа,
+семантическое равенство и физическая приёмка по-прежнему не доказаны.

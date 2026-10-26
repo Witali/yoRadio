@@ -13,6 +13,8 @@ from pathlib import Path
 import re
 import sys
 
+from reverse.rv32_disassembly import compressed_jal_target
+
 REGISTERS = ('zero ra sp gp tp t0 t1 t2 s0 s1 a0 a1 a2 a3 a4 a5 a6 a7 '
              's2 s3 s4 s5 s6 s7 s8 s9 s10 s11 t3 t4 t5 t6').split()
 REG_INDEX = {name:index for index,name in enumerate(REGISTERS)}
@@ -32,6 +34,7 @@ class Instruction:
     op:str
     operands:str
     note:str=''
+    original_assembly:str=''
 
     @property
     def next(self):
@@ -90,8 +93,20 @@ def parse(text, fallback='function'):
         if len(match[2]) not in (4,8):
             raise ValueError(f'Expected a 16/32-bit instruction at 0x{int(match[1],16):x}')
         operands,_,note=match[4].partition('#')
-        instructions.append(Instruction(int(match[1],16),len(match[2])//2,match[2],
-                                        match[3].removeprefix('c.'),operands.strip(),note.strip()))
+        item=Instruction(int(match[1],16),len(match[2])//2,match[2],
+                         match[3].removeprefix('c.'),operands.strip(),note.strip())
+        word=int(match[2],16)
+        if item.size==2 and word&0xe003==0x2001:
+            # RV32 reuses the RV64 C.ADDIW encoding for a link-producing jump.
+            # Recover old ISA-less exports from bytes, retaining the disagreement.
+            target=compressed_jal_target(word,item.address)
+            if item.op!='jal' or item.target()!=target:
+                item.original_assembly=item.op+(' '+item.operands if item.operands else '')
+            item.op='jal';item.operands=hex(target)
+        elif item.op in ('addiw','addw','subw','mulw','divw','divuw','remw','remuw',
+                         'sllw','srlw','sraw','slliw','srliw','sraiw','ld','sd','lwu'):
+            raise ValueError(f'RV64 mnemonic in RV32 input at {item.address:#x}; re-export with explicit RV32 ISA metadata')
+        instructions.append(item)
     if instructions:
         functions.append((name,instructions))
     for _,items in functions:
@@ -103,12 +118,30 @@ def parse(text, fallback='function'):
     return functions
 
 
+def frame_args(item):
+    """Normalize numeric register names only for ABI stack-frame hints."""
+    return [re.sub(r'\bx([0-9]|[12][0-9]|3[01])\b',
+                   lambda match:REGISTERS[int(match[1])],arg) for arg in item.args()]
+
+
+def stack_adjustment(item):
+    """Recognize both aliased ADDI and canonical compressed SP adjustments."""
+    args=frame_args(item)
+    if item.op in ('addi','addi16sp'):
+        if len(args)==2 and args[0]=='sp':args=['sp',*args]
+        if len(args)==3 and args[:2]==['sp','sp']:
+            return int(args[2],0)
+    return 0
+
+
 def structure(name, instructions):
     """Build intraprocedural blocks, dominators and proven natural-loop back edges."""
     if not instructions:
         raise ValueError('No instructions in selected function')
     addresses={item.address for item in instructions}; leaders={instructions[0].address}
-    warnings=[]
+    warnings=[{'kind':'rv32_decode_corrected','address':hex(item.address),
+               'original':item.original_assembly,'decoded':item.op+' '+item.operands}
+              for item in instructions if item.original_assembly]
     for previous,item in zip(instructions,instructions[1:]):
         if previous.next!=item.address:
             leaders.add(item.address)
@@ -167,10 +200,10 @@ def structure(name, instructions):
                           'blocks':[hex(value) for value in sorted(members)]})
     prologue=[]
     for item in blocks[0][:12]:
-        args=item.args()
-        if item.op=='addi' and len(args)==3 and args[:2]==['sp','sp'] and int(args[2],0)<0:
-            prologue.append({'address':hex(item.address),'stack_bytes':-int(args[2],0)})
-        elif item.op in ('sw','sd') and args and (args[0]=='ra' or re.fullmatch(r's\d+',args[0])) and '(sp)' in item.operands:
+        args=frame_args(item);adjustment=stack_adjustment(item)
+        if adjustment<0:
+            prologue.append({'address':hex(item.address),'stack_bytes':-adjustment})
+        elif item.op in ('sw','swsp') and args and (args[0]=='ra' or re.fullmatch(r's\d+',args[0])) and '(sp)' in args[-1]:
             prologue.append({'address':hex(item.address),'saved_register':args[0],'slot':args[-1]})
     returns=[hex(item.address) for item in instructions if item.kind()=='return']
     epilogues=[]
@@ -179,10 +212,9 @@ def structure(name, instructions):
         if last.kind()=='return':
             frame=0; restored=[]
             for item in block[-13:-1]:
-                args=item.args()
-                if item.op=='addi' and len(args)==3 and args[:2]==['sp','sp'] and int(args[2],0)>0:
-                    frame+=int(args[2],0)
-                if item.op in ('lw','ld') and args and (args[0]=='ra' or re.fullmatch(r's\d+',args[0])) and '(sp)' in item.operands:
+                args=frame_args(item);adjustment=stack_adjustment(item)
+                if adjustment>0:frame+=adjustment
+                if item.op in ('lw','lwsp') and args and (args[0]=='ra' or re.fullmatch(r's\d+',args[0])) and '(sp)' in args[-1]:
                     restored.append(args[0])
             epilogues.append({'return_address':hex(last.address),'stack_bytes':frame,'restored_registers':restored})
         if last.kind() in ('indirect','trap'):

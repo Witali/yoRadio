@@ -5144,3 +5144,30 @@ findings не объясняются этим invalid-ID исправление�
 - Previous long-test processes are all absent, with stale running files and
   unaccepted654/1091/1081cycle prefixes. No restart or final acceptance claim;
   preserved sources/metadata for later analysis. Continue factory item4.
+
+## 2026-10-26 — RV32 disassembly corrected before further factory call searches
+
+- Previous goal turn PROGRESS:25b8ef015. Continued the user's factory item4;
+  no return to deferred1–3, physical I/O, new VM or firmware build.
+- Reproduced ISA-less GNU interpreting factory712b at420aeb6e as RV64 C.ADDIW,
+  even with -m riscv:rv32. Independent RV32 execution proves C.JAL to420af10a,
+  RA420aeb70 and unchangeds6. Added a separate code-only ISA-view module with
+  real-decoder canary, immutable byte/tool hashes and bounded temporary cleanup.
+- Updated selected IROM exporter; added full executable-region exporter and
+  raw-byte/call/graph audit as separate tools. Transfer assistant recovers old
+  compact calls with visible warnings, rejects other RV64 input and preserves
+  canonical compressed/numeric-register stack hints. No native behavior changed.
+- Full export813936B/288036rows preserves all287952old rows and396GP accesses;
+  -z adds84zero halfwords/168B.453C.JAL candidates previously443c.addiw/10.insn.
+  Against frozen5143-functiongraph:448matching refs/452known targets, five sites
+  remain explicit. No reachability or semantic-completeness claim from listing.
+- All29tests pass without skips, including every2048compact encoding through
+  literal RV32 and actualGNU. Evidence reader recomputes graph/byte/call audit,
+  reruns tests and rejects8report alterations plus one actual wrong GNU target.
+  Final consumer exec0c42ea terminal0. Prior output was unavailable after context
+  compaction; verified original consumer absent before rerunning only the reader.
+- Saved3gzip11468B/10sourcepins and reused hashed graph ancestor/delta payloads.
+  Documentation distinguishes old byte audit from misleading mnemonic searches.
+  NEXT qualify five call sites and SDK boundaries, then remaining TIM/null,
+  station+820 lifetime and negotiated-period ranges. Whole-image/final full/
+  independent network/display/duration/hardware acceptance remains open.

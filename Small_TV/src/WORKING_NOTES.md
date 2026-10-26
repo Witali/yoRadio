@@ -1,6 +1,16 @@
 # Контекст работы над восстановленной Small TV
 
-## Текущий checkpoint — heap metadata, 2026-10-25
+## Текущий приоритет — заводской образ, 2026-10-26
+
+Рабочая копия `.worktree/small-tv-factory-audit`, ветка
+`codex/small-tv-factory-audit`. Продолжать пользовательский пункт4; к1–3 вернуться
+позже. Последний checkpoint и NEXT сохранены в конце этого файла. Ниже остаётся
+исторический контекст; старые `running` JSON не подтверждают живые процессы.
+Все12 прежних duration владельцев отсутствуют по CIM26Oct; прогоны не приняты.
+Текущие документы: [RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md),
+[WIFI_EVENT_LIFETIME.md](tests/WIFI_EVENT_LIFETIME.md).
+
+## Исторический checkpoint — heap metadata, 2026-10-25
 
 Разработка продолжена в `.worktree/small-tv-memory-retention`, ветка
 `codex/small-tv-memory-retention`, от `b4a851041`. Основной H10 остаётся в
@@ -4509,3 +4519,48 @@ selection before trusting GNU mnemonic-based whole-image searches. Raw-byte
 qualifiers/private RV32 tests remain independent. Ignored cjal-control.json
 and cjal_control.py retain the control. Other plan points and final independent
 network/display/full/duration/hardware acceptance remain open. Goal stays ACTIVE.
+
+## CURRENT 2026-10-26 — ISA-qualified factory disassembly and five call candidates
+
+Previous goal turn PROGRESS25b8ef015. Active user priority remains factory item4,
+not deferred1–3. No new physical I/O, firmware build, QEMU/SDK/ROM mutation or VM.
+Native appC912/ELF9E4E remain unchanged. Do not restart absent duration owners or
+call stale prefixes acceptance. Frozen prior inputs remain available for replay.
+
+GNU main and both dispatcher variants misdecode ISA-less ELF/raw16bit712b at
+420aeb6e even with -m riscv:rv32. Real RV32 proves C.JAL/target420af10a/RA420aeb70/
+s6unchanged17. New reverse/rv32_disassembly standard ISA metadata view preserves
+codebytes/addresses, no loadsegments/DROM/data; actualGNUcanary before export and
+toolpinsbefore/after. Verified unique temp child paths before recursive cleanup.
+disassemble_factory.py gains optional verified --dump; fullELFexport and pureaudit
+are separate tools. Assistant repairs old C.JAL encodings with visible warnings,
+rejects otherRV64 and retains compressed/numericSPframehints. Original ELF intact.
+
+New fullzero export .build/factory-decoder-20261026/full-rv32-zeroes/factory-rv32.asm
+contains813936bytes/288036rows, all287952oldrows identical. Added84zerohalfwords/
+168bytes (128vectors/40flash) via-z.453C.JALcandidates:old443c.addiw/10.insn;
+all396GPaccesses unchanged. Canonical rawmapold67f4f41f..,newd2d264eb..;
+oldGNUtextSHA d82e4db7a45a128554f7da5abf92a0be0190f5fdd238899ad9f332fe3d16feb9.
+
+Audit uses frozenSDKgap graph5143functions, not later5161. Ancestor+delta reused
+by hashes, canonicalgraph36a65f46edcab37281fd079b2295ab0ff20fad7f520db9cefa0c769dea4b30f9.
+448refs agree/452targets known. Five unmatched:40380180→40380584,
+4038018e→40380566,420a3a12→420a3d32,420a3a14→420a3da2,420a3e32→420a3fd4.
+Don't declare missingfunctions/bugs or all453reachable: code sections can contain
+inline data/unreached regions. Need boundary/caller/SDK qualification next.
+
+Final evidence rv32-disassembly-validation-20261026.json:3newgzip11468B/10sourcepins.
+All29tests no skips:21assistant+8ISAview. Every2048C.JAL encoding runs literalRV32
+and realGNU; PC/RA/s6 and parsedcalltarget checked. IndependentELFreader, wrongISA,
+tempcleanup/range and realcapture publicIROMCLI tested. Reader reconstructsgraph,
+recomputes fullbyte/call/GP audit, reruns29tests, rejects8report+1realGNUtargetmutant.
+Finalconsumer exec0c42ea terminal0; first output lost to compaction, actualCIM
+found no originalconsumer, archive already complete, so onlyconsumer rerun.
+Do not rerun archive.py into an existing output. All source inputs LF before pins.
+Docs tests/RV32_DISASSEMBLY.md include commands and claims. Whole-image completeness,
+candidate reachability, semantic equivalence and physical flags remain false.
+
+NEXT item4: qualify five remaining call candidates, revisit GNU mnemonic-dependent
+searches, then TIM/null-completion/station+820 lifetime/BSS negotiated ranges and
+other aliases/startup error branches. Retaining Wi-Fi callbacks remains verified
+intentional factory-bug correction. All broader goal and acceptance gates persist.

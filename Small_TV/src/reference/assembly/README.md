@@ -116,7 +116,13 @@ and sync at `0x4200f3d4`/`0x4200f3dc`. The natural calendar transport test uses
 that real endpoint for factory re-entry and records the advanced-only observation.
 
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
-objdump path and a list of addresses or bounded IROM ranges.
+objdump path and a list of addresses or bounded IROM ranges. Optional `--dump`
+selects the original capture by path; its fixed SHA-256 is still required.
+The exporter now uses an ISA-qualified RV32 ELF view instead of raw-binary GNU
+decoding. Use `../../tools/disassemble_factory_elf.py --elf ... --objdump ...
+--output ...` for all three executable regions, including explicit zero bytes.
+See [RV32 decoder qualification](../../tests/RV32_DISASSEMBLY.md) before repeating
+mnemonic-based searches: ISA-less GNU exports mislabel compressed calls as RV64.
 ### Control-flow review tool
 
 `../../tools/assist_c_port.py` reads decoded RV32/RVC objdump text and generates
@@ -166,6 +172,14 @@ disconnected and irreducible graphs, natural loops, malformed layouts, multiple
 ELF sections, bounded CLI output, exact name bindings and the real factory
 getclocktype excerpt. Reproducible results are recorded separately in
 `../../../qemu/parity/port-assistant-validation-20261017.json`.
+
+The 2026-10-26 follow-up also checks all 2,048 C.JAL encodings against literal
+RV32 execution and real ISA-qualified GNU output. The assistant recovers these
+calls from raw encoding in old exports and retains a `rv32_decode_corrected`
+warning for every changed mnemonic/target. Other RV64 instructions are rejected.
+Canonical compressed SP operations and numeric registers retain frame hints.
+The [new proof](../../../qemu/parity/rv32-disassembly-validation-20261026.json)
+replays 29 tests without skips; original historical proof inputs are preserved.
 
 `application_main_at_42008e56.asm` preserves the actual active-clock dispatch:
 `0x42009054..0x420090c0` gates weather retry by station state, while all four
