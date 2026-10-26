@@ -9,6 +9,7 @@ import json
 from pathlib import Path, PurePosixPath
 
 BASE_SHA = '897096caf216de0e161f4fd833037863f8e2dc3da0531e34b851503f932f4b14'
+PUBLIC_HEADER = 'upstream/libvorbis/include/vorbis/codec.h'
 
 def need(ok, reason):
     if not ok:
@@ -50,12 +51,13 @@ def materialize(upstream, port, output):
     need(adaptation['base_manifest_sha256'] == BASE_SHA, 'same unchanged release baseline')
     changes = json.loads(edits['edits.json'])
     need(changes['schema'] == 'native-vorbis-xiph-exact-edits-v1'
-         and len(changes['edits']) == 33, 'thirty-three exact reviewed edits')
+         and len(changes['edits']) == 35, 'thirty-five exact reviewed edits')
     modified, applied = {}, []
     for change in changes['edits']:
         source = relative(change['source'])
         before_name, after_name = relative(change['before']), relative(change['after'])
-        need(source in baseline['compile_sources'], 'only a declared compiled source can change')
+        need(source in baseline['compile_sources'] or source == PUBLIC_HEADER,
+             'only a declared compiled source or the rate public header can change')
         before, after = edits[before_name], edits[after_name]
         need(before and after and before != after, 'explicit nonempty source deviation')
         body = modified.get(source, original[source])
@@ -68,10 +70,17 @@ def materialize(upstream, port, output):
                            'upstream/libvorbis/lib/floor0.c', 'upstream/libvorbis/lib/floor1.c',
                            'upstream/libvorbis/lib/res0.c', 'upstream/libvorbis/lib/mapping0.c',
                            'upstream/libvorbis/lib/info.c', 'upstream/libvorbis/lib/mdct.c',
-                           'upstream/libvorbis/lib/synthesis.c'},
-         'only the eleven reviewed translation units change')
+                           'upstream/libvorbis/lib/synthesis.c', PUBLIC_HEADER},
+         'only eleven reviewed C units and the rate public header change')
     generated = {'base/' + name: body for name, body in original.items()}
-    generated.update({'ported/' + PurePosixPath(name).name: body for name, body in modified.items()})
+    generated.update({'ported/' + PurePosixPath(name).name: body for name, body in modified.items()
+                      if name != PUBLIC_HEADER})
+    public_headers = []
+    for name in ('codec.h', 'vorbisenc.h', 'vorbisfile.h'):
+        origin = 'upstream/libvorbis/include/vorbis/' + name
+        destination = 'ported/include/vorbis/' + name
+        generated[destination] = modified.get(origin, original[origin])
+        public_headers.append(dict(original=origin, generated=destination, modified=origin in modified))
     generated['ported/native_vorbis_xiph_header_error.h'] = edits['include/native_vorbis_xiph_header_error.h']
     generated['ported/native_vorbis_xiph_dsp_error.h'] = edits['include/native_vorbis_xiph_dsp_error.h']
     generated['ported/native_vorbis_xiph_comment_error.h'] = edits['include/native_vorbis_xiph_comment_error.h']
@@ -80,7 +89,7 @@ def materialize(upstream, port, output):
               if name in modified else 'base/' + name)) for name in baseline['compile_sources']]
     record = dict(schema='native-vorbis-xiph-generated-port-v1', base_manifest_sha256=BASE_SHA,
                   port_manifest_sha256=sha(edits['port-manifest.json']), edits=applied,
-                  compiled_units=units, files={name: sha(body) for name, body in sorted(generated.items())})
+                  compiled_units=units, public_headers=public_headers, files={name: sha(body) for name, body in sorted(generated.items())})
     generated['PORTING.json'] = (json.dumps(record, indent=2, sort_keys=True) + '\n').encode()
     # Reconfiguration can reuse only an identical complete generated tree.
     if output.exists():

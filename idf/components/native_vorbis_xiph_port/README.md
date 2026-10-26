@@ -2,8 +2,9 @@
 
 This separate candidate preserves the pinned `native_vorbis_xiph` baseline.
 Its generator validates both complete manifests, retains every original byte
-under `base/`, and creates only eleven modified translation units and four owned
-private headers under `ported/`.
+under `base/`, and creates eleven modified C units, four owned private headers
+and a three-file public header overlay under `ported/`. Two overlay headers
+remain byte-identical; the codec header declares the unsigned-rate extension.
 Each declared before fragment must match exactly once. `PORTING.json` records
 all edits and compiled file hashes. No fuzzy patching or external patch tool is
 used. The source version and successful decoding arithmetic remain upstream's.
@@ -11,7 +12,7 @@ used. The source version and successful decoding arithmetic remain upstream's.
 The declared deviations cover optional arena consolidation after realloc
 failure, and decode-codebook scratch/checked allocation cleanup. The latter
 also makes a valid first-table word shift explicitly unsigned. The port uses
-the same base-library units, types, floating configuration and narrow GCC
+the same base-library units, floating configuration and narrow GCC
 diagnostic adaptations as the original evaluation.
 The first ASan/UBSan corpus run also found signed byte-promotion shifts in
 libogg 1.3.5. Four reader functions backport the unsigned-long shifts present
@@ -76,6 +77,19 @@ OV_EFAULT on refusal. Mono/stereo allocation behavior is unchanged; wider
 streams trade channel-sized task-stack use for temporary arena heap ownership.
 This is a bounded-stack change, not a measured total RAM or speed saving.
 No-work residue paths return before allocating the wider scratch.
+
+The public rate field now uses unsigned long where long is 32 bits; on LP64 it
+retains long. This represents the entire positive unsigned 32-bit identification
+rate without clamping or storing negative bits. Public struct storage, alignment
+and offsets stay unchanged, while the source signedness is an explicit 32-bit
+API extension. Consumers must rebuild with the matching generated headers;
+old binaries using signed long cannot interpret newly accepted high values.
+Two checked 16-bit reads distinguish 0xffffffff from EOP. Zero remains invalid,
+signed bitrate hints stay unchanged, and existing granule_time division sees
+the positive rate directly. No physical output-rate capability is implied.
+The overlay exports codec.h plus unchanged vorbisenc.h/vorbisfile.h copies so
+their quoted sibling include selects the same type. Encoder and convenience
+library rate consumers remain separately unqualified.
 
 Neither production application selects this component. The previous unchanged
 31-case numerical checkpoint remains separate. Resource tests must not imply

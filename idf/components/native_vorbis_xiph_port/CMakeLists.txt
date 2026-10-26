@@ -36,7 +36,7 @@ endforeach()
 list(APPEND xiph_sources "${xiph_generated}/ported/bitwise.c"
                          "${xiph_generated}/base/upstream/libogg/src/framing.c")
 idf_component_register(SRCS ${xiph_sources}
-    INCLUDE_DIRS "${xiph_generated}/base/upstream/libvorbis/include"
+    INCLUDE_DIRS "${xiph_generated}/ported/include"
                  "${xiph_generated}/base/upstream/libogg/include"
                  "${xiph_generated}/base/platform"
     PRIV_INCLUDE_DIRS "${xiph_generated}/base/upstream/libvorbis/lib" "${xiph_generated}/ported")

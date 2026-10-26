@@ -71,7 +71,7 @@ def main():
         report['porting']=porting;need(porting['port_manifest_sha256']==args.port_manifest_sha256,'executed frozen port identity')
         report['compiler_version']=run('compiler-version',['gcc','--version']);report['compiler_machine']=run('compiler-machine',['gcc','-dumpmachine'])
         native=out/'sources/native'
-        includes=[generated/'base/upstream/libvorbis/include',generated/'base/upstream/libogg/include',generated/'base/platform',generated/'base/upstream/libvorbis/lib',generated/'ported',native]
+        includes=[generated/'ported/include',generated/'base/upstream/libogg/include',generated/'base/platform',generated/'base/upstream/libvorbis/lib',generated/'ported',native]
         common=['gcc','-std=c11','-O1','-g','-UNDEBUG','-D_GNU_SOURCE=1','-DHAVE_ALLOCA_H=1','-fno-fast-math','-ffp-contract=off','-fno-pie','-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer','-ffunction-sections','-fdata-sections',*['-I'+linux(p)for p in includes]]
         objects=[]
         for index,unit in enumerate(porting['compiled_units']):
