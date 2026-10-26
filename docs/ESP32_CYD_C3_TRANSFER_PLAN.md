@@ -118,8 +118,13 @@ book allocations; все прежние31 PCM остаются точными. �
 остаётся NONPASS: длинная серия тестов вызвала watchdog на IDLE1.
 [Доработка scheduling теста отложена](CYD_XIPH_DSP_TARGET_DEFERRED_20261026.md)
 после автоматического отказа; повторный target/PCM gate и Clang ещё нужны.
-Дальше — завершение DSP target gate, OOM propagation/recovery при packet decode, выделяющие память
-comment query/add helpers, остальные channel-sized scratch,
+Независимые [comment query/add API](../tests/results/vorbis-xiph-comments-20261026/CHECKPOINT.md)
+теперь проверены отдельно: ASan/UBSan и metadata-only ESP32 QEMU проходят399
+сценариев. Поиск тегов не выделяет память, добавление сохраняет прежнее состояние
+при отказе любой из трёх аллокаций; указатели существующих значений и binary
+metadata сохранены. DSP/декодер в этом target не исполняются; отложенный DSP gate
+не возобновлялся и его NONPASS остаётся. Дальше — завершение DSP target gate,
+OOM propagation/recovery при packet decode, остальные channel-sized scratch,
 границы uint32 rate/floor0 amplitude/VQ range и runtime integration.
 Новый кандидат пока не подключён к радио. Старые
 NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также

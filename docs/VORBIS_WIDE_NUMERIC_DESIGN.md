@@ -86,6 +86,17 @@ suppression followed. Native qualification, independent native PCM comparison
 and post-change Clang remain open. This candidate now has23 exact edits across
 10 C units and two owned private headers; it is not selected by the radio.
 
+The independent [comment API stage](../tests/results/vorbis-xiph-comments-20261026/CHECKPOINT.md)
+passes399 host ASan/UBSan and metadata-only ESP32 QEMU scenarios. Query/count
+need no allocation. Checked append prepares three owned allocations before
+publishing, preserving old state on refusal and old string/vendor pointers on
+success, including length-delimited binary comment bytes. Public void wrappers
+and borrowing semantics remain unchanged. Atomic insertion may require extra
+transient array storage compared with in-place realloc; no universal heap saving
+is claimed. This24th edit adds a third owned private header; decoder/DSP symbols
+are absent from the metadata ELF. The deferred DSP scheduling gate, its NONPASS,
+full PCM and other decoder/range/production requirements remain unchanged.
+
 Full floor0 correctness requires a precision and range design for the complete
 synthesis path. The public low-memory implementation stores Q4 amplitude and
 Q24 LSP values; the current bridge delegates residue, coupling, IMDCT, overlap

@@ -22,8 +22,12 @@ This is a tooling restriction, not a confirmed cybersecurity defect in the
 firmware. No alternate phrasing, replacement agent or execution route was used
 to bypass it. The fixture remains byte-identical to the host/native snapshots,
 SHA256 `09dc6f13d7034ba2f26068aac79947756ae4804de8e67aabd756a5799433fde5`.
-No scheduler change or new decoder/SDK run followed that refusal. The watchdog
+No scheduler change or new decoder/SDK run of this DSP fixture followed that refusal. The watchdog
 and original reader checks remain enabled.
+
+The later independent [comment API qualification](../tests/results/vorbis-xiph-comments-20261026/CHECKPOINT.md)
+executes only metadata utilities in its own project; decoder/DSP symbols are
+absent from that ELF. It neither changes this fixture nor qualifies its gate.
 
 The [saved checkpoint](../tests/results/vorbis-xiph-dsp-20261026/CHECKPOINT.md)
 retains the host PASS and native NONPASS separately, including the preceding
