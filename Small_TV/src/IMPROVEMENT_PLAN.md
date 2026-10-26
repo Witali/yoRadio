@@ -353,6 +353,14 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [NVS recovery](tests/NVS_RECOVERY.md) исправлен локальным source patch:
+счётчики ERASED/ILLEGAL/tail, полная identity hash-кандидата, точный BLOB chunk,
+возврат recovery I/O errors. App34CB/ELF73BE сохранены; общий SDK/QEMU не менялись.
+27record+27reopen+12FULL/FREEING,130fault/reopen/stable cases и прежние652partial
+executions проходят; сеть и точный LCD проверены отдельно. Дальше full Storage/
+многосекторные faults и реальные power cuts, TIM/null/station/BSS/aliases.
+Deferred1–3/full/24h/hardware gates сохраняются.
+
 26Oct: [NVS records before](tests/NVS_RECORDS.md) воспроизводит три настоящие
 унаследованные ошибки: счётчики ERASED/ILLEGAL, удаление чужого ключа при
 24-bit hash collision и смешивание BLOB chunks/generations. Замыкание вызовов

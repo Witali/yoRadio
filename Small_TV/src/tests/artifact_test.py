@@ -115,9 +115,13 @@ class ArtifactTests(unittest.TestCase):
 
 def main():
     """Write a fresh result on success and fail the caller on any integrity mismatch."""
+    global RESOURCES
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--resources', type=Path, default=RESOURCES,
+                        help='Resources from the exact isolated production build being tested')
     args = parser.parse_args()
+    RESOURCES = args.resources
     result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(ArtifactTests))
     manifest = json.loads((ARCHIVE / 'manifest.json').read_text())
     args.output.parent.mkdir(parents=True, exist_ok=True)

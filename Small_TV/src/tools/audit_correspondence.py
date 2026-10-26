@@ -57,6 +57,11 @@ def inputs(root: Path) -> dict[str, str]:
                  'tools/prepare_timezones.py', 'tools/build_jpeg_library.py', 'tools/jpeg_cache_layout.py',
                  'tools/jpeg_guard_layout.py', 'tools/jpeg_storage_layout.py',
                  'tools/audit_correspondence.py', 'tools/organize_decompilation.py', 'cmake/debug_logging.cmake'))
+    paths.update(root/name for name in ('cmake/nvs_recovery.cmake', 'tools/patch_nvs_page.py',
+                 'tools/verify_nvs_recovery.py', 'tools/reverse/nvs_record_linkage.py',
+                 'tools/reverse/factory_nvs.py', 'tools/reverse/runtime_call_gaps.py',
+                 'tools/audit_factory_xrefs.py', 'tools/reverse/nothrow_linkage.py',
+                 'tools/reverse/elf_archive.py', 'tools/reverse/rv32_link_match.py'))
     return {p.relative_to(root.parent).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(paths)}
 

@@ -252,6 +252,10 @@ def main():
     compiled += [ROOT / 'tools/verify_nothrow_linkage.py', ROOT / 'tools/reverse/nothrow_linkage.py']
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     compiled += [ROOT / "cmake/debug_logging.cmake"]
+    compiled += [ROOT / 'cmake/nvs_recovery.cmake', ROOT / 'tools/patch_nvs_page.py']
+    compiled += [ROOT / 'tools/verify_nvs_recovery.py', ROOT / 'tools/reverse/nvs_record_linkage.py',
+                 ROOT / 'tools/reverse/factory_nvs.py', ROOT / 'tools/reverse/runtime_call_gaps.py',
+                 ROOT / 'tools/audit_factory_xrefs.py']
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]
     for name in ["web_pages.c", "font6x12.h", "unicode_bitmaps.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h", "timezone_data.h",*jpeg_generated]:
         records.append({"file":"generated/"+name,"sha256":hashlib.sha256((args.output/name).read_bytes()).hexdigest()})

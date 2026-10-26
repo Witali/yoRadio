@@ -66,6 +66,11 @@ try {
     & $python -B (Join-Path $PSScriptRoot 'tools/verify_nothrow_linkage.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --object (Join-Path $BuildDirectory 'esp-idf/app/CMakeFiles/__idf_app.dir/platform/nothrow_new.cpp.obj') --nvs (Join-Path $BuildDirectory 'esp-idf/nvs_flash/libnvs_flash.a') --output $smallTvNothrowTemporary
     if ($LASTEXITCODE -ne 0) { throw 'Nothrow allocation linkage qualification failed' }
     Move-Item -LiteralPath $smallTvNothrowTemporary -Destination (Join-Path $BuildDirectory 'nothrow-linkage.json') -Force
+    # Refuse to archive if the linked NVS recovery no longer matches our local copy.
+    $smallTvNvsTemporary = Join-Path $BuildDirectory ('nvs-recovery-linkage-' + [Guid]::NewGuid().ToString('N') + '.json')
+    & $python -B (Join-Path $PSScriptRoot 'tools/verify_nvs_recovery.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --nvs (Join-Path $BuildDirectory 'esp-idf/nvs_flash/libnvs_flash.a') --source (Join-Path $idf 'components/nvs_flash/src/nvs_page.cpp') --generated (Join-Path $BuildDirectory 'sdk/nvs_page.cpp') --patch-report (Join-Path $BuildDirectory 'nvs-recovery.json') --output $smallTvNvsTemporary
+    if ($LASTEXITCODE -ne 0) { throw 'NVS recovery source/linkage qualification failed' }
+    Move-Item -LiteralPath $smallTvNvsTemporary -Destination (Join-Path $BuildDirectory 'nvs-recovery-linkage.json') -Force
 } finally {
     foreach ($key in $saved.Keys) { [Environment]::SetEnvironmentVariable($key,$saved[$key]) }
 }
@@ -82,6 +87,9 @@ if (!$NoArchive) {
     Copy-Item -LiteralPath (Join-Path $jpegSelection.build_directory 'report.json') -Destination (Join-Path $destination 'jpeg-library-build.json')
     Copy-Item -LiteralPath (Join-Path $BuildDirectory 'wifi-timer-guard.json') -Destination (Join-Path $destination 'wifi-timer-guard.json')
     Copy-Item -LiteralPath (Join-Path $BuildDirectory 'nothrow-linkage.json') -Destination (Join-Path $destination 'nothrow-linkage.json')
+    foreach ($name in @('nvs-recovery.json','nvs-recovery-linkage.json')) {
+        Copy-Item -LiteralPath (Join-Path $BuildDirectory $name) -Destination (Join-Path $destination $name)
+    }
     foreach ($name in @('jpeg_layout.h','jpeg_cache_layout.h','jpeg-cache-plan.json')) {
         Copy-Item -LiteralPath (Join-Path $BuildDirectory ('resources/'+$name)) -Destination (Join-Path $destination $name)
     }

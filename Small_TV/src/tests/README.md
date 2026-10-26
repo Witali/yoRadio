@@ -9,6 +9,11 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[NVS recovery](NVS_RECOVERY.md) исправляет унаследованные счётчики, hash/chunk
+identity и скрытые I/O ошибки в локальной SDK source copy. Машинные fault/reopen
+checks, новая production app и отдельные сеть/LCD gates проходят. Full Storage/
+power-cut/whole-image приёмка остаётся открытой; failing-before proof сохранён.
+
 [Partial-record repair](NVS_PARTIAL_REPAIR.md) исполняет bitmap/purge, сохраняет
 частичные flash effects и проверяет652CPU executions. Остальные типы записей,
 полный entry-table loader и full VM power cuts остаются открытыми.
