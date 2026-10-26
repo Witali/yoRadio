@@ -136,8 +136,22 @@ refusal. Clang всех25 library/fixture units: 308 предупреждени�
 диагностики сохранены. [Подготовка отдельного packet target отложена](CYD_XIPH_PACKET_TARGET_DEFERRED_20261026.md):
 инструмент вернул «aborted before dispatch» без причины; проект не создан,
 SDK/QEMU не запускались. Это не подтверждённый отказ по кибербезопасности.
-Дальше — оба незавершённых native gates, остальные channel-sized scratch,
-границы uint32 rate/floor0 amplitude/VQ range и runtime integration.
+[Channel-sized scratch](../tests/results/vorbis-xiph-channels-20261026/CHECKPOINT.md)
+теперь использует локальные массивы на два канала: моно/стерео не добавляет
+выделений в арене, более широкие mapping/residue0/1 bundles используют checked
+block storage. Host ASan/UBSan проходит 47166 сценариев, все прежние 31 PCM и
+14 relations остаются точными. Source-only Xtensa GCC подтверждает static
+собственные frames 128/112 B вместо dynamic; это не stack high-water задачи
+или полный SDK/runtime gate. Clang 25 units проходит с 316 warnings/0 errors;
+новые восемь pointer/narrowing diagnostics разобраны с bounds channels 1–255.
+General stack/heap и runtime с максимальными 255 каналами остаются открытыми.
+[Широкая floor0 amplitude отложена](CYD_XIPH_FLOOR0_AMPLITUDE_DEFERRED_20261026.md):
+read-only аудит подтвердил gaps 31–63, но подготовка тестов остановлена
+автоматической проверкой с сообщением possible cybersecurity risk; новые файлы
+не созданы, implementation не менялась. Для uint32 rate отдельно требуется
+решение по signed-long API на ILP32; clamp и ослабление проверки не применялись.
+Дальше — незавершённые native gates, общие stack/resource проверки,
+uint32 rate/floor0 amplitude/VQ range и runtime integration.
 Новый кандидат пока не подключён к радио. Старые
 NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также
 не закрывает deferred scopes, physical acceptance или полное соответствие
@@ -1597,3 +1611,20 @@ Stream остаётся на core0, decode/output на core1 с прежними
   после «aborted before dispatch» без указанной причины, новых native случаев0.
   Старый DSP watchdog NONPASS, прочие deferred scopes, format/range,
   channel-sized stacks, radio integration и physical acceptance остаются.
+
+- 2026-10-26, CYD-C3-14: [channel scratch](../tests/results/vorbis-xiph-channels-20261026/CHECKPOINT.md)
+  ограничен локальными массивами на два канала; более широкие mapping и
+  residue0/1 используют checked arena storage с прежним OOM propagation.
+  Моно/стерео не добавляет allocation на этих пяти местах. Неизменённый packet
+  fixture проходит 47166 сценариев ASan/UBSan: original 27875, synthetic 19268,
+  arena 23; все исходные 31/434/738560 PCM bytes имеют max0 и все 14 relations.
+  Собственные frames двух функций в source-only Xtensa GCC -O2 -fno-inline
+  стали static 128/112 B вместо dynamic 96/112 B плюс переменные массивы.
+  Это не измерение суммарного RAM или реального стека задачи. Clang 25 units:
+  316 warnings/0 errors; новые восемь bounded pointer/narrowing сообщений
+  сохранены и разобраны. SDK/runtime/255-channel heap qualification остаются.
+  [Floor0 amplitude audit](CYD_XIPH_FLOOR0_AMPLITUDE_DEFERRED_20261026.md)
+  выявил gaps 31–63 и отдельное ограничение signed-long rate API на ILP32;
+  подготовка amplitude tests остановлена автоматической проверкой с сообщением
+  possible cybersecurity risk. Новые файлы не созданы, amplitude не менялась.
+  Прежние deferred scopes, radio integration и physical acceptance остаются.
