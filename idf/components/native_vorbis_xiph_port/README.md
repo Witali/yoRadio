@@ -70,10 +70,17 @@ any nonzero result the block must not be submitted to synthesis_blockin. Close
 the block/DSP/info/comment owners and replay all three headers for recovery.
 This does not qualify encoder allocation paths or change nominal EOP behavior.
 
+Mapping and residue0/1 channel-pointer scratch now has a fixed two-channel
+stack fast path. More channels use checked block storage and propagate
+OV_EFAULT on refusal. Mono/stereo allocation behavior is unchanged; wider
+streams trade channel-sized task-stack use for temporary arena heap ownership.
+This is a bounded-stack change, not a measured total RAM or speed saving.
+No-work residue paths return before allocating the wider scratch.
+
 Neither production application selects this component. The previous unchanged
 31-case numerical checkpoint remains separate. Resource tests must not imply
 general OOM recovery or a complete decoder stack bound: packet-path qualification
 is recorded separately. DSP target qualification remains separately deferred.
-Channel-sized mapping/residue scratch and unchecked allocations elsewhere
+Native stack/resource qualification and unchecked allocations elsewhere
 still require work. No deferred vendor/Ogg scope is
 reopened, and no physical performance claim is made.

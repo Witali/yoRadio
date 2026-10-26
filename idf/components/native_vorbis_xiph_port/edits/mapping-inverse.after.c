@@ -17,11 +17,24 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
   int                   i,j;
   long                  n=vb->pcmend=ci->blocksizes[vb->W];
 
-  float **pcmbundle=alloca(sizeof(*pcmbundle)*vi->channels);
-  int    *zerobundle=alloca(sizeof(*zerobundle)*vi->channels);
-
-  int   *nonzero  =alloca(sizeof(*nonzero)*vi->channels);
-  void **floormemo=alloca(sizeof(*floormemo)*vi->channels);
+  /* Keep the usual mono/stereo path allocation-free here. Wider channel
+     bundles use checked block storage instead of growing the task stack. */
+  float *small_pcm[2];
+  int small_zero[2],small_nonzero[2];
+  void *small_floor[2];
+  float **pcmbundle=small_pcm;
+  int *zerobundle=small_zero,*nonzero=small_nonzero;
+  void **floormemo=small_floor;
+  if(vi->channels>2){
+    pcmbundle=_vorbis_block_alloc(vb,sizeof(*pcmbundle)*vi->channels);
+    if(!pcmbundle)return OV_EFAULT;
+    zerobundle=_vorbis_block_alloc(vb,sizeof(*zerobundle)*vi->channels);
+    if(!zerobundle)return OV_EFAULT;
+    nonzero=_vorbis_block_alloc(vb,sizeof(*nonzero)*vi->channels);
+    if(!nonzero)return OV_EFAULT;
+    floormemo=_vorbis_block_alloc(vb,sizeof(*floormemo)*vi->channels);
+    if(!floormemo)return OV_EFAULT;
+  }
 
   /* recover the spectral envelope; store it in the PCM vector for now */
   for(i=0;i<vi->channels;i++){

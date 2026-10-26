@@ -16,7 +16,7 @@ PORT=ROOT/'idf/components/native_vorbis_xiph_port'
 GENERATOR=PORT/'prepare.py'
 GENERATOR_SHA='873472c0a30c955fa5d81528195ef71e4f476915b1ac8b64dd1d04dbae7f0251'
 BASE_SHA='897096caf216de0e161f4fd833037863f8e2dc3da0531e34b851503f932f4b14'
-PORT_SHA='908348db2d68684ddb21211b7f255e54a6fa95302567aa27bbc160cca8072894'
+PORT_SHA='400e4c3f3b01fec11d7d051d3a0cef62cc7e0528eb71962bd6e015ab8bf95355'
 
 def sha(body):return hashlib.sha256(body).hexdigest()
 def files(root):return {p.relative_to(root).as_posix():p.read_bytes()for p in root.rglob('*')if p.is_file()}
