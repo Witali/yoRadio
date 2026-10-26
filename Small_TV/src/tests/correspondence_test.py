@@ -31,7 +31,7 @@ class CorrespondenceTest(unittest.TestCase):
         self.assertFalse(result['semantic_equivalence_proved'])
         self.assertEqual(result['factory_export_functions'], 176)
         # Owner/prefetch integration plus the two independent JPEG budget settings APIs.
-        self.assertEqual(result['native_app_functions'], 219)
+        self.assertEqual(result['native_app_functions'], 223)
         self.assertEqual(len(result['assembly_only']), 11)
 
     def test_missing_factory(self):
@@ -73,6 +73,16 @@ class CorrespondenceTest(unittest.TestCase):
     def test_wrong_reference(self):
         self.reject(lambda m: m['factory'][0].update(reference='reference/application.c'), 'Wrong reference')
 
+    def test_missing_nothrow_cpp_support(self):
+        """The new C++ allocation correction must not escape the reverse inventory."""
+        self.reject(lambda m: m['native_support'].pop('app/platform/nothrow_new.cpp#allocate_nothrow'),
+                    'Unaccounted native function')
+
+    def test_missing_timer_guard_support(self):
+        """Keep the earlier SDK timer correction in the reverse inventory too."""
+        self.reject(lambda m: m['native_support'].pop('app/network/wifi_timer.c#__wrap_pp_timer_do_process'),
+                    'Unaccounted native function')
+
     def test_wrong_assembly_target(self):
         self.reject(lambda m: m['assembly_only']['0x42011040'].update(native=['missing']), 'Unknown assembly-only')
 
@@ -88,6 +98,16 @@ class CorrespondenceTest(unittest.TestCase):
             names = [r['symbol'] for r in audit.functions(path, path.parent)]
             self.assertEqual(names, ['fixture.c#allocate', 'fixture.c#api', 'fixture.c#timer',
                                      'fixture.c#split_return_type'])
+
+    def test_cpp_nothrow_parser(self):
+        """Retain C linkage and noexcept definitions alongside ordinary C functions."""
+        with tempfile.TemporaryDirectory(dir=ROOT.parents[1]/'.build') as folder:
+            path=Path(folder)/'fixture.cpp'
+            path.write_text('static void *allocate(std::size_t n) noexcept { return 0; }\n'
+                            'extern "C" void *wrapped(std::size_t n, const std::nothrow_t &) noexcept\n'
+                            '{ return allocate(n); }\n',encoding='utf8')
+            self.assertEqual([r['symbol'] for r in audit.functions(path,path.parent)],
+                             ['fixture.cpp#allocate','fixture.cpp#wrapped'])
 
 
 if __name__ == '__main__':

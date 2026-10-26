@@ -105,6 +105,13 @@ warnings, and rejects other RV64 input. The complete code-only export preserves
 requiring further boundary/reachability analysis. See
 [decoder checks and remaining candidates](tests/RV32_DISASSEMBLY.md).
 
+The [nothrow allocation correction](tests/NOTHROW_ALLOCATION.md) keeps ordinary
+scalar/array `new(std::nothrow)` failures out of the SDK's abort-only exception
+path. Both overloads share a small platform module; allocation/free ownership,
+zero-size requests and returning new-handler retries are preserved. Post-link
+checks match the actual NVS caller to its wrapper. This is a no-exceptions C2
+profile, not a replacement for throwing or over-aligned allocation semantics.
+
 The broader export used for organization came from the existing analyzed
 factory ELF, including application functions and SDK callers. Its SHA-256
 and the immutable flash-dump SHA-256 are recorded in the symbol map. To

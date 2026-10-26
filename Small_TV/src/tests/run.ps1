@@ -47,3 +47,9 @@ $privacyOutput=Join-Path $output ('jpeg-privacy-'+[Guid]::NewGuid().ToString('N'
 & (Join-Path $PSScriptRoot 'jpeg_privacy/run.ps1') -OutputDirectory $privacyOutput -VsDevCmd $VsDevCmd
 Copy-Item -LiteralPath (Join-Path $privacyOutput 'report.json') -Destination (Join-Path $output 'privacy-report.json')
 Write-Host 'PASS: independent JPEG privacy controls'
+# Compile the actual C++ allocation correction in the ordinary native gate,
+# so a later SDK/link change cannot leave its source regressions optional.
+$nothrowOutput=Join-Path $output ('nothrow-'+[Guid]::NewGuid().ToString('N'))
+& (Join-Path $PSScriptRoot 'nothrow_new/run.ps1') -OutputDirectory $nothrowOutput -VsDevCmd $VsDevCmd
+Copy-Item -LiteralPath (Join-Path $nothrowOutput 'report.json') -Destination (Join-Path $output 'nothrow-report.json')
+Write-Host 'PASS: independent nothrow allocation controls'

@@ -7,8 +7,10 @@
 позже. Последний checkpoint и NEXT сохранены в конце этого файла. Ниже остаётся
 исторический контекст; старые `running` JSON не подтверждают живые процессы.
 Все12 прежних duration владельцев отсутствуют по CIM26Oct; прогоны не приняты.
-Следующий шаг — NTH-ALLOC-FAIL: исправить подтверждённый nothrow OOM→abort
-в нашей сборке. Текущие документы: [RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md),
+NTH-ALLOC-FAIL исправлен: app4F2C / ELFEB20. Дальше factory metadata/caller,
+TIM/null/lifetime/BSS/aliases. Текущие документы:
+[NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md),
+[RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md),
 [RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md),
 [WIFI_EVENT_LIFETIME.md](tests/WIFI_EVENT_LIFETIME.md).
 
@@ -4610,3 +4612,64 @@ After NTHfix: transient Ghidra ranges, actualcaller matching, remaining TIM/null
 station+820 lifetime/BSS negotiated period/aliases and final acceptance gates.
 Final consumer exec3a80d5 terminal0 repeats176cases and13+7controls after adding
 the exact512-byte caller input. Desired OOM contract staysfalse, not accepted.
+
+## CURRENT 2026-10-26 — NTH-ALLOC-FAIL fixed, production app and independent gates
+
+Previous goal turn PROGRESS cfd5cb9f3. User-priority item4 continues; points1–3
+remain deferred. App/platform/nothrow_new.cpp shares malloc/get_new_handler loop
+between scalar/array CABI wrappers, marked FIXED_FACTORY. Size0→1, null failure,
+retry and changing/removing/nonreturning handler preserved. C2/RV32/IDF6.1,
+no C++exceptions and no heap-abort profile enforced; no SDK patch, no FlashI/O,
+no new endpoint/delay. Throwing/aligned new unchanged; unsupported linked aligned
+nothrow symbol rejects checker. Upper app_main NVSinit ESP_ERROR_CHECK stillfatal;
+this is not full boot-under-global-OOM recovery.
+
+Final build .build/small-tv-nothrow-20261026, production DEBUGoff archived under
+firmware/development/small-tv-esp32c2-reconstructed. AppSHA4f2cfd9837fff0143098eb32f3a2ec6f59170d23902f17f2b2e9fff857165195,
+ELF eb20fb1309d1a5f28229d2ca846924cd18b311da229d34a1319a324d621ee2e6,
+source5b6252cec1006fc3b4e5a6fc2dc2f72ca4a396a2a8c6bac521f45be0bf07d161.
+App1475840B (-640 vsC912),60160free. Helper50B+two4B wrappers=58B.
+Strengthened post-link checker validates local helper calls too; real NVSPage::load
+328sourceB matched to linked body and its allocation selects wrapper. Existing
+Wi-Fi guard post-link/ROM check stillpasses. Final buildexec50378 terminal0;
+ELF/app identical to firstbuild46239, only source/validator metadata updated.
+
+26host source cases,26actual RV32 cases (incl4NVS outcomes), actual old9E NVS→
+abort before vs EB20 NVS→NO_MEM after. Private partition/ROMmemset/malloc/handler/
+free boundaries explicit. No wholeVM OOM fault injection. New-handler nonreturn
+is retained, not converted to success.13semantic input controls including wrong
+localhelper/NVScallee and oldunwrappedbuild pass. Main native gate6300checks (initial6298; conditional async-wait CHECK count varies),
+3727privacy;16inventorytests/223appdefs and6artifact checks pass. CPP/noexcept
+simple definitions included, missing prior Wi-Fi guard support row restored.
+HostCPP26 now mandatory in tests/run.ps1; final exec33184 terminal0.
+Protected production inputs unchanged.
+
+Finalnetwork exec93791 terminal0: configreboot/cold/reset, HTTP settings2,
+connectedSTA192.168.43.15/time_synced and fresh NTP1/1/2, ROMboots2/1/2.
+Network-only copiedprofile has noLCD; weather loopback503 not weatheracceptance.
+Finaldisplay exec3351 terminal0: factory and native setupframes all57600pixels
+each exact acc588ab.., onecoldcycle each, network not used as LCDgate.
+4finalowners34392/21584/21168/35764 absent byCIM12:24:26UTC, nativeheldhandlesexit0.
+No physicalserial/reset/flash. Earlier network2/display1 also passed, notfinalpins.
+Network1 failed only stale helper expected10.0.2.15; actualSDK192.168.43.15 proven
+in successfulfinalrecords. Scoped newpredicate derives configuredaddress, frozen47
+helperfiles/QEMU unchanged. Preserve prototypes in ignored scratch, don'tcallpass.
+
+Proof nothrow-fix-validation-20261026.json:14gzip124101B, reused legacyqualification,
+sourcepins plus optionalmandatory-test-entrypoint pin. Readerexec7eb452 terminal0
+replayed before/after/static+13controls and recomputed clocks/2wholeframes;
+5runtime mutations rejected. Need final replay after context/docs/sourcepin refresh.
+Consumer requires exact current ELF/object/NVSarchive and frozen old9E ELF/app;
+these build dirs must remain for replay. Original whole-image completeness and
+physical/full/24h flags false. CODEC-REPRO fresh library/cache identity remains
+deferred. Don't widen old9E-specific observer pins to acceptEB20: qualify layouts
+and budgets first when returning to old network/heap/soak gates.
+
+NEXT item4 after focused commit: qualified transient Ghidra ranges for the five
+runtime sites; full identity of factorycaller42040efc (nativePage::load known,
+factory identity stillunqualified); TIM/null-completion/station+820 lifetime,
+BSS periods/range-overflow and computed aliases. Broad plan stillACTIVE.
+
+Final native count6300 vs initial6298 is an observed check count; dispatch has conditional async-wait CHECKs. Do not rerun to seek an exact old count or relax functional assertions. Final proof has14gzip124100B/30sourcepins.
+
+Final reader session22193/output8f0061 terminal0 after30pins/native6300 refresh. Getter `_GLOBAL__sub_I__ZSt7nothrow` at420a416a is registered in init_array and tail-calls pthread_mutex_init(3fcb6920,0). SDK valid-mutex lock skips lazy allocation. This is static/source review, not full pthread/RTOS OOM execution. Final prototype owners all absent; no pending sessions. Ready for focused commit.

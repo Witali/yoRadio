@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TOKEN = re.compile(r'/\*[\s\S]*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'')
 DEFINITION = re.compile(
     r'(?m)^(?:[A-Za-z_]\w*(?:\([^()\n]*\))?[ \t\r\n*]+)+'
-    r'([A-Za-z_]\w*)\s*\([^;{}]*\)\s*\{')
+    r'([A-Za-z_]\w*)\s*\([^;{}]*\)\s*(?:noexcept\s*)?\{')
 
 
 def masked(source: str) -> str:
@@ -104,6 +104,7 @@ def audit(root: Path, manifest: dict) -> dict:
     if set(reference_rows) != set(exported):
         raise ValueError('Reference definitions differ from symbol-map.json')
     files = sorted((root/'app').rglob('*.c'))
+    files += sorted((root/'app').rglob('*.cpp'))
     files += sorted((root/'codec').glob('*.c')) + sorted((root/'storage').glob('*.c'))
     files += [root/'third_party/tjpgd/tjpgd.c', root/'third_party/cjson/cJSON.c']
     indexed = [row for path in files for row in functions(path, root)]

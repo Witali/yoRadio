@@ -353,7 +353,18 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
-**Следующий приоритет NTH-ALLOC-FAIL:** пять C.JAL gaps идентифицированы,
+NTH-ALLOC-FAIL исправлен26Oct: [NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md).
+App4F2C/ELFEB20/source5B6252 DEBUGoff;1475840B, -640B кC912. Общие scalar/array
+nothrow wrappers возвращаютNULL на mallocNULL/no-handler; post-link подтверждает
+реальныйNVSPage::load→wrapper.26source+26literal RV32 cases, actual oldNVS→abort
+before/newNVS→ESP_ERR_NO_MEM after,13input и5runtime mutations pass.6300native,
+3727privacy,16inventory,6artifact checks; отдельные3networkphases и2exactLCDframes.
+Четыре finalVMowners отсутствуют поCIM, ни physicalI/O, ни sharedSDKpatch.
+Обычный throwingnew/over-alignment/globalOOM recovery не заявлены. Высший
+app_main NVSinit error остаётся fatal по прежней политике. Дальше factory
+metadata/caller/TIM/lifetime/BSS/aliases; points1–3 и finalacceptance всё ещё открыты.
+
+**Исторический failing-before checkpoint NTH-ALLOC-FAIL:** пять C.JAL gaps идентифицированы,
 но найден общий factory/native дефект: `new[](nothrow)` при mallocNULL/no-handler
 доходит до abort вместо nullptr. Caller42040efc запрашивает512B и проверяетNULL;
 literal RV32 before cases показывают обход его error branch. Проверены

@@ -9,6 +9,10 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Nothrow allocation](NOTHROW_ALLOCATION.md) сохраняет real failing-before и
+проверяет CPP source, compiled RV32 wrappers и NVS error propagation. Network
+и exact LCD запускаются отдельно; hardware/24h/full gates этим не закрываются.
+
 [Живое сравнение PM и отмены keep-alive](WIFI_PM_RUNTIME.md) дополняет частные
 RV32-тесты: native отменяет таймер через `cnx_sta_leave` после `pm_stop` и
 восстанавливает HTTP. Неуспешный factory reconnect сохранён отдельным результатом;

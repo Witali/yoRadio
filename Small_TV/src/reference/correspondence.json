@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "review_date": "2026-10-20",
+  "review_date": "2026-10-26",
   "factory": [
     {
       "address": "0x4201ab6e",
@@ -3464,6 +3464,22 @@
     "storage/jpeg_transport.c#jpeg_transport_limit_program": {
       "kind": "requested_change",
       "note": "REQUESTED_CHANGE: tighten active shared program quota without resetting usage, prevent subtraction underflow, revoke erases at zero, never revive a stopped epoch."
+    },
+    "app/platform/nothrow_new.cpp#allocate_nothrow": {
+      "kind": "factory_correction",
+      "note": "FIXED_FACTORY: NTH-ALLOC-FAIL, factory 0x420a3a0a and baseline native 0x420a413e. Ordinary no-exceptions nothrow allocation returns nullptr on OOM, preserving malloc/free ownership, zero-size and new-handler retries. Source/compiled-RV32/NVS before-after and separate HTTP/SNTP/LCD checks: tests/NOTHROW_ALLOCATION.md. Not whole-SDK equivalence."
+    },
+    "app/platform/nothrow_new.cpp#__wrap__ZnwjRKSt9nothrow_t": {
+      "kind": "factory_correction",
+      "note": "FIXED_FACTORY: NTH-ALLOC-FAIL, factory 0x420a3a0a and baseline native 0x420a413e. Ordinary no-exceptions nothrow allocation returns nullptr on OOM, preserving malloc/free ownership, zero-size and new-handler retries. Source/compiled-RV32/NVS before-after and separate HTTP/SNTP/LCD checks: tests/NOTHROW_ALLOCATION.md. Not whole-SDK equivalence."
+    },
+    "app/platform/nothrow_new.cpp#__wrap__ZnajRKSt9nothrow_t": {
+      "kind": "factory_correction",
+      "note": "FIXED_FACTORY: NTH-ALLOC-FAIL, factory 0x420a3a0a and baseline native 0x420a413e. Ordinary no-exceptions nothrow allocation returns nullptr on OOM, preserving malloc/free ownership, zero-size and new-handler retries. Source/compiled-RV32/NVS before-after and separate HTTP/SNTP/LCD checks: tests/NOTHROW_ALLOCATION.md. Not whole-SDK equivalence."
+    },
+    "app/network/wifi_timer.c#__wrap_pp_timer_do_process": {
+      "kind": "factory_correction",
+      "note": "FIXED_FACTORY: reject invalid IDs before the SDK timer table prefetch, retaining vendor/free ownership. Previously qualified production guard; see tests/WIFI_TIMER_GUARD.md. Its missing reverse-inventory support row is restored here."
     }
   },
   "assembly_only": {
@@ -3550,7 +3566,7 @@
     "local_site/pages/settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
     "local_site/pages/setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
     "src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
-    "src/app/CMakeLists.txt": "1d7fcd0069d1c05cf968c5c5d0c78ed991216b412112c1dac1c58dbcc0325142",
+    "src/app/CMakeLists.txt": "c8451b5e41444e13b748568847a5e47005916062a5d317178c9735c50065b5ad",
     "src/app/display/backlight.c": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03",
     "src/app/display/clock_ui.c": "9baf577d945a3c325715df2f9cdf83f66cfb07043723f265455922e65dc7204c",
     "src/app/display/factory_animation.c": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09",
@@ -3587,7 +3603,9 @@
     "src/app/media/photo_worker.h": "3bb861bd1dfda99e51d5b4c7e575c91ae0c9d30d24ef5b590ceb35e142c319e3",
     "src/app/network/dns.c": "a4bee538e60a4bca3aba5a7b00233c17a9c08ff39779aefde9965e3a17234025",
     "src/app/network/dns_packet.c": "cb807af1329c04c534d61296138529f71e0ac5b2b2c3cf5eeb225ac763d6feb1",
-    "src/app/network/wifi.c": "54d1de158d20e1f41826ca902a14ee3c9e36dc8da540ab852665a91f696908ec",
+    "src/app/network/wifi.c": "ebe12b0ac3259024dfe9d5137e07b1953c6a2ca8f7f34cadbdfc62a5240378d0",
+    "src/app/network/wifi_timer.c": "d0ab82b004647fb369350afab245baf98b9b08b93236dfd5860acd29196d8350",
+    "src/app/platform/nothrow_new.cpp": "651dc83e2e3537ed6d6bf64f6e0121207c9cc8f7626541ed335a9789e498fbb7",
     "src/app/services/country_timezones.h": "d3098a16a798f3831d1321f1c8c7754c9528a38aa5523d9c2b92f65d30f11b8b",
     "src/app/services/time_sync.c": "b44582771c144f62bec9181ac71a25a83cf8b1d0bbad3e3b1d8f3315f55e9c5c",
     "src/app/services/timezones.c": "b7ff1ad5ce79358fa6f7967cb7dce05819636c67a74928165c2dc821ee6c7069",
@@ -3601,7 +3619,7 @@
     "src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
     "src/app/web/server.c": "b936b84396482b72beee190a12d76fdbb1ad17437de93526fd9b40a4ec31a0cc",
     "src/app/web/settings_api.c": "80247849a96e7324488fd9c944de364828016e3e6ebbbc81db67aaf4c6167773",
-    "src/build.ps1": "fbc33f0aa9f696e8e1f05eec59bd9a85b033bba431d797eb93f72f28c3de7285",
+    "src/build.ps1": "4a40960d363a29ef243fa5eaa57ad9400b77b1cfbef0e0d9d6bc6109c09dd3a5",
     "src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
     "src/CMakeLists.txt": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8",
     "src/codec/jpeg_backing.c": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
@@ -3674,7 +3692,7 @@
     "src/reference/assembly/netif-20261018/manifest.json": "fca9b346e055de6618475d4acebcb2f9e03d1544093b8c3b7c6781a59d76e8f4",
     "src/reference/assembly/netif-20261018/netif_ifkey_at_42036f98.asm": "d335c933002fd5ff44ac191fe69e8346a1ac820369aae22b761519ab9c1c36d8",
     "src/reference/assembly/read_clock_theme_at_4200dfdc.asm": "abb4eac4a35c742c5e33443c7d0badef909441a0457fae501f69fe9ecc7c04b6",
-    "src/reference/assembly/README.md": "8e1900e4f0c46f04062fafb5b9f473eb2d8e4b9cea1fcf03a823666388dabeb6",
+    "src/reference/assembly/README.md": "8bbe35be8f60b4fe81acd16693cc54f18c4007255134e1ce2e2337322122a4fb",
     "src/reference/assembly/render_classic_clock_at_4200b738.asm": "1e12e6af1cc3c01aa6fa11050ac5efc2a56c0b1187a617fbc9d13745b7a09a58",
     "src/reference/assembly/render_simple_clock_at_4200bd8c.asm": "4448d88b750cd4eafb0eea76083ddffd4a8bbedd2f5da3878f23f137d102b92b",
     "src/reference/assembly/rgb565_to_rgb888_at_42008a6a.asm": "0da46e5f12e8b9b4e3bccfdcc0010cec8cf2e993c378393c8d720fb76efa4c3d",
@@ -3865,13 +3883,13 @@
     "src/third_party/tjpgd/tjpgd.h": "4c7115c84f1c7042e9ee459d1a731fb6fcdd89fdc8686e95afa9c59074a69557",
     "src/third_party/tjpgd/tjpgdcnf.h": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760",
     "src/third_party/tjpgd/UPSTREAM.json": "2cdbf82b21d79701d3d125ffc420f21fb1f22dab44785f00ee8e29cb8023be7b",
-    "src/tools/audit_correspondence.py": "f655f76d87b7f0c62602abf524e65362f3759647174165d1278bd7fe4cc85701",
+    "src/tools/audit_correspondence.py": "c9a095e5d3329496320abf79aa64887ea13713c734a0643d31ac177f9fae2308",
     "src/tools/build_jpeg_library.py": "cccef6c732e52f600445fd005817aebf4b24be7e9f7d3583f7952c1018343c29",
     "src/tools/jpeg_cache_layout.py": "c9a0a8459f126b2565b65433a14577517bc8567c1e25e9ecc08d57cb06c456b9",
     "src/tools/jpeg_guard_layout.py": "55ac1487f391ff99dbd5d0ca29155969aef0171f8d05621a3cf5bc9edfadef2d",
     "src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
     "src/tools/organize_decompilation.py": "f11108f2ea72027ea9a37669fe628d7e12fb8d5b77cbfd4fb5053a4d58a947d1",
-    "src/tools/prepare_resources.py": "10edd9d175331fbf461b13925c91c042318ce736a4cd50ef42492295bf9258f7",
+    "src/tools/prepare_resources.py": "037c3b3572cfc8678866870960446e960b27fdedf557039f26f95d080b69d9c1",
     "src/tools/prepare_timezones.py": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148"
   },
   "findings": [

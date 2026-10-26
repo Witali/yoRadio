@@ -38,6 +38,8 @@ def main():
     parser.add_argument('--dependency-root',type=Path,default=ROOT)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--cycles',type=int,default=20)
+    parser.add_argument('--elf',type=Path,help='Explicit matching native ELF for an isolated production build')
+    parser.add_argument('--qemu',type=Path,help='Explicit QEMU candidate; the frozen helper bundle remains unchanged')
     args=parser.parse_args()
     if not 1<=args.cycles<=100:raise ValueError('Expected 1..100 cycles per firmware')
     args.output.mkdir(parents=True,exist_ok=False)
@@ -55,14 +57,15 @@ def main():
         hashlib.sha256(expected).hexdigest()!=FRAME or meta['full_flash_sha256']!=FACTORY):
         raise ValueError('Untrusted factory display reference')
     archive=ROOT/'firmware/development/small-tv-esp32c2-reconstructed'
-    elf=ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf'
+    elf=args.elf or ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf'
+    qemu=args.qemu or args.qemu_root/'bin/qemu-system-riscv32.exe'
     if (archive/'app.bin').read_bytes()[176:208]!=bytes.fromhex(digest(elf)):
         raise ValueError('Archived app and ELF mismatch')
     if digest(ROOT/'Small_TV/full-flash.bin')!=FACTORY:raise ValueError('Unknown factory firmware')
     rom=args.dependency_root/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
     snapshot=json.loads((args.qemu_root/'frozen-inputs.json').read_text())
     files=[Path(__file__),Path(__file__).with_name('display_boot_observer.py'),
-        Path(__file__).with_name('qemu_storage.py'),reference,provenance,rom,elf,
+        Path(__file__).with_name('qemu_storage.py'),reference,provenance,rom,elf,qemu,
         ROOT/'Small_TV/full-flash.bin',ROOT/'Small_TV/qemu/profiles/small-tv-c2.json',
         args.qemu_root/'frozen-inputs.json']
     files += [args.qemu_root/row['file'] for row in snapshot['files']]
@@ -72,7 +75,7 @@ def main():
     report=dict(passed=False,all_functionality_verified=False,scope=__doc__,inputs_sha256=inputs,
         requested_cycles_per_variant=args.cycles,variants=['original','reconstructed'],cycles=[],
         factory_flash_sha256=FACTORY,app_sha256=digest(archive/'app.bin'),native_elf_sha256=digest(elf),
-        qemu_sha256=digest(args.qemu_root/'bin/qemu-system-riscv32.exe'),expected_rgb_sha256=FRAME,
+        qemu_sha256=digest(qemu),expected_rgb_sha256=FRAME,
         network=dict(executed=False,passed=None,reason='No HTTP or SDK network-state observation'),
         started_utc=dt.datetime.now(dt.timezone.utc).isoformat())
     active=None
@@ -81,7 +84,7 @@ def main():
         for variant in report['variants']:
             folder=args.output/variant
             options=SimpleNamespace(yoradio=str(ROOT),firmware=variant,
-                qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),rom_elf=str(rom),
+                qemu=str(qemu),rom_elf=str(rom),
                 hardware_profile=str(ROOT/'Small_TV/qemu/profiles/small-tv-c2.json'),
                 network='setup',display='none',persistent=True,paused=False,gdb_port=0,http_base_port=-1)
             prepared=vm.prepare(options,folder)

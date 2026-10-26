@@ -62,6 +62,10 @@ try {
     & $python -B (Join-Path $PSScriptRoot 'tools/verify_wifi_timer_guard.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --sdk-libraries (Join-Path $idf 'components/esp_wifi/lib/esp32c2') --rom $smallTvGuardRom --output $smallTvGuardTemporary
     if ($LASTEXITCODE -ne 0) { throw 'Wi-Fi timer guard linkage qualification failed' }
     Move-Item -LiteralPath $smallTvGuardTemporary -Destination (Join-Path $BuildDirectory 'wifi-timer-guard.json') -Force
+    $smallTvNothrowTemporary = Join-Path $BuildDirectory ('nothrow-linkage-' + [Guid]::NewGuid().ToString('N') + '.json')
+    & $python -B (Join-Path $PSScriptRoot 'tools/verify_nothrow_linkage.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --object (Join-Path $BuildDirectory 'esp-idf/app/CMakeFiles/__idf_app.dir/platform/nothrow_new.cpp.obj') --nvs (Join-Path $BuildDirectory 'esp-idf/nvs_flash/libnvs_flash.a') --output $smallTvNothrowTemporary
+    if ($LASTEXITCODE -ne 0) { throw 'Nothrow allocation linkage qualification failed' }
+    Move-Item -LiteralPath $smallTvNothrowTemporary -Destination (Join-Path $BuildDirectory 'nothrow-linkage.json') -Force
 } finally {
     foreach ($key in $saved.Keys) { [Environment]::SetEnvironmentVariable($key,$saved[$key]) }
 }
@@ -77,6 +81,7 @@ if (!$NoArchive) {
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\source-manifest.json") -Destination (Join-Path $destination "source-manifest.json")
     Copy-Item -LiteralPath (Join-Path $jpegSelection.build_directory 'report.json') -Destination (Join-Path $destination 'jpeg-library-build.json')
     Copy-Item -LiteralPath (Join-Path $BuildDirectory 'wifi-timer-guard.json') -Destination (Join-Path $destination 'wifi-timer-guard.json')
+    Copy-Item -LiteralPath (Join-Path $BuildDirectory 'nothrow-linkage.json') -Destination (Join-Path $destination 'nothrow-linkage.json')
     foreach ($name in @('jpeg_layout.h','jpeg_cache_layout.h','jpeg-cache-plan.json')) {
         Copy-Item -LiteralPath (Join-Path $BuildDirectory ('resources/'+$name)) -Destination (Join-Path $destination $name)
     }
@@ -85,7 +90,7 @@ if (!$NoArchive) {
     $images = @(@{file="bootloader.bin"; offset="0x0"},@{file="partition-table.bin";offset="0x8000"},@{file="app.bin";offset="0x10000"},@{file="assets.bin";offset="0x200000"})
     foreach ($image in $images) { $image.sha256 = (Get-FileHash -LiteralPath (Join-Path $destination $image.file) -Algorithm SHA256).Hash.ToLower(); $image.bytes = (Get-Item -LiteralPath (Join-Path $destination $image.file)).Length }
     $source=Get-Content -LiteralPath (Join-Path $destination "source-manifest.json") -Raw | ConvertFrom-Json
-    $smallTvArchiveManifest = @{target="esp32c2";idf_revision=$expected;source_sha256=$source.aggregate_sha256;debug_logging=[bool]$DebugLogging;xtal_mhz=26;flash_bytes=4194304;status="compiled; hardware unverified";images=$images;elf_sha256=(Get-FileHash -LiteralPath (Join-Path $BuildDirectory 'small_tv_reconstructed.elf')).Hash.ToLower();jpeg_dependency_sha256=$jpegSelection.library_sha256;jpeg_dependency_report_sha256=(Get-FileHash -LiteralPath (Join-Path $destination 'jpeg-library-build.json')).Hash.ToLower()} | ConvertTo-Json -Depth 5
+    $smallTvArchiveManifest = @{target="esp32c2";idf_revision=$expected;source_sha256=$source.aggregate_sha256;debug_logging=[bool]$DebugLogging;xtal_mhz=26;flash_bytes=4194304;status="compiled; hardware unverified";images=$images;elf_sha256=(Get-FileHash -LiteralPath (Join-Path $BuildDirectory 'small_tv_reconstructed.elf')).Hash.ToLower();jpeg_dependency_sha256=$jpegSelection.library_sha256;jpeg_dependency_report_sha256=(Get-FileHash -LiteralPath (Join-Path $destination 'jpeg-library-build.json')).Hash.ToLower();nothrow_linkage_sha256=(Get-FileHash -LiteralPath (Join-Path $destination 'nothrow-linkage.json')).Hash.ToLower()} | ConvertTo-Json -Depth 5
     # Keep fingerprinted archive metadata identical after Git's LF checkout filter.
     [IO.File]::WriteAllText((Join-Path $destination "manifest.json"), $smallTvArchiveManifest.Replace("`r`n", "`n") + "`n", [Text.UTF8Encoding]::new($false))
     Write-Host "Saved firmware to $destination"

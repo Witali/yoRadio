@@ -5200,3 +5200,49 @@ findings не объясняются этим invalid-ID исправление�
   then remaining TIM/lifetime/BSS/aliases and wider deferred acceptance gates.
   Final offline consumer exec3a80d5 terminal0 with all176cases and13+7controls;
   desired OOM contract staysfalse. Firmware fix and acceptance remain open.
+
+## 2026-10-26 — native nothrow OOM corrected and production firmware verified
+
+- Previous goal turn PROGRESS: cfd5cb9f3. Added one platform CPP module with a
+  shared allocation loop and two ordinary nothrow wrappers. Failure/no-handler
+  returns NULL; zero size, retries, handler changes/nonreturn and free ownership
+  are preserved. No shared SDK patch, physical I/O, new endpoint or Flash writes.
+- Post-link verification matches all three bodies and the complete NVS Page::load
+  caller. Both global and file-local helper targets are checked. Added CPP and
+  checker files to source manifests, and made the 26 CPP cases mandatory in the
+  ordinary native gate. Restored the missing earlier Wi-Fi timer guard inventory
+  row; simple C-linkage/noexcept parsing and omission controls now cover 223 app
+  source definitions. All 16 inventory tests pass.
+- Final DEBUG-off app 4F2C / ELF EB20 / source 5B6252 saved in development:
+  1475840 bytes, 640 fewer than C912, 58 bytes of new helper/wrappers and 60160
+  bytes free in the app partition. Final build session 50378 completed with exit 0;
+  executable bytes equal the initial build; strengthened-checker metadata differs.
+- 26 host and 26 literal RV32 cases passed, including four NVS outcomes. The real
+  old 9E NVS path aborts; the new EB20 path returns ESP_ERR_NO_MEM. Partition I/O,
+  memset, malloc/handler and free are declared private CPU boundaries. Upper
+  startup ESP_ERROR_CHECK remains fatal on an NVS initialization error; this is
+  not global OOM recovery. Getter mutex constructor registration and pthread
+  initialized-mutex source path were inspected separately, not called full
+  transitive RTOS execution.
+- Final ordinary native gate session 33184 completed with exit 0: 6300 native
+  checks, 3727 privacy assertions and 26 CPP cases. Initial native observation
+  had 6298 checks; dispatch contains conditional async-wait CHECKs, so the counter
+  is an observed run value, not a fixed coverage requirement. No assertions or
+  thresholds were relaxed. Six independent artifact checks also pass.
+- Final network session 93791 completed with exit 0: HTTP setup/scan/configure,
+  software reboot, persistent cold boot and reset retain settings and fresh SDK
+  SNTP time. Separate display session 3351 completed with exit 0: one factory
+  and one native setup frame, all 115200 pixels exact, without network readiness
+  as an LCD gate. Four final VM owners 34392/21584/21168/35764 are absent by CIM
+  at 12:24:26 UTC; held network handles exited with code 0.
+- First network prototype expected the frozen helper subnet 10.0.2.15. The actual
+  configured SDK/VM uses 192.168.43.15; the new scoped predicate derives its
+  expectation from that VM. Prototype failed and closed; later independent runs
+  pass. Frozen helpers and QEMU remain unchanged. Private CPU prototype needed
+  an explicit ROM memset boundary; that fixture issue was fixed before capture.
+- Archived 14 gzip payloads / 124100 bytes / 30 source pins, reusing the previous
+  qualified runtime record. Final reader session 22193 / output 8f0061 exited 0:
+  before/after/static replay, 13 input controls, SDK clock arithmetic, two whole
+  frames and five runtime mutations. Full VM OOM injection, whole-image semantics,
+  full/24h and hardware acceptance remain unproved. Continue factory metadata,
+  caller matching, TIM/lifetime/BSS/aliases, then deferred points 1–3. Goal ACTIVE.

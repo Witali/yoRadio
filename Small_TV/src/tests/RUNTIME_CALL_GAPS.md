@@ -5,6 +5,10 @@ Checkpoint 2026-10-26 продолжает [RV32 disassembly](RV32_DISASSEMBLY.m
 связанным targets. Найден общий factory/native отказ при нехватке памяти.
 **Исправление этого отказа открыто.**
 
+Позднее26Oct исправлен native nothrow path и проверена новая production app:
+[NOTHROW_ALLOCATION.md](NOTHROW_ALLOCATION.md). Исторические failing-before
+результаты ниже сохранены, а полнота всего образа остаётся открытой.
+
 | Заводской PC | Владелец / вызываемая функция |
 |---|---|
 | `0x40380180` | `_panic_handler` → `xt_unhandled_exception` |
