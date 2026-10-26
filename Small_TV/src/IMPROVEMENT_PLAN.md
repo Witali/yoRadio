@@ -353,6 +353,14 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [NVS records before](tests/NVS_RECORDS.md) воспроизводит три настоящие
+унаследованные ошибки: счётчики ERASED/ILLEGAL, удаление чужого ключа при
+24-bit hash collision и смешивание BLOB chunks/generations. Замыкание вызовов
+19factory/20native функций полностью сопоставлено; 192 real-ROM CRC, 528header,
+46record и22OOM cases. Это failing-before: native counter/key contracts false.
+Следом локальные SDK source corrections, сохранив исходные inputs; затем fault/
+reopen matrix и отдельные сеть/дисплей. Общий SDK/app4F2C/EB20 пока неизменны.
+
 26Oct: [partial NVS repair](tests/NVS_PARTIAL_REPAIR.md) проходит652CPU cases:
 все126slots обеихверсий, повторное открытие, clean states и68fault/recovery pairs.
 Factory программирует4Bbitmap, native ещё32Bданных; erase0/reopen writes0.

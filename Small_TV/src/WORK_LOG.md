@@ -5386,3 +5386,33 @@ findings не объясняются этим invalid-ID исправление�
   not arbitrary unrelated records. All652executions/11input/7report controls pass.
   Staged check27baf6 confirms all25pins equal Git index bytes and appSHA unchanged.
   No current exec/VM or physical process from this checkpoint; no push performed.
+
+## 26 October 2026 — inherited NVS record defects before correction
+
+Full Page/Item/HashList direct-call closure qualified: 19 factory functions /3368B,
+20 native /3062B. Item/HashList unchanged SDK5.5.4 objects and canonical provenance
+are byte-identical across two analytical builds. Actual official C2 ROM CRC code
+and table executed; 192 cases reach all60 instruction starts/all256 table indices.
+528 real header cases reach all109factory/85native starts, including bad CRC,
+span/type/bounds. 23 records+11malloc failures eachvariant, full bitmap/lookup/
+ABI/cache ownership checks. Seven actual input controls and six report controls.
+
+Both factory and app4F2C/ELFEB20 have three real inherited defects: wrong erased
+counts for ILLEGAL/alreadyERASED children, destructive 24-bit hash-collision
+candidate handling, final duplicate lookup ignoring BLOB chunk/generation.
+The published-index scenario retains a valid old index while mistakenly deleting
+its old data chunk. Full Storage.init/powercut is still untested. These are
+explicitly failing desired native contracts, not a parity success or a QEMU bug.
+No shared SDK, production app, VM/board/serial/reset/flash or push changed.
+
+New proof nvs-records-before-validation-20261026.json:9gzip/202203B/33sourcepins.
+Scratch .build/factory-nvs-records-20261026, source objects replay identical.
+NEXT local, exact-SHA-guarded SDK source corrections with FIXED_FACTORY marks;
+keep before app/ELF and source pins immutable, preferably use a separate task
+worktree for production changes. Fix counters, verify real namespace/key/chunk
+identity for hash candidates, pass exact chunk to final findItem. Retain type
+replacement semantics. Then fault/reopen tests, build/archive app, independent
+network/display checks. Other factory/TIM/lifetime/BSS/aliases and deferred1–3,
+full/24h/hardware remain open. Goal ACTIVE.
+
+Final before-evidence reader99701/e31951 terminal0:192CRC+528header+46record+22OOM;7input+6report controls. Staged scanner2d5a98 checked22files including9decompressed archives,33pins match Git index, no credential/contact/private-path findings. No push.
