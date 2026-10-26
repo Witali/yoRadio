@@ -2,7 +2,7 @@
 
 This separate candidate preserves the pinned `native_vorbis_xiph` baseline.
 Its generator validates both complete manifests, retains every original byte
-under `base/`, and creates only ten modified translation units and two owned private headers under `ported/`.
+under `base/`, and creates only ten modified translation units and three owned private headers under `ported/`.
 Each declared before fragment must match exactly once. `PORTING.json` records
 all edits and compiled file hashes. No fuzzy patching or external patch tool is
 used. The source version and successful decoding arithmetic remain upstream's.
@@ -46,9 +46,19 @@ contract. Failed initialization may have consumed static books; callers close
 the entire stream and replay headers to recover. Encoder-only paths and packet
 allocations are not covered by this decoder-init change.
 
+An independent comment-API edit removes all query allocations and makes
+append failure atomic. Checked private variants return OV_EFAULT/OV_EINVAL;
+the original void wrappers retain their signatures. Three required allocations
+prepare new pointer/length arrays and one string before publishing state.
+Existing string/vendor pointers and length-delimited bytes remain unchanged;
+tag appending writes directly into its final string. Queries preserve ASCII
+case-insensitive matching and borrowed value pointers without temporary tags.
+This metadata-only qualification does not resume the deferred DSP scheduling
+gate or change its watchdog NONPASS.
+
 Neither production application selects this component. The previous unchanged
 31-case numerical checkpoint remains separate. Resource tests must not imply
-general OOM recovery or a complete decoder stack bound: packet arena/floor/residue and allocating comment utilities still require
-qualification. Channel-sized mapping/residue scratch and unchecked allocations elsewhere
+general OOM recovery or a complete decoder stack bound: packet arena/floor/residue allocation paths still require qualification.
+DSP target qualification remains separately deferred. Channel-sized mapping/residue scratch and unchecked allocations elsewhere
 still require work. No deferred vendor/Ogg scope is
 reopened, and no physical performance claim is made.

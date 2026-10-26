@@ -50,7 +50,7 @@ def materialize(upstream, port, output):
     need(adaptation['base_manifest_sha256'] == BASE_SHA, 'same unchanged release baseline')
     changes = json.loads(edits['edits.json'])
     need(changes['schema'] == 'native-vorbis-xiph-exact-edits-v1'
-         and len(changes['edits']) == 23, 'twenty-three exact reviewed edits')
+         and len(changes['edits']) == 24, 'twenty-four exact reviewed edits')
     modified, applied = {}, []
     for change in changes['edits']:
         source = relative(change['source'])
@@ -73,6 +73,7 @@ def materialize(upstream, port, output):
     generated.update({'ported/' + PurePosixPath(name).name: body for name, body in modified.items()})
     generated['ported/native_vorbis_xiph_header_error.h'] = edits['include/native_vorbis_xiph_header_error.h']
     generated['ported/native_vorbis_xiph_dsp_error.h'] = edits['include/native_vorbis_xiph_dsp_error.h']
+    generated['ported/native_vorbis_xiph_comment_error.h'] = edits['include/native_vorbis_xiph_comment_error.h']
     units = [dict(original=name, compiled=('ported/' + PurePosixPath(name).name
               if name in modified else 'base/' + name)) for name in baseline['compile_sources']]
     record = dict(schema='native-vorbis-xiph-generated-port-v1', base_manifest_sha256=BASE_SHA,

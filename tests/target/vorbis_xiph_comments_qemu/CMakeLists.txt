@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+set(EXTRA_COMPONENT_DIRS "$ENV{XIPH_COMPONENT}")
+set(COMPONENTS main native_vorbis_xiph_port)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(vorbis_xiph_comments_qemu)
