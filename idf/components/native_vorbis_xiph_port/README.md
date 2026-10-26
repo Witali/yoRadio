@@ -2,7 +2,8 @@
 
 This separate candidate preserves the pinned `native_vorbis_xiph` baseline.
 Its generator validates both complete manifests, retains every original byte
-under `base/`, and creates only ten modified translation units and three owned private headers under `ported/`.
+under `base/`, and creates only eleven modified translation units and four owned
+private headers under `ported/`.
 Each declared before fragment must match exactly once. `PORTING.json` records
 all edits and compiled file hashes. No fuzzy patching or external patch tool is
 used. The source version and successful decoding arithmetic remain upstream's.
@@ -56,9 +57,23 @@ case-insensitive matching and borrowed value pointers without temporary tags.
 This metadata-only qualification does not resume the deferred DSP scheduling
 gate or change its watchdog NONPASS.
 
+Nine packet-path edits make arena growth transactional and check PCM, floor
+memo, lazy floor0 map and residue allocations. A local checked floor dispatch
+distinguishes required allocation failure from nominal unused-floor/EOP; mapping
+propagates negative residue/floor statuses before synthesis can return success.
+No complete residue partition, no stages and no active residue2 channels remain
+successful no-work cases. Existing registry signatures and public ABI are retained.
+The port extends vorbis_synthesis's error results with OV_EFAULT for required
+allocation failure; the [upstream API](https://xiph.org/vorbis/doc/libvorbis/vorbis_synthesis.html)
+documents 0/OV_ENOTAUDIO/OV_EBADPACKET only. On
+any nonzero result the block must not be submitted to synthesis_blockin. Close
+the block/DSP/info/comment owners and replay all three headers for recovery.
+This does not qualify encoder allocation paths or change nominal EOP behavior.
+
 Neither production application selects this component. The previous unchanged
 31-case numerical checkpoint remains separate. Resource tests must not imply
-general OOM recovery or a complete decoder stack bound: packet arena/floor/residue allocation paths still require qualification.
-DSP target qualification remains separately deferred. Channel-sized mapping/residue scratch and unchecked allocations elsewhere
+general OOM recovery or a complete decoder stack bound: packet-path qualification
+is recorded separately. DSP target qualification remains separately deferred.
+Channel-sized mapping/residue scratch and unchecked allocations elsewhere
 still require work. No deferred vendor/Ogg scope is
 reopened, and no physical performance claim is made.

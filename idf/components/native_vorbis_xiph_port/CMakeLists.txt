@@ -24,7 +24,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 set(vorbis_units
     mdct smallft block envelope window lsp lpc analysis synthesis psy info
     floor1 floor0 res0 mapping0 registry codebook sharedbook lookup bitrate)
-set(xiph_ported_units block sharedbook codebook floor0 floor1 res0 mapping0 info mdct)
+set(xiph_ported_units block sharedbook codebook floor0 floor1 res0 mapping0 info mdct synthesis)
 set(xiph_sources)
 foreach(unit IN LISTS vorbis_units)
     if(unit IN_LIST xiph_ported_units)
