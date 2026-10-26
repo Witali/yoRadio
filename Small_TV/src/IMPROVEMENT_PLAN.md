@@ -458,6 +458,16 @@ pm_stop/leave/ROMcrypto/SDKcallback вернулись, event-post ID5/41B ве�
 Дальше event delivery/предшествующие appcallback обработчики; не объявлять
 потерю события, ошибку QEMU или блокировку конкретной задачи без наблюдения.
 Replay и9 controls проходят; factory recovery по-прежнему не принят.
+Handler-lifetime checkpoint26Oct: [WIFI_EVENT_LIFETIME.md](tests/WIFI_EVENT_LIFETIME.md)
+закрывает поиск причины этого factory stall. После первого GOT_IP заводской
+startup успешно unregister IP0 и WIFI_ANY callbacks (0x4200cdae/0x4200cdc0).
+Поздний DISCONNECTED принят очередью, извлечён sys_evt и обработан SDK; appcallback
+уже удалён. Новая native VM сохраняет обработку disconnect и восстанавливает HTTP.
+Это существующее исправление помечено в network_init; executable code не менялся,
+правка QEMU/SDK для этого сценария не нужна. 24 literal dispatch/9 startup-tail/
+9 native-event/6 metadata cases,15 metadata и11 runtime negative controls проходят.
+Другие startup/registry branches, TIM/null-completion, station lifetime, BSS
+диапазоны/overflow, whole-image aliases и финальные gates остаются открытыми.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

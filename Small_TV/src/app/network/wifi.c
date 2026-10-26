@@ -121,7 +121,11 @@ esp_err_t network_init(void)
      * FIXED_RECONSTRUCTION: factory 0x4200ca30 creates only WIFI_STA_DEF;
      * 0x4200ce9e/0x4200d06e create only WIFI_AP_DEF. The APSTA scan path
      * does not need a STA netif. Allocate no inactive DHCP/DNS interface or
-     * supervisor stack for the other role. */
+     * supervisor stack for the other role.
+     * FIXED_RECONSTRUCTION: factory 0x4200cdae/0x4200cdc0 unregisters both
+     * application event handlers after its first lease, so a later station
+     * loss reaches only SDK handlers and cannot trigger its reconnect policy.
+     * Keep these handlers registered for the full network lifetime. */
 
     tv_settings_t s;
     settings_snapshot(&s);

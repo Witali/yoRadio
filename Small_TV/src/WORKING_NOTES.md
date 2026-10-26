@@ -4437,3 +4437,75 @@ terminal0; all10boundaries and9controls replay. NEXT inspect real default event-
 handlers preceding the factory appcallback, then remaining TIM/null/lifetime/
 negotiated-period/whole-image gaps. Preserve both failed recovery and native
 cancellation resolution. No firmware rebuild, protectedinput change or boardI/O.
+
+## CURRENT 2026-10-26 — factory reconnect cause proved: startup unregisters app handlers
+
+Previous goal turn PROGRESS:1599acede/b15a01a73; current branch unchanged on entry.
+Continue user-priority item4/factory audit; do not return to deferred1–3 yet.
+New evidence resolves the previously open appcallback absence. Original reference
+wifi_dns.c already shows successful startup teardown; actual assembly/live calls
+now confirm it. No SDK/QEMU fault was established by the older idlePC/timeouts.
+
+Factory initialize_wifi_station success path cd90 sets hint2, cdae unregisters
+IP_EVENT/0/c602, cdc0 unregisters WIFI_EVENT/ffffffff/c602. Both real APIreturn0.
+Then startup event group is deleted. Keeping that original group-using callback
+without preserving its group would be unsafe. Native network_init retains its
+atomic-state callbacks; added FIXED_RECONSTRUCTION explanation only, no executable
+change/new firmware build. AppC912/ELF9E4E/ROM289C/QEMU2DF9 remain unchanged.
+
+Factory finalexec12743 terminal0, PID1388/SmallTV-da2f4da0c1ba. Startup4breakpoints
+plus5 runtime boundaries observed. Samequeue: postentrycount0, queue-sendresult1/
+count1, driverpostreturn0/count1; sys_evt dequeues/count0 and invokes actual SDK
+callback420456ea for WIFI_EVENT5/41B, then returns, queueempty/runningtask0.
+CurrentTCB matches the defaultloop task at both callback boundaries; task/global
+and queue offsets qualified from exactfactory instructions. PM0/hint2 persists.
+No payload or stack reads; nine4B eventmetadata words plus priorboundedPMdecoder.
+Early helper probe65916 and startup probe94930 terminal0 and cleaned; excluded
+from final proof. First host test lacked valid instructions at private stub
+entry addresses, fixed with ret boundary bytes; not a firmware CPU exception.
+
+Native finalexec91502 terminal0, PID40996/SmallTV-685dea4f9739, actual connected→
+disconnected→reconnected and HTTP ready, same backend cancelled after pm_stop by
+cnx_sta_leave and then rearmed. CIM10:24:42UTC confirms finalfactory absent;
+native and prototypes42984/9700 already absent10:14:55UTC. OneROMboot/no panic
+each; no physical flashing/serial/reset.
+
+New test modules separated by role: static event_delivery_layout, numeric
+event_delivery_metadata, literal event_lifetime_test, live event_lifetime_qemu,
+offline verify_event_lifetime_evidence. Private test passes24 cases/all21starts
+of full50B dispatcher;9 selected144B startup-tail/error paths with explicit SDK
+stubs;9 realnativecallback events;6metadata cases and15 rejection controls.
+Not full startup or registry implementation. Native reconnect tested in actual
+fresh QEMU as well, not inferred only from direct callback unit invocations.
+
+Proof event-lifetime-validation-20261026.json pins20sources/sixrawgzip15223B.
+Reader terminal0 recomputes algorithms and both exact typed read streams;
+11 runtime mutations reject wrong unregister/return, queue/count/task forgery,
+stale native connected state, extra read, live owner, reset/full-lifecycle claim.
+Document tests/WIFI_EVENT_LIFETIME.md supersedes the historical unresolved cause.
+Initial11984factory proof is retained in ignored archive-before-lf. Final observer
+normalized to Git eol=lf before capture, avoiding post-checkout source SHA drift.
+Helper comments completed; finalhostunits replay passes. Read unitJSON in
+PowerShell with -AsHashtable: wifi_event/WIFI_EVENT are distinct keys.
+Factory failed recovery remains a known application defect; native retention is
+an intentional correction, not a requirement to copy factory teardown.
+
+IMPORTANT long runs: actual CIM09:50 and10:14UTC finds all12original owners
+ABSENT, despite stale running guard/supervisor files. Last report prefixes:
+diagnostic654cycles, matchedmain1091/V8=1081, passedfalse/errornull, last diagnostic
+supervisor observation21:23:55UTC25Oct. No terminal success/exit evidence; do not
+call them8h/H10 passes or combine durations. Cause of disappearance unknown.
+No restart or source mutation. Read-only snapshot:
+.build/factory-event-delivery-20261026/long-owners-absent.json. Frozen inputs should
+still be preserved for later interrupted-run analysis under deferred1–3.
+
+NEXT item4: remaining TIM/null-completion branches, station+820 lifetime, BSS
+negotiated-period callers/range-overflow, remaining whole-image computed aliases
+and startup/error lifecycle branches. New tool-quality lead: GNU wrapper
+objdump-xespv2p2 decodes actual RV32 bytes712b at420aeb6e as addiw even with -m
+riscv:rv32. Prepared ELF is ELF32/RVC, no archattribute. Literal RV32 Unicorn
+control proves JAL: target420af10a,RA420aeb70,s6unchanged17. Investigate decoder
+selection before trusting GNU mnemonic-based whole-image searches. Raw-byte
+qualifiers/private RV32 tests remain independent. Ignored cjal-control.json
+and cjal_control.py retain the control. Other plan points and final independent
+network/display/full/duration/hardware acceptance remain open. Goal stays ACTIVE.

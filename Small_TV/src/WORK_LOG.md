@@ -5121,3 +5121,26 @@ findings не объясняются этим invalid-ID исправление�
   completion/source rehash pass. Saved four raw records/12414gzipbytes; offline
   replay and nine rejection controls pass. Continue event delivery/preceding
   handlers, with no assumption that the driver or QEMU caused the stall.
+
+## 2026-10-26 — factory reconnect failure explained; native correction verified
+
+- Confirmed original successful startup removes both app event handlers after
+  its first lease. Actual unregister IP0/WIFI_ANY calls and both zero returns
+  observed at boot. Added the existing correction's FIXED_RECONSTRUCTION comment
+  to native network_init; executable code and firmware artifacts unchanged.
+- Traced real factory queue send→dequeue→SDK handler→return. Event5 reaches the
+  dedicated sys_evt task; its application callback has already been removed.
+  This closes the specific recovery-cause question without a QEMU/SDK patch.
+- Added24 literal full-dispatch cases/all21instruction starts,9 selected startup
+  tail/error cases,9 native callback events,6metadata cases/15rejection controls.
+  Decoder and byte qualification are separate modules; payload/stack not exported.
+- Fresh native QEMU again clears connectivity, cancels keep-alive and restores
+  HTTP after APreturn. Final factory/native processes1388/40996 absent by actual
+  CIM10:24/10:14UTC, oneROMboot/no panic each. No board I/O. Observer normalized
+  to required GitLF before final capture; earlier11984 proof retained in scratch.
+- Archived six raw records/15223gzipbytes/20source pins; offline recomputation
+  passes and rejects11 altered runtime records. Historical failed factory gate
+  stays failed; retaining callbacks is an intentional native correction.
+- Previous long-test processes are all absent, with stale running files and
+  unaccepted654/1091/1081cycle prefixes. No restart or final acceptance claim;
+  preserved sources/metadata for later analysis. Continue factory item4.

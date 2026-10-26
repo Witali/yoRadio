@@ -70,8 +70,11 @@ incrementing retries and storing state one. Its GOT_IP callback does not itself
 store state two. Consequently this application hint cannot be used as a live
 link bit or as proof of recovery. The current native callback already clears
 its atomic connected flag before reconnecting and sets it on GOT_IP. The
-factory stall's exact cause and whether it depends on QEMU remain open; the
-observed idle-task PC does not identify a blocked callback's stack.
+factory stall's cause was not established by that snapshot; the observed
+idle-task PC does not identify a blocked callback's stack. The
+[26 October follow-up](WIFI_EVENT_LIFETIME.md) now confirms factory startup
+unregisters both application handlers after its first successful lease. The
+queue and SDK dispatcher deliver the later event correctly.
 
 ## Regression evidence and remaining scope
 
@@ -129,4 +132,6 @@ The first exploratory tracer repeatedly stopped at an uncleared hardware
 breakpoint. That observer defect was corrected by removing each reached
 one-shot breakpoint before continuing. Its run and subsequent exploratory
 versions remain excluded from this final evidence. No vendor patch follows
-from the bounded absence of an application callback.
+from the bounded absence of an application callback. The subsequent
+[handler-lifetime check](WIFI_EVENT_LIFETIME.md) observes its actual startup
+removal and confirms the existing native correction.
