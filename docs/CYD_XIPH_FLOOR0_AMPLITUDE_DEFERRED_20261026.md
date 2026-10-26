@@ -49,3 +49,10 @@ remain open. No rate value is silently clamped or newly rejected here.
 The independent channel-scratch placement change affects mapping/residue
 storage only. It neither implements nor qualifies this deferred amplitude work,
 the packet target preparation or the older DSP target gate.
+
+Subsequent independent [unsigned-rate work](CYD_XIPH_RATE_DESIGN.md) addresses
+the representation/time portion of the rate issue through an explicit matching
+public header extension. Host and ESP32 metadata qualification is recorded
+separately; encoder/convenience consumers, audio integration and hardware rate
+limits remain outside it. That work does not change or qualify the floor0
+amplitude implementation or resume its stopped test preparation.

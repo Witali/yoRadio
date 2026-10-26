@@ -148,10 +148,20 @@ General stack/heap и runtime с максимальными 255 каналами
 [Широкая floor0 amplitude отложена](CYD_XIPH_FLOOR0_AMPLITUDE_DEFERRED_20261026.md):
 read-only аудит подтвердил gaps 31–63, но подготовка тестов остановлена
 автоматической проверкой с сообщением possible cybersecurity risk; новые файлы
-не созданы, implementation не менялась. Для uint32 rate отдельно требуется
-решение по signed-long API на ILP32; clamp и ослабление проверки не применялись.
+не созданы, implementation не менялась.
+[Unsigned rate API](CYD_XIPH_RATE_DESIGN.md) теперь сохраняет положительные
+значения всего uint32 диапазона: на 32-bit long поле unsigned, на LP64 прежний
+long; layout сохранён, source signedness явно расширена и требует matching
+headers. Два checked16 reads не смешивают 0xffffffff с EOP; zero остаётся
+invalid, signed bitrate hints неизменны. Host ASan/UBSan и независимый metadata-only
+ESP32 SDK/QEMU проходят по 13492 сценария; все 12 C/C++ public entry orders
+проверены на обеих платформах, native ABI32/struct32/alignment4/offset8 подтверждены.
+Native metadata не исполняет setup/DSP/audio и не закрывает их deferred gates.
+Host packet47166 сохраняет прежние31 PCM max0/14 relations; никаких clamp,
+новых format caps или изменений аппаратных rate limits нет. Full-range encoder,
+convenience library, native audio/runtime integration отдельно.
 Дальше — незавершённые native gates, общие stack/resource проверки,
-uint32 rate/floor0 amplitude/VQ range и runtime integration.
+floor0 amplitude/VQ range и runtime integration с unsigned rate API.
 Новый кандидат пока не подключён к радио. Старые
 NONPASS относятся к прежнему repair и не переобъявлены успешными. Это также
 не закрывает deferred scopes, physical acceptance или полное соответствие
@@ -1628,3 +1638,21 @@ Stream остаётся на core0, decode/output на core1 с прежними
   подготовка amplitude tests остановлена автоматической проверкой с сообщением
   possible cybersecurity risk. Новые файлы не созданы, amplitude не менялась.
   Прежние deferred scopes, radio integration и physical acceptance остаются.
+
+- 2026-10-26, CYD-C3-14: [полный unsigned identification rate](CYD_XIPH_RATE_DESIGN.md)
+  реализован поверх неизменённой Xiph базы. Conditional unsigned-long field на
+  ILP32/LLP64 сохраняет положительный uint32 rate и исходный layout; это явное
+  source-type расширение, потребители должны использовать matching overlay.
+  Parser использует два checked16 reads, прежний zero guard и signed hints.
+  [Квалификация](../tests/results/vorbis-xiph-rate-20261026/CHECKPOINT.md): по 13492
+  metadata сценария на host ASan/UBSan и actual ESP32 SDK6.0.2/QEMU, включая
+  rate0/INT32_MAX/high half/0xffffffff, все byte prefixes и обе ветви time API.
+  12 C/C++ header orders проходят на host и Xtensa; два negative host probes
+  подтверждают отказ при original-header shadowing. Native37 units, ABI32 и
+  WDT/оба IDLE checks подтверждены. Host packet47166 и прежние31/434/738560 PCM
+  bytes сохраняют max0 и14 relations. Clang25:306 warnings/0errors.
+  Генератор теперь применяет35 exact edits,11 C units+один codec header,
+  четыре private headers и overlay из трёх public headers; два siblings
+  скопированы без изменения. Original116 files сохранены. Отложенные
+  packet/DSP/amplitude scopes, full encoder/convenience rate, native audio,
+  production integration и physical acceptance этим не квалифицированы.

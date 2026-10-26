@@ -1,0 +1,42 @@
+{
+  "completed": true,
+  "archive_unchanged": true,
+  "archive_sha256": "4ac7434d18588228d6e49f1880760b9ced2aa00b305847618d7a8e1f668a7dae",
+  "archived_initial_reader_sha256": "f87c68140ef11b0232fd6d3783fdf2be01f5b40d2e872f3cd91eab4235d30e8c",
+  "corrected_local_reader_sha256": "b96744b9b3f6b455ae20300c6848b680e7a15d31ba92e6afda3b46d1e14ed241",
+  "exact_reader_only_transform": true,
+  "steps": [
+    {
+      "label": "Correct one transcribed ABI runner hash",
+      "before_sha256": "f87c68140ef11b0232fd6d3783fdf2be01f5b40d2e872f3cd91eab4235d30e8c",
+      "after_sha256": "66dadf85da88a2044da14a32e5f6ce538a692194af41d04ea3ddd72495618560",
+      "preceding_failure_receipt": "verify.json",
+      "preceding_failure_exit": 1
+    },
+    {
+      "label": "Parse the sdkconfig CRLF text view consistently",
+      "before_sha256": "66dadf85da88a2044da14a32e5f6ce538a692194af41d04ea3ddd72495618560",
+      "after_sha256": "6e36f2ba1047f1180c56b1609aa38af6a5d67ad0694ff2f0c084e075e0550c86",
+      "preceding_failure_receipt": "verify-final.json",
+      "preceding_failure_exit": 1
+    },
+    {
+      "label": "Keep generated-record path distinct from later tool-path loop variable",
+      "before_sha256": "6e36f2ba1047f1180c56b1609aa38af6a5d67ad0694ff2f0c084e075e0550c86",
+      "after_sha256": "091cc03903b075ee5d06da2aff161b34ce0e5c8a8d51a4127616ebb19b1ebd06",
+      "preceding_failure_receipt": "verify-crlf.json",
+      "preceding_failure_exit": 1
+    },
+    {
+      "label": "Parse the nm CRLF text view consistently",
+      "before_sha256": "091cc03903b075ee5d06da2aff161b34ce0e5c8a8d51a4127616ebb19b1ebd06",
+      "after_sha256": "b96744b9b3f6b455ae20300c6848b680e7a15d31ba92e6afda3b46d1e14ed241",
+      "preceding_failure_receipt": "verify-path.json",
+      "preceding_failure_exit": 1
+    }
+  ],
+  "final_pass_receipt": "verify-text.json",
+  "qualification_data_changed": false,
+  "diagnostics_removed": false,
+  "numerical_limits_changed": false
+}
