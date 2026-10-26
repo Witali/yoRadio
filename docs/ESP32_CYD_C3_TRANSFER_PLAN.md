@@ -203,6 +203,12 @@ decoder или native runtime gate. Выбор числового пути и п
 и 297 056 точных слов результата. Отсутствующий floor обнуляет канал даже
 после coupling; тихий индекс0 остаётся ненулевым. ASan/UBSan проходят,
 новый компонент Clang без предупреждений; C/C++ GCC LX6/RV32IMC компилируется.
+Само [ядро floor1 scale проверено на SDK/QEMU обеих архитектур](../tests/results/vorbis-floor1-product-native-20261026/CHECKPOINT.md):
+по 2 957 вызовов, 619 564 точных отсчёта, 11 817 093 слова и 713 отказов на
+ESP32 и C3. Watchdog/IDLE проверки включены; числовые результаты и независимый
+replay проходят. Исходные CLI завершились1 из-за ошибки финальной печати уже
+после успешных SDK/QEMU; исправлено только выражение summary, исходные ошибки
+сохранены. Это generic scale gate, не native проверка owner/frame или IMDCT.
 Floor0 product, window/overlap/PCM, полная native квалификация и radio
 integration остаются открытыми; прежние отложенные пункты этим не закрыты.
 Для IMDCT реализован [адаптер существующего алгоритма Xiph](CYD_VORBIS_TRANSFORM_DESIGN.md):
@@ -373,7 +379,9 @@ NONPASS относятся к прежнему repair и не переобъяв
   и [точные residue0/1/2 с inverse coupling](../tests/results/vorbis-residue-20261025/CHECKPOINT.md)
   также реализованы и проверены как отдельные компоненты. Широкий путь требует
   сборки полного frame decoder, применения floor0, window/overlap и public raw integration; точное
-  применение floor1 отдельно квалифицировано на host, но ещё не на SDK/QEMU. Компонент
+  применение floor1 координатором frame квалифицировано на host. Его generic
+  scale-ядро теперь проверено на SDK/QEMU ESP32 и C3; owner/frame native gate
+  остаётся отдельным. Компонент
   IMDCT повторно использует тела Xiph с binary64 и прошёл host/source-profile gates;
   полная native/resource/PCM проверка пока не завершена. Компонент
   не подключён к production и не переквалифицирует прежний PCM NONPASS.
@@ -1770,3 +1778,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Оба C модуля Clang0/0, C/C++ GCC двух ISA и static frame records сохранены.
   Точная floor0 provenance и её отдельные численные домены, window/overlap,
   full31 PCM bound2/all14 relations, native integration и плата остаются.
+
+- 2026-10-26, CYD-C3-14: независимый SDK/QEMU тест generic floor1 scale завершён
+  на ESP32 LX6/core1 и C3/core0. Все выбранные scalar inputs прежнего host корпуса
+  сохранены; большие вызовы разделены на bounded batches с прежней общей сеткой.
+  Lossless RLE только сокращает передачу: сравниваются все 11 817 093 слова на
+  каждой архитектуре. Первая ошибка генерации массива, финальная ошибка печати
+  двух CLI и ошибка supplementary tool alias сохранены отдельно от успешного
+  SDK/native результата. Чистый replay и 28 protocol controls проходят без
+  повторного запуска native. Watchdog/IDLE/core/stack настройки сохранены;
+  production, owner/frame/IMDCT и прежние deferred gates этим не закрыты.
