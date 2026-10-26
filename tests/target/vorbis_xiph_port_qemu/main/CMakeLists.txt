@@ -1,6 +1,7 @@
 idf_component_register(SRCS "main.c" "vorbis_xiph_alloc.c"
                            "vorbis_xiph_arena.c" "vorbis_xiph_books.c" "vorbis_xiph_bits.c"
                            "vorbis_xiph_residue.c"
+                           "vorbis_xiph_headers.c"
                       INCLUDE_DIRS "."
                       REQUIRES freertos esp_system heap native_vorbis_xiph_port)
 if(CMAKE_BUILD_EARLY_EXPANSION)
@@ -25,7 +26,8 @@ if(NOT EXISTS "${xiph_generated}/PORTING.json")
     message(FATAL_ERROR "The declared exact source materialization did not complete")
 endif()
 target_include_directories(${COMPONENT_LIB} PRIVATE
-                          "${xiph_generated}/base/upstream/libvorbis/lib")
+                          "${xiph_generated}/base/upstream/libvorbis/lib"
+                          "${xiph_generated}/ported")
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
                           XIPH_CASES_SHA256="${XIPH_CASES_SHA256}"
                           XIPH_MANIFEST_SHA256="${XIPH_BASE_MANIFEST_SHA256}"

@@ -15,7 +15,8 @@ if(NOT xiph_prepare_status EQUAL 0)
     message(FATAL_ERROR "Exact Xiph resource port failed: ${xiph_prepare_error}")
 endif()
 file(GLOB_RECURSE xiph_inputs CONFIGURE_DEPENDS
-    "${xiph_base}/*" "${CMAKE_CURRENT_LIST_DIR}/edits/*")
+    "${xiph_base}/*" "${CMAKE_CURRENT_LIST_DIR}/edits/*"
+    "${CMAKE_CURRENT_LIST_DIR}/include/*")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${xiph_inputs} "${CMAKE_CURRENT_LIST_DIR}/prepare.py"
     "${CMAKE_CURRENT_LIST_DIR}/edits.json" "${CMAKE_CURRENT_LIST_DIR}/port-manifest.json")
@@ -23,9 +24,10 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 set(vorbis_units
     mdct smallft block envelope window lsp lpc analysis synthesis psy info
     floor1 floor0 res0 mapping0 registry codebook sharedbook lookup bitrate)
+set(xiph_ported_units block sharedbook codebook floor0 floor1 res0 mapping0 info)
 set(xiph_sources)
 foreach(unit IN LISTS vorbis_units)
-    if(unit STREQUAL "block" OR unit STREQUAL "sharedbook" OR unit STREQUAL "codebook")
+    if(unit IN_LIST xiph_ported_units)
         list(APPEND xiph_sources "${xiph_generated}/ported/${unit}.c")
     else()
         list(APPEND xiph_sources "${xiph_generated}/base/upstream/libvorbis/lib/${unit}.c")
@@ -37,7 +39,7 @@ idf_component_register(SRCS ${xiph_sources}
     INCLUDE_DIRS "${xiph_generated}/base/upstream/libvorbis/include"
                  "${xiph_generated}/base/upstream/libogg/include"
                  "${xiph_generated}/base/platform"
-    PRIV_INCLUDE_DIRS "${xiph_generated}/base/upstream/libvorbis/lib")
+    PRIV_INCLUDE_DIRS "${xiph_generated}/base/upstream/libvorbis/lib" "${xiph_generated}/ported")
 target_compile_definitions(${COMPONENT_LIB} PRIVATE HAVE_ALLOCA_H=1)
 target_compile_options(${COMPONENT_LIB} PRIVATE -fno-fast-math -ffp-contract=off
     -Wno-error=misleading-indentation)

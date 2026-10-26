@@ -20,6 +20,7 @@ extern int xiph_arena_tests(void);
 extern int xiph_book_tests(void);
 extern int xiph_bitreader_tests(void);
 extern int xiph_residue_tests(void);
+extern int xiph_header_tests(void);
 #ifdef NDEBUG
 #error "Xiph capture requires active guard assertions"
 #endif
@@ -113,6 +114,9 @@ static void port_resource_tests(void){
     printf("PORT_RESOURCE phase=residue_before live=0 bytes=0 core=%d\n",xPortGetCoreID());
     int residue=xiph_residue_tests();assert(residue==3997 && xiph_port_test_live()==0 && xiph_port_test_bytes()==0);
     printf("PORT_RESOURCE phase=residue_after checks=%d live=0 bytes=0 core=%d\n",residue,xPortGetCoreID());
+    printf("PORT_RESOURCE phase=headers_before live=0 bytes=0 core=%d\n",xPortGetCoreID());
+    int headers=xiph_header_tests();assert(headers>0 && xiph_port_test_live()==0 && xiph_port_test_bytes()==0);
+    printf("PORT_RESOURCE phase=headers_after checks=%d live=0 bytes=0 core=%d\n",headers,xPortGetCoreID());
     xiph_port_test_reset(0);
 }
 static void port_case_resource(uint32_t index){

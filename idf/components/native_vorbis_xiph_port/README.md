@@ -2,7 +2,7 @@
 
 This separate candidate preserves the pinned `native_vorbis_xiph` baseline.
 Its generator validates both complete manifests, retains every original byte
-under `base/`, and creates only four modified translation units under `ported/`.
+under `base/`, and creates only nine modified translation units and one owned private header under `ported/`.
 Each declared before fragment must match exactly once. `PORTING.json` records
 all edits and compiled file hashes. No fuzzy patching or external patch tool is
 used. The source version and successful decoding arithmetic remain upstream's.
@@ -27,9 +27,19 @@ unchanged; the separately allocated PCM and codebook value arrays never alias
 in the decoder. This adds no allocation or new OOM status. Empty-book, positive
 dimension and upper-layer geometry assumptions are otherwise unchanged.
 
+Seven further exact edits check every allocation in header book/floor/
+residue/mapping/comment/mode parsing. Explicit checked variants report
+OV_EFAULT for required allocation failures; malformed headers keep their
+existing status. The original pointer-returning callback signatures remain
+as thin wrappers. The public header parser uses a local status and checked
+dispatch tables bound to the pinned registry sizes at compile time. There is
+no shared mutable error state, TLS, errno inference, public ABI change, or
+modified baseline header. Legal zero-size NULL allocations are preserved.
+The generated private header declares only these checked entry points.
+
 Neither production application selects this component. The previous unchanged
 31-case numerical checkpoint remains separate. Resource tests must not imply
 general OOM recovery or a complete decoder stack bound: other block, DSP,
-header, floor and residue allocations still require qualification. Channel-sized mapping/residue scratch and unchecked allocations elsewhere
+packet floor and residue allocations still require qualification. Channel-sized mapping/residue scratch and unchecked allocations elsewhere
 still require work. No deferred vendor/Ogg scope is
 reopened, and no physical performance claim is made.

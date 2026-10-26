@@ -19,10 +19,13 @@ PORT=ROOT/'idf/components/native_vorbis_xiph_port'
 PORT_MANIFEST=PORT/'port-manifest.json'
 BASE_READER=ROOT/'tests/run-vorbis-xiph-qemu.py'
 BASE_READER_SHA256='837847878b19e352db8188b6927a3b3a91449bee74be9b59e93a9a110066c1d9'
-HELPERS=('vorbis_xiph_alloc.h','vorbis_xiph_alloc_inject.h','vorbis_xiph_alloc.c','vorbis_xiph_arena.c','vorbis_xiph_books.c','vorbis_xiph_bits.c','vorbis_xiph_residue.c')
+HELPERS=('vorbis_xiph_alloc.h','vorbis_xiph_alloc_inject.h','vorbis_xiph_alloc.c','vorbis_xiph_arena.c','vorbis_xiph_books.c','vorbis_xiph_bits.c','vorbis_xiph_residue.c','vorbis_xiph_headers.c')
 BOOK_CHECKS=200864
 BIT_CHECKS=124754
 RESIDUE_CHECKS=3997
+HEADER_CHECKS=1598
+PRIVATE_HEADER='native_vorbis_xiph_header_error.h'
+PORTED_UNITS={'upstream/libvorbis/lib/'+name+'.c'for name in('block','sharedbook','codebook','floor0','floor1','res0','mapping0','info')}|{'upstream/libogg/src/bitwise.c'}
 SDK_HEAD={'esp32':'7101770dc6db2667b3c477cc31365dd1acd6db4e'}
 VORBIS_UNITS=('mdct','smallft','block','envelope','window','lsp','lpc','analysis','synthesis','psy','info','floor1','floor0','res0','mapping0','registry','codebook','sharedbook','lookup','bitrate')
 PUBLIC=('vorbis_synthesis_headerin','vorbis_synthesis_init','vorbis_block_init','vorbis_synthesis','vorbis_synthesis_blockin','vorbis_synthesis_pcmout','vorbis_synthesis_read','vorbis_block_clear','vorbis_dsp_clear','vorbis_comment_clear','vorbis_info_clear','vorbis_version_string')
@@ -119,35 +122,38 @@ def validate_port_manifest(document,base_sha256):
     need(document['schema']=='native-vorbis-xiph-resource-port-v1'and document['base_manifest_sha256']==base_sha256 and isinstance(document['files'],dict),'matching resource-port manifest')
     for name,digest in document['files'].items():
         path=PurePosixPath(name);need(name==path.as_posix()and path.parts and not path.is_absolute()and '..'not in path.parts and ':'not in name and '\\'not in name and name!='port-manifest.json'and re.fullmatch('[0-9a-f]{64}',digest),'exact relative resource-port identity')
-    need({'CMakeLists.txt','prepare.py','edits.json'}<=document['files'].keys(),'complete port generator/edit inputs');return document
+    need({'CMakeLists.txt','prepare.py','edits.json','include/'+PRIVATE_HEADER}<=document['files'].keys(),'complete port generator/edit inputs');return document
 
-def validate_resource_log(log,rows,base_sha256,port_sha256,book_checks=BOOK_CHECKS,bit_checks=BIT_CHECKS,residue_checks=RESIDUE_CHECKS):
-    need(book_checks>0 and bit_checks>0 and residue_checks>0,'declared measured resource-test counts')
+def validate_resource_log(log,rows,base_sha256,port_sha256,book_checks=BOOK_CHECKS,bit_checks=BIT_CHECKS,residue_checks=RESIDUE_CHECKS,header_checks=HEADER_CHECKS):
+    need(book_checks>0 and bit_checks>0 and residue_checks>0 and header_checks>0,'declared measured resource-test counts')
     lines=log.splitlines();need(not any('PORT_RESOURCE'in line and not line.startswith('PORT_RESOURCE ')for line in lines),'foreign/torn resource record')
-    events=[(i,line)for i,line in enumerate(lines)if line.startswith('PORT_RESOURCE ')];need(len(events)==len(rows)+9,'all ordered resource/cleanup records')
+    events=[(i,line)for i,line in enumerate(lines)if line.startswith('PORT_RESOURCE ')];need(len(events)==len(rows)+11,'all ordered resource/cleanup records')
     def marker(prefix):
         found=[i for i,line in enumerate(lines)if line.startswith(prefix)];need(len(found)==1,'unique public event boundary');return found[0]
     def take(index,expected):
         tokens=events[index][1].split(' ');need(tokens[0]=='PORT_RESOURCE'and all(t.count('=')==1 for t in tokens[1:]),'resource record syntax');fields=dict(t.split('=')for t in tokens[1:])
         wanted=dict(expected,live=0,bytes=0,core=1);need(len(fields)+1==len(tokens)and set(fields)==set(wanted)and all(fields[k]==str(v)for k,v in wanted.items()),'exact resource record/count/cleanup identity')
-    phases=[dict(phase='arena_before',base=base_sha256,port=port_sha256),dict(phase='arena_after',checks=11),dict(phase='books_before'),dict(phase='books_after',checks=book_checks),dict(phase='bits_before'),dict(phase='bits_after',checks=bit_checks),dict(phase='residue_before'),dict(phase='residue_after',checks=residue_checks)]
+    phases=[dict(phase='arena_before',base=base_sha256,port=port_sha256),dict(phase='arena_after',checks=11),dict(phase='books_before'),dict(phase='books_after',checks=book_checks),dict(phase='bits_before'),dict(phase='bits_after',checks=bit_checks),dict(phase='residue_before'),dict(phase='residue_after',checks=residue_checks),dict(phase='headers_before'),dict(phase='headers_after',checks=header_checks)]
     worker,controls=marker('XIPH_WORKER '),marker('XIPH_CONTROLS ')
     for i,expected in enumerate(phases):take(i,expected);need(worker<events[i][0]<controls,'resource tests precede original31 conversion controls')
     for i,row in enumerate(rows):
-        take(i+8,dict(phase='case',case=i));start=marker('XIPH_CASE_END case='+str(i)+' ');end=marker('XIPH_CASE case='+str(i+1)+' ')if i+1<len(rows)else marker('XIPH_COMPLETE ')
-        need(start<events[i+8][0]<end,'zero live allocation check follows each public close')
-    take(len(rows)+8,dict(phase='complete'));need(events[-2][0]<events[-1][0]<marker('XIPH_COMPLETE '),'final cleanup precedes public completion')
-    return dict(arena_checks=11,book_checks=book_checks,bit_checks=bit_checks,residue_checks=residue_checks,records=len(events),per_case_zero_live=len(rows),final_live=0,final_bytes=0,core=1)
+        take(i+10,dict(phase='case',case=i));start=marker('XIPH_CASE_END case='+str(i)+' ');end=marker('XIPH_CASE case='+str(i+1)+' ')if i+1<len(rows)else marker('XIPH_COMPLETE ')
+        need(start<events[i+10][0]<end,'zero live allocation check follows each public close')
+    take(len(rows)+10,dict(phase='complete'));need(events[-2][0]<events[-1][0]<marker('XIPH_COMPLETE '),'final cleanup precedes public completion')
+    return dict(arena_checks=11,book_checks=book_checks,bit_checks=bit_checks,residue_checks=residue_checks,header_checks=header_checks,records=len(events),per_case_zero_live=len(rows),final_live=0,final_bytes=0,core=1)
 
 def validate_generated(path,base,port,base_root,port_root,base_sha256,port_sha256):
     raw=path.read_bytes();record=json.loads(raw);original={name:(base_root/name).read_bytes()for name in (*base['files'],'component-manifest.json')};changes=json.loads((port_root/'edits.json').read_bytes())
-    need(changes['schema']=='native-vorbis-xiph-exact-edits-v1'and len(changes['edits'])==9,'nine explicit exact-fragment changes');modified,applied={},[]
+    need(changes['schema']=='native-vorbis-xiph-exact-edits-v1'and len(changes['edits'])==16,'sixteen explicit exact-fragment changes');modified,applied={},[]
     for change in changes['edits']:
         source,before_name,after_name=(change[k]for k in ('source','before','after'));need(source in base['compile_sources']and before_name in port['files']and after_name in port['files'],'declared compiled source/edit fragments')
         before,after=(port_root/before_name).read_bytes(),(port_root/after_name).read_bytes();body=modified.get(source,original[source]);need(before and after and before!=after and body.count(before)==1,'one exact original fragment');modified[source]=body.replace(before,after,1)
         applied.append(dict(source=source,before=before_name,after=after_name,before_sha256=hashlib.sha256(before).hexdigest(),after_sha256=hashlib.sha256(after).hexdigest()))
-    need(set(modified)=={'upstream/libvorbis/lib/block.c','upstream/libvorbis/lib/sharedbook.c','upstream/libvorbis/lib/codebook.c','upstream/libogg/src/bitwise.c'},'only four declared translation units differ')
+    need(set(modified)==PORTED_UNITS,'only nine declared translation units differ')
     generated={'base/'+name:body for name,body in original.items()};generated.update({'ported/'+PurePosixPath(name).name:body for name,body in modified.items()})
+    private_name='include/'+PRIVATE_HEADER;private_body=(port_root/private_name).read_bytes()
+    need(hashlib.sha256(private_body).hexdigest()==port['files'].get(private_name),'declared private header identity')
+    generated['ported/'+PRIVATE_HEADER]=private_body
     units=[dict(original=name,compiled='ported/'+PurePosixPath(name).name if name in modified else'base/'+name)for name in base['compile_sources']]
     wanted=dict(schema='native-vorbis-xiph-generated-port-v1',base_manifest_sha256=base_sha256,port_manifest_sha256=port_sha256,edits=applied,compiled_units=units,files={name:hashlib.sha256(body).hexdigest()for name,body in sorted(generated.items())})
     need(record==wanted and raw==(json.dumps(wanted,indent=2,sort_keys=True)+'\n').encode(),'actual PORTING.json matches independently replayed exact edits')
@@ -156,10 +162,10 @@ def validate_generated(path,base,port,base_root,port_root,base_sha256,port_sha25
 
 
 def validate_compile_sources(database,fixture_sources,porting,generated_root):
-    need(len(fixture_sources)==6 and len({name for name,_ in fixture_sources})==6,'all six distinct fixture translation units')
-    need(len(porting['compiled_units'])==22 and sum(unit['compiled'].startswith('ported/')for unit in porting['compiled_units'])==4,'all twenty-two library units including four declared ports')
+    need(len(fixture_sources)==7 and len({name for name,_ in fixture_sources})==7,'all seven distinct fixture translation units')
+    need(len(porting['compiled_units'])==22 and sum(unit['compiled'].startswith('ported/')for unit in porting['compiled_units'])==9,'all twenty-two library units including nine declared ports')
     expected=fixture_sources+[(unit['original'],generated_root/unit['compiled'])for unit in porting['compiled_units']]
-    need(len({name for name,_ in expected})==28 and len({path for _,path in expected})==28,'all twenty-eight distinct selected source rows')
+    need(len({name for name,_ in expected})==29 and len({path for _,path in expected})==29,'all twenty-nine distinct selected source rows')
     selected={}
     for name,source in expected:
         found=[row for row in database if Path(row['file']).resolve()==source]
@@ -186,7 +192,7 @@ def main():
     for name in pure:
         definitions=[[n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name==name]for tree in (old,new)]
         need(all(len(d)==1 for d in definitions)and ast.dump(definitions[0][0],include_attributes=False)==ast.dump(definitions[1][0],include_attributes=False),'unchanged original reader definition '+name)
-    need(BOOK_CHECKS>0 and BIT_CHECKS>0,'fixed measured resource-test counts')
+    need(BOOK_CHECKS>0 and BIT_CHECKS>0 and RESIDUE_CHECKS>0 and HEADER_CHECKS>0,'fixed measured resource-test counts')
     required=[*[COMPONENT/name for name in manifest['files']],*[PORT/name for name in port['files']],*[ROOT/'tests/native'/name for name in HELPERS],MANIFEST,PORT_MANIFEST,BASE_READER,cases/'cases.json',cases/'cases.h',sdk/'export.ps1',sdk/'tools/idf.py',ps,py,qemu,git]
     need(all(p.is_file()for p in required)and rom.is_dir()and any(rom.glob('esp32*rom*.bin')),'required sources/tools/explicit ROM')
     need(out.is_relative_to(ROOT/'.build')and out!=ROOT/'.build'and not out.exists(),'fresh task-local output')
@@ -264,10 +270,11 @@ def main():
         for unit in porting['compiled_units']:need(normalize(generated_root/unit['compiled']).casefold()in dependencies,'actual original/ported compile dependency')
         for name in ('upstream/libvorbis/include/vorbis/codec.h','upstream/libogg/include/ogg/ogg.h','platform/ogg/config_types.h'):
             need(normalize(generated_root/'base'/name).casefold()in dependencies,'actual unchanged public/platform header dependency')
+        need(normalize(generated_root/'ported'/PRIVATE_HEADER).casefold()in dependencies,'actual explicit header-error interface dependency')
         for name in HELPERS:need(normalize(out/'project/main'/name).casefold()in dependencies,'actual frozen test/helper dependency')
         need(normalize(out/'project/main/cases.h').casefold()in dependencies,'actual original31 data dependency');report['whole_module_compiled']=True
         symbols=run('symbols',[nm,'-n','-S',elf]);need(all(re.search(r'\b'+name+r'$',symbols,re.M)for name in PUBLIC),'public Xiph synthesis symbols')
-        need(all(re.search(r'\b'+name+r'$',symbols,re.M)for name in ('xiph_arena_tests','xiph_book_tests','xiph_bitreader_tests','xiph_residue_tests','xiph_port_test_malloc','xiph_port_test_calloc','xiph_port_test_realloc','xiph_port_test_free')),'actual focused resource tests/allocator symbols')
+        need(all(re.search(r'\b'+name+r'$',symbols,re.M)for name in ('xiph_arena_tests','xiph_book_tests','xiph_bitreader_tests','xiph_residue_tests','xiph_header_tests','xiph_port_test_malloc','xiph_port_test_calloc','xiph_port_test_realloc','xiph_port_test_free')),'actual focused resource tests/allocator symbols')
         need(not re.search(r'\b__wrap_(?:vorbis|ogg)\w*$',symbols,re.M),'no private library wrappers')
         need(not re.search(r'\b(?:__wrap_)?esp_vorbis_dec_\w+$',symbols,re.M),'no Espressif decoder/private wrapper symbols');map_file=elf.with_suffix('.map');need(map_file.is_file()and b'libesp_audio_codec.a'not in map_file.read_bytes(),'no vendor audio archive')
         need(b'libnative_vorbis_xiph.a'not in map_file.read_bytes(),'the unchanged sibling is a source input, not a second linked decoder')
@@ -292,7 +299,7 @@ def main():
         files=[elf,map_file,flash,*usage,*pcm_paths,*generated_paths,out/'sdkconfig',out/'elf-header.bin',out/'sdk-child.json',out/'sdk-build.stdout.log',out/'sdk-build.stderr.log',*flash_files.values()]+[build/name for name in ('compile_commands.json','project_description.json','flasher_args.json','CMakeCache.txt','config/sdkconfig.h','build.ninja','CMakeFiles/rules.ninja')]
         report['build_outputs']={p.relative_to(out).as_posix():sha(p)for p in files};report['build_warning_lines']=[line for name in ('sdk-build.stdout.log','sdk-build.stderr.log')for line in (out/name).read_text(encoding='utf-8',errors='replace').splitlines()if re.search(r'\bwarning:',line)]
         current();need(all(sha(out/path)==digest for path,digest in report['build_outputs'].items()),'selected actual build/capture bytes changed')
-        report.update(completed=True,capture_completed=True,math_capture_completed=True,source_inputs_unchanged=True,result='CHECKED_XIPH_PORT_CAPTURED',limitations='Focused arena/codebook/bitreader/residue resource checks plus complete original31 raw capture; independent PCM comparison pending. No whole-decoder OOM or stack bound, production integration, Ogg EOF/reset extension, physical timing, or full SDK binary dependency closure. Heap minimum and task high-water are cumulative emulator observations, not per-case transient peaks.')
+        report.update(completed=True,capture_completed=True,math_capture_completed=True,source_inputs_unchanged=True,result='CHECKED_XIPH_PORT_CAPTURED',limitations='Focused arena/codebook/bitreader/residue/header resource checks plus complete original31 raw capture; independent PCM comparison pending. No whole-decoder OOM or stack bound, production integration, Ogg EOF/reset extension, physical timing, or full SDK binary dependency closure. Heap minimum and task high-water are cumulative emulator observations, not per-case transient peaks.')
         save();print(json.dumps(dict(completed=True,capture_completed=True,cases=len(rows),pcm_bytes=report['observed']['pcm_bytes'],numerical_qualified=False,result=report['result'])));return 0
     except BaseException as error:report.update(completed=False,capture_completed=False,math_capture_completed=False,result='NONPASS',error=repr(error));save();raise
 
