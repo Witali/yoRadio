@@ -5246,3 +5246,46 @@ findings не объясняются этим invalid-ID исправление�
   frames and five runtime mutations. Full VM OOM injection, whole-image semantics,
   full/24h and hardware acceptance remain unproved. Continue factory metadata,
   caller matching, TIM/lifetime/BSS/aliases, then deferred points 1–3. Goal ACTIVE.
+
+## 26 October 2026 — qualified runtime metadata recovery
+
+- Continued the user's factory priority (item 4). Added RecoverFactoryRuntime.java
+  and separate specification/graph-validation/control modules. Ten complete
+  object-qualified bodies / 508 bytes now have precise names and extents in a
+  disposable Ghidra 12.0.4 read-only session. This is an analysis correction;
+  production app 4F2C / ELF EB20, SDK and QEMU remain unchanged.
+- Recovered panic, the disconnected nothrow landing pad and TLS destructor;
+  split DeleteException out of the overlong Resume body and trimmed end-catch.
+  Three functions created, 116 instructions added; enumerated 5140 to 5143.
+  FunctionManager separately reports 5145 to 5148. Its pre-existing five-record
+  difference is retained without interpreting it as completeness.
+- Detached return at 420a3e08 and forwarding abort stub at 420a3fe0 remain decoded
+  and explicitly unowned, ten bytes total. No SDK name is inferred from their
+  short byte patterns. Full metadata edits affect 19 exported function records,
+  including changed incoming-reference owners; all other graph content is retained.
+- Independent checker rebuilds full-object matches, every qualified instruction,
+  the entire graph delta, RV32 call targets/AUIPC-JALR and the existing bad_alloc
+  destructor data argument. All 453 C.JAL have exact call edges and target
+  functions afterward; before had five missing edges and one unknown target.
+  This does not prove their reachability or whole-image semantic equivalence.
+- Both successful headless executions finished with exit 0 and explicit
+  read-only discard footers; first session 24902, final session 85890. Original
+  and copied project inventories all match the ten original file hashes after
+  execution. No byte patches, persistent metadata saves, VM, physical serial,
+  reset or flashing performed. Failed Python checker prototypes were corrected
+  before final validation: branch_target raises on indirect code, and a PARAM
+  pointer needs object relocation plus the existing edge, not an adjacent LUI.
+- Archived six new gzip payloads / 11097 bytes / 17 source pins, reusing the old
+  complete graph and seven runtime objects. Consumer output 61b949 completed 0;
+  all 20 actual altered-input controls were rejected. Existing runtime evidence
+  replay output 1b9dd6 also completed 0: 176 literal cases, 13 input and seven
+  report controls, with the historical failing-before OOM flag preserved.
+- Read-only inspection places factory allocation call 42040efc in Ghidra body
+  42040e56..42040f8e (312 bytes). Complete SDK-source identity is still pending:
+  factory SDK descriptor is v5.5.4, and its inline Header initialization differs
+  from current SDK6.1 object code. No relocation masks were weakened and no
+  compiler version was inferred. Next: caller identity, TIM/null-completion,
+  station lifetime, BSS periods/overflow and aliases. Broad goal remains ACTIVE.
+- Final staged-source check aacd3a confirmed all 17 pins equal Git index bytes
+  and production app SHA is unchanged. Final consumer 2ef9bb completed with exit
+  0 and repeated all 20 rejection controls. No active process from this checkpoint.

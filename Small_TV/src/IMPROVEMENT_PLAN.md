@@ -353,6 +353,15 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [runtime metadata](tests/RUNTIME_METADATA.md) закрывает пять конкретных
+C.JAL reference gaps. В transient read-only копии Ghidra восстановлены десять
+object-qualified тел / 508B, три новые функции и 116 инструкций. Все453 compact
+calls имеют точные ссылки и target functions. Десять detached bytes сохранены
+без угаданного владельца. Полный graph delta и20input controls проходят; исходные
+десять файлов проекта и production app неизменны. Это не закрывает whole-image
+семантику/достижимость. Дальше full factory caller42040efc, TIM/null-completion,
+station lifetime, BSS periods/overflow и aliases; затем отложенные points1–3.
+
 NTH-ALLOC-FAIL исправлен26Oct: [NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md).
 App4F2C/ELFEB20/source5B6252 DEBUGoff;1475840B, -640B кC912. Общие scalar/array
 nothrow wrappers возвращаютNULL на mallocNULL/no-handler; post-link подтверждает
@@ -361,8 +370,9 @@ before/newNVS→ESP_ERR_NO_MEM after,13input и5runtime mutations pass.6300nativ
 3727privacy,16inventory,6artifact checks; отдельные3networkphases и2exactLCDframes.
 Четыре finalVMowners отсутствуют поCIM, ни physicalI/O, ни sharedSDKpatch.
 Обычный throwingnew/over-alignment/globalOOM recovery не заявлены. Высший
-app_main NVSinit error остаётся fatal по прежней политике. Дальше factory
-metadata/caller/TIM/lifetime/BSS/aliases; points1–3 и finalacceptance всё ещё открыты.
+app_main NVSinit error остаётся fatal по прежней политике. Runtime metadata
+закрыта в следующем scoped checkpoint выше; caller/TIM/lifetime/BSS/aliases,
+points1–3 и finalacceptance всё ещё открыты.
 
 **Исторический failing-before checkpoint NTH-ALLOC-FAIL:** пять C.JAL gaps идентифицированы,
 но найден общий factory/native дефект: `new[](nothrow)` при mallocNULL/no-handler

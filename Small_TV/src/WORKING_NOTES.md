@@ -7,8 +7,10 @@
 позже. Последний checkpoint и NEXT сохранены в конце этого файла. Ниже остаётся
 исторический контекст; старые `running` JSON не подтверждают живые процессы.
 Все12 прежних duration владельцев отсутствуют по CIM26Oct; прогоны не приняты.
-NTH-ALLOC-FAIL исправлен: app4F2C / ELFEB20. Дальше factory metadata/caller,
-TIM/null/lifetime/BSS/aliases. Текущие документы:
+NTH-ALLOC-FAIL исправлен: app4F2C / ELFEB20. Десять runtime ranges восстановлены
+в transient read-only Ghidra: все453C.JALrefs есть,20negativecontrols pass.
+Дальше factory caller, TIM/null/lifetime/BSS/aliases. Текущие документы:
+[RUNTIME_METADATA.md](tests/RUNTIME_METADATA.md),
 [NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md),
 [RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md),
 [RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md),
@@ -4673,3 +4675,38 @@ BSS periods/range-overflow and computed aliases. Broad plan stillACTIVE.
 Final native count6300 vs initial6298 is an observed check count; dispatch has conditional async-wait CHECKs. Do not rerun to seek an exact old count or relax functional assertions. Final proof has14gzip124100B/30sourcepins.
 
 Final reader session22193/output8f0061 terminal0 after30pins/native6300 refresh. Getter `_GLOBAL__sub_I__ZSt7nothrow` at420a416a is registered in init_array and tail-calls pthread_mutex_init(3fcb6920,0). SDK valid-mutex lock skips lazy allocation. This is static/source review, not full pthread/RTOS OOM execution. Final prototype owners all absent; no pending sessions. Ready for focused commit.
+
+## Latest checkpoint — runtime metadata, 26 October 2026
+
+RecoverFactoryRuntime.java executed only in a copied read-only Ghidra project;
+ten object-qualified bodies / 508 B recovered, three functions created and 116
+instructions added. Full graph changes exactly match instructions and scoped
+ownership: enumerated5140→5143 (API5145→5148), 19 changed function records,
+GP accesses unchanged. All453 C.JAL now have exact references/target functions.
+Detached return420a3e08..3e0a and abort-forwarder420a3fe0..3fe8 stay decoded and
+unowned: no guessed SDK names. Original/copy ten project hashes unchanged;
+both headless sessions terminal0/read-only discarded. Production4F2C/EB20,
+SDK/QEMU unchanged; no VM or physical action.
+
+Proof runtime-metadata-validation-20261026.json reuses original full graph and
+seven runtime objects; six new gzip11097B/17pins. Consumer61b949 terminal0,
+20 actual altered-input controls rejected. Historical runtime consumer1b9dd6
+also terminal0 with176literal cases/13input/7report controls. Do not call the
+old OOM-failing-before flag a regression; current correction is the separate
+nothrow proof. Details: tests/RUNTIME_METADATA.md.
+
+NEXT user item4: factory512B allocation caller42040efc belongs to Ghidra body
+42040e56..42040f8e/312B. This is metadata ownership, not full source identity.
+Factory descriptor says IDFv5.5.4 (already documented), currentSDK6.1 NVSPage::load
+is328sourceB and calls Header constructor out of line; factory has an inline19B
+fill loop. Check pinned SDK5.5.4/compiler/options before requiring full-body
+matching. Existing14compiler not found in inspected tool directories;
+SDK5.5.4 tools.json selects esp-14.2.0_20260121. No toolchain downloaded yet;
+no compiler version proved and no strict relocation matcher weakened.
+Then TIM/null-completion, station+820 lifetime, BSS periods/range-overflow and
+computed aliases. Deferred points1–3 and full/24h/physical gates remain open.
+No active exec/VM from this checkpoint. Broad goal ACTIVE; no push performed.
+
+Final staged-source check aacd3a confirms all17 source pins equal Git index bytes
+and production app4F2C SHA is unchanged. Final consumer2ef9bb terminal0 repeats
+the scoped validation and all20 rejection controls. Ready for focused commit.

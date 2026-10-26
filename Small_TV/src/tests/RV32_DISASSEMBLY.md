@@ -103,5 +103,8 @@ $objdump='C:/Work/yoRadio/.idf/tools-v6.1/tools/riscv32-esp-elf/esp-15.2.0_20251
 
 Следующий checkpoint установил владельцев пяти выбранных call sites и нашёл
 общий factory/native OOM defect: [RUNTIME_CALL_GAPS.md](RUNTIME_CALL_GAPS.md).
-Исправление nothrow allocation failure остаётся следующим шагом. Прежний Ghidra
-snapshot сохранён; полнота образа этим не закрывается.
+Nothrow allocation failure затем исправлен:
+[NOTHROW_ALLOCATION.md](NOTHROW_ALLOCATION.md). Отдельный read-only checkpoint
+восстановил десять runtime ranges и все пять недостающих ссылок:
+[RUNTIME_METADATA.md](RUNTIME_METADATA.md). Прежние Ghidra snapshots сохранены;
+полнота образа этим не закрывается.

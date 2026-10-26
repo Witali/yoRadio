@@ -101,9 +101,11 @@ Factory disassembly now uses explicit RV32 ISA metadata. This corrects GNU's
 RV64 interpretation of compressed link-producing jumps in ISA-less exports.
 The assistant also recovers old C.JAL entries from their bytes, with visible
 warnings, and rejects other RV64 input. The complete code-only export preserves
-813,936 original bytes; 453 call candidates include five Ghidra-reference gaps
-requiring further boundary/reachability analysis. See
-[decoder checks and remaining candidates](tests/RV32_DISASSEMBLY.md).
+813,936 original bytes. A subsequent object-qualified recovery closes the five
+Ghidra-reference gaps: all 453 compact calls now have target functions and exact
+call edges in the transient analysis. See [decoder checks](tests/RV32_DISASSEMBLY.md)
+and [runtime metadata recovery](tests/RUNTIME_METADATA.md). Reachability,
+indirect calls and whole-image equivalence still require separate work.
 
 The [nothrow allocation correction](tests/NOTHROW_ALLOCATION.md) keeps ordinary
 scalar/array `new(std::nothrow)` failures out of the SDK's abort-only exception

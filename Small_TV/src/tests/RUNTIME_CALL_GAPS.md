@@ -9,6 +9,11 @@ Checkpoint 2026-10-26 продолжает [RV32 disassembly](RV32_DISASSEMBLY.m
 [NOTHROW_ALLOCATION.md](NOTHROW_ALLOCATION.md). Исторические failing-before
 результаты ниже сохранены, а полнота всего образа остаётся открытой.
 
+Следующий scoped checkpoint восстановил границы десяти тел и все пять
+пропущенных ссылок в transient read-only Ghidra:
+[RUNTIME_METADATA.md](RUNTIME_METADATA.md). Все453C.JAL теперь имеют точные
+ссылки и target functions; это не доказательство достижимости всего образа.
+
 | Заводской PC | Владелец / вызываемая функция |
 |---|---|
 | `0x40380180` | `_panic_handler` → `xt_unhandled_exception` |

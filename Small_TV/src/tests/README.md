@@ -9,6 +9,11 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Разметка runtime](RUNTIME_METADATA.md) восстанавливает десять проверенных полных
+тел в отдельном read-only сеансе Ghidra. Все 453 C.JAL получили точные call edges;
+20 altered-input controls проходят. Полнота образа и всех indirect calls остаётся
+открытой.
+
 [Nothrow allocation](NOTHROW_ALLOCATION.md) сохраняет real failing-before и
 проверяет CPP source, compiled RV32 wrappers и NVS error propagation. Network
 и exact LCD запускаются отдельно; hardware/24h/full gates этим не закрываются.
