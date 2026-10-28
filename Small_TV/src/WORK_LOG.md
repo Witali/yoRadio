@@ -5754,3 +5754,21 @@ then correct in a fresh worktree to preserve current replay inputs.
 User now requests common smart-tv integration in chronological branch order.
 Save this focused evidence checkpoint before creating the integration worktree.
 Root main, old worktrees, full plan and deferred full/24h/hardware gates remain.
+
+## 28 October 2026 — common smart-tv branch and checkout cleanup
+
+Merged seven device branches chronologically from main DA103347F; all 43 local/remote
+device branch names covered, 81 commits beyond base including merge history.
+Only two journal conflicts; unique older checkpoints retained separately.
+Published smart-tv before retiring checkouts. Verified native 6302 / privacy 3727 /
+nothrow 26 / artifact 8 and 25266 before + 65836 after replay with 23 semantic controls.
+Production source/app unchanged. A canonical LF evidence-reference hash is
+recorded alongside the original working-copy hash, preserving raw reports.
+
+Snapshotted 394082 files / 62310 unique objects, XZ 9 extreme / SHA-256,
+fully verified compressed members and source bytes. Restored-file check passed.
+Removed eight idle published Small TV worktrees and temporary raw object store;
+branches, root main, other devices and shared SDK retained. Archive is local
+.build/worktree-archives/small-tv-20261028; restoration keeps old absolute paths
+available for offline replay. See ../SMART_TV.md and integration proof.
+Full improvement objective remains active, not completed by integration.

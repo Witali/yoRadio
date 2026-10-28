@@ -1,5 +1,22 @@
 # Контекст работы над восстановленной Small TV
 
+## Общая ветка smart-tv — 28 October 2026
+
+Current development is `.worktree/smart-tv-integration`, branch `smart-tv`.
+All 43 device branches are covered: 36 through base main and 7 chronological merge
+commits. Eight old Small TV worktrees were removed after full local snapshots
+and publication. Frozen paths can be restored as data, without Git registration,
+using .build/worktree-archives/small-tv-20261028/restore.py. See ../SMART_TV.md.
+The archive uses maximum XZ 9 extreme and remains local; keep it for old evidence.
+Current shared-tree native 6302 / privacy 3727 / nothrow 26 / artifact 8 and independent
+25266 before + 65836 after replay pass. Original production inputs remain unchanged.
+The checkout JSON normalization is recorded explicitly in the replay supplement;
+historical raw reports and their working-copy hash remain unchanged in snapshots.
+Next factory work: qualify short BSS IE/caller bounds in both images. The scratch
+native probe is preserved in the old BSS snapshot. Full plan, deferred items 1–3 and
+whole-image/full/24h/hardware requirements remain open. Goal remains ACTIVE.
+Earlier process/checkpoint sections below are historical observations.
+
 ## Текущий приоритет — заводской образ, 2026-10-26
 
 Текущая рабочая копия `.worktree/small-tv-storage-fixes`, ветка
