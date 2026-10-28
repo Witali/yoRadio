@@ -116,3 +116,8 @@ Next: actual callback producer/status contracts and station/peer lifetime,
 including field 820; negotiated BSS setters/ranges/overflow; computed aliases and
 whole-image reachability. Deferred points 1–3 and full/24-hour/hardware acceptance
 remain open. This checkpoint does not replace any of those requirements.
+
+Continuation: [WIFI_PRODUCERS.md](WIFI_PRODUCERS.md) now executes both callback
+adapters into this exact parent closure and identifies field 820's IE producer.
+It preserves a conditional BSS timer-range failure; concurrent lifetime, full
+association validation and runtime enablement remain open.

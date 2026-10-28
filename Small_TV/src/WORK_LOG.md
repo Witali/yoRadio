@@ -5673,3 +5673,33 @@ Updated plan, working notes and test entry points. No VM, hardware or push.
 Remaining: actual callback producer/status semantics and concurrent station/peer
 lifetime including field 820; BSS setters/ranges/overflow; computed aliases and
 whole-image reachability; deferred points 1–3 and final full/24h/hardware gates.
+
+## 28 October 2026 — bind producers and preserve conditional BSS timer failure
+
+Revalidated 141b7eb4e clean. Strict full matching now covers 20 producer/init/
+association functions, 5322 B, against own pinned libpp/net80211. Callback packet
+and descriptor fields are verified through the real completion closure. IE peer
+stores survive into actual cnx -> PM setter -> rearm. 25266 CPU executions cover
+all 119 instruction starts in ten small producers, complete status/option byte
+domains and selected period/context/fallback boundaries. Larger bodies are
+statically matched; no full association or concurrent ownership acceptance.
+
+Field820 is now traced to BSS options bit0; period818 to IE bytes2/3. SDK public
+header names protected_keep_alive and 1.024-second units. pm_attach/wifi_hmac
+registration bodies and two direct wake completion calls are identified, with
+runtime registration, descriptor enums and station lifetime still open.
+
+Found conditional timer-range defects: native4197 produces760704us instead of
+4295728000us; factory32772 produces0ms with BSS enabled. Both are actual private
+CPU witnesses. Native 61339 wrapping periods are a separate arithmetic inventory.
+Production archived sdkconfig disables BSS Max Idle; live feature word was not
+read. Safety gate stays false. Preserve full range in the correction, do not
+copy factory overflow or silently enable this feature.
+
+Producer 48017/e88318, independent reader 68662/178df8 terminal0. Five static and
+eight evidence controls pass, including rejection of a false safety claim.
+Proof20pins, one68341 B gzip /1037251 B expanded. Isolated GNU --defsym experiment
+also proves same-object calls can target local C without SDK patching; the timer
+correction itself is not implemented. New task worktree required to preserve
+this baseline's absolute app/ELF/source pins. No VM/hardware/SDK/QEMU mutation.
+No push. Remaining full objective and deferred gates stay open.

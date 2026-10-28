@@ -9,6 +9,13 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Callback/BSS producers](WIFI_PRODUCERS.md): 25266 CPU executions связывают
+descriptor status/flag с реальным null-completion и IE → peer → PM timer.
+Поле +820 идентифицировано как BSS options bit; 20 полных SDK bodies matched.
+Сохранён failing-before: native period4197 переполняет microseconds, factory
+period32772 превращается в нулевой интервал. В archived sdkconfig поддержка BSS
+Max Idle отключена; runtime enablement/lifetime и исправление ещё открыты.
+
 [Null completion](WIFI_NULL_COMPLETION.md): 16662 literal RV32 executions,
 полные parent/quick-wake/state-setter bodies обеих SDK (519 instruction starts).
 Проверены pending/retry/sleep-deadline branches, counter wrap и guarded station

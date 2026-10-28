@@ -5126,3 +5126,55 @@ NEXT: actual callback producers/status and station/peer lifetime (+820), BSS
 setters/ranges/overflow, computed aliases and whole-image reachability. Deferred
 points 1–3, full regression, 24-hour and physical acceptance remain open. Goal
 ACTIVE. No running exec from this checkpoint; no implicit push of this new work.
+
+## 28 October 2026 — callback/BSS producers and conditional timer failure
+
+Previous goal turn made progress in 141b7eb4e (complete null/quick/state bodies).
+Revalidated clean HEAD, ahead one; preserved every frozen app/ELF/source proof.
+Continued factory priority, no production source, shared SDK, QEMU or device edits.
+
+New reverse/wifi_producers pins both net80211 libraries and matches 20 complete
+producer/initializer/receive bodies, 5322 B. Factory net SHA 8F989ECD, native
+C2DF6FCC. New private CPU modules execute callback adapters into the real prior
+completion closure, and retain IE peer stores into actual cnx/PM setter/rearm.
+25266 executions: per image 7424 callback, 5200 BSS and 9 actual getter cases.
+All 119 starts / 344 B in ten small producers visited; larger association/init/
+transmit/wake bodies are static matches only. PM-start is an explicit seven-arg
+boundary; prior PM start/stop tests remain separate. No lifetime/RF claim.
+
+Concrete producer contract: sleep a0=1, wake a0=0; both read packet+36 descriptor
+and descriptor byte19 status. Native also forwards descriptor word0 &1 in a2;
+factory leaves a2 alone and its parent ignores it. Driver enum/flag naming still
+open. IE bytes2/3 -> peer halfword818, IE byte4 bit0 -> peer byte820. Pinned SDK
+header describes BSS period units and protected_keep_alive; cnx reads818 into PM.
+pm_attach materializes callbacks; wifi_hmac_init binds transmit; wdev table alias
+and actual registration lifetime remain open. Direct wake has two (0,1,0) calls.
+
+Confirmed conditional BSS timer defects with real IE -> peer -> PM instructions:
+native period4197 arms760704us, intended4295728000us; factory period32772 stores
+encoded0 but enabled1 and arms0ms. Mathematical 1..65535 inventory finds 61339
+native wraps; this is not exhaustive CPU execution. Archived production sdkconfig
+has BSS Max Idle support off; actual runtime feature word was not read. Getter
+itself is executed with controlled word64 bit8. Preserve failing safety flag.
+
+Producer 48017 / e88318 and independent consumer 68662 / 178df8 terminal 0.
+Five static and eight report controls reject changed producers and false safety/
+lifetime claims. Proof factory-wifi-producer-validation-20261028.json: 20 pins,
+one gzip68341 B /1037251 B expanded. No VM or physical test started.
+
+NEXT production BSS-TIMER-RANGE correction in a NEW task worktree, preserving
+this current 8758BD09/DA1ED0CE and all absolute before inputs. Keep full 16-bit
+periods; use ms arm for large intervals, preserve exact microsecond/fallback
+behavior where representable, qualify ABI/callers/cancellation and new independent
+network/LCD gates. Do not enable the currently disabled BSS feature implicitly.
+Isolated GCC15 RV32 --defsym experiment (redirect-vendor.c / redirect-local.c in
+.build/wifi-producers-20261028) compiled/linked successfully: same-object caller
+at100008 C.JAL goes to local_timer_entry100014. SDK g_pm (584 B), g_pm_cfg (76 B)
+and rearm/disarm functions are global. This is only feasibility, not a timer fix.
+First link attempt was a PowerShell unquoted-comma parse error; quoting linker
+arguments fixed it. First discovery script name inspect.py shadowed stdlib;
+renamed it catalogue.py before any successful scan. No package/SDK changes.
+
+Further requirements remain: real status/flag enums, station/peer lifetime,
+association input bounds, computed/wdev aliases and whole-image gaps; deferred
+points 1–3 and final full/24h/hardware gates. Goal ACTIVE; no pending exec.

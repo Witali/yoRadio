@@ -604,6 +604,23 @@ Native остаётся app8758BD09/ELFDA1ED0CE, production/SDK/QEMU не мен
 lifetime (+820), negotiated BSS setters/overflow и aliases/reachability открыты.
 Пункты 1–3 и full/24h/hardware acceptance остаются в полном объёме.
 
+Checkpoint 28 Oct, [WIFI_PRODUCERS.md](tests/WIFI_PRODUCERS.md): 20 полных тел
+SDK / 5322 B matched, 25266 CPU executions. Реальные sleep/wake adapters передают
+descriptor+19 status, native также descriptor word0 bit0; peer+818/820 заполнены
+из BSS Max Idle IE, затем период доходит до настоящего PM setter/rearm.
+Обнаружен условный дефект `BSS-TIMER-RANGE`: native period4197 даёт760704us вместо
+4295728000us; factory period32772 даёт0ms. Archived CONFIG_ESP_WIFI_BSS_MAX_IDLE_SUPPORT
+off, живое значение feature word ещё не наблюдалось. Это failing-before baseline,
+а не закрытый safety gate. 5 static + 8 evidence controls и replay проходят.
+Далее исправить native timer с сохранением полного 16-bit диапазона (для больших
+интервалов использовать ms API), проверить все вызовы/ABI/units/cancellation и
+отдельные network/LCD gates; поддержку функции автоматически не включать.
+Сохранить текущие 8758BD09/DA1ED0CE и исходники как replay inputs; production fix
+делать в отдельной task worktree. Изолированный GNU --defsym тест подтвердил
+перенаправление same-object вызова без патча SDK, но это ещё не production fix.
+Producer status/flag enum, station/peer lifetime, association bounds, wdev aliases
+и whole-image reachability остаются открытыми, как и весь прежний scope.
+
 ## 6. Приёмка окончательной версии и правила работы
 
 Для завершённого исправления — focused commit, failing test и проверка исправления,
