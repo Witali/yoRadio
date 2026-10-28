@@ -3619,9 +3619,10 @@
     "src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
     "src/app/web/server.c": "b936b84396482b72beee190a12d76fdbb1ad17437de93526fd9b40a4ec31a0cc",
     "src/app/web/settings_api.c": "80247849a96e7324488fd9c944de364828016e3e6ebbbc81db67aaf4c6167773",
-    "src/build.ps1": "4a40960d363a29ef243fa5eaa57ad9400b77b1cfbef0e0d9d6bc6109c09dd3a5",
+    "src/build.ps1": "fdf5f0614adc38e58debfc36ae80c8a3edcbc6449ca9d2f6c182ada845abce7b",
     "src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
-    "src/CMakeLists.txt": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8",
+    "src/cmake/nvs_recovery.cmake": "e1f153253da4baffa21ebb173ff564c0bf1c473f2fbee7fc591d1c2882e27843",
+    "src/CMakeLists.txt": "4e015646dbf24af8e60a2e0404af729f1f06aac161f17ddebaa4ba888d45d7cb",
     "src/codec/jpeg_backing.c": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
     "src/codec/jpeg_backing.h": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e",
     "src/codec/jpeg_baseline.c": "b0bb9a49fb9cbccd9c49fdd9d92c893e12721ca0bc151de98ad815d5556fe1b8",
@@ -3883,14 +3884,23 @@
     "src/third_party/tjpgd/tjpgd.h": "4c7115c84f1c7042e9ee459d1a731fb6fcdd89fdc8686e95afa9c59074a69557",
     "src/third_party/tjpgd/tjpgdcnf.h": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760",
     "src/third_party/tjpgd/UPSTREAM.json": "2cdbf82b21d79701d3d125ffc420f21fb1f22dab44785f00ee8e29cb8023be7b",
-    "src/tools/audit_correspondence.py": "c9a095e5d3329496320abf79aa64887ea13713c734a0643d31ac177f9fae2308",
+    "src/tools/audit_correspondence.py": "c9f2943f600e479841d18f69c4d47485dc4143d64b0bf80f26cd65ff318e68f9",
+    "src/tools/audit_factory_xrefs.py": "382fa18a447e20ac13b528c7f9ea35398f90eff5c2f23cb0b679476d5762ae5d",
     "src/tools/build_jpeg_library.py": "cccef6c732e52f600445fd005817aebf4b24be7e9f7d3583f7952c1018343c29",
     "src/tools/jpeg_cache_layout.py": "c9a0a8459f126b2565b65433a14577517bc8567c1e25e9ecc08d57cb06c456b9",
     "src/tools/jpeg_guard_layout.py": "55ac1487f391ff99dbd5d0ca29155969aef0171f8d05621a3cf5bc9edfadef2d",
     "src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
     "src/tools/organize_decompilation.py": "f11108f2ea72027ea9a37669fe628d7e12fb8d5b77cbfd4fb5053a4d58a947d1",
-    "src/tools/prepare_resources.py": "037c3b3572cfc8678866870960446e960b27fdedf557039f26f95d080b69d9c1",
-    "src/tools/prepare_timezones.py": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148"
+    "src/tools/patch_nvs_page.py": "f637cd6c7d15da60df0427ab4c1216bda3d77f0bb95eaa0df53480c1fb03b889",
+    "src/tools/prepare_resources.py": "edd9b6c6a49084124673f1f9982ae5b27d8db7eabf3e6eeb00ab885f04f0718b",
+    "src/tools/prepare_timezones.py": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148",
+    "src/tools/reverse/elf_archive.py": "8229e872a677fbbcdb25fcb62c3de5f216bf36b3cde4420249b72a2f02dc887a",
+    "src/tools/reverse/factory_nvs.py": "16cef812ad0389717fa884de345be23e282e466e252cf9392e8fdc96f3baa3a1",
+    "src/tools/reverse/nothrow_linkage.py": "627785079a072119f7490851947da8478bc60ff2fa69641635d1122cb3aebe07",
+    "src/tools/reverse/nvs_record_linkage.py": "efd8da1c2e5a5943c515ae575885060dcc68201987302bf4ca68a349269b0974",
+    "src/tools/reverse/runtime_call_gaps.py": "573a6bc924deb2f3c4d00d04c373a021a0ee06a10dd57eabdeeb4952d4f286bf",
+    "src/tools/reverse/rv32_link_match.py": "dbe79ffa1da1cd773460fa44359bf92da0e1b2e4bba3ab0902979f2636a35150",
+    "src/tools/verify_nvs_recovery.py": "1882e5be409f8015545c3874018297bbf1977f8a8a6d7d117f371e220df41f27"
   },
   "findings": [
     {
@@ -3955,6 +3965,11 @@
       "id": "STALE-MAP",
       "status": "fixed_navigation",
       "detail": "All 176 entries now derive native_module and exact native_targets from this reviewed function mapping; 74 stale category-based module summaries corrected. Reference headers direct readers to those links. Organizer refresh mode preserves function bodies/names; the audit rejects stale navigation and pins both tools. Historical Ghidra aliases remain address-qualified, not semantic names or proof of full-image completeness."
+    },
+    {
+      "id": "NVS-RECOVERY",
+      "status": "corrected_sdk_boundary",
+      "detail": "Local exact-source-SHA patch of the pinned NVS Page translation unit corrects erased-slot counts, full namespace/key/chunk identity for 24-bit hash candidates, exact BLOB chunk lookup and recovery I/O error propagation. Actual factory/current source-object closures and real C2 ROM CRC were executed on synthetic records. Selected fault/reopen checks supplement this inventory; full Storage.init/power-cut and whole-image acceptance remain open. See tests/NVS_RECORDS.md and tests/NVS_RECOVERY.md."
     }
   ],
   "limitations": [

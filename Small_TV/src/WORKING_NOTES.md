@@ -2,6 +2,27 @@
 
 ## Текущий приоритет — заводской образ, 2026-10-26
 
+Новый analysis checkpoint в той же `small-tv-nvs-fixes`: полный Storage.init/read
+qualified71factory/53native.18baseline+18reopen,460fault/retry+6six-sector cases
+подтвердили BLOBfix, но верхние PageManager/Storage ещё скрывают134native I/O
+ошибки (factory130). NEXT — исправить этот error propagation в новой локальной
+NVS component copy с согласованными private cleanup signatures; сохранить
+текущие 34CB/73BE before inputs. См. [NVS_STORAGE.md](tests/NVS_STORAGE.md).
+Первый reader53022 повторил матрицу, но выявил JSON shape mismatch int/str keys
+в retained_allocations; wire evidence не менялось, ключи нормализованы в fixture.
+Ещё4malloc failures доказывают40Btemporary leak при втором BlobIndexNode OOM.
+NEXT исправление должно очистить temporary list на всех выходах. Final reader
+47042/2a9a74 terminal0: вся матрица повторена,8input+6report controls проходят.
+
+Актуальная рабочая копия `.worktree/small-tv-nvs-fixes`, ветка
+`codex/small-tv-nvs-fixes`, создана от7ebe96846. Factory-audit оставлена чистой
+с неизменными before inputs. Локальный NVS recovery patch исправляет счётчики,
+коллизии ключей/BLOB chunks и скрытые I/O errors. App34CB/ELF73BE собраны,
+архивированы и проверены отдельно CPU/native/network/LCD gates. Детали:
+[NVS_RECOVERY.md](tests/NVS_RECOVERY.md). Final proof reader62193/e7059c terminal0,
+включая шесть report/runtime controls. NEXT — full Storage/multisector faults, затем TIM/null/
+station+820/BSS/aliases. Оставшаяся цель не сокращается.
+
 Рабочая копия `.worktree/small-tv-factory-audit`, ветка
 `codex/small-tv-factory-audit`. Продолжать пользовательский пункт4; к1–3 вернуться
 позже. Последний checkpoint и NEXT сохранены в конце этого файла. Ниже остаётся
@@ -4832,3 +4853,118 @@ network/display checks. Other factory/TIM/lifetime/BSS/aliases and deferred1–3
 full/24h/hardware remain open. Goal ACTIVE.
 
 Final reader99701/e31951 terminal0; staged33pins match, no sensitive findings across22files/9expanded gzip. Ready for baseline commit; then local NVS corrections in new task worktree.
+
+## 26 October 2026 — correct inherited NVS recovery in a local component copy
+
+Previous checkpoint7ebe96846 preserved failing-before records. Created task
+worktree .worktree/small-tv-nvs-fixes / codex/small-tv-nvs-fixes from it, leaving
+factory-audit old source/4F2C/EB20 inputs immutable. Common SDK6.1 stays clean.
+Exact source SHA patcher + CMake replace only our NVS Page translation unit;
+FIXED_FACTORY comments describe count, identity and I/O corrections. New build
+postlink guard qualifies all20current direct-call closure bodies/3184B against
+source objects and validates generated source; factory19bodies/3368B preserved.
+
+Fixed ERASED/ILLEGAL span accounting, full namespace/key/chunk comparison for
+24-bit cache hash candidates, exact chunk for last duplicate search, and missing
+recovery I/O error propagation. Native-before136faults reproduce50hidden errors;
+factory108faults reproduce32. Selected current130faults surface0x104/INVALID,
+stop immediately, preserve physical prefixes, and fresh Page reopens retain keys
+and correct counts. A second reopen is stable/no programs. No secureerase claim.
+Additional damaged-tail probe reproduced count3 for twoERASEDslots in firstfixed
+candidate; corrected adjacent tail accounting too and added permanent vector.
+
+Build prototype initially failed configure because IDF_PATH used Windows
+backslashes while target SOURCES used forward slashes. Normalize declared path,
+require exactly one replacement; no broad basename fallback. First successful
+candidate89E8/0464 retained ignored with its passing checkpoint; final34CB/73BE
+includes the tail correction and mandatory NVS linkage guard. App1475968B,
+128Bmore than4F2C,60032Bpartition free. Source aggregatee3a1e0b5….
+Final build89297/b5a19d terminal0; app/bootloader/assets/metadata archived normally.
+
+Final machine check8105/f5ff8d terminal0:192actualROMCRC+528headers,23records and
+11OOM eachvariant;27native extra records+27reopens+12FULL/FREEING;130faults each
+with recovery/stable retries;652previous partial cases. Seven actual input and
+five source/link guards pass/reject. New counter/key/error contracts pass.
+Native gate first stopped on changed build inventory; reviewed changed files,
+added10NVS tool inputs, updated explicit hashes/disposition, did not bypass gate.
+Second native79334/946dd8 terminal0:6298checks,3727privacy,26nothrow,16map controls.
+Six artifact checks848adc terminal0 using new explicit --resources argument.
+
+Independent network58264/9f97ba terminal0: Wi-Fi setup/HTTP/settings persistence,
+reboot/coldboot/reset and threefresh SNTP phases, no LCD device. Independent
+LCD84889/71e571 terminal0: onefactory+onenative coldboot,57600pixels exact.
+All4ownedVMs exited; initial non-escalated CIM call was inaccessible and its
+absence inference discarded. Final fail-fast escalated CIM51acc3 verified all4
+matching owners absent. No foreign processes, physical board/serial/reset/flash,
+QEMU source, push or global SDK changed.
+
+Proof nvs-recovery-validation-20261026.json:23gzip/250808B/51sourcepins. Final
+reader62193 is collecting/replaying; obtain terminal0 before committing. Next
+full Storage.init/multisector repair/power cuts and TIM/null/station+820/BSS/
+aliases. Deferred1–3/full/24h/hardware remain open, goal ACTIVE.
+
+Final reader62193/e7059c terminal0; all phases reproduced,51pins,7+5+6controls. No pending exec or ownedVM at this checkpoint. Stage/scan/commit current fix; factory-audit baseline remains7ebe96846.
+
+Precommit scan1686ee checks52staged files/23expandedgzip/2LFS data/51pins; no unresolved sensitive findings. Four generic PEM parser constants classified against official SDK header. No push; currentapp34CB/73BE remains frozen.
+
+## 26 October 2026 — full Storage init/read and multi-sector before evidence
+
+Previous goal turn made concrete progress in c95e3674b. Verified clean HEAD and
+continued user factory item4 in small-tv-nvs-fixes without changing production
+34CB/73BE or any existing proof/build/network/LCD input. Added only analysis
+sources/tests/docs, source SDK5.5.4/6.1 and QEMU remain unchanged.
+
+Compiled unchanged SDK5.5.4 PageManager/Storage twice with the same qualified
+GCC14 profile; objects5bcb5625/aed3fbcf, canonical provenance and resolved DWARF
+carrier ELF are byte-identical. The full factory Storage.init is42041d38/314B,
+PageManager.load42043314/620B, Storage.readItem42041740. New strict qualification
+follows every named direct call from init/read,71factory bodies8750B and53native
+7630B; no unqualified NVS algorithm/relaxed identity. Standard array new/delete,
+allocator/string copies and synthetic Partition API are explicit boundaries;
+actual C2 ROM CRC code/table executed. Factory array OOM abort is not replaced
+by a claimed real NULL path; this fixture boundary is explicitly synthetic.
+
+Resolved DWARF independently verifies Storage104B/PageManager40B/Page84B/
+NamespaceEntry28B/BlobIndexNode40B and all used offsets/virtualslots. First CPU
+prototype used get_readonly slot36, reached PC0, and was corrected to real slot40
+before accepted runs; actual slot guards and offset mutants prevent recurrence.
+No QEMU emulation defect or production SDK fix was inferred from that fixture bug.
+
+Full literal CPU baseline:9wire images pervariant plus fresh stable reopens,
+ordering/duplicates/FREEING before and after target activation/BLOB publication/
+two-chunk reads. Real Storage.readItem returns factoryNOT_FOUND for old valid
+BLOB + uncommitted new generation in the same page; current returns oldA.
+Cross-page uncommitted generation retainsA, published new index returnsB,
+two-chunk returnsAB. Thus prior Page fix now has a complete Storage witness.
+Six additional cases use sixactualNVS sectors24576B:5used+reserve,6writable
+NO_FREE_PAGES,6readonly successful unchanged reads. No fabricated sector size.
+
+460actual faults (224factory/236native) cover every observed non-512-byte I/O
+ordinal on4new inter-sector paths, each before/half-transfer. Retained media
+is independently replayed from issued physical program/erase prefixes. All460
+fresh Storage retries retain expected values. However higher layers hide130
+factory and134native errors: error contract false. PageManager ignores some
+search/erase returns; Storage lookup loops and private void cleanup helpers lose
+I/O errors, init can become ACTIVE despite an underlying failure. This is new
+unfinished corrective work, not a pass waived by successful fresh retry.
+
+8actual source/frame/call/ABI mutations are rejected. Repeated analysis builds
+13e573 and public strict closure90cd77 completed0. Producer24173/0c164f completed0;
+geometry29546/bb5f43 completed0. Proof nvs-storage-before-validation-20261026.json
+archives9newgzip536773B/60sourcepins and reuses prior3objects/config/ROM witness.
+Consumer53022 is replaying; require terminal0 including5report controls before
+staging/committing. No new firmware build, VM, board/serial/reset/flash or push.
+
+NEXT exact I/O propagation through PageManager/Storage, no subsequent I/O,
+INVALID storage, preserve normal NOT_FOUND. Return status from private cleanup
+helpers with consistent declarations/definitions. Use exact-SHA guarded local
+NVS component source/header copy; do not patch shared SDK, invent global error
+state, misuse enum fields, or leave inconsistent class declarations across TUs.
+Preserve all34CB/73BE before inputs in this worktree; create separate task
+worktree for the production correction. Then rerun before/after fault matrix,
+archive new app, independent native/network/LCD checks. Remaining TIM/null/
+station+820/BSS/aliases and deferred1–3/full/24h/hardware remain open. Goal ACTIVE.
+
+OOM checkpoint:4custom malloc failures reproduce40Btemporary leak at second BlobIndex allocation, both factory/native. Proof10gzip539365B/61pins; finalreader47042 pending. Add cleanup-on-all-exits to next correction. Firstreader53022 failed only numeric-key vsJSON string-key equality, canonicalized without changing archived bytes.
+
+Final reader47042/2a9a74 terminal0, all18+18+460+460+6+4cases and8+6controls reproduced. Native upper-error and temporary-cleanup false; data preserved in selected retries. No pending exec/VM. Stage scan26files/10gzip/61pins clean; ready for focused baseline commit, then production fix in a separate worktree preserving this snapshot.

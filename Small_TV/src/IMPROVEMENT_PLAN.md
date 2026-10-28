@@ -353,6 +353,24 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [full Storage before](tests/NVS_STORAGE.md) квалифицирует71factory/
+53native функций и исполняет Storage.init/read с реальными PageManager/Page/CRC.
+18baseline+18reopen,460fault/retry и6six-sector cases подтверждают прошлый BLOBfix,
+но находят ещё134native/130factory скрытых I/O errors. Данные во всех выбранных
+retry сохраняются; верхний error contract false. NEXT — точный возврат ошибок
+через PageManager/Storage, private cleanup status и локальный SDK component overlay,
+с сохранением текущих before inputs. App34CB/73BE/общий SDK/QEMU неизменны.
+Четыре custom allocation failures дополнительно воспроизводят утечку40B
+temporary BlobIndexNode при втором OOM; освободить temporary list на всех exit paths.
+
+26Oct: [NVS recovery](tests/NVS_RECOVERY.md) исправлен локальным source patch:
+счётчики ERASED/ILLEGAL/tail, полная identity hash-кандидата, точный BLOB chunk,
+возврат recovery I/O errors. App34CB/ELF73BE сохранены; общий SDK/QEMU не менялись.
+27record+27reopen+12FULL/FREEING,130fault/reopen/stable cases и прежние652partial
+executions проходят; сеть и точный LCD проверены отдельно. Дальше full Storage/
+многосекторные faults и реальные power cuts, TIM/null/station/BSS/aliases.
+Deferred1–3/full/24h/hardware gates сохраняются.
+
 26Oct: [NVS records before](tests/NVS_RECORDS.md) воспроизводит три настоящие
 унаследованные ошибки: счётчики ERASED/ILLEGAL, удаление чужого ключа при
 24-bit hash collision и смешивание BLOB chunks/generations. Замыкание вызовов
