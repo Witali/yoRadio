@@ -9,6 +9,7 @@ idf_component_register(
          display/clock_ui.c display/factory_timer.c display/factory_photo.c display/factory_animation.c display/factory_fonts.c display/ui_renderer.c media/assets.c media/photo_upload.c media/photo_codec.c media/photo_worker.c media/photo_storage.c media/color_convert.c network/wifi.c
          network/dns.c network/dns_packet.c services/time_sync.c services/timezones.c services/weather.c services/weather_parser.c web/server.c
          network/wifi_timer.c
+         platform/nothrow_new.cpp
          web/request_body.c web/settings_api.c web/photo_api.c web/photo_async.c text/text.c
          ../third_party/tjpgd/tjpgd.c ../third_party/cjson/cJSON.c
          ../codec/jpeg_privacy.c ../codec/jpeg_baseline.c ../codec/jpeg_decoder.c ../codec/jpeg_memory.c ../codec/jpeg_backing.c ../codec/jpeg_coefficients.c
@@ -32,6 +33,14 @@ target_link_libraries(${COMPONENT_LIB} PRIVATE small_tv_jpeg_vendor)
 # audit checks wdev_funcs_init and ppTask's actual ROM/table ingress path.
 target_link_options(${COMPONENT_LIB} INTERFACE "LINKER:--wrap=pp_timer_do_process"
     "LINKER:--undefined=__wrap_pp_timer_do_process")
-target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Werror=implicit-function-declaration)
+
+# Keep ordinary scalar/array nothrow allocation out of the throwing SDK path.
+# Force extraction of this archive member even when only SDK code refers to it.
+target_link_options(${COMPONENT_LIB} INTERFACE
+    "LINKER:--wrap=_ZnwjRKSt9nothrow_t" "LINKER:--wrap=_ZnajRKSt9nothrow_t"
+    "LINKER:--undefined=__wrap__ZnwjRKSt9nothrow_t"
+    "LINKER:--undefined=__wrap__ZnajRKSt9nothrow_t")
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra
+    $<$<COMPILE_LANGUAGE:C>:-Werror=implicit-function-declaration>)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE CJSON_NESTING_LIMIT=16)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE DEBUG=$<BOOL:${DEBUG}>)

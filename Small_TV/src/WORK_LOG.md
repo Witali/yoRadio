@@ -5085,3 +5085,334 @@ findings не объясняются этим invalid-ID исправление�
   boot and running guards. Old main/V8 metadata controls retain all eight original
   identities and444/437 cycles. These pending prefixes do not establish H10/8h.
   Source trees, shared SDK/ROM/helpers and pinned executables are now protected.
+
+## 2026-10-25 — factory item4: real PM cancellation and recovery comparison
+
+- Qualified native timer layouts from linked DWARF and factory alarm/marker
+  predicates independently. Eight literal RV32 predicate cases, eight decoder
+  cases, ten rejection cases and four uninitialized/ROM-unbound cases pass.
+- Observed natural station disconnects on fresh factory/native QEMU copies.
+  Native keep-alive is armed at pm_stop exit, then cancelled by the immediately
+  following cnx_sta_leave call. Hardware entry/return observations show alarm
+  cleared before deadline. ROM/OSI/backend ownership remains bound; native HTTP
+  recovers. No SDK patch justified for this path.
+- Factory baseline already inactive: armed cancellation not proved. FactoryHTTP
+  did not recover after APreturn; PMinactive/apphint2 persisted. Combined report
+  stays failed. Exact stall cause and QEMU dependence remain open.
+- Archived five bounded raw records/9956gzipbytes and exact input pins. Offline
+  replay passes/nine altered-evidence controls rejected, including forgedfactory
+  pass/full-lifecycleclaim. Both finalVMs absent, oneROMboot/no panic each.
+- CIM18:37:44UTC: all12protected originalowners match, pending diagnostic243 /
+  matchedmain682/V8=674cycles, runningguards/noUARTerrors. Not final duration
+  acceptance; frozen sources unchanged. Points1–3 remain deferred.
+
+## 2026-10-25 — factory item4: narrowed disconnect stall beyond station leave
+
+- Matched entire factory/native cnx_sta_leave against exact wl_cnx.o archives:
+  662/628 linked bytes and PMstop binding. All caller branches/lifetimes remain
+  outside this static identity result.
+- Final new owned factory trace observes ten boundaries. PMstop and complete
+  leave/tail-helper return, as do ROM crypto and indirect SDKcallback. SDK event
+  post with ID5/41bytes returns0; application callback isn't reached in bounded
+  observation after APreturn. Cause and actual queue/delivery remain open.
+- Corrected an exploratory observer's uncleared hardware breakpoint; excluded
+  that invalid run and all prototypes from final evidence. No firmware patch.
+- FinalVM37708 absent at18:55:01UTC, oneROMboot/no panic; owned cleanup/controller
+  completion/source rehash pass. Saved four raw records/12414gzipbytes; offline
+  replay and nine rejection controls pass. Continue event delivery/preceding
+  handlers, with no assumption that the driver or QEMU caused the stall.
+
+## 2026-10-26 — factory reconnect failure explained; native correction verified
+
+- Confirmed original successful startup removes both app event handlers after
+  its first lease. Actual unregister IP0/WIFI_ANY calls and both zero returns
+  observed at boot. Added the existing correction's FIXED_RECONSTRUCTION comment
+  to native network_init; executable code and firmware artifacts unchanged.
+- Traced real factory queue send→dequeue→SDK handler→return. Event5 reaches the
+  dedicated sys_evt task; its application callback has already been removed.
+  This closes the specific recovery-cause question without a QEMU/SDK patch.
+- Added24 literal full-dispatch cases/all21instruction starts,9 selected startup
+  tail/error cases,9 native callback events,6metadata cases/15rejection controls.
+  Decoder and byte qualification are separate modules; payload/stack not exported.
+- Fresh native QEMU again clears connectivity, cancels keep-alive and restores
+  HTTP after APreturn. Final factory/native processes1388/40996 absent by actual
+  CIM10:24/10:14UTC, oneROMboot/no panic each. No board I/O. Observer normalized
+  to required GitLF before final capture; earlier11984 proof retained in scratch.
+- Archived six raw records/15223gzipbytes/20source pins; offline recomputation
+  passes and rejects11 altered runtime records. Historical failed factory gate
+  stays failed; retaining callbacks is an intentional native correction.
+- Previous long-test processes are all absent, with stale running files and
+  unaccepted654/1091/1081cycle prefixes. No restart or final acceptance claim;
+  preserved sources/metadata for later analysis. Continue factory item4.
+
+## 2026-10-26 — RV32 disassembly corrected before further factory call searches
+
+- Previous goal turn PROGRESS:25b8ef015. Continued the user's factory item4;
+  no return to deferred1–3, physical I/O, new VM or firmware build.
+- Reproduced ISA-less GNU interpreting factory712b at420aeb6e as RV64 C.ADDIW,
+  even with -m riscv:rv32. Independent RV32 execution proves C.JAL to420af10a,
+  RA420aeb70 and unchangeds6. Added a separate code-only ISA-view module with
+  real-decoder canary, immutable byte/tool hashes and bounded temporary cleanup.
+- Updated selected IROM exporter; added full executable-region exporter and
+  raw-byte/call/graph audit as separate tools. Transfer assistant recovers old
+  compact calls with visible warnings, rejects other RV64 input and preserves
+  canonical compressed/numeric-register stack hints. No native behavior changed.
+- Full export813936B/288036rows preserves all287952old rows and396GP accesses;
+  -z adds84zero halfwords/168B.453C.JAL candidates previously443c.addiw/10.insn.
+  Against frozen5143-functiongraph:448matching refs/452known targets, five sites
+  remain explicit. No reachability or semantic-completeness claim from listing.
+- All29tests pass without skips, including every2048compact encoding through
+  literal RV32 and actualGNU. Evidence reader recomputes graph/byte/call audit,
+  reruns tests and rejects8report alterations plus one actual wrong GNU target.
+  Final consumer exec0c42ea terminal0. Prior output was unavailable after context
+  compaction; verified original consumer absent before rerunning only the reader.
+- Saved3gzip11468B/10sourcepins and reused hashed graph ancestor/delta payloads.
+  Documentation distinguishes old byte audit from misleading mnemonic searches.
+  NEXT qualify five call sites and SDK boundaries, then remaining TIM/null,
+  station+820 lifetime and negotiated-period ranges. Whole-image/final full/
+  independent network/display/duration/hardware acceptance remains open.
+
+## 2026-10-26 — five runtime call owners qualified; shared nothrow OOM defect found
+
+- Previous goal turn PROGRESS79fc5c424. Continued factory item4 in the same task
+  worktree. Factory/native ELF, app, SDK, QEMU and frozen inputs intact; no VM,
+  physical I/O or firmware rebuild.
+- Qualified10factory/508B and9native/496B complete SDK/runtime bodies. All five
+  compact-call sites bind named relocations to checked targets. Seven pinned
+  objects used; factory compiler identity and whole-SDK equivalence not claimed.
+- Scalar/array nothrow bodies look alike. Resolved the exploratory naming trap:
+  actual _ZnajRKSt9nothrow_t→_Znaj veneer→_Znwj, verified against native symbols.
+  Only native Unwind_Resume absent. Tiny body-only matches cannot name callees.
+- Executed176literalRV32 cases:132panic frames/restore/mret, allocations0/1/512/
+  UINT32_MAX, handler retry, TLS null/empty/one/two and explicit landing pads.
+  Returning panic callback/direct EH entry are artificial controls. Invalid empty
+  private stub bytes fixed before final execution; not a firmware CPU exception.
+- NTH-ALLOC-FAIL confirmed in both images: mallocNULL/no-handler makes nothrow
+  array new abort before returningNULL. Factorycaller42040efc requests512B and
+  has a NULL branch. Desired contract stays false. Fix this next, preserving
+  shared SDK/frozen builds and testing actual NVS/network error handling.
+- Saved10gzip62267B/12sourcepins. Consumer recomputes19bodymatches/176cases,
+  13inputrejections and7reportcontrols, including forgedOOMfix. Original images,
+  library and object pins rechecked. No persistent Ghidra recovery yet.
+- Broad exploratory compiler scan stopped by verified process handle/creation
+  identity; originalexec90076 terminal1, no pass claimed. Narrow object scan
+  completed normally. NEXT safe nothrow path, source/target tests/production app;
+  then remaining TIM/lifetime/BSS/aliases and wider deferred acceptance gates.
+  Final offline consumer exec3a80d5 terminal0 with all176cases and13+7controls;
+  desired OOM contract staysfalse. Firmware fix and acceptance remain open.
+
+## 2026-10-26 — native nothrow OOM corrected and production firmware verified
+
+- Previous goal turn PROGRESS: cfd5cb9f3. Added one platform CPP module with a
+  shared allocation loop and two ordinary nothrow wrappers. Failure/no-handler
+  returns NULL; zero size, retries, handler changes/nonreturn and free ownership
+  are preserved. No shared SDK patch, physical I/O, new endpoint or Flash writes.
+- Post-link verification matches all three bodies and the complete NVS Page::load
+  caller. Both global and file-local helper targets are checked. Added CPP and
+  checker files to source manifests, and made the 26 CPP cases mandatory in the
+  ordinary native gate. Restored the missing earlier Wi-Fi timer guard inventory
+  row; simple C-linkage/noexcept parsing and omission controls now cover 223 app
+  source definitions. All 16 inventory tests pass.
+- Final DEBUG-off app 4F2C / ELF EB20 / source 5B6252 saved in development:
+  1475840 bytes, 640 fewer than C912, 58 bytes of new helper/wrappers and 60160
+  bytes free in the app partition. Final build session 50378 completed with exit 0;
+  executable bytes equal the initial build; strengthened-checker metadata differs.
+- 26 host and 26 literal RV32 cases passed, including four NVS outcomes. The real
+  old 9E NVS path aborts; the new EB20 path returns ESP_ERR_NO_MEM. Partition I/O,
+  memset, malloc/handler and free are declared private CPU boundaries. Upper
+  startup ESP_ERROR_CHECK remains fatal on an NVS initialization error; this is
+  not global OOM recovery. Getter mutex constructor registration and pthread
+  initialized-mutex source path were inspected separately, not called full
+  transitive RTOS execution.
+- Final ordinary native gate session 33184 completed with exit 0: 6300 native
+  checks, 3727 privacy assertions and 26 CPP cases. Initial native observation
+  had 6298 checks; dispatch contains conditional async-wait CHECKs, so the counter
+  is an observed run value, not a fixed coverage requirement. No assertions or
+  thresholds were relaxed. Six independent artifact checks also pass.
+- Final network session 93791 completed with exit 0: HTTP setup/scan/configure,
+  software reboot, persistent cold boot and reset retain settings and fresh SDK
+  SNTP time. Separate display session 3351 completed with exit 0: one factory
+  and one native setup frame, all 115200 pixels exact, without network readiness
+  as an LCD gate. Four final VM owners 34392/21584/21168/35764 are absent by CIM
+  at 12:24:26 UTC; held network handles exited with code 0.
+- First network prototype expected the frozen helper subnet 10.0.2.15. The actual
+  configured SDK/VM uses 192.168.43.15; the new scoped predicate derives its
+  expectation from that VM. Prototype failed and closed; later independent runs
+  pass. Frozen helpers and QEMU remain unchanged. Private CPU prototype needed
+  an explicit ROM memset boundary; that fixture issue was fixed before capture.
+- Archived 14 gzip payloads / 124100 bytes / 30 source pins, reusing the previous
+  qualified runtime record. Final reader session 22193 / output 8f0061 exited 0:
+  before/after/static replay, 13 input controls, SDK clock arithmetic, two whole
+  frames and five runtime mutations. Full VM OOM injection, whole-image semantics,
+  full/24h and hardware acceptance remain unproved. Continue factory metadata,
+  caller matching, TIM/lifetime/BSS/aliases, then deferred points 1–3. Goal ACTIVE.
+
+## 26 October 2026 — qualified runtime metadata recovery
+
+- Continued the user's factory priority (item 4). Added RecoverFactoryRuntime.java
+  and separate specification/graph-validation/control modules. Ten complete
+  object-qualified bodies / 508 bytes now have precise names and extents in a
+  disposable Ghidra 12.0.4 read-only session. This is an analysis correction;
+  production app 4F2C / ELF EB20, SDK and QEMU remain unchanged.
+- Recovered panic, the disconnected nothrow landing pad and TLS destructor;
+  split DeleteException out of the overlong Resume body and trimmed end-catch.
+  Three functions created, 116 instructions added; enumerated 5140 to 5143.
+  FunctionManager separately reports 5145 to 5148. Its pre-existing five-record
+  difference is retained without interpreting it as completeness.
+- Detached return at 420a3e08 and forwarding abort stub at 420a3fe0 remain decoded
+  and explicitly unowned, ten bytes total. No SDK name is inferred from their
+  short byte patterns. Full metadata edits affect 19 exported function records,
+  including changed incoming-reference owners; all other graph content is retained.
+- Independent checker rebuilds full-object matches, every qualified instruction,
+  the entire graph delta, RV32 call targets/AUIPC-JALR and the existing bad_alloc
+  destructor data argument. All 453 C.JAL have exact call edges and target
+  functions afterward; before had five missing edges and one unknown target.
+  This does not prove their reachability or whole-image semantic equivalence.
+- Both successful headless executions finished with exit 0 and explicit
+  read-only discard footers; first session 24902, final session 85890. Original
+  and copied project inventories all match the ten original file hashes after
+  execution. No byte patches, persistent metadata saves, VM, physical serial,
+  reset or flashing performed. Failed Python checker prototypes were corrected
+  before final validation: branch_target raises on indirect code, and a PARAM
+  pointer needs object relocation plus the existing edge, not an adjacent LUI.
+- Archived six new gzip payloads / 11097 bytes / 17 source pins, reusing the old
+  complete graph and seven runtime objects. Consumer output 61b949 completed 0;
+  all 20 actual altered-input controls were rejected. Existing runtime evidence
+  replay output 1b9dd6 also completed 0: 176 literal cases, 13 input and seven
+  report controls, with the historical failing-before OOM flag preserved.
+- Read-only inspection places factory allocation call 42040efc in Ghidra body
+  42040e56..42040f8e (312 bytes). Complete SDK-source identity is still pending:
+  factory SDK descriptor is v5.5.4, and its inline Header initialization differs
+  from current SDK6.1 object code. No relocation masks were weakened and no
+  compiler version was inferred. Next: caller identity, TIM/null-completion,
+  station lifetime, BSS periods/overflow and aliases. Broad goal remains ACTIVE.
+- Final staged-source check aacd3a confirmed all 17 pins equal Git index bytes
+  and production app SHA is unchanged. Final consumer 2ef9bb completed with exit
+  0 and repeated all 20 rejection controls. No active process from this checkpoint.
+
+## 26 October 2026 — full factory NVS caller and actual OOM path
+
+- Previous goal turn made progress in 9ef0130b1. Continued user item4 in the same
+  clean factory-audit worktree. Identified the complete factory caller42040efc
+  as nvs::Page::load42040e56..42040f8e,312B. Four factory bodies1442B and four
+  native bodies1158B fully match unchanged source objects with strict local
+  control flow/relocation/RELAX handling; no matcher or old ELF pin was weakened.
+- Downloaded the official GCC14 Win64 package only under this task's ignored
+  build directory. Its705866147B archive SHA c2734714… matches SDK5.5.4 tools.json.
+  Clean SDK735507283d5b, GCC14 esp-14.2.0_20260121, RV32IMC/Newlib/Og/no-shrink-wrap
+  produce the full match. This is a sufficient matching profile, not proof of
+  the factory compiler version or complete configuration.
+- Early exploratory GCC15/14 compiles mixed the current Picolibc config with
+  Newlib headers and failed. Consistent Newlib succeeded. Standard Os/O1/O2/Og
+  alternatives did not fully match; Og with shrink wrapping disabled did.
+  Diagnostics remain ignored, not promoted as successful proof. The public
+  fixture compiler now uses eight SDK include roots and explicit inputs.
+- Two clean analytical builds0b2052/a3b38d finished0. Object9ed443fe… and
+  layout-carrier314324a8…, plus canonical provenance, are byte-identical in
+  separate output directories.258dependencies/34SDK files pinned. Source SDK
+  and current SDK6.1 remain clean; no production/bootloader/flash image built.
+  GNU ld resolves debug relocations in the carrier because this elftools version
+  cannot relocate RV32 ET_REL DWARF; carrier code is not executed as a firmware.
+- Both DWARF profiles show Page84B/base8/state12/seq16/version20/used64/erased66/
+  partition80/read_raw-slot12. Source Page::load and CRC bodies are identical
+  across SDK versions. Current C2 code is304B with out-of-line Header constructor;
+  factory is312B with an inline reserved-byte loop and separate find helper.
+- 394 actual caller cases (197 each) passed every full Page-byte/return/ABI/
+  ownership check and reached all120/118caller instruction starts.442 direct
+  factory find cases reach all51helper starts, covering0..9/127/128/129 lengths,
+  every dirty index and all-erased, with an independent bounds-read hook.
+  Normal caller matrix uses explicit nullable allocator, partition, ROM CRC and
+  entry-table boundaries. The factory NULL allocation case is synthetic.
+- Two additional cases run real allocator/helper/throw-stub instructions from
+  the actual NVS caller: factory mallocNULL/no-handler reaches abort before its
+  NULL branch; current wrapper returns ESP_ERR_NO_MEM with preserved ABI. This
+  extends the prior4bb10a376 fix witness; it is not a new app change/global OOM
+  recovery or full-VM fault injection. No VM, board/serial/reset/flash touched.
+- Found an actual source difference behind the entry-table delegation:
+  SDK6.1 DEFAULT_PURGE_AFTER_ERASE=true adds purgeEntry and purge arguments.
+  Its970B factory/822B native bodies match statically; their repair algorithms
+  and flash-fault behavior were not executed here. Preserve the difference and
+  test it next rather than silently disabling the current purge behavior.
+- Proof factory-nvs-validation-20261026.json archives11gzip185441B/20sourcepins,
+  reusing previous runtime/wrapper qualifications. Consumer83649/bf8c31 finished0:
+  394+442+2CPUcases,13actual input mutations and5report mutations all pass/reject.
+  Package provenance, source identity and explicit scope limitations are checked.
+  Plan/notes updated: actual entry-table repair/writes/faults next within item4,
+  then TIM/null/station/BSS/aliases. Deferred1–3 and full/24h/hardware remain open.
+- Final replay78978/e4246d completed0 after the last source-pin refresh; all
+  394+442+2 cases and13+5 controls repeat successfully. Earlier metadata proof
+  replay852092 also completed0 with20controls. Staged-source check99e25a confirms
+  all20pins equal Git index bytes and production app SHA unchanged. No pending
+  process from this checkpoint; no push performed.
+
+## 26 October 2026 — actual partial-record NVS repair and writes
+
+- Previous turn made progress in eede53e52. Continued factory item4 into actual
+  mLoadEntryTable/bitmap/purge instructions. Added separate helper qualification,
+  private Partition API fixture, partial-record CPU suite, mutation controls and
+  evidence reader. Factory3bodies1106B/native6bodies1108B fully matched existing
+  source objects; prior decoder/source/ELF pins remain unchanged.
+- All126slots pass in both images. Factory programs one4B bitmap word; native
+  also programs32zero bytes for the recovered slot. Full4096B sector comparison
+  proves other payloads/reserved bits unchanged.252fresh reopens and12clean
+  ACTIVE/FULL/FREEING baseline runs cause no additional program/erase operations.
+- 68failures cover each observed API ordinal for slots0/15/16/125, both failure
+  before transfer and half-transfer/error.68new private Page instances reuse
+  the real altered bytes and recover logical capacity. Return0x104/INVALID,
+  used/erased/first/next counters, ABI and unrelated Page fields are checked.
+  Total252repair+252reopen+12baseline+68fault+68recovery=652CPU executions.
+- Physical NOR1->0 programming, retained partial bytes and bounds are enforced
+  at the Partition API fixture. This is not a new generic SPI model or a claim
+  about WIP/timing/arbitrary bit cuts. No firmware, SDK, QEMU or physical action.
+- Ten native error cases leave16..32nonzero synthetic payload bytes after retry:
+  bitmap is alreadyERASED, so reopening skips cleanup. Includes partial bitmap
+  programming and purge failures. Original operation returns an error. No full
+  secure deletion guarantee or automatic purge-disable change is introduced.
+- Prototype fixtures initially omitted native outlined bitmap get/set helpers;
+  actual PCs42008276/42008390 identified the missing code and both complete
+  helpers were qualified. The last-slot oracle also needed the exact distinction:
+  in-flight repair ends at126, a fresh all-non-EMPTY scan leaves INVALID_ENTRY.
+  Assertion now derives this from retained bitmap bytes, not a relaxed range.
+  A JALR target mutant first toggled ignored bit0; corrected it to bit1 so the
+  actual address changes. These were fixture/control corrections, not app fixes.
+- Final target-v6 run cbd9d2 completed0. Source/fixture mutation run4fcf20 rejects
+  11actual inputs. Initial consumer57870/596e0b completed0, recomputing all652
+  executions and7report controls. Threegzip44243B/25sourcepins reuse the prior
+  factory object and base qualification. Updated plan preserves remaining
+  ILLEGAL/WRITTEN/corrupt/span/duplicate/HashList/eraseEntryAndSpan branches,
+  then TIM/null/station/BSS/aliases and deferred1–3/full/24h/hardware scope.
+- Final reader20605/226540 completed0 after report-control refinement. It rejects
+  an actual pre-program-media rollback and a forged successful32Bpurge failure,
+  not arbitrary unrelated records. All652executions/11input/7report controls pass.
+  Staged check27baf6 confirms all25pins equal Git index bytes and appSHA unchanged.
+  No current exec/VM or physical process from this checkpoint; no push performed.
+
+## 26 October 2026 — inherited NVS record defects before correction
+
+Full Page/Item/HashList direct-call closure qualified: 19 factory functions /3368B,
+20 native /3062B. Item/HashList unchanged SDK5.5.4 objects and canonical provenance
+are byte-identical across two analytical builds. Actual official C2 ROM CRC code
+and table executed; 192 cases reach all60 instruction starts/all256 table indices.
+528 real header cases reach all109factory/85native starts, including bad CRC,
+span/type/bounds. 23 records+11malloc failures eachvariant, full bitmap/lookup/
+ABI/cache ownership checks. Seven actual input controls and six report controls.
+
+Both factory and app4F2C/ELFEB20 have three real inherited defects: wrong erased
+counts for ILLEGAL/alreadyERASED children, destructive 24-bit hash-collision
+candidate handling, final duplicate lookup ignoring BLOB chunk/generation.
+The published-index scenario retains a valid old index while mistakenly deleting
+its old data chunk. Full Storage.init/powercut is still untested. These are
+explicitly failing desired native contracts, not a parity success or a QEMU bug.
+No shared SDK, production app, VM/board/serial/reset/flash or push changed.
+
+New proof nvs-records-before-validation-20261026.json:9gzip/202203B/33sourcepins.
+Scratch .build/factory-nvs-records-20261026, source objects replay identical.
+NEXT local, exact-SHA-guarded SDK source corrections with FIXED_FACTORY marks;
+keep before app/ELF and source pins immutable, preferably use a separate task
+worktree for production changes. Fix counters, verify real namespace/key/chunk
+identity for hash candidates, pass exact chunk to final findItem. Retain type
+replacement semantics. Then fault/reopen tests, build/archive app, independent
+network/display checks. Other factory/TIM/lifetime/BSS/aliases and deferred1–3,
+full/24h/hardware remain open. Goal ACTIVE.
+
+Final before-evidence reader99701/e31951 terminal0:192CRC+528header+46record+22OOM;7input+6report controls. Staged scanner2d5a98 checked22files including9decompressed archives,33pins match Git index, no credential/contact/private-path findings. No push.

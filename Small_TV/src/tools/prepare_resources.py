@@ -240,6 +240,7 @@ def main():
         (args.output/'jpeg-library-build.json').write_bytes(metadata.read_bytes())
         jpeg_generated.append('jpeg-library-build.json')
     compiled = sorted((ROOT / "app").rglob("*.c")) + sorted((ROOT / "app").rglob("*.h"))
+    compiled += sorted((ROOT / 'app').rglob('*.cpp'))
     compiled += sorted((ROOT / "third_party").rglob("*.c")) + sorted((ROOT / "third_party").rglob("*.h"))
     for directory in ('codec', 'storage'):
         compiled += sorted((ROOT / directory).glob('*.c')) + sorted((ROOT / directory).glob('*.h'))
@@ -248,6 +249,7 @@ def main():
     compiled += sorted(p for p in (ROOT / 'third_party/libjpeg-turbo').rglob('*') if p.is_file())
     compiled += [ROOT / 'tools/build_jpeg_library.py', ROOT / 'tools/prepare_resources.py', ROOT / 'build.ps1']
     compiled += [ROOT / 'tools/verify_wifi_timer_guard.py', ROOT / 'tools/reverse/elf_archive.py', ROOT / 'tools/reverse/rv32_link_match.py']
+    compiled += [ROOT / 'tools/verify_nothrow_linkage.py', ROOT / 'tools/reverse/nothrow_linkage.py']
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     compiled += [ROOT / "cmake/debug_logging.cmake"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]

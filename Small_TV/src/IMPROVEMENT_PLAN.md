@@ -1,6 +1,6 @@
 # План улучшения восстановленной Small TV
 
-Обновлено: 2026-10-25. База: `main` / `51cd114f9`.
+Обновлено: 2026-10-26. База: `main` / `51cd114f9`; текущие checkpoints ниже.
 
 Цель — восстановить полезное поведение заводской прошивки ESP32-C2, исправляя
 её подтверждённые ошибки. Сопоставлять ассемблер, декомпиляцию и наш C-код в обе
@@ -353,6 +353,76 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [NVS records before](tests/NVS_RECORDS.md) воспроизводит три настоящие
+унаследованные ошибки: счётчики ERASED/ILLEGAL, удаление чужого ключа при
+24-bit hash collision и смешивание BLOB chunks/generations. Замыкание вызовов
+19factory/20native функций полностью сопоставлено; 192 real-ROM CRC, 528header,
+46record и22OOM cases. Это failing-before: native counter/key contracts false.
+Следом локальные SDK source corrections, сохранив исходные inputs; затем fault/
+reopen matrix и отдельные сеть/дисплей. Общий SDK/app4F2C/EB20 пока неизменны.
+
+26Oct: [partial NVS repair](tests/NVS_PARTIAL_REPAIR.md) проходит652CPU cases:
+все126slots обеихверсий, повторное открытие, clean states и68fault/recovery pairs.
+Factory программирует4Bbitmap, native ещё32Bданных; erase0/reopen writes0.
+Частичные физические эффекты сохраняются. В10native failures повторный scan
+пропускает ужеERASED payload16..32B: secureerase не заявлен, ошибки не скрыты.
+11input+7report controls pass. App4F2C/EB20/SDK/QEMU не менялись. Следующие
+factory ветки: ILLEGAL/WRITTEN/corrupt/span/duplicate и реальный eraseEntryAndSpan/
+HashList; после них TIM/null/station/BSS/aliases. Остальные gates сохраняются.
+
+26Oct: [factory NVS](tests/FACTORY_NVS.md) полностью идентифицирует caller
+42040efc как Page::load42040e56..42040f8e/312B. Статически matched4factory тела/
+1442B и4native/1158B.197cases на каждом caller покрывают все120/118instruction
+starts,442find-helper cases покрывают все51starts, два real allocator OOMcases
+подтверждают factoryabort/nativeNO_MEM.13input+5report controls pass; повторные
+analytical builds byte-identical. Page::load/CRC source bodies одинаковы, но
+SDK6.1 entry-table repair добавляет DEFAULT_PURGE_AFTER_ERASE=true. Его actual
+algorithm/flash-fault matrix ещё не исполнен: это следующий factory шаг перед
+TIM/null/station/BSS/aliases. Не отключать новый purge ради паритета. App4F2C/EB20
+не менялся; whole-image/full/24h/hardware и отложенные1–3 остаются открытыми.
+
+26Oct: [runtime metadata](tests/RUNTIME_METADATA.md) закрывает пять конкретных
+C.JAL reference gaps. В transient read-only копии Ghidra восстановлены десять
+object-qualified тел / 508B, три новые функции и 116 инструкций. Все453 compact
+calls имеют точные ссылки и target functions. Десять detached bytes сохранены
+без угаданного владельца. Полный graph delta и20input controls проходят; исходные
+десять файлов проекта и production app неизменны. Это не закрывает whole-image
+семантику/достижимость. Дальше full factory caller42040efc, TIM/null-completion,
+station lifetime, BSS periods/overflow и aliases; затем отложенные points1–3.
+
+NTH-ALLOC-FAIL исправлен26Oct: [NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md).
+App4F2C/ELFEB20/source5B6252 DEBUGoff;1475840B, -640B кC912. Общие scalar/array
+nothrow wrappers возвращаютNULL на mallocNULL/no-handler; post-link подтверждает
+реальныйNVSPage::load→wrapper.26source+26literal RV32 cases, actual oldNVS→abort
+before/newNVS→ESP_ERR_NO_MEM after,13input и5runtime mutations pass.6300native,
+3727privacy,16inventory,6artifact checks; отдельные3networkphases и2exactLCDframes.
+Четыре finalVMowners отсутствуют поCIM, ни physicalI/O, ни sharedSDKpatch.
+Обычный throwingnew/over-alignment/globalOOM recovery не заявлены. Высший
+app_main NVSinit error остаётся fatal по прежней политике. Runtime metadata
+закрыта в следующем scoped checkpoint выше; caller/TIM/lifetime/BSS/aliases,
+points1–3 и finalacceptance всё ещё открыты.
+
+**Исторический failing-before checkpoint NTH-ALLOC-FAIL:** пять C.JAL gaps идентифицированы,
+но найден общий factory/native дефект: `new[](nothrow)` при mallocNULL/no-handler
+доходит до abort вместо nullptr. Caller42040efc запрашивает512B и проверяетNULL;
+literal RV32 before cases показывают обход его error branch. Проверены
+10factory/9nativeполныхтел,176cases,13input и7report negativecontrols.
+`desired_nothrow_oom_contract_passed=false`; это ещё не fix. Исправить nothrow
+allocation без патча shared SDK, проверить zero-size/new-handler/ownership и
+реальный NVS/network workflow; сохранить новую app. См.
+[RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md). Остальной factory scope и
+отложенные1–3 сохраняются. Transient Ghidra metadata recovery ещё открыто.
+
+Checkpoint26Oct: [RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md) исправляет
+декодирование factory C.JAL: ISA-less GNU ошибочно выдавал443c.addiw и10.insn.
+Теперь все813936codebytes экспортируются непрерывно;287952прежнихrows/396GP
+accesses сохранены,84нулевыхrows добавлены.29tooltests, все2048C.JALencodings
+в literalRV32 и realGNU,9evidencecontrols проходят. Из453callcandidates448
+согласованы с frozen5143-functiongraph,5 требуютboundary/reachability review.
+Это не453доказанно достижимыхвызова и не полнота сравнения. Нового firmwarebuild,
+SDK/QEMU изменения нет. Продолжать factory пункт по приоритету пользователя;
+остальные пункты предыдущего списка отложены, их scope не сокращается.
+
 Статус: **176 выбранных функций учтены; полнота всего образа не доказана**.
 Проверить indirect calls/callback tables, tasks/timers и handlers вне экспорта.
 Найти full-image xrefs NETWORK/SLOW flags, `browser_time`, `clickCount` и JPEG
@@ -403,6 +473,71 @@ Dispatch checkpoint25Oct: [WIFI_TIMER_DISPATCH.md](tests/WIFI_TIMER_DISPATCH.md)
 wdev_funcs_init pointer registration после link, invalid IDs и прежние valid IDs.
 Отдельно разобрать событие11: factory max_idle/native keep_alive wrappers
 соответствуют по форме, transitive callee semantics пока не подтверждены.
+Event11 checkpoint25Oct: [WIFI_TIMER_EVENT11.md](tests/WIFI_TIMER_EVENT11.md)
+проверяет восемь полных тел против собственных версий SDK и 9776 исполнений
+реальных инструкций: wrapper, handler, rearm и parameter setter в каждом образе.
+Все 186 instruction starts покрыты, 11 static и 5 evidence controls отвергнуты.
+Подтверждены различия pending latch, дополнительных state writes, rearm gating,
+fallback и представления периода. OSI ABI8/9 и три forwarding slots проверены;
+runtime binding, timer initialization/flag producers, допустимые protocol ranges
+и влияние на часы ещё не доказаны. Переполнение не принимать за требуемую норму.
+По указанию пользователя сначала продолжаем этот factory/whole-image пункт;
+CODEC-REPRO и остальные пункты предыдущего списка отложены. Уже запущенные
+duration/control ВМ сохраняются без изменения producer inputs и перезапуска.
+Registration checkpoint25Oct: [WIFI_TIMER_REGISTRATION.md](tests/WIFI_TIMER_REGISTRATION.md)
+сопоставляет ещё шесть SDK тел на каждый образ, проверяет96 registration/gateway
+states и реальную timer+492→producer→post8/{11,0} цепочку в приватном RV32 CPU.
+Два настоящих station boot подтвердили OSI pointer/480byte table и timer metadata;
+сырые ограниченные typed reads сохранены для replay. Инициализация исследованных
+флагов совпала; stored period60/30 не активен (enable52=0 в обоих). Следом сравнить
+старый отдельный pm_keep_alive/reset со свежим fallback, pm_start/stop и writers
+pending flag. Все initialization branches, queue delivery и RF ещё не доказаны.
+Keep-alive checkpoint25Oct: [WIFI_KEEP_ALIVE.md](tests/WIFI_KEEP_ALIVE.md) связывает
+12 полных SDK тел (4502bytes), включая старые predicate/reset и TIM/start/stop,
+с обоими TX-completion путями. 12108 private instruction executions проходят;
+граница rearm100000/100001us и 64-bit rollover проверены, 6 static controls.
+В выбранном null-completion family проверены условия очистки488 и связанные
+timestamp/rearm. Нулевой/удалённый station object и поле820 требуют дальнейшего
+lifetime/reachability анализа. TIM/start/stop и остальные null/failure branches
+ещё не исполнялись полностью; negotiated BSS ranges/overflow и RF остаются открытыми.
+PM lifecycle checkpoint25Oct: [WIFI_PM_LIFECYCLE.md](tests/WIFI_PM_LIFECYCLE.md)
+добавляет5224 исполнения полных start/stop и малых cancellation helpers. Все628
+instruction starts двух fixtures посещены; реальные SDK active-cancel и ROM
+sleep-delay trampoline/body исполнены. Повторные start/stop и8 сохранённых
+цепочек проверены. Прямой disarm492 есть в factory stop и отсутствует в native
+при явных platform stubs; это ещё не доказательство полной runtime-ошибки.
+Далее наблюдать настоящий g_pm_ptr и backend timer при естественном разрыве STA,
+квалифицировать layout перед чтением alarm; не вызывать отсутствующий linked API.
+TIM, null-failure, lifetime, negotiated ranges/overflow и прочие whole-image gaps
+сохраняются. Пункты1–3 по-прежнему отложены по приоритету пользователя.
+Runtime checkpoint25Oct: [WIFI_PM_RUNTIME.md](tests/WIFI_PM_RUNTIME.md) проверяет
+реальные ROM/OSI bindings и backend alarm на естественном station disconnect.
+В native отмена вынесена в cnx_sta_leave сразу после pm_stop: настоящий helper
+и его возврат наблюдены, alarm очищается до срока, затем STA/HTTP восстанавливаются.
+Отсутствие прямого disarm492 в pm_stop не требует исправления на этом пути.
+Factory baseline уже inactive и не доказывает armed cancellation; восстановление
+HTTP после возврата AP не прошло, общий runtime report остаётся failed. Устаревший
+application state2 не считать connectivity bit; причина stall/роль QEMU открыты.
+Typed replay и9 evidence controls проходят; прочие callers/lifecycle/RF/hardware
+не закрываются этим опытом. Продолжить factory stall и остальные whole-image gaps.
+Factory-disconnect checkpoint25Oct: полные cnx_sta_leave сопоставлены с точными
+SDK wl_cnx.o (662/628 linked bytes). В новой factory VM наблюдены10 границ:
+pm_stop/leave/ROMcrypto/SDKcallback вернулись, event-post ID5/41B вернул0, но
+прикладной callback не достигнут в ограниченном окне после APreturn. См.
+[трассу](tests/WIFI_PM_RUNTIME.md#factory-follow-up-event-post-return-observed).
+Дальше event delivery/предшествующие appcallback обработчики; не объявлять
+потерю события, ошибку QEMU или блокировку конкретной задачи без наблюдения.
+Replay и9 controls проходят; factory recovery по-прежнему не принят.
+Handler-lifetime checkpoint26Oct: [WIFI_EVENT_LIFETIME.md](tests/WIFI_EVENT_LIFETIME.md)
+закрывает поиск причины этого factory stall. После первого GOT_IP заводской
+startup успешно unregister IP0 и WIFI_ANY callbacks (0x4200cdae/0x4200cdc0).
+Поздний DISCONNECTED принят очередью, извлечён sys_evt и обработан SDK; appcallback
+уже удалён. Новая native VM сохраняет обработку disconnect и восстанавливает HTTP.
+Это существующее исправление помечено в network_init; executable code не менялся,
+правка QEMU/SDK для этого сценария не нужна. 24 literal dispatch/9 startup-tail/
+9 native-event/6 metadata cases,15 metadata и11 runtime negative controls проходят.
+Другие startup/registry branches, TIM/null-completion, station lifetime, BSS
+диапазоны/overflow, whole-image aliases и финальные gates остаются открытыми.
 Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
 task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
 Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null

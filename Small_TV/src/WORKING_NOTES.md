@@ -1,6 +1,28 @@
 # Контекст работы над восстановленной Small TV
 
-## Текущий checkpoint — heap metadata, 2026-10-25
+## Текущий приоритет — заводской образ, 2026-10-26
+
+Рабочая копия `.worktree/small-tv-factory-audit`, ветка
+`codex/small-tv-factory-audit`. Продолжать пользовательский пункт4; к1–3 вернуться
+позже. Последний checkpoint и NEXT сохранены в конце этого файла. Ниже остаётся
+исторический контекст; старые `running` JSON не подтверждают живые процессы.
+Все12 прежних duration владельцев отсутствуют по CIM26Oct; прогоны не приняты.
+NTH-ALLOC-FAIL исправлен: app4F2C / ELFEB20. Десять runtime ranges восстановлены
+в transient read-only Ghidra: все453C.JALrefs есть,20negativecontrols pass.
+Factory caller qualified как Page::load312B. Partial-record bitmap/purge repair
+проверен652CPU executions. Следующий checkpoint воспроизвёл три настоящие NVS
+ошибки; исправить их локально, сохраняя failing-before inputs. Затем расширить
+fault/reopen проверки и TIM/null/lifetime/BSS/aliases. Текущие документы:
+[NVS_RECORDS.md](tests/NVS_RECORDS.md),
+[NVS_PARTIAL_REPAIR.md](tests/NVS_PARTIAL_REPAIR.md),
+[FACTORY_NVS.md](tests/FACTORY_NVS.md),
+[RUNTIME_METADATA.md](tests/RUNTIME_METADATA.md),
+[NOTHROW_ALLOCATION.md](tests/NOTHROW_ALLOCATION.md),
+[RUNTIME_CALL_GAPS.md](tests/RUNTIME_CALL_GAPS.md),
+[RV32_DISASSEMBLY.md](tests/RV32_DISASSEMBLY.md),
+[WIFI_EVENT_LIFETIME.md](tests/WIFI_EVENT_LIFETIME.md).
+
+## Исторический checkpoint — heap metadata, 2026-10-25
 
 Разработка продолжена в `.worktree/small-tv-memory-retention`, ветка
 `codex/small-tv-memory-retention`, от `b4a851041`. Основной H10 остаётся в
@@ -4132,3 +4154,681 @@ NEXT: revalidate owners/status, inspect any genuine failure-state snapshot;
 meanwhile advance CODEC-REPRO or selected whole-image/ID11 analysis independently.
 HTTP timeout cause, long acceptance, retained loss, actual I/O/power fault matrix,
 queued guest TCP samples, final independent gates and hardware remain open.
+
+## CURRENT 2026-10-25 — factory comparison takes priority; event 11 characterized
+
+User explicitly requested continuing item4 (factory firmware), then returning to
+items1–3. Do not advance CODEC-REPRO/JPEG fault/retained-memory fixes ahead of this
+factory audit. Existing three duration/control VMs remain protected and running.
+Created a clean worktree from d0c82d127, then renamed its unused initial CODEC
+branch/path to `.worktree/small-tv-factory-audit`, `codex/small-tv-factory-audit`.
+This tree is the active editable analysis tree. Frozen timer-bounds and memory-
+retention producer trees, SDK/ROM/helpers/QEMU executables stay read-only.
+
+Progress: timer_event11_match + independent model/instruction/test/consumer
+modules. Factory8C9F/native9E4E and exact old/new libpp archives pinned. Six event
+bodies plus two parameter setters matched completely, boundaries/data/calls bound
+to actual bytes. Factory setter starts74c12 after the intervening getter74c08;
+its encoding of the period differs from native. Finding raw delay formulas alone
+was insufficient. OSI480-byte tables are ABI8/9, not one shared ABI; three slots
+and whole forwarding wrappers checked. Legacy timer bodies are linked IRAM code,
+not ROM. Runtime OSI binding/complete timer backend still unqualified.
+
+9776 private RV32 executions pass:4632 event states per image plus128 setter+
+event states per image. All186 instruction starts in8 selected bodies visited.
+Caller-saved poison, preserved ABI/stack, exact SRAM writes/call arguments/order
+checked against independent models. 11 static and5 evidence mutations rejected.
+Raw-state pairs4344different/288equal are synthetic coverage, NOT a compatibility
+percentage. Native adds pending-action suppression, byte15-zero flag writes and
+fallback/changed rearm. Factory setter10 stores12 and later arms slot224 with6144;
+native stores10/adjustment2000000 and arms slot240 with8240000. Timer units differ.
+Documented wrap edges as observations, not desired behavior or a proven bug in a
+reachable clock path. Do not copy SDK bugs or revert modern SDK without evidence.
+
+Proof factory-event11-validation-20261025.json pins9 sources and7630-byte result
+gzip. Consumer reexecutes exact original code; final replay passed all5 controls.
+See tests/WIFI_TIMER_EVENT11.md. No firmware rebuild/change, VM launch, physical
+flashing, QEMU edit, long-run acceptance or whole-image equivalence in this step.
+
+Read-only CIM17:11:26–28UTC matched all12 original owner PID/name/creation times.
+Diagnostic-main64cycles; old metadata main/V8 controls505/498. Supervisors/guards
+running, no workload error. Diagnostic UART guard last observation one ROM boot,
+no errors. Details ignored `.build/factory-event11-20261025/live-observation.json`.
+These are pending prefixes, never H10/8h pass; do not combine durations.
+
+NEXT factory work: verify actual OSI pointer binding; match timer initialization/
+post11 and follow pm_set_bss_max_idle inputs, flag producers and valid protocol
+period ranges (including overflow boundaries). Then compare corresponding clock
+behavior, preserving improvements and correcting confirmed defects. Remaining
+whole-image computed aliases/function boundaries/SDK-application transitions are
+open. User-deferred items1–3 and final independent gates/hardware still remain.
+Broad goal remains active; this is a progress checkpoint, not completion.
+
+## CURRENT 2026-10-25 — event-11 registration and actual OSI binding verified
+
+Previous turn classified PROGRESS:7d8b50d88. Continue factory item4 first. Active
+editable tree remains small-tv-factory-audit. Producer trees/QEMU/SDK/helpers
+unchanged; appC912/ELF9E4E retained. This turn is another progress checkpoint.
+
+New static registration qualifier pins old/new libnet80211 and prior libpp;
+six complete SDK bodies per image (init, OSI register, pm_attach, timeout11,
+post, post-register) matched, plus actual timer_setfn forwarding adapters.
+Factory attach76792..76978, init68a9a..68bbc, register6819e..68206.
+Setfn is in flash962d0 / native9378c, forwarding to ets_timer_setfn; do not guess
+an IRAM wrapper. Actual old/new local cfg anchor names differ; bind addresses
+and object context, not identical .LANCHOR names across SDK versions.
+
+96 registration/gateway cases pass, including bad ABI/magic/null, already-bound
+pointer idempotence and real init error propagation. All five other selected
+SDK bodies plus setfn adapters covered completely. Init gateway intentionally
+exits at a stubbed API-lock error:26/99old,25/98new instructions only. Its later
+branches are statically matched but NOT dynamically covered in this checkpoint.
+pm_attach direct stores match independent model and registers ten timers;492
+is timeout11 with null arg. Invoke captured callback through real post body:
+outer8/{11,0}; absent callback returnsffffffff, installed callback status
+0/1/fffffffb propagated, remove/reset exercised. Backend helpers explicit stubs.
+
+Ran owned factory/native station VM pair twice: first observation passed; final
+pair adds retained raw typed reads so offline replay is independent of decoded
+passed fields. Final session98016 terminal0. FactoryPID43028/SmallTV-50e01a6c9d49,
+nativePID6280/SmallTV-b44080cb0c48; both absent by CIM17:27:06UTC after owned quit.
+Initial pair20828/22872 likewise absent. No leftover short VM or restarted long VM.
+
+Actual OSI global selects factoryABI8/nativeABI9 table, all480bytes match known
+SHA. One UART boot/no errors each. Connected PM bytes1/14/15/16/488=0/1/1/0/0,
+word36=1, configenable52=0 both, fallback28=10000000. Factorystoredperiod60 /
+adjustment0, native30/500000. These fields are inactive here; do not label them
+an observed timing regression. Timer word4=12121212 and word16 SRAM handle read;
+backend callback/queue delivery/RF still not proven. Source/firmware pins unchanged.
+
+Proof factory-timer-registration-validation-20261025.json:14 source pins,5gzip/
+27614bytes, no complete RAM/credentials/stack/payload. First consumer exposed
+JSON int-address keys vs serialized string keys; fixed canonical comparison,
+kept previous prototype proof in ignored scratch. Final consumer session10021
+ended0: all96 cases and both native observations replayed, four static mutations
+and six raw-runtime/owner/UART mutation controls rejected. Archive session71047
+ended1 for the diagnosed JSON comparison issue; no live process from either.
+
+Latest CIM17:28:21–27UTC matched all12 protected original process identities.
+Diagnostic-main99cycles, metadata main/V8 controls540/533; all supervisors/guards
+running, one ROM boot each/no UART errors, no workload error. Ignored snapshot:
+.build/factory-event11-registration-20261025/long-owners-after-short-tests.json.
+Not H10/8h acceptance and no duration aggregation. No launcher/poll timeout was
+treated as completion: sessions51918/78286/95000/98016/43387 inspected to terminal.
+
+NEXT: follow pm_start/stop and pending-flag writers, old separate pm_keep_alive /
+pm_reset_keep_alive path versus native unified fallback, then protocol period
+range validation and timer cancellation. Real post callback/backend ownership
+also open. Continue remaining full-image computed aliases/functions/SDK boundary
+audit. User-deferred1–3, final independent gates/H10 and physical gates remain;
+the broad goal remains ACTIVE. Do not edit frozen long-run producer inputs.
+
+## CURRENT 2026-10-25 — old keep-alive path and TX/pending boundaries characterized
+
+Previous turn PROGRESS:dfb452cce. Factory item4 remains first; no return to the
+user-deferred1–3. Active editable tree small-tv-factory-audit, current firmware
+C912/9E4E and frozen producers/SDK/QEMU/helpers unchanged. No new VM this turn.
+
+New timer_keep_alive qualifier matches12 full bodies/4502linkedbytes from exact
+old/new pm.o. Factory predicate40390590..4039061c, reset42074c5c/82B, TXdata
+42075896/196B, TIM4039061c/488B, start420763d8/580B, stop4207661c/374B,
+TXnull420759cc/514B. Native equivalents except absent predicate/reset:
+TXdata4207ad48/218B,TIM420d1b6a/356B,start4207b93e/568B,stop4207bb76/352B,
+TXnull4207ae8c/634B. Shared globals/calls and pm.o-scoped local anchors cross-
+checked against previous PM/configuration bodies. This prevents relocated data
+lookalikes from silently binding another configuration struct.
+
+Predicate is boolean elapsed-time check, called by real factory pm_process_tim;
+factory instructions4207a020/24 materialize/store its pointer in another table
+(full initializer/indirect caller table still to qualify).
+It compares fallback28 vs timestamp88, or sign-extended wrapped BSS product vs
+timestamp480. Document overflow as observed code, not a requirement to copy it.
+TXdata modern path coalesces rearm at elapsed>100000us; exactly100000 skips,
+100001 rearms. This is a comparison, not an explicit sleep/delay. Old reset and
+new rearm paths tested with actual child bodies, OSI clock paira0/a1 stub only.
+
+12108 executions:2664 oldpredicate,36 oldreset,4608 TXdata perimage and96 selected
+TXnull perimage. Four whole dynamic bodies cover213instruction starts; partial
+null61/174old,92/213new. TIM/start/stop statically matched only,0dynamic visits.
+No claim of full lifecycle/reachability/RF. New pending clear checks g_ic+16,
+second pointer+228 and byte820; ifbyte820 nonzero, nonzero third argument permits
+the clear. A first model inverted that last branch; literal CPU mismatch exposed
+it, fixed against actual beqz at4207af54, final matrix then passed. Missing first
+object logs/returns, missing second skips clear. Older clear additionally gates
+on BSS enabled. Selected fixtures do not establish these states as reachable.
+
+Proof factory-keep-alive-validation-20261025.json pins12 sources and33297byte gzip.
+Six static mutations reject wrongSDK, truncation, neighbor, PM/config anchors,
+100-msconstant. Consumer session37767 ended0: all12108 cases recomputed and five
+evidence mutations rejected. Main test sessions45970/96044/96167/63506 terminal0;
+49901 terminal1 for corrected reference-model branch, not a firmware failure.
+Readonly assembly session47608 and owner session93137 terminal0. Preserve
+intermediate results in ignored .build/factory-keep-alive-20261025.
+
+Latest CIM17:39:06–12UTC matched all12 protected original PID/name/creation UTC
+identities. Diagnostic-main118cycles, metadata main/V8 controls559/552; all
+supervisors/guards running, one ROM boot/no UART errors, no workload errors.
+Ignored long-owner-observation.json retains readings. Pending prefixes only;
+not H10/8h pass and never aggregate their durations with failed/interrupted runs.
+
+NEXT factory scope: TIM/start/stop dynamic state/cancellation paths, remaining
+null-failure branches, station object+820 lifetime; trace setter callers and
+negotiated BSS period bounds before deciding overflow fixes. Then remaining
+whole-image computed aliases/functions/SDK-application boundaries. Independent
+network/display/final/H10/hardware and deferred1–3 stay open. Broad goal ACTIVE.
+
+## CURRENT 2026-10-25 — full start/stop bodies tested; cancellation question retained
+
+Previous turn PROGRESS:7a9b2f830. Continue factory item4 first. Active worktree
+small-tv-factory-audit, firmwareC912/ELF9E4E unchanged, no SDK/QEMU/physical change
+or new VM. New source modules separate static qualification, reference model,
+private instruction probe, case matrix and archive consumer by purpose.
+
+5224 executions pass:1440start+1152stop perimage,40retained-state invocations in
+8 chains(start,start,stop,stop,start). All319old/309new instruction starts visited
+across main bodies/selected SDK helpers/shared ROM helper. Full PM/configuration
+bytes and direct writes/global writes/call order/log numeric arguments match
+independent models. Read-only callback data, saved registers/stack and caller-
+saved poison verified. Cases include optional beacon callbacks, all local branch
+choices, integer narrowing/shift wrap and 32/64-bit clock boundaries.
+
+New qualifier reuses exact prior bodies and adds active-cancel22B perSDK and
+factorymaxidle-cancel22B. Active object is PM+200, not guessed220. The actual
+ROM4Bentry40001b74→40043cae/30B executes: clearbyte440,disarm260. Synthetic
+g_pm_ptr at3fcdfd7c explicitly bound to corresponding private PM object; actual
+guest binding still open. Existing external platform calls remain declared
+stubs; complete transitive platform or RF effects are NOT claimed.
+
+First fixture needed missing numeric word reader; added locally. Then actual
+callback incominga5 was its JALR target, not original argument5 (already saved
+in s4). Corrected model from actual instruction order; this is no firmware bug.
+Final v3/final producers terminal0, earlier v1/v2 terminal1 fixture/model issues.
+Proof factory-pm-lifecycle-validation-20261025.json pins15 sources,39281byte gzip.
+Consumer recomputed all5224 cases and rejected5evidence controls;5staticcontrols
+also pass. No need to rerun absent a new source change or unresolved concern.
+
+Direct stop disarm sequence with declared platform boundaries:
+factory260/200/180/492, native260/200/180. Configenable52 cleared in both; native
+has no direct keep-alive disable call in this body. Need real runtime ownership/
+cancel evidence before any vendor patch. Inspected shared ROMconnectionless
+body40045d68/374B behind40001f70: directly disarms316/336, conditional ROM-table
+calls still external here. Native ELF's entry symbol size388 is not actual ROM
+body extent. pm_disable_sleep_delay uses actual ROM g_pm_ptr rather than ELF
+g_pm address; don't equate a synthetic pointer assignment with runtime proof.
+
+Runtime follow-up preparation: native SDK esp_timer struct has alarmu64 at0 and
+timer_armed returnsalarm>0; must derive actual ELF/DWARF layout before backend
+metadata reads. Linked esp_timer_is_active/timer_armed symbols were absent in
+current ELF; do NOT invent/call those guest APIs. Factory needs independent
+layout qualification. Natural QEMU station loss with read-only metadata is
+next, using new owned VM copies and pinned helper/QEMU, not protected runs.
+
+Latest authoritative CIM18:06:16–17UTC matches all12 original protected owners.
+Diagnostic-main177cycles; old metadata main/V8 controls617/609. All supervisor/
+guard states running, one ROM boot/no UART errors, no workload error. Ignored
+.build/factory-pm-lifecycle-20261025/long-owner-observation.json. These remain
+pending prefixes, never H10/8h acceptance, and durations must not combine.
+
+NEXT: real ROM binding/backend timer state around natural disconnect and
+reconnect, then TIM/full null-failure branches, station+820lifetime, negotiated
+BSS period validation/overflow and remaining whole-image aliases/gaps. Deferred
+1–3 and final independent network/display/full/H10/hardware gates remain open.
+Broad goal stays ACTIVE. Preserve all frozen producer/helper/QEMU inputs.
+
+## CURRENT 2026-10-25 — native cancellation resolved; factory recovery still fails
+
+Previous checkpoint1007938ae. Continue factory item4; deferred1–3 untouched.
+Editable tree small-tv-factory-audit. NativeC912/ELF9E4E, SDK/ROM/QEMU and all
+protected long-run producer inputs unchanged. No firmware build or board I/O.
+
+New modules separate qualification, bounded decoder, literal predicate tests,
+live observer and offline evidence verifier. Native DWARF: esp_timer32B/alarmu64
+at0, legacy20B/marker4/handle16. Factory independently qualified14B/18B predicates
+and handle load; only8B backendprefix claimed. Eight literal predicate cases,
+eight metadata cases, ten rejection cases and four uninitialized/ROM-unbound
+cases pass. Follow handle only if real ROMg_pm_ptr equals SDKPM and marker valid.
+Metadata only/max32requests/256bytes; no stack/payload/credentials.
+
+Final qemu-v4 session7708 terminal1, deliberately MIXED OUTCOME. FactoryPID6112/
+SmallTV-252af7b44bc1, nativePID28832/SmallTV-9f08cc5692fa. CIM18:36:25UTC confirms
+both absent; oneROMboot/no panic each. FactoryHTTP did not recover within30host
+seconds after APonline; PMactive0/apphint2 persisted. Factory baseline alarm0
+cannot prove armed cancellation. Actual handler4200c652 callsconnect before
+state1 store4200c66a; GOT_IP doesn't directlywrite2. Hint isn't a live link bit.
+No blocked callbackPC/stack captured; idlePC doesn't establish cause/app/QEMU.
+
+Native PMstop epilogue4207bcca still hasalarm17535664. Natural cancelhelper
+4207a0e6 enters atguest7791516us withsamealarm, returns7791544us/alarm0 BEFORE
+deadline. RA42070ad4 identifies cnx_sta_leave42070aac/628B. ELFcheckedcalls:
+42070acc->pm_stop,42070ad0->pm_disable_keep_alive_timer. Same initializedbackend
+1070352264, realROM/OSI bindings throughout. Then appflag0; APreturn restores
+actualHTTP/PMactive/flag1, newalarm20137076. No missing-cancellation patch needed
+on this leave path; other callers/lifecycle/RF/hardware remain open.
+
+Proof factory-pm-runtime-validation-20261025.json: fivegzip9956B/13sourcepins.
+Consumer terminal0 repeats predicates/rawreads, callerJALs, preserves factory
+passedfalse and rejects9evidence mutations. See tests/WIFI_PM_RUNTIME.md.
+qemu-v1 failed obsolete apphint assumption, v2 factoryHTTP, v3nativeonly passed;
+all remain ignored scratch, not paired acceptance. Finalhostunits terminal0.
+Original24209 handle absent, but persistedv2failure/ownerexit inspected before
+new run. No restart based solely on observing a timeout or missing output.
+
+CIM18:37:44UTC matches all12original PID/name/creationUTC. Diagnostic243cycles,
+oldmatchedmain/V8=682/674; allguardsrunning, oneROMboot/noUART/workloaderrors.
+Snapshot long-owner-observation-final.json. Concurrent reportwrite truncated
+an earlier read; bounded retry succeeded, earlier stalePS variable not evidence.
+Pending prefixes only, not8h/H10. No secondQMP/RSP or protectedinput changes.
+
+NEXT item4: actual factory callback/SDK boundaries at reconnect stall; other
+cnx_sta_leave callers, TIM/null-failure, station+820lifetime, negotiated BSS
+validation/overflow and remaining whole-image computed aliases/gaps. Otherplan
+items and final independent network/display/full/H10/physical gates stay open.
+
+## CURRENT 2026-10-25 — factory event-post returns; application callback not observed
+
+Previous checkpoint1599acede. Continue item4. New factory_disconnect_qemu.py
+uses explicit immutable CLI inputs, one owned RSP connection and one QMP owner
+thread. One-shot breakpoints are removed before resume. Initial ignoredv1
+forgot removal and repeatedly hitret, preventing guesttime/APrestore; invalid
+observer control, NOT firmware evidence. V2–6 exploratory; finalv7 is archived.
+
+Final originalexec42947 terminal0, PID37708/SmallTV-5671e7f01262 absent by actual
+CIM18:55:01UTC. OneROMboot/no panic, owned stop/controller join/input rehash pass.
+Ten observed boundaries: PMret42076790→4206c1d2; leave-tail4206c438→4206dfa4;
+ROM crypto call4206dfb2/return4206dfba (40001e68 is hal_crypto_enable entry,
+not coexistence as an exploratory label guessed); SDKcallback at42085452
+returns via4206dfd8; event-postcall4206e03e→42067b46 id5,length41 returns0 at
+4206e042. Actual payload/stack neverread. Appentry4200c602 and connect-return
+4200c656 armed but nothit in10hostsecond inactivity window. Controller restored
+AP afterguest1.007137seconds; lastguest snapshot later, hint2/PM0/alarm0.
+No claim of lost event/blocked thread/app-or-QEMU cause from idlePC or timeout.
+
+New station_leave_match requalifies old/new libnet80211 SHA and complete
+wl_cnx.o::cnx_sta_leave, factory4206c1ae..4206c444/662linkedB and native
+42070aac..42070d20/628B. PMstop binding checked; not parent state-machine or
+all branch/lifetime semantics. Initial ignoredqualifier guessed cnx.o name;
+actual archive is wl_cnx.o, corrected before final match. No SDK input changes.
+
+Proof factory-disconnect-validation-20261025.json: fourgzip12414B/14sourcepins.
+Reader repeats completebodymatches, checks realcallerJALs/metadata and rejects
+9 alterations. Event-postreturn0 is observed; actual event queue/delivery not
+yet qualified. Final observer additionally bounds diagnostic interrupt and
+exits nonzero on controller/transport/cleanup/UART/hash errors; v6 archive kept
+in ignored archive-v6 rather than relabelled as final. Consumer finalsession
+terminal0; all10boundaries and9controls replay. NEXT inspect real default event-loop dispatch and netif/other
+handlers preceding the factory appcallback, then remaining TIM/null/lifetime/
+negotiated-period/whole-image gaps. Preserve both failed recovery and native
+cancellation resolution. No firmware rebuild, protectedinput change or boardI/O.
+
+## CURRENT 2026-10-26 — factory reconnect cause proved: startup unregisters app handlers
+
+Previous goal turn PROGRESS:1599acede/b15a01a73; current branch unchanged on entry.
+Continue user-priority item4/factory audit; do not return to deferred1–3 yet.
+New evidence resolves the previously open appcallback absence. Original reference
+wifi_dns.c already shows successful startup teardown; actual assembly/live calls
+now confirm it. No SDK/QEMU fault was established by the older idlePC/timeouts.
+
+Factory initialize_wifi_station success path cd90 sets hint2, cdae unregisters
+IP_EVENT/0/c602, cdc0 unregisters WIFI_EVENT/ffffffff/c602. Both real APIreturn0.
+Then startup event group is deleted. Keeping that original group-using callback
+without preserving its group would be unsafe. Native network_init retains its
+atomic-state callbacks; added FIXED_RECONSTRUCTION explanation only, no executable
+change/new firmware build. AppC912/ELF9E4E/ROM289C/QEMU2DF9 remain unchanged.
+
+Factory finalexec12743 terminal0, PID1388/SmallTV-da2f4da0c1ba. Startup4breakpoints
+plus5 runtime boundaries observed. Samequeue: postentrycount0, queue-sendresult1/
+count1, driverpostreturn0/count1; sys_evt dequeues/count0 and invokes actual SDK
+callback420456ea for WIFI_EVENT5/41B, then returns, queueempty/runningtask0.
+CurrentTCB matches the defaultloop task at both callback boundaries; task/global
+and queue offsets qualified from exactfactory instructions. PM0/hint2 persists.
+No payload or stack reads; nine4B eventmetadata words plus priorboundedPMdecoder.
+Early helper probe65916 and startup probe94930 terminal0 and cleaned; excluded
+from final proof. First host test lacked valid instructions at private stub
+entry addresses, fixed with ret boundary bytes; not a firmware CPU exception.
+
+Native finalexec91502 terminal0, PID40996/SmallTV-685dea4f9739, actual connected→
+disconnected→reconnected and HTTP ready, same backend cancelled after pm_stop by
+cnx_sta_leave and then rearmed. CIM10:24:42UTC confirms finalfactory absent;
+native and prototypes42984/9700 already absent10:14:55UTC. OneROMboot/no panic
+each; no physical flashing/serial/reset.
+
+New test modules separated by role: static event_delivery_layout, numeric
+event_delivery_metadata, literal event_lifetime_test, live event_lifetime_qemu,
+offline verify_event_lifetime_evidence. Private test passes24 cases/all21starts
+of full50B dispatcher;9 selected144B startup-tail/error paths with explicit SDK
+stubs;9 realnativecallback events;6metadata cases and15 rejection controls.
+Not full startup or registry implementation. Native reconnect tested in actual
+fresh QEMU as well, not inferred only from direct callback unit invocations.
+
+Proof event-lifetime-validation-20261026.json pins20sources/sixrawgzip15223B.
+Reader terminal0 recomputes algorithms and both exact typed read streams;
+11 runtime mutations reject wrong unregister/return, queue/count/task forgery,
+stale native connected state, extra read, live owner, reset/full-lifecycle claim.
+Document tests/WIFI_EVENT_LIFETIME.md supersedes the historical unresolved cause.
+Initial11984factory proof is retained in ignored archive-before-lf. Final observer
+normalized to Git eol=lf before capture, avoiding post-checkout source SHA drift.
+Helper comments completed; finalhostunits replay passes. Read unitJSON in
+PowerShell with -AsHashtable: wifi_event/WIFI_EVENT are distinct keys.
+Factory failed recovery remains a known application defect; native retention is
+an intentional correction, not a requirement to copy factory teardown.
+
+IMPORTANT long runs: actual CIM09:50 and10:14UTC finds all12original owners
+ABSENT, despite stale running guard/supervisor files. Last report prefixes:
+diagnostic654cycles, matchedmain1091/V8=1081, passedfalse/errornull, last diagnostic
+supervisor observation21:23:55UTC25Oct. No terminal success/exit evidence; do not
+call them8h/H10 passes or combine durations. Cause of disappearance unknown.
+No restart or source mutation. Read-only snapshot:
+.build/factory-event-delivery-20261026/long-owners-absent.json. Frozen inputs should
+still be preserved for later interrupted-run analysis under deferred1–3.
+
+NEXT item4: remaining TIM/null-completion branches, station+820 lifetime, BSS
+negotiated-period callers/range-overflow, remaining whole-image computed aliases
+and startup/error lifecycle branches. New tool-quality lead: GNU wrapper
+objdump-xespv2p2 decodes actual RV32 bytes712b at420aeb6e as addiw even with -m
+riscv:rv32. Prepared ELF is ELF32/RVC, no archattribute. Literal RV32 Unicorn
+control proves JAL: target420af10a,RA420aeb70,s6unchanged17. Investigate decoder
+selection before trusting GNU mnemonic-based whole-image searches. Raw-byte
+qualifiers/private RV32 tests remain independent. Ignored cjal-control.json
+and cjal_control.py retain the control. Other plan points and final independent
+network/display/full/duration/hardware acceptance remain open. Goal stays ACTIVE.
+
+## CURRENT 2026-10-26 — ISA-qualified factory disassembly and five call candidates
+
+Previous goal turn PROGRESS25b8ef015. Active user priority remains factory item4,
+not deferred1–3. No new physical I/O, firmware build, QEMU/SDK/ROM mutation or VM.
+Native appC912/ELF9E4E remain unchanged. Do not restart absent duration owners or
+call stale prefixes acceptance. Frozen prior inputs remain available for replay.
+
+GNU main and both dispatcher variants misdecode ISA-less ELF/raw16bit712b at
+420aeb6e even with -m riscv:rv32. Real RV32 proves C.JAL/target420af10a/RA420aeb70/
+s6unchanged17. New reverse/rv32_disassembly standard ISA metadata view preserves
+codebytes/addresses, no loadsegments/DROM/data; actualGNUcanary before export and
+toolpinsbefore/after. Verified unique temp child paths before recursive cleanup.
+disassemble_factory.py gains optional verified --dump; fullELFexport and pureaudit
+are separate tools. Assistant repairs old C.JAL encodings with visible warnings,
+rejects otherRV64 and retains compressed/numericSPframehints. Original ELF intact.
+
+New fullzero export .build/factory-decoder-20261026/full-rv32-zeroes/factory-rv32.asm
+contains813936bytes/288036rows, all287952oldrows identical. Added84zerohalfwords/
+168bytes (128vectors/40flash) via-z.453C.JALcandidates:old443c.addiw/10.insn;
+all396GPaccesses unchanged. Canonical rawmapold67f4f41f..,newd2d264eb..;
+oldGNUtextSHA d82e4db7a45a128554f7da5abf92a0be0190f5fdd238899ad9f332fe3d16feb9.
+
+Audit uses frozenSDKgap graph5143functions, not later5161. Ancestor+delta reused
+by hashes, canonicalgraph36a65f46edcab37281fd079b2295ab0ff20fad7f520db9cefa0c769dea4b30f9.
+448refs agree/452targets known. Five unmatched:40380180→40380584,
+4038018e→40380566,420a3a12→420a3d32,420a3a14→420a3da2,420a3e32→420a3fd4.
+Don't declare missingfunctions/bugs or all453reachable: code sections can contain
+inline data/unreached regions. Need boundary/caller/SDK qualification next.
+
+Final evidence rv32-disassembly-validation-20261026.json:3newgzip11468B/10sourcepins.
+All29tests no skips:21assistant+8ISAview. Every2048C.JAL encoding runs literalRV32
+and realGNU; PC/RA/s6 and parsedcalltarget checked. IndependentELFreader, wrongISA,
+tempcleanup/range and realcapture publicIROMCLI tested. Reader reconstructsgraph,
+recomputes fullbyte/call/GP audit, reruns29tests, rejects8report+1realGNUtargetmutant.
+Finalconsumer exec0c42ea terminal0; first output lost to compaction, actualCIM
+found no originalconsumer, archive already complete, so onlyconsumer rerun.
+Do not rerun archive.py into an existing output. All source inputs LF before pins.
+Docs tests/RV32_DISASSEMBLY.md include commands and claims. Whole-image completeness,
+candidate reachability, semantic equivalence and physical flags remain false.
+
+NEXT item4: qualify five remaining call candidates, revisit GNU mnemonic-dependent
+searches, then TIM/null-completion/station+820 lifetime/BSS negotiated ranges and
+other aliases/startup error branches. Retaining Wi-Fi callbacks remains verified
+intentional factory-bug correction. All broader goal and acceptance gates persist.
+
+## CURRENT 2026-10-26 — five runtime gaps identified; FIX NTH-ALLOC-FAIL NEXT
+
+Previous goal turn PROGRESS79fc5c424. Factory item4 priority persists. New
+runtime_call_gaps module qualifies19completebodies/1004linkedB:10factory508B,
+9native496B. Seven pinned objects (vectors, C++stubs, GCC15new_op/new_opv/
+new_opvnt/eh_globals/eh_catch) and named bindings, not guessed function labels.
+Factory compiler version not established. Persistent Ghidra projects untouched.
+
+Five sites:40380180/18e→xt_unhandled_exception/panicHandler in fullpanic214B;
+420a3a12/14→begin/endcatch in20Barraynothrownew;420a3e32→UnwindDeleteException
+in48Behglobalsdtor. Scalar/array similar-byte trap resolved via actual_Znaj
+veneer→_Znwj and native symbols. Native arraynothrow DOES exist at420a413e;
+only_Unwind_Resume absent. Do not repeat the exploratory scalar absence claim.
+
+Confirmed actual bug in BOTH factory/native frozen images: new[](nothrow)→new[]
+→scalarnew→cxaAllocateException abortstub when mallocNULL/no new-handler. Does
+NOT returnnullptr or enter landingpad. Caller42040efc requests512B and checks
+NULL at42040f02→42040f80. Name/fullbody not yet SDK-qualified; likely-NVS source
+similarity is not proof. NEXT fix native nothrow failure paths safely, including
+zero-size/newhandler/ownership, fail-before/pass-after/source+target tests, new
+production app under firmware/development and actual NVS/network workflow.
+Don't patch shared SDK or any frozen old ELF/build/helper. Ordinary throwing new
+and all exception semantics are not implicitly fixed by nothrow-only wrappers.
+
+176privateRV32 cases pass as observation:132panic fullframes/return/mret,
+allocsizes0/1/512/ffffffff, handlerretry, cleanupnull/empty/one/two, nothrow
+success/abort/directlandingpad in BOTH images. Desired nothrowOOM contractfalse
+is explicitly retained. Panic callbackreturn/directEHentry synthetic; full
+endcatch internals/naturalEHdelivery unproved. Valid ret at external private
+stub entries required before Unicorn codehooks, fixed before final capture.
+
+Proof runtime-call-gaps-validation-20261026.json:10gzip62267B/12sourcepins;
+consumer redoes19bodymatches,176cases,13input/7reportmutations (forgedfix too).
+Source modules separate qualification/instructions/controls/consumer. Original
+images/library/selectedbuildobjects rehashed; no app/SDK/QEMU/sourceproducer
+mutation, VM or physicalI/O. Broad compilerarchive exploratory scan90076 stopped
+via verifiedownedhandle, terminal1; narrowed EH/new members completed normally.
+All12old durationowners remain historicallyabsent/unaccepted; don'trestart
+or accept stale statuses. GoalACTIVE, full original scope/points1–3 deferred.
+After NTHfix: transient Ghidra ranges, actualcaller matching, remaining TIM/null/
+station+820 lifetime/BSS negotiated period/aliases and final acceptance gates.
+Final consumer exec3a80d5 terminal0 repeats176cases and13+7controls after adding
+the exact512-byte caller input. Desired OOM contract staysfalse, not accepted.
+
+## CURRENT 2026-10-26 — NTH-ALLOC-FAIL fixed, production app and independent gates
+
+Previous goal turn PROGRESS cfd5cb9f3. User-priority item4 continues; points1–3
+remain deferred. App/platform/nothrow_new.cpp shares malloc/get_new_handler loop
+between scalar/array CABI wrappers, marked FIXED_FACTORY. Size0→1, null failure,
+retry and changing/removing/nonreturning handler preserved. C2/RV32/IDF6.1,
+no C++exceptions and no heap-abort profile enforced; no SDK patch, no FlashI/O,
+no new endpoint/delay. Throwing/aligned new unchanged; unsupported linked aligned
+nothrow symbol rejects checker. Upper app_main NVSinit ESP_ERROR_CHECK stillfatal;
+this is not full boot-under-global-OOM recovery.
+
+Final build .build/small-tv-nothrow-20261026, production DEBUGoff archived under
+firmware/development/small-tv-esp32c2-reconstructed. AppSHA4f2cfd9837fff0143098eb32f3a2ec6f59170d23902f17f2b2e9fff857165195,
+ELF eb20fb1309d1a5f28229d2ca846924cd18b311da229d34a1319a324d621ee2e6,
+source5b6252cec1006fc3b4e5a6fc2dc2f72ca4a396a2a8c6bac521f45be0bf07d161.
+App1475840B (-640 vsC912),60160free. Helper50B+two4B wrappers=58B.
+Strengthened post-link checker validates local helper calls too; real NVSPage::load
+328sourceB matched to linked body and its allocation selects wrapper. Existing
+Wi-Fi guard post-link/ROM check stillpasses. Final buildexec50378 terminal0;
+ELF/app identical to firstbuild46239, only source/validator metadata updated.
+
+26host source cases,26actual RV32 cases (incl4NVS outcomes), actual old9E NVS→
+abort before vs EB20 NVS→NO_MEM after. Private partition/ROMmemset/malloc/handler/
+free boundaries explicit. No wholeVM OOM fault injection. New-handler nonreturn
+is retained, not converted to success.13semantic input controls including wrong
+localhelper/NVScallee and oldunwrappedbuild pass. Main native gate6300checks (initial6298; conditional async-wait CHECK count varies),
+3727privacy;16inventorytests/223appdefs and6artifact checks pass. CPP/noexcept
+simple definitions included, missing prior Wi-Fi guard support row restored.
+HostCPP26 now mandatory in tests/run.ps1; final exec33184 terminal0.
+Protected production inputs unchanged.
+
+Finalnetwork exec93791 terminal0: configreboot/cold/reset, HTTP settings2,
+connectedSTA192.168.43.15/time_synced and fresh NTP1/1/2, ROMboots2/1/2.
+Network-only copiedprofile has noLCD; weather loopback503 not weatheracceptance.
+Finaldisplay exec3351 terminal0: factory and native setupframes all57600pixels
+each exact acc588ab.., onecoldcycle each, network not used as LCDgate.
+4finalowners34392/21584/21168/35764 absent byCIM12:24:26UTC, nativeheldhandlesexit0.
+No physicalserial/reset/flash. Earlier network2/display1 also passed, notfinalpins.
+Network1 failed only stale helper expected10.0.2.15; actualSDK192.168.43.15 proven
+in successfulfinalrecords. Scoped newpredicate derives configuredaddress, frozen47
+helperfiles/QEMU unchanged. Preserve prototypes in ignored scratch, don'tcallpass.
+
+Proof nothrow-fix-validation-20261026.json:14gzip124101B, reused legacyqualification,
+sourcepins plus optionalmandatory-test-entrypoint pin. Readerexec7eb452 terminal0
+replayed before/after/static+13controls and recomputed clocks/2wholeframes;
+5runtime mutations rejected. Need final replay after context/docs/sourcepin refresh.
+Consumer requires exact current ELF/object/NVSarchive and frozen old9E ELF/app;
+these build dirs must remain for replay. Original whole-image completeness and
+physical/full/24h flags false. CODEC-REPRO fresh library/cache identity remains
+deferred. Don't widen old9E-specific observer pins to acceptEB20: qualify layouts
+and budgets first when returning to old network/heap/soak gates.
+
+NEXT item4 after focused commit: qualified transient Ghidra ranges for the five
+runtime sites; full identity of factorycaller42040efc (nativePage::load known,
+factory identity stillunqualified); TIM/null-completion/station+820 lifetime,
+BSS periods/range-overflow and computed aliases. Broad plan stillACTIVE.
+
+Final native count6300 vs initial6298 is an observed check count; dispatch has conditional async-wait CHECKs. Do not rerun to seek an exact old count or relax functional assertions. Final proof has14gzip124100B/30sourcepins.
+
+Final reader session22193/output8f0061 terminal0 after30pins/native6300 refresh. Getter `_GLOBAL__sub_I__ZSt7nothrow` at420a416a is registered in init_array and tail-calls pthread_mutex_init(3fcb6920,0). SDK valid-mutex lock skips lazy allocation. This is static/source review, not full pthread/RTOS OOM execution. Final prototype owners all absent; no pending sessions. Ready for focused commit.
+
+## Latest checkpoint — runtime metadata, 26 October 2026
+
+RecoverFactoryRuntime.java executed only in a copied read-only Ghidra project;
+ten object-qualified bodies / 508 B recovered, three functions created and 116
+instructions added. Full graph changes exactly match instructions and scoped
+ownership: enumerated5140→5143 (API5145→5148), 19 changed function records,
+GP accesses unchanged. All453 C.JAL now have exact references/target functions.
+Detached return420a3e08..3e0a and abort-forwarder420a3fe0..3fe8 stay decoded and
+unowned: no guessed SDK names. Original/copy ten project hashes unchanged;
+both headless sessions terminal0/read-only discarded. Production4F2C/EB20,
+SDK/QEMU unchanged; no VM or physical action.
+
+Proof runtime-metadata-validation-20261026.json reuses original full graph and
+seven runtime objects; six new gzip11097B/17pins. Consumer61b949 terminal0,
+20 actual altered-input controls rejected. Historical runtime consumer1b9dd6
+also terminal0 with176literal cases/13input/7report controls. Do not call the
+old OOM-failing-before flag a regression; current correction is the separate
+nothrow proof. Details: tests/RUNTIME_METADATA.md.
+
+NEXT user item4: factory512B allocation caller42040efc belongs to Ghidra body
+42040e56..42040f8e/312B. This is metadata ownership, not full source identity.
+Factory descriptor says IDFv5.5.4 (already documented), currentSDK6.1 NVSPage::load
+is328sourceB and calls Header constructor out of line; factory has an inline19B
+fill loop. Check pinned SDK5.5.4/compiler/options before requiring full-body
+matching. Existing14compiler not found in inspected tool directories;
+SDK5.5.4 tools.json selects esp-14.2.0_20260121. No toolchain downloaded yet;
+no compiler version proved and no strict relocation matcher weakened.
+Then TIM/null-completion, station+820 lifetime, BSS periods/range-overflow and
+computed aliases. Deferred points1–3 and full/24h/physical gates remain open.
+No active exec/VM from this checkpoint. Broad goal ACTIVE; no push performed.
+
+Final staged-source check aacd3a confirms all17 source pins equal Git index bytes
+and production app4F2C SHA is unchanged. Final consumer2ef9bb terminal0 repeats
+the scoped validation and all20 rejection controls. Ready for focused commit.
+
+## Latest checkpoint — factory NVS caller, 26 October 2026
+
+Factory call42040efc fully identified as Page::load42040e56..42040f8e/312B.
+Four complete factory bodies1442B, four native1158B matched strict unchanged
+objects. Clean SDK5.5.4/735507283d5b + officialGCC14 esp-14.2.0_20260121,
+RV32IMC/Newlib/Og/no-shrink-wrap is a sufficient matching profile; factory
+compiler/config identity still unproved. Toolchain isolated under this worktree
+.build/factory-nvs-20261026/idf-tools; archiveSHAc2734714… verified from SDKmanifest.
+No sharedSDK/QEMU/production changes or physical action.
+
+Public tools/compile_factory_nvs_fixture.py produces source object and an
+analysis-only DWARF carrier. Qualified and qualified-replay are byte-identical
+object9ed443fe…/carrier314324a8…/provenance258dependencies(34SDK), bothexec0.
+Newlib fixture config is derived from the existing native profile with libc
+selection changed; it is not a recovered factory sdkconfig. Original mixed
+Picolibc/Newlib failures and rejected optimization prototypes remain ignored.
+Current/factory sourcePage::load and CRC exactly equal; entry-table source differs.
+page_layout sees Page84B/offsets8,12,16,20,64,66,80/read_raw-vslot12 in both ELFs.
+
+197caller cases pervariant(394) reached every120/118caller instruction starts,
+checked all84pagebytes/return/ABI/read sequence/ownership.442directfind cases
+reach all51starts, including all tails and length0 bounds. Normal allocator,
+partitionI/O, ROMCRC arithmetic and entry-table are explicit boundaries;
+NULL-return factorycase is synthetic. Two separate actual allocator cases
+follow factoryNVS→abort vs currentNVS→NO_MEM through real runtime instructions.
+Do not call the factory fixed. Upper app_main NVSinit error stillfatal.
+
+Proof factory-nvs-validation-20261026.json:11gzip185441B/20pins, oldruntime and
+currentwrapper qualifications reused. Consumer83649/bf8c31 terminal0 recomputes
+394+442+2cases and13input+5report controls. SDKs remain clean and production4F2C/
+EB20unchanged; no current VM or exec session from these finished runs.
+
+NEXT user item4: actual mLoadEntryTable execution for corrupt/incomplete/duplicate
+records and read/write/erase faults. Its bodies are statically matched970Bfactory/
+822Bnative, but SDK6.1 DEFAULT_PURGE_AFTER_ERASE=true adds purgeEntry and extra
+purge arguments vs5.5.4. This is a real unverified repair/write policy difference,
+not covered by caller delegation tests. Do not automatically disable purge to
+match old bytes. Then TIM/null-completion/station+820 lifetime/BSSoverflow/aliases.
+Deferred1–3, H10/currentABI observer qualification, CODEC-REPRO, full/24h/physical
+remain open. Goal ACTIVE. No push requested/performed this checkpoint.
+
+Final replay78978/e4246d terminal0 after source-pin refresh; metadata replay852092
+also terminal0 with20controls. Staged check99e25a: all20pins equal Git index bytes,
+production appSHA unchanged. No pending exec/VM. Ready for focused NVS commit.
+
+## Latest checkpoint — partial-record repair, 26 October 2026
+
+Actual TABLE/bitmap/purge instructions tested, factory3bodies1106B/native6bodies
+1108B. New files: reverse/nvs_repair_linkage.py, nvs_partition_fixture.py,
+nvs_partial_repair.py, nvs_repair_controls.py, verify_nvs_partial_repair_evidence.py.
+No changes to previous source pins, production4F2C/EB20, SDK or QEMU.
+
+All126slots eachvariant: factory4Bbitmap, native additional32Bzero payload.
+Sector bytes/other records/reserved bits checked.252reopen+12clean baselines
+issue no writes/erases.68faults (4boundaryslots/everyactualAPIordinal/before or
+half-transfer) retain actual physical prefixes;68new Page instances recover.
+Total652CPU executions, ABI/fields/counters/error checked. This is private
+PartitionAPI byte fixture, not live flash/SPI/WIP/fullVM power cut acceptance.
+
+10native failure/retry cases retain16..32nonzero payload bytes because bitmap
+alreadyERASED: includes partial bitmap and purge failures. Original operation
+returns0x104; no invented secureerase guarantee, no automatic purge disabling.
+Last-slot RAM sentinel depends on retained bitmap: in-flightrepair126 vs fresh
+allnonEMPTY INVALID_ENTRY. Old simplistic oracle corrected, not widened.
+Initial missing outlined nativeGET/SET helpers now fully qualified; prototypes
+preserved ignored. JALR mutant corrected to change bit1, since bit0 is ignored.
+
+Scratch .build/factory-nvs-repair-20261026; target-final-v6 cbd9d2 terminal0,
+11input controls4fcf20 pass. Proof nvs-partial-repair-validation-20261026.json:
+3gzip44243B/25pins; initial reader57870/596e0b terminal0 with652CPU+11+7controls.
+Prior factory object/basequalification reused, no new full dumps. Update source
+pins/final replay after last report-control edit before commit.
+
+NEXT item4: other actual entry-table branches (ILLEGAL/WRITTEN/corrupt headers,
+variable spans/duplicates, HashList allocations, eraseEntryAndSpan/purge ranges),
+including return/error and physical writes. Factory page object already contains
+several full helpers (diagnostic repair-factory-probe.json in oldfactory-NVS
+scratch), but HashList/Item need their own SDK5.5.4 objects and strict bindings.
+Do not stub these algorithms and call the whole loader tested. Then pending
+TIM/null/station+820/BSSoverflow/aliases. Old1–3/full/24h/physical remain open.
+GoalACTIVE. No VM, board, serial/reset/flash or push from this checkpoint.
+
+Final reader20605/226540 terminal0 after refined actual-rollback/purge-error report
+controls:652executions/11input/7report controls pass. Staged27baf6 confirms25pins
+equal Git index bytes/appSHA unchanged. No pending exec/VM; ready for focused commit.
+
+## 26 October 2026 — inherited NVS record defects before correction
+
+Full Page/Item/HashList direct-call closure qualified: 19 factory functions /3368B,
+20 native /3062B. Item/HashList unchanged SDK5.5.4 objects and canonical provenance
+are byte-identical across two analytical builds. Actual official C2 ROM CRC code
+and table executed; 192 cases reach all60 instruction starts/all256 table indices.
+528 real header cases reach all109factory/85native starts, including bad CRC,
+span/type/bounds. 23 records+11malloc failures eachvariant, full bitmap/lookup/
+ABI/cache ownership checks. Seven actual input controls and six report controls.
+
+Both factory and app4F2C/ELFEB20 have three real inherited defects: wrong erased
+counts for ILLEGAL/alreadyERASED children, destructive 24-bit hash-collision
+candidate handling, final duplicate lookup ignoring BLOB chunk/generation.
+The published-index scenario retains a valid old index while mistakenly deleting
+its old data chunk. Full Storage.init/powercut is still untested. These are
+explicitly failing desired native contracts, not a parity success or a QEMU bug.
+No shared SDK, production app, VM/board/serial/reset/flash or push changed.
+
+New proof nvs-records-before-validation-20261026.json:9gzip/202203B/33sourcepins.
+Scratch .build/factory-nvs-records-20261026, source objects replay identical.
+NEXT local, exact-SHA-guarded SDK source corrections with FIXED_FACTORY marks;
+keep before app/ELF and source pins immutable, preferably use a separate task
+worktree for production changes. Fix counters, verify real namespace/key/chunk
+identity for hash candidates, pass exact chunk to final findItem. Retain type
+replacement semantics. Then fault/reopen tests, build/archive app, independent
+network/display checks. Other factory/TIM/lifetime/BSS/aliases and deferred1–3,
+full/24h/hardware remain open. Goal ACTIVE.
+
+Final reader99701/e31951 terminal0; staged33pins match, no sensitive findings across22files/9expanded gzip. Ready for baseline commit; then local NVS corrections in new task worktree.

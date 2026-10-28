@@ -9,6 +9,34 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Partial-record repair](NVS_PARTIAL_REPAIR.md) исполняет bitmap/purge, сохраняет
+частичные flash effects и проверяет652CPU executions. Остальные типы записей,
+полный entry-table loader и full VM power cuts остаются открытыми.
+
+[Factory NVS](FACTORY_NVS.md) связывает весь312-byte caller с Page::load source:
+394caller +442find +2actual OOM cases, полные120/118caller instruction starts.
+Source Page::load/CRC совпадает; новая entry-table purge policy требует отдельной
+проверки repair/writes/faults. Весь NVS и whole-image этим не объявляются принятыми.
+
+[Разметка runtime](RUNTIME_METADATA.md) восстанавливает десять проверенных полных
+тел в отдельном read-only сеансе Ghidra. Все 453 C.JAL получили точные call edges;
+20 altered-input controls проходят. Полнота образа и всех indirect calls остаётся
+открытой.
+
+[Nothrow allocation](NOTHROW_ALLOCATION.md) сохраняет real failing-before и
+проверяет CPP source, compiled RV32 wrappers и NVS error propagation. Network
+и exact LCD запускаются отдельно; hardware/24h/full gates этим не закрываются.
+
+[Живое сравнение PM и отмены keep-alive](WIFI_PM_RUNTIME.md) дополняет частные
+RV32-тесты: native отменяет таймер через `cnx_sta_leave` после `pm_stop` и
+восстанавливает HTTP. Неуспешный factory reconnect сохранён отдельным результатом;
+полный сетевой цикл и аппаратная приёмка ещё не подтверждены.
+
+[Жизненный цикл обработчиков Wi-Fi](WIFI_EVENT_LIFETIME.md) объясняет заводской
+reconnect stall: после первого GOT_IP приложение удаляет свои callbacks.
+Доставка события очередью и SDK подтверждена; наша версия сохраняет обработчики
+и восстанавливает HTTP. Добавлены literal RV32, metadata и runtime regression checks.
+
 [Двусторонняя карта](../reference/BIDIRECTIONAL_AUDIT.md) учитывает каждый
 экспортированный factory entry и каждую прикладную C-функцию. Проверка
 `correspondence_test.py` отвергает пропущенные/неизвестные цели и устаревшие входы.

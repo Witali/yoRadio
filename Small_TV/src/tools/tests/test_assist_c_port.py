@@ -89,6 +89,15 @@ class FlowTests(unittest.TestCase):
         self.assertEqual(port.branch_condition(port.Instruction(0, 4, '', 'blt', 'a0,a1,1000')), '(int32_t)r[10] < (int32_t)r[11]')
         self.assertEqual(port.register('x0'), 'UINT32_C(0)')
 
+    def test_canonical_numeric_compressed_frame_hints(self):
+        graph=self.graph(decoded((0x1000,'1141','c.addi x2,-16'),(0x1002,'c606','c.swsp x1,12(x2)'),
+            (0x1004,'c422','c.swsp x8,8(x2)'),(0x1006,'40b2','c.lwsp x1,12(x2)'),
+            (0x1008,'4422','c.lwsp x8,8(x2)'),(0x100a,'0141','c.addi x2,16'),(0x100c,'8082','c.jr x1')))
+        self.assertEqual(graph['prologue'][0]['stack_bytes'],16)
+        self.assertEqual(graph['epilogues'][0]['stack_bytes'],16)
+        self.assertEqual(set(graph['epilogues'][0]['restored_registers']),{'ra','s0'})
+        self.assertEqual(port.stack_adjustment(port.Instruction(0,2,'7139','addi16sp','x2,-64')),-64)
+
     def test_unresolved_indirect_and_trap_are_visible(self):
         graph = self.graph(decoded((0x1000, '8502', 'jr a0'), (0x1002, '9002', 'ebreak')))
         self.assertFalse(graph['blocks'][1]['reachable'])
@@ -98,6 +107,29 @@ class FlowTests(unittest.TestCase):
         graph = self.graph(decoded((0x1000, '000000ef', 'jal ra,1008'),
                                   (0x1004, '8082', 'ret'), (0x1008, '8082', 'ret')))
         self.assertIn({'kind': 'call_inside_range', 'address': '0x1000', 'target': '0x1008'}, graph['warnings'])
+
+    def test_factory_compressed_call_survives_wrong_rv64_mnemonic(self):
+        text=decoded((0x420aeb6e,'2b71','c.addiw x22,28'),(0x420aeb70,'8082','ret'))
+        graph=self.graph(text)
+        self.assertEqual(graph['calls'],[{'address':'0x420aeb6e','target':'0x420af10a'}])
+        self.assertEqual(graph['blocks'][0]['successors'],['0x420aeb70'])
+        self.assertEqual(graph['warnings'],[{'kind':'rv32_decode_corrected','address':'0x420aeb6e',
+                                          'original':'addiw x22,28','decoded':'jal 0x420af10a'}])
+
+    def test_wrong_compressed_call_target_is_recovered_from_bytes(self):
+        graph=self.graph(decoded((0x420aeb6e,'2b71','jal 420af100'),(0x420aeb70,'8082','ret')))
+        self.assertEqual(graph['calls'][0]['target'],'0x420af10a')
+        self.assertEqual(graph['warnings'][0]['kind'],'rv32_decode_corrected')
+
+    def test_correct_rv32_compressed_call_keeps_no_warning(self):
+        graph=self.graph(decoded((0x420aeb6e,'2b71','c.jal 420af10a'),(0x420aeb70,'8082','ret')))
+        self.assertEqual(graph['calls'][0]['target'],'0x420af10a')
+        self.assertEqual(graph['warnings'],[])
+
+    def test_unrecoverable_rv64_input_is_rejected(self):
+        for word,assembly in (('00013083','ld ra,0(sp)'),('0010809b','addiw ra,ra,1')):
+            with self.subTest(assembly=assembly),self.assertRaisesRegex(ValueError,'RV64 mnemonic'):
+                port.parse(decoded((0x1000,word,assembly)))
 
     def test_factory_clock_theme_has_no_natural_loop(self):
         source = TOOL.parent.parent / 'reference/assembly/read_clock_theme_at_4200dfdc.asm'
