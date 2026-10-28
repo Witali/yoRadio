@@ -17,6 +17,8 @@ static uint32_t generation;
 static uint32_t theme_selection_generation;
 static bool dirty;
 static int64_t last_change_us;
+static portMUX_TYPE jpeg_limit_lock=portMUX_INITIALIZER_UNLOCKED;
+static uint32_t jpeg_write_limit_kib=TV_JPEG_WRITE_LIMIT_DEFAULT_KIB;
 
 /* Read the old native ABI explicitly; the unchanged raw-sector ABI is separate. */
 typedef struct
@@ -206,6 +208,12 @@ esp_err_t settings_init(void)
     esp_err_t result = nvs_open("small_tv", NVS_READWRITE, &settings_store);
     if (result != ESP_OK)
         return result;
+    /* REQUESTED_CHANGE: keep the new preference outside both legacy layouts.
+     * Reading an absent key uses the default without a startup flash write. */
+    uint32_t jpeg_limit=TV_JPEG_WRITE_LIMIT_DEFAULT_KIB;
+    result=nvs_get_u32(settings_store,"jpeg_write_kib",&jpeg_limit);
+    if(result!=ESP_OK && result!=ESP_ERR_NVS_NOT_FOUND)return result;
+    portENTER_CRITICAL(&jpeg_limit_lock);jpeg_write_limit_kib=jpeg_limit;portEXIT_CRITICAL(&jpeg_limit_lock);
     bool migrated;
     dirty = false;
     if (!load_nvs(&current_settings, &migrated))
@@ -245,8 +253,9 @@ void settings_snapshot_with_revisions(tv_settings_t *out, uint32_t *configuratio
 {
     /* Copy display values and command revisions under one lock.
      * FIXED_RECONSTRUCTION: a same-value theme selection is an explicit reset
-     * command at 0x4200d7f0. Keep its revision coherent with the copied theme so
-     * a concurrent HTTP selection cannot reset an older or already-seen theme. */
+     * command at 0x4200d7f0; /updateCity clears the same latch at 0x4200f3cc.
+     * Keep the revision coherent with the theme and location so a concurrent
+     * HTTP command cannot reset an older or already-seen snapshot. */
 
     xSemaphoreTake(settings_mutex, portMAX_DELAY);
     *out = current_settings;
@@ -255,6 +264,14 @@ void settings_snapshot_with_revisions(tv_settings_t *out, uint32_t *configuratio
     if (theme_selection_revision)
         *theme_selection_revision = theme_selection_generation;
     xSemaphoreGive(settings_mutex);
+}
+
+static void mark_settings_changed_locked(void)
+{
+    /* Schedule one debounced write for changed bytes; the caller holds the mutex. */
+    ++generation;
+    dirty = true;
+    last_change_us = esp_timer_get_time();
 }
 
 esp_err_t settings_select_theme(unsigned theme)
@@ -270,9 +287,29 @@ esp_err_t settings_select_theme(unsigned theme)
     if (current_settings.theme != theme)
     {
         current_settings.theme = (uint8_t)theme;
-        ++generation;
-        dirty = true;
-        last_change_us = esp_timer_get_time();
+        mark_settings_changed_locked();
+    }
+    ++theme_selection_generation;
+    xSemaphoreGive(settings_mutex);
+    return ESP_OK;
+}
+
+esp_err_t settings_update_city(const char *city, const char *country)
+{
+    /* Apply only the location and always request a coherent theme reinitialization.
+     * FIXED_RECONSTRUCTION: 0x4200f2c0 clears the theme latch even for the same
+     * city. Publish both under one mutex; do not replay an HTTP snapshot's older
+     * theme, brightness or photo lengths over concurrent changes. Identical city
+     * commands advance only the transient revision and never schedule flash I/O. */
+    if (!city || !city[0] || strlen(city) >= sizeof(current_settings.city) ||
+        !settings_country_valid(country))
+        return ESP_ERR_INVALID_ARG;
+    xSemaphoreTake(settings_mutex, portMAX_DELAY);
+    if (strcmp(current_settings.city, city) || strcmp(current_settings.country, country))
+    {
+        strcpy(current_settings.city, city);
+        strcpy(current_settings.country, country);
+        mark_settings_changed_locked();
     }
     ++theme_selection_generation;
     xSemaphoreGive(settings_mutex);
@@ -289,9 +326,7 @@ esp_err_t settings_replace(const tv_settings_t *s)
     if (memcmp(s, &current_settings, sizeof(*s)))
     {
         current_settings = *s;
-        ++generation;
-        dirty = true;
-        last_change_us = esp_timer_get_time();
+        mark_settings_changed_locked();
     }
     xSemaphoreGive(settings_mutex);
     return ESP_OK;
@@ -305,9 +340,7 @@ esp_err_t settings_photo_size(unsigned slot, uint32_t bytes)
         return ESP_ERR_INVALID_ARG;
     xSemaphoreTake(settings_mutex, portMAX_DELAY);
     current_settings.photo_size[slot] = bytes;
-    ++generation;
-    dirty = true;
-    last_change_us = esp_timer_get_time();
+    mark_settings_changed_locked();
     xSemaphoreGive(settings_mutex);
     return settings_flush(); /* Record invalidation before erasing a slot. */
 }
@@ -320,4 +353,27 @@ uint32_t settings_generation(void)
     uint32_t value = generation;
     xSemaphoreGive(settings_mutex);
     return value;
+}
+
+uint32_t settings_jpeg_write_limit_kib(void)
+{
+    /* A short atomic snapshot is cheap enough for every decoder checkpoint. */
+    portENTER_CRITICAL(&jpeg_limit_lock);uint32_t value=jpeg_write_limit_kib;portEXIT_CRITICAL(&jpeg_limit_lock);
+    return value;
+}
+
+esp_err_t settings_set_jpeg_write_limit_kib(uint32_t kib)
+{
+    /* Persist before publishing; serialize with ordinary settings NVS commits.
+     * A repeated value causes no flash write or unrelated theme reinitialization. */
+    xSemaphoreTake(settings_mutex,portMAX_DELAY);
+    esp_err_t result=ESP_OK;
+    if(kib!=settings_jpeg_write_limit_kib()) {
+        result=nvs_set_u32(settings_store,"jpeg_write_kib",kib);
+        if(result==ESP_OK)result=nvs_commit(settings_store);
+        if(result==ESP_OK) {
+            portENTER_CRITICAL(&jpeg_limit_lock);jpeg_write_limit_kib=kib;portEXIT_CRITICAL(&jpeg_limit_lock);
+        }
+    }
+    xSemaphoreGive(settings_mutex);return result;
 }

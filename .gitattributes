@@ -683,23 +683,36 @@ firmware/development/esp32c3-aac-pc19-network/*.json -text
 /tests/results/esp32c3-fir-build-20261009/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 /firmware/development/esp32c3-idf-6.1-r9a97-fir32/* -text whitespace=cr-at-eol
 # Keep reconstructed sources and their provenance hashes stable across checkouts.
+/.gitattributes text eol=lf
 Small_TV/src/** text eol=lf
+Small_TV/src/third_party/libjpeg-turbo/upstream.tar.gz -text
+# Unified patch context lines preserve their pinned bytes, including blank context.
+Small_TV/src/third_party/libjpeg-turbo/*.patch whitespace=-blank-at-eol
 Small_TV/qemu/profiles/*.json text eol=lf
 Small_TV/qemu/*.ps1 text eol=lf
 Small_TV/qemu/parity/*.py text eol=lf
 Small_TV/src/resources/timezones/*.tzif -text
 Small_TV/src/tests/fixtures/jpeg/*.jpg -text
+Small_TV/src/tests/fixtures/jpeg_extended/*.jpg -text
 Small_TV/src/third_party/cjson/cJSON.h whitespace=-blank-at-eol
 firmware/development/small-tv-esp32c2-reconstructed/*.json text eol=lf
+firmware/development/small-tv-esp32c2-reconstructed/*.h text eol=lf
 firmware/development/small-tv-esp32c2-reconstructed/sdkconfig text eol=lf
 firmware/development/small-tv-esp32c2-reconstructed-debug/*.json text eol=lf
+firmware/development/small-tv-esp32c2-reconstructed-debug/*.h text eol=lf
 firmware/development/small-tv-esp32c2-reconstructed-debug/sdkconfig text eol=lf
 # Client-side processing inputs are fingerprinted by the frontend regression.
 Small_TV/local_site/*.js text eol=lf
 Small_TV/local_site/*.mjs text eol=lf
 Small_TV/local_site/photo_crop.html text eol=lf
 Small_TV/local_site/extract_pages.py text eol=lf
+Small_TV/local_site/server.py text eol=lf
+Small_TV/local_site/photo_write_policy.html text eol=lf
 Small_TV/local_site/pages-manifest.json text eol=lf
+
+# Keep the archived storage-probe fingerprints stable across Windows checkouts.
+firmware/development/small-tv-storage-probe/*.json text eol=lf
+firmware/development/small-tv-storage-probe/sdkconfig -text whitespace=cr-at-eol
 /tests/results/esp32c3-shared-decoder-arena-20261012/** -text whitespace=cr-at-eol,-blank-at-eof,-blank-at-eol
 /firmware/development/esp32c3-idf-6.1-r9a97-decoder-arena/* -text whitespace=cr-at-eol
 /firmware/development/esp32c3-idf-6.1-r9a97-decoder-arena100/* -text whitespace=cr-at-eol

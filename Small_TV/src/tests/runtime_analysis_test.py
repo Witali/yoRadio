@@ -132,6 +132,23 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Changed runtime input'):
             self.run.audit()
 
+    def test_explicit_candidate_must_be_pinned_and_match_the_recorded_identity(self):
+        """Keep the frozen executable distinct; reject an unpinned or wrong candidate."""
+        candidate = self.run.root / 'clients-v8-riscv32.exe'
+        candidate.write_bytes(b'candidate model')
+        self.run.report.update(schema_version=5, qemu_executable=str(candidate))
+        with self.assertRaisesRegex(ValueError, 'not a pinned input'):
+            self.run.audit()
+        self.run.report['inputs_sha256'][str(candidate)] = sha(candidate)
+        with self.assertRaisesRegex(ValueError, 'Emulator identity differs'):
+            self.run.audit()
+        self.run.report['qemu_sha256'] = sha(candidate)
+        self.run.write_report()
+        # Use the report itself here: the earlier start record belongs to the old binary.
+        self.assertTrue(audit_run(self.run.folder, self.run.root)['terminal'])
+        with self.assertRaisesRegex(ValueError, 'captured start'):
+            self.run.audit()
+
     def test_rehashed_input_cannot_replace_captured_start(self):
         path = self.run.root / 'runtime_qemu.py'
         path.write_bytes(b'changed')

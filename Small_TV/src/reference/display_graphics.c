@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/display/st7789.c.
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: application_review; entry: ram:420095c4; name: draw_filled_circle_at_420095c4

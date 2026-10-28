@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/services/weather.c.
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: application_review; entry: ram:4200fcbe; name: stop_http_server_at_4200fcbe

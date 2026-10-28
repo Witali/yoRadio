@@ -30,7 +30,8 @@ class CorrespondenceTest(unittest.TestCase):
         self.assertTrue(result['passed'])
         self.assertFalse(result['semantic_equivalence_proved'])
         self.assertEqual(result['factory_export_functions'], 176)
-        self.assertEqual(result['native_app_functions'], 168)
+        # Owner/prefetch integration plus the two independent JPEG budget settings APIs.
+        self.assertEqual(result['native_app_functions'], 219)
         self.assertEqual(len(result['assembly_only']), 11)
 
     def test_missing_factory(self):
@@ -53,6 +54,21 @@ class CorrespondenceTest(unittest.TestCase):
 
     def test_stale_source(self):
         self.reject(lambda m: m['inputs'].update({'src/app/app_main.c': '0'*64}), 'Review inputs changed')
+
+    def test_missing_jpeg_support(self):
+        """The newly compiled extension must remain visible in reverse review."""
+        self.reject(lambda m: m['native_support'].pop('codec/jpeg_decoder.c#jpeg_decoder_decode'),
+                    'Unaccounted native function')
+
+    def test_stale_jpeg_adapter(self):
+        """Changing an adapter cannot retain an old factory/native inventory pin."""
+        self.reject(lambda m: m['inputs'].update({'src/storage/jpeg_cache.c': '0'*64}),
+                    'Review inputs changed')
+
+    def test_missing_write_budget(self):
+        """Live quota reductions cannot disappear from the reviewed source map."""
+        self.reject(lambda m: m['native_support'].pop('storage/jpeg_transport.c#jpeg_transport_limit_program'),
+                    'Unaccounted native function')
 
     def test_wrong_reference(self):
         self.reject(lambda m: m['factory'][0].update(reference='reference/application.c'), 'Wrong reference')

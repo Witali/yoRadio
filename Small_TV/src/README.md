@@ -26,12 +26,14 @@ virtual-time limitations; physical-board and Internet weather checks remain pend
 | `app/app_main.c` | Initialization and task startup |
 | `app/settings/` | Factory raw-sector compatibility, NVS migration, validation and RGB565 |
 | `app/display/` | ST7789 hardware SPI, LEDC backlight, four clock themes |
-| `app/media/` | Flash assets, streaming JPEG/BMP, validated photo uploads |
+| `app/media/` | Flash assets, async photo owner, guarded cache and validated uploads |
 | `app/network/` | Station/AP mode, real Wi-Fi scan, bounded captive DNS |
 | `app/services/` | SNTP, factory timezone selection, HTTP/Kelvin weather and cached results |
 | `app/text/` | Strict UTF-8 scalar decoding and complete label prefixes |
 | `app/web/` | Recovered HTTP contracts, pages, settings and photo APIs |
-| `third_party/` | Pinned cJSON, TJpgDec and licensed Spleen font |
+| `codec/` | Bounded JPEG API, factory baseline strip producer, privacy and coefficient conversion |
+| `storage/` | Guarded NOR transport, scratch files, atomic journal and verified frame cache |
+| `third_party/` | Pinned cJSON, TJpgDec, offline libjpeg-turbo source bundle and licensed Spleen font |
 | `reference/` | 176 exported functions split into 16 logical pseudocode modules |
 
 [`symbol-map.json`](symbol-map.json) preserves every exported function's
@@ -47,7 +49,8 @@ meaning. The executable files in `app/` use real C types and descriptive
 functions, configuration fields, buffers and state variables. SDK code is
 provided by ESP-IDF rather than stubbed out or mapped to old machine addresses.
 
-All 162 production C functions have an entry comment explaining their purpose.
+Application functions have entry comments explaining their purpose; the exact
+source inventory is checked by `tools/audit_correspondence.py`.
 Corrected functions also carry searchable entry-comment markers:
 `FIXED_FACTORY` identifies a deliberate correction of an original firmware bug;
 `FIXED_RECONSTRUCTION` identifies a repair of our C implementation to restore
@@ -59,6 +62,10 @@ The [correction marker convention](CORRECTION_MARKERS.md) documents their usage,
 examples and the functions already marked.
 The [working context](WORKING_NOTES.md) preserves the current recommendations
 and next checks; the [work journal](WORK_LOG.md) records findings and validation.
+The [current JPEG integration checkpoint](tests/JPEG_MAIN_INTEGRATION.md) separates
+host support, actual C2 memory refusals, HTTP/cache execution and pending LCD,
+migration and full/hardware acceptance. Ordinary builds now include the new
+photo owner; a successful library build alone is not the supported-format list.
 Classic city, description and weather-title text is clipped to its own field.
 Long strings scroll left and back with pauses; short strings remain centered.
 Status refreshes preserve the phase; changed text or theme re-entry resets it.
@@ -197,19 +204,29 @@ it has no flash operation.
 | Unallocated tail / original settings sector | `0x3e7000` | 102,400 |
 | **Total** | | **4,194,304** |
 
-The application image uses approximately 1 MiB of its 1.465 MiB partition;
-the exact size is in the build manifest. The media partition includes the
+The application image includes the extended JPEG decoder; its exact size and
+remaining app-partition capacity are in the build manifest. The media partition includes the
 five 100 KiB photo slots, five 200 KiB animation slots, weather/status slots
-and their unused padding. About 1 MiB is spare application capacity plus
-the gap/tail, not a missing three megabytes. Keeping original absolute media
+and their padding. Verified gaps/tails now provide coefficient scratch and five
+RGB565 caches; `jpeg-cache-plan.json` records their allocation. Keeping original absolute media
 offsets makes comparison with the dump straightforward. No SPIFFS/LittleFS
 filesystem or second OTA application partition is created.
 
-If manually installing the archived images later, their offsets are
+For a fresh installation, the archived image offsets are
 `bootloader.bin` → `0x0`, `partition-table.bin` → `0x8000`, `app.bin` →
 `0x10000`, and **`assets.bin` → `0x200000`**. Plain `idf.py flash` does not
 include the separately packed media, so it alone is insufficient for a fresh
 installation. Board installation was not performed as part of this task.
+
+For an existing matching native installation, update only the application:
+startup can adopt the old unstamped resources without erasing photos/settings.
+It verifies the full partition map, all 27 immutable payloads, vacant candidate
+areas and reachable interrupted stamp states. It writes/verifies the 32-byte
+identity first and the 8-byte commit header last; the 24-byte FF tail stays untouched. A valid
+existing stamp retains its cache data. Foreign resources/stamps or occupied
+unclaimed areas fail closed. **The full `assets.bin` contains default photos;
+writing it during an ordinary update would replace user uploads.** See
+[legacy migration checks](tests/JPEG_LEGACY_PROVISION.md). No flashing was done here.
 
 ## Restored behavior and deliberate differences
 
@@ -291,7 +308,7 @@ inside it and resized by dragging any corner, with zoom and position sliders.
 Browser Canvas resamples the chosen region to 240×240 JPEG, and
 JavaScript strips APP/COM metadata before sending chunks to the board.
 Cancel/Escape sends no upload and preserves the slot. Native JPEG dimensions,
-baseline/scan completeness and privacy validation still apply. Original HTML
+full decode and multi-scan privacy validation still apply. Original HTML
 bytes remain preserved under `../local_site/source/`.
 
 The reconstruction corrects unsafe DNS bounds, image-buffer overlap,
@@ -299,9 +316,12 @@ unbounded/misordered chunks, the `/wifireset` credential-copy defect, and
 the panel's inclusive end-coordinate literal of 240 (now 239). Photo uploads
 use ordered 4096-byte chunks, idempotent last-block retries, a 100 KiB slot
 limit and a 120-second abandoned-session timeout. A partial slot is marked
-absent in NVS before erase. Finish validates a complete baseline 240×240 JPEG
-and rejects EXIF, other private metadata, progressive images and appended
-data. All stock JPEGs are the already sanitized exports. DNS replies fit a
+absent in NVS before erase. Finish validates metadata and decodes one complete
+240×240 JPEG into a verified durable cache. Extended modes, including progressive,
+are subject to the device's measured memory/backing/service budgets, with precise
+resource refusal reasons. EXIF, other private metadata and appended data remain
+rejected. Factory baseline pixels retain their existing producer policy. All stock
+JPEGs are the already sanitized exports. DNS replies fit a
 bounded packet and only serve peers on the setup AP subnet. Cross-origin
 browser writes are rejected. Local HTTP management and the setup AP retain
 the original unauthenticated access model.

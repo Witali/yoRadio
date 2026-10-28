@@ -1,5 +1,12 @@
 # Функциональные тесты Small TV ESP32-C2
 
+Offline production JPEG dependency и проверки повреждённых исходников/сборочного
+кэша описаны в [JPEG_DEPENDENCY_BUILD.md](JPEG_DEPENDENCY_BUILD.md). Компиляция
+adapter modules не означает включение нового декодера в UI/upload.
+В обычный native gate включён [JPEG privacy contract](JPEG_PRIVACY.md): metadata
+между scans, границы буфера, truncation, I/O и остановки проверяются отдельно от
+entropy decoding. Реальный upload finish использует этот модуль.
+
 ## Полнота переноса
 
 [Двусторонняя карта](../reference/BIDIRECTIONAL_AUDIT.md) учитывает каждый
@@ -16,6 +23,16 @@ native AP и native STA в отдельных ВМ без LCD/debugger, с на�
 [54F4 scoped proof](../../qemu/parity/captive-portal-validation-20261020.json)
 не заменяет полный suite/24h новой версии.
 
+## Переинициализация после смены города
+
+`city_theme.inc` проверяет четыре темы, одинаковые/новые города, отказы без
+побочных эффектов, отсутствие лишних flash commits и сохранение настроек,
+изменённых во время HTTP body I/O. `city_theme_qemu.py` выполняет восемь реальных
+city commands и наблюдает первые init events и завершённый вывод всех тем.
+`photo_reinit_qemu.py --command city` отдельно проверяет active fade с original
+и native VM и точным literal factory frame. По умолчанию остаётся `--command theme`.
+См. [CITY_REINIT.md](CITY_REINIT.md); это не полная или аппаратная приёмка.
+
 ## Цвета и подготовка нового JPEG
 
 Pure color module имеет отдельные host/RV32 проверки grayscale/RGB/CMYK2–16бит
@@ -28,9 +45,44 @@ Host libjpeg allocation/I/O faults и recovery после abort проверяю
 [JPEG_FAULT_RECOVERY.md](JPEG_FAULT_RECOVERY.md). Эти результаты не заменяют
 NOR/HTTP/LCD или полный/суточный прогон будущей firmware.
 
+Actual libjpeg с одним общим NOR scratch проверен отдельной матрицей pixels,
+logical faults и 2238 partial physical error recoveries. Это host execution,
+не target UI integration. См. [JPEG_SHARED_SCRATCH.md](JPEG_SHARED_SCRATCH.md).
+Сокращение actual NOR traffic через reversible DC/AC temporary encoding, flat
+tradeoffs и независимые pixel/fault gates: [JPEG_COEFFICIENTS.md](JPEG_COEFFICIENTS.md).
+Portable decoder API, resource preflight/typed refusals, RGB565 pixels, callback
+faults/reuse и RV32 binding: [JPEG_DECODER.md](JPEG_DECODER.md).
+Новый API с actual NOR/packed backing проверен также в standalone C2 QEMU:
+[JPEG_BACKING.md](JPEG_BACKING.md). Это ещё не UI/upload/cache workflow или
+доказательство общего RAM/stack/time fit приложения с Wi-Fi и дисплеем.
+Persistent source/SHA/rows/journal workflow с реальным JPEG decoder, cold readonly
+cache и проверкой transient source reads: [JPEG_CACHE_PIPELINE.md](JPEG_CACHE_PIPELINE.md).
+Этот cache owner пока host/RV32-linked, не native UI/HTTP/ESP-IDF runtime.
+
 Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
 для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write
 не выполняется. Это capacity/ownership plan, не готовый NOR backend.
+
+Portable NOR storage core реализован отдельно: 3000random operations,83partial
+fault/reopen scenarios,7actual-layout stores и6compiled mutation controls.
+См. [JPEG_NOR_STORAGE.md](JPEG_NOR_STORAGE.md). Он не подключён к production.
+Readonly resource/layout guard также подготовлен отдельно:27payloads + ownership
+stamp, partial read/hash failures и10compiled mutants проверены. См.
+[JPEG_OWNERSHIP_GUARD.md](JPEG_OWNERSHIP_GUARD.md). Atomic metadata, authorization/
+SHA transport, matching assets build и codec integration ещё нужны.
+
+Portable [JPEG_CACHE_JOURNAL.md](JPEG_CACHE_JOURNAL.md): two-bank snapshots,
+durable invalidation, mandatory physical frame hash на publish/каждый hit;
+33400NOR/power-cut cases,769corruptions,6boot read failures и12compiled mutants.
+Independent Python wire parser проверяет реальные persisted records. Это ещё
+не actual source-upload/HTTP integration, ESP-IDF/hardware или production decoder.
+
+[JPEG_TRANSPORT.md](JPEG_TRANSPORT.md): shared revocable I/O/time budgets и
+настоящий ESP-IDF flash/partition/PSA adapter.31host cases/14compiled mutants;
+standalone probe исполняется в QEMU:4variants/5owned processes, real sector RMW,
+fresh-process persistence, rejected legacy stamp/unknown raw flags/extra partition.
+Основная app3E03/TJpgd не менялась; это storage gate без network/LCD criteria,
+не готовый libjpeg codec/shared subfiles/upload integration или hardware acceptance.
 
 ## JPEG Huffman selectors
 

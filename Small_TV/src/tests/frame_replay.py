@@ -22,7 +22,7 @@ class SceneMachine(WeatherMachine):
         elif name != 'asset-frame-count':
             super().adapt(address,name,callback)
 
-    def __init__(self, variant, dump, assets):
+    def __init__(self, variant, dump, assets, *, dependency_root=None,omit_photo_owner=False):
         self.jpeg_assets = assets_list(assets)
         factory=variant.startswith('factory')
         # Validate public bytes once in assets_list, then retain immutable bounds.
@@ -33,7 +33,7 @@ class SceneMachine(WeatherMachine):
                            (ROOT/'Small_TV/assets'/item['file']).stat().st_size)
                           for item in self.jpeg_assets]
         self.header_ranges = [(int(item['flash_offset'],16),1024) for item in assets['animations']]
-        super().__init__(variant,dump,assets)
+        super().__init__(variant,dump,assets,dependency_root=dependency_root,omit_photo_owner=omit_photo_owner)
         if not self.is_factory:
             self.adapt(self.symbols['malloc'],'scene-workspace-malloc',self.allocate)
             self.adapt(self.symbols['free'],'scene-workspace-free',self.release)

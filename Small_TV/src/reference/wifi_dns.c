@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/network/wifi.c + app/network/dns.c.
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: application_review; entry: ram:4200c578; name: stop_wifi_http_server_at_4200c578

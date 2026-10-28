@@ -6,6 +6,18 @@
 в пятый слот. Наблюдение помогает готовить H09/H10; короткий запуск не закрывает
 24-часовую проверку, радиоканал, прерывания физического чипа или аппаратную приёмку.
 
+При использовании замороженного набора инструментов новый бинарник задаётся
+отдельно: `--qemu <candidate.exe>`. Без этого параметра сохраняется прежний
+`<qemu-root>/bin/qemu-system-riscv32.exe`. Заменять файл в frozen bundle не нужно.
+PowerShell-обвязки `start_runtime.ps1` и `runtime_supervisor.ps1` передают тот же
+выбор через `-QemuExecutable <candidate.exe>`.
+
+Schema 5 сохраняет абсолютный `qemu_executable` и его SHA в `inputs_sha256`.
+Аудитор требует, чтобы именно этот файл был среди pinned inputs и совпадал с
+`qemu_sha256`; прежние schema 3/4 проверяются по старому имени. Погодные критерии
+schema 4 сохраняются. Тест отвергает неприкреплённый кандидат, неверный SHA и
+попытку использовать start record другой сборки.
+
 Запуск из репозитория после подготовки обычных oracle dependencies:
 
 ```powershell
@@ -42,6 +54,123 @@ guest disconnect/reconnect состояния и доступность station 
 читать готовые ELF и архив основной копии, не пересобирая и не меняя их. Скрипт
 создаёт только собственную локальную ВМ без SDL и закрывает её в `finally`.
 Ни прошивка платы, ни NVS/flash физического устройства не затрагиваются.
+
+## Результат на текущей прошивке, 24 октября
+
+Checkpoint 2026-10-24 на app `9c1a83bd…`, ELF `76b5ce37…`, QEMU `a5be14c5…`:
+
+| Запуск | Циклы / Wi-Fi outages | HTTP | Гостевое время | Минимум sampled free heap | Минимум stack fill |
+|---|---|---|---|---|---|
+| Preflight | 4 / 2 | 32 | 22,569796 s | 54820 B | 476 B |
+| Churn | 40 / 20 | 320 | 200,910826 s | 54688 B | 332 B |
+
+Все запросы уложились в прежний предел 6 guest s; максимум 4,084654 s.
+Десять повторных загрузок JPEG в 40-cycle run прошли обычный HTTP upload path.
+Независимые UART guards наблюдали один ROM boot без panic; workload, guard и
+supervisor завершились с code 0 и неизменными входами. Оба owned VM остановлены.
+Сумма накопленных минимумов отдельных heaps в churn достигла 23180 B;
+это другая метрика, чем минимум sampled free heap, и не одновременный global peak.
+Это две короткие проверки, а не доказательство отсутствия любой утечки или H10.
+
+[`runtime-candidate-validation-20261024.json`](../../qemu/parity/runtime-candidate-validation-20261024.json)
+содержит 34 typed raw items / 34 payloads, 114908 новых gzip bytes. Сохранены
+полные численные журналы, отчёты/guard/supervisor, early start record 40-cycle
+run, исходники и unit log; полные VM flash/RAM/UART не копируются. Replay
+пересчитывает журнал и отвергает 16 испорченных отчётов. Отдельные 59 unit tests
+для audit/memory/ROM/clock/weather прошли; в этом архиве сохранён log 25 audit tests.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_runtime_candidate_evidence.py `
+  --proof Small_TV/qemu/parity/runtime-candidate-validation-20261024.json
+```
+
+Исторический replay принимает `--source-revision`; source snapshots и точные
+app/ELF identities обязательны. В архиве есть ссылка по SHA на отдельный
+network-stalled-peer checkpoint новой модели QEMU. Полные display и network
+gates, 24h и аппаратная приёмка остаются самостоятельными этапами.
+
+## Прерванный H10, проверка 2026-10-25
+
+H10 `.build/runtime-h10-current-20261024` на app9C1A83BD/ELF76B5CE37 и
+QEMU A5BE14C5 не завершился. Windows CIM подтвердил отсутствие всех четырёх
+владельцев и других процессов того же запуска. Supervisor и guard остались со
+статусом `running`; это устаревшие файлы, а не живые процессы. Последний heartbeat
+—24Oct19:57:54UTC. Причина завершения неизвестна. В ограниченном20-minute окне
+Application1000/1001 подходящих crash events не найдено, хост загружен14Oct.
+Это не устанавливает ни ошибку прошивки, ни конкретную причину остановки.
+
+Пересчитан весь численный журнал:1488 полных циклов, ещё4 незавершённых события,
+25560.689541 гостевых секунд (7ч6мин),11909 HTTP requests с учётом частичного
+цикла и24 настоящих STA outages. Промежуточный `completed_cycles=1487` отстаёт
+от snapshot на один цикл; он не заменяет разбор журнала. Min sampled heap55116B,
+один ROM boot/нет UART panic,1482 разных valid weather generations, максимальный
+наблюдаемый интервал свежей погоды68.579137guest s. Нет terminal footer или
+успешного terminal guard: строгая приёмка правильно отвергает run. `--diagnostic`
+возвращает `pending` для проверенного **префикса**, а не утверждает живость.
+В отдельном архиве этот случай классифицирован как `interrupted`.
+
+Неизменённый анализ после часового warm-up дал6 полных часовых окон/60 фаз и
+семь retained-loss warnings. По фазам1/13/25/33/37/49/59 разница первой/последней
+медиан равна16/18/16/20/12/12/220B. Объяснение этих различий и отсутствие утечки
+не установлены. Пороги не смягчались; soak этим не принимается.
+
+[`runtime-interrupted-validation-20261025.json`](../../qemu/parity/runtime-interrupted-validation-20261025.json)
+сохраняет24 raw/payload references,167082 новых gzip bytes: numeric journal,
+report/guard/supervisor, early record, наблюдение владельцев, исходники и оба
+offline результата. Full UART/RAM/flash не копируются. Независимый
+`verify_interrupted_runtime_evidence.py` пересчитывает журнал/trend, сохраняет
+все warnings и отвергает12 controls, включая ложный H10 pass, живого владельца,
+скрытые flags, HTTP503 и неверную сумму heap. `evidence_verified=true` означает
+проверенные данные прерванного запуска; workload/H10 passed остаются false.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_interrupted_runtime_evidence.py `
+  --proof Small_TV/qemu/parity/runtime-interrupted-validation-20261025.json
+```
+
+Исторический replay принимает `--source-revision`; нужен соответствующий app/ELF.
+Переход на main QEMU проверен следующим отдельным checkpoint; он не объясняет
+прежние memory flags.
+
+## Квалификация main QEMU, 2026-10-25
+
+Неизменённые app9C1A83BD/ELF76B5CE37/source7D95988C проверены с QEMU main9135fc89ce
+(compiled modelcb9deafd83), executable2DF903276E66AFE0095AD19AFD6D8B7201BCCA3FBDA073F3EDB958934AEF0001.
+Отдельный pin `C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients/build/main-9135-riscv32.exe`
+сохраняет прежнийV8 и frozen47-file tools. Исходники модели совпали с pins
+сохранённого QEMU main integration report; само слияние здесь не переигрывается.
+
+Preflight4cycles/2outages/32HTTP/22.790034guest s и detached40cycles/20outages/
+320HTTP/201.050119guest s завершились с workload/guard/supervisor0. Во втором run
+10повторных JPEG uploads, все темы/города/погода и concurrent GET. Один ROM boot,
+неизменённые входы,8owner PIDs отсутствуют по последующему CIM. MaxHTTP4.043722guest s
+при прежней границе6; min sampled heap54816B, SDK sum-of-per-heap-minima20348B,
+наименьший task stack fill332B. Это разные метрики и короткие нагрузки, не H10.
+
+[`runtime-main-validation-20261025.json`](../../qemu/parity/runtime-main-validation-20261025.json):
+34raw/payload references,30741newgzipbytes с reuse старых producer payloads.
+Новый schema2 replay привязывает main manifest к точному executable; schema1
+сохранён. На текущем reader старый checkpoint отдельно прошёл с source-revision
+deda58625/16negative controls. Новый checkpoint отвергает20controls:16workload/
+guard mutations и4самосогласованно rehashed, но ложных model manifests. Также
+прошли25audit/trend unit tests. Полные RAM/flash/UART не добавлены.
+
+```powershell
+$env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
+& 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
+  Small_TV/src/tests/verify_runtime_candidate_evidence.py `
+  --proof Small_TV/qemu/parity/runtime-main-validation-20261025.json
+```
+
+Новый H10 `.build/runtime-h10-main-20261025` запущен25Oct11:23:20UTC на полные
+86400guest s, interval15/outageEvery60. Старые7часов к нему не прибавляются.
+Early record сохранён наcycle0; после присоединения guard CIM подтвердил всех
+четырёх владельцев. Это пока running, не terminal result. Данные прежних
+retained-loss flags остаются открытым исследованием и не смягчают приёмку.
 
 ## Разделение модулей и способ измерения
 

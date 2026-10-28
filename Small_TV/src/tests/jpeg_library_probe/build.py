@@ -50,6 +50,7 @@ def main():
     parser.add_argument("--adapted", action="store_true")
     parser.add_argument("--flash-tables", action="store_true")
     parser.add_argument("--compact-pools", action="store_true")
+    parser.add_argument("--nor-fixtures", type=Path, help="Use real shared scratch/NOR model instead of host temporary files")
     args = parser.parse_args()
     if args.flash_tables and not args.adapted:
         parser.error("--flash-tables requires --adapted")
@@ -57,10 +58,17 @@ def main():
         parser.error("--compact-pools requires --adapted")
     input_names = ("probe.c", "probe_memory.c", "probe_memory.h", "probe_faults.c",
                    "probe_faults.h", "probe_reuse.c", "CMakeLists.txt",
-                   "table_dump.c", "table_dump.h", "libjpeg-turbo-3.2.0-bounded.patch", "build.py",
+                   "table_dump.c", "table_dump.h", "probe_backing.h", "probe_backing_stdio.c",
+                   "libjpeg-turbo-3.2.0-bounded.patch", "build.py",
                    "generate_flash_tables.py", "libjpeg-turbo-3.2.0-flash-tables.patch",
                    "libjpeg-turbo-3.2.0-compact-pools.patch")
     build_inputs = {name: sha(HERE / name) for name in input_names}
+    if args.nor_fixtures:
+        for name in ("../jpeg_scratch/probe_backing_nor.c", "../jpeg_scratch/nor_model.c", "../jpeg_scratch/nor_model.h",
+                     "../../storage/jpeg_scratch.c", "../../storage/jpeg_scratch.h", "../../storage/jpeg_nor.c", "../../storage/jpeg_nor.h",
+                     "../../codec/jpeg_coefficients.c", "../../codec/jpeg_coefficients.h"):
+            build_inputs[name] = sha(HERE/name)
+    fixture_inputs = {str(p.resolve()): sha(p) for p in (args.nor_fixtures/'scratch_fixture.h',args.nor_fixtures/'plan.json')} if args.nor_fixtures else {}
     source = args.source.resolve()
     actual = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True).strip()
     if actual != PIN:
@@ -105,7 +113,8 @@ def main():
     if not library.exists():
         library = library_build / "libjpeg.a"
     probe_build = output / "probe"
-    run([args.cmake, "-S", HERE, "-B", probe_build, "-G", "Ninja",
+    backing_flags = [f"-DJPEG_NOR_FIXTURES={args.nor_fixtures.resolve().as_posix()}"] if args.nor_fixtures else []
+    run([args.cmake, "-S", HERE, "-B", probe_build, "-G", "Ninja", *backing_flags,
          f"-DCMAKE_MAKE_PROGRAM={args.ninja}", "-DCMAKE_BUILD_TYPE=Release",
          "-DCMAKE_TRY_COMPILE_CONFIGURATION=Release",
          f"-DJPEG_SOURCE={exported}", f"-DJPEG_BUILD={library_build}", f"-DJPEG_LIBRARY={library}"])
@@ -113,7 +122,7 @@ def main():
     executable = probe_build / "jpeg_probe.exe"
     if not executable.exists():
         executable = probe_build / "jpeg_probe"
-    if build_inputs != {name: sha(HERE / name) for name in input_names}:
+    if build_inputs != {name: sha(HERE / name) for name in build_inputs} or fixture_inputs != {p: sha(Path(p)) for p in fixture_inputs}:
         raise ValueError("Probe inputs changed during compilation")
     adapted_names = ["jdmaster.c", "jdcoefct.c"]
     if args.flash_tables:
@@ -125,6 +134,8 @@ def main():
                   source_archive_sha256=sha(archive), patch_sha256=sha(patch) if args.adapted else None,
                   flash_tables=args.flash_tables, flash_patch_sha256=sha(flash_patch) if args.flash_tables else None,
                   compact_pools=args.compact_pools, pool_patch_sha256=sha(pool_patch) if args.compact_pools else None,
+                  backing_backend="shared-nor-model" if args.nor_fixtures else "stdio",
+                  backing_fixture_inputs=fixture_inputs,
                   probe_inputs=build_inputs,
                   executable=str(executable), executable_sha256=sha(executable),
                   library_sha256=sha(library),

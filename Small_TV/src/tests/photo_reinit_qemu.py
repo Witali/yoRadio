@@ -1,4 +1,4 @@
-"""Select the photo theme again during a fade and compare the next complete photograph."""
+"""Reinitialize the photo theme during a fade and compare the next complete photograph."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -81,16 +81,23 @@ def exercise(options, folder, variant, symbols, loop_end):
             address = (scene.cstring(observer, 0x3fcb7b84, 20) if variant == 'original' else
                        socket.inet_ntoa(observer.memory(symbols['last_station_address'], 4)))
             reference = PhotoMachine('factory', (ROOT/'Small_TV/full-flash.bin').read_bytes(),
-                                     json.loads((ROOT/'Small_TV/assets/manifest.json').read_text()))
+                                     json.loads((ROOT/'Small_TV/assets/manifest.json').read_text()),
+                                     dependency_root=options.dependency_root)
             reference.advance(2, 1, 3, address)
             expected = panel_rgb(reference.panel, 1000)
             url = session['web_urls']['station']
-            command = 0x4200d850 if variant == 'original' else symbols['settings_select_theme']
+            city = options.command == 'city'
+            # 0x4200f3cc clears 0x3fcc39e9, the latch consumed by the factory UI.
+            command = ((0x4200f3cc if city else 0x4200d850) if variant == 'original' else
+                       symbols['settings_update_city' if city else 'settings_select_theme'])
             command_code = observer.memory(command, 4)
             observer.breakpoint(command)
             requested = weather.virtual_seconds(qmp)
             with ThreadPoolExecutor(max_workers=1) as executor:
-                pending = executor.submit(http, url, '/setclocktype', {'clocktype': '2'}, origin=url, timeout=30)
+                route, payload = (('/updateCity', {'city': 'Shenzhen,CN'}) if city else
+                                  ('/setclocktype', {'clocktype': '2'}))
+                result['command'] = dict(route=route, payload=payload)
+                pending = executor.submit(http, url, route, payload, origin=url, timeout=30)
                 observer.continue_to(command)
                 result['state_when_command_executes'] = list(observer.memory(pointer, 2))
                 observer.breakpoint(command, False)
@@ -159,6 +166,7 @@ def main():
     parser.add_argument('--dependency-root', type=Path, default=ROOT)
     parser.add_argument('--qemu-root', type=Path, default=Path('C:/Work/QEMU-ESP32'))
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--command', choices=('theme', 'city'), default='theme')
     args = parser.parse_args()
     sys.path.insert(0, str(args.qemu_root/'tools'))
     sys.path.insert(0, str(ROOT/'Small_TV/qemu/parity'))
@@ -170,6 +178,8 @@ def main():
         hardware_profile=str(ROOT/'Small_TV/qemu/profiles/small-tv-c2.json'), display='none',
         rom_elf=str(args.dependency_root/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
         service_port=fixture.port)
+    options.command = args.command
+    options.dependency_root = args.dependency_root
     args.output.mkdir(parents=True, exist_ok=False)
     symbols, loop_end = native_entries()
     paths = [Path(__file__), *[Path(__file__).with_name(name) for name in
@@ -180,19 +190,19 @@ def main():
     inputs = [{'file': path.relative_to(ROOT).as_posix(), 'sha256': vm.digest(path.read_bytes())} for path in paths]
     helpers = {name: vm.digest((args.qemu_root/'tools'/name).read_bytes()) for name in
         ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py', 'small_tv_display.py')}
-    result = {'passed': False, 'app_sha256': verify_inputs(),
+    result = {'passed': False, 'app_sha256': verify_inputs(dependency_root=args.dependency_root),
         'source_sha256': json.loads((ROOT/'firmware/development/small-tv-esp32c2-reconstructed/manifest.json').read_text())['source_sha256'],
         'native_elf_sha256': vm.digest((ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()),
         'qemu_sha256': vm.digest(Path(options.qemu).read_bytes()), 'helper_sha256': helpers,
         'profile_sha256': vm.digest(Path(options.hardware_profile).read_bytes()), 'test_inputs': inputs,
-        'flows': {}, 'scope': __doc__}
+        'flows': {}, 'scope': __doc__, 'command': args.command}
     try:
         for variant in ('original', 'reconstructed'):
             result['flows'][variant] = exercise(options, args.output/variant, variant, symbols, loop_end)
         result['passed'] = all(flow['passed'] for flow in result['flows'].values())
     finally:
         fixture.close()
-        result['inputs_unchanged'] = (verify_inputs() == result['app_sha256'] and
+        result['inputs_unchanged'] = (verify_inputs(dependency_root=args.dependency_root) == result['app_sha256'] and
             vm.digest((ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()) == result['native_elf_sha256'] and
             vm.digest(Path(options.qemu).read_bytes()) == result['qemu_sha256'] and
             all(vm.digest((ROOT/row['file']).read_bytes()) == row['sha256'] for row in inputs) and

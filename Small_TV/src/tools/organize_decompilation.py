@@ -9,6 +9,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+from audit_correspondence import reconstruction_targets
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = {
@@ -114,17 +115,52 @@ def category(address: str, name: str) -> str:
     return "time_setup"
 
 
-def native_module(group: str) -> str:
-    return {"application":"app/app_main.c", "settings_colors":"app/settings/settings.c", "backlight":"app/display/backlight.c",
-            "display_spi":"app/display/st7789.c", "display_graphics":"app/display/st7789.c", "clock_dial":"app/display/clock_ui.c",
-            "display_fonts":"app/display/st7789.c", "clock_themes":"app/display/clock_ui.c", "media_images":"app/media/assets.c",
-            "wifi_dns":"app/network/wifi.c + app/network/dns.c", "http_photos":"app/web/photo_api.c + app/media/photo_upload.c",
-            "http_settings":"app/web/settings_api.c", "http_server":"app/web/server.c", "weather":"app/services/weather.c",
-            "time_setup":"app/services/time_sync.c + app/display/clock_ui.c", "sdk_platform":"ESP-IDF / libc (not ported)"}[group]
+REFERENCE_HEADER = ("/* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.\n"
+    " * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.\n"
+    " * Per-function reconstruction targets: symbol-map.json native_targets.\n */\n\n")
+
+
+def reviewed_targets() -> dict:
+    """Read explicit address/function links; grouping is not an implementation map."""
+    manifest=json.loads((ROOT/'reference/correspondence.json').read_text(encoding='utf-8'))
+    rows={row['address']:row for row in manifest['factory']}
+    if len(rows)!=len(manifest['factory']):raise ValueError('Duplicate reviewed factory address')
+    return rows
+
+
+def navigation(address: str, reviewed: dict) -> dict:
+    """Leave newly discovered functions unreviewed instead of inventing a target."""
+    row=reviewed.get(address)
+    if row is None:return dict(native_module='Unreviewed: update reference/correspondence.json',native_targets=[])
+    return reconstruction_targets(row)
+
+
+def refresh_navigation() -> int:
+    """Refresh navigation only, preserving all decompiled function bodies/names."""
+    reviewed=reviewed_targets();path=ROOT/'symbol-map.json'
+    symbols=json.loads(path.read_text(encoding='utf-8'))
+    if {row['address'] for row in symbols['functions']}!=reviewed.keys():
+        raise ValueError('Review the changed factory inventory before refreshing navigation')
+    for row in symbols['functions']:row.update(navigation(row['address'],reviewed))
+    symbols['navigation_source']='reference/correspondence.json; reviewed function targets, not semantic equivalence'
+    path.write_text(json.dumps(symbols,indent=2)+'\n',encoding='utf-8',newline='\n')
+    for path in sorted((ROOT/'reference').glob('*.c')):
+        source=path.read_text(encoding='utf-8');header,separator,body=source.partition('*/')
+        if not separator or not header.startswith('/* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.'):
+            raise ValueError('Unrecognized reference header: '+str(path))
+        path.write_text(REFERENCE_HEADER.rstrip('\n')+body,encoding='utf-8',newline='\n')
+    return len(symbols['functions'])
 
 
 def main():
-    parser=argparse.ArgumentParser(); parser.add_argument("export",type=Path); args=parser.parse_args()
+    """Organize a new export, or refresh file links without regenerating pseudocode."""
+    parser=argparse.ArgumentParser();parser.add_argument('export',type=Path,nargs='?')
+    parser.add_argument('--refresh-navigation',action='store_true');args=parser.parse_args()
+    if args.refresh_navigation:
+        if args.export:parser.error('Choose an export or --refresh-navigation')
+        print('Refreshed per-function navigation:',refresh_navigation());return
+    if args.export is None:parser.error('An export or --refresh-navigation is required')
+    reviewed=reviewed_targets()
     source=args.export.read_text(encoding="utf-8")
     blocks=[]; names={}; symbols=[]
     for block in re.split(r"(?=// Audit label:)",source):
@@ -139,7 +175,7 @@ def main():
         else: renamed="sdk_"+re.sub(r"[^a-z0-9_]","_",label)+"_at_"+address
         names[original]=renamed; blocks.append((group,address,block))
         symbols.append({"address":"0x"+address,"original":original,"logical_name":renamed,"category":group,
-                        "native_module":native_module(group),"name_basis":"registered URI" if original.startswith("uri_") else ("inferred from body / callers" if semantic else "SDK symbol or reference relationship")})
+                        **navigation('0x'+address,reviewed),"name_basis":"registered URI" if original.startswith("uri_") else ("inferred from body / callers" if semantic else "SDK symbol or reference relationship")})
     replacements=names.copy()
     for address,name in GLOBALS.items():
         replacements["DAT_ram_"+address]=name+"_at_"+address
@@ -160,10 +196,10 @@ def main():
         block,count=re.subn(r'"[0-9a-fA-F]{32}"','"[redacted factory credential]"',block); redacted+=count
         grouped.setdefault(group,[]).append("\n".join(line.rstrip() for line in block.splitlines()).rstrip()+"\n")
     for group,parts in grouped.items():
-        header="/* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.\n * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.\n * Executable reconstruction: "+native_module(group)+".\n */\n\n"
-        (output/(group+".c")).write_text(header+"\n".join(parts),encoding="utf-8",newline="\n")
+        (output/(group+".c")).write_text(REFERENCE_HEADER+"\n".join(parts),encoding="utf-8",newline="\n")
     (ROOT/"symbol-map.json").write_text(json.dumps({"source_export_sha256":hashlib.sha256(args.export.read_bytes()).hexdigest(),
         "source_dump_sha256":"5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+        "navigation_source":"reference/correspondence.json; reviewed function targets, not semantic equivalence",
         "functions":symbols,"globals":[{"address":"0x"+address,"logical_name":name,"basis":"observed read/write and API use"} for address,name in GLOBALS.items()],
         "locals":local_symbols,"credential_literals_redacted":redacted},indent=2)+"\n",encoding="utf-8",newline="\n")
     print(f"Organized {len(blocks)} functions into {len(grouped)} modules; named {len(GLOBALS)} globals and {sum(len(s['names']) for s in local_symbols)} local/parameter aliases")

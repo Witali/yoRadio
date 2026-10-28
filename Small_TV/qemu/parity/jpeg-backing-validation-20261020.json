@@ -1,0 +1,2271 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Actual portable JPEG decoder + coefficient NOR adapter, host strict physical model and standalone ESP32-C2/ESP-IDF/QEMU execution. Native UI/HTTP/source/journal/durable RGB565 cache/workflow and total UI/Wi-Fi RAM, real hardware/endurance/final acceptance remain unverified.",
+  "source_sha256": {
+    "Small_TV/src/app/include/board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+    "Small_TV/src/app/include/color_convert.h": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6",
+    "Small_TV/src/app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
+    "Small_TV/src/codec/jpeg_backing.c": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
+    "Small_TV/src/codec/jpeg_backing.h": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e",
+    "Small_TV/src/codec/jpeg_coefficients.c": "7543ca5459b2981313804f62d23feb8ea6933c9e478beec7b6b564302a39d1f1",
+    "Small_TV/src/codec/jpeg_coefficients.h": "9f1fd219b8ef83e39c72b411e258c025e4c1e159c5c94d44ef786194ace58a4a",
+    "Small_TV/src/codec/jpeg_decoder.c": "986cafff84e946b3bf942fbf8f2a4805647e582920e89b62d0f21e02722e47c9",
+    "Small_TV/src/codec/jpeg_decoder.h": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12",
+    "Small_TV/src/codec/jpeg_decoder_internal.h": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac",
+    "Small_TV/src/codec/jpeg_memory.c": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4",
+    "Small_TV/src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
+    "Small_TV/src/sdkconfig.defaults": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
+    "Small_TV/src/storage/jpeg_espidf.c": "3c1f6da36252388ada387ce25c6d0ccae7caebd2afb066aa7ece561b359dc743",
+    "Small_TV/src/storage/jpeg_espidf.h": "2cea326b1290b61079e987709ac1ddd1a4a6f12049fa062d5f7624b946d11e07",
+    "Small_TV/src/storage/jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+    "Small_TV/src/storage/jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+    "Small_TV/src/storage/jpeg_nor.c": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+    "Small_TV/src/storage/jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+    "Small_TV/src/storage/jpeg_scratch.c": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb",
+    "Small_TV/src/storage/jpeg_scratch.h": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49",
+    "Small_TV/src/storage/jpeg_transport.c": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
+    "Small_TV/src/storage/jpeg_transport.h": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c",
+    "Small_TV/src/tests/jpeg_backing/build-decoder.ps1": "c77548b2bd563363c343b0235fae1d2ed599a5b92d237f0191ddf4398adda254",
+    "Small_TV/src/tests/jpeg_backing/build-idf.ps1": "ebeb124a478fd7c646b97ec99b25a7acb0056d8d82db7cfac0c049011d123a8d",
+    "Small_TV/src/tests/jpeg_backing/decoder_contract.py": "8840ec9761b318aff09840978b14347f0adc8b3b3410997690cd103d99ac154f",
+    "Small_TV/src/tests/jpeg_backing/decoder_driver.c": "446ff77cdeeaf504dc8d14d4e50a3c0cc2d09d8625d92dbb4d9f989cf3189b4a",
+    "Small_TV/src/tests/jpeg_backing/idf_probe/CMakeLists.txt": "0883b1dfcac4fec948f974ec81327514354d50e97ac994e4340cf99499bd4d28",
+    "Small_TV/src/tests/jpeg_backing/idf_probe/main/CMakeLists.txt": "d36c2174d0c6cbfacbe3e3edf95a83679df45ea9070879d2e02e6e1a1e0fb43e",
+    "Small_TV/src/tests/jpeg_backing/idf_probe/main/probe.c": "d187d30fe541492128b57f8541e2b30993f6e0987a43e3abd1c51e9e33e2ec0e",
+    "Small_TV/src/tests/jpeg_backing/mutation_contract.py": "7cc4f84d7f6224cb98de0dc1a9b9ec1d8649df0e968d48c161249097af6086ed",
+    "Small_TV/src/tests/jpeg_backing/native_test.c": "d487c419854ea3a30a0ba6275e701996d45e1723d575a5a6d68cc48ac881854f",
+    "Small_TV/src/tests/jpeg_backing/prepare-idf.py": "c7b9808bdd51e51ae371715d0637bb3f41017f07c61d946b65d791234c968bc9",
+    "Small_TV/src/tests/jpeg_backing/qemu_probe.py": "7ef514813a4c8969fc3171a2f2e128e1e90f76f3e9d555115e05cc464ae3b4ef",
+    "Small_TV/src/tests/jpeg_backing/run.ps1": "dd0275498de506fc4b75fb76c6cc805c970a3bf93f1db768615d0c80c0827928",
+    "Small_TV/src/tests/jpeg_decoder/build.ps1": "66540d641a38107451b7716d3049fe63bdd27f0e5ebe5bd6dceab96038e97ff6",
+    "Small_TV/src/tests/jpeg_decoder/driver.c": "577644c84c5ad320443c6cf5f4ff374ca0bc1f28421ea56849e5070deda57131",
+    "Small_TV/src/tests/jpeg_scratch/nor_model.c": "77e0e4a70c2f1fce79c8752c6b088d7a227fc6daa866d1715178f5a527c7b65f",
+    "Small_TV/src/tests/jpeg_scratch/nor_model.h": "745c6f5f2d33eb65065640055c3f0790ec7ad32e749bc37b66a80b5dfd96994d",
+    "Small_TV/src/tools/jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+    "Small_TV/src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a"
+  },
+  "compile_inputs_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_backing.c": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_backing.h": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_decoder.h": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_coefficients.c": "7543ca5459b2981313804f62d23feb8ea6933c9e478beec7b6b564302a39d1f1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_coefficients.h": "9f1fd219b8ef83e39c72b411e258c025e4c1e159c5c94d44ef786194ace58a4a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_scratch.c": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_scratch.h": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_nor.c": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\native_test.c": "d487c419854ea3a30a0ba6275e701996d45e1723d575a5a6d68cc48ac881854f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\run.ps1": "dd0275498de506fc4b75fb76c6cc805c970a3bf93f1db768615d0c80c0827928",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_scratch\\nor_model.c": "77e0e4a70c2f1fce79c8752c6b088d7a227fc6daa866d1715178f5a527c7b65f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_scratch\\nor_model.h": "745c6f5f2d33eb65065640055c3f0790ec7ad32e749bc37b66a80b5dfd96994d",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-backing-20261020\\native-final\\scratch_fixture.h": "57d6be6bbee2a7299291b9de1f984cb6e145114a10f228097769abd0179809b4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_decoder.c": "986cafff84e946b3bf942fbf8f2a4805647e582920e89b62d0f21e02722e47c9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_memory.c": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\app\\media\\color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\decoder_driver.c": "446ff77cdeeaf504dc8d14d4e50a3c0cc2d09d8625d92dbb4d9f989cf3189b4a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\codec\\jpeg_decoder_internal.h": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\app\\include\\color_convert.h": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_decoder\\driver.c": "577644c84c5ad320443c6cf5f4ff374ca0bc1f28421ea56849e5070deda57131",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\build-decoder.ps1": "c77548b2bd563363c343b0235fae1d2ed599a5b92d237f0191ddf4398adda254",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\cderror.h": "055f8c462104b5af80e15f50f0dbc6997ac078b2c7a21a4c0f26bc99ee14cca9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\cdjpeg.h": "4bf682d2a707c1af50d30429523603593849e12a74f2c94b490ea4ce301fadfb",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\cmyk.h": "9c6828eb33b3e87a8ffafb5f0eb248dd5571662fbc4b34158c87a7e3c152bc96",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jchuff.h": "25b856b80985eec45c92d3ad1e00df5d559064cd63301081a62f25276d7d26c5",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jcmaster.h": "c129770a85cc108c330ad8fc22aabb9909d5c20e0c10d403aa9fa7bcac53b72c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jdcoefct.h": "d728c0d42cd1544a84333b06a93161c8bf3d0e84af0a7e9bada266bd150f401a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jdct.h": "db01b9c58ab2453740a7c05fde65de4750f71f1082033c2f7a082b7b2b965197",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jdhuff.h": "2149e8296bf551a148ec609edf59489614093867f7926c26d9f1427fc0ea3d45",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jdmainct.h": "720f08b42c98b213573bb03cd6805c38ba71a6b56b7a37bcb481d4fcd23be536",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jdmaster.h": "bb1dd2c1ea741ec9e860237c23ebb486c335acb9cfbaf6e2df41764d0bab4511",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jdmerge.h": "1c388a1eef49a6d75fcd3d0e385a2c67117020eb742cc1e8fa6fe951ad23d7b4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jdsample.h": "5ec4dbe5641651d5ee837039b56d08643f73e44900538121067fd65b4406dea0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jerror.h": "03cef99075e62137930f27bd0a086bfb43377acd97f558f4109a5f7f51ae3a9e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jinclude.h": "9a2440690f8944edac68c33005abf384b1b46de4a5466b44624fdad668cfde7b",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jlossls.h": "aff95abc811632d2b545c169771bcf19628d8a2922ac6978a110081df42087ee",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jmemsys.h": "fec0259090ef60c6cfea145de594ccbd8930eb75d6f7177aaec861947b985241",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jmorecfg.h": "98cb9c1bf6c0a35ad113d45d72992e7658debf109455305eede21f1bb104d5e5",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jpeg_nbits.h": "70b3814acd912499b5e1e1407eb689256e595e219fd6764ea61085a8b4f0c687",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jpegapicomp.h": "4b44b7b5887c4bea33532a55922b56a466a82ea6cf73184a33faa5d07cea5320",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jpegint.h": "8bb3773b50fe2905be523755d1d5d330a1c6f14932cc6bcdd7110f400990dc54",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jpeglib.h": "ea0fbba47e9e5da192a487df4df3cf01a338b86a0a85d154ef329dd7b5439043",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\jsamplecomp.h": "aa9490acc6f3293a604f56b539b01bcc96e3623e3cc369f5b8ecbad29c99181f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\small_tv_jpeg12_color.h": "730e530227f4b33508b1ffa27a1ccb582ac34d20cd517981d19e2f1e3208a274",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\small_tv_jpeg12_range.h": "84b73c649a31c0a462cd2a250a1ba32c512019f65d937936be714c4ca93e54fc",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\tjutil.h": "77daebd72192e6f8fa6fe83b93e3fb21e7041581ed6d1010487113cc9d0e9808",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\transupp.h": "bdf2d678bfad6e69aa9f9d824df3fc55870aec165b5b8ad82fa3f7ec4abc5770",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\source\\src\\turbojpeg.h": "878d9adf8365275f60c899c85c8ff3f985cf1e0f00b2ed04a4c54079bee88ec6",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\library\\jconfig.h": "d4629529f77fa0e4f8069fa99f176e7ff9b70fbe8d4d76c5a37fb662843ec6d4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\library\\jconfigint.h": "6709a9d8543e61b041d8772b6ea2571faa47d82cc5528188b222b6d1db4a4599",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\library\\jversion.h": "a1e2d443be1f146c5793a1adde340397290fc60015d1536cb546de9b2cc19589",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-coefficients-20261020\\nor-final\\library\\jpeg-static.lib": "c7c518e121ba99c06f5de32b957421087a2a94a1994fc3732aba48090933b6f8",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-backing-20261020\\native\\scratch_fixture.h": "57d6be6bbee2a7299291b9de1f984cb6e145114a10f228097769abd0179809b4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_decoder\\build.ps1": "66540d641a38107451b7716d3049fe63bdd27f0e5ebe5bd6dceab96038e97ff6",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_transport.c": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_transport.h": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_espidf.c": "3c1f6da36252388ada387ce25c6d0ccae7caebd2afb066aa7ece561b359dc743",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_espidf.h": "2cea326b1290b61079e987709ac1ddd1a4a6f12049fa062d5f7624b946d11e07",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\app\\include\\board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\idf_probe\\CMakeLists.txt": "0883b1dfcac4fec948f974ec81327514354d50e97ac994e4340cf99499bd4d28",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\idf_probe\\main\\CMakeLists.txt": "d36c2174d0c6cbfacbe3e3edf95a83679df45ea9070879d2e02e6e1a1e0fb43e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\idf_probe\\main\\probe.c": "d187d30fe541492128b57f8541e2b30993f6e0987a43e3abd1c51e9e33e2ec0e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\prepare-idf.py": "c7b9808bdd51e51ae371715d0637bb3f41017f07c61d946b65d791234c968bc9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\build-idf.ps1": "ebeb124a478fd7c646b97ec99b25a7acb0056d8d82db7cfac0c049011d123a8d",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tools\\jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tools\\jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\sdkconfig.defaults": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-backing-20261020\\target\\resources\\jpeg_layout.h": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-backing-20261020\\target\\resources\\probe_fixture.h": "c617fa76197d7e08126d83403d580634b3e327060d6ac2bfd249f619734e741d",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\report.json": "903b68639ee939f8239bdeb498bd107ba237f241dd62778bb85ffee4c25cabfd",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\library\\libjpeg.a": "d690bdf330d3c406b92686100a9478432724f13dec8b7faff63fde882dc17d8a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\cderror.h": "055f8c462104b5af80e15f50f0dbc6997ac078b2c7a21a4c0f26bc99ee14cca9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\cdjpeg.h": "4bf682d2a707c1af50d30429523603593849e12a74f2c94b490ea4ce301fadfb",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\cmyk.h": "9c6828eb33b3e87a8ffafb5f0eb248dd5571662fbc4b34158c87a7e3c152bc96",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jchuff.h": "25b856b80985eec45c92d3ad1e00df5d559064cd63301081a62f25276d7d26c5",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jcmaster.h": "c129770a85cc108c330ad8fc22aabb9909d5c20e0c10d403aa9fa7bcac53b72c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jdcoefct.h": "d728c0d42cd1544a84333b06a93161c8bf3d0e84af0a7e9bada266bd150f401a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jdct.h": "db01b9c58ab2453740a7c05fde65de4750f71f1082033c2f7a082b7b2b965197",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jdhuff.h": "2149e8296bf551a148ec609edf59489614093867f7926c26d9f1427fc0ea3d45",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jdmainct.h": "720f08b42c98b213573bb03cd6805c38ba71a6b56b7a37bcb481d4fcd23be536",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jdmaster.h": "bb1dd2c1ea741ec9e860237c23ebb486c335acb9cfbaf6e2df41764d0bab4511",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jdmerge.h": "1c388a1eef49a6d75fcd3d0e385a2c67117020eb742cc1e8fa6fe951ad23d7b4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jdsample.h": "5ec4dbe5641651d5ee837039b56d08643f73e44900538121067fd65b4406dea0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jerror.h": "03cef99075e62137930f27bd0a086bfb43377acd97f558f4109a5f7f51ae3a9e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jinclude.h": "9a2440690f8944edac68c33005abf384b1b46de4a5466b44624fdad668cfde7b",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jlossls.h": "aff95abc811632d2b545c169771bcf19628d8a2922ac6978a110081df42087ee",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jmemsys.h": "fec0259090ef60c6cfea145de594ccbd8930eb75d6f7177aaec861947b985241",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jmorecfg.h": "98cb9c1bf6c0a35ad113d45d72992e7658debf109455305eede21f1bb104d5e5",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jpeg_nbits.h": "70b3814acd912499b5e1e1407eb689256e595e219fd6764ea61085a8b4f0c687",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jpegapicomp.h": "4b44b7b5887c4bea33532a55922b56a466a82ea6cf73184a33faa5d07cea5320",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jpegint.h": "8bb3773b50fe2905be523755d1d5d330a1c6f14932cc6bcdd7110f400990dc54",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jpeglib.h": "ea0fbba47e9e5da192a487df4df3cf01a338b86a0a85d154ef329dd7b5439043",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\jsamplecomp.h": "aa9490acc6f3293a604f56b539b01bcc96e3623e3cc369f5b8ecbad29c99181f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\small_tv_jpeg12_color.h": "730e530227f4b33508b1ffa27a1ccb582ac34d20cd517981d19e2f1e3208a274",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\small_tv_jpeg12_range.h": "84b73c649a31c0a462cd2a250a1ba32c512019f65d937936be714c4ca93e54fc",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\tjutil.h": "77daebd72192e6f8fa6fe83b93e3fb21e7041581ed6d1010487113cc9d0e9808",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\transupp.h": "bdf2d678bfad6e69aa9f9d824df3fc55870aec165b5b8ad82fa3f7ec4abc5770",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\source\\src\\turbojpeg.h": "878d9adf8365275f60c899c85c8ff3f985cf1e0f00b2ed04a4c54079bee88ec6",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\library\\jconfig.h": "d4629529f77fa0e4f8069fa99f176e7ff9b70fbe8d4d76c5a37fb662843ec6d4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\library\\jconfigint.h": "0c808d1c6654fb95a92d18a835d25f006552f2198a8310d33d732742d4608fd1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-decoder-20261020\\rv32-library\\library\\jversion.h": "a1e2d443be1f146c5793a1adde340397290fc60015d1536cb546de9b2cc19589"
+  },
+  "host_counts": {
+    "positive": 61,
+    "limits": 7,
+    "negative": 10,
+    "faults": 827,
+    "stops": 48,
+    "transitions": 12
+  },
+  "native": {
+    "passed": true,
+    "checks": 15273,
+    "physical_fault_cases": 134,
+    "capacity": 460800,
+    "bitmap_bytes": 15
+  },
+  "negative_controls": [
+    {
+      "name": "prepare-before-prefix-validation",
+      "rejected": true,
+      "source_sha256": "be238f42f94bcc39e2f91fe75e5b898bce051eb58cd0822e31622d62fb91eaa5",
+      "executable_sha256": "4cebadf7630c522db42ba9d584f0ce2bfda4f77881a115d0c8d26c99ea1db632",
+      "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+      "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\native_test.c:82: scratch_model_stats().calls==calls"
+    },
+    {
+      "name": "erase-initialized-neighbor",
+      "rejected": true,
+      "source_sha256": "0364c9b82367cff206215e66bdf164280c314b1cd291afd70dc329cd68ede892",
+      "executable_sha256": "219c500078d2fb981fe353c0e3e95446e0223c51c8ada1a8b9b4f90fe3dbb058",
+      "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+      "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\native_test.c:55: api.read(api.context,files[f],offset,output,256)==JPEG_SCRATCH_OK && !memcmp(input,output,256)"
+    },
+    {
+      "name": "ignore-ram-checkpoint",
+      "rejected": true,
+      "source_sha256": "aa2aa873ea1423f8fdf7975d594d3f45a80090554faccb76c80c581a62456b9c",
+      "executable_sha256": "ea16e4239c6c2801b736479f75f5f970f29a5d2e40e424046c3ed58abba0ac5e",
+      "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+      "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\native_test.c:96: scratch_model_stats().calls==calls && api.close(api.context,file)==0"
+    },
+    {
+      "name": "mix-raw-and-packed",
+      "rejected": true,
+      "source_sha256": "cf1dac7874e56c21cea252c3a4bdabbeb11dcf75d0668d1ee9037ff3d65f77e6",
+      "executable_sha256": "e4b1c20cde7aad04a2c4373fe460745698549d27412bab60b818539cf07e37d6",
+      "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+      "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\native_test.c:81: api.open(api.context,128,false,&stale)==JPEG_SCRATCH_ARGUMENT"
+    },
+    {
+      "name": "reuse-stale-id",
+      "rejected": true,
+      "source_sha256": "fa91ddbcdb15f3387eb077eae555fd3b6b1eaf67cc73fa2d341a9cbeed234496",
+      "executable_sha256": "008719b5c2ee659f6e5ed8307e385fc98024cb9a5938905158386358e79e626c",
+      "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+      "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\native_test.c:87: api.open(api.context,128,true,&file)==0 && file>stale"
+    },
+    {
+      "name": "checkpoint-cleanup",
+      "rejected": true,
+      "source_sha256": "e53f1f564f359ac9221ea66e0c3491e38022ee9d84149622d4bb2a3e6dabc806",
+      "executable_sha256": "0591fe38a3d0f75702fb2d703754ce0ed5a34ef83efd1fb0fa99f2ae666133ef",
+      "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+      "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\native_test.c:85: scratch_model_stats().calls==calls && api.close(api.context,file)==0"
+    }
+  ],
+  "stdio_regression_counts": {
+    "positive": 63,
+    "limits": 7,
+    "negative": 10,
+    "faults": 1197,
+    "transitions": 12
+  },
+  "host_traffic": {
+    "name": "full-cmyk12.jpg",
+    "result": {
+      "first": {
+        "status": "ok",
+        "detail": 0,
+        "library_error": 0,
+        "parameter": 0,
+        "callback_error": 0,
+        "required": 0,
+        "available": 0,
+        "available_known": false,
+        "pool_peak": 42275,
+        "pool_retained": 2055,
+        "backing_required": 460800,
+        "backing_peak": 460800,
+        "input_bytes": 44402,
+        "width": 240,
+        "height": 240,
+        "rows": 240,
+        "opened": 4,
+        "closed": 4,
+        "context_bytes": 5232,
+        "reused_object": false,
+        "fault_hits": 0,
+        "visits": {
+          "alloc": 15,
+          "input": 44,
+          "output": 240,
+          "open": 0,
+          "read": 0,
+          "write": 0,
+          "close": 0,
+          "cancel": 3459,
+          "time": 3459,
+          "budget": 3459
+        }
+      },
+      "recovery": {
+        "status": "ok",
+        "detail": 0,
+        "library_error": 0,
+        "parameter": 0,
+        "callback_error": 0,
+        "required": 0,
+        "available": 0,
+        "available_known": false,
+        "pool_peak": 42275,
+        "pool_retained": 2055,
+        "backing_required": 460800,
+        "backing_peak": 460800,
+        "input_bytes": 44402,
+        "width": 240,
+        "height": 240,
+        "rows": 240,
+        "opened": 4,
+        "closed": 4,
+        "context_bytes": 5232,
+        "reused_object": true,
+        "fault_hits": 0,
+        "visits": {
+          "alloc": 12,
+          "input": 44,
+          "output": 240,
+          "open": 0,
+          "read": 0,
+          "write": 0,
+          "close": 0,
+          "cancel": 3459,
+          "time": 3459,
+          "budget": 3459
+        }
+      },
+      "physical_first": {
+        "calls": 49114,
+        "read_bytes": 13532672,
+        "program_bytes": 2582784,
+        "erases": 113,
+        "fault_hits": 0
+      },
+      "physical_recovery": {
+        "calls": 49114,
+        "read_bytes": 13532672,
+        "program_bytes": 2582784,
+        "erases": 113,
+        "fault_hits": 0
+      },
+      "first_last_id": 4,
+      "recovery_last_id": 8,
+      "heap_final": 0,
+      "heap_peak": 47507,
+      "first_sha256": "be98fc78cb8453abe1a313fa3c05254b167d64583b8c32c0a3349ba2e4c8cf46",
+      "second_sha256": "be98fc78cb8453abe1a313fa3c05254b167d64583b8c32c0a3349ba2e4c8cf46"
+    }
+  },
+  "target": {
+    "passed": true,
+    "all_functionality_verified": false,
+    "physical_hardware_tested": false,
+    "network_tested": false,
+    "lcd_tested": false,
+    "app_sha256": "0f637039a537b0eca0f2bb5761c6e939d190489bc91823fee9c4c7e09aa45ad8",
+    "elf_sha256": "040300f81e15639d4c17abfa53bfff5969833522d5bb57ed83665746013863a5",
+    "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+    "boots": [
+      {
+        "session": {
+          "name": "SmallTV-95a79eb20456",
+          "pid": 38320,
+          "qmp_port": 63180,
+          "firmware": "reconstructed",
+          "hardware_profile": {
+            "schema": 1,
+            "name": "small-tv",
+            "soc": "esp32c2",
+            "machine": "esp32c2,default-peripherals=off",
+            "arguments": [
+              "-device",
+              "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+            ],
+            "sd_images": [],
+            "profile": "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json",
+            "network": {
+              "station_ssid": "yoRadio-QEMU",
+              "softap_client_ssid": "Small_TV",
+              "ntp_hosts": [
+                "ntp1.aliyun.com",
+                "cn.pool.ntp.org",
+                "pool.ntp.org"
+              ],
+              "urls": [
+                "http://api.openweathermap.org/data/2.5/weather"
+              ]
+            },
+            "network_arguments": [],
+            "service_urls": [],
+            "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+          },
+          "network": "offline",
+          "persistent": true,
+          "qemu": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-selectors\\.build\\jpeg-selector-qemu-complete-20261019\\bin\\qemu-system-riscv32.exe",
+          "started_utc": "2026-10-20T17:23:10.006782+00:00",
+          "web_endpoints": [],
+          "web_urls": {},
+          "service_urls": [],
+          "service_endpoints": []
+        },
+        "sources": {
+          "images": [
+            {
+              "bytes": 19248,
+              "file": "bootloader.bin",
+              "offset": "0x0",
+              "sha256": "48b7f4b78b1707f2262f1eb4ca4032d487056b353adbe3b4ce77d312fe1ad2ec"
+            },
+            {
+              "bytes": 3072,
+              "file": "partition-table.bin",
+              "offset": "0x8000",
+              "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+            },
+            {
+              "bytes": 506784,
+              "file": "app.bin",
+              "offset": "0x10000",
+              "sha256": "0f637039a537b0eca0f2bb5761c6e939d190489bc91823fee9c4c7e09aa45ad8"
+            },
+            {
+              "bytes": 1994752,
+              "file": "assets.bin",
+              "offset": "0x200000",
+              "sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9"
+            }
+          ],
+          "source_sha256": "15ab27cd82bf74f3b4281b8ce2d9da20809c0639338272f8ec49ddcda4573306"
+        },
+        "events": [
+          {
+            "event": "authorization",
+            "authorized": true,
+            "result": 0
+          },
+          {
+            "event": "start",
+            "case": "small-cmyk12"
+          },
+          {
+            "event": "case",
+            "case": "small-cmyk12",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 540577,
+            "pool_peak": 13968,
+            "context_bytes": 4984,
+            "requested_peak": 18952,
+            "required": 0,
+            "available": 0,
+            "reused": false,
+            "calls": 786,
+            "read_bytes": 244736,
+            "program_bytes": 33280,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "quota"
+          },
+          {
+            "event": "case",
+            "case": "quota",
+            "status": "io-budget",
+            "passed": true,
+            "elapsed_us": 1459,
+            "pool_peak": 13968,
+            "context_bytes": 4984,
+            "requested_peak": 18952,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 17,
+            "read_bytes": 8192,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "recover"
+          },
+          {
+            "event": "case",
+            "case": "recover",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 647815,
+            "pool_peak": 13968,
+            "context_bytes": 4984,
+            "requested_peak": 18952,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 820,
+            "read_bytes": 252928,
+            "program_bytes": 33280,
+            "erases": 2,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "full-cmyk12"
+          },
+          {
+            "event": "case",
+            "case": "full-cmyk12",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 39137736,
+            "pool_peak": 40592,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 47219,
+            "read_bytes": 13078016,
+            "program_bytes": 2580736,
+            "erases": 2,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "lossless16"
+          },
+          {
+            "event": "case",
+            "case": "lossless16",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 1976,
+            "pool_peak": 7381,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 0,
+            "read_bytes": 0,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "gray"
+          },
+          {
+            "event": "case",
+            "case": "gray",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 8384,
+            "pool_peak": 9107,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 1,
+            "read_bytes": 4096,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "capacity"
+          },
+          {
+            "event": "case",
+            "case": "capacity",
+            "status": "backing-capacity",
+            "passed": true,
+            "elapsed_us": 167,
+            "pool_peak": 22937,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 460800,
+            "available": 460799,
+            "reused": false,
+            "calls": 0,
+            "read_bytes": 0,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "complete",
+            "passed": true,
+            "checks": 85,
+            "cases": 7,
+            "heap_final_requested": 0,
+            "heap_peak_requested": 45576,
+            "heap_minimum_free": 149576,
+            "adapter_bytes": 600,
+            "nor_bytes": 4352,
+            "stack_free_bytes": 1988
+          }
+        ],
+        "owners_stopped": true,
+        "passed": true,
+        "initial_flash_sha256": "01741d4db4374a8ce9c13a9385023fd3f32b8c34b732fb375405297bc0d25415",
+        "final_flash_sha256": "e332d9bb61b7fabc8bf46f2d06d2d9515edb0dd01a9471ba08e911bbf51772a6",
+        "changed_bytes": 72354
+      },
+      {
+        "session": {
+          "name": "SmallTV-5879edd337ad",
+          "pid": 39016,
+          "qmp_port": 50530,
+          "firmware": "reconstructed",
+          "hardware_profile": {
+            "schema": 1,
+            "name": "small-tv",
+            "soc": "esp32c2",
+            "machine": "esp32c2,default-peripherals=off",
+            "arguments": [
+              "-device",
+              "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+            ],
+            "sd_images": [],
+            "profile": "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json",
+            "network": {
+              "station_ssid": "yoRadio-QEMU",
+              "softap_client_ssid": "Small_TV",
+              "ntp_hosts": [
+                "ntp1.aliyun.com",
+                "cn.pool.ntp.org",
+                "pool.ntp.org"
+              ],
+              "urls": [
+                "http://api.openweathermap.org/data/2.5/weather"
+              ]
+            },
+            "network_arguments": [],
+            "service_urls": [],
+            "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+          },
+          "network": "offline",
+          "persistent": true,
+          "qemu": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-selectors\\.build\\jpeg-selector-qemu-complete-20261019\\bin\\qemu-system-riscv32.exe",
+          "started_utc": "2026-10-20T17:26:06.820397+00:00",
+          "web_endpoints": [],
+          "web_urls": {},
+          "service_urls": [],
+          "service_endpoints": []
+        },
+        "sources": {
+          "images": [
+            {
+              "bytes": 19248,
+              "file": "bootloader.bin",
+              "offset": "0x0",
+              "sha256": "48b7f4b78b1707f2262f1eb4ca4032d487056b353adbe3b4ce77d312fe1ad2ec"
+            },
+            {
+              "bytes": 3072,
+              "file": "partition-table.bin",
+              "offset": "0x8000",
+              "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+            },
+            {
+              "bytes": 506784,
+              "file": "app.bin",
+              "offset": "0x10000",
+              "sha256": "0f637039a537b0eca0f2bb5761c6e939d190489bc91823fee9c4c7e09aa45ad8"
+            },
+            {
+              "bytes": 1994752,
+              "file": "assets.bin",
+              "offset": "0x200000",
+              "sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9"
+            }
+          ],
+          "source_sha256": "15ab27cd82bf74f3b4281b8ce2d9da20809c0639338272f8ec49ddcda4573306"
+        },
+        "events": [
+          {
+            "event": "authorization",
+            "authorized": true,
+            "result": 0
+          },
+          {
+            "event": "start",
+            "case": "small-cmyk12"
+          },
+          {
+            "event": "case",
+            "case": "small-cmyk12",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 661781,
+            "pool_peak": 13968,
+            "context_bytes": 4984,
+            "requested_peak": 18952,
+            "required": 0,
+            "available": 0,
+            "reused": false,
+            "calls": 820,
+            "read_bytes": 252928,
+            "program_bytes": 33280,
+            "erases": 2,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "quota"
+          },
+          {
+            "event": "case",
+            "case": "quota",
+            "status": "io-budget",
+            "passed": true,
+            "elapsed_us": 1459,
+            "pool_peak": 13968,
+            "context_bytes": 4984,
+            "requested_peak": 18952,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 17,
+            "read_bytes": 8192,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "recover"
+          },
+          {
+            "event": "case",
+            "case": "recover",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 655647,
+            "pool_peak": 13968,
+            "context_bytes": 4984,
+            "requested_peak": 18952,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 820,
+            "read_bytes": 252928,
+            "program_bytes": 33280,
+            "erases": 2,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "full-cmyk12"
+          },
+          {
+            "event": "case",
+            "case": "full-cmyk12",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 45058612,
+            "pool_peak": 40592,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 49106,
+            "read_bytes": 13532672,
+            "program_bytes": 2580736,
+            "erases": 113,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "lossless16"
+          },
+          {
+            "event": "case",
+            "case": "lossless16",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 1977,
+            "pool_peak": 7381,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 0,
+            "read_bytes": 0,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "gray"
+          },
+          {
+            "event": "case",
+            "case": "gray",
+            "status": "ok",
+            "passed": true,
+            "elapsed_us": 7918,
+            "pool_peak": 9107,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 0,
+            "available": 0,
+            "reused": true,
+            "calls": 1,
+            "read_bytes": 4096,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "start",
+            "case": "capacity"
+          },
+          {
+            "event": "case",
+            "case": "capacity",
+            "status": "backing-capacity",
+            "passed": true,
+            "elapsed_us": 167,
+            "pool_peak": 22937,
+            "context_bytes": 4984,
+            "requested_peak": 45576,
+            "required": 460800,
+            "available": 460799,
+            "reused": false,
+            "calls": 0,
+            "read_bytes": 0,
+            "program_bytes": 0,
+            "erases": 0,
+            "stack_free_bytes": 1988
+          },
+          {
+            "event": "complete",
+            "passed": true,
+            "checks": 85,
+            "cases": 7,
+            "heap_final_requested": 0,
+            "heap_peak_requested": 45576,
+            "heap_minimum_free": 149576,
+            "adapter_bytes": 600,
+            "nor_bytes": 4352,
+            "stack_free_bytes": 1988
+          }
+        ],
+        "owners_stopped": true,
+        "passed": true,
+        "initial_flash_sha256": "e332d9bb61b7fabc8bf46f2d06d2d9515edb0dd01a9471ba08e911bbf51772a6",
+        "final_flash_sha256": "e332d9bb61b7fabc8bf46f2d06d2d9515edb0dd01a9471ba08e911bbf51772a6",
+        "changed_bytes": 0
+      }
+    ],
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_backing\\qemu_probe.py": "7ef514813a4c8969fc3171a2f2e128e1e90f76f3e9d555115e05cc464ae3b4ef",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+    },
+    "frozen_inputs_unchanged": true,
+    "build_inputs_unchanged": true
+  },
+  "probe_manifest": {
+    "source_sha256": "15ab27cd82bf74f3b4281b8ce2d9da20809c0639338272f8ec49ddcda4573306",
+    "status": "standalone JPEG decoder/NOR probe; UI/Wi-Fi/hardware unverified",
+    "source_files": [
+      {
+        "file": "codec/jpeg_decoder.c",
+        "sha256": "986cafff84e946b3bf942fbf8f2a4805647e582920e89b62d0f21e02722e47c9"
+      },
+      {
+        "file": "codec/jpeg_decoder.h",
+        "sha256": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12"
+      },
+      {
+        "file": "codec/jpeg_decoder_internal.h",
+        "sha256": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac"
+      },
+      {
+        "file": "codec/jpeg_memory.c",
+        "sha256": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4"
+      },
+      {
+        "file": "codec/jpeg_backing.c",
+        "sha256": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c"
+      },
+      {
+        "file": "codec/jpeg_backing.h",
+        "sha256": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e"
+      },
+      {
+        "file": "codec/jpeg_coefficients.c",
+        "sha256": "7543ca5459b2981313804f62d23feb8ea6933c9e478beec7b6b564302a39d1f1"
+      },
+      {
+        "file": "codec/jpeg_coefficients.h",
+        "sha256": "9f1fd219b8ef83e39c72b411e258c025e4c1e159c5c94d44ef786194ace58a4a"
+      },
+      {
+        "file": "storage/jpeg_scratch.c",
+        "sha256": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb"
+      },
+      {
+        "file": "storage/jpeg_scratch.h",
+        "sha256": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49"
+      },
+      {
+        "file": "storage/jpeg_nor.c",
+        "sha256": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228"
+      },
+      {
+        "file": "storage/jpeg_nor.h",
+        "sha256": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e"
+      },
+      {
+        "file": "storage/jpeg_guard.c",
+        "sha256": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534"
+      },
+      {
+        "file": "storage/jpeg_guard.h",
+        "sha256": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88"
+      },
+      {
+        "file": "storage/jpeg_transport.c",
+        "sha256": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43"
+      },
+      {
+        "file": "storage/jpeg_transport.h",
+        "sha256": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c"
+      },
+      {
+        "file": "storage/jpeg_espidf.c",
+        "sha256": "3c1f6da36252388ada387ce25c6d0ccae7caebd2afb066aa7ece561b359dc743"
+      },
+      {
+        "file": "storage/jpeg_espidf.h",
+        "sha256": "2cea326b1290b61079e987709ac1ddd1a4a6f12049fa062d5f7624b946d11e07"
+      },
+      {
+        "file": "app/media/color_convert.c",
+        "sha256": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a"
+      },
+      {
+        "file": "app/include/color_convert.h",
+        "sha256": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6"
+      },
+      {
+        "file": "app/include/board.h",
+        "sha256": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0"
+      },
+      {
+        "file": "tests/jpeg_backing/idf_probe/CMakeLists.txt",
+        "sha256": "0883b1dfcac4fec948f974ec81327514354d50e97ac994e4340cf99499bd4d28"
+      },
+      {
+        "file": "tests/jpeg_backing/idf_probe/main/CMakeLists.txt",
+        "sha256": "d36c2174d0c6cbfacbe3e3edf95a83679df45ea9070879d2e02e6e1a1e0fb43e"
+      },
+      {
+        "file": "tests/jpeg_backing/idf_probe/main/probe.c",
+        "sha256": "d187d30fe541492128b57f8541e2b30993f6e0987a43e3abd1c51e9e33e2ec0e"
+      },
+      {
+        "file": "tests/jpeg_backing/prepare-idf.py",
+        "sha256": "c7b9808bdd51e51ae371715d0637bb3f41017f07c61d946b65d791234c968bc9"
+      },
+      {
+        "file": "tests/jpeg_backing/build-idf.ps1",
+        "sha256": "ebeb124a478fd7c646b97ec99b25a7acb0056d8d82db7cfac0c049011d123a8d"
+      },
+      {
+        "file": "tools/jpeg_guard_layout.py",
+        "sha256": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7"
+      },
+      {
+        "file": "tools/jpeg_storage_layout.py",
+        "sha256": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a"
+      },
+      {
+        "file": "partitions.csv",
+        "sha256": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e"
+      },
+      {
+        "file": "sdkconfig.defaults",
+        "sha256": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835"
+      },
+      {
+        "file": "generated/jpeg_layout.h",
+        "sha256": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f"
+      },
+      {
+        "file": "generated/probe_fixture.h",
+        "sha256": "c617fa76197d7e08126d83403d580634b3e327060d6ac2bfd249f619734e741d"
+      }
+    ],
+    "library_sha256": "d690bdf330d3c406b92686100a9478432724f13dec8b7faff63fde882dc17d8a",
+    "images": [
+      {
+        "bytes": 19248,
+        "file": "bootloader.bin",
+        "offset": "0x0",
+        "sha256": "48b7f4b78b1707f2262f1eb4ca4032d487056b353adbe3b4ce77d312fe1ad2ec"
+      },
+      {
+        "bytes": 3072,
+        "file": "partition-table.bin",
+        "offset": "0x8000",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "bytes": 506784,
+        "file": "app.bin",
+        "offset": "0x10000",
+        "sha256": "0f637039a537b0eca0f2bb5761c6e939d190489bc91823fee9c4c7e09aa45ad8"
+      },
+      {
+        "bytes": 1994752,
+        "file": "assets.bin",
+        "offset": "0x200000",
+        "sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9"
+      }
+    ],
+    "target": "esp32c2",
+    "elf_sha256": "040300f81e15639d4c17abfa53bfff5969833522d5bb57ed83665746013863a5",
+    "idf_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+    "flash_bytes": 4194304,
+    "inputs_unchanged_during_build": true
+  },
+  "probe_owners": {
+    "owned_pids": [
+      31824,
+      2476,
+      38320,
+      39016
+    ],
+    "alive": [],
+    "all_stopped": true
+  },
+  "main_production": {
+    "unchanged": true,
+    "decoder": "TJpgd",
+    "app_sha256": "3e030c1cc5f7b456fefc9985c397daf8340c33d1bb2805965b076147a07cd7e1"
+  },
+  "old_transport_probe": {
+    "unchanged": true,
+    "app_sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944"
+  },
+  "existing_gates": {
+    "artifact": 6,
+    "correspondence": 10
+  },
+  "sdk_tracked_clean": true,
+  "old_h10": {
+    "owners": [
+      {
+        "ProcessId": 22184,
+        "Name": "pwsh.exe",
+        "CreationDate": "2026-10-20T11:27:35.206623+02:00"
+      },
+      {
+        "ProcessId": 32636,
+        "Name": "python.exe",
+        "CreationDate": "2026-10-20T11:27:35.684696+02:00"
+      },
+      {
+        "ProcessId": 20772,
+        "Name": "python.exe",
+        "CreationDate": "2026-10-20T11:27:35.711979+02:00"
+      },
+      {
+        "ProcessId": 32580,
+        "Name": "qemu-system-riscv32.exe",
+        "CreationDate": "2026-10-20T11:27:41.510965+02:00"
+      },
+      {
+        "ProcessId": 18268,
+        "Name": "python.exe",
+        "CreationDate": "2026-10-20T11:28:10.414044+02:00"
+      },
+      {
+        "ProcessId": 14972,
+        "Name": "python.exe",
+        "CreationDate": "2026-10-20T11:28:10.447191+02:00"
+      }
+    ],
+    "frozen_payloads": 46,
+    "manifest_included": true,
+    "QMP_RSP_interaction": false
+  },
+  "failed_test_expectations": [
+    "Rare4x4 12bit hits65536pool first,8bit hits524288backing; both before physical I/O. Correct measured causes asserted.",
+    "RAM-checkpoint mutant initially survived: added stopped first-use-sector write test. All6 final mutants rejected.",
+    "Initial host global-stop wrapper checked only logical calls; corrected test transport to check every physical pre/post call.",
+    "First target observer wrongly required changed bytes on replay. Actual second target passed all7 cases and produced identical physical bytes. Observer corrected to require initial changes/positive SDK traffic and compare every protected byte; fresh two-process run retained separately."
+  ],
+  "required_remaining": [
+    "native source/upload privacy/journal/hash/durable RGB565 cache workflow with matching assets and photo/settings preservation",
+    "UI integration, actual shared Wi-Fi/LCD heap/stack/time, error HTTP response and reset/power-loss tests",
+    "independent network/LCD/full/24h/hardware acceptance and remaining factory/network/electrical audit"
+  ],
+  "raw_artifacts": [
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/app/include/board.h.gz",
+      "sha256": "2bf36668a05a2f577d3f07f06b1daee1babd9fb45953f56ddf28895f89db113b",
+      "bytes": 267,
+      "uncompressed_sha256": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+      "uncompressed_bytes": 527
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/app/include/color_convert.h.gz",
+      "sha256": "cae83d5ba92801556bda2ca9a7e9ad891312f33cce29415a726c18c757c68141",
+      "bytes": 624,
+      "uncompressed_sha256": "90bece07d8e5ce231d3175e0a6e7afb0d586a850c560980a1fe1f1bee9253eb6",
+      "uncompressed_bytes": 1192
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/app/media/color_convert.c.gz",
+      "sha256": "8c4f89952ff405f1ca836aa26918e9af554a25ff97dac01f77007c0d2e75ec64",
+      "bytes": 1588,
+      "uncompressed_sha256": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
+      "uncompressed_bytes": 4367
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_backing.c.gz",
+      "sha256": "375ec6b466ce36803d60e0443cd38470a88380be62d06260b0d102a072be7f70",
+      "bytes": 2617,
+      "uncompressed_sha256": "30fe1dfea568bccd5cff26d6e909381a8e3c23238d2aecadb684e65429c4e00c",
+      "uncompressed_bytes": 8783
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_backing.h.gz",
+      "sha256": "b908cd1b9610fb75cad1b0a4a8ad311a16db17ebc8af53713d7f263a936c4589",
+      "bytes": 686,
+      "uncompressed_sha256": "edf96417673d4173d1d71428903b9fe7c50b37a6d1456789890b789960e2e60e",
+      "uncompressed_bytes": 1286
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_coefficients.c.gz",
+      "sha256": "79ae7a2a9d630d465427cb9b7c4e13c456f8e39a02263712801a0a452583a90c",
+      "bytes": 902,
+      "uncompressed_sha256": "7543ca5459b2981313804f62d23feb8ea6933c9e478beec7b6b564302a39d1f1",
+      "uncompressed_bytes": 2233
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_coefficients.h.gz",
+      "sha256": "7e66e0abde94c847a28667f91a50a58f284cfd382cb673ee5819d8e2a54cc2bb",
+      "bytes": 597,
+      "uncompressed_sha256": "9f1fd219b8ef83e39c72b411e258c025e4c1e159c5c94d44ef786194ace58a4a",
+      "uncompressed_bytes": 1051
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_decoder.c.gz",
+      "sha256": "6e6bf199fc0c20f22cd9a4f68715ef0e6f15d54e09b21d16bb66189d8a6a3a30",
+      "bytes": 3967,
+      "uncompressed_sha256": "986cafff84e946b3bf942fbf8f2a4805647e582920e89b62d0f21e02722e47c9",
+      "uncompressed_bytes": 13557
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_decoder.h.gz",
+      "sha256": "d6903cc167e86213effef29dc23218636e0061fc7f1eb3f41e3afa6f1bf7ec39",
+      "bytes": 1464,
+      "uncompressed_sha256": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12",
+      "uncompressed_bytes": 3849
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_decoder_internal.h.gz",
+      "sha256": "6136acf5f1d041a4382d33bfd4589b397714bb46d750a201685eb904bbf4cbce",
+      "bytes": 610,
+      "uncompressed_sha256": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac",
+      "uncompressed_bytes": 1612
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/codec/jpeg_memory.c.gz",
+      "sha256": "ac112a6866adc033a18a780ba924cf216bc3b8b618f7a3fb0b76778194dad930",
+      "bytes": 2629,
+      "uncompressed_sha256": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4",
+      "uncompressed_bytes": 9144
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/partitions.csv.gz",
+      "sha256": "c5122dc78ae7581965712db47e786ccb117c0a42be64599e52ce6f56058554eb",
+      "bytes": 139,
+      "uncompressed_sha256": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
+      "uncompressed_bytes": 194
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/sdkconfig.defaults.gz",
+      "sha256": "22eb05443436a5bdbd35560b9dfae8934e726a4a0124adfc76c3e3f853553ec7",
+      "bytes": 338,
+      "uncompressed_sha256": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
+      "uncompressed_bytes": 800
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_espidf.c.gz",
+      "sha256": "dcdf1f217098be02048e56b7ba0740a4fe0e9a8133288423a16c1061ef887394",
+      "bytes": 2663,
+      "uncompressed_sha256": "3c1f6da36252388ada387ce25c6d0ccae7caebd2afb066aa7ece561b359dc743",
+      "uncompressed_bytes": 7634
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_espidf.h.gz",
+      "sha256": "deda4d77f4e4b1828d032a958945c8b0655edd667a2e630857f64117432c1d05",
+      "bytes": 608,
+      "uncompressed_sha256": "2cea326b1290b61079e987709ac1ddd1a4a6f12049fa062d5f7624b946d11e07",
+      "uncompressed_bytes": 1096
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_guard.c.gz",
+      "sha256": "3bf8b79792b1bc3441a760cdeca8683888309f82c0ad92ca835cbdea8a498a00",
+      "bytes": 2126,
+      "uncompressed_sha256": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+      "uncompressed_bytes": 7659
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_guard.h.gz",
+      "sha256": "f649435ffc8af8ab3eb0b19d1504a487bf16e399a7d2db4c16cb4c94b928b667",
+      "bytes": 1291,
+      "uncompressed_sha256": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+      "uncompressed_bytes": 2876
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_nor.c.gz",
+      "sha256": "5dc83799a8479c207b820d4a2ff9cb8b8e7ddee3e82b1208c88760e1bf26682d",
+      "bytes": 3077,
+      "uncompressed_sha256": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+      "uncompressed_bytes": 12464
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_nor.h.gz",
+      "sha256": "ae2fa264350d05ea06dfd083ab1e03e695632a8c8b848a9ae73711ad56319101",
+      "bytes": 1129,
+      "uncompressed_sha256": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+      "uncompressed_bytes": 2829
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_scratch.c.gz",
+      "sha256": "51fd8a0a1c233869abe67d0d5b87bdb9ebd49c66cb902f481cc7aba9ef2df350",
+      "bytes": 1912,
+      "uncompressed_sha256": "e3aa2c1535f913a6feeca29a58a2cf1b3fe42af61110307fe8d7d7c129dcbfdb",
+      "uncompressed_bytes": 6385
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_scratch.h.gz",
+      "sha256": "2a599218271b0ea415ef41d61793133174bf50440950cda617fe4a672ee34973",
+      "bytes": 964,
+      "uncompressed_sha256": "c906dc607fd754f8638d9c1a2e369cbc42e71bc94e2d463c5a3d624af73c0a49",
+      "uncompressed_bytes": 2334
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_transport.c.gz",
+      "sha256": "710a1799fe2c101faa11e3d629d2e2ea8234baa9c5e3b0f542ce9b895f54863e",
+      "bytes": 3155,
+      "uncompressed_sha256": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
+      "uncompressed_bytes": 11268
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/storage/jpeg_transport.h.gz",
+      "sha256": "e82bf7313643a2a62033238373fe73deaa013df64afcded4c54089e63c0f79c0",
+      "bytes": 1424,
+      "uncompressed_sha256": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c",
+      "uncompressed_bytes": 3642
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/build-decoder.ps1.gz",
+      "sha256": "c55b449648dd48a2ea41b25d4d1dac1487ca1d57fd50c3c5b5edea1fe1c5e205",
+      "bytes": 1429,
+      "uncompressed_sha256": "c77548b2bd563363c343b0235fae1d2ed599a5b92d237f0191ddf4398adda254",
+      "uncompressed_bytes": 3532
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/build-idf.ps1.gz",
+      "sha256": "ddd1303cdddc84f8d5091b8808733726d209106fdfb659dcc313ec0e2d376a91",
+      "bytes": 2750,
+      "uncompressed_sha256": "ebeb124a478fd7c646b97ec99b25a7acb0056d8d82db7cfac0c049011d123a8d",
+      "uncompressed_bytes": 7293
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/decoder_contract.py.gz",
+      "sha256": "1ec786ba9574492e6fac29b46d57f0e579e51324fab0bca5918d932141d80313",
+      "bytes": 2389,
+      "uncompressed_sha256": "8840ec9761b318aff09840978b14347f0adc8b3b3410997690cd103d99ac154f",
+      "uncompressed_bytes": 7960
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/decoder_driver.c.gz",
+      "sha256": "9276fbb5903dc020b969896e7621315cce01e9738918bfe366fb7e2e61c583c6",
+      "bytes": 2062,
+      "uncompressed_sha256": "446ff77cdeeaf504dc8d14d4e50a3c0cc2d09d8625d92dbb4d9f989cf3189b4a",
+      "uncompressed_bytes": 5918
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/idf_probe/CMakeLists.txt.gz",
+      "sha256": "00c135adbabacbb42402d6cbe836e094bb8ff81d3d4ee9bc65a40661b91ea043",
+      "bytes": 159,
+      "uncompressed_sha256": "0883b1dfcac4fec948f974ec81327514354d50e97ac994e4340cf99499bd4d28",
+      "uncompressed_bytes": 162
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/idf_probe/main/CMakeLists.txt.gz",
+      "sha256": "622dcf15ad7b6037e3539ffd22732a49afac6ab529c5d1bfe4b0cf4a59df2878",
+      "bytes": 449,
+      "uncompressed_sha256": "d36c2174d0c6cbfacbe3e3edf95a83679df45ea9070879d2e02e6e1a1e0fb43e",
+      "uncompressed_bytes": 1017
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/idf_probe/main/probe.c.gz",
+      "sha256": "8c9022e7ba94ad77e6b85bee50195cf0d7c70115f18a3eaa09ca983145b3a131",
+      "bytes": 2865,
+      "uncompressed_sha256": "d187d30fe541492128b57f8541e2b30993f6e0987a43e3abd1c51e9e33e2ec0e",
+      "uncompressed_bytes": 8339
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/mutation_contract.py.gz",
+      "sha256": "175061229a2f75d46c54006678c99bf685677f0e597ff3ecaee1af21e5acc60c",
+      "bytes": 1866,
+      "uncompressed_sha256": "7cc4f84d7f6224cb98de0dc1a9b9ec1d8649df0e968d48c161249097af6086ed",
+      "uncompressed_bytes": 4421
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/native_test.c.gz",
+      "sha256": "c72c9f7d0e33af9dbb154f5f9ed58ed1e69be8af89e87057d5ba4e41eeda66d6",
+      "bytes": 2199,
+      "uncompressed_sha256": "d487c419854ea3a30a0ba6275e701996d45e1723d575a5a6d68cc48ac881854f",
+      "uncompressed_bytes": 7750
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/prepare-idf.py.gz",
+      "sha256": "4f3ea8adb2bd3e4466f30536829681c41065cd82cc8332c71bbfba5b0c927afa",
+      "bytes": 1564,
+      "uncompressed_sha256": "c7b9808bdd51e51ae371715d0637bb3f41017f07c61d946b65d791234c968bc9",
+      "uncompressed_bytes": 3578
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/qemu_probe.py.gz",
+      "sha256": "81b037b193d5a0618bd7d94fca11325a9e2a1629e112f8cf5a4dfebe5e6460c2",
+      "bytes": 2921,
+      "uncompressed_sha256": "7ef514813a4c8969fc3171a2f2e128e1e90f76f3e9d555115e05cc464ae3b4ef",
+      "uncompressed_bytes": 7834
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_backing/run.ps1.gz",
+      "sha256": "8ffc023b9dd829fe2f5d6defe1a4501678933edadb6f7608624fd142581612bd",
+      "bytes": 1161,
+      "uncompressed_sha256": "dd0275498de506fc4b75fb76c6cc805c970a3bf93f1db768615d0c80c0827928",
+      "uncompressed_bytes": 2917
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_decoder/build.ps1.gz",
+      "sha256": "6d5fa237e7ddff3728338851a32ee2d3ce63abdacef7d3d1f0c9bf91259b652e",
+      "bytes": 1434,
+      "uncompressed_sha256": "66540d641a38107451b7716d3049fe63bdd27f0e5ebe5bd6dceab96038e97ff6",
+      "uncompressed_bytes": 3520
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_decoder/driver.c.gz",
+      "sha256": "352a9be884474eba0d65b24a34f523cb94e2acd93823173617aba2c174c0ea68",
+      "bytes": 2784,
+      "uncompressed_sha256": "577644c84c5ad320443c6cf5f4ff374ca0bc1f28421ea56849e5070deda57131",
+      "uncompressed_bytes": 7675
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_scratch/nor_model.c.gz",
+      "sha256": "381449693a3f8adbecc1150ea758ad44e43c7d1683b8b51ed5c64f8d6daa6ad1",
+      "bytes": 1731,
+      "uncompressed_sha256": "77e0e4a70c2f1fce79c8752c6b088d7a227fc6daa866d1715178f5a527c7b65f",
+      "uncompressed_bytes": 4653
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tests/jpeg_scratch/nor_model.h.gz",
+      "sha256": "ef4a200a0d899c7b7344700a361f585c2bcbc7dfe5b8635827725733a16534fd",
+      "bytes": 357,
+      "uncompressed_sha256": "745c6f5f2d33eb65065640055c3f0790ec7ad32e749bc37b66a80b5dfd96994d",
+      "uncompressed_bytes": 726
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tools/jpeg_guard_layout.py.gz",
+      "sha256": "d7797e367d7015b013976748f551f32f78af0035f50795d648c91c4ae23a0700",
+      "bytes": 3153,
+      "uncompressed_sha256": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+      "uncompressed_bytes": 9079
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/source/Small_TV/src/tools/jpeg_storage_layout.py.gz",
+      "sha256": "813f3df1922aedde3e97cf6c7fbaea1d33885ca5a0741696b0682c25d1d18f0f",
+      "bytes": 4080,
+      "uncompressed_sha256": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
+      "uncompressed_bytes": 11680
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final/build.json.gz",
+      "sha256": "37795584afd288c51dc10032aee72d80ec821cbf4eb26c7e6ac23c395f69fa02",
+      "bytes": 125,
+      "uncompressed_sha256": "231dec95206c8ae641e7f332bef4ae1924b79ddd4b10ae99b7bd0d9eb9b04d13",
+      "uncompressed_bytes": 122
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final/compile.cmd.gz",
+      "sha256": "5ea1d84d6329b801b3f83db15f2cf14d67db0cdc79ac833e52063216f6f1f7a0",
+      "bytes": 401,
+      "uncompressed_sha256": "f6293bcae4db5bf542e47dacbe11cb23a9b1711e9583e99b4d67bcb371ca69d4",
+      "uncompressed_bytes": 1354
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final/inputs.json.gz",
+      "sha256": "16984d4efa0986e5c6842ff29bf2b1f9a30ed8773ea2907f49f5268cf196750a",
+      "bytes": 823,
+      "uncompressed_sha256": "270361faa7a165121bc230b7a50699cf6483030910ee1db2202bc79500c3b527",
+      "uncompressed_bytes": 2419
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final/plan.json.gz",
+      "sha256": "284bca1ad08228f40905091a44ccb11d245ef6814fcb166cc6a810ed0074494e",
+      "bytes": 3367,
+      "uncompressed_sha256": "bbe355ef71e95b1be23fdd3a76c04e0a57d1001bd2ca244bd188450f1c597243",
+      "uncompressed_bytes": 15882
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final/report.json.gz",
+      "sha256": "4b6a26d565948dfa61622bcb30810a7feb6e5234749b385dadea848edd9c838d",
+      "bytes": 107,
+      "uncompressed_sha256": "67cd111441c3df3307ebc4a8a2af44b36a2a60d1f31c14e3886562c18dba184c",
+      "uncompressed_bytes": 95
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final/scratch_fixture.h.gz",
+      "sha256": "57a22e8d53c7c282a7fa0b3f360a563ffad51b0cd5d1575e0a8cbd6639520be2",
+      "bytes": 231,
+      "uncompressed_sha256": "57d6be6bbee2a7299291b9de1f984cb6e145114a10f228097769abd0179809b4",
+      "uncompressed_bytes": 286
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/host-decoder-bounded/build.json.gz",
+      "sha256": "40accbfacb5d5e42d19d0978ac5d49dcb132488e69c601e755220dc065c9b849",
+      "bytes": 275,
+      "uncompressed_sha256": "c84eb47ba48ad1e5e28fff22b773ead9a3c42003cd34a8db70c2c59ceabf108e",
+      "uncompressed_bytes": 509
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/host-decoder-bounded/compile.cmd.gz",
+      "sha256": "ff8263dbc2e3cfa54f2377dcc15ef59b96315e4d3945066d51663546c98f7d91",
+      "bytes": 541,
+      "uncompressed_sha256": "90c3240a49d8d919a9df9ba9ece20a339360cada867540fe933b402f3aff94ae",
+      "uncompressed_bytes": 2111
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/host-decoder-bounded/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/host-decoder-bounded/inputs.json.gz",
+      "sha256": "6c5e4a9973d8441c3063047c4d022e100dd590a520bc414f3bb217ab08c70a25",
+      "bytes": 2645,
+      "uncompressed_sha256": "55bfc8391aa365247ce9c7019b4984f47922458c6cf3addcafe225e56a5417a6",
+      "uncompressed_bytes": 9690
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/stdio-decoder/build.json.gz",
+      "sha256": "601ec2adc2afc4d9e6049dc999e9b71ac27378a9d8fb0f39eb634bcacd41d6e2",
+      "bytes": 390,
+      "uncompressed_sha256": "f48f92d58d6ff69f770454d9a9cc5b115c43ac44fdc69c38e754a46e521106b6",
+      "uncompressed_bytes": 612
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/stdio-decoder/compile.cmd.gz",
+      "sha256": "2596192e020bbf8b88ea01bb2c81bb4812da7c1508f91a242b6cd63116827507",
+      "bytes": 472,
+      "uncompressed_sha256": "65fe801fdc28e4fcd87591c0445062ed68217528dd06c3dfae4b5137a7914b6d",
+      "uncompressed_bytes": 1378
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/stdio-decoder/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/stdio-decoder/inputs.json.gz",
+      "sha256": "7232c5a86d498c0831cbb213d1013b3e4141eb28d1b484f3b508a1835fd82d1f",
+      "bytes": 2050,
+      "uncompressed_sha256": "58555524f5c578796b47ec3515014938e3f9bdd091d01ec36d8a96b1976a06c3",
+      "uncompressed_bytes": 7610
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/checkpoint-cleanup/compile.cmd.gz",
+      "sha256": "640e5dd6c49a3acff9ee82e9179415e76a18ac8de1946a3da9dd91cc47ea23c5",
+      "bytes": 421,
+      "uncompressed_sha256": "d0c0c6df02ec12b7193f8c672e5ff9be3abf52da089a829f0280e369e3b88047",
+      "uncompressed_bytes": 1421
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/checkpoint-cleanup/compile.log.gz",
+      "sha256": "6123b807f9970bca2c1729179a62e3aced49b0d3090115b5f04ebbdd16d3c258",
+      "bytes": 114,
+      "uncompressed_sha256": "9c539b91cb5affeba6ed5848373642bc9d73e71369ad8251018cddbe43b6548b",
+      "uncompressed_bytes": 117
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/checkpoint-cleanup/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/checkpoint-cleanup/mutant.c.gz",
+      "sha256": "4224a8eb0dc144b4f4e13a0ec6bb19ca5ce6d6ab3e7bef219155ec8267bcd8f4",
+      "bytes": 2623,
+      "uncompressed_sha256": "e53f1f564f359ac9221ea66e0c3491e38022ee9d84149622d4bb2a3e6dabc806",
+      "uncompressed_bytes": 8844
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/checkpoint-cleanup/run.log.gz",
+      "sha256": "c28f1766f7cf2056a1ad8a397a4db8bb333897a81ad736ad15a676b97d4b2500",
+      "bytes": 172,
+      "uncompressed_sha256": "852f0569c676f52fa308bdf28d56f09da02f3fb1d6b78a0eeb708622f0059e30",
+      "uncompressed_bytes": 177
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/erase-initialized-neighbor/compile.cmd.gz",
+      "sha256": "eb8ed3d964aaace953455635c2a1cd3df381faedba828e37a475be39a6f21689",
+      "bytes": 428,
+      "uncompressed_sha256": "661216b11e689d828152840d1180886c45e1f78074df1df227011840a11ffc62",
+      "uncompressed_bytes": 1445
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/erase-initialized-neighbor/compile.log.gz",
+      "sha256": "6123b807f9970bca2c1729179a62e3aced49b0d3090115b5f04ebbdd16d3c258",
+      "bytes": 114,
+      "uncompressed_sha256": "9c539b91cb5affeba6ed5848373642bc9d73e71369ad8251018cddbe43b6548b",
+      "uncompressed_bytes": 117
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/erase-initialized-neighbor/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/erase-initialized-neighbor/mutant.c.gz",
+      "sha256": "cf51c33c225f697f0184312cf2c0548b31159e3d5f162fe66a2da357100f51e6",
+      "bytes": 2611,
+      "uncompressed_sha256": "0364c9b82367cff206215e66bdf164280c314b1cd291afd70dc329cd68ede892",
+      "uncompressed_bytes": 8764
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/erase-initialized-neighbor/run.log.gz",
+      "sha256": "fffc907ed47210cab4cac65853bcd6944767e9d20a29ffd5b24289ebd30e509c",
+      "bytes": 191,
+      "uncompressed_sha256": "8da0f82eb2d62d6e59381e8292626a1d62053c9b1b369646cb78c2cf4626453f",
+      "uncompressed_bytes": 203
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/ignore-ram-checkpoint/compile.cmd.gz",
+      "sha256": "c343556144be23705a6aac55a6a47014a124f1e2a895b3e0ca7babc44825ea38",
+      "bytes": 423,
+      "uncompressed_sha256": "1f5e9e4d7f0950a56ec1055ac673f5ac66dc1947246f77b582c66e523daa40f3",
+      "uncompressed_bytes": 1430
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/ignore-ram-checkpoint/compile.log.gz",
+      "sha256": "6123b807f9970bca2c1729179a62e3aced49b0d3090115b5f04ebbdd16d3c258",
+      "bytes": 114,
+      "uncompressed_sha256": "9c539b91cb5affeba6ed5848373642bc9d73e71369ad8251018cddbe43b6548b",
+      "uncompressed_bytes": 117
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/ignore-ram-checkpoint/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/ignore-ram-checkpoint/mutant.c.gz",
+      "sha256": "94336c215c717af6e900464ca61ce3018764bab12bda8d415fc4d12a4d1386aa",
+      "bytes": 2612,
+      "uncompressed_sha256": "aa2aa873ea1423f8fdf7975d594d3f45a80090554faccb76c80c581a62456b9c",
+      "uncompressed_bytes": 8746
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/ignore-ram-checkpoint/run.log.gz",
+      "sha256": "f3860bac2cd8940aa2e978d4ebb77f256ef3b5d890d269071d31d567baf9657c",
+      "bytes": 172,
+      "uncompressed_sha256": "fd4ab73e349bf946d1e07e97759e11857d264c67fbb5e8f74ad6d37bf99a5886",
+      "uncompressed_bytes": 177
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/mix-raw-and-packed/compile.cmd.gz",
+      "sha256": "4804bd80f02c86022e7121c3106426afb3ab46d377c12082908d680a6800d12d",
+      "bytes": 420,
+      "uncompressed_sha256": "befce2f158f89ae64e8871d6ec1f202f79daa3ae546717afbec6e11e340b136a",
+      "uncompressed_bytes": 1421
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/mix-raw-and-packed/compile.log.gz",
+      "sha256": "6123b807f9970bca2c1729179a62e3aced49b0d3090115b5f04ebbdd16d3c258",
+      "bytes": 114,
+      "uncompressed_sha256": "9c539b91cb5affeba6ed5848373642bc9d73e71369ad8251018cddbe43b6548b",
+      "uncompressed_bytes": 117
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/mix-raw-and-packed/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/mix-raw-and-packed/mutant.c.gz",
+      "sha256": "dfe9ca58bf0480f23b867e6f4c456e8923501b40317b26aba0fbb2e082a521a9",
+      "bytes": 2607,
+      "uncompressed_sha256": "cf1dac7874e56c21cea252c3a4bdabbeb11dcf75d0668d1ee9037ff3d65f77e6",
+      "uncompressed_bytes": 8762
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/mix-raw-and-packed/run.log.gz",
+      "sha256": "19350050e4a79a1752f3dcfcecf8d8f4a627c90be1fde7475432972ecca4c753",
+      "bytes": 173,
+      "uncompressed_sha256": "275204682b26d1c52c0e37f37e47481f4dc75d53ba35dac8630d2d04aa536920",
+      "uncompressed_bytes": 170
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/prepare-before-prefix-validation/compile.cmd.gz",
+      "sha256": "4cf8b71358483e342678e05d9d67699a4330a6f592bb55a4cd05282187dabf25",
+      "bytes": 429,
+      "uncompressed_sha256": "6136641e166bf5951a540879c5d069beffed62d14c7a3771883af95ae8896904",
+      "uncompressed_bytes": 1463
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/prepare-before-prefix-validation/compile.log.gz",
+      "sha256": "6123b807f9970bca2c1729179a62e3aced49b0d3090115b5f04ebbdd16d3c258",
+      "bytes": 114,
+      "uncompressed_sha256": "9c539b91cb5affeba6ed5848373642bc9d73e71369ad8251018cddbe43b6548b",
+      "uncompressed_bytes": 117
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/prepare-before-prefix-validation/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/prepare-before-prefix-validation/mutant.c.gz",
+      "sha256": "c5b77dc7f64b922f6584f20a54955d2c3abb330c3dc6d67cf5d2050fd909dd89",
+      "bytes": 2595,
+      "uncompressed_sha256": "be238f42f94bcc39e2f91fe75e5b898bce051eb58cd0822e31622d62fb91eaa5",
+      "uncompressed_bytes": 8711
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/prepare-before-prefix-validation/run.log.gz",
+      "sha256": "e3190bbe2dcb29744d855e1d6e07900c34e46a1d9bd3a3145c90fb8ac2045932",
+      "bytes": 147,
+      "uncompressed_sha256": "7b42db9244e8b73377c5aa3cf468f17677c4163439601c9884839f633aab9d9d",
+      "uncompressed_bytes": 143
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/report.json.gz",
+      "sha256": "0aa22271f6eecc22d662ef88a1b60c332f78bcaee08587d9a35212e09b42ebcb",
+      "bytes": 1931,
+      "uncompressed_sha256": "dbfff40aefc3e8d48f772c7e5ba6bd56b732dfcf2c1cf22e8caf8a59756794b3",
+      "uncompressed_bytes": 6044
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/reuse-stale-id/compile.cmd.gz",
+      "sha256": "c0c9d9694a40fb476f459f5fdc3f347147e825021c64cbaf218c0682982aa1d8",
+      "bytes": 418,
+      "uncompressed_sha256": "b6337f4431a4cacf48fd90176cfe298c2cb54f86da5f09fea75bc4d5cae579fe",
+      "uncompressed_bytes": 1409
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/reuse-stale-id/compile.log.gz",
+      "sha256": "6123b807f9970bca2c1729179a62e3aced49b0d3090115b5f04ebbdd16d3c258",
+      "bytes": 114,
+      "uncompressed_sha256": "9c539b91cb5affeba6ed5848373642bc9d73e71369ad8251018cddbe43b6548b",
+      "uncompressed_bytes": 117
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/reuse-stale-id/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/reuse-stale-id/mutant.c.gz",
+      "sha256": "5af723411b76a2f1920b5bb12d52e0f2af42c386c61fa5460a6491305213cb4e",
+      "bytes": 2627,
+      "uncompressed_sha256": "fa91ddbcdb15f3387eb077eae555fd3b6b1eaf67cc73fa2d341a9cbeed234496",
+      "uncompressed_bytes": 8804
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final/reuse-stale-id/run.log.gz",
+      "sha256": "e44774dec00d02bc2c65dba4e09c843f3695aa6a3bfac58212f1738310ee5e9e",
+      "bytes": 163,
+      "uncompressed_sha256": "bdeb2f613ae5d0312601a3af1ef97b3cb1c6b0b0becaa897bec0f12b37d823dd",
+      "uncompressed_bytes": 162
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/decoder-contract-checked/report.json.gz",
+      "sha256": "2d375c68631d6ba7eced98a7c256e07d7ce1f4ca8ea43c1bd4b38f76080d82d5",
+      "bytes": 39505,
+      "uncompressed_sha256": "196e319629fec4c074aa7e2a96b7a356ea24c5271177fddee53bde60d971ecd9",
+      "uncompressed_bytes": 2509437
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/stdio-contract/report.json.gz",
+      "sha256": "076baf690806db1be80510592b45f961745d6ec2926067a1ee2ef1cf51d442f3",
+      "bytes": 48714,
+      "uncompressed_sha256": "3632a33a93c691a72a3f7cac569489584e4a40eed24c9f02c3044097b7d67e3a",
+      "uncompressed_bytes": 2780474
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/report.json.gz",
+      "sha256": "88c0aa81c2fb89381a504607ec719c453ef1321dcb21eb7dc6494ffc399c7f9b",
+      "bytes": 2310,
+      "uncompressed_sha256": "8708a25bb0cb5408f4b0962b529af19948173563eec22f8908e0f16bbc49e081",
+      "uncompressed_bytes": 15886
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/decoder-contract-checked.log.gz",
+      "sha256": "be7f6bbfe895f7e9028af8865933dd09ac2fe68c915be70cb686a06b55f0ce9a",
+      "bytes": 155,
+      "uncompressed_sha256": "14ad82c8ffec1ab6c13e229aa1c0ab67f7fcddfc59fa93771fdd2119f67e5c3c",
+      "uncompressed_bytes": 510
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/decoder-contract-final.log.gz",
+      "sha256": "0f115f20ea1cfebd7c9335c8c9e8444eb133653e4a84dcf143c2c4edf3f05a4e",
+      "bytes": 698,
+      "uncompressed_sha256": "516c2ca4469a0ea214d33f23b06bf56d7fa4c2fb64740b1b871e7c4737f19d2b",
+      "uncompressed_bytes": 2146
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/decoder-contract-pinned.log.gz",
+      "sha256": "be7f6bbfe895f7e9028af8865933dd09ac2fe68c915be70cb686a06b55f0ce9a",
+      "bytes": 155,
+      "uncompressed_sha256": "14ad82c8ffec1ab6c13e229aa1c0ab67f7fcddfc59fa93771fdd2119f67e5c3c",
+      "uncompressed_bytes": 510
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/decoder-contract-resources.log.gz",
+      "sha256": "cf983941199b3fffcb833bb84d408383c2e7766432ccf5f92d82058177457805",
+      "bytes": 724,
+      "uncompressed_sha256": "0631aa63483cc0da79ae783f52b31b03f024571a7dd1de036e14bf9059323204",
+      "uncompressed_bytes": 2262
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/decoder-contract.log.gz",
+      "sha256": "5ae042cb0ef85b98f11d6423371e14d7eb1337875d3d17e73dead6d40cb6bdcf",
+      "bytes": 733,
+      "uncompressed_sha256": "b6b99d2243f9b31861c93c9edac1b966fc20e06f2f027595d2e6685f5527d01a",
+      "uncompressed_bytes": 2263
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/existing-gates.log.gz",
+      "sha256": "bb49515810ee96984ad721e22798bd13f38c0fff6d2f2124498e125fb98ac31f",
+      "bytes": 60,
+      "uncompressed_sha256": "eb783a8960a9cc01a11c69207d5ce46c83fbd3ea1f47fc34dbfee71727f1a748",
+      "uncompressed_bytes": 120
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/export-proof.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "bytes": 20,
+      "uncompressed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressed_bytes": 0
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/host-decoder-bounded.log.gz",
+      "sha256": "4956bfffd50e012ae117087eeea4ef846914e4ad18abb574e47f6554500af257",
+      "bytes": 140,
+      "uncompressed_sha256": "2be34d5a9a3e4f9adba658dc8619869faa5741a810057f178449e6ba7d188ee4",
+      "uncompressed_bytes": 174
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/host-decoder.log.gz",
+      "sha256": "4956bfffd50e012ae117087eeea4ef846914e4ad18abb574e47f6554500af257",
+      "bytes": 140,
+      "uncompressed_sha256": "2be34d5a9a3e4f9adba658dc8619869faa5741a810057f178449e6ba7d188ee4",
+      "uncompressed_bytes": 174
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations-final.log.gz",
+      "sha256": "49d91a6bc7b4827c2a2b3c6ac0a5c60c7d0270bc701c43f6350e020bda6f82de",
+      "bytes": 157,
+      "uncompressed_sha256": "b4ebd46be3d2e2d8a131b30f83dd221d6a2ee35a567e17102268208da2a5885d",
+      "uncompressed_bytes": 291
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/mutations.log.gz",
+      "sha256": "db921c579ed86810d4cbc0d87c6df6e1b0ab8ed73527ebfb283a50956b3f54e9",
+      "bytes": 441,
+      "uncompressed_sha256": "d7f5ea08325951cad16ccf3938c68fd0ab788045f3e3f6c970beb540df07fc0a",
+      "uncompressed_bytes": 822
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-final.log.gz",
+      "sha256": "7d46e74d236eac593a8b762986a4e579d71305ad6bf29dd30942e56091b06c04",
+      "bytes": 223,
+      "uncompressed_sha256": "e4629682a498e790e669626c0baafa08923cb2165144b5783305ef32983cbcbf",
+      "uncompressed_bytes": 270
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final.log.gz",
+      "sha256": "f915f8831692ee5b012f95ecb6d32147ade2ab0a8714682b83b75671519ea94b",
+      "bytes": 199,
+      "uncompressed_sha256": "9073bb9db3271c3bc214aea6e7571565dfec92cff60b4a3295be16fcb61bef15",
+      "uncompressed_bytes": 494
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu.log.gz",
+      "sha256": "e101806f3c0bb9e8a37480c4d7c9c374e040d35731d8d2e0be4704edbe613b20",
+      "bytes": 428,
+      "uncompressed_sha256": "9cdeb99e3303c8ead8fccad02e9c7e12ef196fbf96d72a16d007d02e87bbc7db",
+      "uncompressed_bytes": 838
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/stdio-contract.log.gz",
+      "sha256": "3b6a99076f8e717b096c06cf1561dd76da4b7cafc82dc56b3007b6fe0aaf0263",
+      "bytes": 130,
+      "uncompressed_sha256": "e8ae46688d98a3cad0d1b0417c6ab069333f8560bcdd9b9e9ec5bb522468e6a7",
+      "uncompressed_bytes": 500
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/stdio-decoder.log.gz",
+      "sha256": "1089bc0d8d828aafa676b85b5bfd31166c45cca74333532a982c39eba7e5a81d",
+      "bytes": 97,
+      "uncompressed_sha256": "c8582f4cf4f62b057186854bd1ced1be07db9ab446a29243bdd4cccfbf12035a",
+      "uncompressed_bytes": 88
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target-build.log.gz",
+      "sha256": "f5e04b53996d5c7c28a535a41b1b7fb76c95baf823caeb7fd852c54f75f6d3bf",
+      "bytes": 18113,
+      "uncompressed_sha256": "ee8b4f230c33ee0c66f77d90b1e543994173b646e53214719636eba770cd3261",
+      "uncompressed_bytes": 146070
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/inputs.json.gz",
+      "sha256": "1be0143089f24edc6d5e2fe5918c95076db831916e2c3d9192af5a332c73831d",
+      "bytes": 3299,
+      "uncompressed_sha256": "686b96c2c33f741b1b9c15a93067bbab4252898dcb698af24c64c31ef7d5977b",
+      "uncompressed_bytes": 11907
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/size.txt.gz",
+      "sha256": "d01500bb57f83f5dde2ffffa5846c9c82663f3303a1aefa093f348faed4cdd8f",
+      "bytes": 491,
+      "uncompressed_sha256": "2713f165403904090192e17abb40a132aa38b1a08782263db1cccdc363f7915e",
+      "uncompressed_bytes": 1471
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/symbols.txt.gz",
+      "sha256": "8df3d5c8434ae038e612996fbfb0a73f88ace40ac5d19845a4db952f95050291",
+      "bytes": 22723,
+      "uncompressed_sha256": "09c9706772813bf8d92886138e479460be79871462ecc2467cd83169aa4ee262",
+      "uncompressed_bytes": 82136
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/sdkconfig.gz",
+      "sha256": "f97cca455deacafc4b472bd0171db8c84b2b5d9a29e6fde8bf33b15c595eba4c",
+      "bytes": 14706,
+      "uncompressed_sha256": "ec2fe0eaddb5889c4f0b07a96d8f04ea91a8bda1436abe99276d76f7b3924d1e",
+      "uncompressed_bytes": 80457
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/sdkconfig.defaults.gz",
+      "sha256": "b637fd2cdd7fb835496efbcfd4d50671263dec5683c3eec8e0a8915d8fbfd451",
+      "bytes": 398,
+      "uncompressed_sha256": "16db800b034c2c3104202a030b48d847d8587463eb8843e2c97b4d0629ed92bb",
+      "uncompressed_bytes": 865
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/compile_commands.json.gz",
+      "sha256": "00595b3d0adb56798e23e3118e8ade705fa18f8cd35bcbe48c8810920cfc6383",
+      "bytes": 77043,
+      "uncompressed_sha256": "bcac6748b5dfe0892209030a4355d9766a51c3c4150ecefa8e615ea7e853310e",
+      "uncompressed_bytes": 7027941
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/CMakeCache.txt.gz",
+      "sha256": "0394d190d99feb27ca02dce8f38b3c97a1d6501971736114bd82d10f292a0a91",
+      "bytes": 5087,
+      "uncompressed_sha256": "9075cd34d806e87af62d002f44c7e6434d8b525d008101682fa9fe1fb349dfe4",
+      "uncompressed_bytes": 31357
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/small_tv_jpeg_decoder_probe.map.gz",
+      "sha256": "b26c5eb390dd0787269206d35f3e7bc843823b829202b23481ea3c1fd59870f8",
+      "bytes": 225277,
+      "uncompressed_sha256": "e6403567dc42e3e505461bd3743160855991c497e6b46884362b7612f951b427",
+      "uncompressed_bytes": 3128593
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/resources/jpeg_layout.h.gz",
+      "sha256": "27b787fb54146daf122de2798575a4c05d495204e300b275e744aec3e5cd2fcc",
+      "bytes": 1850,
+      "uncompressed_sha256": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+      "uncompressed_bytes": 6623
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/resources/probe_fixture.h.gz",
+      "sha256": "2929d5c06dfa58c72d6d4130721ef5255d2ff396c880461e0cb364a94fa448ad",
+      "bytes": 71767,
+      "uncompressed_sha256": "c617fa76197d7e08126d83403d580634b3e327060d6ac2bfd249f619734e741d",
+      "uncompressed_bytes": 492861
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/resources/plan.json.gz",
+      "sha256": "67a56a186bd3bb0050f8a6f7542b299adfe2bf3cd72bc05fcacfeb91839978f3",
+      "bytes": 3739,
+      "uncompressed_sha256": "a471c3b66790a272e15444752ef259649d143f57bb144bd046ed56a3e655fa94",
+      "uncompressed_bytes": 17155
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/small_tv_jpeg_decoder_probe.elf.gz",
+      "sha256": "68378acb533fb065107295a89673e82623fabc665557574e2644577fbf2f7c94",
+      "bytes": 1314133,
+      "uncompressed_sha256": "040300f81e15639d4c17abfa53bfff5969833522d5bb57ed83665746013863a5",
+      "uncompressed_bytes": 3992900
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/app/media/color_convert.c.su.gz",
+      "sha256": "0eae626baec30770db46de8fa560d7d95afb38e3c101a0d2cfc639d41a6c4bb5",
+      "bytes": 165,
+      "uncompressed_sha256": "19e618cef018e846d05e5002432a553323e9515dd0c396c8b22c0f1d2173eba4",
+      "uncompressed_bytes": 383
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/codec/jpeg_backing.c.su.gz",
+      "sha256": "cfeb83bc0040013f196d12ceee35026469566c8db6d766b0571452821de5bfcd",
+      "bytes": 264,
+      "uncompressed_sha256": "efce773215ee067764a33cace82d4879d89403e268e61cb4c11a6c1f215904c7",
+      "uncompressed_bytes": 1409
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/codec/jpeg_coefficients.c.su.gz",
+      "sha256": "20522e1f74565c889298e5bb6543b005b1c38b7523c042109172a813530aa43c",
+      "bytes": 152,
+      "uncompressed_sha256": "57f97088a4fe1fe8228ab6a127913f083b0849ce535f35ca0dc106fbcca6c7a1",
+      "uncompressed_bytes": 377
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/codec/jpeg_decoder.c.su.gz",
+      "sha256": "08ef684ec0d0f6d028a83871510e717e14ff28f5747c0f0bea8849e273d06996",
+      "bytes": 278,
+      "uncompressed_sha256": "5ae959c028bb417301f93989fbae5759fff39cb26ce77dcaf2ae4b0d2aab22f7",
+      "uncompressed_bytes": 1556
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/codec/jpeg_memory.c.su.gz",
+      "sha256": "120b379e1d2829b23aef3deca4611c6131b3d036d47fc63a78fe4219e3b93230",
+      "bytes": 344,
+      "uncompressed_sha256": "ebdd2cec095216e68fec9cafdebd2ad68651766c31e051e92a82e4ae7ff69ca3",
+      "uncompressed_bytes": 2218
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage/jpeg_espidf.c.su.gz",
+      "sha256": "c4dc414fffaa05ba1e1f9de88af7d4d8d044eede4cfb1e20cf69bdfadc2114be",
+      "bytes": 242,
+      "uncompressed_sha256": "6b8d68de1bd6abcb6c8681877c1ce51afc38feca2b449565e1010a4dd9d6e21f",
+      "uncompressed_bytes": 1167
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage/jpeg_guard.c.su.gz",
+      "sha256": "361b1f73ce1eb4f85718293e9f954f1857882f3a4dd00cc78c2085870769f9fa",
+      "bytes": 176,
+      "uncompressed_sha256": "f7ac76708b24cdb9dd09c0090ffb166fc83d058b7a81a5de4ba1bb7d9baceedf",
+      "uncompressed_bytes": 469
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage/jpeg_nor.c.su.gz",
+      "sha256": "9299b683382f3fcaea04704e25eaa5818eab93d551be40fa95c01161c7bdedd8",
+      "bytes": 244,
+      "uncompressed_sha256": "b0d2c3ebeb34844fb9e74697dbfb377b4fe3b81de979bb05671f94f892fe4771",
+      "uncompressed_bytes": 1148
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage/jpeg_scratch.c.su.gz",
+      "sha256": "634d0cbb6e2418d3b6c04efeda144516f9d83987d480833b4fa7627fd832df1d",
+      "bytes": 234,
+      "uncompressed_sha256": "677e764481c275c3296d9bf66d612ad3269abb68ec7b41cc31a25bf23c2e0c74",
+      "uncompressed_bytes": 1198
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage/jpeg_transport.c.su.gz",
+      "sha256": "2c1bb35a8b48b51533b1d18fa42f0fa1fc1db50db36110adc7fccf8e973693c6",
+      "bytes": 315,
+      "uncompressed_sha256": "7f6bda207f3be1e85ba7a3f4dfd24a9ccdcecaa026885092b7b347b31886915a",
+      "uncompressed_bytes": 2178
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/target/esp-idf/main/CMakeFiles/__idf_main.dir/probe.c.su.gz",
+      "sha256": "49ee58930d5be3956286fb18b8c022df4a114e1885c08eae69ab09f2d6b6a19f",
+      "bytes": 259,
+      "uncompressed_sha256": "a77b3275930ca3550803a6fd3f4aaac9ee796bce117faac21f0bd50de55f21ee",
+      "uncompressed_bytes": 1215
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/uart-0.log.gz",
+      "sha256": "93d4a76d2db25940e3f5a0f767faae39eeabf9f15225e9934976cd2ac98e9cfd",
+      "bytes": 1677,
+      "uncompressed_sha256": "5bf453028d77a3015094f3eda48dea03cebfe4a95a8aea08c15abe8ea31dff98",
+      "uncompressed_bytes": 5309
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/uart-1.log.gz",
+      "sha256": "99efb1b0b37a8014f91e068b25f08a70eac435a25339938029d5802476a0da19",
+      "bytes": 1673,
+      "uncompressed_sha256": "2487670d0f39e3eb5582bb46153ff29dc09728da74903e1f005a5017c0e787da",
+      "uncompressed_bytes": 5311
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/session-0.json.gz",
+      "sha256": "7c7b25027d7096b87b777ac807a16ec69fc2665c40a8d3a5d280850ca49ae623",
+      "bytes": 810,
+      "uncompressed_sha256": "af25a7f074096480c64e65ec11e6c1c03d542e5ec5cca88fa4c035a731429985",
+      "uncompressed_bytes": 1604
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/session-1.json.gz",
+      "sha256": "ef55cc908b35bee8552b63737260ad5355a7426d8158c82903c2b9fbb38bc694",
+      "bytes": 809,
+      "uncompressed_sha256": "5fc5b25d4fcec98c2cebd90134e417ee03907abe91d3f7d77b928d412790149c",
+      "uncompressed_bytes": 1604
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/vm/qemu.log.gz",
+      "sha256": "628b2eb93033738d9db5a409a8022efe0eac1ce54558f48b124674c5ea5e19e0",
+      "bytes": 173,
+      "uncompressed_sha256": "70b4e9900232026b72ac4ce575c5684bbf3bddc6e7230fe26d4bbe84b876d568",
+      "uncompressed_bytes": 189
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/vm/prepared.json.gz",
+      "sha256": "1d038547c2f123f0284ccf3c5438f90ed94a419b0932156c00d0a1510fd27197",
+      "bytes": 745,
+      "uncompressed_sha256": "1e708f8bfd1bb90c5da676362c4b2967cf433a0feedee78f925c988bc6cc73d4",
+      "uncompressed_bytes": 2864
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/vm/session.json.gz",
+      "sha256": "ef55cc908b35bee8552b63737260ad5355a7426d8158c82903c2b9fbb38bc694",
+      "bytes": 809,
+      "uncompressed_sha256": "5fc5b25d4fcec98c2cebd90134e417ee03907abe91d3f7d77b928d412790149c",
+      "uncompressed_bytes": 1604
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/flash-images/01741d4db4374a8ce9c13a9385023fd3f32b8c34b732fb375405297bc0d25415.bin.gz",
+      "sha256": "5bd469d73a8c454da319ccfe14335fdc4dcaf30b08f321cc96c8fd27dc9f7abe",
+      "bytes": 1244848,
+      "uncompressed_sha256": "01741d4db4374a8ce9c13a9385023fd3f32b8c34b732fb375405297bc0d25415",
+      "uncompressed_bytes": 4194304
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-final/flash-images/e332d9bb61b7fabc8bf46f2d06d2d9515edb0dd01a9471ba08e911bbf51772a6.bin.gz",
+      "sha256": "d4b55fb8323378d53a091be9d4d3f1fd9668f100650bf5a0041efe9d0c9598a0",
+      "bytes": 1270796,
+      "uncompressed_sha256": "e332d9bb61b7fabc8bf46f2d06d2d9515edb0dd01a9471ba08e911bbf51772a6",
+      "uncompressed_bytes": 4194304
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/qemu-observer/report.json.gz",
+      "sha256": "30fe15c2f5cd6b418ba305a96ad194c06714a45341d9ac264753071b2b06e282",
+      "bytes": 2110,
+      "uncompressed_sha256": "e5ac5aca5a2517c4a63284318a9cf0ce08daa8016e26db307afd5f0256982e30",
+      "uncompressed_bytes": 8288
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/qemu-observer/uart-0.log.gz",
+      "sha256": "3c3397a85af6bae2f87a8628721893913aa4b06bd256e28f24af2fce0309cf43",
+      "bytes": 1676,
+      "uncompressed_sha256": "d8f8d52a185084c4d004489c31519f67b0619107942efa8fd1bb5b3332db3b46",
+      "uncompressed_bytes": 5309
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/qemu-observer/session-0.json.gz",
+      "sha256": "3a34c23efc5ceac9288cf45a35bb428f830fb43d490feb244ae7b36c93e2fb7f",
+      "bytes": 808,
+      "uncompressed_sha256": "d74cd639c2903d00b7cad890c64e79d11e5ff037c1196c5b31bc28cce3844b35",
+      "uncompressed_bytes": 1604
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/qemu-observer/vm/session.json.gz",
+      "sha256": "4f5e9dc49ddb838830c53d8503620ea83a6555be1924df5226d45add5b314fad",
+      "bytes": 810,
+      "uncompressed_sha256": "b1f5c8fc87baa4b70b36a03dc9be896b76be139af93d9100a6fbd763818c5b7d",
+      "uncompressed_bytes": 1603
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/qemu-observer/vm/uart.log.gz",
+      "sha256": "500b268de86d17a4dd9a5dfa17aed0ef27a5913d86b694f0a54eb64b2d60e089",
+      "bytes": 1674,
+      "uncompressed_sha256": "d2b59acc4105c930f6a51a9cd1ea2ff6198716d2eea0608caf2db88d19870810",
+      "uncompressed_bytes": 5311
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/qemu-observer/vm/qemu.log.gz",
+      "sha256": "628b2eb93033738d9db5a409a8022efe0eac1ce54558f48b124674c5ea5e19e0",
+      "bytes": 173,
+      "uncompressed_sha256": "70b4e9900232026b72ac4ce575c5684bbf3bddc6e7230fe26d4bbe84b876d568",
+      "uncompressed_bytes": 189
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/decoder-contract/report.json.gz",
+      "sha256": "9af32581f7b70261ee5c3066fcb69b401415cad868b0ffbb3dfd8cecc5279f9b",
+      "bytes": 11888,
+      "uncompressed_sha256": "80381ecc18439a2da721b01357c720447c06731eca0ccfa34df84b02decdb692",
+      "uncompressed_bytes": 180424
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/decoder-contract-resources/report.json.gz",
+      "sha256": "677ad76154bd6614fd844a02c8cddb89a5dd61fa2f6097af0215a8ce67390a19",
+      "bytes": 11692,
+      "uncompressed_sha256": "d91464ffe728fe13f1ae35b61fcf9202bb339c0d7a12ad835fa69a8983f8f47d",
+      "uncompressed_bytes": 177653
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/decoder-contract-final/report.json.gz",
+      "sha256": "174ed9326f81a918abd48d7d0b81e73ac41977038b017fa1f54ca9547cda65e8",
+      "bytes": 11687,
+      "uncompressed_sha256": "cfebfd2a3f3d2a22b4682e828c012f5f1fce292cf26d90bf375394b2b2d04a8c",
+      "uncompressed_bytes": 177653
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/decoder-contract-pinned/report.json.gz",
+      "sha256": "f4b8dccbc46eaf1ae2cee0a8cb5e621bd7ceb8957d190d84687b56e5c6da7066",
+      "bytes": 39495,
+      "uncompressed_sha256": "03b98385d660b254d5ce51ded4f2cd1aae6bfba9ae6a7bfa2428aa19e63c3cba",
+      "uncompressed_bytes": 2509427
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/mutations/report.json.gz",
+      "sha256": "0b24c23e825b776aa7fc1b01f9d25f8f33835db850f99258b758f19408f59c0c",
+      "bytes": 1458,
+      "uncompressed_sha256": "fbc0c2e6cfa2cc8bada10a225ca7de7c7ff32bcf1dcc034dd5fb5423d973a76f",
+      "uncompressed_bytes": 3836
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/mutations/erase-initialized-neighbor/mutant.c.gz",
+      "sha256": "cf51c33c225f697f0184312cf2c0548b31159e3d5f162fe66a2da357100f51e6",
+      "bytes": 2611,
+      "uncompressed_sha256": "0364c9b82367cff206215e66bdf164280c314b1cd291afd70dc329cd68ede892",
+      "uncompressed_bytes": 8764
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/mutations/ignore-ram-checkpoint/mutant.c.gz",
+      "sha256": "94336c215c717af6e900464ca61ce3018764bab12bda8d415fc4d12a4d1386aa",
+      "bytes": 2612,
+      "uncompressed_sha256": "aa2aa873ea1423f8fdf7975d594d3f45a80090554faccb76c80c581a62456b9c",
+      "uncompressed_bytes": 8746
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/mutations/prepare-before-prefix-validation/mutant.c.gz",
+      "sha256": "c5b77dc7f64b922f6584f20a54955d2c3abb330c3dc6d67cf5d2050fd909dd89",
+      "bytes": 2595,
+      "uncompressed_sha256": "be238f42f94bcc39e2f91fe75e5b898bce051eb58cd0822e31622d62fb91eaa5",
+      "uncompressed_bytes": 8711
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/native/report.json.gz",
+      "sha256": "7288b7969c013457d23b620a705c8a20d223aaf9a1c1eb0d012ad29445492753",
+      "bytes": 106,
+      "uncompressed_sha256": "bdbff20cc360149d9f75e4ec317952e9b56210b12fc5a57af08c37c1b675a508",
+      "uncompressed_bytes": 95
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/native/build.json.gz",
+      "sha256": "439bd281e77bdea231b38e77ddabd8959cb414ddf0ea3a22e3a1f4b374f4951d",
+      "bytes": 125,
+      "uncompressed_sha256": "d54e88b999ca2e7ef6be89a0c726b7fa2886dbd580f2fb08b3367d658dbc3b1f",
+      "uncompressed_bytes": 122
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/native/inputs.json.gz",
+      "sha256": "3d3cd802c35c82ae137c76ee7a9adf00ea5cabd23df406f473e04b1b48e7c3f9",
+      "bytes": 818,
+      "uncompressed_sha256": "c2df64a447739382c7b27e3a9a5d6b397b0f283f9faaa6d44bcf2fb76e67e9b0",
+      "uncompressed_bytes": 2413
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/host-decoder/build.json.gz",
+      "sha256": "e37db986ac91312555623047f7aab0ccc025a2aa564f857b7a8efc8780fedbc3",
+      "bytes": 269,
+      "uncompressed_sha256": "4ad67e58b63f56884c693e872e51d482d6e4ef593b00766a3e07baee32f76229",
+      "uncompressed_bytes": 501
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/history/host-decoder/inputs.json.gz",
+      "sha256": "af57b8343fd1382b6ebd5719afd4e15fa27f966b205a3677c90ba2ef3d91c550",
+      "bytes": 2640,
+      "uncompressed_sha256": "988d1b07a1e24cab4717c605bbcced7d4ebd63999be95d10d64533be9b5e34f3",
+      "uncompressed_bytes": 9690
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/h10-owners.json.gz",
+      "sha256": "2ba9e2509bbd3475c45a2905e730f9094a80a12b67f47654b78cc1df6fc4a772",
+      "bytes": 226,
+      "uncompressed_sha256": "fce990cc8b36d5b57b345921d32aff18d285e8870a0cb667c56380129803fccc",
+      "uncompressed_bytes": 730
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/probe-owners.json.gz",
+      "sha256": "3ec46f9bcd595cf926f2201b5a8d5ea2cc8b74d742b67b3c6c41cdeedd1132b3",
+      "bytes": 102,
+      "uncompressed_sha256": "16ecc002d03ebef6de2d753fa9d025ed1f135f9f281ff411ce034c8ec72f110b",
+      "uncompressed_bytes": 116
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/sdk-status.txt.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "bytes": 20,
+      "uncompressed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressed_bytes": 0
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/export-proof.py.gz",
+      "sha256": "492a37e17359906fc8f03299d0c1cb7b2a943198138194d44489d569b3040eb3",
+      "bytes": 3947,
+      "uncompressed_sha256": "26a794ae3e75f04b2d7cbbf944b0539e540528a05ed7cc6a89e8909cdb3e4559",
+      "uncompressed_bytes": 10016
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/qemu-observer-before-fix.py.gz",
+      "sha256": "1e4384231ae5fe580a7b8faad7a184065920c5a3e4fd41acfa5109c57c4fee32",
+      "bytes": 2670,
+      "uncompressed_sha256": "91cfaf28915eb220da75a9bd07dc37b8af0fd9c8e3419221d0a06dc1795ecbdb",
+      "uncompressed_bytes": 7068
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/native-test-before-first-use-stop.c.gz",
+      "sha256": "f10795485c7c040a40c62a3b4014083b4017e2ab6eb165a1c6e1c243d7b7955a",
+      "bytes": 2132,
+      "uncompressed_sha256": "ea8d3d8d3769d4218e2ab78137e498385c73c0f5ad41e00ba226871d19c82b27",
+      "uncompressed_bytes": 7307
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/save-history.py.gz",
+      "sha256": "febfa66f1a9d329a9e70b99c4682132e4a94d1874a7f876c6f9f3b1392386f14",
+      "bytes": 938,
+      "uncompressed_sha256": "a0888a5098bbdb42ca35f4b2eb20033d85fbf6bb6014957008c46988d40f19c3",
+      "uncompressed_bytes": 2130
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/production-probe/manifest.json.gz",
+      "sha256": "fffb91064e62a58835891602dbae9c71f143c0b7db5f2486c5a1af1ae215c084",
+      "bytes": 2260,
+      "uncompressed_sha256": "903ff517db63421eb06ce15f08c8493f0304bb5cc4582e079c3eec681afed1fa",
+      "uncompressed_bytes": 5673
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/old-h10-frozen-inputs.json.gz",
+      "sha256": "8086cf131c5b7e95639d958d50a8de36dc21d1e11e1041f67d0d5e68d47e81a9",
+      "bytes": 2863,
+      "uncompressed_sha256": "be176712060ca82a03a9025c0aed8a7b2d5092600716aeedfb97892673b9f6a5",
+      "uncompressed_bytes": 7135
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/compile-headers.tar.gz",
+      "sha256": "aa437bc8ba6706548b0b48a438c6643f76e7ba22077ed2151555a21947c09f1a",
+      "bytes": 370389,
+      "uncompressed_sha256": "8e22d8ad0998446a762d3a84de9c15847648db66448bd6f080be7b6f50ab25fa",
+      "uncompressed_bytes": 1751040
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/upstream-licenses/LICENSE.md.gz",
+      "sha256": "0854cfe756ddf99c7c40363d2de3344093a3ae89fad96152b4b79275ed5c51a1",
+      "bytes": 2208,
+      "uncompressed_sha256": "ba6bceebcba0fdd35488477c2cca8c4632ce82c74dbfbc87d886ce6fc4433579",
+      "uncompressed_bytes": 6077
+    },
+    {
+      "file": "raw/jpeg-backing-20261020/upstream-licenses/README.ijg.gz",
+      "sha256": "46c1219ac9b28b7d6fac9eaf9698b0b59d83e9207350875a1d6ad62c04d9062e",
+      "bytes": 5474,
+      "uncompressed_sha256": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6",
+      "uncompressed_bytes": 12799
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/display/clock_ui.c.
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: application_review; entry: ram:42009a38; name: draw_dial_hand_at_42009a38

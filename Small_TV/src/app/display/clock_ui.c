@@ -105,6 +105,20 @@ static struct tm factory_local_time(const char *country, time_t now, bool *valid
     return local;
 }
 
+static bool photo_prepare_next(const tv_settings_t *settings,const factory_photo_t *slideshow,uint32_t *present)
+{
+    /* FIXED_RECONSTRUCTION: preload only the next round-robin source while
+     * idle. Do not let valid-but-unprepared photos be skipped at selection or
+     * let unrelated warm-up jobs stall an already visible fade. */
+    uint32_t configured=0,failed=media_photo_failed_mask();
+    for(unsigned slot=0;slot<PHOTO_COUNT;++slot)
+        if(settings->photo_size[slot])configured|=1u<<slot;
+    *present=media_photo_ready_mask()&~failed;
+    int slot=factory_photo_prefetch(slideshow,settings->photo_mask,configured,*present,failed);
+    if(slot<0)return false;
+    media_request_photo((unsigned)slot);return true;
+}
+
 static void clock_task(void *unused)
 {
     /* Run the startup/setup/theme state machine and factory animation/fade timers.
@@ -119,8 +133,9 @@ static void clock_task(void *unused)
      * FIXED_RECONSTRUCTION: photo idle must apply settings/calendar brightness
      * changes as 0x4200913c does, without waiting for another photo timer event.
      * FIXED_RECONSTRUCTION: consume explicit theme selections, including a
-     * same-value /setclocktype request. A configuration-byte comparison alone
-     * loses 0x4200d7f0's reinitialization command. Snapshot both revisions once.
+     * same-value /setclocktype or /updateCity request. A configuration-byte
+     * comparison loses the commands at 0x4200d7f0/0x4200f3cc. Snapshot both
+     * revisions and location once; preserve the fade reset below for city too.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
@@ -171,14 +186,8 @@ static void clock_task(void *unused)
             else
                 --weather_retry;
         }
-        /* A photo slot can be partially overwritten during upload. Weather has
-         * a separate worker and publishes a complete snapshot under its mutex,
-         * so waiting for its network timeout would needlessly freeze the UI. */
-        if (media_upload_active())
-        {
-            vTaskDelay(pdMS_TO_TICKS(100));
-            continue;
-        }
+        /* REQUESTED_CHANGE: only mutable photo/cache work is excluded. Clock,
+         * network state and immutable animation/weather drawing keep running. */
         /* A confirmed clock needs no further progress animation. Cancel only
          * startup: resetting all counters would shift GIF, colon and photo phases.
          * Weather is optional and must not keep a usable clock on this screen. */
@@ -265,13 +274,12 @@ static void clock_task(void *unused)
             }
             else if (settings.theme == 2)
             {
-                uint32_t present = 0;
-                for (unsigned slot = 0; slot < PHOTO_COUNT; ++slot)
-                    if (settings.photo_size[slot])
-                        present |= 1u << slot;
+                uint32_t present;
+                bool preparing=photo_prepare_next(&settings,&slideshow,&present);
                 factory_photo_action_t action;
                 factory_photo_step(&slideshow, settings.photo_mask, present,
-                                   (ticks.pending & TV_TIMER_PHOTO) || reset_theme, false, &action);
+                                   (ticks.pending & TV_TIMER_PHOTO) || reset_theme,
+                                   preparing || !media_photo_idle(), &action);
                 if (action.set_duty)
                     backlight_set_level(action.duty);
                 if (action.photo >= -1)
@@ -319,5 +327,10 @@ void clock_ui_start(void)
 {
     /* Start the sole task that owns normal clock rendering. */
 
+    tv_settings_t initial; settings_snapshot(&initial);
+    if(initial.theme==2) {
+        factory_photo_t first={0};uint32_t present;
+        photo_prepare_next(&initial,&first,&present);
+    }
     configASSERT(xTaskCreate(clock_task, "clock_display", 4096, NULL, 2, NULL) == pdPASS);
 }

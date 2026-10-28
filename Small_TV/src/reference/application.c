@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/app_main.c.
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: application_review; entry: ram:4200826a; name: system_timer_alarm_callback_at_4200826a

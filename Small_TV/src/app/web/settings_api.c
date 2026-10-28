@@ -45,6 +45,11 @@ esp_err_t web_settings_get(httpd_req_t *req)
     const char *uri = req->user_ctx;
     tv_settings_t s;
     settings_snapshot(&s);
+    if(!strcmp(uri,"/get_jpeg_write_limit")) {
+        cJSON *value=cJSON_CreateObject();
+        cJSON_AddNumberToObject(value,"limit_kib",settings_jpeg_write_limit_kib());
+        return web_json(req,value);
+    }
     cJSON *result = NULL;
     for (unsigned i = 0; i < sizeof(integers) / sizeof(integers[0]); ++i)
         if (!strcmp(uri, integers[i].get))
@@ -179,13 +184,30 @@ esp_err_t web_settings_post(httpd_req_t *req)
      * with unrelated scratch buffers. Persist the validated JSON SSID/password.
      * FIXED_RECONSTRUCTION: /setclocktype is a reinitialization command even
      * when its value is unchanged, as in 0x4200d7f0. Publish that intent explicitly.
+     * FIXED_RECONSTRUCTION: /updateCity clears the same theme latch at 0x4200f3cc;
+     * update only the location and its command revision under the settings mutex.
      * Both credential routes accept normal JSON whitespace instead of relying
      * on the factory handlers' literal substring parsing. */
 
     const char *uri = req->user_ctx;
+    if(!strcmp(uri,"/set_jpeg_write_limit")) {
+        /* REQUESTED_CHANGE: accept exact uint32 KiB, including zero; neither
+         * narrowing nor floating-point truncation may relax the chosen limit. */
+        cJSON *object=web_parse_json(req);
+        if(!object)return web_error(req,"Expected a bounded JSON object");
+        const cJSON *value=cJSON_GetObjectItemCaseSensitive(object,"limit_kib");
+        bool valid=cJSON_IsNumber(value) && value->valuedouble>=0 && value->valuedouble<=UINT32_MAX;
+        uint32_t kib=valid ? (uint32_t)value->valuedouble:0;
+        valid=valid && (double)kib==value->valuedouble;
+        cJSON_Delete(object);
+        if(!valid)return web_error(req,"Expected integer limit_kib from 0 to 4294967295");
+        if(settings_set_jpeg_write_limit_kib(kib)!=ESP_OK)return web_error(req,"Could not save JPEG write limit");
+        return web_ok(req);
+    }
     tv_settings_t s;
     settings_snapshot(&s);
-    bool valid = false, restart = false, weather = false, select_theme = false;
+    bool valid = false, restart = false, weather = false, select_theme = false,
+         city_update = false;
     if (!strcmp(uri, "/restart"))
     {
         if (req->content_len)
@@ -273,6 +295,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
         {
             valid = update_city(&s, object);
             weather = valid;
+            city_update = valid;
         }
         else if (!strcmp(uri, "/set_clock_color"))
         {
@@ -308,7 +331,16 @@ esp_err_t web_settings_post(httpd_req_t *req)
         }
         cJSON_Delete(object);
     }
-    if (!valid || (select_theme ? settings_select_theme(s.theme) : settings_replace(&s)) != ESP_OK)
+    if (!valid)
+        return web_error(req, "Invalid setting or value");
+    esp_err_t applied;
+    if (city_update)
+        applied = settings_update_city(s.city, s.country);
+    else if (select_theme)
+        applied = settings_select_theme(s.theme);
+    else
+        applied = settings_replace(&s);
+    if (applied != ESP_OK)
         return web_error(req, "Invalid setting or value");
     if (weather)
         weather_request_update();

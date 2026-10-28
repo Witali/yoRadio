@@ -1,11 +1,161 @@
 # Контекст работы над восстановленной Small TV
 
+## Продолжение в отдельной рабочей копии — 2026-10-25
+
+Текущая разработка: `.worktree/small-tv-memory-retention`, ветка
+`codex/small-tv-memory-retention`, commits `135e61860` (exact TLSF metadata replay)
+и `82d901e2d` (TCP/IP mailbox gate), затем `23b641680` (typed TCP inventory и
+live-allocation attribution). Там обновлены полный IMPROVEMENT_PLAN,
+WORK_LOG и tests/HEAP_TOPOLOGY.md / tests/TCP_HEAP_ATTRIBUTION.md. 4+40-cycle
+heap qualification,46snapshots/92inventories и38negative controls pass;
+TCP prerequisite15host tests/real4cycles/5quiet samples/12controls pass.
+TCP PCB/segment/pbuf attribution готов:33real-ROM hosttests+25baseline,
+4+40actualcycles/46observed snapshots/76negativecontrols. Actualguest samples
+далиLISTEN/FIN_WAIT_2 PCB80..504B; queuedbuffer targetprobe и старые7warnings
+не закрыты. Там запущеныsoak-main/soak-v8 по28800guest seconds/15s/outageEvery60,
+25Oct13:40/13:42UTC,early0 и4positiveowneridentities каждый. Теперь runtime inputs
+обеих рабочих копий pinned; дальнейшие producer изменения — новая task worktree.
+
+Эту рабочую копию пока сохранять как pinned input основного
+`.build/runtime-h10-main-20261025`. Не cherry-pick/merge сюда новые runtime
+helpers, не менять app/ELF/SDK/ROM/profile/assets/frozen47files и не присоединять
+второй observer. При последней CIM-проверке362cycles,4originalowners и точные
+creationUTC совпали; oneROMboot/noUARTerrors, H10 ещё running. Дополнительные
+короткие ВМ завершены. После настоящего terminal H10 выполнять полный audit,
+а не принимать старый JSON status за liveness или дополнять24h прежними7часами.
+
 Актуальные решения и рекомендации для продолжения сравнения заводской прошивки
 ESP32-C2 с собираемым C-проектом в `Small_TV/src`. История действий и результатов
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+Актуальная последовательность следующих этапов и критерии завершения:
+[план улучшений](IMPROVEMENT_PLAN.md). CITY-REINIT закрыт scoped native/QEMU
+проверками (app3E03); следующий этап — production JPEG/NOR, затем сетевой
+lifecycle, аппаратные различия, full-image audit и приёмка окончательной сборки.
+Старый H10 B50D не изменять.
+
+JPEG/NOR checkpoint20Oct: portable core в storage/jpeg_nor.c/.h, вне production.
+Один4096byte cache, sparse allowlisted extents, RMW только при0→1, проверка erase
+и окончательных bytes, poisoned handle после I/O/verification failure.3000random,
+83fault,7actual stores и6compiled negative mutations pass. Первоначальный
+allowlist mutant выявил test gap конца последнего range; FIXED_TEST и failed
+evidence сохранены. RV32 object1848/handle4352/cache4096/maxframe304; не whole
+firmware RAM/stack. App3E03/TJpgd не меняется;6artifact tests pass. Следом runtime
+immutable guard и journal/publication/cold recovery. Backing arrays должны быть
+bounded logical subfiles одного scratch store, без per-file sector rounding или
+независимых dirty caches общих sectors. Детали tests/JPEG_NOR_STORAGE.md.
+
+Ownership guard checkpoint20Oct: storage/jpeg_guard.c/.h и tools/jpeg_guard_layout.py
+подготовлены вне production. Verify all boot partitions/flash geometry, sector
+ownership,27immutable payloads +64byte stamp в protected animation padding
+0x28f720. Stamp нужен для changed allocation со старыми payloads; SHA known
+payloads без marker этого не доказывает. Новый assets copy только для host gate,
+production archive3E03 не меняется.49layout/84corruption/3050read/3010hash faults,
+12generator invalid inputs+12controls и10compiled mutants pass. RV32 code1150,
+const descriptors1448,maxsingleframe320, не runtime/link/whole stack.85rawproof;
+6artifact checks pass;6old H10 original owners readonly-confirmed, VM не трогать.
+Следом atomic journal invalidation/publication/cold recovery. ESP-IDF adapter
+обязан enumerate ALL partitions, provide SHA и gate write capabilities только
+после OK. Build должен связать stamped assets/header без потери photos/settings;
+на неизвестной flash marker автоматически не записывать. Детали
+tests/JPEG_OWNERSHIP_GUARD.md. Полная цель IMPROVEMENT_PLAN остаётся активной.
+
+Journal checkpoint20Oct: storage/jpeg_journal.c/.h подготовлен вне production.
+Два metadata banks полного snapshot пяти entries, durable invalidation перед
+source/frame overwrite, commit page после erase/body verification. Publish и
+каждый lookup требуют adapter flush/full physical SHA. Newest foreign IDs не
+откатываются к старому matching bank; ties fail closed/MAX generation не wrap.
+33400fault cases(128/256pages),769corruptions,6boot failures,12compiled mutants
+и independent Python wire gate pass. Все ready recovery frames целые; прочие
+4frames/protected bytes сохранны. RV32 code2976/const24/handle1032/open448
+(оптимизировано704→448), не whole stack/runtime/link.118raw proof,6artifact pass,
+app3E03/TJpgd unchanged;6oldH10 owners readonly-confirmed, VM не трогать.
+Следом ESP-IDF authorization/SHA/budgets и shared scratch subfiles, actual upload
+invalidation/source identity, matching assets build и codec integration.
+Журнал сам не восстанавливает source JPEG после interrupted upload. Детали
+tests/JPEG_CACHE_JOURNAL.md; цель/остальные пункты плана сохраняются целиком.
+
+Transport checkpoint20Oct: storage/jpeg_transport +jpeg_espidf обеспечивают shared
+physical read/program/erase/call/time budgets, revocable bounded ports/epochs,
+monotonic pre/post/check deadlines и true ESP-IDF/PSA. Both physical+configured
+flash sizes; full raw MD5 table/unknown flags +ALL SDK partitions cross-check.
+31host cases/14mutants pass. Probe app6cb29771…(135504bytes) отдельно archived
+firmware/development/small-tv-storage-probe;19inputs frozen BEFORE build и checked
+after.4target variants/5final processes: actual RMW/cross-sector writes, fresh
+process cold persistence, guarded rejection of unmarked/extra partition/raw flags;
+whole4MiB comparison only35expected bytes. Earlier10successful processes also
+stopped. Main3E03/TJpgd unchanged;6artifact pass,6oldH10 owners readonly-confirmed.
+155raw proof:jpeg-transport-validation-20261020.json. Нет network/LCD/hardware
+acceptance. Port memory borrowed: abort/drop all old borrowers before reuse;
+RAM-only operations need explicit jpeg_transport_check, not just I/O callback.
+
+Scratch checkpoint20Oct: byte-bounded files over ONE NOR cache выполнены.
+Pinned upstream c85e6b… src/jmemmgr.c first_undef_row contract подтверждён actual
+libjpeg/NOR pixels matrix:25resource/924lossless/48rich12-bit/18Pillow images,
+16+12negative/4optional/18budget cases. Native16432assertions/5000random/134faults,
+13compiled mutants;1227logical faults/36damaged recoveries/12transitions и
+2238partial physical I/O errors с same-object recovery прошли. Small physical
+calls exhaustive2010, четыре full-size sampled по57; silent read corruption не
+обещается detect. Byte prefix/token IDs/checkpoints/cleanup без temp flush.
+Pool allocator, stdio oracle и NOR bridge разделены по своим модулям. RV32
+scratch code1240/handle576/token24/region32/frame48; не target runtime/UI link.
+RichCMYK12 использует3780608program bytes/923erase calls на один tested decode;
+нужен persistent RGB565 cache вместо повторного scratch decode при показе.
+Current460800bound всё ещё только fixtures: расширить sampling matrix/rounded
+coefficient capacity, не исключать редкие требуемые варианты ради старого лимита.
+Source readonly C:/Work/yoRadio/.build/libjpeg-turbo-3.2.0. Production3E03/TJpgd
+и targetprobe6cb29771… unchanged; SDK clean, frozen47files/H10 original six
+owners проверены readonly. Proof jpeg-scratch-validation-20261020.json;
+tests/JPEG_SHARED_SCRATCH.md. Далее sampling/budgets, source/upload journal
+invalidation, actual source/frame SHA, matching assets build/native codec bridge
+и HTTP/target memory/time/LCD/full/24h/hardware gates. Весь план остаётся активным.
+
+Уточнение пользователя20Oct: объективно невозможный для устройства JPEG должен
+быть отклонён с правильной причиной, вплоть до отказа до decode. В native codec
+contract различать unsupported mode, malformed/truncated input, RAM/scratch limit
+и I/O failure. Для resource refusal сохранить required/available; preflight по
+реальным header/sampling/rounded allocations до backing writes, где это возможно.
+Отказ по нынешнему reserved scratch не означает, что сам JPEG испорчен или что
+все файлы этого coding mode невозможны. Нужны отдельные tests точной причины и
+отсутствия опубликованного частичного cache. Новый контракт ещё не включён в UI.
+
+Coefficient checkpoint20Oct по запросу уменьшить объём: codec/jpeg_coefficients
+сохраняет DC two's-complement, AC sign/magnitude, complement both(zeroFF).
+Exact signed16 bijection/INT16_MIN reserved negativezero. Pinned direct progressive
+JBLOCK path, other backings raw.256byte buffer, same4KiB cache,15byte first-use
+bitmap. Prepare FF once per sector/job, preserve initialized adjacent-file bytes;
+reset bitmap on next job, keep physical flash. RichCMYK12 program3780608→2582784,
+erase923→113; scratch460800/pool42275 прежние. FlatCMYK program460800→2048, но
+erase0→113: не universal wear gain.19726488native assertions/4194304value-position
+cases/983040refinements,7pure+4integration compiled mutants;18traffic cases,
+standard JPEG matrix,1227logical+1573physical recoveries pass. RV32converter234code/
+frame0/static0, не target execution/full app memory. Proof jpeg-coefficients-
+validation-20261020.json; tests/JPEG_COEFFICIENTS.md. Main3E03/TJpgd/probe6cb
+unchanged;6artifact/10map controls, SDK/H10 readonly. Следом precise error/resource
+preflight и actual native source/upload/journal/cache/codec integration; весь план
+сохраняется активным.
+
 ## Независимость проверок подсистем — 2026-10-18
+
+Native decoder checkpoint20Oct: codec/jpeg_decoder.c/.h +jpeg_memory.c отделены
+от CLI, public API без libjpeg типов для network/LCD. Bounded reader1024/oneRGB565
+row, mandatory pre/post checkpoints, per-context allocator cap/backing. Wrapped
+virtual requests считают actual padded rows; complete preflight before ANY open.
+Typed unsupported/invalid/truncated/pool/backing/dimension/I/O/cancel/time/quota
+diagnostics; required/available с known flag. Post-open deadline orphan очищается
+после library abort без dereference freed owner/flush. Mutable jmp state в heap;
+созданный JPEG object сохраняется после fail, recreate только если create failed.
+63positive/7limits/10negative/1197faults/12transitions/6compiled mutants pass.
+Rare legal4x4 CMYK needs524288 vsnative460800; positive oracle at262144pool/1MiB
+backing не считать C2 fit. Host context5232+poolpeak42275(fullCMYK12); RV32context
+4984, decoder2384code+311rodata/memory1870/color586, static writable0. Complete
+relocatable binding148672code+120581rodata, libc/libgcc unresolved by design;
+не runtime/full UI link/whole heap/stack/timing. Proof jpeg-decoder-validation-
+20261020.json; tests/JPEG_DECODER.md. Main3E03/TJpgd/probe6cb unchanged;6artifact/
+10map controls. Далее NOR/packed backend adapter для нового API, target execution,
+actual upload/source/journal/cache/physical hashes/matching assets/UI integration
+и full/final/hardware gates. Весь IMPROVEMENT_PLAN по-прежнему активен.
 
 ## План улучшений форматов изображений — 2026-10-19
 
@@ -2358,3 +2508,1254 @@ active selector H10/CYD инезакоммиченные C3/ESP8266 сохран
 H10/CYD не прерывались. Пользовательские изменения root совпадают с начальным
 inventory. Код и firmware не менялись; тесты повторно не запускались.
 Подробности: Small_TV/WORKTREE_INTEGRATION_20261020.md и машинный отчёт.
+
+## 2026-10-20 — актуальный checkpoint JPEG/NOR
+
+Продолжение цели IMPROVEMENT_PLAN в `.worktree/small-tv-improvement-plan`, branch
+`codex/small-tv-improvement-plan`. Root checkout с посторонними C3/ESP8266 изменениями
+не трогать. Основная UI firmware3E03/ELF54293 всё ещё TJpgd,1170432bytes. Prepared
+NOR/guard/journal/transport/espidf/scratch/coefficients/decoder modules не означают
+включённый новый JPEG в UI. Завершённые progress commits идут послеccb29b1db.
+
+Новый codec/jpeg_backing — actual adapter API→shared scratch/NOR, raw или packed
+coefficients, noheap/globals; RV32handle600 +caller bitmap15 +NOR4352. IDs/constant
+capacity сохраняются между jobs, first-use bitmap сбрасывается, dirty abort не
+пишет. Весь запрос проверяется до sector preparation. Deadline/quota из callback
+не маскируются generic I/O; owner читает transport.last_error после STATE.
+Callback cause хранится в decoder diagnostic до cleanup, не брать его из
+backing.last_error после успешного close.
+
+Host61images/7limits/10negative/827physical faults/48stops/12transitions,
+15273unit assertions/134partial+silent faults/6compiled mutants pass. Стандартный
+stdio contract63/7/10/1197/12 также pass. Probe0F637039/ELF040300F8/source15AB27CD
+с matching stamped assets сохранена отдельно в firmware/development/small-tv-jpeg-decoder-probe.
+Полный decoder/NOR pipeline исполняется в собственном C2 QEMU:45576requested heap
+peak,1988/4096stack free, без UI/Wi-Fi. FullCMYK12 занимает около39–45guest seconds;
+это не hardware benchmark. Первый observer ошибочно требовал изменённые bytes на
+повторной записи тех же данных; исправлен FIXED_TEST, сохраняются полные flash images.
+Подробности tests/JPEG_BACKING.md и qemu/parity/jpeg-backing-validation-20261020.json.
+
+Далее source/upload privacy + journal invalidation + physical source/frame SHA +
+durable RGB565 cache и matching assets deployment с сохранением photos/settings.
+Validation и cache generation — один decode; redraw готового кадра без повторного
+multi-scan decode/flash writes. Затем UI link, реальный общий RAM/stack/time, HTTP/
+reset/power-loss, независимые LCD/network/full/24h/hardware. Не закрывать цель.
+Старые H10/frozen46payloads+manifest/SDK readonly; ни QMP/RSP, ни stop для oldH10.
+Все новые процессы принадлежат только standalone probes; после tests reap owners.
+
+## 2026-10-20 — следующий checkpoint persistent cache
+
+Предыдущий goal turn69f138125 — progress; цель прежняя, не завершена. В этой же
+clean worktree добавлены storage/jpeg_cache и tools/jpeg_cache_layout. Полный
+source→decoder→rows→physical verify→journal→cold readonly cache workflow работает
+на host с actual libjpeg, не только synthetic producer. Native UI3E03/TJpgd и
+standalone target probe0F63 не менялись; новый cache на C2 ещё не исполнялся.
+
+Cache handle5600RV32 включает journal1032+frameNOR4352; borrowed layout156/devices72,
+scratchNOR/backing/decoder/SHA отдельно. All9roots cache+NOR+journal ET_REL9016code/
+16rodata/static0, maxcacheframe336/maxjournal448. Не whole UI heap/task stack fit.
+Source102400 limit — отдельный SOURCE_LIMIT с required/available, без decoder/
+source reads. Code identity генерируется из actual archive SHA, patches, codec/
+converter/storage sources и geometry. Codec change не требует изменения ownership
+resources, но matching assets/deployment и сохранение user photos/settings ещё нужны.
+
+Критическое: before/after source SHA не обнаруживала silent read внутри decoder.
+Реальный fault378 публиковал wrong pixels, cold hit их повторял. Исправлено
+FIXED_RECONSTRUCTION в jpeg_cache_read_source: fresh256byte readbacks до передачи
+данных decoder. Все218actual input/readback points теперь отвергаются без READY;
+before inputs/output и9runtime mutants сохранены. Cache readback SHA обязан читать
+весь PHYSICAL frame после flush/reopen; test observer проверяет этот объём отдельно.
+
+Final host:59JPEG240×240/5source refusals/6negative,268fault recoveries/18stops;
+12120physical cuts+946SHAfailures+2424stops,9mutants,10generatorrejects и старые
+sampling argc5 byte-identical8/12. FullCMYK12:1decode/2703104program/144erases;
+cold hit0decode/0program/0erase, exact BE98FC78 pixels. Всё ещё host only.
+Proof qemu/parity/jpeg-cache-pipeline-validation-20261020.json; tests/JPEG_CACHE_PIPELINE.md.
+
+Следом native media owner/build/deployment/privacy/HTTP+target runtime. Не вставлять
+40секундный decode под нынешний общий media_mutex: photo_upload_finish держит его,
+UI вызывает media API. Нужен owner/worker protocol без нарушения source serialization
+и отзывчивости UI/HTTP. После integration shared RAM/stack/time, reset/power-loss,
+independent network/LCD/full/24h/hardware. Старые SDK/H10/frozen read-only, no QMP/RSP.
+
+
+## 2026-10-20 — offline dependency/main build checkpoint
+
+Текущая worktree/branch прежние. Goal active, предыдущий read-only ответ о
+сокращении записей —no implementation progress; этот turn реализовал production
+build. Не возвращаться к повторному исследованию vendor workflow: теперь есть
+third_party/libjpeg-turbo/upstream.tar.gz +3qualified patches/licenses и tools/
+build_jpeg_library.py. build.ps1 автоматически собирает dependency, app CMake
+компилирует11codec/storage sources; API roots GC, UI/upload по-прежнему TJpgd.
+Production .a D690BDF3 и configured headers побайтно одинаковы с old RV32 qualified
+library; Os был и прежде в actual Ninja FLAGS, несмотря на O3 в CMakeCache.
+
+Main archive app676C5EDF/ELF CB84E536/source2D1FB659,1170432bytes,365568free;
+assetsBB4469E3 unchanged. Native5806/13dependency/12inventory/10generator/6artifact
+checks pass. Explicit source inventory459/170app. No new VM, SDK tracked clean,
+шесть protected H10 owners present. Локальные logs .build/jpeg-main-20261020;
+доказательства qemu/parity/jpeg-dependency-build-validation-20261020.json.
+Build helper refuses incomplete/corrupt cached output; use fresh dir on failure.
+No source edits during build: post-link input recheck fails. Builds archive in
+firmware/development; no push in this turn.
+
+Next REAL integration: media owner/worker and privacy, not another decoder probe.
+Source/journal invalidation before upload writes; one decoder+verified RGB565 cache,
+source readback protections; no global media_mutex across slow decode. SDK async
+HTTP begin/complete can retain legacy OK after actual finish; inspect server
+lifetime and request/body ownership. Current UI has explicit upload_active pause,
+remove with slot-scoped protection. Current privacy parser baseline-only: needs
+strict metadata-only multi-scan scanner allowing only fixed JFIF/structural Adobe,
+all EXIF/COM/etc rejected even between scans. Keep JS crop/resize/privacy.
+
+Factory baseline photo pixel parity matters: compare TJpgd vs libjpeg output;
+consider a purpose-specific baseline adapter/strip cache if needed rather than
+silently changing factory pixels. UI has1920byte DMA buffer, NOT a115200byte full
+framebuffer. Real combined heap/task stacks/time remain unverified. After owner
+integration deploy matching guard/cache headers/assets without erasing user photo
+slots/settings, then independent LCD/network/full/24h/hardware gates. Old H10/SDK/
+frozen46payloads+manifest readonly, no extra QMP/RSP or stop for old H10.
+
+
+## 2026-10-20 — live upload privacy gate checkpoint
+
+Предыдущий goal turn b4b7834e9 —implementation progress. В этой же worktree
+реальный photo_upload_finish теперь вызывает codec/jpeg_privacy. Старого
+baseline-only marker scanner больше нет; entropy/dimensions всё ещё проверяет
+TJpgd. Privacy module accepts fixed JFIF(no thumbnail)/canonical Adobe and scans
+все SOS/entropy/inter-scan markers доexactEOI; rejects other APP/COM/trailing.
+Domain statuses include I/O/stop/truncated/metadata separately. No private strings
+in diagnostics. Cache CODEC_INPUTS includes policy. Don't reimplement this gate.
+
+3727unit controls (45metadata positions/353truncations/2readfaults/343stops,
+FF00crosses255/256),63actual qualifiedJPEG/5private+trailing rejections and
+7compiled mutants pass. Ordinary tests/run.ps1 now also runs direct privacy gate;
+old5806native checks and6artifact checks pass. Inventory469/172app,12controls.
+Target module maxcompilerframe368,1224code+180rodata,0data/bss (not whole HTTP stack).
+Main app733C006A/ELF C1F1D94B/source4C8C3878,1171136bytes,364864partitionfree,
+DEBUGoff; assetsBB4469E3 unchanged. No new VM/runtime/hardware claim. Saved in
+firmware/development; tests/JPEG_PRIVACY.md and qemu/parity/jpeg-privacy-validation-20261020.json.
+
+Next: actual media owner/worker integration, not another standalone module/probe.
+Reuse existing privacy/cache/guard/decoder. Current upload state+source serialization
+must split short media_mutex from slow codec mutex. Need async HTTP begin/complete,
+keep body/request lifetime, invalidate journal BEFORE source erase/write, persist
+source length only after privacy+ONE decode+physicalcacheverify. Worker low priority
+may use idle-priority time slicing to let idle/WDT run without arbitrary vTaskDelay;
+verify scheduler settings, don't assume. UI should try codec mutex0 and keep clock/
+immutable animations running, no blanket upload_active pause. Avoid read-modify-write
+of selected source while UI reads; use owner state/short locks. Retry/failure/timeout
+must release ownership and all async requests. Own all new VM handles; oldH10 untouched.
+
+Baseline factory pixels still need comparison; consider TJpgd strip producer into
+cache for supported8baseline rather than silent IDCT/color rounding drift. Include
+producer/Tjpgd config/source in cache codec ID if used. UI has1920byte DMA, not full
+framebuffer. Then matching assets/cache-header deployment preserving photos/settings,
+combined heap/stack/time, independent LCD/network/full/24h/hardware. Goal active.
+User asked about backdoor: existing static audit Small_TV/analysis/security/README.md
+finds no confirmed malicious path but unauthenticated management/open AP/plaintext
+weather/unsafe factory bounds. Don't claim whole-image absence; full audit pending.
+
+## 2026-10-23 — current real main integration checkpoint
+
+Do not repeat standalone integration work: UI/upload now call photo_codec/cache
+through photo_worker, SDK async start/finish and matching stamped assets. Baseline
+factory TJpgd pixels preserved via strip producer, extended modes via real libjpeg.
+Source lengths/ready/failed results are rechecked under media/codec ownership.
+Only stable input/fixed-capacity failures suppress background retries. Real
+one-shot privacy-read fault and stale queued length both failed before their fixes.
+
+Whole-app memory was the actual acceptance failure: successful fullCMYK12 alone
+was misleading. Keep-alive probe alone and malloc-time reserve alone both failed.
+Final policy preserves16KiB at allocation and checks the service floor during
+buffered decode work; late pressure aborts, releases codec pools and reports
+service-heap-reserve with measured required/free. Other allocations can happen
+between checks: no claim of a hard reserved RAM bank. Heavy valid JPEG may be
+refused; no broad target-format claims based on host/probe support.
+
+6001native+privacy,176factory/212app/514total inventory,12controls,6artifact pass.
+Main app4B7530CB/ELF6B233C4F/sourceC6B9D1AD,1464560bytes/71440free, DEBUGoff.
+Final5HTTP cases: three heap-headroom refusals, one late service-reserve abort,
+one progressive gray success;46concurrent GETs/max0.657host sec. Separate control
+160GETs/max0.640sec. Two cold processes preserve source/protected bytes; all four
+final workflow/control owners stopped/reaped. This is HTTP/storage, not LCD,
+RF/weather, cold-hit0writes or power-loss proof. Final report/data in
+qemu/parity/jpeg-main-integration-validation-20261023.json and tests/JPEG_MAIN_INTEGRATION.md.
+
+NEXT: old unstamped-assets safe migration must verify matching immutable27payloads,
+raw/SDK partition map and candidate ownership before any stamp/cache write; never
+erase user photos/preferences to make the guard pass. Then exact whole-app
+heap/stack/time/format/fault coverage and independent LCD frames/clock continuity.
+Existing photo_frames_qemu assumes two clock delays/present31 before async cache
+warm-up; adapt observer to real readiness, without guest RAM/PC changes or hiding
+factory differences. Continue upload/decode power-cut, network reconnect/client/
+connection-churn gates, whole-image indirect-call audit, full/24h/hardware.
+No physical flashing/reset, no edits to frozen bundle or shared SDK. Goal active;
+commit completed change, do not push without the user's next push instruction.
+
+## 2026-10-23 — ordered legacy adoption checkpoint
+
+Matching native unstamped assets migration implemented in jpeg_provision and
+real ESP-IDF main, ordinary guard still read-only. Verify raw/SDK table/flags,
+geometry,27 payloads, compiled stamp, every candidate byte twice, then ID32 FIRST
++ exact readback, header8 LAST + readback, final64 read + full physical guard and
+deadline. One startup budget,40 program bytes max,0 erase, no photo/settings I/O.
+Valid stamp skips vacancy scan and keeps used cache. Unknown/occupied stays intact.
+
+Important regression: single-program prototype could adopt full foreign header
+with wrong compatible ID; negative failed before correction. Nonerased header
+NOW requires exact ID. Recover only torn subsets within supported phase ordering.
+Historical failure preserved separately; never committed/pushed/deployed.
+
+23409 host cases/8 provision +14 transport mutants/31 transport/5995 native/privacy/
+12 inventory controls/6 artifact pass.527 total inventory,212 app unchanged.
+12 actual main QEMU processes passed/stopped/reaped: fresh40, IDdone8, cold0,
+foreign/occupied0, real retained old-main app update0. Full physical comparison
+outside expected stamp/NVS, and NVS exact for cold/upgrade. This is bootstrap
+storage acceptance, not general JPEG/LCD/network/RF/power-cut acceptance.
+App034287C7 /ELFBB7FD7A1 /source1D1F52CE,1466576bytes/69424free,DEBUGoff.
+Assets1032119B/layout44268211/codecB33BC0A1 unchanged. Firmware archive saved.
+tests/JPEG_LEGACY_PROVISION.md + qemu/parity/jpeg-legacy-provision-validation-20261023.json;
+lossless deduplicated sector evidence, independently reconstruct/verify fullSHA.
+
+NEXT: separate full LCD and clock-continuity gate of CURRENT image. Existing
+photo_frames_qemu assumes two clock delays/present31 before asynchronous warm-up;
+observe genuine cache readiness, no RAM/PC patches or masks hiding differences.
+Then complete target heap/stack/time/format/fault/refusal matrix; real upload/
+decode/journal reset/power-cut; network clients/reconnect/churn; full-image
+indirect-call audit/full/24h/hardware. Do not re-open solved standalone core work.
+Frozen QEMU/SDK unchanged, no physical actions, no push. Goal active.
+
+## 2026-10-23 — current photo LCD complete, startup regression measured
+
+Do not rerun obsolete pre-worker photo_frames_qemu as a current-main acceptance:
+it expects2delay calls/present31, whereas current coordinator has1yield and masked
+async readiness. New photo_cache_frames_qemu +contract observes real ABI/states,
+literal factory replay, full57600pixels, no RAM/PC/time writes or diff masks.
+54frames/3110400pixels exact;13report rejects;3native owners reaped. Four masked
+cycles exercise unsynced then actual SNTP night restoration. No production changes.
+Proof qemu/parity/photo-cache-frames-validation-20261023.json; tests/PHOTO_CACHE_FRAMES.md.
+
+IMPORTANT NEXT: startup timing DOES NOT match. Current first photo23.389901guest sec
+(repeat23.559866), literal stock20.565822 in separate reaped VM, same seed/profile.
+Slot0 ready~5.3sec, but photo_worker_idle gates fade until all5warm jobs complete.
+Optimize initial/prefetch scheduling rather than inventing a delay or hiding
+warm-up from measurement. Preserve invalid-slot skip, partial readiness ordering,
+source cancellation/retry, fade timing. Add failing native/QEMU timing and cold
+durable-cache0write tests. Existing source/app/ELF hashes remain034287/BB7FD7/1D1F52.
+Then independent classic/simple/dial clock continuity under foreground decode,
+full target RAM/stack/time/format/fault, reset/power-cut, lifecycle/churn,
+whole-image/full/24h/hardware. Goal active; no physical actions, no push.
+
+## 2026-10-23 — next-photo prefetch complete
+
+Current source prepares only the next eligible round-robin slot at fade0/2;
+no unrelated decode starts in phases1/3/4/5. Initial request only for photo theme.
+Shared bounded next_photo helper preserves valid stock selection; stable failed
+current lengths skip, transient I/O/memory/cancel retry. No new sleeps. Native
+failure getter exposed through media; GUI waits for valid pending target rather
+than jumping to a ready later source. Same-length upload still clears failure.
+
+FINAL6077 native +privacy,12inventory controls,6unsafe compiled policy mutants,
+13440literal factory/current RV32 fade/selection traces and6artifact pass.
+Audit217app/532total. New target AppABF14143 /ELF896558F5 /source64EDEEF9,
+1466800bytes/69200free,DEBUGoff; saved firmware/development archive. Assets1032119B,
+layout44268211/codecB33BC0A1/libraryD690 unchanged. Old timing fails isolated new
+criterion before correction (retained23.389901 >stock20.565822).
+
+Five final owned cold QEMU processes stopped/reaped: all28frames, night22/4cycles,
+none4, damaged-first22, true durable cold28.104frames/5990400pixels exact,
+17report negative controls. First5.560901guest sec (pilot5.619954), present1;
+cold2.251859,0JPEG program/erase attempts. Z1 traps actual unique flash_program/
+flash_erase addresses, checked against exact ELF by machine model; whole4MiB
+also unchanged in cold fixture. Cold before EXACT warm after, no NVS/settings
+reseed. Damaged source0 SOI byte intentionally0, valid slots1..4 continue in order.
+All warm runs preserve photos/boot/immutable/protected, only declared NVS/prefs/
+generated candidates may differ. This is LCD/storage/timing, NOT network/RF gate.
+
+Proof qemu/parity/photo-prefetch-validation-20261023.json, tests/PHOTO_PREFETCH.md;
+verify_photo_prefetch_evidence.py reconstructs10full images and104RGB surfaces.
+Only~0.8MB new compressed evidence,184old payloads reused. Source/app/ELF/QEMU/
+raw hashes pinned. All exec handles55183/38683/1272/98601/28063/74933/61342 terminal0;
+no owned VM remains. Production unchanged after successful target build.
+
+NEXT: classic/simple/dial clock continuity during actual foreground decode,
+complete CURRENT target JPEG memory/stack/format/fault/refusal matrix. Existing
+photo_owner_qemu workflow can requalify current HTTP/resource policy, but its
+simple WeatherHTTP1.0 fixture caused timeouts earlier: use actual persistent
+weather_qemu WeatherFixture, keep network/display gates separate. Then real
+upload/decode/journal reset/power-cut, clients/reconnect/churn, whole-image
+indirect-call audit/full/24h/hardware. Earlier HTTP proofs belong to earlier app
+hashes, do not relabel. SDK/frozen QEMU unchanged, no physical actions/no push.
+Goal remains active. Finish focused commit of this checkpoint, then continue.
+
+## 2026-10-23 — foreground clocks/HTTP/recovery completed scope
+
+AppABF14143 /ELF896558F5 /source64EDEEF9 unchanged. New test-only checkpoint:
+tests/JPEG_CLOCK_CONTINUITY.md and jpeg-clock-continuity-validation-20261023.json.
+Classic/simple/dial actual foreground gray8 progressive:13wholeframes; separate
+start/chunk-only control47.60frames/3456000pixels exact clean native/factory RV32,
+real minute rollover,16+12report rejects, hardware breakpoints/no guest writes.
+Actual main complete; only isolated native renderer skips non-pixel RTOS startup.
+
+HTTP requalified current app with persistent WeatherFixture, not one-shot HTTP1.0.
+First240host timeout retained; diagnostics show ongoing CMYK12 flash progress,
+not mutex deadlock. Explicit900host run completed:CMYK12 305s, RGBprogressive146.438s,
+gray37.25s.862GET/0errors/max.875; separate160GET/0errors/max.5. Two sampling44
+precise resource refusals, GET10s/guest I/O-time budgets unchanged. Host icount
+seconds NOT hardware timing. Actual cold source HTTP bytes exact.
+
+Independent wire reader/newest journal/full physical frame matches unmodified
+upstream gray RGB565A3EC07B0. Actual stopped first interrupted flash15F0392B,
+NOT live failure-flash copy, ordinary new boot/replacement works journal1→2.
+Before size0/notready, after full source/frame SHA correct, protected preserved.
+This is not bit-level power-cut/brownout. All11accepted processes stopped/reaped.
+No current firmware changes/new build. Coefficient packing and durable cache
+remain enabled; prior cold-photo proof0program/erase remains separate evidence.
+
+NEXT: current target format/RAM/stack/fault matrix; expand LCD load to accepted
+fullCMYK12/richRGB progressive; publication/program/erase cuts, network lifecycle/
+churn, whole-image/full/24h/hardware. Keep network/display acceptance separate.
+SDK/frozen QEMU unchanged; no physical actions/no push. Goal remains active.
+
+## Historical in-progress 2026-10-23 — configurable cumulative JPEG write budget
+
+USER CHANGED POLICY: keep JPEG mode support, but cap cumulative physical program
+bytes per image including coefficient scratch/RGB565/journal, default200KiB.
+Original JPEG upload excluded. Configurable from0;0forbids decoder/cache erase
+too. User explicitly selected cumulative traffic, NOT scratch capacity. Do not
+silently disable all progressive. Live reductions must not reset usage; raising
+cap enables a later retry. Cache invalidation before upload carries its program
+usage into finish, preventing two full allowances for one image.
+
+HEAD2e811f338 committed prior gray clock/HTTP/recovery checkpoint; active goal
+unbounded. Current substantial edits UNCOMMITTED. Settings use separate NVS u32
+key jpeg_write_kib (same small_tv namespace), default200read-only fallback;
+legacy settings struct/version/raw ABI untouched. /get_jpeg_write_limit and
+/set_jpeg_write_limit JSON limit_kib uint32, UI fragments photo_write_policy.*
+injected by local_site/extract_pages.py. Generated pages/manifest refreshed.
+Local-site server mirrors configuration only, NOT a NOR traffic model.
+
+photo_codec shared transport program quota, zero erase quota; typed
+flash-write-limit/flash-writes-disabled with next cumulative required/available.
+transport program_required/program_limit_hit reset at begin; limit_program only
+tightens and revokes before subtraction underflow. Separate global settings
+short critical read each checkpoint, no new sleeps. Source upload stores prior
+cache program bytes, prepare gets remaining allowance; returned diagnostic
+program_bytes totals both phases. Background policy failures cached for current
+length +budget; no repeated retries until a larger cap or changed source.
+
+Native first failed only stale inventory expected217; updated219app/535total,
+13correspondence controls. native-second.log passed6294checks +independent privacy
+under .build/jpeg-write-budget-20261023; exec50041 TERMINAL0. transport-first gate
+passed348557checks/34cases; actual tightening/zero/overflow safeguards. Need final
+tests, production build/archive, actual QEMU byte-counter/zero cold/persistence,
+browser setting/crop/privacy, mutants, proof/verifier, focused commit. No push.
+
+Earlier heavy clock work superseded by this policy: current jpeg_clock_qemu.py
+adds fixture choices and photo_runtime_metrics.py (passive DWARF/RAM SDK heap/
+task fill diagnostics). .build/jpeg-clock-load-20261023/cmyk12/classic passed127
+full frames, actual CMYK12 status0/finish200, pool40592/context4984/backing460800,
+worker untouched stack4940/8192. RGB classic45frames exact, decode0/HTTP200,
+pool37804/context4984/backing172800/stack5060, but gate correctly failed because
+minute rollover happened before decoder entry. Need NTP phase45 instead of55
+for that workload if reusing it. These are OLD ABF14143 partial runs, not new
+policy acceptance or complete3theme matrices. CMYK continued to simple; explicit
+supersede-intent saved, own QMP busy so verified PID/UUID/path VM terminated.
+Exec81990 terminal1; RGB8038 terminal1; no owned VM remains. Old frozen47files/SDK
+unchanged. old-app/ contains exact old firmware archive+app.elf BEFORE new build.
+Preserve/label partial results and do not claim all themes passed. No physical
+flashing/UART/reset. Full target fault/format, publication cuts, lifecycle/churn,
+whole-image/full/24h/hardware remain open after policy qualification.
+
+## CHECKPOINT 2026-10-23 — configurable JPEG budget qualified and saved
+
+The user-selected cumulative write policy is implemented. Default200KiB,
+0forbids decoder/cache PROGRAM AND ERASE, including startup provisioning.
+Separate NVS u32 small_tv/jpeg_write_kib; settings legacy ABI unchanged.
+Photos field and GET/POST API accept0..UINT32_MAX KiB, uint64 byte arithmetic.
+Original JPEG save and ordinary NVS/settings remain separate as explicitly
+agreed. Cache invalidation traffic carries into finish; no second allowance.
+Live reductions tighten without counter reset/underflow, increases take effect
+on next job. Background stable budget failures do not repeat writes; larger
+budget or changed source allows retry. No new software sleeps.
+
+FINAL app9C1A83BD/ELF76B5CE37/source7D95988C,1476432bytes/59568free,DEBUGoff.
+Production firmware/development archive saved. Assets1032119B/layout44268211/
+libraryD690 unchanged, codec6B537BBB. Native6298 +privacy3727,13inventory controls,
+219app/535total, transport348557/34cases +18unsafe mutants,6integrated unsafe
+mutants with compiled positive control, DOM16, artifact6 PASS.
+
+Actual C2 JPEG callback trace: CMYK12 refused at204800programbytes, next205056
+demand never issued. Gray progressive succeeds at115968 incl invalidation and
+finish; diagnostic matches independent count. Persisted0 hot upload rejects
+before program/erase, paused wholeflash same. Cold EXACT warm stoppedimage,
+no reseed: true photo_worker_draw(slot4) succeeds, callbacks armed from reset,
+0program/erase, entire4MiB same. Independent canonical journal/source/frame SHA.
+
+Found genuine zero-startup loophole in first policy appF94C00B8: unmarked legacy
+provision wrote32+8bytes stamp before HTTP. Retained actual failing report and
+both images. Fixed photo_storage_authorize to strict readonly authorization at0.
+Current legacy samecase:0callbacks/whole4MiB same, stamp/candidates FF, clocks/
+HTTP boot. Without valid stamp photo storage remains unavailable; increasing
+budget requires ordinary restart for safe startup adoption. No runtime erase.
+
+Separate current LCD gray load: classic7/simple4/dial4 exactwholeframes,864000
+pixels, actual foreground decode and minute rollover,16negative controls.
+Worker untouched5012/8192; pool14099/context4984 observed. Passive exactELF DWARF
+heap/task derivation, six256KiB RAM snapshots, heap minima explicitly lower
+bound rather than simultaneous aggregate. Decoder diagnostic pointer not saved:
+pool observation is runtime report, not independently reconstructable from RAM.
+All6current owned processes stopped/reaped. Network timing not requalified here.
+
+tests/JPEG_WRITE_BUDGET.md; qemu/parity/jpeg-write-budget-validation-20261023.json.
+Lossless15physical images (13current+2old failing),15PNG,6RAM snapshots, mutant
+source/compile/run logs; offline verifier recounts writes, reconstructs all
+images/RGB/stack/heaps and checks source pins. Earlier wrongphoto-theme cold
+observer, stale inventory/routes, equivalent mutant and compile-failed mutation
+remain labelled historical failures, not accepted controls.
+
+NEXT unchanged: full current target format/fault/RAM/stack matrix, publication
+cuts, lifecycle/churn, whole-image/full/24h/hardware. Earlier unlimited heavy
+JPEG passes are not new default-policy acceptance. Shared SDK/frozen QEMU
+unchanged; no physical flashing/UART/reset, no push. Broader goal status is
+controlled by the user; this checkpoint completes the requested budget feature.
+
+## ACTIVE 2026-10-24 — current-image JPEG format/resource matrix
+
+Previous goal turn made progress: production configurable budget committed
+db738ea51, clean worktree. Goal explicitly resumed/active; do not shrink it to
+this matrix. App9C1A83BD/ELF76B5CE37/source7D95988C unchanged, default200KiB.
+
+New tests/photo_format_matrix_qemu.py reads committed old cache corpus70 via
+verified fixture tar, uses actual HTTP async owner, full physical source/frame/
+journal oracle and immediate gray recovery after every refusal.59host positives,
+5source capacity,6negative/sampling cases. Extended expected SHA from original
+upstream+Python conversion; rich baseline8 oracle recomputed literal factoryRV32
+for preserved IDCT/clipping. No guest code/PC/RAM writes. Full diagnostic address
+is now saved alongside entry/exit RAM, allowing independent nested field check.
+photo_format_matrix_contract.py independently derives stored RAM fields, protected
+bytes, physical pixels and precise failure reasons; union70 enforcement across
+independent parts. No general network or LCD acceptance criterion.
+
+Pilot .build/photo-format-matrix-20261024/pilot TERMINAL0 (exec38491), VM23772
+SmallTV-6db847ce76bf stopped/reaped.6primary/9workflows:6accepted incl3recoveries,
+2finish failures (write cap,unsupportedSOF5),1oversize source admission. Stack
+untouched5012/8192; sum individual heap minima10548 is conservative lower bound,
+NOT simultaneous aggregate/worst-case. Pilot contract passes, exact pixels good.
+
+FULL RUN NOW LIVE, do not rebuild/apply source changes to pinned inputs or restart
+because of an observation timeout. Four disjoint groups18/18/17/17, explicit names
+in .build/photo-format-matrix-20261024/shards.json. Fresh owned VM per process.
+exec handles part0=29480, part1=11839, part2=7249, part3=62925. Outputs
+.build/photo-format-matrix-20261024/part-N, logs part-N.log; all four last polled
+live by write_stdin. To continue poll the same handles; inspect session.json only
+as locator, not liveness proof. No second debugger. Runtime uses Frozen QEMU
+jpeg-selector-qemu-complete-20261019 and unchanged SDK; active processes retain
+their exact input hashes. Contract/doc changes not consumed by these VM drivers.
+
+NEXT: wait for all terminal; preserve failures truthfully, validate union70+
+RAM/frame/protected data, capture raw reports/physical deltas and update status.
+Then real target allocation/I/O failures, publication cuts and remaining broader
+network/whole-image/full/24h/hardware. Do not claim this pilot completed the plan.
+No push/physical actions. Whole-image/stale-navigation investigation was read-only
+only: no new assertions or source fixes have been made in that category yet.
+
+Pilot evidence saved as qemu/parity/jpeg-format-pilot-validation-20261024.json:
+19lossless physical images,16RAM snapshots, raw diagnostic layouts/logs and
+independent verify_photo_format_matrix_evidence.py. Full parts still excluded
+from accepted evidence until they terminate; don't capture a live backing as
+terminal output. Current owned VM locators: part0 PID4920 SmallTV-d66e31d2e749;
+part1 PID21724 SmallTV-f83944d60067; part2 PID36888 SmallTV-fef47653c41e;
+part3 PID28724 SmallTV-5f583294c6f3. Validate handles/process identity on resume.
+
+## CHECKPOINT 2026-10-24 — stale reference navigation repaired
+
+symbol-map native_module was still guessed from a broad category.74of176module
+summaries were stale (e.g glyph ->SPI driver, classic ->dispatcher only). It now
+contains exact native_targets and derives file summaries from reviewed factory
+rows. All16reference headers link there. Organizer --refresh-navigation preserves
+the decompiled function bodies/names/calls; default export also uses the reviewed
+links, and newly discovered addresses stay explicitly unreviewed. Audit rejects
+stale navigation and pins both tools. Before fails at0x4200826a native_module;
+after passes, refresh idempotent,13existing omission controls pass. Library/app
+source inventory176/219/535 unchanged. Header line numbers can shift; function
+body SHA/name/calls are unchanged. Historical misleading aliases remain documented.
+
+Only navigation and review metadata changed; app/ELF/codec/layout remain fixed.
+The four JPEG VM inputs do not include these navigation files; do not restart
+them. Earlier pilot proof e5d708b49 is bound to pre-refresh review metadata and
+must be replayed at that revision (or with its archived source view), not claimed
+to pin today's updated comments/map. The current app bytes are identical.
+Whole-image xrefs/indirect callbacks/flags and other plan items remain open.
+Proof qemu/parity/reference-navigation-validation-20261024.json retains old map,
+old/new function SHA/call tables, actual rejection, current inventory and13-test log.
+
+## CURRENT 2026-10-24 — full seventy-vector JPEG corpus finished
+
+All four original handles have now returned TERMINAL0:29480/11839/7249/62925.
+Their VM4920/21724/36888/28724 are stopped/reaped. Do NOT restart these completed
+runs or treat earlier LIVE notes as current. Outputs part0..3 under
+.build/photo-format-matrix-20261024. Independent aggregate.json proves disjoint
+union70 with same app9C1A83BD/ELF76B5CE37/source7D95988C.92actual workflows:
+48primary accepted,17finish refusals,5source admissions rejected,22immediate
+successful gray recoveries. Primary reasons8write cap,5heap,1backing,1unsupported,
+1truncated,1invalid,5source. Exact physical source/frame/journal +nested diagnostic
+RAM, task/heap counters passed. Worker untouched minimum5012/8192; maximum
+observed librarypool47983/context4984; sum individual heap minima lowerbound15468,
+NOT simultaneous whole-app peak. No current owned VM remains from this matrix.
+
+Full proof qemu/parity/jpeg-format-matrix-validation-20261024.json archives192
+physical images and174RAM snapshots plus raw logs/layouts. Delta images can use
+an earlier fully reconstructed SHA as parent, avoiding repeated immutable code
+sector lists. Complete4MiB hash still checked for each image. Earlier pilot bound
+to e5dmetadata remains historical; full proof uses updated navigation source view.
+
+This closes the70-vector corpus gate, not all possible format/fault/RAM paths.
+RGB6/CMYK6 lossless samples were source-slot refusals; smaller qualifying fixtures
+needed to execute those precision/color paths on target. Next actual I/O/allocator
+faults and publication cuts, then network lifecycle/churn/whole-image/full/24h/
+hardware. Preserve fixed app/ELF during any newly launched run. No physical/push.
+Archive schema2: only earlier full images may be delta parents; verifier also
+recounts primary outcomes/recoveries/workflows from raw reports. Around12.3MBnew
+compressed payloads,3574sector references, with old immutable/code payload reuse.
+
+## CURRENT 2026-10-24 — six-bit RGB/CMYK lossless target paths closed
+
+HEAD before this work05da1950f; prior goal turn progressed through full70 corpus
+and74navigation fixes. New generated gradient source formula(x+2*y+3*c)&63 covers
+all64samples/channel; files RGB27754/CMYK36999 fit102400slot at240×240,predictor4.
+Unmodified upstream encoder library867C/exe referenceEC59, known original samples
+exact after upstream decode; Python RGB565 independent. New host-only generator
+tests/jpeg_decoder/generate_lossless6.c uses shared build-generator.ps1 optional
+GeneratorSource; reproducible JPEG bytes verified. Old predictor1 rich experiment
+still141194/188235 oversized, failed admission qualification, preserved separately.
+
+Optional fixture-manifest adds the2JPEGs; base70 archive never replaced. Real
+QEMU .build/jpeg-lossless6-20261024/qemu, exec80350 TERMINAL0, VM27340
+SmallTV-414c845e6332 stopped/reaped. Both actual decoded, not cached/baseline,
+processSOF3/precision6/components3&4/rows240 from saved RAM. Full source/frame/
+journal exact;116736programbytes each incl invalidation/publication, limit200KiB
+unchanged. Worker untouched5320/8192; pools12901/15198/context4984; heap-minima
+sum lowerbound41044 NOT simultaneous whole-app peak. Independent-final.json pass.
+No owned VM remains. Current production9C1A83BD/76B5CE37/7D95988C unchanged.
+Proof qemu/parity/jpeg-lossless6-validation-20261024.json supplements the original
+70-vectors on the same firmware; it is not a rerun of the old harness, whose
+source pins require checkout05da. Both proofs jointly cover all45lossless
+precision/color pairs, not every predictor/transform/entropy pattern.
+
+NEXT actual target faults/publication boundary cuts, network lifecycle/churn,
+whole-image audit/full/24h/hardware. Read-only QEMU inspection found main2a593f8d00
+clean and flash-write-audit branch0860e568d4 (shared NOR/cache fixes, not merged
+here). Frozen D64 help exposes operation-timing, no dedicated fault property.
+Referenced79badcba source says functional contents/not electrical power failure;
+program/erase storage changes immediately, WIP delay is tracked separately.
+Do not claim partial in-page brownout from operation-timing. Need inspect/test
+the newer shared-core revision before implementing model fault injection.
+No QEMU/SDK files edited, no physical action/push. Goal remains broad/active.
+Historical source replay now supported by verifier --source-revision. It reads
+committed bytes/LFS identities with git cat-file, never resets files and never
+skips hash verification. Base70 source357pins match05da, wrongE5D differs24files.
+Supplement recursively rechecks all192base images/RAM +6additional images/4RAM,
+then derives exact45modes from actual successful SOF3 diagnostics. This proves
+joint coverage without pretending the old producer was today's changed harness.
+
+## CURRENT 2026-10-24 — actual publication operation-boundary cuts
+
+photo_publication_qemu.py исполнил8selected cuts на прежней9C1A83BD/76B5CE37/
+7D95988C/frozenD64. Seed — stopped lossless6 VM flash с CMYK6ready slot5.
+Replacement —27754-byte RGB6, recovery — known gray progressive. Clock seed
+не включает photo prefetch; cold observations оставляют все4MiB unchanged.
+
+Два4-case runs .build/photo-publication-20261024/part-0 иpart-1; exec88011/66603
+terminal0, все16owned processes stopped/reaped. Warm process убивается через
+TerminateProcess pinned own handle после selected completed SDK operation либо
+обычного completed chunk/finish. Hardware RSP only, no memory/register/code writes.
+Paused/stopped bytes exact; cold gets EXACT stopped flash без NVS/settings reseed,
+actual initial image сохранён до первого CPUcontinue. No guest shutdown at cut.
+
+Cuts: invalidation firstbody/footer => oldCMYK visible; source erased/firstchunk/
+firstRGBpage/publication firstbody/footer => absent; fully completefinish => newRGB.
+Последний footer уже имеет full ready physical cache, но photo_size0 не разрешает
+видимость до settings publication. Каждый cold process затем успешно загружает
+gray; source/frame/journal и protected bytes/остальные slots/cache entries exact.
+
+Independent replay4+4pass,5unsafe report/image controls на каждую часть отвергнуты.
+Trace last return/status/address и code prefix сверены с exact ELF. Archive
+photo-publication-validation-20261024.json сохраняет complete physical identities
+через lossless deltas, raw logs/trace/initial/cut/recovered и failed pilots.
+57complete physical images/78raw items,60416new gzip bytes; each full SHA verified.
+First pilot до cut: runner TypeError numeric getclocktype. Second cut/cold прошёл,
+но recovery HTTP observer30s истёк; не counted. Final900s host observation как в
+format harness; guest quotas/timeouts не менялись. Final обаrun success terminal.
+
+Functional NOR/WIP timing не electrical partial-page power loss. Actual SDK I/O/
+malloc faults, NVS-internal publication cuts, exhaustive timing, network lifecycle/
+churn, whole-image/full/24h/hardware remain. No app/SDK/QEMU edits, physical/push нет.
+
+## Checkpoint 2026-10-24 — network peers and QEMU DHCP (see newer CURRENT below)
+
+Goal remains broad/active, no blocker, no new push request. Latest user explicitly
+requests fixing QEMU emulation bugs when found. No app/SDK/physical changes.
+Production9C1A83BD/ELF76B5CE37/source7D95988C and frozenD64 snapshot unchanged.
+
+QEMU task worktree C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients,
+branch codex/small-tv-ap-clients, base0860e568d4. Completed focused commits:
+- fdb97bef73: native Windows trace generation fix (Meson fs.name + C filename
+  escaping); actual C runtime12cases/6unsafe controls, full two-target build.
+- 6324e5e152: independent3virtual AP clients, masks and packet queue identity;
+  actual two-peer guest events, defaultone preserved. Ethernet initially primary.
+- d49be39d77: bounded shared DHCP reply parser + acquisition state module;
+  identity/server selection, ACK-before-ready, NAK restart. 349cases/905guard-page
+  truncations/10000bad packets; factory/native integration pass; C3 default and
+  modular60s boot checks pass. Xtensa unchanged821D9807 (not full CYD acceptance).
+QEMU rootmain2a593f8d00, flash-write-audit0860, other worktrees untouched.
+
+Build path taskworktree/build, local MSYS2 GCC16.1/Meson1.5/Python3.14.6,
+DEBUGoff/staticSDL/slirp/internaldtc/downloads disabled. Preserve baseline
+binaries; NEVER rerun resume-baseline.sh after model changes (overwrites control).
+Baseline-riscv32 SHA4e283d9b197d3716bda77a4da54ec92da8e83b352b190ad546e7f1060559237e.
+Baseline-xtensa821d98070aa131ccdc5c7ccd87336c90c13a7c205dfe991404ed242f9da0f0e1.
+clients-v1-riscv32 SHA288478784db0281c33b605a781d70c6b18c6ce5ef17667d21f8b04049127df00.
+clients-v2-riscv32 SHA128d0d75316eeb2a33e7c527ce3cb71cbf9158b9e3062fe1a23c7bcccbf610f5.
+No active build/process remains. Old Windows trace verifier needs
+--source-revision fdb97bef73 after model changes; no hash skips.
+
+New Small_TV/src/tests/network_event_abi.py derives real RV32 SDK14/15/scan1,
+connect8/MAC0/AID6, disconnect10/reason8size2 from separate ET_REL object using
+exact production flags, original object/app/ELF unchanged. Probe under
+.build/small-tv-ap-clients-20261024/event-abi-final. Do not edit this producer
+without regenerating ABI report; it pins its own source. Factory old ABI only
+first7bytes MAC/AID used, not unverified native reason layout.
+
+network_clients_qemu.py uses immutable47file tools snapshot plus explicit
+separately-pinned candidate. Read-only hardware RSP observes actual events and
+httpd_start out-pointer/returns, handles tail-call/nested return ownership. No
+register/memory/PC/code writes. Actual DHCP relay ready wait before first SYN.
+Native wifi_event1107363056, WIFI_EVENT1007921672, httpd_start1107554060,
+httpd_stop1107555256. Factory AP event handlerCORRECT0x4200c6e2 (STA C602 wrong),
+base object0x3c0f1eb8, startwrapperC5EC/stopC578, globalhandle0x3fcc3a70.
+3fcc3a78 is retry counter, NOTserver. Literal AP branch14start/15stop.
+
+Eight C2 VMs (pilots included) all stopped/reaped; current process inventory no
+QEMU. native-v1 failed initial observer status after HTTP before DHCP; factory-v2
+wrong handler never collected AP events. Both not accepted. native-v1-relay and
+native-v2 old prototypes passed but only final native-v3/factory-v3 and
+native-dhcp-v2/factory-dhcp-v2 archived as4acceptedruns. Two C3 VMs also reaped.
+Factory real nuance: second start overwrites first nonzero global handle with0
+on listen112; subsequent stop cannot reach still-live listener. Returned client
+repeats listen112. Final factory each3starts/2stopwrappers/handles[nonzero,0,0],
+HTTP200atall4nonemptyphases. Native each1start/0stop, sameHTTP. Do not assert
+that every factory disconnect necessarily kills HTTP in this sequence.
+
+Proof Small_TV/qemu/parity/network-peer-validation-20261024.json:40raw/37gzip,
+121065compressedbytes, source observers/ABIobject+exactQEMU Gitblobs. Full new
+factory flash/RAM/UART not archived. Independent network_clients_contract.py +
+verify_network_clients_evidence.py pass4runs,24unsafecontrols rejected. Native
+exact ELF symbols/entry instructions/base object, factory exact ELF addresses,
+raw SDK MAC/AID/reason, DHCP states/distinctIP and handles rechecked. Historical
+--source-revision supported without resetting. See tests/NETWORK_CLIENTS.md.
+
+NEXT: fix host Ethernet routing when primary virtual client leaves while the
+secondary stays. Currently select_ethernet_interface always primary. Need actual
+primary-departure HTTP proof (including ARP state), cannot call full lifecycle
+from secondary-only case. Consider carrier selection or per-client NIC/backend,
+then test any-one departure/zero->one, default mask/invalid masks/reset/APSTA,
+scan/upload/weather/theme/churn. RF/WPA and full network acceptance distinct.
+Do not overwrite clients-v1/v2 EXEs; new iterations unique names.
+Known earlier CYD IDF6 esp_phy_enable assert is still open; identical Xtensa
+binary only demonstrates these RISC-V Wi-Fi edits do not change it. No fresh
+CYD run in this checkpoint, no complete hardware claim. Other whole-image,
+SDK I/O/allocation/NVS-internal cuts/full regression/24h/H01-H09 remain.
+
+
+## Checkpoint 2026-10-24 — either AP peer departure (newer CURRENT below)
+
+Progress continues, broad goal active, no blockers/new push request. QEMU now
+HEAD7a9764712b (Keep the AP Ethernet relay working across client departures),
+preceded d49be39d77/6324e5e152/fdb97bef73 in same taskworktree/branch. Final
+clients-v5-riscv32.exe SHA cce6b4717d4da21ca1871b817ab697346d428d803f733377dac74ba6e57e5aaa.
+Xtensa still821D9807 byte-identical baseline. No build/liveVM remains.
+
+Actual oldv2 primary departure repro native-primary-before failed HTTP Timeout
+atmask2 while secondary actually SDK-associated/DHCPbound and native serverstill
+onehandle/0stop. v3 selecting surviving peer alone stillfailed(native-primary-relay-v3).
+v4 normal ARP probe via radio/DMA repaired guest neighbor, primary case passed
+factory/native. One factory-secondary-relay-v4 stalled final association instate3;
+explicitly stopped own QMP tosavefailedtrace/reap, notaccepted. v5 distinguishes
+probe3/auth4/association8 waits and retries outstanding exchange after1virtualsec
+onexistingbeacon (no guest busywait). ARP+selection and retransmit saved7a9764712b.
+
+Final v5 all4native/factory x primary/secondary departures pass. Masks1,3,1,0,1
+or1,3,2,0,2;16ordinaryHTTP200. Native1start0stop;factorysame losthandle defect.
+C3 default/modular each60sboot pass also v4 and FINALv5, allstopped/reaped.
+Including earlier pilots this phase19C2runs and6C3runs, noQEMUprocess now.
+All sourceapp/SDK/frozenD64 unchanged, nophysicalactions/push.
+
+Source observer network_clients_qemu.py now --departure primary|secondary
+(defaultsecondary). DO NOT alter it without a fresh run: its exact hash pins all
+v2before/v3/v4/v5 newreports. Independent contract now tracks AID perassociation:
+finalsecondaryrejoin maygetAID1; former fixedMAC->AID assumption waswrongtest.
+FIXED_TEST documentedCORRECTION_MARKERS. Native/factoryrawbytes otherwiseunchanged.
+
+New schema2 proof network-relay-validation-20261024.json archives fourv5runs,
+bothfailedprimarycontrols, excludedfactoryv4stall, exact7a9764712bGitblobs and
+newproducerpins. Older payloads reused. Offline verifier terminal0: all4runs/24unsafecontrols andbothbeforecontrols pass.
+36raw/35unique payloads; new gzip bytes=65978; old payloads reused.
+Unused failed-capture AID-contract source preserved under ignored .build, not staged. Earlier
+network-peer proof remains verified with --source-revision4f501d7af; do not
+pretend previous producer source is today's changedharness.
+
+NEXT after saving/replaying evidence: scan/upload/weather/theme during reconnect,
+controlled management loss/retries, DHCP retransmission policy, APSTA/churn.
+Per-peerhostendpoints are optional future capability, not requirement of current
+AP/STA hostportseparation or twopeerHTTPgate. Do not expand goal unnecessarily.
+Selected any-one departure cases pass; entire HTTP-LIFETIME/full/24h/hardware,
+SDK I/O/allocation/NVSinternal faults and wholeimage audit remain open. Known
+CYDIDF6 esp_phy_enable assert stillopen (not changedbyRISC-Vmodel). No freshCYD
+run performed here. References tests/NETWORK_CLIENTS.md,QEMU docs/WIFI_AP_CLIENTS.md.
+
+
+## Checkpoint 2026-10-24 — AP activity (newer CURRENT below)
+
+Previous goal turn made progress (four focused QEMU commits + two yoRadio network
+proof commits). This turn authoritatively inspected clean yoRadio HEADfc6e7750e
+and QEMU7a9764712b, no new emulation bug or production change found.
+Broad goal remains active; no blocker/new push request, no physical actions.
+
+New tests/network_activity_qemu.py uses exact native9C1A83BD/ELF76B5CE37 with
+unchanged clients-v5-riscv32 CCE6B471 and frozenD64 tools (47file pins). Reuses
+Events observer/target SDK ABI, generic activity hook changes AP presence at real
+SDK/photo/theme function entry while HTTP Future is stillpending. Records actual
+return_event_index to distinguish nested callbacks from later events. No guest
+code/PC/register/memory writes. Network gate has NO LCD acceptance criterion.
+
+Initialpilot .build/network-activity-20261024/pilot exec54721 terminal0:
+1cycle6ops, allpass. Saved exact older producer.py (before extra metadata),
+matching reportinputhash. Final .build/network-activity-20261024/final exec91607
+terminal0:2cycles12ops, 14SDKpeer events,6nestedinsideactualfunctioncalls,
+2exact508byte sourceJPEG readbacks andthemeGET. BothVMsstopped/reaped.
+Scan finds3APs yoRadio-QEMU/QEMU-2/QEMU-3. JPEG fixture flat-gray-progressive-8
+SHA45263A1C; no realphotos/private dump data copied into new archive.
+
+Sequenceeachcycle:scan mask3->2 atesp_wifi_scan_start(blocking1), uploadstart2->3,
+chunk3->1, finish1->3, theme3->2, reselect2->3. FunctionreturnsESP_OK, mainHTTP200,
+ordinary file/themeGETs match. Native onehttpd_start andzerohttpd_stop throughout.
+PeerMAC/AID/reason bytes tracked by actual SDK layout, ready onlyafterDHCPACK.
+This uses sharedhostbridge throughremainingpeer, not separateperpeerTCPbackends.
+
+network_activity_contract.py independently validates records and8negativecontrols:
+completedHTTP, wrongMACbytes, wrongreturnboundary, missingAP, alteredJPEG,
+duplicateserver, notreaped, finish400. verify_network_activity_evidence.py
+rechecks exactELFsymbols/code/base/SDKET_REL and modelGitblobs. Full proof
+Small_TV/qemu/parity/network-activity-validation-20261024.json passedoffline,
+29raw/29payloads,25531newgzipbytes, unchanged olderpayloads reused. No fullVM
+flash/RAM/UART archive. OwnVMprocessinventory must remain empty beforecommit.
+Documentation tests/NETWORK_ACTIVITY.md +IMPROVEMENT_PLAN updated.
+Historical producer replay supported with --source-revision, nohashskips/reset.
+
+NEXT: STA weather fetch during actual station disconnect/reconnect, then remaining
+controlled managementloss/DHCP retransmission/APSTA/prolongedchurn. Existing
+weather_qemu.WeatherFixture supports hold_response/release_response; snapshot()
+reads identified cached_weather DWARF, separateLCDgates mustnotbeused for network.
+Station profile(nativefirmware) hasnoAPnetif, APsetup usesAPSTAidleSTA so weather
+cannot be checked from APclient-onlycase. Current network_activity is nativeonly;
+factoryscan empty-result nullbug isalreadydocumented, nofactoryscan pass claimed.
+Do not change currentproducer withoutfresh run (selfhashpinned). QEMU7a clean,
+productionapp/SDK/frozenD64 unchanged. KnownCYDIDF6PHYassert, wholeimage audit,
+SDKI/O/allocation/NVSinternalcuts/fullsuite/24h/H01-H09 stillopen.
+
+
+## Checkpoint 2026-10-24 — station weather (newer CURRENT below)
+
+Previous goal turn progress: committed3aedd9bb1 APactivity tests/actual12ops.
+This turn inspected clean3aedd9bb1 and QEMU7a9764712b before work. Goal broad/active,
+no blocker/new push request, no physical/app/SDK/QEMUsource changes. Exactnative
+9C1A83BD/ELF76B5CE37/source7D95988C, candidateCCE6B471, frozenD64tools unchanged.
+
+New station_event_layout.py extracts constants2/5/0 and IPevent20bytes/offset4
+from ACTUAL ELF/DWARF. No target recompilation or new field assumptions. Native
+objects:IP_EVENT3c13a984,connected3fcb6718,APactive3fcb6717,retries3fcb6708,
+lastaddress3fcb6710. Existing weather.native_layout derives248byte cache/fields,
+request_state3fcb6724 and cached_weather3fcafa78. Types/constants agreeacrossCUs.
+
+New station_weather_qemu.py observes SDK callbackentry/return viahardwareRSP.
+Initialpositive67/idle; realPOSTsamecity/fixtureheldresponse (200negative,503JSON).
+At first SDKdisconnectentry restores ONLY externalAPproperty, lets nativebody
+executeesp_wifi_connect and obtains realDHCP/GOT_IP. Actualconnected0/retries1 ->
+connected1/retries0, addressretained10.0.2.15/APfalse. HeldworkerRUNNING1; initial
+cacheunchanged. Bothrequests aborted beforefixture.release (before_releaseworker0),
+oldrawcache retained. RecoveryPOST obtains distinct body/humidity78then79, raw
+cachegeneration2->3->4. Do NOT claim full503received/rejected fromthisoutage:
+actualTCPabort precedesrelease, HTTP503parserpolicy is separateoldweathergate.
+
+Pilot .build/station-weather-20261024/pilot exec12222 terminal0; final /final
+exec35690 terminal0. Pilot producer.py savedbeforeadding extra HTTP/beforerelease/
+holdtiming metadata, matchesitsreporthash. Finaltwooutages,3GOTIP,2freshweather
+publications,4refreshPOST+2themeGET200,1httpd_start0stop,1 ROM boot, no panic/watchdog.
+Holdhostseconds1.563/1.610 (<30sfixturebound); firmwareHTTP10s unchanged. BothownVMs
+stopped/reaped. ExpectedSDK socketabort errno113 recordedlocally, notapanic.
+
+station_weather_contract.py independently reconstructs rawdouble/text/generation,
+SDKIPbytes/baseIDs/nativeflagtransitions/HTTP records/bodySHAs and rejects9controls.
+verify_station_weather_evidence.py rederivesstation+weatherDWARF fromexactELF,
+checks entryinstructions andmodelGitblobs. Proof station-weather-validation-20261024.json passed offline:32raw/32payloads,30274newgzipbytes; unchanged old
+payloads reused, nofullVMflash/RAM/UART. See tests/STATION_WEATHER.md; planupdated.
+Do noteditpinnedproducer beforefresh rerun. Historic --source-revision available.
+
+NEXT: controlled managementloss/retries, DHCP retransmission policy and prolonged
+AP/STA churn/soak, then fullnetworkgate. Earlier AP any-one departure +2cycle
+scan/photo/theme activity andnowSTAweather selectedrecovery covered. No complete
+HTTP-LIFETIME/RF/24h acceptanceclaim. KnownCYDIDF6PHY, wholeimage audit, SDKI/O/
+allocation/NVSinternalpublicationfaults/fullsuite/H01-H09 remainopen. NoQEMU
+process should remain beforecommit. Goal notcomplete orblocked.
+
+
+## Checkpoint 2026-10-24 — DHCP retry (newer CURRENT below)
+
+Previous goal turn progressed: baf6969b3 committed real STA/weather recovery.
+This turn started from clean baf6969b3 / QEMU7a9764712b and found an actual model
+bug. The broad goal remains active. No blocker, push request or physical action.
+Production app9C1A83BD / ELF76B5CE37 / source7D95988C and SDK/frozenD64 unchanged.
+
+QEMU task worktree now HEAD b85483c98d (Retry virtual DHCP acquisition with
+backoff and per-peer transactions), after focused commit287d95e1b1 (one-shot
+virtual AP protocol packet loss controls). Before executable clients-v6-riscv32
+SHA51b6746191d5dc910487ab1540b4279979f50a30eeec5da7fa74054f0674fb1a; final
+clients-v7-riscv32 SHA6d9d82665330a6f567d04eac9563ed05d2d14bdb47329d78e9f306fce3761a90.
+Xtensa v6/v7 still821D9807, byte-identical baseline. Both target builds terminal0.
+
+New QMP softap-drop-next: 21bits = 3peers x7stages (probe/auth/assoc/discover/
+request/offer/ACK). External one-shot loss at virtual client protocol boundary,
+not physical RF/802.11 ACK. Counter/time getter softap-client-faults stores no
+payload and formats only on query. Defaultmask0 exits before parsing/clockread;
+STA excluded. Invalid mask bit21 rejected without mutation. Existing random
+link loss remains separate. Fault policy/counters persist guest reset as external
+harness state. Sources separated into esp32c3_wifi_fault.c/.h.
+
+Before v6: three management losses recover (old1s retry), four DHCP losses remain
+state6(discover/offer) or7(request/ack) for >=12guestseconds, while first peer
+and HTTP200 work. New network_loss_qemu.py records before_control=true and
+recovery_acceptance=false for these4; do not count them as recovery passes.
+All seven v6 runs passed their intended oracle and reaped (including4failcontrols).
+
+v7 adds per-peer acquisition deadline/backoff4/8/16/32/64s, uniform ms jitter
++-1s with rejection sampling, actual cap64s. Existing guestAPbeacon events check
+deadline, no guest delay/busywait. ACK clears it; NAK/reassociation new transaction.
+Fresh random per-peer XIDs (also distinct from existing peers), stable during
+retry, parser matches lease.xid. Previous single constant XID removed. DHCP
+constructors BOOTREQUEST/chaddr/clientID agree, also legacy model client mode.
+Lease renewal/rebinding not implemented. Pure C lease struct now13bytes (adds
+xid4); unit ctypes layout updated before execution. Unit351cases +905guard-page
+prefixes +10000random non-DHCP +14007backoff/jitter combinations passed. Old9byte
+lease reports remain historical, do not mix their ABI with new code.
+
+All seven after runs pass. DHCP target has1retry, healthy peer0; both bound5,
+nextdeadline/nominal cleared, two distinct stable XIDs. Native oneHTTPstart/0stop.
+Factory primary-departure regression passed onv7 (known handle-loss remains).
+C3 default/modular v7 each60s boot/console/panic/immutable-input check pass.
+All15C2 +2C3 owned processes stopped/reaped; builds/sessions terminal. No liveQEMU.
+Original worktrees/rootmain untouched. QEMU taskworktree clean after both commits.
+
+Independent network_loss_contract.py replays14reports and112unsafecontrols.
+verify_network_loss_evidence.py rechecks exactELF/APABI/modelGitblobs, Cunit
+sources/report, factory typedevents and legacy boot reports. Proof
+Small_TV/qemu/parity/network-loss-validation-20261024.json passed offline:
+61raw/54payloads,116266newgzipbytes; oldpayloads reused, nofullVMflash/RAM/UART.
+Docs tests/NETWORK_LOSS.md and IMPROVEMENT_PLAN updated. Newproducer source
+network_loss_qemu.py is self-pinned across all14runs; do not edit without rerun.
+Historical replay supports --source-revision. No push performed.
+
+NEXT: remaining bridge liveness during a permanently stalled primary DHCP needs
+an actual repro. Source select_ethernet_interface compares targetIP with only
+s->softap.ipaddr. If slot0 never saw a DHCP reply, slot1 may have learned guestAP
+IP while slot0 ipaddr iszero. Broadcast hostARP then may select STA wrongly.
+This is a code observation, not yet runtime diagnosis. Use controlled repeated
+DISCOVER loss on peer0, keep peer1 healthy, observe ordinary HTTP before allowing
+peer0 recovery; fix if reproduced. Single-shot peer0 would recover in3..5s and
+mask the demux issue. Could need a dedicated bounded rearm test, not a fake SDK
+callback or PC/RAM mutation. Keep task worktree/model source isolated.
+Then combined/repeated losses and prolonged churn/soak, full network gate.
+Known CYDIDF6PHY gap, wholeimage audit, SDK I/O/allocation/NVSinternal faults,
+fullsuite/24h/H01-H09 still open. Goal not complete/blocked/paused.
+
+## Checkpoint 2026-10-24 — stalled bridge (newer CURRENT below)
+
+Broad goal remains active, no blocker, physical action or new push request.
+Previous checkpoint 98fedc62f qualified individual packet loss/DHCP retries.
+Current production app9C1A83BD/ELF76B5CE37/source7D95988C, SDK and frozenD64
+unchanged. QEMU task worktree HEAD21a8d6dd8c is clean; root/main untouched.
+
+Actual v7 primary-probe failed AssertionError: peer0 held state6/no lease by
+repeated Discover loss, peer1 bound5, HTTP still pending after >=10 guest s.
+After release normal DHCP/pending+new HTTP200. Before secondary-control passes.
+Bug: esp32_wifi_learn_guest_ip stored guest AP IP only in sending peer, but
+Ethernet selector used primary.ipaddr. If primary never sends Discover it is
+zero; host broadcast ARP goes to STA despite bound secondary. FIXED_EMULATION
+shares learned AP interface IP across all AP peers, keeps leases independent;
+STA/legacy path unchanged. QEMU marker policy docs/CORRECTION_MARKERS.md added.
+
+v8 clients-v8-riscv32.exe SHA
+a5be14c545fd2dffec145473429686b9a667735a8fb6f0226c5c60034ac3785f.
+Before v7 SHA6d9d82665330a6f567d04eac9563ed05d2d14bdb47329d78e9f306fce3761a90.
+Both targets build terminal0, Xtensa byte-identical821D9807. All original
+baseline/v1-v7 executables preserved. New stalled producer self-pinned unchanged
+across 4 runs; do not edit without rerun. After v8 peer0 and peer1 stalls both
+serve HTTP200 through healthy neighbor while target still state6/no lease.
+
+network_loss_qemu.py now supports --all-stages; two v8 runs target either peer,
+seven actual losses each, target4DHCP retries/healthy0, distinct stable XIDs.
+Healthy HTTP ready before target finishes, then post-recovery HTTP200. Producer
+same exact hash in both. Generic contract retains single-case result keys;
+old 14-run proof supports historical replay --source-revision98fedc62f.
+Factory primary departure/zero-survivor regression passes, handle-loss still
+observed. C3 default/modular each60s boot/console/panic/input checks pass; not
+full OLED/RF acceptance. All7C2+2C3 owned VMs stopped/reaped, process inventory
+empty. No firmware rebuild. No physical flashing/reset/serial or SDK writes.
+
+New verify_network_stalled_peer_evidence.py checks exact ELF/AP ABI/symbols,
+Git model blobs/source pins, real failed before run, recovery and combined
+losses. 44 semantic negative controls rejected; hold mutations update matching
+sample too so rejection does not rely on duplicated summary inconsistency.
+Proof network-stalled-peer-validation-20261024.json:57raw/44payloads,
+100050newgzipbytes, existing blobs reused; no fullVMflash/RAM/UART archived.
+Docs NETWORK_STALLED_PEER.md, NETWORK_LOSS.md and plan updated. QEMU focused
+commit21a8d6dd8c; yoRadio checkpoint commit follows this working note.
+
+NEXT: qualify prolonged AP/STA churn and current-image runtime/soak. Existing
+runtime_qemu.py supports --duration-seconds/--cycles and actual ROM heap/stack,
+but executable is hardcoded to frozenRoot/bin/qemu-system-riscv32.exe. Add an
+explicit candidate --qemu option preserving default and separate binary pins;
+do not overwrite frozenD64. Inspect code first, run bounded qualification
+before H10. Whole-image xref audit, SDK I/O/allocation/NVS-internal/electrical
+publication faults, full current regression, known CYD IDF6 PHY assert and
+hardware H01-H09 remain open. Goal not complete/blocked/paused.
+
+## Checkpoint 2026-10-24 — runtime qualification (newer CURRENT below)
+
+Goal remains active and unbounded, no blocker or physical actions/push. Prior
+turn progress677defd qualified stalled-peer/combined loss and QEMU21a8d6dd8c.
+Feature commit00096f882 adds --qemu to runtime and -QemuExecutable to both PS
+launchers, preserving default/frozen D64. Schema5 binds exact candidate path
+and pinned SHA; auditor retains schemas3/4 and all weather requirements.
+25audit/16memory/4ROM/6state/8weather tests passed (59). Sandbox TEMP ACL
+initially blocked fixtures; a task TEMP fixed the environment, no weakened tests.
+
+Current native app9C1A83BD/ELF76B5CE37/source7D95988C, SDK, production files and
+frozen47/D64 unchanged. QEMU v8 A5BE14C5 after21a8d6dd8c; Xtensa821D unchanged.
+No new build, SDK writes, physical flash/reset/serial or push. QEMU tree clean.
+Runtime source/test helpers below are now pinned by a live H10; do not edit them,
+rebuild/replace its executable or connect a second debugger/QMP observer.
+
+Completed two runtime qualification VMs: preflight4cycles/2outages/32HTTP/
+22.569796guest s; detached churn40cycles/20outages/320HTTP/200.910826guest s.
+Churn exercises all4themes/5GIF, real city/weather, concurrent settings requests,
+10ordinary JPEG uploads, external AP offline/recovery. MaxHTTP4.084654s<6;
+minimum sampled free54688B, sum of SDK per-heap minima23180B (not simultaneous
+whole-app minimum), stack-fill minimum332B. All positive, no ROM reset/panic;
+not proof of no possible leak. Both workload/guard/supervisor terminal0, pinned
+inputs unchanged. Host CIM explicitly found all8 qualification PIDs absent.
+Do not infer host liveness from sandbox Get-Process or qemu-system-* name: this
+candidate is named clients-v8-riscv32.exe and sandbox may hide detached workers.
+
+verify_runtime_candidate_evidence.py replays numeric journals/ROM counts,
+SDK heap arithmetic/task headroom/HTTP/outages/weather/UART summaries and guards,
+checks app/ELF/source pins, early40cycle start record captured atcycle0, link to
+exact archived network-model proof. The archived model JSON bytes carry its SHA;
+working checkout JSON is compared as parsed data to tolerate Git line endings.
+16actual-report negative controls rejected. Proof runtime-candidate-validation-
+20261024.json:34raw/34payloads,114908newgzipbytes, no fullVMflash/RAM/UART.25unit
+log included; other34unit results recorded in worklog. Earlier draft payloads
+preserved in ignored .build/runtime-candidate-20261024/replaced-evidence, unstaged.
+Docs RUNTIME_MEMORY.md/plan/worklog updated; evidence commit follows this note.
+
+ONE NEW H10 LIVE, launched24Oct10:41:38UTC after qualification, pending:
+run .build/runtime-h10-current-20261024
+supervisor34280, workload34996, guard13180, VM1512 / SmallTV-dc56f2b7a572.
+Windows CIM checked exact commands/creation times after launch; supervisor
+CREATE_BREAKAWAY_FROM_JOB verified outside caller Job. Early start identities
+captured atcycle0 in .build/runtime-h10-current-20261024-start.json. Requested
+86400guestseconds, interval15, externalSTA outageEvery60, 1guestsecond outage.
+Report/JSONL/UART guard are in that run, supervisor heartbeat in sibling
+runtime-h10-current-20261024-supervisor/supervisor.json. Initial guard reports
+oneROMboot/noerrors. Only read status files/OS identities; do NOT pause/reset,
+restart it on observation timeouts or open another debugger. Preserve original
+older H10 evidence. A started/pending flag is not 24h acceptance.
+
+After terminal H10, run tools/analyze_runtime.py with --run that directory,
+--repository-root current worktree, --start-record early-start JSON, allow roots
+C:/Work/yoRadio and C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients, output OUTSIDE
+run. Auditor schema5 accepts explicit filename. It requires actual86400guest s,
+terminal guard/start/source match, weather throughout, phase-complete trend
+windows; do not shorten the goal or claim H10 passed from 40cycles.
+
+NEXT independent work while H10 runs: whole-image xrefs/callback/task/timer audit
+outside176selected exports (NETWORK/SLOW/browser_time/clickCount/JPEG flash-output),
+CYD IDF6 PHY assert in existing tools/test_esp_legacy.py (docs/ESP_FLASH_WRITE.md
+records phy_module_has_clock_bits(PHY_INIT_MODEM_CLOCK_REQUIRED_BITS), phy_init.c332).
+Current candidate Xtensa is byte-identical, not CYD acceptance. Full current
+network/display/regression suite still needs separate gates and candidate/deps
+selection: qemu_suite.py and several older scripts hardcode frozenRoot/bin and
+root SDK. Do not overwrite frozenD64 or edit live-H10 pinned weather/time/runtime
+helpers; use an appropriate isolated snapshot or defer changes until it ends.
+Actual SDK I/O/allocation/NVS-internal/electrical publication faults and hardware
+H01-H09 still open. Goal not complete, blocked or paused.
+
+## Checkpoint 2026-10-24 — xref inventory (newer CURRENT below)
+
+Previous goal turn was PROGRESS: deda58625 qualified current-image runtime,
+00096f882 candidate selection,677defd99 stalled-peer tests/QEMU21a8d6dd8c.
+This turn is PROGRESS, no blocker; broad goal remains active/unbounded.
+New independent reverse tools/typed evidence, no native firmware/SDK/QEMU
+source changes and no physical actions or push. Root/main untouched.
+
+New files tools/reverse/ExportFactoryXrefs.java, tools/audit_factory_xrefs.py,
+tests/factory_xrefs_test.py. Java reads existing Ghidra12.0.4 project SmallTV
+(.build/small-tv-reverse/ghidra-project on dependency root), -readOnly -noanalysis.
+5140 analysed functions,286384 instructions; full GNU executable-section stream
+287952 records. Actual immutable factory ELF SHA8C9FD166; all5 initialized payload
+blocks/ELF metadata and17215 code references checked. Also475literal data pointers and3metadata refs
+match actual four-byte values; the synthetic Entry Point matches ELF entry. GNU canonical map SHA
+67f4f41f9e2e5f398e7dcee65f4ca854d810e6ad4ed3efe010c5dff05fb7b81f.
+
+GP startup AUIPC/ADDI4038046c/40380470 derives3fcb49c0. Existing Ghidra refsTo
+browser active3fcb41f0(gp-2000) empty, but four actual memory instructions exist:
+4200ee60 WRITE1,4200ee6c READ1,4200eef8 WRITE1,4200efd2 WRITE1. Owners GETsettings
+4200ee02/POSTsettings4200ef62. Stored browser3fcb7d14 has2READ+3WRITE. NETWORK
+3fcc39f0 onlyknownWRITE42008356; SLOW3fcc39f4 onlyknownWRITE42008382; click3fcc3a90
+onlyknownWRITE4200ec0c. JPEG flag3fcc3a6c READ4200c432/zeroWRITE4200c54c. Do not
+infer whole-program deadness or add/remove app behavior based only on this.
+Bulk settings I/O/computed aliases still open. Timer callback pointer42008468,
+JPEG output callback param4200c50c, app_main caller420b1e70 in420b1e4e recorded.
+
+393 Ghidra GP integer memory instructions vs396GNU. Real omitted sites:
+42058280 READ32 3fcb4858;420662da READ32 same;420757d2 READ8 3fcb4b0c. These are
+explicit database_gp_gaps, gp_coverage_agrees=false, not suppressed mismatches.
+Crosschecker intentionally rejects any NEW gap until reviewed; known gaps are
+profile facts, not completeness acceptance. Current Ghidra DB has 4964RAM
+functions outside selected export;1162pointer candidate edges/772targets outside
+export. No new found pointer targets in review window4200826a..42011040 outside
+176, but window is not a proven whole-application boundary.3327computed-call
+EDGES (not necessarily distinct call instructions) remain for reachability audit.
+
+Proof full-image-xrefs-validation-20261024.json:7gzip payloads/361910bytes. Raw
+Ghidra address graph +audit+Java/Python/test/symbol-map snapshots and sessionmeta.
+No full dump/ELF/DROM data/VMflash/RAM/UART. GNU14MB text stays ignored at
+.build/factory-all-executable-20261024.asm, can regenerate via local objdump.
+Replay factory_xrefs_test.py --proof ... --elf C:/Work/yoRadio/.build/small-tv-
+reverse/factory-analysis.elf --assembly .build/factory-all-executable-20261024.asm
+passed,9actual-report negative controls rejected. All three semantic/full-image/
+physical claims false. Source revision replay currently needs matching source
+checkout/snapshots; no --source-revision option in this new tool yet.
+
+Local .build/full-image-xrefs-20261024: initialghidra-refs.json had0xram: format;
+v2 script failed on EXTERNAL refs despite headless exit0; v3 repaired namespaces;
+v4 adds GP instruction export and is acceptance. Preserve prototypes, do not
+mix them with v4. audit-final4.json is final core report, controls-final2.json
+records final positive/9controls; committed archive replay reruns
+all9 with final sources. archive.py regenerates proof; replaced draft payloads
+are ignored under replaced-evidence. Ghidra native jobs all terminal, no GUI.
+Docs reference/FULL_IMAGE_XREFS.md +BIDIRECTIONAL_AUDIT/plan/markers/worklog updated.
+
+ONE H10 STILL LIVE: see preceding runtime checkpoint for full preservation rules.
+Run .build/runtime-h10-current-20261024, supervisor34280/workload34996/guard13180/
+VM1512 SmallTV-dc56f2b7a572. Host CIM verified same creation times twice this turn;
+last observed42cycles, oneROMboot/no guarderrors. Requested86400guestseconds,
+interval15,outageEvery60. Pending, not terminal. Never restart it on polling
+failure, never open second QMP/RSP, and do not edit its pinned runtime/weather/
+time helpers or rebuild/overwrite app/QEMU. Early start record is sibling
+.build/runtime-h10-current-20261024-start.json. After terminal use analyze_runtime
+with start record and allowed dependency/QEMU roots, as previous checkpoint.
+Sandbox Get-Process and qemu-system-* name filters cannot establish its liveness.
+
+NEXT independent work: inspect three GNU-only sites and their function boundaries/
+callers; classify SDK vs application callback/task/timer targets, then follow
+computed aliases. Could extend read-only Ghidra observation or use an isolated
+analysis copy, never edit original factory bytes or claim5140equalsall functions.
+Known CYD IDF6 PHY issue still open; separate full current network/display/suite,
+SDK I/O/allocation/NVS internal/electrical cuts and hardwareH01-H09 remain open.
+All full plan requirements persist; goal not complete/blocked/paused.
+
+## CURRENT 2026-10-24 — three SDK gaps identified/recovered; H10 live
+
+Previous goal turn PROGRESS36adbd6f7, current turn also PROGRESS. No blocker,
+physical action or new push request. Full objective remains active/unbounded.
+Native9C1A83BD/ELF76B5CE37/source7D95988C, SDK installations and QEMU21a8d6dd8c
+unchanged. Work stays in .worktree/small-tv-improvement-plan branch; main/root
+untouched. New work is static reverse tooling/evidence, not a firmware rebuild.
+
+Three GP-only missing sites belong to complete known SDK functions:
+* ieee80211_tx_mgt_cb:420581b6..4205838a, source516/linked468,27localbranches.
+* wifi_connect_process:420662da..4206632e, source100/linked84,1localbranch.
+* pm_coex_slice_timeout_process:420756f0..4207581e,source318/linked302,15branches.
+SDK source tagv5.5.4/commit735507283d5b2f9fb363a1901172dbd9e847945d, gitlink
+b87cce81803b85c3639fb14bac6c24cff6d0fbad in espressif/esp32-wifi-lib. Local old
+SDK submodule absent, fetched only3officialC2archives to .build/factory-gaps-
+20261024/sdk-wifi-b87cce8, verified Git blob+SHA via exact commit tree. NO SDK
+writes. Whole934SDKbytes/854factorybytes matched, only17authorizedCALL relaxations
+and3GP LUI elisions.43localCFdestinations/repeatedsymbol/shared g_wifi_nvs,g_ic,
+g_osi_funcs_p,wifi_log bindings verified. This is SDK code identity, not semantic
+or timing equivalence across SDK versions.
+
+New modules tools/reverse/elf_archive.py (bounded ar reader, no extraction),
+rv32_link_match.py (relocation-aware instruction/CF match), xref_delta.py,
+native_sdk_links.py; tools/match_factory_sdk.py; tests/factory_sdk_match_test.py;
+tests/verify_factory_sdk_evidence.py; Java InspectFactoryGaps/RecoverFactoryGaps.
+Classify raw whole source bodies with only supported relocations; no prefix-only
+identity. Direct semantic branch controls are checked after legitimate immediate
+masking. Unsupported/ambiguous alignments fail, no generic all-SDK acceptance.
+Existing audit_factory_xrefs.audit adds expected_gaps, default old3 unchanged;
+new recovery requires empty. factory_xrefs_test supports historical source SHA
+via --source-revision, old36ad proof+9controls replay passed. Do not overwrite old
+source snapshots/reports as though they used the new graph.
+
+Ghidra source copied to .build/factory-gaps-20261024/project-copy (10files hashed),
+then -readOnly -noanalysis RecoverFactoryGaps + ExportFactoryXrefs. Only analysis
+instructions/function definitions changed transiently, every initialized block
+SHA unchanged. Both source project and copied project disk hashes identical to
+before afterwards, source factory ELF8C9FD166 unchanged. Script session terminal0.
+Result5143enumeratedfunctions (was5140),286671instructions (was286384), all396GP
+instructions match GNU. Manager count5145→5148 differs from enumeration but both
+increase3. After-audit verified17233code references,475literal pointers/3metadata/
+syntheticentry still checked. Newgraph stored as14function-row replacements/
+additions,3GP rows,instructioncount over immutable ancestor; actualbefore/after
+full files stay ignored. This closes these THREE gaps, not whole image.
+
+Sourcecaller ownership: first materialization4206fd6a belongs4206fd54..4206fd71;
+second42068f1e belongs42068eec..42068f43. Caller4207b120 still has NO containing
+function. pm original SDK match ends7581e, not nextGhidrafunction75896: intervening
+code still needs classification, do not infer boundary from next known symbol.
+Some bound SDK log anchors lie outside loaded DROM; identity matching alone
+must not turn that into a firmware/backdoor/error claim or proof of reachability.
+
+Native ELF already includes ieee80211_tx_mgt_cb4205b482/452B,
+wifi_connect_process4206a534/836B, pm_coex_slice_timeout_process4207ab2c/6B. Last
+is c.li a0,1 +tailJALto4207a9f0 pm_coex_go_to_sleep316B, not an absent body.
+Native symbol existence/link target are verified, old-vs-new SDK behavior NOT
+proved equivalent. No app functions added/removed or manual SDK duplication.
+
+Proof factory-sdk-gaps-validation-20261024.json:24payload references,
+50296newgzipbytes, ancestor gzip/source reused.15SDK+5analysis negative cases
+rejected, replay matched actual libraries/ELF/ancestor+delta/native ELF/app and
+source pins. NO full library .a/firmwareELF/dump/DROMdata/VMflash/RAM/UART added.
+Need exact local libs to replay: net80211 SHA8f989ecd..., ppb460bb30..., core85394ad5...
+(complete values in reference/SDK_GAP_RECOVERY.md and loader constants). Raw caches
+SDKobjects, SDKmatches-final.json, before.json, recovery.json, after-graph.json,
+after-audit.json, graph-delta.json, native-links.json, sdk-controls.json,
+project-integrity.json and archive.py are under .build/factory-gaps-20261024.
+Producer SDK match input still same exact helpers as sdk-matches-final.json;
+avoid changing them without preserving/rerunning. New verifier supports
+--source-revision for future compatible source changes. Oldfull-image proof
+command now documents --source-revision36ad +PYTHONPATH for shared oracle deps.
+
+ONE H10 STILL LIVE: .build/runtime-h10-current-20261024, supervisor34280,
+workload34996,guard13180,VM1512/SmallTV-dc56f2b7a572, created24Oct10:41UTC.
+Host CIM verified same live processes this turn; last145cycles/2STAoutages,
+oneROMboot/noerrors. Duration86400guestseconds/interval15/outageEvery60 remains
+PENDING. Never restart on observation timeout, never open second debugger/QMP,
+never edit its pinned runtime/weather/time/source helpers or overwrite V8 exe.
+Earlystart .build/runtime-h10-current-20261024-start.json. After terminal use
+analyze_runtime with exact start record and allowed dependency/QEMU roots; do
+not claim24h from short runs. Prior checkpoint has full command/preservation rules.
+
+NEXT: caller4207b120 +undefinedregion7581e..75896, callback registration parents
+and wider SDK/application xrefs/reachability. The matcher can help classify SDK
+boundaries; keep all unclassified nodes explicit and no whole-image claims.
+Also resolve known CYD IDF6 PHY assertion (QEMU docs/ESP_FLASH_WRITE.md), possibly
+independent of C2. Preserve H10's clients-v8 exe if making/building new QEMU;
+build a DISTINCT candidate filename and separate CYD/C3/C2 regression. Full
+current network/display/suite, SDK I/O/allocation/NVSinternal/electrical faults,
+H10 and hardwareH01-H09 remain open. Hardware requires identified intended board,
+no unsolicited serial resets/flashes. Goal not complete/blocked/paused.
+
+## CURRENT 2026-10-25 — H10 interrupted; main qualification live
+
+Previous turn PROGRESS: QEMU main9135fc89ce merged/pushed. Current turn also
+PROGRESS. Older LIVE notes above are historical: CIM now confirms all old IDs
+34280/34996/13180/1512 absent and no same-run/V8 processes. Stale running JSON
+stopped24Oct19:57:54UTC. Termination cause unknown; no matching app crash events
+in checked20-minute window, host last boot14Oct. Do not invent a clean finish or
+firmware failure. Original run/pinned sources remain intact.
+
+Old .build/runtime-h10-current-20261024 audited read-only. Strict rejects missing
+footer; diagnostic replays1488cycles (saved counter1487 lags),4pendingevents,
+25560.689541guest s,11909HTTP incl partialcycle,24outages,1ROMboot/noUARTerrors,
+minsampledfree55116B,1482validweathergenerations/maxfreshgap68.579137s. Seven
+flags remain: phases1/13/25/33/37/49/59 losses16/18/16/20/12/12/220B. Investigate;
+no leak/no-leak conclusion or weakened thresholds. Diagnostic pending means a
+prefix, not liveness. H10 unaccepted. New proof runtime-interrupted-validation-
+20261025.json:24raw/refs,167082newgzipbytes,12rejected controls; no rawUART/RAM/flash.
+Replay supports --source-revision and needs matching app/ELF. Details RUNTIME_MEMORY.
+
+App9C1A83BD/ELF76B5CE37/source7D95988C/SDK unchanged. Current QEMU main9135fc89ce,
+compiled modelcb9deafd83, SHA2df903276e66afe0095ad19afd6d8b7201bcca3fbda073f3edb958934aef0001.
+Separate pin C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients/build/main-9135-riscv32.exe;
+preserve it, old V8 and frozen47-file tools. Preflight4/2outages/22.790034guest s
+passed terminalguard/supervisor0. ONE40-cycle/outageEvery2 qualification RUNNING:
+.build/runtime-main-20261025/churn-40, supervisor30164 created25Oct11:15:03.325607Z,
+workload37400/guard24956; live viaCIM, last2cycles. Cycle0 captured at sibling
+churn-40-start.json. No new H10 yet. Never restart from a polling timeout.
+Next: finish candidate qualification/preserve evidence, investigate retained loss,
+then caller4207b120/undefined7581e..75896/fullsuite/fault matrix/hardware as planned.
+No physical reset/flash, no OTA; full goal active, not complete/blocked/paused.
+
+## CURRENT 2026-10-25 — main qualified; ONE new H10 live
+
+This turn is PROGRESS (committed interrupted soak, qualified current app on QEMU
+main, launched a fresh full H10). Old interrupted run/V8 and all original raw
+files are intact. No physical action or push in this continuation. Goal active.
+
+40-cycle main qualification is now TERMINAL SUCCESS, not live: all workload/
+guard/supervisor0,4+40cycles/22outages/352HTTP;40-cycle run201.050119guest s,
+10JPEGuploads, maxHTTP4.043722<6, minsampledfree54816B, SDKsummin20348B,
+minstackfill332B. All8savedowner IDs absent viaCIM. Proof runtime-main-validation-
+20261025.json:34raw/refs,30741newgzipbytes,20negative controls. Current reader
+supports explicit schema2 main manifest identity and old schema1; old proof replay
+--source-revisiondeda58625/16controls pass.25audit/trend units pass. Model source
+pins equal actual QEMU main9135 files. This does NOT explain the old memory flags.
+
+ONE H10 RUNNING:
+* run .build/runtime-h10-main-20261025, VM SmallTV-530edfe0517b.
+* supervisor19884 created2026-10-25T11:23:20.860023Z.
+* workload8080 created2026-10-25T11:23:22.225068Z.
+* guard18380 created2026-10-25T11:24:04.818320Z.
+* VM18652/main-9135-riscv32.exe created2026-10-25T11:23:29.720127Z.
+Host CIM confirms all four exact processes; last1cycle/oneROMboot/noerrors.
+Requested86400guest s/interval15/outageEvery60, app9C1A83BD/ELF76B5CE37/source7D95988C,
+QEMU2df903276e66afe0095ad19afd6d8b7201bcca3fbda073f3edb958934aef0001.
+Pin C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients/build/main-9135-riscv32.exe.
+Frozen bundle remains C:/Work/yoRadio/.worktree/small-tv-jpeg-selectors/.build/
+jpeg-selector-qemu-complete-20261019. Do not overwrite binary/app/ELF/assets or
+edit pinned runtime/weather/time helpers/SDK. No second QMP/RSP connection.
+
+Early cycle0 .build/runtime-h10-main-20261025-start.json. Actual all-positive CIM
+identities in sibling -processes.json. -processes-initial-incomplete.json is an
+EXCLUDED early probe: guard PID not published yet, null converted to zero and
+System Idle appeared; never use that as an owner. Corrected observation keeps
+four positive PIDs and creation times, first record itself remains genuine0.
+Never restart on a polling timeout; check current CIM identities against above.
+After actual terminal, analyze_runtime with new run/start record, --allow-root
+C:/Work/yoRadio and C:/Work/QEMU-ESP32/.worktree/small-tv-ap-clients; output outside
+run. No24h or memory-trend acceptance yet. Old7h never combines with the new run.
+
+NEXT: investigate retained losses12..220B without weakening thresholds. Consider
+read-only allocator block/free-fragment metadata in a SEPARATE owned control VM;
+do not attach another observer to H10 or infer leak/no-leak from free-size alone.
+New firmware builds must use an independent worktree/artifact location while H10
+pins the current app. Broader SDK/application reachability (4207b120 and7581e..
+75896), target actual I/O/allocation/NVS/electrical faults, independent current
+network/display/fullsuite and hardwareH01-H09 remain open. QEMU main fixed earlier
+classic SPI/clock issues; full CYD RF still unqualified at MMIO60033c00 (main docs),
+so do not keep treating the old PHY assertion as the current proven fault.
+No OTA, no serial reset/flash; full objective not complete/blocked/paused.
+
+Latest H10 identity recheck: all4savedPID+creationUTC pairs match, last11cycles,
+oneROMboot/noUARTerrors, request86400 unchanged. IMPORTANT for pwsh7.5 probes:
+read -processes.json with ConvertFrom-Json -DateKind String before exact ISO
+comparisons. Default JSON date conversion produced one false string/DateTime
+mismatch even though supervisor19884 was alive. Immediate re-query of the SAME
+four IDs with string timestamps confirmed all identities; no restart occurred.
+This does not explain the OLD interrupted run: its four PIDs and same-run/V8
+scan were truly absent, independently of timestamp comparison. Pinned runtime
+helper sources use held process handles/command identities, not this ad-hoc
+timestamp comparison. Do not edit them for a probe-only formatting mistake.

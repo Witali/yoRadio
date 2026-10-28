@@ -6,6 +6,17 @@
 Результат — карта переноса и список пробелов; полной эквивалентности программы
 эта проверка не доказывает.
 
+Checkpoint offline JPEG build: в явную обратную инвентаризацию добавлены160
+функций из11codec/storage C-файлов как requested extensions, без утверждения
+эквивалентности factory. Всего459source functions, по-прежнему170app. Они
+компилируются в app component, но UI/upload пока не вызывают новый decoder/cache;
+проверка ELF подтверждает section GC. Сборщик и production bundle включены в
+проверяемые входы. [Границы проверки](../tests/JPEG_DEPENDENCY_BUILD.md).
+Следующий snapshot учитывает JPEG privacy gate и два bounded upload adapters:
+469source functions/172app. Gate вызывается из upload finish; codec/privacy
+разделены, алгоритм TJpgd и его подтверждённые factory pixel corrections прежние.
+Никакой новый upstream decoder caller этим изменением не активирован.
+
 Точная карта: [correspondence.json](correspondence.json). В каждой заводской
 строке указаны адрес, файл reference, конкретные `file#function` и оговорки.
 Обратный список со строками, вызовами и хешами строится командой:
@@ -25,7 +36,7 @@ python Small_TV/src/tests/correspondence_test.py
 | Область | Результат |
 |---|---|
 | 176 экспортированных функций | 120 прикладных сопоставлены; 56 оставлены явными границами SDK/libc |
-| 168 функций в 26 наших C-файлах | 92 связаны с заводскими строками; 76 учтены как поддержка, дополнения или оставшиеся API |
+| 170 функций в 26 наших C-файлах | 93 связаны с заводскими строками; 77 учтены как поддержка, дополнения или оставшиеся API |
 | TJpgd | 13 определений; отдельно сопоставлены 11 заводских точек из ассемблера `0x42011040..0x42012092` |
 | cJSON | 116 определений библиотечной замены; не утверждается совпадение с заводской версией |
 | Вызовы вне выбранных 176 тел | 198 прямых `FUN_ram_*`; в прикладном диапазоне — JPEG prepare/decomp, учтённые отдельно |
@@ -36,6 +47,31 @@ python Small_TV/src/tests/correspondence_test.py
 все callbacks/indirect calls и не доказывает отсутствие других задач во всём
 заводском образе. Подготовленная libjpeg ещё не подключена; её upstream-код
 и инструменты хостовых проб не являются переносом заводских функций.
+
+Новые storage modules jpeg_nor/guard/journal/transport/espidf/scratch — расширение JPEG,
+не перенос отдельных factory функций. Они пока не входят в native UI app3E03.
+NOR/guard/transport/espidf скомпилированы и исполнены в standalone target probe;
+journal проверен отдельно на host. Собственные [NOR contract](../tests/JPEG_NOR_STORAGE.md),
+[ownership guard](../tests/JPEG_OWNERSHIP_GUARD.md),
+[cache journal](../tests/JPEG_CACHE_JOURNAL.md) и
+[target transport](../tests/JPEG_TRANSPORT.md) и
+[shared scratch](../tests/JPEG_SHARED_SCRATCH.md) хранят отдельные input closures.
+Scratch/actual libjpeg исполнены на host NOR model и в отдельной C2 probe,
+но пока не в target UI.
+Prepared codec/jpeg_coefficients — converter temporary JCOEF storage, не новая
+factory function или новый формат input JPEG; он также ещё вне UI inventory.
+Exact pixels/traffic/error evidence: [JPEG_COEFFICIENTS](../tests/JPEG_COEFFICIENTS.md).
+Portable jpeg_decoder/jpeg_memory — новый bounded library adapter с exact
+resource preflight и typed errors, пока вне UI inventory. Новая codec/jpeg_backing
+связывает их с настоящим shared NOR; полный pipeline исполнен в standalone C2 QEMU,
+не в UI. См. [JPEG_DECODER](../tests/JPEG_DECODER.md) и
+[JPEG_BACKING](../tests/JPEG_BACKING.md).
+Новый storage/jpeg_cache и build identity generator связывают source, rows,
+physical frame verification и journal; real decoder/cache workflow проверен на
+host, RV32 linked. В UI inventory ещё не входит. См.
+[JPEG_CACHE_PIPELINE](../tests/JPEG_CACHE_PIPELINE.md).
+При native UI integration их нужно включить в source inventory/сборочные inputs.
+Это REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 
 ## Найденные пробелы
 
@@ -49,11 +85,15 @@ python Small_TV/src/tests/correspondence_test.py
    STA прошли; 59 входов QEMU неизменны, все три собственные ВМ закрыты.
    Дисплей отсутствовал. [Доказательства](../../qemu/parity/captive-portal-validation-20261020.json).
    Это не полный прогон новой 54F4 и не аппаратная проверка.
-2. **CITY-REINIT, пропущенный переход.** В конце `0x4200f2c0` (`/updateCity`)
-   очищается latch инициализации темы. У нас revision команды увеличивается только
-   для `/setclocktype`. Смена или повторная отправка города не эквивалентна этой
-   команде. Нужен переход для всех четырёх тем, особенно активного фото fade;
-   нельзя объявлять это оптимизацией по совпадению сохранённых настроек.
+2. **CITY-REINIT, исправлено и проверено.** `0x4200f3cc` внутри `/updateCity`
+   очищает theme-init latch `0x3fcc39e9`. Новый `settings_update_city` публикует
+   город/страну и команду под одним mutex даже для прежнего города; другие
+   свежие настройки не заменяются старым HTTP snapshot. Identical city не
+   требует повторной flash-записи. 5806 native checks, четыре QEMU темы/8 city
+   commands и отдельный active-fade gate прошли. Заводской blank bug наблюдён;
+   наша следующая фотография совпала с literal replay по всем 57600 pixels.
+   [Подробности и допустимые отличия](../tests/CITY_REINIT.md).
+   Это scoped приёмка app `3e030c1c…`, не full/24h/hardware acceptance.
 3. **HTTP-LIFETIME, намеренная разница с пробелом тестирования.** Заводские AP
    peer events запускают/останавливают HTTP. У нас один сервер живёт с загрузки.
    Это предотвращает повторный запуск и исчезновение сервиса при отключении
@@ -64,14 +104,32 @@ python Small_TV/src/tests/correspondence_test.py
    включает pull-up, наша оставляет их выключенными. Кадры в QEMU не проверяют
    электрическое состояние при старте/reset. Без проверки не считать эту разницу
    ни доказанной поломкой, ни доказанной эквивалентностью.
-5. **STALE-MAP, устаревшая навигация.** `symbol-map.json.native_module`,
-   заголовки reference и старый `organize_decompilation.py` указывают файлы до
-   разделения модулей. Пользоваться новой картой конкретных функций.
+5. **STALE-MAP, исправлена навигация2026-10-24.** Все176записей
+   `symbol-map.json.native_module/native_targets` берутся из проверенной карты
+   конкретных функций;74старых module summaries были неверны. Заголовки reference
+   теперь указывают на эти per-function links, а organizer имеет
+   `--refresh-navigation` без повторного создания псевдокода. Тела/имена/calls
+   всех176reference functions сохранены; header length может сдвинуть line numbers.
+   Audit проверяет навигацию и хеши обоих tools,13existing controls pass.
+   Это не новые claims semantic equivalence/full-image completeness.
    `send_http_json_number` в действительности заменяет `{{STATE}}` в HTML;
    `draw_large_digit` рисует температурную единицу; `load_animation_frame_table`
-   также выбирает и рисует кадр. Адреса надёжнее этих старых названий.
+   также выбирает и рисует кадр. Это сохранённые исторические Ghidra aliases;
+   для назначения пользоваться адресами и конкретными native_targets.
+   [Before/after и сохранённые проверки](../../qemu/parity/reference-navigation-validation-20261024.json).
 
 ## Обратная проверка
+
+Дополнение2026-10-24: выполнен адресный поиск по полной существующей базе
+Ghidra (5140functions), с независимой сверкой ELF/GNU и 396GP accesses.
+Восстановлены четыре ранее неиндексированных обращения рабочего `browser_time`.
+Три GNU участка отсутствуют в базе; полнота остаётся недоказанной. См.
+[FULL_IMAGE_XREFS.md](FULL_IMAGE_XREFS.md) и сохранённый proof с9negative controls.
+Следом все3пропущенные GP sites сопоставлены с полными телами функций SDK5.5.4
+и восстановлены в transient-копии анализа; bytes прошивки и обоихпроектов прежние.
+Native counterpart symbols присутствуют, coex wrapper проверен до316-byte target.
+См. [SDK_GAP_RECOVERY.md](SDK_GAP_RECOVERY.md). Это закрывает именно3analysis gaps,
+не доказывает весьcallgraph/semantic equivalence и не меняет app-код.
 
 - Отдельные timer/photo/GIF, UI, UTF-8, цвета, JSON/body, raw settings и
   mutex/atomic helpers реализуют разделение по назначению. Отношение функций

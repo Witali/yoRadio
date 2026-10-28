@@ -155,7 +155,9 @@ def recover() -> None:
             # to select a source square instead of always taking the center.
             crop_ui = (ROOT / 'photo_crop.html').read_text(encoding='utf-8')
             crop_script = (ROOT / 'photo_crop.js').read_text(encoding='utf-8')
-            page = page.replace('<script>', crop_ui + '\n<script>', 1)
+            policy_ui = (ROOT / 'photo_write_policy.html').read_text(encoding='utf-8')
+            policy_script = (ROOT / 'photo_write_policy.js').read_text(encoding='utf-8')
+            page = page.replace('<script>', crop_ui + '\n' + policy_ui + '\n<script>\n' + policy_script, 1)
             start = page.index('        function resizeAndCropImage(file) {')
             start = page.rfind('        /**', 0, start)
             end = page.index('        async function handleFileUpload', start)

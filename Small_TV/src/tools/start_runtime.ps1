@@ -6,6 +6,7 @@
 param(
     [Parameter(Mandatory)][string]$YoradioRoot,
     [Parameter(Mandatory)][string]$QemuRoot,
+    [string]$QemuExecutable,
     [Parameter(Mandatory)][string]$OutputDirectory,
     [string]$DependencyRoot = $YoradioRoot,
     [ValidateRange(0,100000)][int]$Cycles = 0,
@@ -46,6 +47,8 @@ try {
         '-IntervalSeconds',$IntervalSeconds.ToString([Globalization.CultureInfo]::InvariantCulture),
         '-OutageEvery',"$OutageEvery")
     if ($Cycles) {$arguments+=@('-Cycles',"$Cycles")}
+    # FIXED_TEST: preserve a separately pinned candidate through detached launch.
+    if ($QemuExecutable) {$arguments+=@('-QemuExecutable',[IO.Path]::GetFullPath($QemuExecutable))}
     $state.process=Start-SmallTvDetachedProcess -FilePath (Get-Command pwsh).Source `
         -Arguments $arguments -WorkingDirectory $YoradioRoot
     $state.status='started_not_completed'

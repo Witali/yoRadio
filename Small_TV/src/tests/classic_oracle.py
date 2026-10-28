@@ -56,8 +56,8 @@ class Inputs:
 
 class ClassicMachine(Machine):
     """Execute the composite renderer with declared flash/network/media boundaries."""
-    def __init__(self, variant, dump, assets):
-        super().__init__(variant)
+    def __init__(self, variant, dump, assets, *, dependency_root=None):
+        super().__init__(variant,dependency_root=dependency_root)
         self.dump, self.assets, self.media_calls = dump, assets, []
         self.frames = {int(row['flash_offset'], 16): ['animation', animation['index'], row['index']]
                        for animation in assets['animations'] for row in animation['frames']}

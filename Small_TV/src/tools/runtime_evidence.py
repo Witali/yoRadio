@@ -220,7 +220,7 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
     """Bind final journal, UART guard, source files, image/ELF and elapsed guest time."""
     folder, repository_root = Path(folder).resolve(), Path(repository_root).resolve()
     report = decode((folder / 'report.json').read_bytes())
-    require(report['schema_version'] in (3, 4), 'Unsupported runtime report schema')
+    require(report['schema_version'] in (3, 4, 5), 'Unsupported runtime report schema')
     terminal = 'journal' in report and 'inputs_unchanged' in report
     require(terminal or allow_progress, 'Runtime workload has not finished')
     roots = (repository_root, *map(Path, extra_roots))
@@ -239,10 +239,16 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
     app, elf = named('app.bin'), named('small_tv_reconstructed.elf')
     require(sha(app) == report['app_sha256'] and sha(elf) == report['native_elf_sha256'] and
             app.read_bytes()[176:208] == bytes.fromhex(report['native_elf_sha256']), 'Application/ELF binding differs')
-    require(sha(named('qemu-system-riscv32.exe')) == report['qemu_sha256'], 'Emulator identity differs')
+    # FIXED_TEST: bind the explicit candidate to the pinned inputs, not a basename.
+    if report['schema_version'] >= 5:
+        executable = checked_path(report['qemu_executable'], roots)
+        require(executable in paths.values(), 'Emulator executable is not a pinned input')
+    else:
+        executable = named('qemu-system-riscv32.exe')
+    require(sha(executable) == report['qemu_sha256'], 'Emulator identity differs')
     chunks = (named('rgb-420.jpg').stat().st_size + 4095) // 4096
     every = integer(report['outage_every_cycles'], 'outage cadence')
-    weather_required = report['schema_version'] == 4
+    weather_required = report['schema_version'] >= 4
     evidence = journal_evidence(folder / 'events.jsonl', chunks, every, allow_partial=not terminal,
                                 require_weather=weather_required)
     result = {'terminal': terminal, 'inputs_verified': len(inputs), 'evidence': evidence, 'report': report,

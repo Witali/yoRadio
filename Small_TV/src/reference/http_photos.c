@@ -1,6 +1,6 @@
 /* GHIDRA REFERENCE PSEUDOCODE, NOT COMPILED.
  * Retains addresses, unresolved SDK calls and decompiler type/overlap artifacts.
- * Executable reconstruction: app/web/photo_api.c + app/media/photo_upload.c.
+ * Per-function reconstruction targets: symbol-map.json native_targets.
  */
 
 // Audit label: http_photo_at_4200d54c; entry: ram:4200d54c; name: http_photo_at_4200d54c

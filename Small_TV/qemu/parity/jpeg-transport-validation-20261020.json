@@ -1,0 +1,2489 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Shared revocable I/O/time-budgeted ports + real ESP-IDF flash/partition/PSA binding; host contracts/mutations and executed standalone RV32 probe. Not linked into main UI/TJpgd, not libjpeg/shared-subfiles/upload integration or hardware/final parity acceptance.",
+  "source_sha256": {
+    "Small_TV/src/storage/jpeg_transport.c": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
+    "Small_TV/src/storage/jpeg_transport.h": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c",
+    "Small_TV/src/storage/jpeg_espidf.c": "3c1f6da36252388ada387ce25c6d0ccae7caebd2afb066aa7ece561b359dc743",
+    "Small_TV/src/storage/jpeg_espidf.h": "2cea326b1290b61079e987709ac1ddd1a4a6f12049fa062d5f7624b946d11e07",
+    "Small_TV/src/storage/jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+    "Small_TV/src/storage/jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+    "Small_TV/src/storage/jpeg_nor.c": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+    "Small_TV/src/storage/jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+    "Small_TV/src/tests/jpeg_transport/prepare.py": "78fec537bdfd98ed57c73b3657b8548066d94ba88f679fdb02718cf6a2fe5c77",
+    "Small_TV/src/tests/jpeg_transport/run.ps1": "e5ba0b75f4d761e4b335addf28aacc935cddf135c927a87bf5816de41df37f60",
+    "Small_TV/src/tests/jpeg_transport/native_test.c": "c423ffe3a8f582c6e6fc8f86b2b53948acc165ad8170fdcb601e89b3f5f82bf9",
+    "Small_TV/src/tests/jpeg_transport/mutation_contract.py": "02ca3ff7ac9505110a9d5474384a1ebbf64a098d304d1a27c4d5caa00a1042ae",
+    "Small_TV/src/tests/jpeg_transport/qemu_probe.py": "2efdd6a71f8cde132b8d80e6b1838c20013314cb58f021531969bda05139d614",
+    "Small_TV/src/tests/jpeg_transport/build-idf.ps1": "d71401b08ef515e61fb344c1d7665e3f6f70d73bbdb9392cc886ce5395f485de",
+    "Small_TV/src/tests/jpeg_transport/idf_probe/CMakeLists.txt": "21d5479bd50924e61ef9d80028481cc4152d4c825a4dd4a2d44e78bee83602f8",
+    "Small_TV/src/tests/jpeg_transport/idf_probe/main/CMakeLists.txt": "3322bbed942db9c250df52615b97389a6ec0e7e4c84ebb6a780c6f2d418bd2dc",
+    "Small_TV/src/tests/jpeg_transport/idf_probe/main/probe.c": "33249b49ca83de321404c4f5d3a4db068677c609fa1d1ca72859e116140c41bb",
+    "Small_TV/src/tools/jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+    "Small_TV/src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
+    "Small_TV/src/app/include/board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+    "Small_TV/src/sdkconfig.defaults": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835",
+    "Small_TV/src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e"
+  },
+  "archive_sha256": {
+    "firmware/development/small-tv-storage-probe/app.bin": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+    "firmware/development/small-tv-storage-probe/assets-manifest.json": "a63ebf788367d79e8070dfd821e2d705716254ad8e9525c69a372454c9822f9c",
+    "firmware/development/small-tv-storage-probe/assets.bin": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+    "firmware/development/small-tv-storage-probe/bootloader.bin": "d9ab86f41f72f0e539bb1f30a347f33ea7faf271cfa49637ec23f89b75f6fc30",
+    "firmware/development/small-tv-storage-probe/manifest.json": "8b6470fed577ee74dea4e390b9bb84a41986f3e6a2fde9680f7ca361c5fc8643",
+    "firmware/development/small-tv-storage-probe/partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+    "firmware/development/small-tv-storage-probe/sdkconfig": "ec2fe0eaddb5889c4f0b07a96d8f04ea91a8bda1436abe99276d76f7b3924d1e"
+  },
+  "sdk": {
+    "revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+    "tracked_worktree_clean": true,
+    "mbedtls_revision": "ce3f3485a121c100f58f36d700cb35b060f6e866",
+    "api_sha256": {
+      "components/spi_flash/include/esp_flash.h": "d4b3494c456102e048456cfbdaee5613aab5b016659cd67d499f3c75bc0c9642",
+      "components/esp_partition/include/esp_partition.h": "e344def341b70e3b1436d1378dbd8b352d924688bb96a7e96e9c0d65d90b77db",
+      "components/esp_partition/partition.c": "a1aab884d2a193ad0c70ce08fe672eb61b968062240448fa24956ddb46e846ac",
+      "components/bootloader_support/include/esp_flash_partitions.h": "33f885756432caad6ed71fc55b04512b8d9b092e1a5ce05287ec3d4131520784",
+      "components/bootloader_support/src/flash_partitions.c": "df53a00c575d83f1e0e4d790a134c14861ede55ae929c999b76c3f4df3cbc491",
+      "components/mbedtls/mbedtls/tf-psa-crypto/include/psa/crypto.h": "b3cfca32e17621d50f096c27dd5325b0dd16d91cac294ba4ae328413d777bf91"
+    }
+  },
+  "host": {
+    "passed": true,
+    "checks": 312205,
+    "cases": 31,
+    "physical_hardware_tested": false
+  },
+  "negative_controls": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "bypass_guard",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "d6f62c9de907bebdfed273ad953e1354c986cd4496d240e6ba1a8b10df2a7347",
+        "executable_sha256": "0d187ee7cb26281807ee4aca562e8a33c61d579f492a04e678985d81a31fbf3b",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:170: authorize(&ample)==JPEG_TRANSPORT_IO && !transport.authorized"
+      },
+      {
+        "name": "ignore_epoch",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "b7f64d9214fbf50cd742d394bfbcfd4bea0e1aae1992e81c4e44cc7225a5efbf",
+        "executable_sha256": "936bd5bbd4b93a6ad03a0e1d5890d365116b96f82a36bf9a72b5a98ac1714e71",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:134: a.read(a.context,PROBE_SCRATCH_ADDRESS,buffer,1)!=0 && transport.usage.calls==0"
+      },
+      {
+        "name": "ignore_port_bounds",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "8505e0db41d4b8c7a0b315b813d79ecfa97d492bdff5fce6d5a8233ea9feacca",
+        "executable_sha256": "1eb66a80ddd1826802c2753690b9d6d360ca0469b1ebcf74ef70a944d4972aa1",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:193: a.read(a.context,PROBE_SCRATCH_ADDRESS+8191,buffer,2)!=0 && model.reads==reads && !transport.usage.calls"
+      },
+      {
+        "name": "write_readonly",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "6ffb64c4d3ef614b3cd0c5efffaaf70691ea41f107aaa22b6d24c8ca5fc4f225",
+        "executable_sha256": "f9326ac3947df25fcc1c84f25ac1158286a0edb57d70f173fd6c5c7ca14c8b31",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:208: a.erase_sector(a.context,photo.offset)!=0 && !model.erases && !transport.usage.calls"
+      },
+      {
+        "name": "ignore_call_limit",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "d6f7cc71bcf355c089fd88ac75fd986cc65946d3da3c31b3a6cd546d21479282",
+        "executable_sha256": "8fc317934e565b69be1b08dcf3f01e6dd6573c5adb8ea04d9c94cda4a1021024",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:145: a.read(a.context,PROBE_SCRATCH_ADDRESS,buffer,1)!=0 && model.reads==reads"
+      },
+      {
+        "name": "ignore_read_limit",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "a7d4c744a2236da8fcd24087feef916c91de51298b6dd1204759d83b7a8bbc41",
+        "executable_sha256": "de637cab388c805839380bb8d65c4b199b9245f5478a10cfd437ff9e931c59fc",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:139: a.read(a.context,PROBE_SCRATCH_ADDRESS,buffer,4)!=0 && model.reads==reads && !transport.usage.calls"
+      },
+      {
+        "name": "ignore_program_limit",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "5eb7b1519fc60104e5474bc5a32916f9707d523157f4f69f22686357d1715567",
+        "executable_sha256": "6845001115c17717b0a62c561c05667d3ebc0b6eb7cf042c83e4c1bd092ffd54",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:141: a.program(a.context,PROBE_SCRATCH_ADDRESS,buffer,256)!=0 && !model.programs && !transport.usage.calls"
+      },
+      {
+        "name": "ignore_erase_limit",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "443842c3156fed2666bcf9b6121bbf79a6b20158c5461a5e0821b96859aace19",
+        "executable_sha256": "e8f2db2ac5ac331f39b276d05dbe9e51751ecfbe2d520ad2838a28704a9a788d",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:143: a.erase_sector(a.context,PROBE_SCRATCH_ADDRESS)!=0 && !model.erases && !transport.usage.calls"
+      },
+      {
+        "name": "ignore_post_deadline",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "7768bc147b5f72845aa2f62aa574620420b77ee8d096610ebfc7c63a8fcb005d",
+        "executable_sha256": "04e1fe4cf9008b1fce8e0d31447bd5236498b9bbc86233d923e2bfa4fa2ae03c",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:159: a.read(a.context,PROBE_SCRATCH_ADDRESS,buffer,1)!=0 && transport.last_error==JPEG_TRANSPORT_TIME && model.reads==reads+1 && transport.usage.calls==1"
+      },
+      {
+        "name": "ignore_final_guard_deadline",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "c347481d9966bacd3a13c3304779fea4dfb2c16442cedf9af88c783942369457",
+        "executable_sha256": "0c0c1170579b670b9807bc78cfb875f6e73244e0fc7c4de882008b1129c4caa6",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:165: authorize(&ample)==JPEG_TRANSPORT_TIME && !transport.authorized"
+      },
+      {
+        "name": "reset_budget_per_port",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "de633593c3b7e10d3b3cb773fad981f60ad2a3c3c99144b61d47eea7450f9495",
+        "executable_sha256": "c1d4905367772bd7bc82fac1aa13c8c3f6460940078c81efa749f7cc826cb47a",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:131: b.read(b.context,PROBE_CACHE_ADDRESS,buffer,1)!=0"
+      },
+      {
+        "name": "retain_revoked_authority",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "170c6bd2d35f47551c3ef0bfe8410fe191a62178dc9f0f691bb99f7422c7b75a",
+        "executable_sha256": "8531d1cc1e2f61e94128d09a9b30795078a5461fc35d66dbd60b54aa51987fce",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:165: authorize(&ample)==JPEG_TRANSPORT_TIME && !transport.authorized"
+      },
+      {
+        "name": "ignore_io_error",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "e2a4cf50dc3a570cf85a2c1075e30219e06ab2dfd67d8d5b184522c138c16717",
+        "executable_sha256": "079e8df70229c02f8dbaabfed7d7f9c40ac42d3303c03daff3463799f1a883cf",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:167: a.read(a.context,PROBE_SCRATCH_ADDRESS,buffer,8)!=0 && transport.last_error==JPEG_TRANSPORT_IO"
+      },
+      {
+        "name": "skip_cooperative_check",
+        "rejected": true,
+        "exit_code": 1,
+        "source_sha256": "4651d613e102014df48d0e58e6080d27dde2fc9bfddc31c2ebce6e7724075635",
+        "executable_sha256": "0e82c9901731f2fa0dc000d2c4a5eb7e24c58ff519becbeacba0de9442d2ee28",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c:161: jpeg_transport_check(&transport)==JPEG_TRANSPORT_CLOCK && !transport.active"
+      }
+    ],
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_transport.c": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_transport.h": "7a05557aac83523a17a9f7f29bdcb7dcbb957ab2a02c62a7ee1fe470aabe0e4c",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\native_test.c": "c423ffe3a8f582c6e6fc8f86b2b53948acc165ad8170fdcb601e89b3f5f82bf9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\mutation_contract.py": "02ca3ff7ac9505110a9d5474384a1ebbf64a098d304d1a27c4d5caa00a1042ae",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-transport-20261020\\final-host\\jpeg_layout.h": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-transport-20261020\\final-host\\probe_map.h": "d5e305eb4d473ed78411cedf0c1e448d0bee6d571b4c838febbf6e7941fa8d4d",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-transport-20261020\\final-host\\assets.bin": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+      "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\VsDevCmd.bat": "a7815e85d636828e5cf70fe4235b11fcb41750896a4d2d60756b43bacaf4f0b2"
+    },
+    "inputs_unchanged": true
+  },
+  "target": {
+    "passed": true,
+    "scope": "Run only owned target storage VMs; no network/LCD criteria or physical flashing.",
+    "physical_hardware_tested": false,
+    "network_tested": false,
+    "lcd_tested": false,
+    "app_sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+    "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+    "cases": [
+      {
+        "variant": "matching",
+        "passed": true,
+        "boots": [
+          {
+            "session": {
+              "name": "SmallTV-b1d12d42e09a",
+              "pid": 17564,
+              "qmp_port": 62497,
+              "firmware": "reconstructed",
+              "hardware_profile": {
+                "schema": 1,
+                "name": "small-tv",
+                "soc": "esp32c2",
+                "machine": "esp32c2,default-peripherals=off",
+                "arguments": [
+                  "-device",
+                  "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+                ],
+                "sd_images": [],
+                "profile": "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json",
+                "network": {
+                  "station_ssid": "yoRadio-QEMU",
+                  "softap_client_ssid": "Small_TV",
+                  "ntp_hosts": [
+                    "ntp1.aliyun.com",
+                    "cn.pool.ntp.org",
+                    "pool.ntp.org"
+                  ],
+                  "urls": [
+                    "http://api.openweathermap.org/data/2.5/weather"
+                  ]
+                },
+                "network_arguments": [],
+                "service_urls": [],
+                "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+              },
+              "network": "offline",
+              "persistent": true,
+              "qemu": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-selectors\\.build\\jpeg-selector-qemu-complete-20261019\\bin\\qemu-system-riscv32.exe",
+              "started_utc": "2026-10-20T15:19:37.668487+00:00",
+              "web_endpoints": [],
+              "web_urls": {},
+              "service_urls": [],
+              "service_endpoints": []
+            },
+            "sources": {
+              "images": [
+                {
+                  "sha256": "d9ab86f41f72f0e539bb1f30a347f33ea7faf271cfa49637ec23f89b75f6fc30",
+                  "bytes": 19248,
+                  "file": "bootloader.bin",
+                  "offset": "0x0"
+                },
+                {
+                  "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                  "bytes": 3072,
+                  "file": "partition-table.bin",
+                  "offset": "0x8000"
+                },
+                {
+                  "sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+                  "bytes": 135504,
+                  "file": "app.bin",
+                  "offset": "0x10000"
+                },
+                {
+                  "sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+                  "bytes": 1994752,
+                  "file": "assets.bin",
+                  "offset": "0x200000"
+                }
+              ],
+              "source_sha256": "3d9e69f41ee5091e4b6107472241e302571b7e177ef9df54d58ff8c0e1bde251"
+            },
+            "events": [
+              {
+                "event": "authorization",
+                "authorized": true,
+                "result": 0,
+                "discovery_error": 0,
+                "physical_bytes": 4194304,
+                "configured_bytes": 4194304
+              },
+              {
+                "event": "complete",
+                "passed": true,
+                "cold": false,
+                "checks": 33,
+                "data_calls": 157,
+                "data_read_bytes": 53314,
+                "data_program_bytes": 1024,
+                "data_erases": 1
+              }
+            ],
+            "owners_stopped": true
+          },
+          {
+            "session": {
+              "name": "SmallTV-80145a865cb5",
+              "pid": 7228,
+              "qmp_port": 62507,
+              "firmware": "reconstructed",
+              "hardware_profile": {
+                "schema": 1,
+                "name": "small-tv",
+                "soc": "esp32c2",
+                "machine": "esp32c2,default-peripherals=off",
+                "arguments": [
+                  "-device",
+                  "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+                ],
+                "sd_images": [],
+                "profile": "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json",
+                "network": {
+                  "station_ssid": "yoRadio-QEMU",
+                  "softap_client_ssid": "Small_TV",
+                  "ntp_hosts": [
+                    "ntp1.aliyun.com",
+                    "cn.pool.ntp.org",
+                    "pool.ntp.org"
+                  ],
+                  "urls": [
+                    "http://api.openweathermap.org/data/2.5/weather"
+                  ]
+                },
+                "network_arguments": [],
+                "service_urls": [],
+                "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+              },
+              "network": "offline",
+              "persistent": true,
+              "qemu": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-selectors\\.build\\jpeg-selector-qemu-complete-20261019\\bin\\qemu-system-riscv32.exe",
+              "started_utc": "2026-10-20T15:19:43.081447+00:00",
+              "web_endpoints": [],
+              "web_urls": {},
+              "service_urls": [],
+              "service_endpoints": []
+            },
+            "sources": {
+              "images": [
+                {
+                  "sha256": "d9ab86f41f72f0e539bb1f30a347f33ea7faf271cfa49637ec23f89b75f6fc30",
+                  "bytes": 19248,
+                  "file": "bootloader.bin",
+                  "offset": "0x0"
+                },
+                {
+                  "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                  "bytes": 3072,
+                  "file": "partition-table.bin",
+                  "offset": "0x8000"
+                },
+                {
+                  "sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+                  "bytes": 135504,
+                  "file": "app.bin",
+                  "offset": "0x10000"
+                },
+                {
+                  "sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+                  "bytes": 1994752,
+                  "file": "assets.bin",
+                  "offset": "0x200000"
+                }
+              ],
+              "source_sha256": "3d9e69f41ee5091e4b6107472241e302571b7e177ef9df54d58ff8c0e1bde251"
+            },
+            "events": [
+              {
+                "event": "authorization",
+                "authorized": true,
+                "result": 0,
+                "discovery_error": 0,
+                "physical_bytes": 4194304,
+                "configured_bytes": 4194304
+              },
+              {
+                "event": "complete",
+                "passed": true,
+                "cold": true,
+                "checks": 27,
+                "data_calls": 6,
+                "data_read_bytes": 80,
+                "data_program_bytes": 0,
+                "data_erases": 0
+              }
+            ],
+            "owners_stopped": true
+          }
+        ],
+        "initial_flash_sha256": "10cd37c49dbba51d86b37a0b43388faa44999317bb94a7f6228f001048cd2463",
+        "changed_bytes": 35,
+        "final_flash_sha256": "72d13d90b51fed6e1d9f0d2051621e4c64ed3351de439aa0ef5a5f389b7fe5f5",
+        "owners_stopped": true
+      },
+      {
+        "variant": "unmarked",
+        "passed": true,
+        "boots": [
+          {
+            "session": {
+              "name": "SmallTV-abe8d81455d5",
+              "pid": 28892,
+              "qmp_port": 62520,
+              "firmware": "reconstructed",
+              "hardware_profile": {
+                "schema": 1,
+                "name": "small-tv",
+                "soc": "esp32c2",
+                "machine": "esp32c2,default-peripherals=off",
+                "arguments": [
+                  "-device",
+                  "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+                ],
+                "sd_images": [],
+                "profile": "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json",
+                "network": {
+                  "station_ssid": "yoRadio-QEMU",
+                  "softap_client_ssid": "Small_TV",
+                  "ntp_hosts": [
+                    "ntp1.aliyun.com",
+                    "cn.pool.ntp.org",
+                    "pool.ntp.org"
+                  ],
+                  "urls": [
+                    "http://api.openweathermap.org/data/2.5/weather"
+                  ]
+                },
+                "network_arguments": [],
+                "service_urls": [],
+                "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+              },
+              "network": "offline",
+              "persistent": true,
+              "qemu": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-selectors\\.build\\jpeg-selector-qemu-complete-20261019\\bin\\qemu-system-riscv32.exe",
+              "started_utc": "2026-10-20T15:19:45.923447+00:00",
+              "web_endpoints": [],
+              "web_urls": {},
+              "service_urls": [],
+              "service_endpoints": []
+            },
+            "sources": {
+              "images": [
+                {
+                  "sha256": "d9ab86f41f72f0e539bb1f30a347f33ea7faf271cfa49637ec23f89b75f6fc30",
+                  "bytes": 19248,
+                  "file": "bootloader.bin",
+                  "offset": "0x0"
+                },
+                {
+                  "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                  "bytes": 3072,
+                  "file": "partition-table.bin",
+                  "offset": "0x8000"
+                },
+                {
+                  "sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+                  "bytes": 135504,
+                  "file": "app.bin",
+                  "offset": "0x10000"
+                },
+                {
+                  "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                  "bytes": 1994752,
+                  "file": "assets.bin",
+                  "offset": "0x200000"
+                }
+              ],
+              "source_sha256": "3d9e69f41ee5091e4b6107472241e302571b7e177ef9df54d58ff8c0e1bde251"
+            },
+            "events": [
+              {
+                "event": "authorization",
+                "authorized": false,
+                "result": 8,
+                "discovery_error": 0,
+                "physical_bytes": 4194304,
+                "configured_bytes": 4194304
+              }
+            ],
+            "owners_stopped": true
+          }
+        ],
+        "initial_flash_sha256": "a83b1aa16ff4d318bbec00a76655e50999d5faaf1be227dbf4f5111599e9ddf2",
+        "final_flash_sha256": "a83b1aa16ff4d318bbec00a76655e50999d5faaf1be227dbf4f5111599e9ddf2",
+        "owners_stopped": true
+      },
+      {
+        "variant": "raw-unknown-flags",
+        "passed": true,
+        "boots": [
+          {
+            "session": {
+              "name": "SmallTV-901470ac65f8",
+              "pid": 18888,
+              "qmp_port": 62530,
+              "firmware": "reconstructed",
+              "hardware_profile": {
+                "schema": 1,
+                "name": "small-tv",
+                "soc": "esp32c2",
+                "machine": "esp32c2,default-peripherals=off",
+                "arguments": [
+                  "-device",
+                  "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+                ],
+                "sd_images": [],
+                "profile": "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json",
+                "network": {
+                  "station_ssid": "yoRadio-QEMU",
+                  "softap_client_ssid": "Small_TV",
+                  "ntp_hosts": [
+                    "ntp1.aliyun.com",
+                    "cn.pool.ntp.org",
+                    "pool.ntp.org"
+                  ],
+                  "urls": [
+                    "http://api.openweathermap.org/data/2.5/weather"
+                  ]
+                },
+                "network_arguments": [],
+                "service_urls": [],
+                "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+              },
+              "network": "offline",
+              "persistent": true,
+              "qemu": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-selectors\\.build\\jpeg-selector-qemu-complete-20261019\\bin\\qemu-system-riscv32.exe",
+              "started_utc": "2026-10-20T15:19:46.865773+00:00",
+              "web_endpoints": [],
+              "web_urls": {},
+              "service_urls": [],
+              "service_endpoints": []
+            },
+            "sources": {
+              "images": [
+                {
+                  "sha256": "d9ab86f41f72f0e539bb1f30a347f33ea7faf271cfa49637ec23f89b75f6fc30",
+                  "bytes": 19248,
+                  "file": "bootloader.bin",
+                  "offset": "0x0"
+                },
+                {
+                  "sha256": "52554541856b7f1c2a764040cc20a15533e537a1b61072ec773a2610fafe040e",
+                  "bytes": 3072,
+                  "file": "partition-table.bin",
+                  "offset": "0x8000"
+                },
+                {
+                  "sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+                  "bytes": 135504,
+                  "file": "app.bin",
+                  "offset": "0x10000"
+                },
+                {
+                  "sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+                  "bytes": 1994752,
+                  "file": "assets.bin",
+                  "offset": "0x200000"
+                }
+              ],
+              "source_sha256": "3d9e69f41ee5091e4b6107472241e302571b7e177ef9df54d58ff8c0e1bde251"
+            },
+            "events": [
+              {
+                "event": "authorization",
+                "authorized": false,
+                "result": 8,
+                "discovery_error": 0,
+                "physical_bytes": 4194304,
+                "configured_bytes": 4194304
+              }
+            ],
+            "owners_stopped": true
+          }
+        ],
+        "initial_flash_sha256": "25286110d0b202b8287fbac7da34a8a960566975b64871cb62ed9a5cb395a2c5",
+        "final_flash_sha256": "25286110d0b202b8287fbac7da34a8a960566975b64871cb62ed9a5cb395a2c5",
+        "owners_stopped": true
+      },
+      {
+        "variant": "extra-partition",
+        "passed": true,
+        "boots": [
+          {
+            "session": {
+              "name": "SmallTV-92661780cf6d",
+              "pid": 41876,
+              "qmp_port": 62536,
+              "firmware": "reconstructed",
+              "hardware_profile": {
+                "schema": 1,
+                "name": "small-tv",
+                "soc": "esp32c2",
+                "machine": "esp32c2,default-peripherals=off",
+                "arguments": [
+                  "-device",
+                  "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+                ],
+                "sd_images": [],
+                "profile": "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\qemu\\profiles\\small-tv-c2.json",
+                "network": {
+                  "station_ssid": "yoRadio-QEMU",
+                  "softap_client_ssid": "Small_TV",
+                  "ntp_hosts": [
+                    "ntp1.aliyun.com",
+                    "cn.pool.ntp.org",
+                    "pool.ntp.org"
+                  ],
+                  "urls": [
+                    "http://api.openweathermap.org/data/2.5/weather"
+                  ]
+                },
+                "network_arguments": [],
+                "service_urls": [],
+                "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+              },
+              "network": "offline",
+              "persistent": true,
+              "qemu": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-selectors\\.build\\jpeg-selector-qemu-complete-20261019\\bin\\qemu-system-riscv32.exe",
+              "started_utc": "2026-10-20T15:19:47.616042+00:00",
+              "web_endpoints": [],
+              "web_urls": {},
+              "service_urls": [],
+              "service_endpoints": []
+            },
+            "sources": {
+              "images": [
+                {
+                  "sha256": "d9ab86f41f72f0e539bb1f30a347f33ea7faf271cfa49637ec23f89b75f6fc30",
+                  "bytes": 19248,
+                  "file": "bootloader.bin",
+                  "offset": "0x0"
+                },
+                {
+                  "sha256": "cdb818f83261534483606445012213ba992da7e550d52d1ea2c84bc011b5c3f9",
+                  "bytes": 3072,
+                  "file": "partition-table.bin",
+                  "offset": "0x8000"
+                },
+                {
+                  "sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+                  "bytes": 135504,
+                  "file": "app.bin",
+                  "offset": "0x10000"
+                },
+                {
+                  "sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+                  "bytes": 1994752,
+                  "file": "assets.bin",
+                  "offset": "0x200000"
+                }
+              ],
+              "source_sha256": "3d9e69f41ee5091e4b6107472241e302571b7e177ef9df54d58ff8c0e1bde251"
+            },
+            "events": [
+              {
+                "event": "authorization",
+                "authorized": false,
+                "result": 8,
+                "discovery_error": 0,
+                "physical_bytes": 4194304,
+                "configured_bytes": 4194304
+              }
+            ],
+            "owners_stopped": true
+          }
+        ],
+        "initial_flash_sha256": "97071e1ed329bb9ca396823ea3cf339397b8c450c166e62b5ac120cacf3d12e6",
+        "final_flash_sha256": "97071e1ed329bb9ca396823ea3cf339397b8c450c166e62b5ac120cacf3d12e6",
+        "owners_stopped": true
+      }
+    ],
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_transport\\qemu_probe.py": "2efdd6a71f8cde132b8d80e6b1838c20013314cb58f021531969bda05139d614"
+    },
+    "frozen_inputs_unchanged": true
+  },
+  "rv32": {
+    "jpeg_transport": {
+      "code_bytes": 2324,
+      "writable_bytes": 0,
+      "max_single_frame": 240,
+      "single_frames": {
+        "disjoint": 0,
+        "covered": 0,
+        "deadline": 16,
+        "complete": 16,
+        "charge": 16,
+        "guard_read": 32,
+        "request": 32,
+        "port_read": 32,
+        "port_program": 32,
+        "port_erase": 32,
+        "start": 16,
+        "jpeg_transport_init": 32,
+        "jpeg_transport_begin": 0,
+        "jpeg_transport_check": 0,
+        "jpeg_transport_end": 0,
+        "jpeg_transport_revoke": 0,
+        "jpeg_transport_authorize": 80,
+        "jpeg_transport_port": 240
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-gcc.exe",
+        "-DESP_PLATFORM",
+        "-DESP_PSA_ITS_AVAILABLE",
+        "-DIDF_VER=\"9a97f6c5\"",
+        "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-DMBEDTLS_MAJOR_VERSION=4",
+        "-DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE",
+        "-DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ",
+        "-DTF_PSA_CRYPTO_USER_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-D_GLIBCXX_HAVE_POSIX_SEMAPHORE",
+        "-D_GLIBCXX_USE_POSIX_SEMAPHORE",
+        "-D_GNU_SOURCE",
+        "-D_POSIX_READER_WRITER_LOCKS",
+        "-D__STDC_WANT_LIB_EXT1__=0",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/config",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/resources",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/esp_additions/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/ldo/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/debug_probe/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/etm/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/tuning_scheme_impl/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_intr/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/esp_mspi_align/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/power_supply/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/modem/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/.",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/tlsf",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/register",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/platform_port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/riscv",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/private",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_stdio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_usb/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/freertos/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/arch",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/sys",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/spi_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_blockdev/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_partition/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/bootloader_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_timer/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/library",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/core",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/extras",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/esp_crt_bundle/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_driver/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_crypto_storage/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include",
+        "@C:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/toolchain/cflags",
+        "-fdiagnostics-color=always",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Werror",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-variable",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-error=extra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-Wno-enum-conversion",
+        "-gdwarf-4",
+        "-ggdb",
+        "-Os",
+        "-freorder-blocks",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/tests/jpeg_transport/idf_probe=.",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6=/IDF",
+        "-fstrict-volatile-bitfields",
+        "-fno-jump-tables",
+        "-fno-tree-switch-conversion",
+        "-std=gnu23",
+        "-Wno-old-style-declaration",
+        "-fzero-init-padding-bits=all",
+        "-fno-malloc-dce",
+        "-c",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_transport.c",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-transport-20261020\\rv32-final\\jpeg_transport.o"
+      ],
+      "source_sha256": "718751c4d33b9c623ec648fa7cbc4ea2a9e4e2d35d6efa40568ebb0b9b84fa43",
+      "object_sha256": "8ef32f3abed0a3ac09d726264b6c5c6213fdcbc6f3c6a0f2fb9dbc130ebb6a51"
+    },
+    "jpeg_espidf": {
+      "code_bytes": 1448,
+      "writable_bytes": 0,
+      "max_single_frame": 416,
+      "single_frames": {
+        "clock_us": 0,
+        "flash_erase": 0,
+        "flash_program": 0,
+        "flash_read": 0,
+        "hash_reset": 0,
+        "hash_finish": 32,
+        "hash_update": 0,
+        "hash_begin": 0,
+        "jpeg_espidf_init": 48,
+        "jpeg_espidf_authorize": 416
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-gcc.exe",
+        "-DESP_PLATFORM",
+        "-DESP_PSA_ITS_AVAILABLE",
+        "-DIDF_VER=\"9a97f6c5\"",
+        "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-DMBEDTLS_MAJOR_VERSION=4",
+        "-DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE",
+        "-DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ",
+        "-DTF_PSA_CRYPTO_USER_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-D_GLIBCXX_HAVE_POSIX_SEMAPHORE",
+        "-D_GLIBCXX_USE_POSIX_SEMAPHORE",
+        "-D_GNU_SOURCE",
+        "-D_POSIX_READER_WRITER_LOCKS",
+        "-D__STDC_WANT_LIB_EXT1__=0",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/config",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/resources",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/esp_additions/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/ldo/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/debug_probe/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/etm/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/tuning_scheme_impl/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_intr/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/esp_mspi_align/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/power_supply/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/modem/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/.",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/tlsf",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/register",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/platform_port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/riscv",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/private",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_stdio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_usb/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/freertos/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/arch",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/sys",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/spi_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_blockdev/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_partition/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/bootloader_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_timer/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/library",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/core",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/extras",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/esp_crt_bundle/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_driver/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_crypto_storage/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include",
+        "@C:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/toolchain/cflags",
+        "-fdiagnostics-color=always",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Werror",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-variable",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-error=extra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-Wno-enum-conversion",
+        "-gdwarf-4",
+        "-ggdb",
+        "-Os",
+        "-freorder-blocks",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/tests/jpeg_transport/idf_probe=.",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6=/IDF",
+        "-fstrict-volatile-bitfields",
+        "-fno-jump-tables",
+        "-fno-tree-switch-conversion",
+        "-std=gnu23",
+        "-Wno-old-style-declaration",
+        "-fzero-init-padding-bits=all",
+        "-fno-malloc-dce",
+        "-c",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_espidf.c",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-transport-20261020\\rv32-final\\jpeg_espidf.o"
+      ],
+      "source_sha256": "3c1f6da36252388ada387ce25c6d0ccae7caebd2afb066aa7ece561b359dc743",
+      "object_sha256": "8cf7019a517188905265a2e4dfa8dfb05b2eec28b0f1b4ba446d5d85d9da1c1a"
+    },
+    "jpeg_guard": {
+      "code_bytes": 1150,
+      "writable_bytes": 0,
+      "max_single_frame": 320,
+      "single_frames": {
+        "contained": 0,
+        "verify_resource": 320,
+        "valid_ranges": 0,
+        "jpeg_guard_verify": 96
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-gcc.exe",
+        "-DESP_PLATFORM",
+        "-DESP_PSA_ITS_AVAILABLE",
+        "-DIDF_VER=\"9a97f6c5\"",
+        "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-DMBEDTLS_MAJOR_VERSION=4",
+        "-DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE",
+        "-DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ",
+        "-DTF_PSA_CRYPTO_USER_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-D_GLIBCXX_HAVE_POSIX_SEMAPHORE",
+        "-D_GLIBCXX_USE_POSIX_SEMAPHORE",
+        "-D_GNU_SOURCE",
+        "-D_POSIX_READER_WRITER_LOCKS",
+        "-D__STDC_WANT_LIB_EXT1__=0",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/config",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/resources",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/esp_additions/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/ldo/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/debug_probe/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/etm/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/tuning_scheme_impl/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_intr/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/esp_mspi_align/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/power_supply/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/modem/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/.",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/tlsf",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/register",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/platform_port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/riscv",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/private",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_stdio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_usb/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/freertos/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/arch",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/sys",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/spi_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_blockdev/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_partition/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/bootloader_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_timer/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/library",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/core",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/extras",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/esp_crt_bundle/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_driver/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_crypto_storage/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include",
+        "@C:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/toolchain/cflags",
+        "-fdiagnostics-color=always",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Werror",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-variable",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-error=extra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-Wno-enum-conversion",
+        "-gdwarf-4",
+        "-ggdb",
+        "-Os",
+        "-freorder-blocks",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/tests/jpeg_transport/idf_probe=.",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6=/IDF",
+        "-fstrict-volatile-bitfields",
+        "-fno-jump-tables",
+        "-fno-tree-switch-conversion",
+        "-std=gnu23",
+        "-Wno-old-style-declaration",
+        "-fzero-init-padding-bits=all",
+        "-fno-malloc-dce",
+        "-c",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_guard.c",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-transport-20261020\\rv32-final\\jpeg_guard.o"
+      ],
+      "source_sha256": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+      "object_sha256": "db05a71d7c4874ed38bb40ab958bbf712b8c86224dfe997f7ab9ed5dbe13be5a"
+    },
+    "jpeg_nor": {
+      "code_bytes": 1848,
+      "writable_bytes": 0,
+      "max_single_frame": 304,
+      "single_frames": {
+        "io_read": 16,
+        "flush_sector": 304,
+        "valid_extents": 0,
+        "check_request": 0,
+        "jpeg_nor_open": 208,
+        "jpeg_nor_read": 48,
+        "jpeg_nor_write": 48,
+        "jpeg_nor_sync": 0,
+        "jpeg_nor_close": 16,
+        "jpeg_nor_abort": 0
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-gcc.exe",
+        "-DESP_PLATFORM",
+        "-DESP_PSA_ITS_AVAILABLE",
+        "-DIDF_VER=\"9a97f6c5\"",
+        "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-DMBEDTLS_MAJOR_VERSION=4",
+        "-DSOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE",
+        "-DSOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ",
+        "-DTF_PSA_CRYPTO_USER_CONFIG_FILE=\"mbedtls/esp_config.h\"",
+        "-D_GLIBCXX_HAVE_POSIX_SEMAPHORE",
+        "-D_GLIBCXX_USE_POSIX_SEMAPHORE",
+        "-D_GNU_SOURCE",
+        "-D_POSIX_READER_WRITER_LOCKS",
+        "-D__STDC_WANT_LIB_EXT1__=0",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/config",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/storage",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/resources",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/config/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/esp_additions/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/include/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/ldo/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/debug_probe/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/etm/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_timing_tuning/tuning_scheme_impl/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/mspi_intr/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/mspi/esp_mspi_align/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/power_supply/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/modem/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/.",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hw_support/port/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/tlsf",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/heap/rom_patches/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/log/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/soc/esp32c2/register",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/platform_port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/hal/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2/include/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_rom/esp32c2",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_common/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/soc",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/riscv",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_system/port/include/private",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_stdio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/riscv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpio/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_usb/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_pmu/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_regi2c/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_uart/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_ana_conv/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_dma/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/include/apps",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/lwip/src/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/freertos/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/arch",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/lwip/port/esp32xx/include/sys",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/spi_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_mspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_gpspi/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_clock/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_blockdev/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_partition/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bootloader_support/bootloader_flash/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_timer/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/library",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/core",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/src",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/extras",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/esp_crt_bundle/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_driver/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/port/psa_crypto_storage/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/esp32c2/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_hal_security/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/builtin/include",
+        "-IC:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/esp-idf/mbedtls/mbedtls/tf-psa-crypto/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/everest/include",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/p256-m/p256-m",
+        "-IC:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/mbedtls/mbedtls/tf-psa-crypto/drivers/pqcp/include",
+        "@C:/Work/yoRadio/.worktree/small-tv-improvement-plan/.build/jpeg-transport-20261020/idf-final/toolchain/cflags",
+        "-fdiagnostics-color=always",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Werror",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-variable",
+        "-Wno-error=unused-but-set-variable",
+        "-Wno-error=deprecated-declarations",
+        "-Wextra",
+        "-Wno-error=extra",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-Wno-enum-conversion",
+        "-gdwarf-4",
+        "-ggdb",
+        "-Os",
+        "-freorder-blocks",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.worktree/small-tv-improvement-plan/Small_TV/src/tests/jpeg_transport/idf_probe=.",
+        "-fmacro-prefix-map=C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6=/IDF",
+        "-fstrict-volatile-bitfields",
+        "-fno-jump-tables",
+        "-fno-tree-switch-conversion",
+        "-std=gnu23",
+        "-Wno-old-style-declaration",
+        "-fzero-init-padding-bits=all",
+        "-fno-malloc-dce",
+        "-c",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_nor.c",
+        "-fstack-usage",
+        "-o",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-transport-20261020\\rv32-final\\jpeg_nor.o"
+      ],
+      "source_sha256": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+      "object_sha256": "6a53dff12b5ea8f5e9efc5f1ecc975468431413e51c5a2f45fa56a40df703bfb"
+    },
+    "executed_probe_globals": {
+      "storage": 536,
+      "scratch_port": 152,
+      "cache_port": 152,
+      "scratch": 4352,
+      "cache": 4352
+    },
+    "elf_sha256": "f51b0e1cf25ae51ad1d5f761f5b5ad0674ad994c42839f037b2246c8fffc0790"
+  },
+  "probe": {
+    "app_sha256": "6cb297718cb657bb91443cbaf8a345b0ab2091d60b55a1669a08b4d12b5ac944",
+    "elf_sha256": "f51b0e1cf25ae51ad1d5f761f5b5ad0674ad994c42839f037b2246c8fffc0790",
+    "app_bytes": 135504,
+    "inputs_frozen_before_build": true,
+    "source_fingerprint": "3d9e69f41ee5091e4b6107472241e302571b7e177ef9df54d58ff8c0e1bde251",
+    "final_owner_processes": 5,
+    "earlier_successful_owner_processes": 10,
+    "all_owned_processes_stopped": true
+  },
+  "main_production": {
+    "changed": false,
+    "app_sha256": "3e030c1cc5f7b456fefc9985c397daf8340c33d1bb2805965b076147a07cd7e1",
+    "codec": "TJpgd",
+    "artifact_checks": {
+      "passed": true,
+      "cases": 6,
+      "failures": 0,
+      "errors": 0,
+      "source_sha256": "ebc0fb059639612e3181654dd1c9aa0d29bbe5ac485619c90b3f43284d8f9b2f",
+      "app_sha256": "3e030c1cc5f7b456fefc9985c397daf8340c33d1bb2805965b076147a07cd7e1",
+      "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+    }
+  },
+  "early_failures": [
+    "CMake custom include Windows path escaping",
+    "unknown network profile before process launch",
+    "missing firmware argument before process launch"
+  ],
+  "old_h10": "Six original owners readonly-confirmed; no SDK/source/frozen helper or H10 VM mutation.",
+  "required_remaining": [
+    "one shared scratch cache + byte-bounded subfiles and initialization tracking",
+    "measure actual libjpeg NOR traffic/wear/time; select production limits including expanded subsampling bounds",
+    "source/upload journal invalidation + physical source/frame hashes + matching assets integration preserving photos/settings",
+    "full JPEG bridge/native link/heap/task stack/time/HTTP/LCD/full/24h/hardware acceptance"
+  ],
+  "raw_artifacts": [
+    {
+      "file": "raw/jpeg-transport-20261020/build-idf-before-cmake-path-fix.ps1.gz",
+      "sha256": "703d4dac489952bc3e4debfcda5c596398bf70ae09b4815b1e6c8fb04b7a3185",
+      "bytes": 2119,
+      "uncompressed_sha256": "48f079d25ee189e18222a7af6cd73f9b32054eb539717c3c9c65011256f9bc8d",
+      "uncompressed_bytes": 5167
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/build-idf-before-input-freeze.ps1.gz",
+      "sha256": "db88df9a0b8f85c0621c92b462c0e8aa02d3491337ad2b802e91f808a8e47d1f",
+      "bytes": 2195,
+      "uncompressed_sha256": "db59cecc9cec5e07112b645110c8a6a8ecbd48a25fb2630e4ecd5ae244cc6f22",
+      "uncompressed_bytes": 5353
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/assets-manifest.json.gz",
+      "sha256": "f2dd782516b7339e3a9380cb1a07179f8e27b3110ab2a76913e9a6f5a29f4acd",
+      "bytes": 1344,
+      "uncompressed_sha256": "a63ebf788367d79e8070dfd821e2d705716254ad8e9525c69a372454c9822f9c",
+      "uncompressed_bytes": 4939
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/compile.cmd.gz",
+      "sha256": "4f807f4de21f7fdeed6dd0e79bbd12fe2422baf2df2a9574a2e538765fda0a15",
+      "bytes": 396,
+      "uncompressed_sha256": "e4aa65917d4e1a7f88535f4da2ca27d763bb073d003213b8ba3970de4f23e8fc",
+      "uncompressed_bytes": 968
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/jpeg_layout.h.gz",
+      "sha256": "27b787fb54146daf122de2798575a4c05d495204e300b275e744aec3e5cd2fcc",
+      "bytes": 1850,
+      "uncompressed_sha256": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+      "uncompressed_bytes": 6623
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/jpeg_transport_test.exe.gz",
+      "sha256": "75479a9e354e928fbe68c8826d09c99da29707fb8b6de569befef5bf13379e25",
+      "bytes": 93476,
+      "uncompressed_sha256": "33fa1165f18e089ad50e28e45281519527b72566b8d9395f0b5f27036d9c49eb",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/plan.json.gz",
+      "sha256": "c611fe8711b76390edb41e1dc6d8be7f14471a14ae35d360e66245dc228f5d0e",
+      "bytes": 3369,
+      "uncompressed_sha256": "ca3c858138436c4e96e76149dd6674ee59971ca9ce68249ab119cbe7dd312357",
+      "uncompressed_bytes": 15886
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/probe_map.h.gz",
+      "sha256": "14f4ff2e9b4b96dea27e92e93dd2567040d683c97113df3b5150fac86eb18384",
+      "bytes": 207,
+      "uncompressed_sha256": "d5e305eb4d473ed78411cedf0c1e448d0bee6d571b4c838febbf6e7941fa8d4d",
+      "uncompressed_bytes": 303
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host/report.json.gz",
+      "sha256": "3069ef48bfaba422cfc7e11136d9f7a9ccd0d6e2ec870af40709dddc4439f354",
+      "bytes": 90,
+      "uncompressed_sha256": "721ce84f4c1e351545cf44fa25a77a2a88d06e29b02b90cc37dde068dddc4fd1",
+      "uncompressed_bytes": 77
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-host.log.gz",
+      "sha256": "e1c25fe282932738454130e9b5fdd562934dec55506d6832b6b11c669e24ea95",
+      "bytes": 184,
+      "uncompressed_sha256": "cae6f70cc615137f00719f9ff7ac5ab4a414bc7a4f917ba9913c59057296653a",
+      "uncompressed_bytes": 203
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu/report.json.gz",
+      "sha256": "24aaf986a77a9dbdd6e4f1ab5ba36587e39fdd331882fa2b05fc1957b11fb5ca",
+      "bytes": 2379,
+      "uncompressed_sha256": "3828f459a40dad6371843746d5eb96268303f8911c4f094d83e9d5728447f60f",
+      "uncompressed_bytes": 19672
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/extra-partition/vm/prepared.json.gz",
+      "sha256": "e767ca854ca96a704f9bb47db1b4303827b6ceacc91c6a94f2cc2d0b559f4d91",
+      "bytes": 748,
+      "uncompressed_sha256": "4850159fd0df0e873adc8ad7554ef9f21442becbf595dccece9f489ecf6ef69a",
+      "uncompressed_bytes": 2864
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/extra-partition/vm/qemu.log.gz",
+      "sha256": "628b2eb93033738d9db5a409a8022efe0eac1ce54558f48b124674c5ea5e19e0",
+      "bytes": 173,
+      "uncompressed_sha256": "70b4e9900232026b72ac4ce575c5684bbf3bddc6e7230fe26d4bbe84b876d568",
+      "uncompressed_bytes": 189
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/extra-partition/vm/session.json.gz",
+      "sha256": "85836ae2cc17d0381e22a5b02c05846434c146fba999ca1b2265a578106bc11c",
+      "bytes": 809,
+      "uncompressed_sha256": "aafbb569bd83f428e5da3cea1d46b2b7a3c755f3fff2e6939b2349cc9d2a7627",
+      "uncompressed_bytes": 1604
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/extra-partition/vm/uart.log.gz",
+      "sha256": "be94552321992fddb92502c8ae0505e804798e898066eaec27a75fcaeb2f8dab",
+      "bytes": 1243,
+      "uncompressed_sha256": "722095ed3c7908e1482d069d1d32f942754f024b2ae822d00eaa2e8f82bc40ad",
+      "uncompressed_bytes": 2777
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/matching/uart-first.log.gz",
+      "sha256": "6bf81ac5feeb1ff21edb4ddd2cf0f66134983d196253c965322ed3da2ab01999",
+      "bytes": 1297,
+      "uncompressed_sha256": "bcd132048f2c492734905f1ebf6725364806101f9f5617304a4abb8a73c6ef4f",
+      "uncompressed_bytes": 2868
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/matching/vm/prepared.json.gz",
+      "sha256": "a0995c8a17684e7f020a202242c7a8d01b48dfd9861c2dbc5f34ed9300cecba2",
+      "bytes": 745,
+      "uncompressed_sha256": "492283235d67921eaa020f9dd9db288ae8743a198b5be60d6637794c136aa4cf",
+      "uncompressed_bytes": 2864
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/matching/vm/qemu.log.gz",
+      "sha256": "628b2eb93033738d9db5a409a8022efe0eac1ce54558f48b124674c5ea5e19e0",
+      "bytes": 173,
+      "uncompressed_sha256": "70b4e9900232026b72ac4ce575c5684bbf3bddc6e7230fe26d4bbe84b876d568",
+      "uncompressed_bytes": 189
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/matching/vm/session.json.gz",
+      "sha256": "46c3a4d97e92ea47e1c125f7b77391407c214f9fc7443dffba3b8bf49e30c62d",
+      "bytes": 809,
+      "uncompressed_sha256": "ab0e6657702f6fff33121fd383de94d3af690a6e4013691ec9e3b60e754a1aac",
+      "uncompressed_bytes": 1603
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/matching/vm/uart.log.gz",
+      "sha256": "92d45babf757d3a3211de580cced1cbb281f02231c42202de550a0c6fce4da18",
+      "bytes": 1285,
+      "uncompressed_sha256": "21f65f40efd0f175c965d7447d829a1c247e719ec5cb7963c4b14e75a97588bd",
+      "uncompressed_bytes": 2859
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/raw-unknown-flags/vm/prepared.json.gz",
+      "sha256": "78b3ead4d396b886daf6448e582cc39ff76bce30335171bd743bb97bd8ac18d2",
+      "bytes": 745,
+      "uncompressed_sha256": "6496d8c529bf22e8febf8ef65c181f27c9e2a2b0a90e7edf3d5384bb835abff0",
+      "uncompressed_bytes": 2864
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/raw-unknown-flags/vm/qemu.log.gz",
+      "sha256": "628b2eb93033738d9db5a409a8022efe0eac1ce54558f48b124674c5ea5e19e0",
+      "bytes": 173,
+      "uncompressed_sha256": "70b4e9900232026b72ac4ce575c5684bbf3bddc6e7230fe26d4bbe84b876d568",
+      "uncompressed_bytes": 189
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/raw-unknown-flags/vm/session.json.gz",
+      "sha256": "9ef8a1860fc982c5bb089e3f0ab0f349f0989261aa84c537ae671a2084caee9a",
+      "bytes": 809,
+      "uncompressed_sha256": "2a2980ef1219ac05785d24f6069cdb436133d3ba43cac19f5b56d380d09093d3",
+      "uncompressed_bytes": 1604
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/raw-unknown-flags/vm/uart.log.gz",
+      "sha256": "a2207680d40dc60589406cdd790ae2bd7956aa22dfd463a2d707f18100511c75",
+      "bytes": 1226,
+      "uncompressed_sha256": "56f8e2e39a5410925ef019ccd49cd1790a55e895743e480f350ef52444e9a450",
+      "uncompressed_bytes": 2703
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/report.json.gz",
+      "sha256": "a36d338babe06fb6b57dba5f6ed55e8bc294b7c1056251fbeb401006441f5276",
+      "bytes": 2377,
+      "uncompressed_sha256": "57595059d93496c483a82fe796f07809254dd8c51ffc756da31eac433a94df31",
+      "uncompressed_bytes": 19671
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/unmarked/vm/prepared.json.gz",
+      "sha256": "afbb48428ed49fc4d674b11ce77006903e903182a55bece9d9c72fb8bbc52a5d",
+      "bytes": 742,
+      "uncompressed_sha256": "c9ecaaf0562e3b2e59dea76ab83cb361dfeb9f56af802d7851cdf8da63917d93",
+      "uncompressed_bytes": 2864
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/unmarked/vm/qemu.log.gz",
+      "sha256": "628b2eb93033738d9db5a409a8022efe0eac1ce54558f48b124674c5ea5e19e0",
+      "bytes": 173,
+      "uncompressed_sha256": "70b4e9900232026b72ac4ce575c5684bbf3bddc6e7230fe26d4bbe84b876d568",
+      "uncompressed_bytes": 189
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/unmarked/vm/session.json.gz",
+      "sha256": "ddb003cd89555796f571643dea7797d55da7e4fc1f17544655c48721f0ccedce",
+      "bytes": 810,
+      "uncompressed_sha256": "bb6b5a2f7973d88ba6d6bb98ef2abf4dea49763fb6e55de97fb971cdc7c38d22",
+      "uncompressed_bytes": 1604
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen/unmarked/vm/uart.log.gz",
+      "sha256": "fb88634a8354a058b56aed4e6cdeca0591763e7375ac7cc0cac52aedeaee9936",
+      "bytes": 1229,
+      "uncompressed_sha256": "c9f44f00ca9a6b24f5ae6c002da3749412895e1c72ab56a96a406fccf9e2cc9e",
+      "uncompressed_bytes": 2703
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/final-qemu-frozen.log.gz",
+      "sha256": "b40f92e756e494dd75b1162a96e866dca150d2a221865d0fdf9e80ecd0a9b846",
+      "bytes": 100,
+      "uncompressed_sha256": "83008cdec5d4c15524aa139482812dd9f06c35a68e882e3a90038c398f9da5f7",
+      "uncompressed_bytes": 85
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/h10-live-owners.json.gz",
+      "sha256": "408a124ad1ccbbba0a8f379bd70ebe98692d6e2fb845c09842971a82971cf24b",
+      "bytes": 224,
+      "uncompressed_sha256": "54936ccfc4493226445be4af51482f7f627783bf4dec5c53185cc806d40affcb",
+      "uncompressed_bytes": 730
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-build.log.gz",
+      "sha256": "283a9f0330827c00106939bb937a64c9390319a56fb157cfe7c7d1ab25874bd6",
+      "bytes": 1968,
+      "uncompressed_sha256": "253e418567e611d353fd1ff3c1460559b8630d9abdaabe4f62a1dd07046ab07e",
+      "uncompressed_bytes": 7352
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final/compile_commands.json.gz",
+      "sha256": "842ac706ad7b51df2ba5cc9b88bbbd39af3675c0467366ae662c0be5c25dce88",
+      "bytes": 76435,
+      "uncompressed_sha256": "8bd85739629fc18f0087fb63e52059e6af37b4687690899de76070e02240224e",
+      "uncompressed_bytes": 6980361
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final/resources/jpeg_layout.h.gz",
+      "sha256": "27b787fb54146daf122de2798575a4c05d495204e300b275e744aec3e5cd2fcc",
+      "bytes": 1850,
+      "uncompressed_sha256": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+      "uncompressed_bytes": 6623
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final/resources/plan.json.gz",
+      "sha256": "c611fe8711b76390edb41e1dc6d8be7f14471a14ae35d360e66245dc228f5d0e",
+      "bytes": 3369,
+      "uncompressed_sha256": "ca3c858138436c4e96e76149dd6674ee59971ca9ce68249ab119cbe7dd312357",
+      "uncompressed_bytes": 15886
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final/resources/probe_map.h.gz",
+      "sha256": "14f4ff2e9b4b96dea27e92e93dd2567040d683c97113df3b5150fac86eb18384",
+      "bytes": 207,
+      "uncompressed_sha256": "d5e305eb4d473ed78411cedf0c1e448d0bee6d571b4c838febbf6e7941fa8d4d",
+      "uncompressed_bytes": 303
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final/sdkconfig.defaults.gz",
+      "sha256": "b637fd2cdd7fb835496efbcfd4d50671263dec5683c3eec8e0a8915d8fbfd451",
+      "bytes": 398,
+      "uncompressed_sha256": "16db800b034c2c3104202a030b48d847d8587463eb8843e2c97b4d0629ed92bb",
+      "uncompressed_bytes": 865
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final/small_tv_storage_probe.elf.gz",
+      "sha256": "54b7fd02de405706dff24a8d0f3382d0d61a423d752f47f2ff560d24b5e549c1",
+      "bytes": 1058961,
+      "uncompressed_sha256": "f51b0e1cf25ae51ad1d5f761f5b5ad0674ad994c42839f037b2246c8fffc0790",
+      "uncompressed_bytes": 3295856
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final/small_tv_storage_probe.map.gz",
+      "sha256": "3c786bbed22ff1dd15daf2fd48a456cd16d21bc5597eee7873c612024ec8c992",
+      "bytes": 201458,
+      "uncompressed_sha256": "d860af3cfbb4a722c33bb2a09a3ca33e2e44e8bd95c7b7c637a2496af1b20b3e",
+      "uncompressed_bytes": 2708725
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/idf-final-build.log.gz",
+      "sha256": "5c758262400c3416cb49c5fb85ab8c37a3a591993d177f2951cbe97dba8c8998",
+      "bytes": 17974,
+      "uncompressed_sha256": "bd60937872115db32fc7ec6b06b61f3f815bd5f32bebc107f39802f7ff6734bc",
+      "uncompressed_bytes": 145042
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/bypass_guard/compile.cmd.gz",
+      "sha256": "c1be52c6e09e16d9c030176a4ee67e52c1e529cb3487142d8f757a4888fc5f24",
+      "bytes": 407,
+      "uncompressed_sha256": "379aa9d3a67e6df83d4c85a00571dc778cd20e76f4b2d23723a98164cbec397b",
+      "uncompressed_bytes": 1000
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/bypass_guard/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/bypass_guard/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/bypass_guard/mutant.c.gz",
+      "sha256": "61e41d5b79210e7392a2c921225bafb4e175f0a9e6ac45238de223a1bd035310",
+      "bytes": 3150,
+      "uncompressed_sha256": "d6f62c9de907bebdfed273ad953e1354c986cd4496d240e6ba1a8b10df2a7347",
+      "uncompressed_bytes": 11251
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/bypass_guard/mutant.exe.gz",
+      "sha256": "8328e3267571ac9916403096877e2a074094c6974309015fe64da91b28e9cb60",
+      "bytes": 93498,
+      "uncompressed_sha256": "0d187ee7cb26281807ee4aca562e8a33c61d579f492a04e678985d81a31fbf3b",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/bypass_guard/run.log.gz",
+      "sha256": "260b8dffa179a08a1ce3c079db3caf1c22bb0c5abc8a3913577d5ed4b0f22268",
+      "bytes": 168,
+      "uncompressed_sha256": "458f79638f3aa97984527cb32cfd2d356179fd9a3245c50d9aafa19a7cbaae4f",
+      "uncompressed_bytes": 173
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_call_limit/compile.cmd.gz",
+      "sha256": "42d31a5c8b3e1b4f893121f12bb004d7e1cb176ec3c013daaa4d148302743997",
+      "bytes": 410,
+      "uncompressed_sha256": "d962f9aa677d6c997256576270df2ac0e143ce37460ae8364aacb47d3680a571",
+      "uncompressed_bytes": 1015
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_call_limit/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_call_limit/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_call_limit/mutant.c.gz",
+      "sha256": "6aca47b0c54d1e4a2b135e3f665ff278f7248cfea3dfc2393f5a01ac4511a92f",
+      "bytes": 3152,
+      "uncompressed_sha256": "d6f7cc71bcf355c089fd88ac75fd986cc65946d3da3c31b3a6cd546d21479282",
+      "uncompressed_bytes": 11242
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_call_limit/mutant.exe.gz",
+      "sha256": "5de1e3bbe3022f79b94c35073cf6c7f7745acd94312554737be006254565c074",
+      "bytes": 93490,
+      "uncompressed_sha256": "8fc317934e565b69be1b08dcf3f01e6dd6573c5adb8ea04d9c94cda4a1021024",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_call_limit/run.log.gz",
+      "sha256": "8ad001027860ddc4bcea69539f25b8f09902f308202eeeaf2ad2aea2cbb151e4",
+      "bytes": 182,
+      "uncompressed_sha256": "3f596b5cad66e593dd7a0097e055f60d4eb96192b45661253c0e8f3a8f757c88",
+      "uncompressed_bytes": 185
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_epoch/compile.cmd.gz",
+      "sha256": "f0f87eb6609202e9f45dcf232092ecb8a70fd465c7b49f6ab091783339e1a7f5",
+      "bytes": 407,
+      "uncompressed_sha256": "9f074c7f4d9782df2292ef507ad7c7b218ebc06c6ccd0d73d527187be7954db5",
+      "uncompressed_bytes": 1000
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_epoch/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_epoch/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_epoch/mutant.c.gz",
+      "sha256": "7ec79a440268a6407d58e38c1f299e5708f927ecf85f0d844b125c61b1695b81",
+      "bytes": 3150,
+      "uncompressed_sha256": "b7f64d9214fbf50cd742d394bfbcfd4bea0e1aae1992e81c4e44cc7225a5efbf",
+      "uncompressed_bytes": 11252
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_epoch/mutant.exe.gz",
+      "sha256": "81956ba7461b90be27f9b7878230f8b2fd194891640b703bf8e378b743ff9e3f",
+      "bytes": 93487,
+      "uncompressed_sha256": "936bd5bbd4b93a6ad03a0e1d5890d365116b96f82a36bf9a72b5a98ac1714e71",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_epoch/run.log.gz",
+      "sha256": "cb74c6f5dc273f296819e565dc1598b4a5eeda9df971382ee533bacff463e730",
+      "bytes": 186,
+      "uncompressed_sha256": "6783f2b95f13c53f0f593298050adab4ab3f6b1f9b35a779f319cd2288e92943",
+      "uncompressed_bytes": 191
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_erase_limit/compile.cmd.gz",
+      "sha256": "fd72af4240a3d6b85858c42d3cf76bb575363f460420bc03428fe11c17198a38",
+      "bytes": 411,
+      "uncompressed_sha256": "3893be2c4bb6356fa184dce62395bf4d5d46bc4411f64b251c7e2feb9325ba4e",
+      "uncompressed_bytes": 1018
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_erase_limit/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_erase_limit/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_erase_limit/mutant.c.gz",
+      "sha256": "097f2c4da79fcf6a05ea4154aec5394f968c39e031fd8eb9e1ce906c3fc3ec1a",
+      "bytes": 3150,
+      "uncompressed_sha256": "443842c3156fed2666bcf9b6121bbf79a6b20158c5461a5e0821b96859aace19",
+      "uncompressed_bytes": 11210
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_erase_limit/mutant.exe.gz",
+      "sha256": "03c8fda48f016681ea9ddf4fd58acba4fa65bce8c95f542100606598592f5dc5",
+      "bytes": 93474,
+      "uncompressed_sha256": "e8f2db2ac5ac331f39b276d05dbe9e51751ecfbe2d520ad2838a28704a9a788d",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_erase_limit/run.log.gz",
+      "sha256": "30ea3884dcd31bd23b913aefdc539d42963f65c2858e3d477781127fd8eb7433",
+      "bytes": 191,
+      "uncompressed_sha256": "d8433c03e53d1b4b2712249040f7eb74c1dcbb86de03a4e2918093b384f95bfa",
+      "uncompressed_bytes": 205
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_final_guard_deadline/compile.cmd.gz",
+      "sha256": "318adbb90578ac60acba018f96d8efa0eb4322f563e93afb2f3d4d7c95eb7a04",
+      "bytes": 415,
+      "uncompressed_sha256": "2dc265cfdd11ea68065b01b4c4452b704f5e94e6f783400d0aa6fb1d6755061e",
+      "uncompressed_bytes": 1045
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_final_guard_deadline/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_final_guard_deadline/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_final_guard_deadline/mutant.c.gz",
+      "sha256": "7c2f318cd6d6557da36843f80ff64501458389fda031bfcf610166702bc21d0c",
+      "bytes": 3158,
+      "uncompressed_sha256": "c347481d9966bacd3a13c3304779fea4dfb2c16442cedf9af88c783942369457",
+      "uncompressed_bytes": 11274
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_final_guard_deadline/mutant.exe.gz",
+      "sha256": "953c87e79f967c068476d1c558d1a8adeadd30d47054e7322c6b13c24fae5a48",
+      "bytes": 93472,
+      "uncompressed_sha256": "0c0c1170579b670b9807bc78cfb875f6e73244e0fc7c4de882008b1129c4caa6",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_final_guard_deadline/run.log.gz",
+      "sha256": "c0df02a98777ef904f098a6165a3b43f442d2822dbbc6df2349e2282348c7a10",
+      "bytes": 171,
+      "uncompressed_sha256": "d7182a95a6ec12303f6742414de9d02eb86b997ade89ab3ab9ca562b823e0772",
+      "uncompressed_bytes": 175
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_io_error/compile.cmd.gz",
+      "sha256": "8217d77a2b6c41ba6401287c791ce73323c95c2fccd251a250ed33f86e1a9934",
+      "bytes": 408,
+      "uncompressed_sha256": "8627877ac982e7b7dec54eee8b745bb870f436c2bc6b196c345c2baae44ef621",
+      "uncompressed_bytes": 1009
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_io_error/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_io_error/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_io_error/mutant.c.gz",
+      "sha256": "253d05b5982ef1fb954d6b20fc4dc67d07178cb157c8b2a7820017a6521730e8",
+      "bytes": 3155,
+      "uncompressed_sha256": "e2a4cf50dc3a570cf85a2c1075e30219e06ab2dfd67d8d5b184522c138c16717",
+      "uncompressed_bytes": 11265
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_io_error/mutant.exe.gz",
+      "sha256": "a5ef76a1cdb1ef95ed37c117d8d2bb927b27241273eb0b562c953dc4082fe91c",
+      "bytes": 93433,
+      "uncompressed_sha256": "079e8df70229c02f8dbaabfed7d7f9c40ac42d3303c03daff3463799f1a883cf",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_io_error/run.log.gz",
+      "sha256": "4171ceff23402251689b93c861712a833bf6a67dd3fae47442c83dbfd10eea1c",
+      "bytes": 203,
+      "uncompressed_sha256": "4fb8d4577b4162d7e78227ea9a622279b675c2e6f14f211a367e3d5c4f09eff4",
+      "uncompressed_bytes": 206
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_port_bounds/compile.cmd.gz",
+      "sha256": "637d6be0c44edb637913cf6f74a38fbcbe743452d15854264e1ef2013a2a8f3a",
+      "bytes": 411,
+      "uncompressed_sha256": "5c39f9676a75e8a7be33ef072ec55e05ffaadc603fd5bf7b78498f6418adaf55",
+      "uncompressed_bytes": 1018
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_port_bounds/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_port_bounds/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_port_bounds/mutant.c.gz",
+      "sha256": "98c6b6c5e55e4ed7554d3b412004c1724692c24c4349abad4476db4115a6f1e6",
+      "bytes": 3143,
+      "uncompressed_sha256": "8505e0db41d4b8c7a0b315b813d79ecfa97d492bdff5fce6d5a8233ea9feacca",
+      "uncompressed_bytes": 11224
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_port_bounds/mutant.exe.gz",
+      "sha256": "0bb30ea392d70ea8503b35527e465fc035b2398fe090582795e1386ecd9bf737",
+      "bytes": 93343,
+      "uncompressed_sha256": "1eb66a80ddd1826802c2753690b9d6d360ca0469b1ebcf74ef70a944d4972aa1",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_port_bounds/run.log.gz",
+      "sha256": "4cb5a16d4b9e32cadb4aa0a9feaf7fd5d137a2f9c7b1794ee0a45ade1c9a24f9",
+      "bytes": 205,
+      "uncompressed_sha256": "5a00f4105b44c8fc44f2a92689154df2c20c6bfbf1faac80e1db0207e9f047ef",
+      "uncompressed_bytes": 216
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_post_deadline/compile.cmd.gz",
+      "sha256": "bf6dd6ddee892febd0dfc194c81b890e477ed6e296d9c55676b048f41b460b34",
+      "bytes": 412,
+      "uncompressed_sha256": "84bcc85f644aad5b2941cbf951db738245a90259aa5bd02f2980d02194fed2c6",
+      "uncompressed_bytes": 1024
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_post_deadline/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_post_deadline/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_post_deadline/mutant.c.gz",
+      "sha256": "8d905d553ec757b82f6a35f1129880ab32632f16a6816e33406a801d881ca9e4",
+      "bytes": 3147,
+      "uncompressed_sha256": "7768bc147b5f72845aa2f62aa574620420b77ee8d096610ebfc7c63a8fcb005d",
+      "uncompressed_bytes": 11182
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_post_deadline/mutant.exe.gz",
+      "sha256": "774f9c9a86566571bdba79a9bceaf277bc54be27f7814a1e7d856997d4cdf775",
+      "bytes": 93447,
+      "uncompressed_sha256": "04e1fe4cf9008b1fce8e0d31447bd5236498b9bbc86233d923e2bfa4fa2ae03c",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_post_deadline/run.log.gz",
+      "sha256": "269f6b9518b49a9865630363fd16f235788496e4cbf6cf4a31046daaf2a296df",
+      "bytes": 231,
+      "uncompressed_sha256": "7189496445a7ff5f26f85a01f326052f399a0694c2fe299ac83fe2eb21702053",
+      "uncompressed_bytes": 260
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_program_limit/compile.cmd.gz",
+      "sha256": "98105e3dc159f340dd63e2e8180aad4316cdcd09828ed7f10e34c5df323dd1be",
+      "bytes": 411,
+      "uncompressed_sha256": "0309a91c08b16a294aecacc7a82c9c4411b7ac05345df6b5804dc81d68101b37",
+      "uncompressed_bytes": 1024
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_program_limit/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_program_limit/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_program_limit/mutant.c.gz",
+      "sha256": "35eb6c3de1c80ac50eff94a5967fb890759dd679cfc5590b41fdafcc8a9addcc",
+      "bytes": 3151,
+      "uncompressed_sha256": "5eb7b1519fc60104e5474bc5a32916f9707d523157f4f69f22686357d1715567",
+      "uncompressed_bytes": 11201
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_program_limit/mutant.exe.gz",
+      "sha256": "bb667b98f40831fa432ca85a85e24c528fd5a059b5ad31b3a5dc92acd54f46fb",
+      "bytes": 93484,
+      "uncompressed_sha256": "6845001115c17717b0a62c561c05667d3ebc0b6eb7cf042c83e4c1bd092ffd54",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_program_limit/run.log.gz",
+      "sha256": "f1bb89feea7d081a98148e4bd8d079c32fc1ffbfa2791b0e453287de98f17e55",
+      "bytes": 202,
+      "uncompressed_sha256": "cbf58ad01794267503a7856098307a31b3bcc8fbcb9bbb0eda76cf81392b52ec",
+      "uncompressed_bytes": 213
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_read_limit/compile.cmd.gz",
+      "sha256": "9de53b267ea1304fa295c44a39dd8cc9459aebcf18e8030869713d945bb6dba4",
+      "bytes": 411,
+      "uncompressed_sha256": "3f560a4e9c654f966371145bbd67e64b314db5efd7d7a114713e40a17a74351d",
+      "uncompressed_bytes": 1015
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_read_limit/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_read_limit/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_read_limit/mutant.c.gz",
+      "sha256": "583b3408db2b3cac540a400f6d42c812aee909ceafbcd1165d7cb4e38a94d76a",
+      "bytes": 3155,
+      "uncompressed_sha256": "a7d4c744a2236da8fcd24087feef916c91de51298b6dd1204759d83b7a8bbc41",
+      "uncompressed_bytes": 11207
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_read_limit/mutant.exe.gz",
+      "sha256": "fefc32ef1219f8ccda953931ebfcb6e2ddd5ecda8e9078f6fcdd64d397c8f954",
+      "bytes": 93459,
+      "uncompressed_sha256": "de637cab388c805839380bb8d65c4b199b9245f5478a10cfd437ff9e931c59fc",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/ignore_read_limit/run.log.gz",
+      "sha256": "4d0b1c5119876f8e9a303f507c80ed61371ed2b6ba28a22daddc58eccbe1e85d",
+      "bytes": 198,
+      "uncompressed_sha256": "12866164e54f2f5ca0907076bf3c1399f31aef950f966ccbdc940cceb33d73c5",
+      "uncompressed_bytes": 211
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/report.json.gz",
+      "sha256": "9afd8465a138767dcedec714950ba0a4a4ebbdc140b8b1edbe772187f970d771",
+      "bytes": 2636,
+      "uncompressed_sha256": "ef3291c6b524d7a6aeb5eb75e156970243604f5b2673980a18ae1e19e8323ecc",
+      "uncompressed_bytes": 10449
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/reset_budget_per_port/compile.cmd.gz",
+      "sha256": "2e14fdae0bc31e90a3c17158e7c1e08e64de84aaa5d6d331b2e6b111bf2a3a75",
+      "bytes": 412,
+      "uncompressed_sha256": "f5111d1a8bddbff944147711d0b3810de175cdfd145dc742b46132fbff6d5996",
+      "uncompressed_bytes": 1027
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/reset_budget_per_port/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/reset_budget_per_port/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/reset_budget_per_port/mutant.c.gz",
+      "sha256": "b8efff26bf4e832f66cdba96af51004234d02dda4b92aa2e619f8af47d8d1624",
+      "bytes": 3160,
+      "uncompressed_sha256": "de633593c3b7e10d3b3cb773fad981f60ad2a3c3c99144b61d47eea7450f9495",
+      "uncompressed_bytes": 11310
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/reset_budget_per_port/mutant.exe.gz",
+      "sha256": "bca0955251133114cacda76169156c03508423140a335bb766f16a3d13b8e3c8",
+      "bytes": 93513,
+      "uncompressed_sha256": "c1d4905367772bd7bc82fac1aa13c8c3f6460940078c81efa749f7cc826cb47a",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/reset_budget_per_port/run.log.gz",
+      "sha256": "d92c2c692eea62aaedecaee05176a44c8520ec9211096c045565068cc855905a",
+      "bytes": 166,
+      "uncompressed_sha256": "c93fcf0bddd723bb0eb2458749d1710ba83e6e07696279da167ae3531911c2a4",
+      "uncompressed_bytes": 161
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/retain_revoked_authority/compile.cmd.gz",
+      "sha256": "14e105562148ba12c84292e161cdec95d859e699e57ca018b7021f2f575c7476",
+      "bytes": 415,
+      "uncompressed_sha256": "717581c497d4a4e8bc4beec65ff2bef9939be78cd8ed05fd3f1e15756b3c7a45",
+      "uncompressed_bytes": 1036
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/retain_revoked_authority/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/retain_revoked_authority/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/retain_revoked_authority/mutant.c.gz",
+      "sha256": "4cbc3c5d80ae8e83ca5cc2b1bfc029be7a944d4ec0e841898deb6d5a72e8d3fe",
+      "bytes": 3151,
+      "uncompressed_sha256": "170c6bd2d35f47551c3ef0bfe8410fe191a62178dc9f0f691bb99f7422c7b75a",
+      "uncompressed_bytes": 11248
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/retain_revoked_authority/mutant.exe.gz",
+      "sha256": "cdc91fac8657d1e93a537e09a2f4cd7ec477336e8394cf9350f5d901bf6a9fff",
+      "bytes": 93475,
+      "uncompressed_sha256": "8531d1cc1e2f61e94128d09a9b30795078a5461fc35d66dbd60b54aa51987fce",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/retain_revoked_authority/run.log.gz",
+      "sha256": "c0df02a98777ef904f098a6165a3b43f442d2822dbbc6df2349e2282348c7a10",
+      "bytes": 171,
+      "uncompressed_sha256": "d7182a95a6ec12303f6742414de9d02eb86b997ade89ab3ab9ca562b823e0772",
+      "uncompressed_bytes": 175
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/skip_cooperative_check/compile.cmd.gz",
+      "sha256": "1f6ec99be6b0c7b92c88f10e50b6cf1aa5114edc821956aa2c81e2e7dcf1998a",
+      "bytes": 413,
+      "uncompressed_sha256": "792b18aadfb50c38447e90f46caa6551b4894ed5761e7dd12f69e49a2eff3d72",
+      "uncompressed_bytes": 1030
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/skip_cooperative_check/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/skip_cooperative_check/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/skip_cooperative_check/mutant.c.gz",
+      "sha256": "8cf16f4891fc6936b1038bd70faac49caf12fa89c68be606c0173d190454be23",
+      "bytes": 3153,
+      "uncompressed_sha256": "4651d613e102014df48d0e58e6080d27dde2fc9bfddc31c2ebce6e7724075635",
+      "uncompressed_bytes": 11274
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/skip_cooperative_check/mutant.exe.gz",
+      "sha256": "281b7dced8b105e5eb3f7d7272e211216f2e4807a2b52576e95b3a1dc1fb5bf3",
+      "bytes": 93474,
+      "uncompressed_sha256": "0e82c9901731f2fa0dc000d2c4a5eb7e24c58ff519becbeacba0de9442d2ee28",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/skip_cooperative_check/run.log.gz",
+      "sha256": "4b05eef89f861d748c10e7b23b70d9a801e82285fba6e497cf09f1c774c651e2",
+      "bytes": 171,
+      "uncompressed_sha256": "fdff91ddf87f83dc97c987fc96851d7404f9e3b9f638c37aae4f45e985899408",
+      "uncompressed_bytes": 187
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/write_readonly/compile.cmd.gz",
+      "sha256": "50cef3968a75808194efe45ff5efdf7a3af8dc022a53d3b67dc187854acd3240",
+      "bytes": 409,
+      "uncompressed_sha256": "53ddd367d09fccdf6890a45cd99a579f58f88e3da18721d6fb40a26ce4d2a47a",
+      "uncompressed_bytes": 1006
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/write_readonly/compile.log.gz",
+      "sha256": "e27325a5994a310ab19de116b8c808e5c6d47fd9542483b1155f215ae03afe53",
+      "bytes": 83,
+      "uncompressed_sha256": "9e0ce70c43ffce1da28aaf2af1954108b0c8436371751c2dedb7984e1a1cc43e",
+      "uncompressed_bytes": 69
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/write_readonly/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/write_readonly/mutant.c.gz",
+      "sha256": "f65e7d3fe6882afef8e530a95094addef1a3c2415262d0c7d1a81eb5cbaba0d9",
+      "bytes": 3147,
+      "uncompressed_sha256": "6ffb64c4d3ef614b3cd0c5efffaaf70691ea41f107aaa22b6d24c8ca5fc4f225",
+      "uncompressed_bytes": 11238
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/write_readonly/mutant.exe.gz",
+      "sha256": "dadb487df6eb5ff9886f0fe884bcaeec6c4b5f20e4888730901357f471ccc88c",
+      "bytes": 93481,
+      "uncompressed_sha256": "f9326ac3947df25fcc1c84f25ac1158286a0edb57d70f173fd6c5c7ca14c8b31",
+      "uncompressed_bytes": 179200
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations/write_readonly/run.log.gz",
+      "sha256": "a86106104d9941797ce6d9b4d0ca88eb3b993de9ad133a8c4cc5fc18fa74cdaf",
+      "bytes": 180,
+      "uncompressed_sha256": "0321f0eed40425e64518b732934d44d7f5484645250070166667e370194c4894",
+      "uncompressed_bytes": 196
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/mutations.log.gz",
+      "sha256": "448d6be9fb09c3d0c004fefa69efd96c45830bbdb0e0c101720203aad5fc9507",
+      "bytes": 203,
+      "uncompressed_sha256": "04387f495bc84d4067e1fe5cc62e7f7fcc5577edd91ce73bda426ebed43b889d",
+      "uncompressed_bytes": 663
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/probe-v2/app.bin.gz",
+      "sha256": "ade101faa0642b83fb5f32f2898710cabc506e2db8bc58fdcbd6fb54b79808b0",
+      "bytes": 82768,
+      "uncompressed_sha256": "494ac7b08a426f70599960500f1e667a3444b0ad29e89ba41851c0c33dc398c0",
+      "uncompressed_bytes": 135504
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/probe-v2/app.elf.gz",
+      "sha256": "e2bda3be231ec5c6f67f0a04a7430bf0fcbcfac3a1810e43260090ddc4e98820",
+      "bytes": 1058984,
+      "uncompressed_sha256": "de88c2b7d50a23f878809ea755975e3e0b6a46d0dc8f77abfeb6f0805473d683",
+      "uncompressed_bytes": 3295856
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/probe-v2/manifest.json.gz",
+      "sha256": "5c11a5ffceb2b34c56e30348a661884a59d61bb1a6734ba45852775e736d0f6e",
+      "bytes": 1523,
+      "uncompressed_sha256": "3785567942236f431061e070eb3874105759702a7c0aee5f64e5d168348a7541",
+      "uncompressed_bytes": 3773
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/production-integrity.json.gz",
+      "sha256": "4bbdbe024a904a2b0c239a02104e9589c4caf4df7a3a512873b95ec70a49620c",
+      "bytes": 237,
+      "uncompressed_sha256": "76de3539cebffb27b0c5b8661525a92dcb8376ef307540c6fef1ea7a622dcae7",
+      "uncompressed_bytes": 341
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/production-integrity.log.gz",
+      "sha256": "5e8022bff18c0ccea3fd663f2b3bfe24633dbc427bddf22eb549dbc6f46e89b9",
+      "bytes": 231,
+      "uncompressed_sha256": "31572f6d37c6d370d972638df4761640141927a3d90fe5792abca9a75ab44039",
+      "uncompressed_bytes": 665
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/qemu/report.json.gz",
+      "sha256": "0774a84dfe01f203b425998110b22ac809691dff29acc1acb5038c5efad60add",
+      "bytes": 437,
+      "uncompressed_sha256": "063b8b42e2e51a515838b9a13ebe71a5e20b5838c3f581d13f04d73568a1f654",
+      "uncompressed_bytes": 663
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/qemu-before-firmware-fix.py.gz",
+      "sha256": "830c08bc82e1dcef6440a3bf73a58eb03f88f2c184c016ebb8a806bd6756f871",
+      "bytes": 3121,
+      "uncompressed_sha256": "399cf322e8a619c4d9c80d6a058b844ac0c29b79206f5078185f5de9b72aeb8e",
+      "uncompressed_bytes": 8640
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/qemu-before-offline-fix.py.gz",
+      "sha256": "63e2a1e4644892b2961fe0a95914537ce9a86903878eb261d949d401cc179595",
+      "bytes": 3117,
+      "uncompressed_sha256": "ed8d52283c198244886bb4e23e40b644b90dd2e00f2299f833568611858d8c10",
+      "uncompressed_bytes": 8637
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/qemu-v2/report.json.gz",
+      "sha256": "5b92867dbf52e001ac6ef6a1eb06a3acce205ba64632f75ddc17aa61797c16f2",
+      "bytes": 437,
+      "uncompressed_sha256": "af2a978b7adbdb510521b3ba06f379012b2cadea2c0f95735a7e6ed1ca59539b",
+      "uncompressed_bytes": 663
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/qemu-v2.log.gz",
+      "sha256": "91e41f8ec6da8cd0821736f1eadcdfca60ab544e57b66cbe066bca98fe1733f8",
+      "bytes": 444,
+      "uncompressed_sha256": "469d4eb5493cb67d0e89fe32eef708d0054806b06e6c315a56e65085b3a55cbe",
+      "uncompressed_bytes": 1354
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/qemu-v3/report.json.gz",
+      "sha256": "a5bb514f322d21c49e1f743ca5ffec437086ec6ebe7d0356a1be4ebc177600e9",
+      "bytes": 2385,
+      "uncompressed_sha256": "4e79a8be33bc2bd2e96c8d904348cb1093fa4a10233641f1302e1a2e855dc4d1",
+      "uncompressed_bytes": 19670
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/qemu.log.gz",
+      "sha256": "82c43c2cca4f5e285197a287d25c8281533a19c2df587695a97d1be1d3901e10",
+      "bytes": 438,
+      "uncompressed_sha256": "951842a345a1ba430721f96483072b82eb828130233b184c38e7cb7a0edca2f7",
+      "uncompressed_bytes": 1325
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_espidf.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "bytes": 20,
+      "uncompressed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressed_bytes": 0
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_espidf.o.gz",
+      "sha256": "9df5cbe01a03085c2111811bb9e94efc32c094b85f3acf92e731448fdb606d5c",
+      "bytes": 24617,
+      "uncompressed_sha256": "8cf7019a517188905265a2e4dfa8dfb05b2eec28b0f1b4ba446d5d85d9da1c1a",
+      "uncompressed_bytes": 71516
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_espidf.su.gz",
+      "sha256": "ba11eae0231929a32cf4dec5f4c130fcc6eb8ff13d591b3430a4621989e7b6d5",
+      "bytes": 243,
+      "uncompressed_sha256": "621783ae2e8f78641ff8e47f241845233925fd808ee608962a9a9f9563b6651e",
+      "uncompressed_bytes": 1167
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_guard.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "bytes": 20,
+      "uncompressed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressed_bytes": 0
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_guard.o.gz",
+      "sha256": "91b0ae6873344a846f0a075c98c03d468be3d486e91f362900da0cfdbdafb1ea",
+      "bytes": 17139,
+      "uncompressed_sha256": "db05a71d7c4874ed38bb40ab958bbf712b8c86224dfe997f7ab9ed5dbe13be5a",
+      "uncompressed_bytes": 48132
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_guard.su.gz",
+      "sha256": "378923c642c2972f980ef020f00d648593a0b7811678d2667e34c492807d6f8a",
+      "bytes": 177,
+      "uncompressed_sha256": "df57cdcd6d5ad3b5b56df849dfaac1f6cc2483d401227da7f1bea0b1d0098e45",
+      "uncompressed_bytes": 469
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_nor.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "bytes": 20,
+      "uncompressed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressed_bytes": 0
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_nor.o.gz",
+      "sha256": "39334f6c9fe59323b44691218d52504fae7f6ef3df68a767b231a7935c993244",
+      "bytes": 26891,
+      "uncompressed_sha256": "6a53dff12b5ea8f5e9efc5f1ecc975468431413e51c5a2f45fa56a40df703bfb",
+      "uncompressed_bytes": 80420
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_nor.su.gz",
+      "sha256": "2346687803819fae47fa8726ce49006cbae4481306d38ddec4f943d6380b49c5",
+      "bytes": 245,
+      "uncompressed_sha256": "a3b6e6052d7977fa1eaa3f5680667104557a63e2d869da66b9c5c59431635e0d",
+      "uncompressed_bytes": 1148
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_transport.log.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "bytes": 20,
+      "uncompressed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressed_bytes": 0
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_transport.o.gz",
+      "sha256": "3b35a20ba4337514853808862e81f8f020979e5903d7ca6ab4ae9050830884c9",
+      "bytes": 33092,
+      "uncompressed_sha256": "8ef32f3abed0a3ac09d726264b6c5c6213fdcbc6f3c6a0f2fb9dbc130ebb6a51",
+      "uncompressed_bytes": 103136
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/jpeg_transport.su.gz",
+      "sha256": "bdccd318681d8bf1c619419022601f371516cc2f7c8caff901438602f435d59e",
+      "bytes": 316,
+      "uncompressed_sha256": "7b2a687b8fdd768fc189cb3f7fdf0933603babe9df499e681ae578b03131c153",
+      "uncompressed_bytes": 2178
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/rv32-final/report.json.gz",
+      "sha256": "78db53542d3816a28e249629fd04824a4239a9b5c73886180ccbdfcb5c361b07",
+      "bytes": 2809,
+      "uncompressed_sha256": "c292749dfc809815184e4dba6364738a802e87f4cee71cc698d5133739c30b1d",
+      "uncompressed_bytes": 45787
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/sdk-provenance.json.gz",
+      "sha256": "2b5b5b263d2281808f1fa72ea1fb8f779c24a40f6785ca1c4b6fe89f78a0f414",
+      "bytes": 508,
+      "uncompressed_sha256": "795777a8f04cf3b789e68270bf49fad263e71983cf5be86fb21dd3555570fd67",
+      "uncompressed_bytes": 936
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/measure_transport.py.gz",
+      "sha256": "9a0a0f9c92439c381578b06678a4482641a27429c933e7386e9d23a245855413",
+      "bytes": 1358,
+      "uncompressed_sha256": "9fd3f56defaeedc8e9c6fd8e754cff4c39830b9da2fea863db8c3f8e98195b80",
+      "uncompressed_bytes": 2903
+    },
+    {
+      "file": "raw/jpeg-transport-20261020/record_evidence.py.gz",
+      "sha256": "ea7cd12dc6ce3fed117595f86896f99cc5adaa4e582b6a2383e71611d52bb846",
+      "bytes": 3465,
+      "uncompressed_sha256": "7ca262f41021348f2021834d0794e956b055a8de449aa68faccaa913156e1076",
+      "uncompressed_bytes": 9618
+    }
+  ]
+}

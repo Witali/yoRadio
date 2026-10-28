@@ -8,6 +8,9 @@ typedef struct {
     unsigned stores_opened, stores_closed;
     unsigned long long backing_capacity, bytes_read, bytes_written;
     int allow_backing;
+    unsigned long long nor_calls,nor_read_bytes,nor_program_bytes,nor_erases,nor_fault_hits;
+    unsigned scratch_peak_files,scratch_error;
+    size_t scratch_peak_bytes;
 } probe_memory_stats;
 
 void probe_memory_reset(size_t limit_bytes, int allow_backing);

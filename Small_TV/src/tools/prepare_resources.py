@@ -208,6 +208,7 @@ def generate_pages(output: Path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument('--jpeg-library-build',type=Path)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     pack_assets(args.output)
@@ -216,12 +217,40 @@ def main():
     generate_factory_bitmaps(args.output)
     generate_pages(args.output)
     generate_timezones(args.output)
+    library=args.jpeg_library_build
+    selection=args.output.parent/'jpeg-library/selection.json'
+    if library is None and selection.exists():
+        library=Path(json.loads(selection.read_text())['build_directory'])
+    jpeg_generated=[]
+    if library is not None:
+        from jpeg_cache_layout import prepare_cache
+        metadata=library/'report.json';archive=library/'library/libjpeg.a'
+        if not metadata.exists():metadata=library/'build.json';archive=library/'library/jpeg-static.lib'
+        record=json.loads(metadata.read_text())
+        if hashlib.sha256(archive.read_bytes()).hexdigest()!=record['library_sha256']:
+            raise ValueError('JPEG archive differs from its build record')
+        guard,cache,plan,prepared,prepared_manifest=prepare_cache(
+            (args.output/'assets.bin').read_bytes(),json.loads((args.output/'assets-manifest.json').read_text()),
+            (ROOT/'app/include/board.h').read_text(),(ROOT/'partitions.csv').read_text(),record)
+        (args.output/'assets.bin').write_bytes(prepared)
+        (args.output/'assets-manifest.json').write_text(json.dumps(prepared_manifest,indent=2)+'\n',encoding='utf-8',newline='\n')
+        for name,data in [('jpeg_layout.h',guard),('jpeg_cache_layout.h',cache),
+                          ('jpeg-cache-plan.json',json.dumps(plan,indent=2)+'\n')]:
+            (args.output/name).write_text(data,encoding='utf-8',newline='\n');jpeg_generated.append(name)
+        (args.output/'jpeg-library-build.json').write_bytes(metadata.read_bytes())
+        jpeg_generated.append('jpeg-library-build.json')
     compiled = sorted((ROOT / "app").rglob("*.c")) + sorted((ROOT / "app").rglob("*.h"))
     compiled += sorted((ROOT / "third_party").rglob("*.c")) + sorted((ROOT / "third_party").rglob("*.h"))
+    for directory in ('codec', 'storage'):
+        compiled += sorted((ROOT / directory).glob('*.c')) + sorted((ROOT / directory).glob('*.h'))
+    # Include the offline dependency and adapters even while the UI still uses
+    # TJpgd. Their separate build report records the actual target archive.
+    compiled += sorted(p for p in (ROOT / 'third_party/libjpeg-turbo').rglob('*') if p.is_file())
+    compiled += [ROOT / 'tools/build_jpeg_library.py', ROOT / 'tools/prepare_resources.py', ROOT / 'build.ps1']
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     compiled += [ROOT / "cmake/debug_logging.cmake"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]
-    for name in ("web_pages.c", "font6x12.h", "unicode_bitmaps.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h", "timezone_data.h"):
+    for name in ["web_pages.c", "font6x12.h", "unicode_bitmaps.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h", "timezone_data.h",*jpeg_generated]:
         records.append({"file":"generated/"+name,"sha256":hashlib.sha256((args.output/name).read_bytes()).hexdigest()})
     canonical = json.dumps(records, separators=(",",":"),sort_keys=True).encode("utf-8")
     (args.output/"source-manifest.json").write_text(json.dumps({"aggregate_sha256":hashlib.sha256(canonical).hexdigest(),"files":records},indent=2)+"\n",encoding="utf-8",newline="\n")

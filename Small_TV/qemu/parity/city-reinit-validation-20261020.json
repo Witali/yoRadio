@@ -1,0 +1,712 @@
+{
+  "schema": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "CITY-REINIT native/real HTTP/all-theme coordinator, active photo fade literal pixels, separate captive network and cold LCD gates. Not full/24h/RF/physical acceptance.",
+  "app_sha256": "3e030c1cc5f7b456fefc9985c397daf8340c33d1bb2805965b076147a07cd7e1",
+  "native_elf_sha256": "54293e9741134adca6bcb71e814498d692c048dfeba648d63b0e0ad5529667c4",
+  "source_sha256": "ebc0fb059639612e3181654dd1c9aa0d29bbe5ac485619c90b3f43284d8f9b2f",
+  "app_bytes": 1170432,
+  "app_partition_free_bytes": 365568,
+  "jpeg_decoder": "TJpgd; prepared libjpeg remains unlinked",
+  "native_checks": 5806,
+  "inventory_controls": 10,
+  "artifact_cases": 6,
+  "city_theme_qemu": {
+    "themes": 4,
+    "http_commands": 8,
+    "inputs_unchanged": true
+  },
+  "photo_city": {
+    "factory_blank_bug_observed": true,
+    "native_different_pixels": 0,
+    "compared_pixels": 57600
+  },
+  "legacy_photo_theme": {
+    "passed": true,
+    "native_different_pixels": 0,
+    "compared_pixels": 57600
+  },
+  "network": {
+    "executed": true,
+    "http_cases": 15,
+    "display_executed": false
+  },
+  "display": {
+    "executed": true,
+    "cold_processes": 4,
+    "exact_factory_setup_frame": true,
+    "network_executed": false
+  },
+  "successful_vm_flows": 15,
+  "owned_vm_cleanup": "All successful and failed test owners executed vm.ensure_stopped; only disposable flash was writable.",
+  "negative_control": "New city revision assertion failed on pre-fix 51cd114f9 source. Initial harness failures (boot mapping, first fade phase, missing explicit dependency root) are retained separately; none count as passes.",
+  "test_inputs": {
+    "Small_TV/src/tests/city_theme.inc": "e6e50301f0a6791052a9862db851f6472b8354ae0f5c981a71e238a076ed3a0a",
+    "Small_TV/src/tests/native_test.c": "766f54fd3d3b0e76bc24eabcc8b179ef98785f81b086d8ceb61a21d5feec413e",
+    "Small_TV/src/tests/city_theme_qemu.py": "3a47f53a3b77789a1cd8d08810e580d35f9d6cb6f4bd060e72385bd0f49f09ee",
+    "Small_TV/src/tests/photo_reinit_qemu.py": "496ecae7668e603e534005697bafbb50163a0c245b78f31255351e12aaa53a22",
+    "Small_TV/src/tests/photo_frame_replay.py": "7c9b4712aa0c097e7c86620254b8f91a0e4c57984fe7ea90f59cbb1f9805a63c",
+    "Small_TV/src/tests/correspondence_test.py": "e15e38a6ebfea95c10c9d376016d2112b0c619cda2e6a86213b483a9aafb3212"
+  },
+  "raw": [
+    {
+      "file": "raw/city-reinit-20261020/artifact.json.gz",
+      "sha256": "4bbdbe024a904a2b0c239a02104e9589c4caf4df7a3a512873b95ec70a49620c",
+      "bytes": 237,
+      "uncompressed_sha256": "76de3539cebffb27b0c5b8661525a92dcb8376ef307540c6fef1ea7a622dcae7",
+      "uncompressed_bytes": 341
+    },
+    {
+      "file": "raw/city-reinit-20261020/artifact.log.gz",
+      "sha256": "39ee805755cdcbd57ed3ad0c413e3decf87576139d16d49f6a8b60b1887134f2",
+      "bytes": 230,
+      "uncompressed_sha256": "373317be29161344dc1ce52c3f158fa65b67f6023f0031e65951b958d226b222",
+      "uncompressed_bytes": 665
+    },
+    {
+      "file": "raw/city-reinit-20261020/build.log.gz",
+      "sha256": "522eea0cdf21b830144bda8354c57c4f23dc87f8010f9feb4024beabf1d9c92d",
+      "bytes": 18198,
+      "uncompressed_sha256": "4041cf1963e2691f6270cda29dd9e02caf25592734f56379eb27cd4a263380d9",
+      "uncompressed_bytes": 146532
+    },
+    {
+      "file": "raw/city-reinit-20261020/display/original/cycle-01/display.ppm.gz",
+      "sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "bytes": 2207,
+      "uncompressed_sha256": "20526d0072aa9096a5400e7e724d207ed60b081a249afba25878835dbf71b22e",
+      "uncompressed_bytes": 172815
+    },
+    {
+      "file": "raw/city-reinit-20261020/display/original/cycle-02/display.ppm.gz",
+      "sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "bytes": 2207,
+      "uncompressed_sha256": "20526d0072aa9096a5400e7e724d207ed60b081a249afba25878835dbf71b22e",
+      "uncompressed_bytes": 172815
+    },
+    {
+      "file": "raw/city-reinit-20261020/display/original/uart.log.gz",
+      "sha256": "dc526a11334241ae04cc6f0f610f804124958a32c365f18b4b2c4a9547bddd85",
+      "bytes": 765,
+      "uncompressed_sha256": "58fdb1590e6a620b8b155183fe5f587141fcc9742f47332e1178a4a4e3a54ce0",
+      "uncompressed_bytes": 1612
+    },
+    {
+      "file": "raw/city-reinit-20261020/display/reconstructed/cycle-01/display.ppm.gz",
+      "sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "bytes": 2207,
+      "uncompressed_sha256": "20526d0072aa9096a5400e7e724d207ed60b081a249afba25878835dbf71b22e",
+      "uncompressed_bytes": 172815
+    },
+    {
+      "file": "raw/city-reinit-20261020/display/reconstructed/cycle-02/display.ppm.gz",
+      "sha256": "aaaf6bbb3f48085a2fe9aafdae8ea989614604ede6edf1d9be9cc90af6911dfb",
+      "bytes": 2207,
+      "uncompressed_sha256": "20526d0072aa9096a5400e7e724d207ed60b081a249afba25878835dbf71b22e",
+      "uncompressed_bytes": 172815
+    },
+    {
+      "file": "raw/city-reinit-20261020/display/reconstructed/uart.log.gz",
+      "sha256": "aa6e9bdc91da00e805ec91b1d0ecfc200551207e1c89ccb12a9341549121daef",
+      "bytes": 254,
+      "uncompressed_sha256": "90071a8da12c626227f013f6824eda9c40f696392ead783b5f8e8c772efbea18",
+      "uncompressed_bytes": 319
+    },
+    {
+      "file": "raw/city-reinit-20261020/display/report.json.gz",
+      "sha256": "cf522d2fec1c36429c22369a524d8e406d4f7d16b19841ef4dff542971ecd4e1",
+      "bytes": 7264,
+      "uncompressed_sha256": "4dc810d2b158be4b0ab2bc8fb3e61ea76eab3e44b3fe36b4266fd461104b650f",
+      "uncompressed_bytes": 71654
+    },
+    {
+      "file": "raw/city-reinit-20261020/display.log.gz",
+      "sha256": "d3ba1b4c4e27f90769870ea1b0148f0d6111a8ea732d5ecd5dd7f6e63ff0eef9",
+      "bytes": 86,
+      "uncompressed_sha256": "7d7c3900baebcf8ca187bbdb4c9fa86873c179a7fcad7bca5ff9abe46fbb4381",
+      "uncompressed_bytes": 206
+    },
+    {
+      "file": "raw/city-reinit-20261020/native-after-v2.log.gz",
+      "sha256": "678d2c930fff6f27b895f23993a03219ec687a6edb8725650285a2a6980e5963",
+      "bytes": 656,
+      "uncompressed_sha256": "aee79f54f1a095be5f5c28b294124ef1c27848a4c17a8752266990ad029df912",
+      "uncompressed_bytes": 1506
+    },
+    {
+      "file": "raw/city-reinit-20261020/native-after.log.gz",
+      "sha256": "04f903e09aaea268a807becbf3fbdf4085d22c14de07784f4c8f09f63ed05388",
+      "bytes": 460,
+      "uncompressed_sha256": "745f5cfae7edcf6ab6ce093180f406c43750d9751748252b9ee3d7404530a75d",
+      "uncompressed_bytes": 1004
+    },
+    {
+      "file": "raw/city-reinit-20261020/native-before.log.gz",
+      "sha256": "7bc012b7fc99357a42e47fbf0a73292fd98303c2a487a3ec1a29198ac889ef92",
+      "bytes": 722,
+      "uncompressed_sha256": "a58a8b7b77914e3392cf0304a41c4aa8bcd1f0fad00027365554d0a4912d92db",
+      "uncompressed_bytes": 1803
+    },
+    {
+      "file": "raw/city-reinit-20261020/network/original-setup/uart.log.gz",
+      "sha256": "f8fe984a81c7fcf5798942c1f557945f6c7c632e5b4c7bdf5e3a682ce0e08cf8",
+      "bytes": 916,
+      "uncompressed_sha256": "ada7ad08e38ef036f068eb417a01615d046068a654a10a5b55ac4feecf90c4ba",
+      "uncompressed_bytes": 2176
+    },
+    {
+      "file": "raw/city-reinit-20261020/network/reconstructed-clock/uart.log.gz",
+      "sha256": "2cbf2e8e971ee74044ebe634ef7e96bdc29c1e765453bca0847c47dbc702e95d",
+      "bytes": 454,
+      "uncompressed_sha256": "4b260a9d23c30b1ad72a2f9bdbe45e2720e75edf52c49adf389f95da6a54499b",
+      "uncompressed_bytes": 907
+    },
+    {
+      "file": "raw/city-reinit-20261020/network/reconstructed-setup/uart.log.gz",
+      "sha256": "208f4d71aa8c2634aaa3e4b7a1e67f99e51f41a8f11aaab09a17fefa402efc38",
+      "bytes": 369,
+      "uncompressed_sha256": "a0de1d185b997e328a74cbc5d9d5376bfea6384c4c80f50b5954bdd2e9c74e21",
+      "uncompressed_bytes": 767
+    },
+    {
+      "file": "raw/city-reinit-20261020/network/report.json.gz",
+      "sha256": "5f25970b1b44100b3f2737e09590090c16908f10873bd361de1e6f8100cdbe18",
+      "bytes": 4827,
+      "uncompressed_sha256": "e9d6cf8b28ce3ed58e324e951d3933bd79d270343b85777a64a152be614e3a32",
+      "uncompressed_bytes": 23776
+    },
+    {
+      "file": "raw/city-reinit-20261020/network.log.gz",
+      "sha256": "7d3d3da5c4008655b3419cfc57d6a52eb132339f97ed5f7fc613df960e445ae3",
+      "bytes": 83,
+      "uncompressed_sha256": "60c9aa9c0d574d2fdbad406f45c97487b5a374dc07b4cb8e727e536ad8b690c9",
+      "uncompressed_bytes": 124
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city/original/photo-reinit-report.json.gz",
+      "sha256": "4e46957e9d5ca31cab7f245e89c756032e8eea3ddadd2f45cc488738ed380e50",
+      "bytes": 236,
+      "uncompressed_sha256": "fa8fcee548c72cb2a7c343a55c6ace3f1e2072ed09718554b89d7c64c0091a3b",
+      "uncompressed_bytes": 334
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city/original/uart.log.gz",
+      "sha256": "0a9d7aab83911ef17a1d3667b4765399dd50ab39ff6d14bcc392525124369e2d",
+      "bytes": 805,
+      "uncompressed_sha256": "d1a57163093feca484217cea9dada6c171f5ea591284cc0dae858c58f7646340",
+      "uncompressed_bytes": 1692
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city/report.json.gz",
+      "sha256": "2331b38e5749783f61c7ca7c9f7e7cac3e28529f9cac587ea49a72c2d2cb313a",
+      "bytes": 1693,
+      "uncompressed_sha256": "92ce29eb087a4ec705441adb657e15f0afde3f3292d42375a627a3f303d0607b",
+      "uncompressed_bytes": 4058
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2/original/after-active-command.png.gz",
+      "sha256": "b8d34d81acffe1b82f51db714fd11419562dfdc5266fa3ff821f479f5430f4e9",
+      "bytes": 96,
+      "uncompressed_sha256": "f62a295859bf626dee9be3dd853873a1ee13a36c591af2bbab4381c8629c7fda",
+      "uncompressed_bytes": 248
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2/original/photo-reinit-report.json.gz",
+      "sha256": "4f92342edd17ca585e1b0b1210ea3d7e51d21db7318c44fbdd18b29a02c8820a",
+      "bytes": 646,
+      "uncompressed_sha256": "ca85792bda7b29889d0870f2aaa69d2facddbbe2189c2492ce0fe5056b8fd06b",
+      "uncompressed_bytes": 1269
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2/original/uart.log.gz",
+      "sha256": "8d6a7be7d48e18b640b80068d315c9e78fcd48a7859c9d703a6dedd7b0344b98",
+      "bytes": 805,
+      "uncompressed_sha256": "8184eb7e71f3d08d0c38d99f1928bb07fee26b90acfa7d01f133f2e8c58f391c",
+      "uncompressed_bytes": 1692
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2/reconstructed/after-active-command.png.gz",
+      "sha256": "3e5f5296ca54cb29ac9ab9075ddb0f7e6e5c756895fed652b26688ec5092b298",
+      "bytes": 87902,
+      "uncompressed_sha256": "f43af60cea0ca5f8df697083e9b98b8a9e8c14cd8819412323623d5e92d2bd38",
+      "uncompressed_bytes": 87854
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2/reconstructed/photo-reinit-report.json.gz",
+      "sha256": "68054e71389f75dab14092bf6bbfc1d00e445d6d18cce5337b1529d14e5feed2",
+      "bytes": 901,
+      "uncompressed_sha256": "f111a5f81bd309bb68bb106195f1c6920c781dc8d1948f270e67b2909cb1eca2",
+      "uncompressed_bytes": 2101
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2/reconstructed/uart.log.gz",
+      "sha256": "c6332152ba1a732df55a25cd28e9cc9bc9bd23ed7cded583fcb15f91d2b3c470",
+      "bytes": 259,
+      "uncompressed_sha256": "0ab54dab6ed2f60f29ee1e788e99f8363bd5be0937523ef615bc03e62bc4c2ca",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2/report.json.gz",
+      "sha256": "a4deea6734cf4c010f6970eec028916bdbecdaa9540ac7ff5854a28296f43c57",
+      "bytes": 2622,
+      "uncompressed_sha256": "aeb982f2b66a7134ebb8c2937019d11aa4eb5227a8daf1629835728d65ce5a93",
+      "uncompressed_bytes": 7973
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city-v2.log.gz",
+      "sha256": "798290388ded0170bc4933d9b85160789db5220c44f15a5544fa62861c3bdf31",
+      "bytes": 100,
+      "uncompressed_sha256": "9c053b1976795dcfed39877d7717ba88e3bf3ce5363ff22124d816d8430b7527",
+      "uncompressed_bytes": 113
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-city.log.gz",
+      "sha256": "2feea1c6047803c004e93c94fbaaa7ecbcc5e06e6ba1da8914f091fc0bdfbfd9",
+      "bytes": 624,
+      "uncompressed_sha256": "73d6a7bdd5357cb0693af7e30e3e0e886bdb54b78816ecaadcf09b27325f8334",
+      "uncompressed_bytes": 1874
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme/original/after-active-command.png.gz",
+      "sha256": "b8d34d81acffe1b82f51db714fd11419562dfdc5266fa3ff821f479f5430f4e9",
+      "bytes": 96,
+      "uncompressed_sha256": "f62a295859bf626dee9be3dd853873a1ee13a36c591af2bbab4381c8629c7fda",
+      "uncompressed_bytes": 248
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme/original/photo-reinit-report.json.gz",
+      "sha256": "ada81afa5d2b1ac567dfd368f1faf11e0f2c24312c1ce2752864c9fcf23acf78",
+      "bytes": 638,
+      "uncompressed_sha256": "8591bf4a8cea7ff3603ccb3f6ed26fcd07808fbc3badfcccd2917415b210b321",
+      "uncompressed_bytes": 1266
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme/original/uart.log.gz",
+      "sha256": "ff721daa58a7de01a5e4e7749743d3d3acaed378a7823d6d3730462281a7775d",
+      "bytes": 805,
+      "uncompressed_sha256": "18cb326e4b34debc35e29b7a96987ac7137a683dc63b6015bb52a4e638665b29",
+      "uncompressed_bytes": 1692
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme/reconstructed/after-active-command.png.gz",
+      "sha256": "3e5f5296ca54cb29ac9ab9075ddb0f7e6e5c756895fed652b26688ec5092b298",
+      "bytes": 87902,
+      "uncompressed_sha256": "f43af60cea0ca5f8df697083e9b98b8a9e8c14cd8819412323623d5e92d2bd38",
+      "uncompressed_bytes": 87854
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme/reconstructed/photo-reinit-report.json.gz",
+      "sha256": "75d74ee9adf847e91032b5b0c29b9bc9aafacadc3d32cfd629ff219b33c6a9aa",
+      "bytes": 890,
+      "uncompressed_sha256": "099862d344217de8cc8b27005fc12fa93394dcb9315f936c58e7dce92c6ea522",
+      "uncompressed_bytes": 2098
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme/reconstructed/uart.log.gz",
+      "sha256": "dc8e6b3840ae08477d792af3a8072c971101fcbd7a8fc7a28fd262215608e1ba",
+      "bytes": 259,
+      "uncompressed_sha256": "8f5d650c9240749d5d58a0552ceb2edf9b4ca2df0056a15e3728cdded5133333",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme/report.json.gz",
+      "sha256": "8800122b8b397f7614dd90f7d392301dc1c04c1281d92b02d949bec0c9a446d4",
+      "bytes": 2615,
+      "uncompressed_sha256": "06da9f2f0fb94aaf48a50bdf8741043a09a1ce14f3b513dd87480c407aaa747d",
+      "uncompressed_bytes": 7968
+    },
+    {
+      "file": "raw/city-reinit-20261020/photo-theme.log.gz",
+      "sha256": "0cc23d8b863463a6fd9edde5ec9422187da63258fa39a6c5e8a57402c0b4f3d2",
+      "bytes": 97,
+      "uncompressed_sha256": "2fce4bd6b69fcf2e212197819afc73dff0803cd2c44930b348c09a2ee81ff238",
+      "uncompressed_bytes": 113
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes/classic/city-theme-report.json.gz",
+      "sha256": "48e348ca69861b55a32d3c490be40a4c5f567b946c01f97d1981a685921d27a4",
+      "bytes": 499,
+      "uncompressed_sha256": "cc6d3daac3eabad46b8f570abac00a817164ce701b29ad5a88c835cd8ec90f2b",
+      "uncompressed_bytes": 1099
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes/classic/uart.log.gz",
+      "sha256": "dc8e6b3840ae08477d792af3a8072c971101fcbd7a8fc7a28fd262215608e1ba",
+      "bytes": 259,
+      "uncompressed_sha256": "8f5d650c9240749d5d58a0552ceb2edf9b4ca2df0056a15e3728cdded5133333",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes/report.json.gz",
+      "sha256": "8838db42a004ffd58c438dcbbf4a7f31fc3e7291a31cf96772ce75e45bda33e8",
+      "bytes": 8537,
+      "uncompressed_sha256": "d307dc8518f66ccc8274c1b08447fe536a31704002a20a9d5216bbeff02d86f7",
+      "uncompressed_bytes": 30170
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/classic/city-theme-report.json.gz",
+      "sha256": "a543003eef9d988fce554b67fe474ad708f775a057f467ebe14201e681b21632",
+      "bytes": 809,
+      "uncompressed_sha256": "b2a6b6bbb820b5ccf0eb38f3efe1f1d76c80d0c374b1d2d07b18b6611ad1ea6d",
+      "uncompressed_bytes": 2021
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/classic/new-city.png.gz",
+      "sha256": "72adc9bea39d84ea9ab9ff336d87ce72d73b4f85500c775cae7430f7a5df6a20",
+      "bytes": 6231,
+      "uncompressed_sha256": "7d9bc2ad21dbe45f3577ef41b1ed76868e29431f3f90c2a8bf90bccd5d542cb6",
+      "uncompressed_bytes": 6282
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/classic/same-city.png.gz",
+      "sha256": "d1f735d98f82a893aff5cefcf18245f4953f791586e1073b0d1abe8a3447384e",
+      "bytes": 7272,
+      "uncompressed_sha256": "2068100f38e7ee758840d55d962c8d9feaf42c0b72dc6413f8bfee0f90bf0a95",
+      "uncompressed_bytes": 7307
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/classic/uart.log.gz",
+      "sha256": "c6332152ba1a732df55a25cd28e9cc9bc9bd23ed7cded583fcb15f91d2b3c470",
+      "bytes": 259,
+      "uncompressed_sha256": "0ab54dab6ed2f60f29ee1e788e99f8363bd5be0937523ef615bc03e62bc4c2ca",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/dial/city-theme-report.json.gz",
+      "sha256": "b38c243439041ac44ef28655177d8badea54c44b18a94b5483ff29852cfe4897",
+      "bytes": 808,
+      "uncompressed_sha256": "372c7bb90266e3daaf3c1ea9851f3461ca2f78c58362d394449978a4476cf27d",
+      "uncompressed_bytes": 2009
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/dial/new-city.png.gz",
+      "sha256": "c5371c44ad6289c7e97b45e1fa57dd6fa60709dd3b086e6028cc4fe1c5f8f951",
+      "bytes": 1634,
+      "uncompressed_sha256": "6851754fb3a7571d5e8a39ef92fa0825940d64698920bd6f7682f8448900536e",
+      "uncompressed_bytes": 1614
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/dial/same-city.png.gz",
+      "sha256": "dabb119b3af7069398ad3cf668c3ea26a967d89c654cf9340a1e9cbf4be9561f",
+      "bytes": 1662,
+      "uncompressed_sha256": "9888ea81c0170052d7f08da1bda89cd68aa5007787c9b3141d5cda0a9644f79f",
+      "uncompressed_bytes": 1639
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/dial/uart.log.gz",
+      "sha256": "dc8e6b3840ae08477d792af3a8072c971101fcbd7a8fc7a28fd262215608e1ba",
+      "bytes": 259,
+      "uncompressed_sha256": "8f5d650c9240749d5d58a0552ceb2edf9b4ca2df0056a15e3728cdded5133333",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/photo/city-theme-report.json.gz",
+      "sha256": "8667afdb75740a2bff3e8bf6b7a999e9f6e81249fb4463efce6d548126864b8f",
+      "bytes": 836,
+      "uncompressed_sha256": "6fccfbd654e3928d89adfd83f4e12191b52cc30d4e54317d8ef0ba94767718d5",
+      "uncompressed_bytes": 2220
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/photo/new-city.png.gz",
+      "sha256": "3e5f5296ca54cb29ac9ab9075ddb0f7e6e5c756895fed652b26688ec5092b298",
+      "bytes": 87902,
+      "uncompressed_sha256": "f43af60cea0ca5f8df697083e9b98b8a9e8c14cd8819412323623d5e92d2bd38",
+      "uncompressed_bytes": 87854
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/photo/same-city.png.gz",
+      "sha256": "d641cb6154c80c45fc75e129f8a8594c400905c8d742a348ac0cff798aeaffa3",
+      "bytes": 68049,
+      "uncompressed_sha256": "49d88eb515ebbf53143ff60000445932db1f25e8c259367faf8b6b5c5a63c8d4",
+      "uncompressed_bytes": 68006
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/photo/uart.log.gz",
+      "sha256": "dc8e6b3840ae08477d792af3a8072c971101fcbd7a8fc7a28fd262215608e1ba",
+      "bytes": 259,
+      "uncompressed_sha256": "8f5d650c9240749d5d58a0552ceb2edf9b4ca2df0056a15e3728cdded5133333",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/report.json.gz",
+      "sha256": "7ca646a9c53780946d6343273d43888c0f10ed31e4688270313e5b06a1d9a6a9",
+      "bytes": 9513,
+      "uncompressed_sha256": "b32209be466c0df0293b4fe9f3fca19523fd3a981b497f37a0d19ac67d0cf365",
+      "uncompressed_bytes": 39604
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/simple/city-theme-report.json.gz",
+      "sha256": "8a300046ae5c587fb39be1641a3b2ea108e96c86a6f05d8c042c666e05119b93",
+      "bytes": 807,
+      "uncompressed_sha256": "a9aa1112053af537f5d8a98c45406de92074f6c719a29f31bafb4cc672ca04f1",
+      "uncompressed_bytes": 2017
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/simple/new-city.png.gz",
+      "sha256": "21db53db184f26d81bc31fe09b5fa0901e062381567af0c03d7578fb2a0a66dd",
+      "bytes": 1979,
+      "uncompressed_sha256": "14345908e710164111905658c22ba00afa8e760831b9eff61b62ad7d49e63eb2",
+      "uncompressed_bytes": 2065
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/simple/same-city.png.gz",
+      "sha256": "66d4de0934f76dc2c9e07f46b475c83e172309ce8de84dae364bbb1f6f60d5eb",
+      "bytes": 1960,
+      "uncompressed_sha256": "ac90fcb5a6cc15c6f8762cee3a039e08604603eac2f2dfcf0509c144ed05d21a",
+      "uncompressed_bytes": 2046
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final/simple/uart.log.gz",
+      "sha256": "d852f6c255101dcedc0b3cba5843107f1de19033c77f0d68210d14e0909362be",
+      "bytes": 260,
+      "uncompressed_sha256": "4130d76c69635c3c9f362ef54517492559618805b619d2fff119fd9fa6838a20",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-final.log.gz",
+      "sha256": "941e5e004ccbd55542f220b4c30086ba670b00c4ae7c129d090ef3dde2e0ea2c",
+      "bytes": 70,
+      "uncompressed_sha256": "d78a8d933fcf0fdcbc14ac0fa2f118349be7e7a32be96292f86a139abf007acf",
+      "uncompressed_bytes": 98
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/classic/city-theme-report.json.gz",
+      "sha256": "d741a3e7859c7d5f1bda93419e0a9b6b8f83ba05750ee934ad293b7f67c02aa1",
+      "bytes": 809,
+      "uncompressed_sha256": "a7d75eeaa84623a48a2c5727c1fef4dfdbe7bd060e6acdbf72613bfc84967770",
+      "uncompressed_bytes": 2021
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/classic/new-city.png.gz",
+      "sha256": "b82b4b89b5f353bcca0b6da84cbcc998f80855c03e5a83f0c40068c334f22179",
+      "bytes": 7299,
+      "uncompressed_sha256": "f160cc7c8d81f495c286b979cd1ec5f606d82b36113afb1db2ec0e9f48738dba",
+      "uncompressed_bytes": 7344
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/classic/same-city.png.gz",
+      "sha256": "5dc2e9061eb2e0676a26b1bf49ff2ea53e1a519a9a77676f8744e9496b9e894a",
+      "bytes": 7248,
+      "uncompressed_sha256": "6d847bbf97bbd6e2abc4e27007e15059634b367219bc682a0d3269e99a227186",
+      "uncompressed_bytes": 7292
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/classic/uart.log.gz",
+      "sha256": "dc8e6b3840ae08477d792af3a8072c971101fcbd7a8fc7a28fd262215608e1ba",
+      "bytes": 259,
+      "uncompressed_sha256": "8f5d650c9240749d5d58a0552ceb2edf9b4ca2df0056a15e3728cdded5133333",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/photo/city-theme-report.json.gz",
+      "sha256": "e6fbbe5341d315ce5e6e437b9b3ba2a1aa38a6001eacf722690d92af032dd067",
+      "bytes": 559,
+      "uncompressed_sha256": "9ca6481ba9eccdaf04f1c9f4ba6de51e34c6adafc5b086c01c059b2dd9ad5e45",
+      "uncompressed_bytes": 1243
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/photo/same-city.png.gz",
+      "sha256": "b8d34d81acffe1b82f51db714fd11419562dfdc5266fa3ff821f479f5430f4e9",
+      "bytes": 96,
+      "uncompressed_sha256": "f62a295859bf626dee9be3dd853873a1ee13a36c591af2bbab4381c8629c7fda",
+      "uncompressed_bytes": 248
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/photo/uart.log.gz",
+      "sha256": "dc8e6b3840ae08477d792af3a8072c971101fcbd7a8fc7a28fd262215608e1ba",
+      "bytes": 259,
+      "uncompressed_sha256": "8f5d650c9240749d5d58a0552ceb2edf9b4ca2df0056a15e3728cdded5133333",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/report.json.gz",
+      "sha256": "480c9d52e23d988cb21536ee6f99d344dc28ccee1a2281462f794d37a4e3e82a",
+      "bytes": 9225,
+      "uncompressed_sha256": "35bd0fa1cf2cd30f3b761c9a1405baf7988c7c661980723094708f744627317a",
+      "uncompressed_bytes": 34785
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/simple/city-theme-report.json.gz",
+      "sha256": "289a20ee0ae7eafeef0b3dda753ae2d89d7b469ff4dcade418ff4f39cbeae563",
+      "bytes": 806,
+      "uncompressed_sha256": "2e6ff0eaa912628fadbc300d0920b8ac6d2c957536cbb73e2435ac16773ac00d",
+      "uncompressed_bytes": 2017
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/simple/new-city.png.gz",
+      "sha256": "5669b1fd14b33799e142e0d9c5b12af683a42c2e7cbb9f945dee4ebdf8add904",
+      "bytes": 1926,
+      "uncompressed_sha256": "3dc4ad47363e4cabc35a6959eb6cc6efef6c732d26bcd032a44f4cd87aaee8a4",
+      "uncompressed_bytes": 1996
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/simple/same-city.png.gz",
+      "sha256": "63016ae42ec61be03e6ac086ead4b21aa15d5685b0c2fcf9218a1807e78b5fd0",
+      "bytes": 1969,
+      "uncompressed_sha256": "615c0024927663a82c301f675c9ad30fadf8196febae9d8a14f1d364e8a95a6c",
+      "uncompressed_bytes": 2009
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2/simple/uart.log.gz",
+      "sha256": "dc8e6b3840ae08477d792af3a8072c971101fcbd7a8fc7a28fd262215608e1ba",
+      "bytes": 259,
+      "uncompressed_sha256": "8f5d650c9240749d5d58a0552ceb2edf9b4ca2df0056a15e3728cdded5133333",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v2.log.gz",
+      "sha256": "59e39fcd8c05f3030521c83b8accfc34b005eddc8a5e502535002fa7ba2c4353",
+      "bytes": 333,
+      "uncompressed_sha256": "6cdd60e935620c62453d00452b8f0c4bb551ec91efb3b35a36230cecc9b7b74a",
+      "uncompressed_bytes": 770
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/classic/city-theme-report.json.gz",
+      "sha256": "a7809f435bdf3096b8117e7d487d4d81c492d796435e4c21c29c8f33a199d6ac",
+      "bytes": 809,
+      "uncompressed_sha256": "6273469635131c200e3ade0208addccbb53d9819ccc30489fb31c3f7633d09ef",
+      "uncompressed_bytes": 2021
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/classic/new-city.png.gz",
+      "sha256": "0bd202dcc024db606a40a28a8da885b2e4dad95ab5f0441e2f7d0ce11e867079",
+      "bytes": 7332,
+      "uncompressed_sha256": "650119355e111dbb239f7d2eec6f764961cb2c16e646257dfcd89037c7929bed",
+      "uncompressed_bytes": 7385
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/classic/same-city.png.gz",
+      "sha256": "6dc7e79de9949996f2ea1df0410d37ff9683f93fb88365f9ef2a96b715185222",
+      "bytes": 7329,
+      "uncompressed_sha256": "c57a768161f4aa6e021e9ad91ca34b68cc3ea44d23354e75654156fa5c927031",
+      "uncompressed_bytes": 7378
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/classic/uart.log.gz",
+      "sha256": "d852f6c255101dcedc0b3cba5843107f1de19033c77f0d68210d14e0909362be",
+      "bytes": 260,
+      "uncompressed_sha256": "4130d76c69635c3c9f362ef54517492559618805b619d2fff119fd9fa6838a20",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/dial/city-theme-report.json.gz",
+      "sha256": "1c7e8aaf3db80c11e78cdab161683de9c24e7bab7a9b7768c189deb107a1aff7",
+      "bytes": 808,
+      "uncompressed_sha256": "d2f2aca360fd3aeae82fe414624588831425c664343c89e18b1728d5137619f9",
+      "uncompressed_bytes": 2009
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/dial/new-city.png.gz",
+      "sha256": "db695349c6dbd72d8124f8208381385b8ea6b1b7509cd663f84655018e1ad84a",
+      "bytes": 1421,
+      "uncompressed_sha256": "91d39c160c281cc55353a9050f38d5311dfe517373e93bf8819f6052b996a797",
+      "uncompressed_bytes": 1492
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/dial/same-city.png.gz",
+      "sha256": "3e495ecabce286329330455fae69d8446d464a535d255f7b59c2c7bd96049019",
+      "bytes": 1418,
+      "uncompressed_sha256": "32be52548795eb20ba59599a45ca46b677b29240589799a50d9db01c76273412",
+      "uncompressed_bytes": 1477
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/dial/uart.log.gz",
+      "sha256": "d852f6c255101dcedc0b3cba5843107f1de19033c77f0d68210d14e0909362be",
+      "bytes": 260,
+      "uncompressed_sha256": "4130d76c69635c3c9f362ef54517492559618805b619d2fff119fd9fa6838a20",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/photo/city-theme-report.json.gz",
+      "sha256": "8667afdb75740a2bff3e8bf6b7a999e9f6e81249fb4463efce6d548126864b8f",
+      "bytes": 836,
+      "uncompressed_sha256": "6fccfbd654e3928d89adfd83f4e12191b52cc30d4e54317d8ef0ba94767718d5",
+      "uncompressed_bytes": 2220
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/photo/new-city.png.gz",
+      "sha256": "3e5f5296ca54cb29ac9ab9075ddb0f7e6e5c756895fed652b26688ec5092b298",
+      "bytes": 87902,
+      "uncompressed_sha256": "f43af60cea0ca5f8df697083e9b98b8a9e8c14cd8819412323623d5e92d2bd38",
+      "uncompressed_bytes": 87854
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/photo/same-city.png.gz",
+      "sha256": "d641cb6154c80c45fc75e129f8a8594c400905c8d742a348ac0cff798aeaffa3",
+      "bytes": 68049,
+      "uncompressed_sha256": "49d88eb515ebbf53143ff60000445932db1f25e8c259367faf8b6b5c5a63c8d4",
+      "uncompressed_bytes": 68006
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/photo/uart.log.gz",
+      "sha256": "c6332152ba1a732df55a25cd28e9cc9bc9bd23ed7cded583fcb15f91d2b3c470",
+      "bytes": 259,
+      "uncompressed_sha256": "0ab54dab6ed2f60f29ee1e788e99f8363bd5be0937523ef615bc03e62bc4c2ca",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/report.json.gz",
+      "sha256": "1b05b682229759e7b49cf931faaba8de7c37a4006a6719ed6518daa09aa81f1b",
+      "bytes": 9523,
+      "uncompressed_sha256": "b7f2ee0cb16caef3149fcaa709b685d366371379978cfe9c9ec8000112e0f978",
+      "uncompressed_bytes": 39604
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/simple/city-theme-report.json.gz",
+      "sha256": "df82a5d50d42798ff30384dba7e491245811957f3ae5bc6e92c8f381555abf5d",
+      "bytes": 809,
+      "uncompressed_sha256": "09361e17931e1b3314623f07066251bddbe6192cf56c1883b3dae90e216a0a65",
+      "uncompressed_bytes": 2017
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/simple/new-city.png.gz",
+      "sha256": "002a4816a408940c0162102057ae689381be8fc4deb670aec98122379801c3e5",
+      "bytes": 1957,
+      "uncompressed_sha256": "60b565022177d8dca264cc9c45d864a6be1f16b302cb69c6b1923cfcb8723814",
+      "uncompressed_bytes": 2049
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/simple/same-city.png.gz",
+      "sha256": "81977be1686563bd7cf751aa0d86d6c2b7189be060a21de2bb7677b9aa1f52be",
+      "bytes": 1985,
+      "uncompressed_sha256": "239b745700d4c06178ab91aa90109e44cba832898accc6121ddc3e04c84c58ce",
+      "uncompressed_bytes": 2034
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3/simple/uart.log.gz",
+      "sha256": "d852f6c255101dcedc0b3cba5843107f1de19033c77f0d68210d14e0909362be",
+      "bytes": 260,
+      "uncompressed_sha256": "4130d76c69635c3c9f362ef54517492559618805b619d2fff119fd9fa6838a20",
+      "uncompressed_bytes": 333
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes-v3.log.gz",
+      "sha256": "941e5e004ccbd55542f220b4c30086ba670b00c4ae7c129d090ef3dde2e0ea2c",
+      "bytes": 70,
+      "uncompressed_sha256": "d78a8d933fcf0fdcbc14ac0fa2f118349be7e7a32be96292f86a139abf007acf",
+      "uncompressed_bytes": 98
+    },
+    {
+      "file": "raw/city-reinit-20261020/themes.log.gz",
+      "sha256": "0ede46e970ecbebe5ad72b8d8b4e3ef1653e7f419f8ec1046ac8cf0d6bd41587",
+      "bytes": 362,
+      "uncompressed_sha256": "02f82c0f8b8c1c46c05f3338d0bb0f82e66daff567166dd6a1a049c923f60801",
+      "uncompressed_bytes": 1017
+    },
+    {
+      "file": "raw/city-reinit-20261020/native-report.json.gz",
+      "sha256": "2c2c9c66acecdfda5f0f95f675a1d477639facd264cb583a93dd925b4d4de76f",
+      "bytes": 566,
+      "uncompressed_sha256": "4466d7afd1c5536ff2af383db289dc974d09c86083414730ad2fbac65b2719e1",
+      "uncompressed_bytes": 2792
+    },
+    {
+      "file": "raw/city-reinit-20261020/small_tv_reconstructed.elf.gz",
+      "sha256": "df131b3ce1459cbf42dda9aca953771e4aa035801e98f8a3e78a48cd44947559",
+      "bytes": 3875732,
+      "uncompressed_sha256": "54293e9741134adca6bcb71e814498d692c048dfeba648d63b0e0ad5529667c4",
+      "uncompressed_bytes": 11233180
+    }
+  ]
+}

@@ -19,8 +19,8 @@ class WeatherMachine(ClassicMachine):
         else:
             super().adapt(address,name,callback)
 
-    def __init__(self,variant,dump,assets):
-        super().__init__(variant,dump,assets)
+    def __init__(self,variant,dump,assets,*,dependency_root=None,omit_photo_owner=False):
+        super().__init__(variant,dump,assets,dependency_root=dependency_root)
         self.heap_next, self.allocations = SCRATCH+0x4000, set()
         self.partition_reads, self.fail_read_number = 0, None
         self.native_assets = (ROOT/'firmware/development/small-tv-esp32c2-reconstructed/assets.bin').read_bytes()
@@ -41,6 +41,11 @@ class WeatherMachine(ClassicMachine):
             self.adapt(self.symbols['xQueueSemaphoreTake'],'media-mutex-take',lambda:1)
             self.adapt(self.symbols['xQueueGenericSend'],'media-mutex-give',lambda:1)
             self.adapt(self.symbols['esp_partition_read'],'bmp-partition-read',self.partition_read)
+            if omit_photo_owner:
+                # Explicit boundary for an isolated IMMUTABLE renderer replay:
+                # its RTOS photo task/storage startup produces no clock pixels.
+                # The actual QEMU main still executes the complete owner/guard.
+                self.adapt(self.symbols['photo_worker_init'],'unrelated-photo-owner-startup',lambda:0)
             if self.call(self.symbols['media_init']) != 0:
                 raise AssertionError('Native media initialization failed')
 

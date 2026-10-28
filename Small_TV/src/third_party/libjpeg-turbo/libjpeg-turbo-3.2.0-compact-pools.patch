@@ -1,0 +1,34 @@
+--- a/src/jmemmgr.c
++++ b/src/jmemmgr.c
+@@ -5,6 +5,7 @@
+  * Copyright (C) 1991-1997, Thomas G. Lane.
+  * libjpeg-turbo Modifications:
+  * Copyright (C) 2016, 2021-2022, 2024, D. R. Commander.
++ * Small TV modifications: Copyright (C) 2026 Small TV contributors.
+  * For conditions of distribution and use, see the accompanying README.ijg
+  * file.
+  *
+@@ -252,12 +253,12 @@
+ 
+ static const size_t first_pool_slop[JPOOL_NUMPOOLS] = {
+   1600,                         /* first PERMANENT pool */
+-  16000                         /* first IMAGE pool */
++  4096                          /* first IMAGE pool: bounded embedded reserve */
+ };
+ 
+ static const size_t extra_pool_slop[JPOOL_NUMPOOLS] = {
+   0,                            /* additional PERMANENT pools */
+-  5000                          /* additional IMAGE pools */
++  1024                          /* additional IMAGE pools: smaller spare chunks */
+ };
+ 
+ #define MIN_SLOP  50            /* greater than 0 to avoid futile looping */
+@@ -267,6 +268,8 @@
+ alloc_small(j_common_ptr cinfo, int pool_id, size_t sizeofobject)
+ /* Allocate a "small" object */
+ {
++  /* REQUESTED_CHANGE: use smaller spare IMAGE chunks for the C2 RAM budget.
++   * Object sizes, alignment, allocation retries and lifetimes are unchanged. */
+   my_mem_ptr mem = (my_mem_ptr)cinfo->mem;
+   small_pool_ptr hdr_ptr, prev_hdr_ptr;
+   char *data_ptr;

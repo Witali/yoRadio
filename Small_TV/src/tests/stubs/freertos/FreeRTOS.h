@@ -4,22 +4,24 @@
 #define portMAX_DELAY UINT32_MAX
 #define pdPASS 1
 #define pdTRUE 1
+#define configUSE_TIME_SLICING 1
+#define tskIDLE_PRIORITY 0
 #define DMA_ATTR
 #define pdMS_TO_TICKS(ms) (ms)
 #define configASSERT(value) assert(value)
-typedef unsigned portMUX_TYPE;
+typedef volatile long portMUX_TYPE;
+void native_port_enter(portMUX_TYPE *lock);
+void native_port_exit(portMUX_TYPE *lock);
 #define portMUX_INITIALIZER_UNLOCKED 0
 #define portENTER_CRITICAL(lock)                                                                   \
     do                                                                                             \
     {                                                                                              \
-        assert(*(lock) == 0);                                                                      \
-        *(lock) = 1;                                                                               \
+        native_port_enter(lock);                                                                   \
     } while (0)
 #define portEXIT_CRITICAL(lock)                                                                    \
     do                                                                                             \
     {                                                                                              \
-        assert(*(lock) == 1);                                                                      \
-        *(lock) = 0;                                                                               \
+        native_port_exit(lock);                                                                    \
     } while (0)
 #define portENTER_CRITICAL_ISR(lock) portENTER_CRITICAL(lock)
 #define portEXIT_CRITICAL_ISR(lock) portEXIT_CRITICAL(lock)

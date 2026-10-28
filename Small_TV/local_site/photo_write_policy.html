@@ -1,0 +1,10 @@
+<section aria-labelledby="jpeg-write-title" style="margin:20px 0;padding:12px;border:1px solid #aaa;border-radius:8px">
+    <h2 id="jpeg-write-title">Photo processing write limit</h2>
+    <form id="jpeg-write-form">
+        <label for="jpeg-write-limit">Maximum flash writes per processed photo (KiB)</label>
+        <input id="jpeg-write-limit" type="number" min="0" max="4294967295" step="1" required value="200">
+        <button id="jpeg-write-save" type="submit">Save limit</button>
+    </form>
+    <p>The limit includes temporary data and the prepared display image. Saving the uploaded JPEG is separate. Set 0 to forbid processing writes and erases; already prepared photos can still be shown.</p>
+    <p id="jpeg-write-status" role="status" aria-live="polite"></p>
+</section>
