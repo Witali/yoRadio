@@ -87,7 +87,7 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 Актуальная очередь после квалификации 28 октября:
 
 - Vorbis: применение floor0 с сохранением provenance и широких конечных
-  диапазонов; granule/EOS trimming и полный PCM-тракт;
+  диапазонов; полный PCM-тракт и подключение granule/EOS к выдаче декодера;
   полный исходный corpus31/bound2/all14 relations и raw/audio-task integration.
   IMDCT, окна и overlap/history/reset уже имеют отдельные host-проверки, но ещё
   не составляют завершённый новый decoder/runtime. Потери от underflow окна
@@ -96,6 +96,9 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   реализована отдельно; это не доказательство точности предшествующего синтеза.
   [Совместный host-контроллер overlap→PCM пока не подготовлен](CYD_VORBIS_OVERLAP_PCM_DEFERRED_20261028.md):
   две записи отменены до dispatch без указанной причины; новых composed cases0.
+  [Granule/EOS bookkeeping](CYD_VORBIS_TIMING_DESIGN.md) квалифицирован отдельно
+  на всех434 исходных metadata events и безопасном Xiph reference subset;
+  транспортные правила первой страницы и интеграция с decoded output остаются.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1869,3 +1872,17 @@ Stream остаётся на core0, decode/output на core1 с прежними
   active fixtures после byte-equality/containment проверки. Отдельные host
   overlap/PCM квалификации остаются действующими; совместный и full PCM gates
   не закрыты. После команды остановки повторных запросов/других маршрутов нет.
+
+- 2026-10-28, CYD-C3-14: добавлен [целочисленный granule/EOS timing](CYD_VORBIS_TIMING_DESIGN.md).
+  [ASan/UBSan квалификация](../tests/results/vorbis-timing-20261028/CHECKPOINT.md)
+  проходит20 019 metadata actions/18 818 audio events, все36 конфигураций/64
+  перехода размеров,588 restarts/1 576 gaps и26 359 refusals/1 521 715 checks.
+  Все31 исходных потока/434 packet metadata сохраняют184 640 frames per channel;
+  12 467 результатов совпадают с byte-identical Xiph metadata fragment на
+  безопасном LP64 диапазоне. Unlimited integer model проверяет720 arithmetic
+  seeds, включая значения выше counter cap, иEOS у INT64_MAX без лимита
+  длины потока; ten damaged captures отклонены. Core Clang0/0,6 fixture
+  object-byte warnings сохранены; C/C++ GCC обеих ISA, own push160/144B.
+  Это только metadata: decoder/overlap/PCM/native не исполнялись. Initial-page
+  transport validation, full31 PCM, floor0/wider synthesis, radio и прежние
+  deferred/physical gates остаются; production tasks/configuration не менялись.
