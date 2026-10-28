@@ -2,6 +2,17 @@
 
 ## Текущий приоритет — заводской образ, 2026-10-26
 
+Текущая рабочая копия `.worktree/small-tv-storage-fixes`, ветка
+`codex/small-tv-storage-fixes`, создана отa3ebb45d0. Локальная NVS component copy
+исправляет upper I/O errors и temporary40Bleak;45vendor SHA/35copies/17TUs.
+App8758/ELFDA1E сохранены и проходят236fault/retry,4OOM,compat/geometry/Page652,
+native6300 и отдельные network/LCD checks. Old34CB/73BE оставлены неизменными в
+small-tv-nvs-fixes. См. [NVS_STORAGE_FIX.md](tests/NVS_STORAGE_FIX.md).
+Final proof reader59401/fd6be3 terminal0: before/after,8input+8overlay+5report
+controls,6300native и network/LCD witnesses повторно проверены.
+NEXT — TIM/null-completion/station+820/BSS/aliases; full NVS API/powercut и
+deferred1–3/full/24h/hardware остаются открытыми. Shared SDK/QEMU не менять.
+
 Новый analysis checkpoint в той же `small-tv-nvs-fixes`: полный Storage.init/read
 qualified71factory/53native.18baseline+18reopen,460fault/retry+6six-sector cases
 подтвердили BLOBfix, но верхние PageManager/Storage ещё скрывают134native I/O
@@ -4968,3 +4979,202 @@ station+820/BSS/aliases and deferred1–3/full/24h/hardware remain open. Goal AC
 OOM checkpoint:4custom malloc failures reproduce40Btemporary leak at second BlobIndex allocation, both factory/native. Proof10gzip539365B/61pins; finalreader47042 pending. Add cleanup-on-all-exits to next correction. Firstreader53022 failed only numeric-key vsJSON string-key equality, canonicalized without changing archived bytes.
 
 Final reader47042/2a9a74 terminal0, all18+18+460+460+6+4cases and8+6controls reproduced. Native upper-error and temporary-cleanup false; data preserved in selected retries. No pending exec/VM. Stage scan26files/10gzip/61pins clean; ready for focused baseline commit, then production fix in a separate worktree preserving this snapshot.
+
+## 26 October 2026 — fix upper Storage recovery errors and temporary ownership
+
+Previous goal turn made progress in a3ebb45d0 with a complete failing-before
+Storage witness. Verified clean HEAD; created .worktree/small-tv-storage-fixes /
+codex/small-tv-storage-fixes from a3ebb45d0. Old small-tv-nvs-fixes remains frozen
+with34CB/73BE, source pins and full before proofs. No shared SDK/QEMU mutation.
+
+Five C++ fragments in storage/nvs correct PageManager.load, Storage index
+collection/mismatch/orphan cleanup and init. PageManager consolidates predecessor
+erase with preserved FREEING skip, first match, TYPE_MISMATCH miss and legacy
+BLOB fallback. All failed scans/erases return the original status. Storage stays
+INVALID until all recovery succeeds. Cleanup helpers return esp_err_t; local
+scope guard frees every temporary index even after a later OOM/I/O failure.
+No global error slot or overloaded enum state is used. FIXED_FACTORY comments
+mark the corrected functions and explain ownership/nontrivial cases.
+
+prepare_nvs_component checks45source/header SHA and exactly5fragments, copies35
+src files locally, patches the private header consistently, retains the oldPage
+patch/report, and redirects all17component TUs. Postlink guard verifies allinput
+bytes, compile commands and56native bodies7776B; factory71bodies8750B. No private
+header disagreement across TUs or vendor checkout edits. Unsafe source/report
+outputs are rejected. Full normal I/O sequences in9native baselines remain
+byte-identical to before (1bbe8e), so no added flash operations in those paths.
+
+First patch application was rejected atomically for duplicate CMake patch
+operations; corrected before any generator write. First build33896 failed
+configure because3target_sources paths were relative; resolve them against the
+pinned component directory, retain strict source containment. Build15955/0d74c2
+completed0. Added output-path/fragment-inventory guards, then final build97551/
+e9a7e4 completed0 and archived app8758BD09/ELFDA1ED0CE/sourceF2699B39. App1476112B,
+144Bmore than34CB,59888Bpartition free. Existing WARN/DEBUGoff/JPEG policy remains.
+JPEG long try-compile path warnings did not cause a failed dependency build.
+
+Producer19839/bacb08 completed0: all236native I/O failures now0x104/INVALID with
+no further I/O; all retained-media retries preserve values. Before replay still
+reproduces134native false successes. Four customOOM failures leave0temporary
+bytes native; two replacement cases + two same-object retries pass. Sixgeometry
+cases and previousPage records/652partial executions pass. Standard arrayOOM is
+an explicit nullable fixture boundary, not a new full-VM OOM claim.
+
+Native40197/710c8d completed0:6300checks/3727privacy/26nothrow, mapping controls.
+Artifact681d8c completed0 with7tests including component metadata consistency.
+Overlay62988/3b14e6 completed0: unchanged private copied fixture passes,8real
+vendor/header/TU/app/archive/output mutations reject, original SDK/overlay intact.
+Network45257/972668 completed0: setup/HTTP/NVS persistence/reboot/coldboot/reset/
+3fresh SNTP phases, no LCD. Display48754/a34d42 completed0:1factory+1native cold
+frame exact. CIM a73edb verified all4matching owners absent. No physical board,
+serial/reset/flash or outside process touched. No push.
+
+Inspected raw-settings witnesses locally without printing suspected values:
+password empty, SSID synthetic, country/city compiled defaults, unused bytes only
+zero/erased. Weather field is the fixed8B test token at offset0x11c/width65 in
+pinned small_tv_network.seed_network, not a user key; NTP is private VM service
+address. Initial empty-key/zero-tail assumptions rejected and were replaced by
+exact fixture comparison plus padding check; all3phases pass d6980d. No user
+credential values were printed or exported by this inspection.
+
+Proof nvs-storage-fix-validation-20261026.json:23newgzip405247B/74sourcepins.
+Final reader59401/fd6be3 terminal0: complete before/after CPU rerun, Page652,
+8input+8overlay+5report/runtime controls, full production source/resource hashes,
+6300native/3727privacy and independent3network/2LCD witnesses. Allthree native
+contracts pass; physical/full-VM powercut/whole-image flags remain false.
+
+NEXT factory TIM/null-completion/station+820/BSSoverflow/aliases and remaining
+whole-image gaps; fullpublicNVS/API/arbitrary physical cuts and deferred1–3,
+fullsuite/24h/hardware acceptance remain open. Preserve allold/new proof inputs;
+no long VM is pending. Goal ACTIVE. Stage exact focused fix, inspect archives/
+LFS/metadata locally and commit after clean staged checks; do not push implicitly.
+
+Staged57files/23expandedgzip/2LFS/74pins checked clean (dd2404), plus decoded synthetic settings check d6980d. Finalreader59401/fd6be3 terminal0, no pending exec or ownedVM. Ready for focused commit; next factory TIM/null/lifetime/BSS/aliases.
+
+## 26 October 2026 — complete TIM instruction comparison
+
+Previous goal turn made progress in671ecdf59: Storage propagation and temporary
+index cleanup fixed, archived current app8758BD09/ELFDA1ED0CE, clean HEAD verified.
+Continued factory priority with TIM; no production/source-overlay/sharedSDK/QEMU
+or physical device changes. Existing production proof source pins are preserved.
+
+New reverse/timer_tim requalifies the old reference9E4EC88D without relaxing its
+guards, then independently matches9complete native SDK bodies to the saved
+current app/ELF. Checks data geometry/local anchors/public callees, actual OSI
+wrappers and event11 entry. Absolute g_osi_funcs_p is intentionally resolved by
+the existing unique-symbol reader; LinkedRuntime.symbol excludes SHN_ABS and
+was unsuitable for that ROM-global lookup. No existing helper was weakened.
+
+New separate tim_model/tim_instructions/tim_test cover2404cases per image,
+4808executions, full TIM168/168factory and128/128native instruction starts.
+Exact PM/counter stores, whole remaining buffers/config, stack/callee-saved ABI,
+caller-register poisoning,64-bit clock/deadline, capped/lowword OSI408delay,
+32-bitcounterwrap, truthy flags and originalpredicate boundaries all pass.
+Real old predicate executes; RF/slice/sleep/dream/wake/platform helpers remain
+explicit boundaries. Complete instruction coverage is not all RF paths.
+
+Factory computes predicate even before unrelated early returns and can set488/
+request null instead of sleep; native TIM relies on separateevent11 keepalive.
+No production bug found in these cases. Do not restore factory requests into
+modern TIM based only on this difference. BSS negotiated ranges still unproven.
+
+Producerfa341c terminal0; independent readercb431f terminal0.9staticcontrols
+including4actual body mutations below whole-image hash guard,6reportcontrols.
+Prooffactory-tim-validation-20261026.json:16pins,1gzip33240B /458146Bexpanded.
+No pending exec/VM; no push. NEXT remaining null/failure completions, actual
+station/peer+820 lifetime, BSS producers/overflow, aliases/whole-image gaps.
+Deferred1–3/fullsuite/24h/hardware stay open. Goal ACTIVE.
+
+## 28 October 2026 — complete null-completion comparison
+
+Previous goal work made progress: c8e672cf0 completed TIM instruction comparison;
+the user-requested push sent all 34 unpublished commits through that HEAD to
+origin/codex/small-tv-storage-fixes. Revalidated a clean, synchronized worktree.
+No historical proof, production source, app/ELF, shared SDK or QEMU was changed.
+
+New reverse/tx_null extends the strict TIM qualifier and matches complete
+quick-wake/state-setter helpers from each SDK, with parent target, scoped local,
+shared/public/absolute symbol, data and counter checks. Initial helper target
+check incorrectly assumed a global namespace; the quick helper is object-local.
+Corrected this new guard to use exact matched caller bindings. No old guard was
+weakened and no library/ELF was patched. The first CPU run then passed.
+
+Separate tx_null_model/instructions/test modules perform 8331 cases per image,
+16662 executions. Every instruction in parents (174 factory / 213 native),
+quick-wake (40/38) and state setters (27/27) is visited: 519 starts / 1524 B.
+Real old reset and both rearm functions also execute. Exact writes/calls,
+remaining PM/config/counter buffers, ABI and guarded station read sequences
+match the independent model. Explicit external RF/slice/scheduler/hardware,
+beacon, GPIO and off-channel boundaries remain; no concurrent lifetime proof.
+
+Newly checked differences: native pending byte 488 changes the ready/retry
+selection compared with factory byte15/16 rules; native byte543/deadline568/572
+can choose sleep instead of the delay timer. Null station returns before peer
+reads, null peer skips byte820. Quick-wake can return synthetic byte19 unchanged;
+do not normalize it in tests. Retry/counter boundary effects are retained.
+Actual callback argument/status meaning remains a producer-tracing requirement.
+No production defect was established by these selected synthetic fixtures.
+
+Producer 6244 / 3ee096 and independent consumer 19325 / caeea6 are terminal 0.
+Nine static controls reject wrong SDK/reference/helper/body fields, including
+four parent mutations below the image hash guard; eight evidence controls reject
+changed effects, pointers, counters, coverage and an unsupported lifetime claim.
+Proof factory-null-completion-validation-20261028.json: 17 source pins, one gzip
+36734 B / 538755 B expanded. No VM or physical device test was started.
+
+NEXT: actual callback producers/status and station/peer lifetime (+820), BSS
+setters/ranges/overflow, computed aliases and whole-image reachability. Deferred
+points 1–3, full regression, 24-hour and physical acceptance remain open. Goal
+ACTIVE. No running exec from this checkpoint; no implicit push of this new work.
+
+## 28 October 2026 — callback/BSS producers and conditional timer failure
+
+Previous goal turn made progress in 141b7eb4e (complete null/quick/state bodies).
+Revalidated clean HEAD, ahead one; preserved every frozen app/ELF/source proof.
+Continued factory priority, no production source, shared SDK, QEMU or device edits.
+
+New reverse/wifi_producers pins both net80211 libraries and matches 20 complete
+producer/initializer/receive bodies, 5322 B. Factory net SHA 8F989ECD, native
+C2DF6FCC. New private CPU modules execute callback adapters into the real prior
+completion closure, and retain IE peer stores into actual cnx/PM setter/rearm.
+25266 executions: per image 7424 callback, 5200 BSS and 9 actual getter cases.
+All 119 starts / 344 B in ten small producers visited; larger association/init/
+transmit/wake bodies are static matches only. PM-start is an explicit seven-arg
+boundary; prior PM start/stop tests remain separate. No lifetime/RF claim.
+
+Concrete producer contract: sleep a0=1, wake a0=0; both read packet+36 descriptor
+and descriptor byte19 status. Native also forwards descriptor word0 &1 in a2;
+factory leaves a2 alone and its parent ignores it. Driver enum/flag naming still
+open. IE bytes2/3 -> peer halfword818, IE byte4 bit0 -> peer byte820. Pinned SDK
+header describes BSS period units and protected_keep_alive; cnx reads818 into PM.
+pm_attach materializes callbacks; wifi_hmac_init binds transmit; wdev table alias
+and actual registration lifetime remain open. Direct wake has two (0,1,0) calls.
+
+Confirmed conditional BSS timer defects with real IE -> peer -> PM instructions:
+native period4197 arms760704us, intended4295728000us; factory period32772 stores
+encoded0 but enabled1 and arms0ms. Mathematical 1..65535 inventory finds 61339
+native wraps; this is not exhaustive CPU execution. Archived production sdkconfig
+has BSS Max Idle support off; actual runtime feature word was not read. Getter
+itself is executed with controlled word64 bit8. Preserve failing safety flag.
+
+Producer 48017 / e88318 and independent consumer 68662 / 178df8 terminal 0.
+Five static and eight report controls reject changed producers and false safety/
+lifetime claims. Proof factory-wifi-producer-validation-20261028.json: 20 pins,
+one gzip68341 B /1037251 B expanded. No VM or physical test started.
+
+NEXT production BSS-TIMER-RANGE correction in a NEW task worktree, preserving
+this current 8758BD09/DA1ED0CE and all absolute before inputs. Keep full 16-bit
+periods; use ms arm for large intervals, preserve exact microsecond/fallback
+behavior where representable, qualify ABI/callers/cancellation and new independent
+network/LCD gates. Do not enable the currently disabled BSS feature implicitly.
+Isolated GCC15 RV32 --defsym experiment (redirect-vendor.c / redirect-local.c in
+.build/wifi-producers-20261028) compiled/linked successfully: same-object caller
+at100008 C.JAL goes to local_timer_entry100014. SDK g_pm (584 B), g_pm_cfg (76 B)
+and rearm/disarm functions are global. This is only feasibility, not a timer fix.
+First link attempt was a PowerShell unquoted-comma parse error; quoting linker
+arguments fixed it. First discovery script name inspect.py shadowed stdlib;
+renamed it catalogue.py before any successful scan. No package/SDK changes.
+
+Further requirements remain: real status/flag enums, station/peer lifetime,
+association input bounds, computed/wdev aliases and whole-image gaps; deferred
+points 1–3 and final full/24h/hardware gates. Goal ACTIVE; no pending exec.

@@ -5548,3 +5548,158 @@ private header declarations across all component TUs are required; use local
 source/header overlay, retain shared SDK and frozen before inputs.
 
 Final reader47042/2a9a74 completed0:71/53full bodies;18baseline+18reopen+460fault+460retry+6geometry+4customOOM;8actualinput+6report controls. Desired upper I/O/temporary cleanup contracts remain explicitly false. App SHA34CB unchanged. Staged confidentiality scan a05408 checked26files/10expandedarchives/61pins with no findings; final docs/status refresh then repeat scan before focused commit.
+
+## 26 October 2026 — fix upper Storage recovery errors and temporary ownership
+
+Previous goal turn made progress in a3ebb45d0 with a complete failing-before
+Storage witness. Verified clean HEAD; created .worktree/small-tv-storage-fixes /
+codex/small-tv-storage-fixes from a3ebb45d0. Old small-tv-nvs-fixes remains frozen
+with34CB/73BE, source pins and full before proofs. No shared SDK/QEMU mutation.
+
+Five C++ fragments in storage/nvs correct PageManager.load, Storage index
+collection/mismatch/orphan cleanup and init. PageManager consolidates predecessor
+erase with preserved FREEING skip, first match, TYPE_MISMATCH miss and legacy
+BLOB fallback. All failed scans/erases return the original status. Storage stays
+INVALID until all recovery succeeds. Cleanup helpers return esp_err_t; local
+scope guard frees every temporary index even after a later OOM/I/O failure.
+No global error slot or overloaded enum state is used. FIXED_FACTORY comments
+mark the corrected functions and explain ownership/nontrivial cases.
+
+prepare_nvs_component checks45source/header SHA and exactly5fragments, copies35
+src files locally, patches the private header consistently, retains the oldPage
+patch/report, and redirects all17component TUs. Postlink guard verifies allinput
+bytes, compile commands and56native bodies7776B; factory71bodies8750B. No private
+header disagreement across TUs or vendor checkout edits. Unsafe source/report
+outputs are rejected. Full normal I/O sequences in9native baselines remain
+byte-identical to before (1bbe8e), so no added flash operations in those paths.
+
+First patch application was rejected atomically for duplicate CMake patch
+operations; corrected before any generator write. First build33896 failed
+configure because3target_sources paths were relative; resolve them against the
+pinned component directory, retain strict source containment. Build15955/0d74c2
+completed0. Added output-path/fragment-inventory guards, then final build97551/
+e9a7e4 completed0 and archived app8758BD09/ELFDA1ED0CE/sourceF2699B39. App1476112B,
+144Bmore than34CB,59888Bpartition free. Existing WARN/DEBUGoff/JPEG policy remains.
+JPEG long try-compile path warnings did not cause a failed dependency build.
+
+Producer19839/bacb08 completed0: all236native I/O failures now0x104/INVALID with
+no further I/O; all retained-media retries preserve values. Before replay still
+reproduces134native false successes. Four customOOM failures leave0temporary
+bytes native; two replacement cases + two same-object retries pass. Sixgeometry
+cases and previousPage records/652partial executions pass. Standard arrayOOM is
+an explicit nullable fixture boundary, not a new full-VM OOM claim.
+
+Native40197/710c8d completed0:6300checks/3727privacy/26nothrow, mapping controls.
+Artifact681d8c completed0 with7tests including component metadata consistency.
+Overlay62988/3b14e6 completed0: unchanged private copied fixture passes,8real
+vendor/header/TU/app/archive/output mutations reject, original SDK/overlay intact.
+Network45257/972668 completed0: setup/HTTP/NVS persistence/reboot/coldboot/reset/
+3fresh SNTP phases, no LCD. Display48754/a34d42 completed0:1factory+1native cold
+frame exact. CIM a73edb verified all4matching owners absent. No physical board,
+serial/reset/flash or outside process touched. No push.
+
+Inspected raw-settings witnesses locally without printing suspected values:
+password empty, SSID synthetic, country/city compiled defaults, unused bytes only
+zero/erased. Weather field is the fixed8B test token at offset0x11c/width65 in
+pinned small_tv_network.seed_network, not a user key; NTP is private VM service
+address. Initial empty-key/zero-tail assumptions rejected and were replaced by
+exact fixture comparison plus padding check; all3phases pass d6980d. No user
+credential values were printed or exported by this inspection.
+
+Proof nvs-storage-fix-validation-20261026.json:23newgzip405247B/74sourcepins.
+Final reader59401/fd6be3 terminal0: complete before/after CPU rerun, Page652,
+8input+8overlay+5report/runtime controls, full production source/resource hashes,
+6300native/3727privacy and independent3network/2LCD witnesses. Allthree native
+contracts pass; physical/full-VM powercut/whole-image flags remain false.
+
+NEXT factory TIM/null-completion/station+820/BSSoverflow/aliases and remaining
+whole-image gaps; fullpublicNVS/API/arbitrary physical cuts and deferred1–3,
+fullsuite/24h/hardware acceptance remain open. Preserve allold/new proof inputs;
+no long VM is pending. Goal ACTIVE. Stage exact focused fix, inspect archives/
+LFS/metadata locally and commit after clean staged checks; do not push implicitly.
+
+Staged audit27964/dd2404:57files,23decompressed archives,2actualLFS payloads,74sourcepins and all payload hashes match index. Four standalone PEM parser markers classified against official SDK pk_internal.h; no unresolved sensitive findings. Decoded raw-settings privacy check d6980d confirms fixed seed_network token, empty password, compiled location defaults and VM/padding fields; no values printed. Final focused commit follows, no push.
+
+## 26 October 2026 — execute the complete factory/current TIM bodies
+
+Continued factory comparison after671ecdf59. Preserved all current app/ELF and
+source-overlay inputs; added only analysis/tests/docs/evidence. Requalified the
+old9E reference, independently rebound9full native SDK bodies to current
+8758BD09/DA1ED0CE and checked local anchors, absolute/public symbols, PM/config
+sizes, OSI wrappers and timer11 table. The first attempt used a helper excluding
+absolute symbols for g_osi_funcs_p; switched this new qualifier to the existing
+unique-symbol reader, without changing old guards or SDK bytes.
+
+Literal2404cases/image,4808executions pass: every TIM instruction (168old/128new),
+exact PM/counters, untouched buffers/config and ABI, clock/deadline widths,
+counter wrap and oldpredicate boundaries. Models/probes/linkage are separate
+modules with function comments. Factorypredicate/null requests differ from the
+modern event11 mechanism; no new production defect established. RF/slice/sleep
+boundaries remain external and full path/physical equivalence is not claimed.
+
+Producerfa341c and independent readercb431f both terminal0.9static controls
+reject bad identities/SDK/reference and4private code mutations;6evidence controls
+reject changed effects/counts/coverage/pair. Proof16sourcepins,1gzip33240B,
+458146Bexpanded. Updated plan/readme and WIFI_TIM with exact limitations.
+No liveVM, physicalboard, serial/reset/flash, SDK/QEMU mutation or push.
+Next null/failure completions, station+820 lifetime, BSS ranges/overflow,
+aliases/whole-image gaps; deferred1–3 and finalfull/24h/hardware remain open.
+
+## 28 October 2026 — full null-completion, quick-wake and state comparison
+
+Revalidated clean c8e672cf0 and its synchronized origin branch after the previous
+successful push. Continued factory priority with untouched saved factory,
+reference and production inputs. Added separate qualifier/model/CPU/test/replay
+modules, documentation and bounded evidence; no production or emulator changes.
+
+The new qualifier initially assumed the quick helper was globally bound; it is
+object-local. Scoped identity now comes from the exact matched parent calls,
+while the full source-object matcher, data anchors and current symbol checks
+stay strict. All six selected bodies match and execute unchanged.
+
+8331 cases per image / 16662 executions pass with every parent, quick-wake and
+state-setter instruction visited (519 starts / 1524 linked bytes). Ordered PM
+and counter writes, untouched buffers/configuration, ABI and station/peer read
+gates match a separate model. Checked ready/retry/pending paths, 64-bit sleep
+deadline, byte/word wrapping, exact status-equality and quick helper return.
+Factory/native differences are recorded; no new production defect established.
+
+Producer session 6244 (3ee096), independent reader 19325 (caeea6), both terminal
+0. Nine static controls include real helper and parent-field changes; eight
+report controls reject changed effects, coverage and a false lifetime claim.
+Proof has 17 source pins and one 36734-byte gzip (538755 bytes expanded).
+Updated plan, working notes and test entry points. No VM, hardware or push.
+
+Remaining: actual callback producer/status semantics and concurrent station/peer
+lifetime including field 820; BSS setters/ranges/overflow; computed aliases and
+whole-image reachability; deferred points 1–3 and final full/24h/hardware gates.
+
+## 28 October 2026 — bind producers and preserve conditional BSS timer failure
+
+Revalidated 141b7eb4e clean. Strict full matching now covers 20 producer/init/
+association functions, 5322 B, against own pinned libpp/net80211. Callback packet
+and descriptor fields are verified through the real completion closure. IE peer
+stores survive into actual cnx -> PM setter -> rearm. 25266 CPU executions cover
+all 119 instruction starts in ten small producers, complete status/option byte
+domains and selected period/context/fallback boundaries. Larger bodies are
+statically matched; no full association or concurrent ownership acceptance.
+
+Field820 is now traced to BSS options bit0; period818 to IE bytes2/3. SDK public
+header names protected_keep_alive and 1.024-second units. pm_attach/wifi_hmac
+registration bodies and two direct wake completion calls are identified, with
+runtime registration, descriptor enums and station lifetime still open.
+
+Found conditional timer-range defects: native4197 produces760704us instead of
+4295728000us; factory32772 produces0ms with BSS enabled. Both are actual private
+CPU witnesses. Native 61339 wrapping periods are a separate arithmetic inventory.
+Production archived sdkconfig disables BSS Max Idle; live feature word was not
+read. Safety gate stays false. Preserve full range in the correction, do not
+copy factory overflow or silently enable this feature.
+
+Producer 48017/e88318, independent reader 68662/178df8 terminal0. Five static and
+eight evidence controls pass, including rejection of a false safety claim.
+Proof20pins, one68341 B gzip /1037251 B expanded. Isolated GNU --defsym experiment
+also proves same-object calls can target local C without SDK patching; the timer
+correction itself is not implemented. New task worktree required to preserve
+this baseline's absolute app/ELF/source pins. No VM/hardware/SDK/QEMU mutation.
+No push. Remaining full objective and deferred gates stay open.

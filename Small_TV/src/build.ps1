@@ -68,9 +68,13 @@ try {
     Move-Item -LiteralPath $smallTvNothrowTemporary -Destination (Join-Path $BuildDirectory 'nothrow-linkage.json') -Force
     # Refuse to archive if the linked NVS recovery no longer matches our local copy.
     $smallTvNvsTemporary = Join-Path $BuildDirectory ('nvs-recovery-linkage-' + [Guid]::NewGuid().ToString('N') + '.json')
-    & $python -B (Join-Path $PSScriptRoot 'tools/verify_nvs_recovery.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --nvs (Join-Path $BuildDirectory 'esp-idf/nvs_flash/libnvs_flash.a') --source (Join-Path $idf 'components/nvs_flash/src/nvs_page.cpp') --generated (Join-Path $BuildDirectory 'sdk/nvs_page.cpp') --patch-report (Join-Path $BuildDirectory 'nvs-recovery.json') --output $smallTvNvsTemporary
+    & $python -B (Join-Path $PSScriptRoot 'tools/verify_nvs_recovery.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --nvs (Join-Path $BuildDirectory 'esp-idf/nvs_flash/libnvs_flash.a') --source (Join-Path $idf 'components/nvs_flash/src/nvs_page.cpp') --generated (Join-Path $BuildDirectory 'sdk/nvs/nvs_page.cpp') --patch-report (Join-Path $BuildDirectory 'nvs-recovery.json') --output $smallTvNvsTemporary
     if ($LASTEXITCODE -ne 0) { throw 'NVS recovery source/linkage qualification failed' }
     Move-Item -LiteralPath $smallTvNvsTemporary -Destination (Join-Path $BuildDirectory 'nvs-recovery-linkage.json') -Force
+    $smallTvStorageTemporary = Join-Path $BuildDirectory ('nvs-storage-linkage-' + [Guid]::NewGuid().ToString('N') + '.json')
+    & $python -B (Join-Path $PSScriptRoot 'tools/verify_nvs_storage.py') --elf (Join-Path $BuildDirectory 'small_tv_reconstructed.elf') --app (Join-Path $BuildDirectory 'small_tv_reconstructed.bin') --nvs (Join-Path $BuildDirectory 'esp-idf/nvs_flash/libnvs_flash.a') --component (Join-Path $idf 'components/nvs_flash') --overlay (Join-Path $BuildDirectory 'sdk/nvs') --overlay-report (Join-Path $BuildDirectory 'nvs-storage-overlay.json') --commands (Join-Path $BuildDirectory 'compile_commands.json') --output $smallTvStorageTemporary
+    if ($LASTEXITCODE -ne 0) { throw 'NVS Storage source/linkage qualification failed' }
+    Move-Item -LiteralPath $smallTvStorageTemporary -Destination (Join-Path $BuildDirectory 'nvs-storage-linkage.json') -Force
 } finally {
     foreach ($key in $saved.Keys) { [Environment]::SetEnvironmentVariable($key,$saved[$key]) }
 }
@@ -87,7 +91,7 @@ if (!$NoArchive) {
     Copy-Item -LiteralPath (Join-Path $jpegSelection.build_directory 'report.json') -Destination (Join-Path $destination 'jpeg-library-build.json')
     Copy-Item -LiteralPath (Join-Path $BuildDirectory 'wifi-timer-guard.json') -Destination (Join-Path $destination 'wifi-timer-guard.json')
     Copy-Item -LiteralPath (Join-Path $BuildDirectory 'nothrow-linkage.json') -Destination (Join-Path $destination 'nothrow-linkage.json')
-    foreach ($name in @('nvs-recovery.json','nvs-recovery-linkage.json')) {
+    foreach ($name in @('nvs-recovery.json','nvs-recovery-linkage.json','nvs-storage-overlay.json','nvs-storage-linkage.json')) {
         Copy-Item -LiteralPath (Join-Path $BuildDirectory $name) -Destination (Join-Path $destination $name)
     }
     foreach ($name in @('jpeg_layout.h','jpeg_cache_layout.h','jpeg-cache-plan.json')) {

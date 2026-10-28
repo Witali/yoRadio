@@ -123,3 +123,15 @@ start/stop bodies and selected real cancellation helpers, including the ROM
 sleep-delay entry. 5224 cases cover repeated calls and retained-state restarts.
 Transitive cancellation of modern timer 492 and actual ROM binding still need
 runtime evidence; TIM and other null-completion branches remain open.
+
+Continuation 26 October: [WIFI_TIM.md](WIFI_TIM.md) executes both complete TIM
+bodies, 4808 cases with all 168/128 instruction starts, against the saved current
+app8758BD09/ELFDA1ED0CE. The historical reference and its guards remain intact.
+Other null-completion branches, station/peer lifetime and BSS producer ranges
+remain open; external scheduler/RF/slice helpers are not a full protocol proof.
+
+Continuation 28 October: [WIFI_NULL_COMPLETION.md](WIFI_NULL_COMPLETION.md) now
+executes the complete null-completion parents, real quick-wake and state setters:
+16662 executions, all 174/213 parent starts and all 40/38 + 27/27 helper starts.
+The station/peer pointer gates are checked, but actual concurrent lifetime,
+callback producer contracts and negotiated BSS ranges remain open.

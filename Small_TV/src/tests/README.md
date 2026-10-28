@@ -9,6 +9,28 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Callback/BSS producers](WIFI_PRODUCERS.md): 25266 CPU executions связывают
+descriptor status/flag с реальным null-completion и IE → peer → PM timer.
+Поле +820 идентифицировано как BSS options bit; 20 полных SDK bodies matched.
+Сохранён failing-before: native period4197 переполняет microseconds, factory
+period32772 превращается в нулевой интервал. В archived sdkconfig поддержка BSS
+Max Idle отключена; runtime enablement/lifetime и исправление ещё открыты.
+
+[Null completion](WIFI_NULL_COMPLETION.md): 16662 literal RV32 executions,
+полные parent/quick-wake/state-setter bodies обеих SDK (519 instruction starts).
+Проверены pending/retry/sleep-deadline branches, counter wrap и guarded station
+reads; 9 static и 8 evidence controls проходят. Actual pointer lifetime и RF
+producer/status contracts остаются открытыми, executable code не менялся.
+
+[TIM](WIFI_TIM.md): 4808 literal RV32 executions покрывают все инструкции обоих
+обработчиков (168/168 factory, 128/128 native), clock/counter boundaries и все
+записи PM/counters. Native привязан к app8758BD09/ELFDA1ED0CE после Storage fix;
+9 static и 6 evidence controls проходят. Transitive RF/slice/lifetime ещё открыты.
+
+[Storage fix](NVS_STORAGE_FIX.md) исправляет верхний I/O contract и temporary
+OOM leak в согласованной локальной SDK copy. Before/after fault matrix, Page
+regressions, native tests и отдельные сеть/LCD gates проверены; широкий scope открыт.
+
 [Full Storage before](NVS_STORAGE.md) квалифицирует замыкание init/read,
 исполняет межсекторные сценарии и подтверждает исправление BLOB. 460 fault/retry cases
 воспроизводят оставшийся верхний I/O error contract false; это следующий fix.

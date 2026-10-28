@@ -353,6 +353,15 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 
 ## 5. Аудит всего заводского образа
 
+26Oct: [Storage fix](tests/NVS_STORAGE_FIX.md) возвращает точные ошибки через
+PageManager/Storage и освобождает temporary indices при каждом выходе.
+Локальный SDK component:45pinned files/35copies/17TUs,56native bodies7776B;
+app8758/ELFDA1E архивированы.236native fault/retry cases теперь без скрытых ошибок,
+4customOOM без40Bleak; before134failures сохранён. Native6300, Page652, отдельные
+network/LCD и overlay controls проходят. Не считать этим принятым весь public
+NVS/API/powercut. Далее TIM/null-completion/station+820/BSS/aliases и оставшиеся
+whole-image gaps; deferred1–3/full/24h/hardware scope сохраняется.
+
 26Oct: [full Storage before](tests/NVS_STORAGE.md) квалифицирует71factory/
 53native функций и исполняет Storage.init/read с реальными PageManager/Page/CRC.
 18baseline+18reopen,460fault/retry и6six-sector cases подтверждают прошлый BLOBfix,
@@ -571,6 +580,46 @@ library SHA и cache codec ID при тех жеcodec sources. Зафиксир�
 build inputs/date, проверить два paths/dates и отсутствие лишней Flash cache
 перезаписи; настоящее изменение codec должно сохранять invalidation. Не убирать
 library identity из ownership guard ради совпадения. Пока это не исправлено.
+
+Checkpoint26Oct: [WIFI_TIM.md](tests/WIFI_TIM.md) закрывает прежние нулевые
+динамические visits обоих TIM bodies: 2404 cases/image,4808executions,
+168/168factory и128/128native instruction starts, exact PM/counter writes/ABI,
+64-bit clock/deadline и counter-wrap boundaries. Девять current SDK bodies заново
+matched к сохранённым app8758BD09/ELFDA1ED0CE, старые ELF guards не ослаблены.
+9static+6evidence controls и independent replay pass. Factory TIM predicate/null
+requests отличаются от modern отдельного keep-alive; нового production defect
+в этих сценариях не найдено. Transitive RF/slice/sleep semantics, remaining
+null/failure branches, station+820 lifetime, BSS setters/overflow, aliases и
+whole-image reachability открыты. Приоритет factory сравнения сохраняется;
+пункты1–3/full/24h/hardware не закрываются этим checkpoint.
+
+Checkpoint 28 Oct: [WIFI_NULL_COMPLETION.md](tests/WIFI_NULL_COMPLETION.md)
+проверяет полные null-completion parents и реальные quick-wake/state setters
+обеих SDK: 8331 case/image, 16662 executions, все 519 instruction starts / 1524 B.
+Pending/retry, guarded station/peer reads, sleep deadline и wrap counters
+проверены отдельной моделью; 9 static + 8 evidence controls и replay pass.
+Native остаётся app8758BD09/ELFDA1ED0CE, production/SDK/QEMU не менялись.
+Различия ready-ветки при pending и нового deadline зафиксированы без объявления
+их дефектами. Actual callback producer/status contracts, concurrent station/peer
+lifetime (+820), negotiated BSS setters/overflow и aliases/reachability открыты.
+Пункты 1–3 и full/24h/hardware acceptance остаются в полном объёме.
+
+Checkpoint 28 Oct, [WIFI_PRODUCERS.md](tests/WIFI_PRODUCERS.md): 20 полных тел
+SDK / 5322 B matched, 25266 CPU executions. Реальные sleep/wake adapters передают
+descriptor+19 status, native также descriptor word0 bit0; peer+818/820 заполнены
+из BSS Max Idle IE, затем период доходит до настоящего PM setter/rearm.
+Обнаружен условный дефект `BSS-TIMER-RANGE`: native period4197 даёт760704us вместо
+4295728000us; factory period32772 даёт0ms. Archived CONFIG_ESP_WIFI_BSS_MAX_IDLE_SUPPORT
+off, живое значение feature word ещё не наблюдалось. Это failing-before baseline,
+а не закрытый safety gate. 5 static + 8 evidence controls и replay проходят.
+Далее исправить native timer с сохранением полного 16-bit диапазона (для больших
+интервалов использовать ms API), проверить все вызовы/ABI/units/cancellation и
+отдельные network/LCD gates; поддержку функции автоматически не включать.
+Сохранить текущие 8758BD09/DA1ED0CE и исходники как replay inputs; production fix
+делать в отдельной task worktree. Изолированный GNU --defsym тест подтвердил
+перенаправление same-object вызова без патча SDK, но это ещё не production fix.
+Producer status/flag enum, station/peer lifetime, association bounds, wdev aliases
+и whole-image reachability остаются открытыми, как и весь прежний scope.
 
 ## 6. Приёмка окончательной версии и правила работы
 
