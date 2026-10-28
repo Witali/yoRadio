@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+set(EXTRA_COMPONENT_DIRS "$ENV{DEC_COMPONENTS}")
+set(COMPONENTS main native_vorbis_decoder)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(vorbis_decoder_qemu)

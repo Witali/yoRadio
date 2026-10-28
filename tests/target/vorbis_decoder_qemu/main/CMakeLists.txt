@@ -1,0 +1,28 @@
+idf_component_register(SRCS "main.c" INCLUDE_DIRS "."
+    REQUIRES freertos esp_system native_vorbis_decoder)
+if(CMAKE_BUILD_EARLY_EXPANSION)
+    return()
+endif()
+if(IDF_TARGET STREQUAL "esp32" AND CONFIG_IDF_TARGET_ESP32)
+    set(expected_sdk "6.0.2")
+elseif(IDF_TARGET STREQUAL "esp32c3" AND CONFIG_IDF_TARGET_ESP32C3)
+    set(expected_sdk "6.1.0")
+else()
+    message(FATAL_ERROR "Only isolated ESP32/C3 decoder tests are supported")
+endif()
+if(NOT "${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}.${IDF_VERSION_PATCH}" STREQUAL expected_sdk)
+    message(FATAL_ERROR "Wrong pinned SDK version")
+endif()
+file(SHA256 "${CMAKE_CURRENT_LIST_DIR}/cases.h" actual)
+if(NOT actual STREQUAL DEC_CASES_HEADER_SHA256)
+    message(FATAL_ERROR "Frozen raw case header hash mismatch")
+endif()
+target_compile_definitions(${COMPONENT_LIB} PRIVATE DEC_CASES_SHA256="${DEC_CASES_SHA256}")
+target_compile_options(${COMPONENT_LIB} PRIVATE -fno-fast-math -ffp-contract=off -fstack-usage)
+foreach(component native_vorbis_numeric native_vorbis_setup_owner native_vorbis_packet_frame
+        native_vorbis_floor1_product native_vorbis_floor0_spectrum native_vorbis_transform
+        native_vorbis_window native_vorbis_window_exact native_vorbis_pcm_exact
+        native_vorbis_timing native_vorbis_synthesis native_vorbis_decoder)
+    idf_component_get_property(library ${component} COMPONENT_LIB)
+    target_compile_options(${library} PRIVATE -fno-fast-math -ffp-contract=off -fstack-usage)
+endforeach()

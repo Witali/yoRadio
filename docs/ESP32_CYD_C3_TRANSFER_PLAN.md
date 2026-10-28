@@ -74,7 +74,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | В работе | [Optional custom FLAC runtime](CYD_FLAC_TRANSFER_DESIGN.md) подключён к actual CYD decoder task; vendor остаётся default. [Квалификация](../tests/results/cyd-flac-runtime-20261019/README.md): 520 exact PCM сравнений, 4304 metadata-prefix случая, 24 allocation failure/reopen и lifecycle/maintenance controls, actual Xtensa custom/vendor component compile. Source depth и PCM16 разделены; workspace освобождается до maintenance ACK. [Полный custom PDM app export](../tests/results/network-power-transfer-20261019/SDK.md) проверен по ELF/image/configuration; текущий host rerun повторяет 520 точных PCM сравнений. [Все три custom backend exports](../tests/results/cyd-network-settings-20261020/SDK.md) собраны и проверены; [QEMU adapter/core](../tests/results/cyd-flac-qemu-20261020/README.md) проходит 520 byte-exact PCM случаев и 48 guards на SDK6.0.2/Xtensa/core0+1; [Actual CYD task QEMU](../tests/results/cyd-flac-task-qemu-20261020/README.md) проходит три public-API случая: ordered EOF/exact PCM, Stop/reopen и three-owner maintenance/resume; пять реальных decoder/client cleanup, исходные cores/priorities/stacks. OOM/backpressure/target semantic controls, production watchdog/ресурсы и физический vendor/custom A/B остаются. |
 | CYD-C3-13 | В работе | [Освобождение GET TX-буфера](CYD_MEMORY_TRANSFER_DESIGN.md) подключено через проверяемый build-local overlay SDK6.0.2. Host SDK17/8, actual open_stream62/6, CMake9 и whole Xtensa compile проходят. Число 4096 — configured capacity, не измеренная экономия heap. [Освобождение IDLE slots при отказе TLS allocation](CYD_INPUT_RECLAIM_DESIGN.md) реализовано отдельной default-off опцией: binding после READY, SMP pin/retirement и фиксированный бюджет повторов. Host21/17, startup12/4, CMake8 и полный Clang54/86warnings/0errors проходят без новых предупреждений. [Actual SDK/QEMU](../tests/results/cyd-input-reclaim-qemu-20261020/README.md) проходит пять сценариев и четыре exact controls: реальный calloc NULL/recovery, health hook, оба ядра, retirement/refill и timer ISR. [Семь production exports](../tests/results/cyd-input-reclaim-20261020/SDK.md) из чистого `a1b9d5a1` проверены для vendor/custom FLAC × три выхода и disabled PDM control; ELF allocator/free, OTA и прежние task bindings подтверждены. [Аудит TLS reserve/MPI](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md) завершён. [Ранняя MPI](CYD_EARLY_MPI_DESIGN.md) подключена default-off в `959f35486`: canonical startup, реальные SDK locks/heap, оба ядра и exact controls проходят; [архив проверок](../tests/results/cyd-early-mpi-20261020/README.md) сохранён. [Семь полных MPI exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md) из чистого `1190aebce` также проверены: vendor/custom × три выхода и disabled PDM, actual first-call/allocator/free/config/OTA; минимальный запас OTA — 224912 B. [Статический TLS RX reserve](CYD_MEMORY_TRANSFER_DESIGN.md) также подключён default-off: host, 12 SDK/QEMU вариантов, [семь GCC exports и шесть Clang-профилей](../tests/results/cyd-tls-static-rx-sdk-20261020/README.md) проходят. Radio boot/board, TLS traffic, IRAM/stack и физические измерения CYD остаются. |
-| CYD-C3-14 | В работе | [Новый stateful packet→PCM путь](CYD_VORBIS_SYNTHESIS_DESIGN.md) проходит полный corpus31/434 packets/bound2/all14 на host и в SDK/QEMU ESP32+C3; actual PCM побайтно совпадает. History/granule/EOS реализованы; production raw/Ogg/audio-task integration, general gain/wider precision и ресурсы остаются. Подробнее — актуальная очередь ниже. [Аудит и план Vorbis/Ogg](CYD_VORBIS_TRANSFER_DESIGN.md) подтверждают шесть проблем в реальных Xtensa archives2.6.2. Изолированный ESP32 bridge добавлен в `cbb69fdad`, в основной radio runtime пока не подключён. [Квалификация](../tests/results/cyd-vorbis-bridge-20261020/README.md): actual SDK6.0.2/Xtensa, три canonical translation units, 535 raw packets/2,112,000 byte-exact PCM bytes и 1602 undersized retries; bypass-preflight variant даёт точный ожидаемый отказ, 21 CMake configuration проверена. Private layout подтверждён частично. [Raw8192 format regression](../tests/results/cyd-vorbis-format-20261020/README.md) закрывает одно ограничение G6: разрешены блоки 8192 при 48 000/63 999 Гц; пять пар дают 340 сравнений пакетов и 4 631 808 точных PCM байт, четыре bad-header controls и восстановление старого guard проходят. Полное G6 и radio integration остаются открыты. [Расширение Ogg target-проверок отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после автоматической проверки безопасности: SDK compile завершён, observer-selection отказал до QEMU; ноль новых runtime случаев квалифицировано. Ogg EOF/reset, allocation failure/reopen, concurrent scopes, format/conformance, полная callback ABI и audio-task интеграция остаются. AAC compact owners требуют отдельной адаптации; ранее отложенный private owner-view не исследовался и остаётся отложенным. |
+| CYD-C3-14 | В работе | [Постоянный public raw decoder](CYD_VORBIS_DECODER_DESIGN.md) реализует replace/measure/process/info/reset/clear. [Host и actual SDK/QEMU](../tests/results/vorbis-decoder-20261028/CHECKPOINT.md) проходят все31/434/738560 PCM-байт к обоим эталонам при bound2/all14; host/ESP32/C3 побайтно совпадают. Host закрывает1480 allocation refusals/recovery, capacity, reset, replacement, lifetime и typed numeric routes; native — полный corpus после actual 8355840-byte malloc отказа и его cleanup. Production backend не переключён. [Общие certified gain/wider численные маршруты](CYD_VORBIS_CERTIFIED_GAIN_REMAINING.md), Ogg/container metadata handoff, actual audio-task integration/resources и физическая приёмка остаются. AAC compact owners требуют собственной Xtensa ABI/PCM/OOM/lifetime адаптации; прежние отложенные scopes сохраняются. |
 | CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; 42 host tests проходят, 1 symlink case пропущен. Изолированный sdkconfig сохраняет аппаратные настройки и обеспечивает минимум два SNTP servers. [Шесть CYD сборок после N5](../tests/results/cyd-network-settings-20261020/SDK.md) проверены: vendor/custom FLAC во всех трёх backend; [C3 N4 image](../tests/results/network-power-transfer-20261019/SDK.md) сохраняет отдельный baseline; конфигурации, image/ELF/compiler hashes, task affinity и запас OTA сохранены. Фактические DWARF размеры структур и static symbols зафиксированы без заявления об экономии heap. Единая физическая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend ещё впереди. |
 
 Дополнительная [проверка status keys](../tests/results/ws-status-key-20261023/README.md)
@@ -86,24 +86,28 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 Актуальная очередь после квалификации 28 октября:
 
-- Vorbis: подключить новый проверенный packet→PCM тракт к actual raw/Ogg
-  decoder registry и audio task CYD; завершить EOF/reset/reopen, callback ABI,
-  OOM/backpressure и проверку ресурсов полного радиоприложения. Базовое
-  воспроизведение Ogg/Vorbis уже работает, новый путь пока не выбран production.
-  [История каналов и общий granule/EOS owner](CYD_VORBIS_SYNTHESIS_DESIGN.md)
-  уже соединяют actual setup→frame→floor0/floor1→IMDCT→exact window→S16.
-  [Полная квалификация](../tests/results/vorbis-synthesis-20261028/CHECKPOINT.md)
-  проходит все31 исходных потока/434 пакета/738560 PCM-байт на host и в actual
-  SDK/QEMU ESP32/core1 и C3/core0. Ошибка максимум2 при прежнем допуске2,
-  все14 relations; host сравнивает оба эталона, native PCM побайтно равен host.
-  Все20019 timing actions и каналы1..255 проходят host owner-проверку;
-  ошибки до публикации сохраняют состояние и выход. Эти gates уже закрыты.
-  Общая сертификация точности floor0 gain и оставшиеся wider/precision fallback
-  ещё нужны: успех ограниченного корпуса не доказывает весь численный домен.
-  Native memory для8192/255, radio/TLS и реальная производительность также
-  не квалифицированы этим stereo/2048 стендом. Comment bytes сохранены,
-  но setup API их не разбирает. Все прежние отложенные пункты остаются отдельно,
-  включая старый rounded overlap/PCM controller; повторно они не запускались.
+- Vorbis: подключить [проверенный постоянный raw decoder](CYD_VORBIS_DECODER_DESIGN.md)
+  к Ogg/container metadata и actual audio task CYD. Нужна явная передача granule/EOS,
+  проверка трёх заголовков/конца и смены logical stream, остановки/повторного открытия,
+  очередей и ресурсов полного radio/TLS приложения. HTTP EOF не является packet EOS.
+  Базовое воспроизведение Ogg/Vorbis уже работает; новый путь пока не выбран production.
+  [Квалификация raw owner](../tests/results/vorbis-decoder-20261028/CHECKPOINT.md)
+  уже проходит все31 исходных потока/434 пакета/738560 PCM-байт на host и в actual
+  SDK/QEMU ESP32/core1 и C3/core0: ошибка максимум2 к обоим эталонам при прежнем
+  допуске2, все14 relations, host/native PCM побайтно равен. История/granule/EOS,
+  транзакционный output/capacity, replace/reset/clear и1480 host OOM ordinal
+  refusals/recovery реализованы. Эти public raw gates больше не открыты.
+  Законная конфигурация255 каналов/8192 проходит host с большим аллокатором;
+  на обоих MCU actual malloc корректно отказывает8355840-байтному запросу и
+  освобождает candidate, после чего декодируется весь исходный корпус.
+  Это не утверждение, что большой профиль помещается на MCU.
+  [Certified floor0 gain и полный wider/precision путь](CYD_VORBIS_CERTIFIED_GAIN_REMAINING.md)
+  через IMDCT/историю ещё нужны: обычный finite corpus не доказывает весь диапазон.
+  Один допустимый finite gain требует минимум1572 бита для целой части показателя;
+  замена int64 на int128 и per-bin double exponent не закрывают эту задачу.
+  Комментарии/порядок заголовков и транспортная семантика остаются вне raw API.
+  Native resource/performance полного radio/TLS/TFT и physical также открыты.
+  Все прежние отложенные пункты сохраняются; повторно они не запускались.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1997,3 +2001,29 @@ Stream остаётся на core0, decode/output на core1 с прежними
   General floor0 gain/wider precision, raw/Ogg/audio-task integration,
   production OOM/backpressure/resources и physical остаются. Production backend,
   affinity/priority/stack и прежние deferred scopes не менялись.
+
+- 2026-10-28, CYD-C3-14: [постоянный public raw owner](CYD_VORBIS_DECODER_DESIGN.md)
+  добавлен отдельным, не выбранным production компонентом. Replace публикует
+  новый setup/owner после подготовки и сохраняет старый при отказе; process
+  проверяет точную S16 capacity до allocation/math, подготавливает все каналы
+  и только затем публикует историю/PCM/position/EOS. Нет post-commit callbacks,
+  входные пакеты не удерживаются; reset без allocations, clear обнуляет handle
+  до освобождений. [Host и actual SDK/QEMU](../tests/results/vorbis-decoder-20261028/CHECKPOINT.md)
+  сохраняют весь31/434/738560 PCM contract к обоим эталонам при bound2/all14;
+  полный PCM host/ESP32/C3 равен прежнему квалифицированному результату.
+  Host ASan/UBSan:589 open+589 replace+302 process OOM refusals,4017 recovery
+  spans/4035840 actual PCM bytes,1212 capacity/14187 measures/265 other controls,
+ 17082734 final checks,13 typed numeric vectors и8 damaged captures проходят.
+  Законный255×8192 host выдаёт1044480 zero S16 при достаточном caller budget;
+  на MCU actual malloc8355840 отказывает с7 attempts/6 allocs/6 releases/live0,
+  затем восстанавливается полный corpus. На каждом target434 resource/capacity,
+ 62 EOS,31 reset,62 warm retries/31 clears и4536 strict protocol lines проходят.
+  Native stack16384/WDT/IDLE/core bindings сохранены; min free stack10348/10600B,
+  owner payload peak125642B и caller PCM peak8192B наблюдаются отдельно. Это
+  isolated fixture, не production radio/TLS/physical performance. Source-only
+  C/C++ LX6/RV32IMC проходят, production Clang2 и fixture7 warnings разобраны
+  без suppression. Все infrastructure/fixture failures сохранены отдельно.
+  [Точный численный аудит](CYD_VORBIS_CERTIFIED_GAIN_REMAINING.md) фиксирует
+  допустимый finite exponent минимум1572bits и следующий certified interval
+  contract. General gain/wider IMDCT/history, Ogg/container/audio-task,
+  production resources и physical остаются. Прежние deferred scopes не менялись.
