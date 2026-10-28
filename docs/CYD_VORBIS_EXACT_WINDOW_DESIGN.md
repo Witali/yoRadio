@@ -90,3 +90,8 @@ ASan/UBSan, 10,360 refusals / 14,889,244 checks and 13 corruption controls.
 Source profiles compile C/C++ for both LX6 and RV32IMC; both new C units have
 zero Clang warnings/errors. Source objects are not SDK/native execution or
 measurement of the decoder's RAM, task stack, or real-time performance.
+
+The following [exact S16 boundary](CYD_VORBIS_EXACT_PCM_DESIGN.md) now carries
+both complete products through adjacent-window slice addition and final
+rounding. Decoder history/ownership, granule trimming and full packet/raw
+integration remain; the old two-binary64 PCM API is unchanged.

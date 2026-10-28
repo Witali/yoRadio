@@ -24,4 +24,6 @@ The [host qualification](../../../tests/results/vorbis-window-exact-20261028/CHE
 retains all 17,962 recorded underflow witnesses as data-only operands and
 checks every original window shape against an independent integer-ratio
 product oracle. The old window/overlap captures and their limitations remain
-unchanged; exact-product propagation into adjacent-block addition/PCM is next.
+unchanged. The following [exact PCM component](../native_vorbis_pcm_exact/README.md)
+now adds complete products from adjacent-window slices through S16 rounding;
+stream history/ownership and full decoder integration remain.

@@ -105,13 +105,16 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   специальные маршруты, provenance и нормализацию. Отдельное точное умножение
   и однократное округление также проверены; оба новых C-модуля Clang0/0 и
   source-only GCC LX6/RV32IMC. Это не полный PCM или универсальная гарантия
-  точности gain: wider/precision fallback, передача точных произведений окна
-  в overlap/PCM, native
+  точности gain: wider/precision fallback, подключение готового exact-window/PCM
+  к состоянию декодера, native
   и raw/audio-task integration остаются открытыми. Базовый Ogg/Vorbis уже работает.
   [Точное представление оконных произведений](CYD_VORBIS_EXACT_WINDOW_DESIGN.md)
   реализовано отдельно: сохраняет до106 значащих бит и полный исходный scale
-  без промежуточного floating product. Встраивание этого представления в
-  adjacent-block addition и конечный PCM остаётся следующим этапом.
+  без промежуточного floating product.
+  [Сложение полных106-bit terms и конечный S16](CYD_VORBIS_EXACT_PCM_DESIGN.md)
+  теперь квалифицированы отдельно, включая чтение actual-neighbor window views
+  и все864 сохранённых перехода. Следующий этап — история/ownership, подключение
+  granule/EOS и исходного packet→frame→IMDCT тракта к этому PCM-пути.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1957,3 +1960,26 @@ Stream остаётся на core0, decode/output на core1 с прежними
   deferred scopes не менялись. Передача106-bit products в adjacent-block
   addition/PCM, prior transform/gain precision, wider fallback, full31 PCM,
   raw/native/resource/radio и физическая приёмка остаются открытыми.
+
+- 2026-10-28, CYD-C3-14: [точное сложение106-bit продуктов и S16](CYD_VORBIS_EXACT_PCM_DESIGN.md)
+  реализовано со связью lazy window views→полная сумма→одно nearest-even
+  округление/clamp. Источник с полным int64 base+bounded shift не сужается
+  в double. [Квалификация](../tests/results/vorbis-pcm-exact-20261028/CHECKPOINT.md)
+  сохраняет все 2 479 старых PCM batches/478 388 outputs и добавляет 208 411 scalar
+  случаев, в том числе 432 wide carry/merge и все 65 538 half-boundaries с тремя
+  tiny signs. Все 864 DATA-перехода/648 emits дают 598 992 exact S16 outputs и
+  1 197 984 точных оконных terms; сохранены 17 962 underflow identities, включая
+  13 767 с E>=1074. Два независимых Fraction-набора проходят по 2 033 anchors.
+  ASan/UBSan, 4 178 refusals/62 379 152 checks и 14 damaged captures проходят.
+  Все старые данные и pre-matrix captures сохранены; поправлен только тестовый
+  probe zero→zero, затем добавлен bounded carry matrix и fixture allocator cap.
+  Оба новых C-модуля Clang0/0; C/C++ source profiles дают шесть ELF32 objects
+  LX6/RV32IMC. Own scalar192/192 B и adapter112/112 B — без callee/high-water.
+  Fixture lint сохраняет27 displayed/48 generated warnings, пять default
+  system suppressions и0 errors, без custom suppression. Архив хранит все 431
+  logical файла через 124 shared SHA blobs. Одинаковые bytes представлены одним
+  blob; все случаи и данные сохранены. Полный pure replay и root artifacts
+  verification проходят. Старые rounded overlap/PCM APIs и deferred controller
+  не выполнялись, production/affinity не менялись. История/ownership, granule/EOS,
+  actual packet/frame/IMDCT→этот PCM, full31/bound2/all14, general gain/wider,
+  native/resource/radio и физическая приёмка остаются открытыми.
