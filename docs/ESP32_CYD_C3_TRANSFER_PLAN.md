@@ -105,6 +105,11 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   через IMDCT/историю ещё нужны: обычный finite corpus не доказывает весь диапазон.
   Один допустимый finite gain требует минимум1572 бита для целой части показателя;
   замена int64 на int128 и per-bin double exponent не закрывают эту задачу.
+  [Независимый directed MPFR-эталон](../tools/codec_benchmark/vorbis_floor0_mpfr_oracle.md)
+  уже проверен на8202 точных наборах с сохранением всех447 packet-frame identities;
+  два tiny finite случая получают совпадающие arbitrary-length integer floors
+  после уточнения до4096 bits. Это host oracle для следующих правок, не реализация
+  certified gain на MCU и не доказательство универсальной достаточности4096 bits.
   Комментарии/порядок заголовков и транспортная семантика остаются вне raw API.
   Native resource/performance полного radio/TLS/TFT и physical также открыты.
   Все прежние отложенные пункты сохраняются; повторно они не запускались.
@@ -2027,3 +2032,17 @@ Stream остаётся на core0, decode/output на core1 с прежними
   допустимый finite exponent минимум1572bits и следующий certified interval
   contract. General gain/wider IMDCT/history, Ogg/container/audio-task,
   production resources и physical остаются. Прежние deferred scopes не менялись.
+
+- 2026-10-28, CYD-C3-14: добавлен [независимый MPFR-эталон floor0](../tools/codec_benchmark/vorbis_floor0_mpfr_oracle.md)
+  с exact affine/rational input, direct-cosine directed intervals и целой частью
+  log gain произвольной длины. [Host checkpoint](../tests/results/vorbis-certified-oracle-20261028/CHECKPOINT.md)
+  сохраняет все447 исходных packet identities/894 каналов; все336 original active
+  floor0 channels сопоставлены с запросами для каждого возможного Bark index.
+  8192 уникальных набора и10 дополнительных дают8202 requests;8194 пары256/512-bit
+  enclosures вложены. Два tiny finite запроса уточняются1024/2048/4096 bits до
+  совпадающих integer floors, включая показатель не менее1572bits. Шестнадцать
+  malformed records и явный caller precision budget проверены. Собственный C oracle
+  проходит ASan/UBSan; MPFR4.2.2/GMP6.3.0 dependencies не собраны с санитайзерами.
+  Это только host-эталон по supplied Bark index: MCU implementation, certified
+  Bark selection, wider IMDCT/history, новый PCM, Ogg/audio-task/resources/physical
+  им не закрыты. Предыдущие deferred scopes и core bindings сохраняются.
