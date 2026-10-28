@@ -129,6 +129,22 @@ class ArtifactTests(unittest.TestCase):
         for name, digest in overlay['fragments'].items():
             self.assertEqual(digest, sha((PROJECT / 'storage/nvs' / name).read_bytes()))
 
+    def test_keep_alive_range_linkage(self):
+        """Require the archived app's actual redirect and all four checked SDK callers."""
+        manifest = json.loads((ARCHIVE / 'manifest.json').read_bytes())
+        linked = json.loads((ARCHIVE / 'wifi-keep-alive-linkage.json').read_bytes())
+        self.assertTrue(linked['passed'])
+        self.assertEqual(linked['app_sha256'], sha((ARCHIVE / 'app.bin').read_bytes()))
+        self.assertEqual(linked['elf_sha256'], manifest['elf_sha256'])
+        self.assertEqual(linked['replacement']['address'], linked['sdk_alias']['address'])
+        self.assertEqual(len(linked['sdk_references']), 4)
+        self.assertEqual({row['name'] for row in linked['callers']}, {
+            'cnx_sta_pm.part.0', 'pm_tx_data_done_process',
+            'pm_tx_null_data_done_process', 'pm_keep_alive_timeout_process'})
+        self.assertEqual({row['name'] for row in linked['backends']}, {
+            'ets_timer_arm', 'ets_timer_arm_us', 'ets_timer_disarm'})
+        self.assertFalse(linked['full_runtime_lifecycle_proved'])
+
 
 def main():
     """Write a fresh result on success and fail the caller on any integrity mismatch."""

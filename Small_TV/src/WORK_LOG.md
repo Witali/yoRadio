@@ -5703,3 +5703,27 @@ also proves same-object calls can target local C without SDK patching; the timer
 correction itself is not implemented. New task worktree required to preserve
 this baseline's absolute app/ELF/source pins. No VM/hardware/SDK/QEMU mutation.
 No push. Remaining full objective and deferred gates stay open.
+
+## 28 October 2026 — correct full-range BSS keep-alive timers
+
+Added a small FIXED_FACTORY network module and a definition redirect covering
+all four SDK callers, including same-object calls. Complete compiled matching
+and ABI/source guards bind the replacement, OSI adapters, cancellation and real
+legacy timer backends. The original us path stays for representable intervals;
+long periods use the existing ms backend and its 64-bit conversion. SDK and
+feature enablement are unchanged. Archived successful production app1C23AE3F /
+ELFEF23C81E / sourceB0530201; app1476192 B,59808 B free.
+
+65836 CPU executions cover every valid period and all177 instruction starts in
+the selected536 B closure, with seven rejection controls. Native6298/privacy3727/
+nothrow26/artifact8 pass. Separate network3phases and display1+1 cold boots pass.
+Actual QEMU API receives67105840000us; typed long alarm is cancelled by station
+leave. One explicit2-byte synthetic peer-period write occurs after PM setup;
+the first two harness attempts wrote too early and failed. They were preserved,
+and no firmware change was needed for the corrected test fixture. Final VM
+exited0, UART clean, input hashes unchanged. Runtime BSS feature bit remains off.
+
+Saved bounded reports and tests/WIFI_KEEP_ALIVE_RANGE.md for the user-requested
+commit/push checkpoint. No standalone evidence consumer or final full/24h/
+hardware acceptance is claimed. Continue factory comparison under the existing
+plan; other branches/worktrees and root main remain untouched.

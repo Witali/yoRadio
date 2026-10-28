@@ -30,8 +30,8 @@ class CorrespondenceTest(unittest.TestCase):
         self.assertTrue(result['passed'])
         self.assertFalse(result['semantic_equivalence_proved'])
         self.assertEqual(result['factory_export_functions'], 176)
-        # Owner/prefetch integration plus the two independent JPEG budget settings APIs.
-        self.assertEqual(result['native_app_functions'], 223)
+        # Includes the separately reviewed full-range SDK keep-alive correction.
+        self.assertEqual(result['native_app_functions'], 224)
         self.assertEqual(len(result['assembly_only']), 11)
 
     def test_missing_factory(self):
@@ -81,6 +81,11 @@ class CorrespondenceTest(unittest.TestCase):
     def test_missing_timer_guard_support(self):
         """Keep the earlier SDK timer correction in the reverse inventory too."""
         self.reject(lambda m: m['native_support'].pop('app/network/wifi_timer.c#__wrap_pp_timer_do_process'),
+                    'Unaccounted native function')
+
+    def test_missing_keep_alive_range_support(self):
+        """The SDK timer replacement must remain visible in the reverse inventory."""
+        self.reject(lambda m: m['native_support'].pop('app/network/wifi_keep_alive.c#small_tv_wifi_enable_keep_alive_timer'),
                     'Unaccounted native function')
 
     def test_wrong_assembly_target(self):
