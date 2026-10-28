@@ -105,8 +105,13 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   специальные маршруты, provenance и нормализацию. Отдельное точное умножение
   и однократное округление также проверены; оба новых C-модуля Clang0/0 и
   source-only GCC LX6/RV32IMC. Это не полный PCM или универсальная гарантия
-  точности gain: wider/precision fallback, устранение underflow окна, native
+  точности gain: wider/precision fallback, передача точных произведений окна
+  в overlap/PCM, native
   и raw/audio-task integration остаются открытыми. Базовый Ogg/Vorbis уже работает.
+  [Точное представление оконных произведений](CYD_VORBIS_EXACT_WINDOW_DESIGN.md)
+  реализовано отдельно: сохраняет до106 значащих бит и полный исходный scale
+  без промежуточного floating product. Встраивание этого представления в
+  adjacent-block addition и конечный PCM остаётся следующим этапом.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1930,3 +1935,25 @@ Stream остаётся на core0, decode/output на core1 с прежними
   full31 PCM/bound2/all14 relations, raw/audio-task/native/resources, физическая
   приёмка и все прежние deferred scopes остаются открытыми. Привязки к ядрам,
   backend, приоритеты, стеки и production selection не менялись.
+
+- 2026-10-28, CYD-C3-14: [точное произведение окна и borrowed view](CYD_VORBIS_EXACT_WINDOW_DESIGN.md)
+  сохраняют до106 значащих бит без floating product и его underflow. Полный
+  signed64 base scale хранится отдельно от shift[-2148,1023]; сумма показателей
+  символическая. View копирует descriptors и читает готовое окно по индексу
+  без full-block output array. [Host-квалификация](../tests/results/vorbis-window-exact-20261028/CHECKPOINT.md)
+  проходит64 940 scalar rows и587 520 точных view products во всех288 shapes;
+  все17 962 ранее потерянных произведения, включая13 767 с E>=1074, сохранены
+  ненулевыми без deduplication. Все53 ширины обоих operands,106-bit product,
+  полные sample exponent fields и signed64 endpoints проверены integer-ratio
+  oracle. 8 160 коэффициентов сохраняют прежний Decimal bound2e-15; ASan/UBSan,
+  10 360 refusals/14 889 244 guard checks и13 damaged captures проходят.
+  Оба новых C-модуля Clang0/0; source-only GCC C/C++ даёт шесть ELF32 objects
+  LX6/RV32IMC. Собственные frames product112/112 B, prepare144/160 B и at48/32 B
+  не являются high-water задачи. Fixture lint сохраняет23 отображённых/44
+  generated warnings, пять default system-header suppressions и0 errors;
+  custom suppression нет. Все ранние host/lint/profile ошибки и отдельный
+  metadata-only ремонт profile JSON сохранены. Полный pure replay и проверка
+  exact artifacts проходят. Старые window/overlap/PCM, production, affinity и
+  deferred scopes не менялись. Передача106-bit products в adjacent-block
+  addition/PCM, prior transform/gain precision, wider fallback, full31 PCM,
+  raw/native/resource/radio и физическая приёмка остаются открытыми.
