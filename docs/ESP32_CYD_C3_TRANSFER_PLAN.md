@@ -87,10 +87,11 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 Актуальная очередь после квалификации 28 октября:
 
 - Vorbis: применение floor0 с сохранением provenance и широких конечных
-  диапазонов; overlap/history/reset, granule/EOS trimming и конечный PCM;
+  диапазонов; granule/EOS trimming и конечный PCM;
   полный исходный corpus31/bound2/all14 relations и raw/audio-task integration.
-  IMDCT и полные окна уже имеют отдельные host-проверки, но ещё не составляют
-  завершённый новый decoder/runtime. Native/resource и отложенные gates остаются.
+  IMDCT, окна и overlap/history/reset уже имеют отдельные host-проверки, но ещё
+  не составляют завершённый новый decoder/runtime. Потери от underflow окна
+  явно воспроизведены; full-range PCM, native/resource и отложенные gates остаются.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1828,3 +1829,16 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Window Clang0/0, 16 fixture snapshot warnings разобраны без suppression;
   C/C++ GCC обеих ISA и static own frames сохранены. Overlap/history,
   granule/EOS, floor0/PCM, native gates и production integration остаются.
+
+- 2026-10-28, CYD-C3-14: реализована [история и перекрытие соседних блоков](CYD_VORBIS_OVERLAP_DESIGN.md)
+  с двумя независимыми exponent и геометрией Xiph по actual adjacent sizes.
+  [ASan/UBSan квалификация](../tests/results/vorbis-overlap-20261028/CHECKPOINT.md)
+  проходит864 blocks/648 emits/216 primes, все36 конфигураций,108 resets,
+  1 197 984 term values и757 344 точных history values. Сохранены57 376
+  cancellation pairs,144 silent-current rows,8 308 refusals и11 895 678 checks;
+  десять повреждённых captures отклонены pure reader. Измерены17 962
+  underflow operands, в том числе13 767 с exponent>=1074: это явный незакрытый
+  full-range synthesis/PCM gate, а не разрешение сузить принимаемый формат.
+  Core Clang0/0,19 fixture byte-snapshot warnings сохранены без suppression;
+  C/C++ GCC обеих ISA, own push frame128B без callee/task high-water.
+  Granule/EOS, floor0/wider fallback, конечный PCM, SDK/runtime и плата остаются.
