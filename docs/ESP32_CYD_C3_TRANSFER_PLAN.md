@@ -87,11 +87,13 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 Актуальная очередь после квалификации 28 октября:
 
 - Vorbis: применение floor0 с сохранением provenance и широких конечных
-  диапазонов; granule/EOS trimming и конечный PCM;
+  диапазонов; granule/EOS trimming и полный PCM-тракт;
   полный исходный corpus31/bound2/all14 relations и raw/audio-task integration.
   IMDCT, окна и overlap/history/reset уже имеют отдельные host-проверки, но ещё
   не составляют завершённый новый decoder/runtime. Потери от underflow окна
   явно воспроизведены; full-range PCM, native/resource и отложенные gates остаются.
+  [Точная S16-граница двух слагаемых](CYD_VORBIS_PCM_PAIR_DESIGN.md) также
+  реализована отдельно; это не доказательство точности предшествующего синтеза.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1842,3 +1844,16 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Core Clang0/0,19 fixture byte-snapshot warnings сохранены без suppression;
   C/C++ GCC обеих ISA, own push frame128B без callee/task high-water.
   Granule/EOS, floor0/wider fallback, конечный PCM, SDK/runtime и плата остаются.
+
+- 2026-10-28, CYD-C3-14: реализована [точная PCM S16-граница двух scaled terms](CYD_VORBIS_PCM_PAIR_DESIGN.md).
+  [ASan/UBSan квалификация](../tests/results/vorbis-pcm-pair-20261028/CHECKPOINT.md)
+  проходит2 479 batches/478 388 exact samples,186 refusals/4 986 045 checks,
+  все2 047 конечных binary64 exponent fields, widths1..53 и полный int64 scale.
+  Сохранены огромная cancellation, half ties с infinitesimal обоих знаков,
+  subnormal и все65 538 half-code boundaries;2 033 Fraction/symbolic anchors
+  и семь повреждённых captures проходят pure replay. Integer/dyadic сравнение
+  не materialize overflowing physical values, не clip отдельные слагаемые и
+  не требует heap/VLA/__int128. Core Clang0/0,5 fixture snapshot warnings без
+  suppression; C/C++ GCC обеих ISA, public own frame176B без callee/high-water.
+  Это точность для переданных dyadic terms; window/IMDCT underflow/rounding,
+  floor0, full31 PCM/all14 relations, runtime и производительность ещё открыты.
