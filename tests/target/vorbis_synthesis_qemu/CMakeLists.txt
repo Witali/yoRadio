@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+set(EXTRA_COMPONENT_DIRS "$ENV{SYN_COMPONENTS}")
+set(COMPONENTS main native_vorbis_synthesis native_vorbis_setup_owner native_vorbis_floor0_spectrum)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(vorbis_synthesis_qemu)
