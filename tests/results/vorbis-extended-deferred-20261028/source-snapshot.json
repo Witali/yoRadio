@@ -1,0 +1,99 @@
+{
+  "schema": "deferred-vorbis-extended-source-v1",
+  "status": "deferred_by_explicit_user_instruction",
+  "branch": "codex/esp32-cyd-c3-review",
+  "base_commit": "3b59f6b4a1f0ef860fb3e9b39c76bd184dadf4c1",
+  "active_direction": "Reuse Espressif Vorbis decoder and applicable C3 improvements; no automatic custom-math resume",
+  "candidate_compiled": false,
+  "candidate_numerically_executed": false,
+  "candidate_qualified": false,
+  "python_check": "AST syntax only; incomplete direct runner explicitly refuses",
+  "files": [
+    {
+      "path": "docs/CYD_VORBIS_EXTENDED_DEFERRED_20261028.md",
+      "bytes": 3721,
+      "sha256": "6120a1383a4b3e05da7c99d080969b757d47a6d3af370157303fc49d910309b7"
+    },
+    {
+      "path": "idf/components/native_vorbis_certified_gain/CMakeLists.txt",
+      "bytes": 201,
+      "sha256": "ffe5c75f73b7930765b2a06dc933792abe8903feedcdc3ca57666850190026f7"
+    },
+    {
+      "path": "idf/components/native_vorbis_certified_gain/gain.c",
+      "bytes": 17716,
+      "sha256": "3b485b29c97bdefc98fc75f43d594bdf9a534d68ab174bb591cbe990797098b1"
+    },
+    {
+      "path": "idf/components/native_vorbis_certified_gain/include/native_vorbis_certified_gain.h",
+      "bytes": 5089,
+      "sha256": "3da2f13dff17d5324a843da19ef1706fa72128ed0cfc5c9dd1dbca03709dd1b6"
+    },
+    {
+      "path": "idf/components/native_vorbis_certified_gain/README.md",
+      "bytes": 5486,
+      "sha256": "a760b306c8140e166425d955400afa72eda836634d06391e29bc5b5e81cac10d"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/CMakeLists.txt",
+      "bytes": 206,
+      "sha256": "683dd83ef3beb2bb2e440d157e440fd24532edaa47e7b93f1dce2ae3310e079a"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/constants.c",
+      "bytes": 7203,
+      "sha256": "17e236b76f2e759e9ad76fdcb644e761781ec514a057574e282925484bc60b26"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/DEFERRED.md",
+      "bytes": 427,
+      "sha256": "4ade037613a18d1f38f93e4b37c2bca6f0c2b3a51fad264126a8d79b290d074c"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/include/native_vorbis_interval.h",
+      "bytes": 6793,
+      "sha256": "81398fafded7e3aff24d718dc1c3a286ddee54a4adc1f0c6e07fb408cf935a22"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/interval.c",
+      "bytes": 17017,
+      "sha256": "5f15ef6eca80d3150fe53aef16ecf08af50e7d4c99b8cd8165e44a53921fba19"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/interval_private.h",
+      "bytes": 1414,
+      "sha256": "8fc4aba353ea66457daf2deca1c17e68c275bb0714c25ec5312ac7e2fbbd4b43"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/README.md",
+      "bytes": 11171,
+      "sha256": "268fde91c5ab52b3c16b668d8100e61ac96df524b0ec9ae50b874e82ff80b2b1"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/source-manifest.json",
+      "bytes": 1570,
+      "sha256": "9d9db6187f759d743e7515de18141587b7e33937bcee65641883202d550d5b84"
+    },
+    {
+      "path": "idf/components/native_vorbis_interval/trig.c",
+      "bytes": 9294,
+      "sha256": "d0a767ab6e21978a045b10f59c7f8e853c5ead68210005d04572d246a26cc5e4"
+    },
+    {
+      "path": "tests/native/vorbis_certified_gain_host.c",
+      "bytes": 18354,
+      "sha256": "3d25029db07998ecf75919c290c86abda1df0e360f3efcef0dfe64c2aca187cd"
+    },
+    {
+      "path": "tests/test-vorbis-certified-gain.py",
+      "bytes": 7144,
+      "sha256": "44a4d5f179fcfb1378256f7e613b46b52a9e43683e25bdf7d1d35e941dbc635f"
+    }
+  ],
+  "incomplete": [
+    "Host launcher/supervisor/MPFR integration and complete transcript validation",
+    "Interval/gain numerical/OOM qualification on both limb models",
+    "Certified Bark mapping and exp2/wide transform/history/PCM",
+    "Transport/audio-task and full radio resource integration"
+  ]
+}
