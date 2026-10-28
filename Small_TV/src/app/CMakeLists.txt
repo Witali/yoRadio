@@ -8,7 +8,7 @@ idf_component_register(
     SRCS app_main.c settings/settings.c settings/factory_settings.c display/st7789.c display/backlight.c
          display/clock_ui.c display/factory_timer.c display/factory_photo.c display/factory_animation.c display/factory_fonts.c display/ui_renderer.c media/assets.c media/photo_upload.c media/photo_codec.c media/photo_worker.c media/photo_storage.c media/color_convert.c network/wifi.c
          network/dns.c network/dns_packet.c services/time_sync.c services/timezones.c services/weather.c services/weather_parser.c web/server.c
-         network/wifi_timer.c
+         network/wifi_timer.c network/wifi_keep_alive.c
          platform/nothrow_new.cpp
          web/request_body.c web/settings_api.c web/photo_api.c web/photo_async.c text/text.c
          ../third_party/tjpgd/tjpgd.c ../third_party/cjson/cJSON.c
@@ -33,6 +33,13 @@ target_link_libraries(${COMPONENT_LIB} PRIVATE small_tv_jpeg_vendor)
 # audit checks wdev_funcs_init and ppTask's actual ROM/table ingress path.
 target_link_options(${COMPONENT_LIB} INTERFACE "LINKER:--wrap=pp_timer_do_process"
     "LINKER:--undefined=__wrap_pp_timer_do_process")
+
+# A definition redirect also covers calls from within pm.o. An ordinary --wrap
+# only rewrites undefined references and cannot establish this same-object path.
+# The post-link guard requires every SDK reference to select this local body.
+target_link_options(${COMPONENT_LIB} INTERFACE
+    "LINKER:--defsym=pm_enable_keep_alive_timer=small_tv_wifi_enable_keep_alive_timer"
+    "LINKER:--undefined=small_tv_wifi_enable_keep_alive_timer")
 
 # Keep ordinary scalar/array nothrow allocation out of the throwing SDK path.
 # Force extraction of this archive member even when only SDK code refers to it.

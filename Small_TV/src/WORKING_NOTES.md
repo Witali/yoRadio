@@ -5178,3 +5178,92 @@ renamed it catalogue.py before any successful scan. No package/SDK changes.
 Further requirements remain: real status/flag enums, station/peer lifetime,
 association input bounds, computed/wdev aliases and whole-image gaps; deferred
 points 1–3 and final full/24h/hardware gates. Goal ACTIVE; no pending exec.
+
+## 28 October 2026 — BSS timer correction and verified progress checkpoint
+
+Previous goal turn made progress in a2732f83e with the complete producer baseline.
+Created .worktree/small-tv-bss-timer-range / codex/small-tv-bss-timer-range from
+that clean HEAD. Preserve the old small-tv-storage-fixes worktree and its
+8758BD09/DA1ED0CE app/ELF/source pins. Root main and other chats are untouched.
+
+Added network/wifi_keep_alive.c (FIXED_FACTORY). It computes the BSS timeout
+without 32-bit narrowing, keeps the original microsecond path when representable,
+uses the existing ms adapter for longer intervals, and retains fallback/zero
+handling. The ms arithmetic uses exact BSS ms minus floor(adjustment/1000), i.e.
+ceil(timeout_us/1000); actual setter adjustments are exact ms. Snapshot config
+before disarm and reload g_osi_funcs_p after callback. Old synthetic out-of-range
+adjustment subtraction keeps its defined low-word behavior; valid negotiated
+periods are not clipped. No feature enablement change or shared SDK patch.
+
+CMake uses --defsym=pm_enable_keep_alive_timer=small_tv_wifi_enable_keep_alive_timer
+and retains the local archive member. New verify_wifi_keep_alive.py checks the
+app/ELF pair, complete local object body, all allocated SDK references (exactly
+four callers: cnx_sta_pm.part.0, TX data/null completion, keep-alive timeout),
+full caller bodies and targets, PM geometry and actual OSI forwarding wrappers.
+It also matches actual ets_timer_arm/us/disarm compiled bodies to the pinned
+SDK source object and source SHA CDDE1090. Backend ms conversion is uint64_t.
+Build and resource manifest require this guard; archived metadata added.
+
+Build session 24983 / 69ba3d terminal 0; all old/new post-link guards passed and
+production images archived. Current app1C23AE3F56F742B3DBC18DA327FBC709735811B61EE2A430DD167E77848A36E5,
+ELFEF23C81E5095C69E730A0B87B235E1780A13997474919F23A4A074BC46B4687F,
+sourceB05302015912327F03AC73732584BA55556A311AF0BEABF3C6B7496F6D44245F.
+App1476192 B (+80),59808 B free. Local replacement166 B. DEBUG and BSS support
+remain off. JPEG BUILD is20261028; known CODEC-REPRO date dependence remains
+deferred, not hidden by this fix. No device flash/reset or QEMU changes.
+
+keep_alive_range_instructions.py maps the new C body, real OSI wrappers and
+legacy backends, with only public esp_timer operations/nonreturning checks as
+explicit boundaries. Exhaustive test20378/25b876 terminal0:65836 executions,
+all65535 valid periods, fallback/rounding/error/cancel/adapter/config mutation,
+177 instruction starts/536 B visited; seven guard rejection controls pass.
+Preserved before app/ELF cannot pass the new redirect qualification.
+
+Native10167/ac5cf7 terminal0:6298 checks, privacy3727, nothrow26; all tests pass.
+First native attempt rejected the stale223-function expectation; inventory is
+now224 and has a missing-keep-alive negative control. Artifact7d77fb terminal0,
+8cases. Network73573/a6dda2 terminal0,3phases,owned VMs exited, no LCD. Separate
+display38820/a486b4 terminal0,one factory+one new cold boot,exact57600pixels.
+
+Long timer93734/c9cdff terminal0:actual API received67105840000us for65535,
+typed live alarm retained full width; real station leave cancelled to zero.
+Menuconfig word3233 has feature bit8 off. Test writes exactly2synthetic bytes
+to the disposable peer after pm_start returns, before the matched period load;
+no register/instruction/source/physical-device writes. Initial long-timer
+attempts injected before PM initialization and saw no long API call; reports
+remain in ignored build/long-timer and long-timer-v2. Fixed fixture timing,
+not production code. Final owned VM exited0; UART clean and inputs unchanged.
+
+Saved eight bounded reports with hashes in wifi-keep-alive-range-validation-
+20261028.json. Synthetic raw settings dumps are omitted from the network copy;
+the local original hash remains recorded. This is a validation record, not yet
+a standalone independent evidence consumer. See tests/WIFI_KEEP_ALIVE_RANGE.md.
+Production inputs remain frozen from the successful build. Goal remains ACTIVE:
+independent evidence replay/negative report controls, producer enums, station/
+peer lifetime, association bounds, wdev aliases and whole-image gaps remain,
+as do deferred points1–3 and final full/24h/hardware gates. User requested a
+commit/push checkpoint; do not merge main, change other worktrees or claim the
+overall goal complete. No running test sessions remain from this checkpoint.
+
+## 28 October 2026 — replay complete; user requests smart-tv integration
+
+0d0320861/141b7eb4e/a2732f83e pushed and remote SHA confirmed. Current selected
+offline consumer passed24322/6a6b19 terminal0,25266before+65836after cases,
+23semantic controls,32typed raw reads,3SNTP phases,2whole LCD frames,5owners.
+No VM/build/production changes. New supplement preserves original validation.
+Initial copied-config-hash typo and PowerShell datetime coercion were corrected;
+DateKind String preserves exact owner metadata, CIM recheck confirms absence.
+
+Next factory investigation is short BSS IE length. Scratch full native prefix
+probe fa35d6 terminal0 observes packet-bound violations for payload0/1/2 when
+the private synthetic feature bit is enabled; production bit remains off.
+Four disabled cases skip setter, payload3 stays bounded. This is not factory
+acceptance or a fix. Save scratch .build/bss-timer-fixed-20261028/probe_assoc_bounds.py
+and assoc-probe.json; qualify both images and broader IE tests next in a NEW
+worktree, retaining current app/ELF/source pins. Do not call it an exploited bug.
+
+Latest human priority: create smart-tv common branch, merge all device branches
+chronologically, later merge to main. First preserve this complete evidence
+change, then inventory local/remote tips and create .worktree/smart-tv-integration.
+No current test handles remain live. Do not delete old pinned worktrees or merge
+main now. Goal remains ACTIVE with full original scope.

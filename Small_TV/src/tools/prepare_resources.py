@@ -249,6 +249,7 @@ def main():
     compiled += sorted(p for p in (ROOT / 'third_party/libjpeg-turbo').rglob('*') if p.is_file())
     compiled += [ROOT / 'tools/build_jpeg_library.py', ROOT / 'tools/prepare_resources.py', ROOT / 'build.ps1']
     compiled += [ROOT / 'tools/verify_wifi_timer_guard.py', ROOT / 'tools/reverse/elf_archive.py', ROOT / 'tools/reverse/rv32_link_match.py']
+    compiled += [ROOT / 'tools/verify_wifi_keep_alive.py', ROOT / 'tools/reverse/timer_event11_match.py']
     compiled += [ROOT / 'tools/verify_nothrow_linkage.py', ROOT / 'tools/reverse/nothrow_linkage.py']
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     compiled += [ROOT / "cmake/debug_logging.cmake"]

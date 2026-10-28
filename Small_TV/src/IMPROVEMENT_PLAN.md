@@ -621,6 +621,20 @@ off, живое значение feature word ещё не наблюдалось
 Producer status/flag enum, station/peer lifetime, association bounds, wdev aliases
 и whole-image reachability остаются открытыми, как и весь прежний scope.
 
+### BSS-TIMER-RANGE: исправление и проверки 28 October 2026
+
+В отдельной ветке исправлен расчёт keep-alive для полного 16-битного периода.
+Все четыре вызова SDK направлены в локальный C-модуль; post-link guard сверяет
+полные тела функций, ABI и реальные ms/us backends. Проверены все65535 периодов
+(65836 CPU executions), семь отрицательных контролей, native6298/privacy3727/
+nothrow26/artifact8. Сеть проверена отдельно от дисплея:3network phases и1+1cold
+display boots. В QEMU реальный API получил67105840000us, живой alarm сохранил
+полную ширину и обнулился при station leave. BSS feature bit наблюдался off;
+поддержка не включалась. См. [проверки](tests/WIFI_KEEP_ALIVE_RANGE.md).
+Остаётся независимый consumer итогового evidence и проверки его искажений;
+selected timer gate не закрывает association bounds, station lifetime, aliases,
+whole-image reachability, deferred1–3 или final full/24h/hardware gates.
+
 ## 6. Приёмка окончательной версии и правила работы
 
 Для завершённого исправления — focused commit, failing test и проверка исправления,
