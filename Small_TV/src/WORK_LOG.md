@@ -5727,3 +5727,30 @@ Saved bounded reports and tests/WIFI_KEEP_ALIVE_RANGE.md for the user-requested
 commit/push checkpoint. No standalone evidence consumer or final full/24h/
 hardware acceptance is claimed. Continue factory comparison under the existing
 plan; other branches/worktrees and root main remain untouched.
+
+## 28 October 2026 — independently replay BSS timer correction
+
+Previous progress checkpoint0d0320861 was committed and pushed with141b7eb4e/
+a2732f83e; origin confirmed. Added an offline consumer with a separate typed
+runtime validator. Final24322/6a6b19 terminal0:25266 failing-before and65836
+after CPU executions, seven current static and23 semantic evidence rejections,
+32raw timer reads, independent SNTP math, two57600-pixel frames, five exact
+owner absence records. Production source aggregate and every file/resource hash
+match. Final records preserve original raw owner/frame bytes. No new VM/build.
+First verifier run exposed a copied SDK-config hash missing its last digit;
+second reached owner checking and rejected PowerShell's datetime normalization.
+Corrected collection with DateKind String and rechecked actual CIM absence.
+Original timer validation remains immutable; supplement records selected replay.
+
+Private scratch probe also executes the complete native association prefix and
+actual getter/setter with only ROM rates/log boundaries. With synthetic feature
+bit on, short BSS IE payloads0/1/2 reach reads beyond the exact packet end; all
+four cases with feature off skip the setter, and payload3 is safe. This is an
+investigation, not complete factory/driver acceptance or a production fix.
+Preserve .build/bss-timer-fixed-20261028/probe_assoc_bounds.py and assoc-probe.json
+in this worktree. Next qualify both images, expand length/IE-boundary controls,
+then correct in a fresh worktree to preserve current replay inputs.
+
+User now requests common smart-tv integration in chronological branch order.
+Save this focused evidence checkpoint before creating the integration worktree.
+Root main, old worktrees, full plan and deferred full/24h/hardware gates remain.

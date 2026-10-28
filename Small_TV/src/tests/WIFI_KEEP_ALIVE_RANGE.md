@@ -51,8 +51,21 @@ object, SDK timer object/source, SDK archives and preserved before-image inputs.
 It needs `pyelftools` and `unicorn`; the QEMU test additionally needs the frozen
 VM helper bundle, ROM and the qualified QEMU executable. Build with
 `build.ps1`, run `tests/run.ps1`, then `tests/artifact_test.py --resources` using
-that build's resource directory. The validation record hashes the reports and
-source files; it is not a standalone independent replay consumer.
+that build's resource directory. The original validation record is preserved.
+The independent consumer and its supplement are now saved in
+`wifi-keep-alive-range-replay-20261028.json` with original owner and panel
+witnesses. It reexecutes 25266 failing-before producer cases and all 65836
+corrected cases, recomputes 32 typed timer reads and SNTP arithmetic, compares
+all panel pixels, checks five owners and rejects 23 semantic report mutations.
+The historical record's `independent_evidence_consumer_complete: false` remains
+unchanged; the supplement records completion of this selected evidence check.
+
+Run `verify_keep_alive_range_evidence.py --help` for explicit build, SDK,
+preserved baseline root, panel directory and owner-record arguments. For the
+archived witnesses, use `--display-root` pointing at
+`Small_TV/qemu/parity/wifi-keep-alive-range-replay-20261028` and `--owners` at
+its `owners.json.gz`. Exact original build/helper/source files remain required;
+this consumer does not launch another VM or establish new runtime acceptance.
 
 This closes the selected timer arithmetic/backend test, not whole-image or
 whole-SDK equivalence. No 18-hour expiry, concurrent station lifetime, full

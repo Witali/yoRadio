@@ -5244,3 +5244,26 @@ peer lifetime, association bounds, wdev aliases and whole-image gaps remain,
 as do deferred points1–3 and final full/24h/hardware gates. User requested a
 commit/push checkpoint; do not merge main, change other worktrees or claim the
 overall goal complete. No running test sessions remain from this checkpoint.
+
+## 28 October 2026 — replay complete; user requests smart-tv integration
+
+0d0320861/141b7eb4e/a2732f83e pushed and remote SHA confirmed. Current selected
+offline consumer passed24322/6a6b19 terminal0,25266before+65836after cases,
+23semantic controls,32typed raw reads,3SNTP phases,2whole LCD frames,5owners.
+No VM/build/production changes. New supplement preserves original validation.
+Initial copied-config-hash typo and PowerShell datetime coercion were corrected;
+DateKind String preserves exact owner metadata, CIM recheck confirms absence.
+
+Next factory investigation is short BSS IE length. Scratch full native prefix
+probe fa35d6 terminal0 observes packet-bound violations for payload0/1/2 when
+the private synthetic feature bit is enabled; production bit remains off.
+Four disabled cases skip setter, payload3 stays bounded. This is not factory
+acceptance or a fix. Save scratch .build/bss-timer-fixed-20261028/probe_assoc_bounds.py
+and assoc-probe.json; qualify both images and broader IE tests next in a NEW
+worktree, retaining current app/ELF/source pins. Do not call it an exploited bug.
+
+Latest human priority: create smart-tv common branch, merge all device branches
+chronologically, later merge to main. First preserve this complete evidence
+change, then inventory local/remote tips and create .worktree/smart-tv-integration.
+No current test handles remain live. Do not delete old pinned worktrees or merge
+main now. Goal remains ACTIVE with full original scope.
