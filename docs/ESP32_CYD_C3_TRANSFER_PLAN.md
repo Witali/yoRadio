@@ -99,6 +99,10 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   [Granule/EOS bookkeeping](CYD_VORBIS_TIMING_DESIGN.md) квалифицирован отдельно
   на всех434 исходных metadata events и безопасном Xiph reference subset;
   транспортные правила первой страницы и интеграция с decoded output остаются.
+  [Аудит исходных floor0 данных](CYD_VORBIS_FLOOR0_ROUTE_AUDIT_20261028.md)
+  подтверждает ordinary range всех168 пакетов/336 каналов: следующий этап —
+  frame→floor0 spectrum→IMDCT на всём исходном434-пакетном корпусе, с сохранением
+  отдельного wider/provenance пути и незакрытого full31 PCM gate.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1886,3 +1890,18 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Это только metadata: decoder/overlap/PCM/native не исполнялись. Initial-page
   transport validation, full31 PCM, floor0/wider synthesis, radio и прежние
   deferred/physical gates остаются; production tasks/configuration не менялись.
+
+- 2026-10-28, CYD-C3-14: [аудит реального floor0 корпуса](CYD_VORBIS_FLOOR0_ROUTE_AUDIT_20261028.md)
+  сохранён с [воспроизводимым pure reader](../tests/audit-vorbis-floor0-route.py)
+  и161 096-byte JSON. Все434 packet/header identities и14 relation identities
+  сохранены; actual host front-end capture совпадает с независимой точной
+  моделью. Floor0:12 потоков/168 пакетов/336 каналов,116 736 mapped bins и
+  5 376 nonzero residue bins; order5/6, rate48000, map64/128, amplitude6/8,
+  offset60, точные LSP7/16..11/4 иresidue{-1,0,1}. Наблюдаемый log2 gain
+  [-6.61494,4.01938] — обычный диапазон. Все2 846 distinct gain evaluations
+  согласуются между800/150-digit независимыми моделями до1e-100; это convergence
+  этого корпуса, не universal error certificate. Root replay byte-identical.
+  Новых decoder/linear spectrum/PCM/native запусков нет. Следующее изменение
+  должно подключить floor0 к фактическим packet frames и прежнему IMDCT;
+  extreme finite gain, precision refinement, window underflow и все прежние
+  full31 PCM/bound2/all14 relations/production/deferred gates остаются открытыми.
