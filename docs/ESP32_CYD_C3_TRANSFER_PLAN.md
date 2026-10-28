@@ -1,6 +1,6 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-10-26. Ветка: `codex/esp32-cyd-c3-review`.
+Обновлено: 2026-10-28. Ветка: `codex/esp32-cyd-c3-review`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
@@ -93,7 +93,10 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 [Xiph на ESP32](../tests/results/vorbis-xiph-20261025/CHECKPOINT.md) проходит
 все исходные 31 случая, 434 пакета и 738560 PCM байт с побитным совпадением;
 максимальная ошибка 0 при прежнем допуске 2, все 14 отношений проходят.
-Новый собственный IMDCT/синтез пока не нужен. Следующие программные проверки —
+Новый алгоритм IMDCT не нужен: [широкий адаптер](CYD_VORBIS_TRANSFORM_DESIGN.md)
+повторно использует неизменённые тела Xiph. [Отдельный binary64 вход](CYD_VORBIS_NORMALIZED_IMDCT_DESIGN.md)
+теперь позволяет подключать другие представления спектра без искусственного
+floor1 product; это ещё не floor0 gain или полный синтез. Следующие программные проверки —
 общая обработка allocation/recovery, packet-sized scratch и оставшиеся format/range
 границы. [Отдельный ресурсный порт](../tests/results/vorbis-xiph-resources-20261025/CHECKPOINT.md)
 уже исправляет optional realloc arena и переносит book-init scratch в проверяемый
@@ -1788,3 +1791,14 @@ Stream остаётся на core0, decode/output на core1 с прежними
   SDK/native результата. Чистый replay и 28 protocol controls проходят без
   повторного запуска native. Watchdog/IDLE/core/stack настройки сохранены;
   production, owner/frame/IMDCT и прежние deferred gates этим не закрыты.
+
+- 2026-10-28, CYD-C3-14: добавлен [binary64 вход к прежнему Xiph IMDCT](CYD_VORBIS_NORMALIZED_IMDCT_DESIGN.md).
+  [Host-квалификация](../tests/results/vorbis-normalized-transform-20261028/CHECKPOINT.md):
+  1 729 сценариев/336 отказов/5 589 927 assertions проходят ASan/UBSan;
+  301 248 значений побитово совпадают с прежним limb-входом. Отдельный common
+  exponent сохраняет оба int64 endpoint без арифметики или ограничения формата.
+  Normal/subnormal ошибки разделены; для underflow сохранён явный абсолютный
+  допуск. Production units Clang0/0; три fixture snapshot warning разобраны без
+  suppression; C/C++ GCC обеих ISA и собственные frames128/144B сохранены.
+  Исходные API/kernel, production и deferred scopes не менялись. Это вход для
+  другого представления спектра, а не готовый floor0 gain/PCM или его native gate.

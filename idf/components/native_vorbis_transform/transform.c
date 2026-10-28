@@ -121,3 +121,40 @@ native_vorbis_numeric_status_t native_vorbis_imdct_transform(
         .exponent = converted.exponent, .samples = data};
     return NATIVE_VORBIS_NUMERIC_OK;
 }
+
+native_vorbis_numeric_status_t native_vorbis_imdct_transform_binary64(
+    const native_vorbis_imdct_plan_t *plan,
+    const native_vorbis_transform_block_t *source, size_t source_capacity,
+    double *workspace, size_t workspace_capacity,
+    native_vorbis_transform_block_t *result) {
+    if (!plan || !source || !result) return NATIVE_VORBIS_NUMERIC_INVALID;
+    native_vorbis_imdct_requirements_t needed;
+    native_vorbis_numeric_status_t status = native_vorbis_imdct_measure(plan->blocksize, &needed);
+    if (status != NATIVE_VORBIS_NUMERIC_OK) return status;
+    if (plan->log2n != needed.log2n || !plan->trig || !plan->bitrev ||
+        source->count != plan->blocksize / 2) return NATIVE_VORBIS_NUMERIC_INVALID;
+    if (source_capacity > SIZE_MAX / sizeof(*source->samples) ||
+        workspace_capacity > SIZE_MAX / sizeof(*workspace)) return NATIVE_VORBIS_NUMERIC_RANGE;
+    if (source_capacity < source->count || workspace_capacity < needed.workspace_count)
+        return NATIVE_VORBIS_NUMERIC_CAPACITY;
+    if (!source->samples || !workspace) return NATIVE_VORBIS_NUMERIC_INVALID;
+    int nonzero = 0;
+    for (uint32_t i = 0; i < source->count; ++i) {
+        double value = source->samples[i];
+        if (!isfinite(value) || fabs(value) > 0x1p639) return NATIVE_VORBIS_NUMERIC_RANGE;
+        nonzero |= value != 0.0;
+    }
+    for (size_t i = 0; i < 8; ++i) workspace[i] = 0.0;
+    double *data = workspace + 8;
+    if (!nonzero) {
+        for (uint32_t i = 0; i < plan->blocksize; ++i) data[i] = 0.0;
+    } else {
+        memcpy(data, source->samples, source->count * sizeof(*data));
+        native_vorbis_xiph_mdct_lookup_t lookup = {.n = (int)plan->blocksize,
+            .log2n = (int)plan->log2n, .trig = plan->trig, .bitrev = plan->bitrev};
+        native_vorbis_xiph_mdct_backward(&lookup, data, data);
+    }
+    *result = (native_vorbis_transform_block_t){.count = plan->blocksize,
+        .exponent = source->exponent, .samples = data};
+    return NATIVE_VORBIS_NUMERIC_OK;
+}

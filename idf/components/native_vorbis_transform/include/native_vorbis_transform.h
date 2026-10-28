@@ -76,6 +76,28 @@ native_vorbis_numeric_status_t native_vorbis_imdct_transform(
     double *workspace, size_t workspace_capacity,
     native_vorbis_transform_block_t *result);
 
+// Reuse the same kernel for a caller-normalized binary64 spectrum. Count must
+// be n/2 and every sample finite with absolute value <=2^639, the proven input
+// bound of the limb conversion route. This is an internal representation
+// contract, not a restriction on a codec's accepted values: a caller with a
+// wider spectrum needs another representation/normalization route. No scaling,
+// clipping or float32 conversion occurs here; exponent is retained unchanged,
+// including INT64_MIN/MAX. A wholly zero spectrum (either zero sign) produces
+// canonical +0 samples, with that same exponent. Other spectra follow ordinary
+// Xiph arithmetic, which may produce signed zeros/subnormals after cancellation.
+//
+// All input samples, shapes and capacities are checked before any write.
+// Failure preserves workspace/result. Source capacity counts doubles and must
+// cover count. Workspace has the same n+8 single-array contract as above.
+// Source/plan/lookup/workspace/descriptors/result are disjoint and immutable
+// borrows remain alive. Normal nearest rounding and the approximate transform
+// limitations above apply; this entry does not implement floor0 gain policy.
+native_vorbis_numeric_status_t native_vorbis_imdct_transform_binary64(
+    const native_vorbis_imdct_plan_t *plan,
+    const native_vorbis_transform_block_t *source, size_t source_capacity,
+    double *workspace, size_t workspace_capacity,
+    native_vorbis_transform_block_t *result);
+
 #ifdef __cplusplus
 }
 #endif
