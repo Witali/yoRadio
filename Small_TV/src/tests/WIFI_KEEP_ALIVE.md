@@ -129,3 +129,9 @@ bodies, 4808 cases with all 168/128 instruction starts, against the saved curren
 app8758BD09/ELFDA1ED0CE. The historical reference and its guards remain intact.
 Other null-completion branches, station/peer lifetime and BSS producer ranges
 remain open; external scheduler/RF/slice helpers are not a full protocol proof.
+
+Continuation 28 October: [WIFI_NULL_COMPLETION.md](WIFI_NULL_COMPLETION.md) now
+executes the complete null-completion parents, real quick-wake and state setters:
+16662 executions, all 174/213 parent starts and all 40/38 + 27/27 helper starts.
+The station/peer pointer gates are checked, but actual concurrent lifetime,
+callback producer contracts and negotiated BSS ranges remain open.

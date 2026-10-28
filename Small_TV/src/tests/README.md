@@ -9,6 +9,12 @@ entropy decoding. Реальный upload finish использует этот �
 
 ## Полнота переноса
 
+[Null completion](WIFI_NULL_COMPLETION.md): 16662 literal RV32 executions,
+полные parent/quick-wake/state-setter bodies обеих SDK (519 instruction starts).
+Проверены pending/retry/sleep-deadline branches, counter wrap и guarded station
+reads; 9 static и 8 evidence controls проходят. Actual pointer lifetime и RF
+producer/status contracts остаются открытыми, executable code не менялся.
+
 [TIM](WIFI_TIM.md): 4808 literal RV32 executions покрывают все инструкции обоих
 обработчиков (168/168 factory, 128/128 native), clock/counter boundaries и все
 записи PM/counters. Native привязан к app8758BD09/ELFDA1ED0CE после Storage fix;

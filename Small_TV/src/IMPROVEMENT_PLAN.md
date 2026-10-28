@@ -593,6 +593,17 @@ null/failure branches, station+820 lifetime, BSS setters/overflow, aliases и
 whole-image reachability открыты. Приоритет factory сравнения сохраняется;
 пункты1–3/full/24h/hardware не закрываются этим checkpoint.
 
+Checkpoint 28 Oct: [WIFI_NULL_COMPLETION.md](tests/WIFI_NULL_COMPLETION.md)
+проверяет полные null-completion parents и реальные quick-wake/state setters
+обеих SDK: 8331 case/image, 16662 executions, все 519 instruction starts / 1524 B.
+Pending/retry, guarded station/peer reads, sleep deadline и wrap counters
+проверены отдельной моделью; 9 static + 8 evidence controls и replay pass.
+Native остаётся app8758BD09/ELFDA1ED0CE, production/SDK/QEMU не менялись.
+Различия ready-ветки при pending и нового deadline зафиксированы без объявления
+их дефектами. Actual callback producer/status contracts, concurrent station/peer
+lifetime (+820), negotiated BSS setters/overflow и aliases/reachability открыты.
+Пункты 1–3 и full/24h/hardware acceptance остаются в полном объёме.
+
 ## 6. Приёмка окончательной версии и правила работы
 
 Для завершённого исправления — focused commit, failing test и проверка исправления,

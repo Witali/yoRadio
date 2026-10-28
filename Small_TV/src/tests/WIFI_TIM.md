@@ -89,3 +89,8 @@ Next: remaining null/failure completions, actual station and peer-object
 lifetimes including field 820, negotiated BSS setters/ranges, computed aliases
 and whole-image reachability. Deferred points 1–3, full regression, 24-hour
 acceptance and physical hardware remain open. No live VM is pending.
+
+Continuation 28 October: [WIFI_NULL_COMPLETION.md](WIFI_NULL_COMPLETION.md) covers
+the previously missing null-completion branches and real quick-wake/state helpers
+on this same saved native pair. Actual station lifetime and producer contracts
+remain separate requirements.

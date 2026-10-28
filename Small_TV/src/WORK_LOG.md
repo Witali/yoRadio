@@ -5644,3 +5644,32 @@ reject changed effects/counts/coverage/pair. Proof16sourcepins,1gzip33240B,
 No liveVM, physicalboard, serial/reset/flash, SDK/QEMU mutation or push.
 Next null/failure completions, station+820 lifetime, BSS ranges/overflow,
 aliases/whole-image gaps; deferred1–3 and finalfull/24h/hardware remain open.
+
+## 28 October 2026 — full null-completion, quick-wake and state comparison
+
+Revalidated clean c8e672cf0 and its synchronized origin branch after the previous
+successful push. Continued factory priority with untouched saved factory,
+reference and production inputs. Added separate qualifier/model/CPU/test/replay
+modules, documentation and bounded evidence; no production or emulator changes.
+
+The new qualifier initially assumed the quick helper was globally bound; it is
+object-local. Scoped identity now comes from the exact matched parent calls,
+while the full source-object matcher, data anchors and current symbol checks
+stay strict. All six selected bodies match and execute unchanged.
+
+8331 cases per image / 16662 executions pass with every parent, quick-wake and
+state-setter instruction visited (519 starts / 1524 linked bytes). Ordered PM
+and counter writes, untouched buffers/configuration, ABI and station/peer read
+gates match a separate model. Checked ready/retry/pending paths, 64-bit sleep
+deadline, byte/word wrapping, exact status-equality and quick helper return.
+Factory/native differences are recorded; no new production defect established.
+
+Producer session 6244 (3ee096), independent reader 19325 (caeea6), both terminal
+0. Nine static controls include real helper and parent-field changes; eight
+report controls reject changed effects, coverage and a false lifetime claim.
+Proof has 17 source pins and one 36734-byte gzip (538755 bytes expanded).
+Updated plan, working notes and test entry points. No VM, hardware or push.
+
+Remaining: actual callback producer/status semantics and concurrent station/peer
+lifetime including field 820; BSS setters/ranges/overflow; computed aliases and
+whole-image reachability; deferred points 1–3 and final full/24h/hardware gates.

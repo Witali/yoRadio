@@ -5084,3 +5084,45 @@ Prooffactory-tim-validation-20261026.json:16pins,1gzip33240B /458146Bexpanded.
 No pending exec/VM; no push. NEXT remaining null/failure completions, actual
 station/peer+820 lifetime, BSS producers/overflow, aliases/whole-image gaps.
 Deferred1–3/fullsuite/24h/hardware stay open. Goal ACTIVE.
+
+## 28 October 2026 — complete null-completion comparison
+
+Previous goal work made progress: c8e672cf0 completed TIM instruction comparison;
+the user-requested push sent all 34 unpublished commits through that HEAD to
+origin/codex/small-tv-storage-fixes. Revalidated a clean, synchronized worktree.
+No historical proof, production source, app/ELF, shared SDK or QEMU was changed.
+
+New reverse/tx_null extends the strict TIM qualifier and matches complete
+quick-wake/state-setter helpers from each SDK, with parent target, scoped local,
+shared/public/absolute symbol, data and counter checks. Initial helper target
+check incorrectly assumed a global namespace; the quick helper is object-local.
+Corrected this new guard to use exact matched caller bindings. No old guard was
+weakened and no library/ELF was patched. The first CPU run then passed.
+
+Separate tx_null_model/instructions/test modules perform 8331 cases per image,
+16662 executions. Every instruction in parents (174 factory / 213 native),
+quick-wake (40/38) and state setters (27/27) is visited: 519 starts / 1524 B.
+Real old reset and both rearm functions also execute. Exact writes/calls,
+remaining PM/config/counter buffers, ABI and guarded station read sequences
+match the independent model. Explicit external RF/slice/scheduler/hardware,
+beacon, GPIO and off-channel boundaries remain; no concurrent lifetime proof.
+
+Newly checked differences: native pending byte 488 changes the ready/retry
+selection compared with factory byte15/16 rules; native byte543/deadline568/572
+can choose sleep instead of the delay timer. Null station returns before peer
+reads, null peer skips byte820. Quick-wake can return synthetic byte19 unchanged;
+do not normalize it in tests. Retry/counter boundary effects are retained.
+Actual callback argument/status meaning remains a producer-tracing requirement.
+No production defect was established by these selected synthetic fixtures.
+
+Producer 6244 / 3ee096 and independent consumer 19325 / caeea6 are terminal 0.
+Nine static controls reject wrong SDK/reference/helper/body fields, including
+four parent mutations below the image hash guard; eight evidence controls reject
+changed effects, pointers, counters, coverage and an unsupported lifetime claim.
+Proof factory-null-completion-validation-20261028.json: 17 source pins, one gzip
+36734 B / 538755 B expanded. No VM or physical device test was started.
+
+NEXT: actual callback producers/status and station/peer lifetime (+820), BSS
+setters/ranges/overflow, computed aliases and whole-image reachability. Deferred
+points 1–3, full regression, 24-hour and physical acceptance remain open. Goal
+ACTIVE. No running exec from this checkpoint; no implicit push of this new work.
