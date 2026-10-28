@@ -4911,3 +4911,177 @@ table/recovery controls; bounded metadata и full xref audit396GP прошли.
 Повторная CIM-проверка14:47:09UTC подтвердила все12 original owners: H10=511
 complete cycles, schema7 main/V8=162/158. Guards running, oneboot/noUARTerrors.
 owners-after-audit.json сохранён в ignored base; elapsed durations не складываются.
+
+## 2026-10-25 — production guard до Wi-Fi SDK table prefetch
+
+Аудит сохранён cdd3646f9 в memory-retention. Для firmware исправления создана
+codex/small-tv-timer-bounds в repo/.worktree, от этого commit; /.worktree/ уже
+tracked ignore. Старые три runs и их inputs не менялись. Новый wifi_timer.c
+в network category помечен FIXED_FACTORY, ID14..255 отсекаются до vendor code,
+message освобождается тем же OSI->_free один раз. Валидные/null paths делегируются.
+Version/target/pointer/adapter layout compile assertions; DEBUG не отключает guard.
+
+Первая линковка не извлекала wrapper object из static app archive. Добавлен
+explicit undefined symbol к wrap option. Следующий post-link prototype выявил
+реальную ошибку предположения: ppTask SHN_ABS40001C44 — ROM trampoline, SDK522B
+symbol не является ROM554B function. Ошибка checker не была пропущена/объявлена
+pass: выстроена проверка pinned ROM289CE00E, event8 jump table и поля+356.
+Native wdev_funcs_init3386B целиком совпал с текущим SDK object и записал guard
+через настоящий function-pointer relocation. В source archives3refs, но ppTask
+body из archive здесь не linked; реальный вход подтверждён через ROM/table.
+
+Final DEBUGoff build V3 успешен. Архив appC91294FC/ELF9E4EC88D/source04B19378,
+1476480bytes (+48), guard body46B. Путь firmware/development/small-tv-esp32c2-
+reconstructed в ЭТОЙ новой копии; старые app9C1A/ELF76B5 в protected копиях целы.
+build.ps1 теперь проверяет реальные link/table/ROM identities перед archive;
+checker sources входят в compiled-source manifest, trace сохранён с firmware.
+
+Private instruction fixture:258direct cases +256ROMevent cases +4feature init
+tails =518pass. Последний initializer tail выполняется от успешного calloc до
+реального return, проверяется финальный guard slot. Сначала fixture не имел
+beacon callback precondition от предшествующего wdev_data_init и ловил read0x10;
+теперь реальные initialized ELF data и явно declared opaque beacon table stubs
+дают корректный контекст. Никаких unknown reads не игнорируется. Scheduler,
+earlier APIs и реальные child callbacks этим не квалифицированы.
+
+All242invalid byte IDs: vendor не вызывается, timer table/OOB reads0, free1.
+Valid14 IDs и null возвращают прежнее; bare vendor control всё ещё ловит OOB255.
+Consumer пересчитывает source ledger, actual SDK bodies/ROM и все518cases;
+source identities проверяются до/после. Proof wifi-timer-guard-validation-
+20261025.json и1902B gzip,12source pins. Initial prefix-only successes сохранены
+в ignored logs; acceptedv2 включает полный initializer return. Source/CMake comment
+pin изменился между ранними probes, поэтому final unit был повторён на exact inputs.
+
+Build follow-up: прежний cached JPEG jconfigint BUILD20261020, fresh20261025.
+Codec sources/patches одинаковы, raw archive SHA d690..→9c009.. и cache codec ID
+6b537..→2a6d6.. отличаются. Не маскировать SHA: нужен отдельный reproducible
+recipe fix и тесты cache reuse across paths/dates, с invalidation реальных codec
+changes. Эта оптимизация записана в плане и пока не выполнена.
+
+Следом commit проверенного guard/build/artifacts, отдельный current QEMU preflight
+4/40, затем остальные runtime/full-image/fullsuite/hardware пункты. Старые7memory
+findings не объясняются этим invalid-ID исправлением; весь goal active.
+## 2026-10-25 — QEMU runtime qualification of Wi-Fi timer guard
+
+- Revalidated actual Git/worktree state after QEMU main audit/push. Last guard
+  preflight had genuinely finished; truncated launch output did not justify a
+  restart. Replayed its full journal, exact inputs and genuine cycle-zero record.
+- Launched one owned schema5 churn40 on unchanged appC91294FC/ELF9E4EC88D and
+  main9135 executable2DF90327. Captured four original owners after guard attachment.
+  It completed40cycles/320HTTP/20outages in161.595062guest seconds; preflight was
+  4cycles/32HTTP/2outages/17.959790seconds. Both workloads+guards exit0, supervisors
+  complete, inputs unchanged, one ROM boot and no UART panic/reset each.
+- Added offline reader schema4: exact arbitrary producer prefix, actual UART
+  replay, start evidence for both runs, typed original PID/name/creationUTC exit
+  verification. A distinct process reusing a PID remains acceptable; a still-live
+  original owner is rejected. No running producer sources or binaries changed.
+- Saved47payloadrefs with37241new gzip bytes. Replayed new proof/28negative
+  controls and previous schema2 main proof/20controls;25analysis tests also pass.
+  This only qualifies short ordinary runtime of the new build. No new live invalid
+  ID injection, H10, independent display/network or physical acceptance claim.
+- Found old mainH10 terminal failed at526cycles, timeout waiting for/start_upload.
+  Its complete journal independently yields4207HTTP/8outages/4pendingevents,
+  2108ROMcrosschecks and9040.980895observed seconds; inputs unchanged, no panic.
+  First diagnostic used an incorrect guessed chunk count and was rejected; rerun
+  derived10chunks from the actual fixture and preserved the original sequence.
+  QEMU log535WSAEventSelect invalid-socket warnings are a lead, not proven cause.
+  All4oldowners absent, supervisorworkloadexit1/guardexit0 plus cleanup refused.
+  Save the failed artifact and investigate before any replacement H10; two matched
+  schema7 controls remain running and protected.
+
+## 2026-10-25 — preserve the failed main H10 before reproduction
+
+- Saved report, complete events, UART, QEMU warnings, traceback, cleanup error,
+  supervisor, genuine start and original/final process identities in a distinct
+  historical failure archive. It has 19 payload references and 64787 new gzip
+  bytes; no duplicate ELF, SDK or full Flash/RAM dump.
+- Added an offline reader that recomputes the exact observed prefix, original
+  trend algorithm and UART bytes while requiring terminal workload failure.
+  Seven actual negative controls reject false success, full-scope/duration claims,
+  missing work, altered journal, successful supervisor and a live original owner.
+- Actual replay with --recheck-inputs passed. All original absolute inputs were
+  rehashed, including the pinned QEMU executable. The prototype expected an
+  explicit null elapsed field; the real failure omits it. Corrected the reader
+  without editing the report or inventing an end time.
+- Documented that 535 invalid-socket warnings do not establish the HTTP timeout's
+  cause. The existing finally block already closed the VM, so failure PC/memory
+  were not available. Next diagnostic must capture bounded state before cleanup;
+  no automatic timeout increase or fresh H10 was used to hide this failure.
+- At 15:55:40/41 UTC, CIM matched all eight original owners of the separate main
+  and V8 metadata controls. They had 323/317 cycles, running UART guards, one ROM
+  boot each and no guard errors. Their input trees and executables remain frozen.
+
+## 2026-10-25 — fix redundant cleanup without hiding workload failure
+
+- Added a process-identity check to the host cleanup module. The session timestamp
+  is an upper bound on original creation; a later or different process at the PID
+  is left alone. Retain the original kernel handle during helper execution and
+  accept an already-exited original without a second QMP stop. Preserve real
+  helper exit codes and both logs. Existing workload failure stays failed.
+- Inspection failures initially bypassed helper execution in the prototype.
+  Corrected this before final qualification: record the diagnostic error, retain
+  unknown liveness, and still attempt the existing nonce-checking helper. A
+  nonzero helper result with unknown/live ownership remains an error.
+- Added 13 real OS canary cases, including successful helper cleanup despite
+  malformed identity. The stale-time case is a controlled live-canary identity
+  fixture, not an actual kernel PID-reuse event. Live canaries remain intact.
+- Initial harness failed on a transient sharing conflict reading a new JSON.
+  Stopped the exact remaining fixture through its verified nonce protocol and
+  confirmed both wrapper/child gone before rerun. Added bounded same-file retry
+  and cached identity. V2 passed 12 cases; final V3 passed 13 cases after the
+  inspection-error fix. All 10 previous supervisor tests also passed again.
+- Final real QEMU fault test used the pinned main executable and unchanged C912
+  image. It stopped all three owned processes and required no test fallback kill.
+  Replayed cleanup of the actual retained closed H10 session: owner absent,
+  helper skipped, no added cleanup error, original passed=false preserved.
+- Saved four final reports / 8314 gzip bytes with seven source pins. Updated
+  historical runtime replay to use d7dccb92f source revision; actual replay passed
+  after cleanup source changes. No firmware, SDK, frozen helper or live matched
+  control input changed. Failure-state capture and timeout cause remain open.
+
+## 2026-10-25 — preserve bounded failure state before cleanup
+
+- Added failure capture inside the existing QMP context so actual typed state is
+  saved before closing QMP/RSP/the owned VM. Initial HTTP exception is preserved
+  even if diagnostic transport, bounds or output fail. No normal-path extra stop.
+- Kept type conversion in a separate native-DWARF module: compilation-unit scoped
+  photo globals, nested queue offsets, scalar sizes and signedness. No old-ELF
+  offsets or relaxation of the TCP synchronization allowlist.
+- Added a shared RSP deadline and bounded existing-QMP stream. Caps: five seconds,
+  192 memory requests, 32768 requested bytes, per-read SRAM bounds, 64-KiB artifact
+  and 16-KiB serialized usernet component. Record PC/SP/RA and typed counters,
+  task metadata, queue/mutex owners; no raw stack, allocator or HTTP payload.
+- First localhost socketpair test blocked during Windows fixture setup. Inspected
+  original Python processes/TCP state, stopped only verified PID45000 with held
+  handle/creation identity, and polled its original exec to terminal. Replaced
+  setup with explicit bounded IPv4 connect/accept, then ran normally authorized
+  local-network tests. No production VM or live long-run input was touched.
+- 10 real-socket RSP deadline tests and 10 diagnostic failure/file/budget tests
+  passed, including partial replies/events, oversized metadata and original-error
+  preservation. Read request and byte limits stop before issuing the next read.
+- Final real C912/main9135 run injected a host timeout only after actual guest
+  /start_upload HTTP200. Snapshot existed before stop with matching final SHA;
+  original exception and kernel process identity preserved. Capture complete in
+  0.047 s / 96 requests / 2230 bytes. No test fallback cleanup needed. This is a
+  diagnostic-path test, not the historical timeout's cause or H10 acceptance.
+- Archived31 payload references/22 source pins,17 new gzip/37969 bytes, reused
+  unchanged blobs and moved an unreferenced reader prototype to ignored build.
+  Actual reader replay recomputed journal, UART and exact ELF layout;11 rejection
+  controls passed. Normal-path preflight and an owned long diagnostic run follow.
+
+## 2026-10-25 — normal path passed; one diagnostic duration run started
+
+- Committed the complete diagnostic feature as70cd3e5be before launching its
+  ordinary schema5 preflight. Genuine cycle-zero and all four owners captured.
+  It completed4 cycles/32HTTP/2outages in18.816259 guest seconds; workload/guard
+  exit0, supervisor complete, inputs rehashed and original owners exited.
+- Verified no failure file/metadata on success. Independently recomputed full
+  journal/UART and12 workload/owner rejection controls. Saved nine raw records,
+  10446 gzip bytes, under runtime-failure-capture-preflight-20261025.json.
+- Launched exactly one separate diagnostic-main with86400 guest seconds,
+  interval15/outage60, same committed producer and unchanged C912/9E4E app/ELF.
+  Captured genuine start0 and four exact owner identities, not a recreated start.
+- CIM at16:45:03UTC verified all four original owners;3 cycles complete, one ROM
+  boot and running guards. Old main/V8 metadata controls retain all eight original
+  identities and444/437 cycles. These pending prefixes do not establish H10/8h.
+  Source trees, shared SDK/ROM/helpers and pinned executables are now protected.

@@ -247,6 +247,7 @@ def main():
     # TJpgd. Their separate build report records the actual target archive.
     compiled += sorted(p for p in (ROOT / 'third_party/libjpeg-turbo').rglob('*') if p.is_file())
     compiled += [ROOT / 'tools/build_jpeg_library.py', ROOT / 'tools/prepare_resources.py', ROOT / 'build.ps1']
+    compiled += [ROOT / 'tools/verify_wifi_timer_guard.py', ROOT / 'tools/reverse/elf_archive.py', ROOT / 'tools/reverse/rv32_link_match.py']
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     compiled += [ROOT / "cmake/debug_logging.cmake"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]

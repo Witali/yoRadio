@@ -54,6 +54,12 @@ Read-only `jpeg_storage_layout.make_plan` использует `REQUESTED_CHANGE
 
 ## Как ставить метку
 
+`FIXED_FACTORY` в `network/wifi_timer.c` относится к подтверждённому чтению
+`table[id].id` до проверки границ в vendor dispatcher. Восстановленная прошивка
+отвергает invalid IDs до этого чтения и сохраняет message ownership. Сам vendor
+body остаётся как контроль; ROM/table ingress проверен отдельно:
+[WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md).
+
 `FIXED_TEST` в `tools/reverse/ExportFactoryXrefs.java#address` относится к
 формату выгрузки анализа: RAM-адреса числовые, внешние адресные пространства
 сохраняются отдельно. GP-relative ссылки дополнены независимым разбором bytes;

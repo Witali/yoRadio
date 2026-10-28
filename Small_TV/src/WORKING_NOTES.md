@@ -3904,3 +3904,231 @@ active; retained-loss flags, H10/matched controls, cleanup/fullsuite/hardware op
 LatestCIM25Oct14:47:09UTC: all12original owners live, H10=511cycles,
 schema7main/V8=162/158; guardsrunning/oneROMboot/noerrors. Ignored
 factory-timer-dispatch-20261025/owners-after-audit.json retains observation.
+
+## CURRENT 2026-10-25 — active tree is small-tv-timer-bounds
+
+Continuing turn PROGRESS:cdd3646f9 audit committed in small-tv-memory-retention,
+then new branch codex/small-tv-timer-bounds at repo/.worktree/small-tv-timer-bounds.
+Do not edit the original H10 or matched-control producer trees. All three old
+VMs/app9C1A83BD/ELF76B5CE37 remain protected; their runs do not qualify a new image.
+
+Implemented network/wifi_timer.c FIXED_FACTORY: reject ID14..255 before vendor
+table read, free once through the same g_osi_funcs_p adapter, delegate valid/null.
+Pinned target6.1/C2/ABI compile assertions; wrap+undefined ensures archive extraction.
+ROM complication was real: native ppTask at40001C44 is a trampoline to40046EEC,
+not its archive522B body. Actual ROM554B/event8 jumps through pp_wdev_funcs+356;
+full current SDK wdev_funcs_init writes the guard to that slot. Three archive
+refs are catalogued, but the ppTask archive body is not a linked ingress.
+
+Build V3 COMPLETE SUCCESS, DEBUGoff, saved production development files:
+app c91294fca6acb16283605eef8aedcf98102d7a8ad42076c09b058594a5c97e93
+ELF 9e4ec88d6e85ae58fa3e164362f1b10491f9edef0feaa4af8c52c9fa88446e24
+source04b19378061ef5cdad4fd56f27477cafb4d454f58b0767df30eba66384333bcd
+App1476480bytes,+48;guard46B. Exact ELF under this tree's .build/small-tv-esp32c2.
+Post-link ROM/table/library verification mandatory in build.ps1; source ledger
+includes checker modules. Do not rebuild/change compiled inputs while a new VM
+qualification is using them. Current prototype/unit artifact names listed below.
+
+Final unit .build/wifi-timer-guard-tests-v2-20261025.json:518cases=258direct+
+256exactROMblock+4complete successful-allocation initializer tails. Actual final
+slot remains guarded through SDK return. Earlier tail fixture missed a beacon
+callback data precondition supplied by wdev_data_init; it failed on0x10, never
+silently zero-filled. Now initialized ELF data +declared opaque beacon stubs;
+these callbacks and earlier APIs/scheduler remain outside this host fixture.
+All242invalid IDs avoid vendor/table/OOB and free1; valid/null preserved.
+Bare vendor control reproduces OOB. No software delays/Flash writes/allocations
+added by guard. tests/WIFI_TIMER_GUARD.md documents exact scope and replay.
+
+Proof wifi-timer-guard-validation-20261025.json,1902B packed transcript,12source
+pins; consumer fully replays source ledger/link/ROM/518cases and rechecks sources.
+Two early build failures were extraction and incorrect ROM assumption, not passed
+qualifications. Final artifacts/static/probe SHA all agree. No physical actions.
+
+NEXT: commit complete guard change, run ONE schema5 preflight4/current-main and
+guard/supervisor; then40cycle qualification and independent network/display/final
+gates. Never use TcpTopology yet: its ABI policy is pinned to OLD76B5 and needs
+separate qualification for a new ELF, not a weakened SHA check.
+Also new CODEC-REPRO plan item: same JPEG code got BUILD20261020→20261025,
+archive d690..→9c009.. and codecID6b537..→2a6d6... Normalize reproducible recipe
+inputs/date with cross-path/date tests; do not remove library SHA ownership guard.
+This is separate from timer fix and not yet implemented. ID11 max_idle/keep_alive
+callee review, old retained losses, three long runs, cleanup/fullsuite/hardware open.
+
+## CURRENT 2026-10-25 — timer guard qualified in short QEMU workloads
+
+Active tree small-tv-timer-bounds, producer2b036586e; appC91294FC/ELF9E4EC88D
+unchanged. Last turn QEMU merge/push audit confirmed all useful branches already
+in main9135fc89ce. This continuation PROGRESS: actual completed preflight inspected,
+then ONE separate churn40 launched, genuine cycle-zero/owners captured, both ended.
+Do not rerun either run due to the earlier truncated launcher output.
+
+Runtime schema5 preflight4/churn40: 32/320HTTP,2/20outages,17.959790/161.595062
+guest seconds. Workload/guard exit0, supervisors complete/inputs unchanged, UART
+one ROM boot/no reset or panic. All8 original PID/name/creationUTC owners exited;
+their live and terminal records are archived. No TCP topology allowlist change.
+Reader schema4 validates exact producer prefix, actual UART bytes, both early
+captures and original-owner exit (PID reuse is not an original owner). New proof
+wifi-timer-runtime-validation-20261025.json:47refs,37241new gzip bytes,28rejections.
+Actual consumer replay and old main schema2 replay pass (old20controls);25analysis
+tests pass. See tests/WIFI_TIMER_GUARD.md. This is NOT H10/fullsuite/hardware.
+
+IMPORTANT: original H10/main9135 OLDapp9C1A is now AUTHORITATIVELY FAILED, not live.
+Supervisor terminal at2026-10-25T14:53:49.5005313Z/workloadexit1/guardexit0, all4
+original PIDs absent. 526cycles/4207HTTP/8outages, last guest9066.078574,
+9040.980895observed seconds from start,4pending HTTP events. Timeout during
+/start_upload response. Journal aggregates+2108ROM crosschecks agree; no panic.
+QEMU log has535 WSAEventSelect invalid-socket warnings. Cause NOT established;
+do not call a firmware bug or excuse the failure, and do not accept as24h.
+Supervisor cleanup also reported connection refused after workload closed VM:
+known separate cleanup issue. Preserve complete failure before a diagnostic run.
+Two schema7 OLDapp controls remain active; revalidate identities before using.
+
+NEXT: archive failed H10 and investigate Windows slirp socket lifecycle/HTTP
+timeout, with a separate QEMU task worktree/build and owned diagnostic VM. Current
+long controls and pinned executables must remain untouched. Then cleanup helper,
+CODEC-REPRO, ID11 callee/full-image reachability, new-image independent gates and
+hardware remain open. Full goal active; do not combine old/new run durations.
+
+Failure archive now saved: runtime-main-failure-validation-20261025.json,
+19 payload references, 64787 new compressed bytes. Actual consumer replay with
+--recheck-inputs passed and rejected seven false-success/ownership controls.
+The first reader prototype expected an explicit null elapsed field; the real
+terminal failure omits it. Fixed the reader to accept absence or null while still
+rejecting any invented elapsed/end time. No producer or report was changed.
+See tests/RUNTIME_MAIN_FAILURE.md. Next priority is bounded pre-cleanup failure
+state capture and an owned diagnostic reproduction. Invalid-socket warnings may
+come from callback registration or unregistration; causation remains unknown.
+
+## CURRENT 2026-10-25 — idempotent host VM cleanup fixed and qualified
+
+Active branch codex/small-tv-timer-bounds. Previous progress committed as
+d7dccb92f (short timer-guard runtime) and 421291ab5 (failed H10 preservation).
+Firmware app C91294FC / ELF 9E4EC88D remains unchanged; no rebuild or flashing.
+
+runtime_cleanup.psm1 now checks production session PID, executable and launch
+timestamp before a redundant helper call. The session time is an upper bound
+on original creation, not the exact creation timestamp. Absent/exited originals
+or a demonstrably later/different process need no stop. For a matching live
+process, hold its kernel handle through helper completion. A helper error is
+benign only if that original has exited; keep its actual nonzero code and logs.
+Unknown liveness never excuses failure. Inspection errors are recorded but do
+not bypass the existing nonce-checking helper. No new PID-based kill operation.
+
+Final module SHA 86cec17ca752b01dd4f5ba447856fbdb8934b2f01df4a43c3f1391a62cb9cf2a.
+13 real Windows canary cases, 10 old supervisor cases and a real main-QEMU
+filesystem-fault run passed. Native workload/guard/VM stopped by the supervisor;
+test fallback cleanup was unnecessary. Replay against the retained closed H10
+session chose absent/original-already-exited, no new cleanup error, passed=false.
+Four final reports saved, 8314 compressed bytes, seven source pins:
+runtime-cleanup-validation-20261025.json; tests/RUNTIME_CLEANUP.md explains scope.
+
+Initial test harness hit an actual Windows sharing race in vm-ready.json; the
+remaining owned canary was stopped by verified nonce and confirmed gone before
+rerun. Added bounded same-file read retry and cached identity. V2 had 12 cases;
+final V3 has 13 after strengthening inspection-error cleanup continuation. Only
+final reports are accepted. All test sessions have finished; none needs polling.
+
+Historical timer runtime replay now needs --source-revision d7dccb92f because
+the cleanup producer file changed after its qualification. That replay passed;
+the original archives were not rewritten. Two metadata-control producer trees
+and their pinned executables are still protected and must be revalidated.
+
+NEXT: implement bounded failure-state capture before runtime_qemu finally closes
+its RSP/QMP and VM, then an owned diagnostic reproduction of the HTTP timeout.
+Do not increase the timeout or infer causation from WSAEventSelect warnings.
+Afterward CODEC-REPRO, ID11 callee review, real queued TCP buffers, full-image
+reachability, final independent network/display/full suite, H10 and hardware
+gates remain open. The broad goal remains active, with no duration aggregation.
+
+Latest authoritative observation, 25 Oct 16:08:50/51 UTC: all eight original
+metadata-control owner identities still match. Main/V8 have 357/352 cycles,
+running guards, one ROM boot each, no guard errors. No cleanup-test processes
+remain. Saved ignored remaining-controls-after-cleanup-20261025.json. These are
+pending prefixes, not 8-hour or H10 acceptance.
+
+## CURRENT 2026-10-25 — bounded failure capture implemented and native-tested
+
+Active tree/branch remains small-tv-timer-bounds, last prior commit 6da615e3c.
+This goal turn is PROGRESS. Firmware remains C91294FC / 9E4EC88D, source 04B19378;
+no firmware rebuild, SDK/frozen-helper change or physical device operation.
+User asked what remains: answered with H10/retained memory, actual JPEG I/O and
+power faults/CODEC-REPRO, remaining whole-image/ID11 paths, final independent
+network/display/full regression, and hardware H01-H09. Broad scope stays active.
+
+Added runtime_failure_capture + separate DWARF layout module. Context captures
+before existing QMP __exit__ and outer RSP/VM cleanup. Actual arbitrary-PC stop,
+no advance to SDK entry, no guest writes/calls. Read CPU PC/SP/RA, heap/task
+metadata, upload/worker flags and queue/mutex counters/owners only, never payload
+or used stack bytes. Partial components remain explicitly diagnostic, not quiet
+TCP/allocator qualification. TCP topology allowlist for the new ELF unchanged.
+
+RSP has a shared deadline; QMP uses the existing bounded stream. Five seconds,
+192 requests, 32768 requested SRAM bytes, 4096 per read, metadata file 64 KiB.
+Usernet serialized component <=16 KiB so a large connection inventory cannot
+crowd out CPU/photo data. Normal context exit performs no diagnostic I/O.
+
+Final native test .build/runtime-failure-capture-qemu-v2-20261025 completed:
+intentional host TimeoutError after real /start_upload HTTP200, original error
+object preserved. File SHA observed before actual stop, original kernel VM
+object exited, no fallback cleanup. Complete snapshot 0.047000 seconds,
+96 requests / 2230 bytes, errors empty. Two prior cycles/four pending events;
+this is NOT a reproduction or explanation of the historical H10 timeout.
+Earlier first native probe passed at 0.016 s; final adds usernet size protection.
+
+10 deadline +10 capture/error/budget tests pass. First socketpair fixture hung
+during Windows local setup; inspected real processes and TCP bound/listen state,
+stopped only the verified own Python PID45000/creation16:15:43.253067UTC, then
+confirmed the same exec session ended. Replaced that unbounded startup with
+explicit bounded IPv4 connect/accept and used the normal approved local-network
+execution context. No live QEMU was restarted from an observation timeout.
+
+Proof runtime-failure-capture-validation-20261025.json: 31 references,22 source
+pins,17 new gzip/37969 bytes. Actual consumer replay recomputes journal/UART/
+native DWARF and rejects11 controls. An unused reader prototype blob was moved
+into ignored .build after confirming no JSON proof referenced it. All unit,
+native and archive replay sessions are terminal; none needs more polling.
+
+NEXT: commit the complete feature, then ONE ordinary schema5 preflight4 using
+the committed producer and one separate diagnostic duration86400/interval15/
+outage60 run with genuine cycle-zero and four original owner observations.
+Do not overwrite failed H10 or protected old controls; their durations never
+combine. Current tree must stay frozen once a new diagnostic run uses it.
+Independent CODEC-REPRO/new source changes then need another task worktree.
+
+## CURRENT 2026-10-25 16:45 UTC — producer frozen for the diagnostic duration run
+
+Feature committed as 70cd3e5bef443c772a714a826ab6a72ea69e38de. The ordinary
+schema5 preflight finished: 4 cycles,32 HTTP,2 outages,18.816259 guest seconds.
+Workload/guard exit0, supervisor complete, all inputs rehashed, original owners
+exited. No failure file/field on success. Journal/UART and 8 workload +4 owner
+controls independently verified. Nine raw records /10446 gzip bytes saved in
+runtime-failure-capture-preflight-20261025.json, including genuine start0.
+
+ONE diagnostic-main run was launched after that pass. Preserve exactly this run:
+root .build/failure-capture-runtime-20261025/diagnostic-main
+request86400 guest seconds, interval15, outage60, schema5, no TCP topology.
+VM name SmallTV-ee01f5c96c24; appC91294FC/ELF9E4EC88D; main QEMU2DF90327.
+Producer70cd3e5be. Genuine cycle-zero and all four original owners captured.
+
+Original owner identities (name, PID, exact creation UTC):
+- supervisor pwsh.exe,31368,2026-10-25T16:42:18.2230720Z
+- workload python.exe,16156,2026-10-25T16:42:18.6920630Z
+- guard python.exe,19100,2026-10-25T16:42:55.3108110Z
+- VM main-9135-riscv32.exe,20424,2026-10-25T16:42:24.5192390Z
+
+Last CIM16:45:03UTC matched all four,3 cycles, guards/supervisor running, one ROM
+boot/no UART guard errors. Old metadata main/V8 controls also still match all8
+original owners,444/437 cycles at16:45:04UTC, guards running. Saved ignored
+failure-capture-final-owner-observation-20261025.json. All three are pending;
+never call them H10/8h pass or combine their durations with earlier failed runs.
+Both launcher execs22039/15764 are terminal; their detached owners are live.
+
+DO NOT change producer/runtime/helper/profile/compiled inputs in this tree or
+the old metadata-control tree. Documentation/offline analysis may be updated.
+For CODEC-REPRO or firmware/producer fixes, create a separate branch/worktree
+under repo/.worktree from this completed source state. Shared SDK/ROM, frozen
+helper bundle and both pinned main/V8 executables remain read-only.
+NEXT: revalidate owners/status, inspect any genuine failure-state snapshot;
+meanwhile advance CODEC-REPRO or selected whole-image/ID11 analysis independently.
+HTTP timeout cause, long acceptance, retained loss, actual I/O/power fault matrix,
+queued guest TCP samples, final independent gates and hardware remain open.

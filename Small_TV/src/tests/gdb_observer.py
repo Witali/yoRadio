@@ -4,6 +4,8 @@ There are no memory/register writes, software breakpoints or continue addresses.
 The guest's PC is changed only by its own instruction execution.
 """
 import socket
+from contextlib import contextmanager
+import time
 
 
 class Observer:
@@ -11,6 +13,7 @@ class Observer:
     def __init__(self, port):
         self.socket = socket.create_connection(('127.0.0.1',port),5)
         self.socket.settimeout(120)
+        self._deadline = None
         self.breakpoints = set()
         response = self.request('qSupported')
         if 'qXfer:features:read+' not in response:
@@ -32,10 +35,43 @@ class Observer:
                 return result
         raise AssertionError('Oversized register description')
 
+    @contextmanager
+    def time_limit(self, seconds):
+        """Bound all RSP I/O in one diagnostic, including slow partial replies."""
+        if type(seconds) not in (int, float) or not 0 < seconds <= 30:
+            raise ValueError('Expected an observer deadline of at most 30 seconds')
+        previous, timeout = self._deadline, self.socket.gettimeout()
+        deadline = time.monotonic() + seconds
+        self._deadline = min(previous, deadline) if previous is not None else deadline
+        try:
+            yield
+        finally:
+            self._deadline = previous
+            self.socket.settimeout(timeout)
+
+    def _limit_io(self):
+        """Keep a total deadline from restarting on each socket byte or request."""
+        if self._deadline is not None:
+            remaining = self._deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError('Observer diagnostic deadline expired')
+            timeout = self.socket.gettimeout()
+            self.socket.settimeout(min(timeout, remaining) if timeout is not None else remaining)
+
+    def _recv(self, size):
+        """Read with the remaining shared deadline while preserving normal mode."""
+        self._limit_io()
+        return self.socket.recv(size)
+
+    def _send(self, data):
+        """Send an existing permitted packet within the same diagnostic budget."""
+        self._limit_io()
+        self.socket.sendall(data)
+
     def receive(self):
         """Check packet checksums and decode RSP escaping/run-length encoding."""
         while True:
-            first = self.socket.recv(1)
+            first = self._recv(1)
             if not first:
                 raise ConnectionError('QEMU debugger disconnected')
             if first==b'$':
@@ -46,7 +82,7 @@ class Observer:
                 raise AssertionError('Unexpected debugger framing byte')
         payload = bytearray()
         while True:
-            byte = self.socket.recv(1)
+            byte = self._recv(1)
             if not byte:
                 raise ConnectionError('Truncated debugger response')
             if byte==b'#':
@@ -56,12 +92,12 @@ class Observer:
                 raise AssertionError('Oversized debugger response')
         digest = bytearray()
         while len(digest)<2:
-            part = self.socket.recv(2-len(digest))
+            part = self._recv(2-len(digest))
             if not part:raise ConnectionError('Missing debugger checksum')
             digest += part
         if sum(payload)%256 != int(digest,16):
             raise AssertionError('Debugger response checksum mismatch')
-        self.socket.sendall(b'+')
+        self._send(b'+')
         decoded = bytearray()
         cursor = 0
         while cursor<len(payload):
@@ -85,7 +121,7 @@ class Observer:
         if not allowed:
             raise AssertionError('State-writing debugger command is forbidden')
         data = command.encode('ascii')
-        self.socket.sendall(b'$'+data+b'#'+f'{sum(data)%256:02x}'.encode())
+        self._send(b'$'+data+b'#'+f'{sum(data)%256:02x}'.encode())
         response = self.receive()
         if response.startswith('E'):
             raise RuntimeError('Debugger request failed: '+command+' -> '+response)
@@ -123,11 +159,11 @@ class Observer:
 
     def resume(self):
         """Resume without a target address; QMP may observe elapsed virtual time."""
-        self.socket.sendall(b'$c#63')
+        self._send(b'$c#63')
 
     def interrupt(self):
         """Pause normally running QEMU without changing a register or instruction."""
-        self.socket.sendall(b'\x03')
+        self._send(b'\x03')
         reply=self.receive()
         if not reply.startswith(('T02','S02')):
             raise AssertionError('Unexpected debugger interrupt response: '+reply)

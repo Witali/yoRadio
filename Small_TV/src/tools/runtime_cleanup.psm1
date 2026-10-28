@@ -52,11 +52,58 @@ function Save-SmallTvRuntimeChildLogs($Child, [string]$Control, $State) {
     }
 }
 
+function Get-SmallTvRuntimeVmOwner([string]$SessionDirectory) {
+    # FIXED_TEST: QMP refusal is not liveness evidence. Inspect the saved PID and
+    # hold its kernel process handle so a later PID reuse cannot change the result.
+    $session = Get-Content -LiteralPath (Join-Path $SessionDirectory 'session.json') -Raw |
+        ConvertFrom-Json -DateKind String
+    # Older host-only fixtures have no production session identity. They must
+    # still use their helper; missing metadata never establishes that a VM exited.
+    if (!$session.PSObject.Properties['pid'] -or !$session.PSObject.Properties['qemu'] -or
+        !$session.PSObject.Properties['started_utc']) {return @{status='unknown'; process=$null}}
+    if ($session.pid -isnot [long] -and $session.pid -isnot [int]) {throw 'Invalid VM process ID.'}
+    if ($session.pid -le 0) {throw 'Invalid VM process ID.'}
+    $launched = [DateTimeOffset]::Parse($session.started_utc,
+        [Globalization.CultureInfo]::InvariantCulture).UtcDateTime
+    $executable = [IO.Path]::GetFullPath([string]$session.qemu)
+    $process = $null
+    try {
+        try {$process = [Diagnostics.Process]::GetProcessById($session.pid)}
+        catch [ArgumentException] {return @{status='absent'; process=$null}}
+        $null = $process.Handle
+        if ($process.HasExited) {return @{status='exited'; process=$process}}
+        $created = $process.StartTime.ToUniversalTime()
+        $image = $process.MainModule.FileName
+        if ($created -gt $launched -or
+            ![StringComparer]::OrdinalIgnoreCase.Equals($image, $executable)) {
+            return @{status='replaced'; process=$process}
+        }
+        return @{status='live'; process=$process}
+    } catch {
+        if ($null -ne $process) {$process.Dispose()}
+        throw
+    }
+}
+
 function Invoke-SmallTvRuntimeVmCleanup([string]$Python, [string]$Helper,
                                        [string]$SessionDirectory, [string]$Control, $State) {
-    # FIXED_TEST: run the identity-checking VM helper before opening its log file.
-    $child = $null
+    # FIXED_TEST: preserve helper failures unless the original VM is proven gone.
+    # A different process at the saved PID must never be stopped or awaited.
+    $child = $owner = $null
     try {
+        try {$owner = Get-SmallTvRuntimeVmOwner $SessionDirectory}
+        catch {
+            # Diagnosis must not bypass the existing nonce-checking cleanup
+            # helper. Unknown liveness can never excuse its nonzero exit code.
+            Set-SmallTvRuntimeCleanupFailure $State 'inspect VM owner' $_.Exception.Message
+            $owner = @{status='unknown'; process=$null}
+        }
+        $State.vm_cleanup_owner_status = $owner.status
+        if ($owner.status -in @('absent','exited','replaced')) {
+            $State.vm_cleanup_action = 'original-already-exited'
+            $State.vm_cleanup_exit_code = $null
+            return
+        }
         $start = [Diagnostics.ProcessStartInfo]::new($Python)
         $start.UseShellExecute=$false
         $start.CreateNoWindow=$true
@@ -74,10 +121,17 @@ function Invoke-SmallTvRuntimeVmCleanup([string]$Python, [string]$Helper,
             stdout=$process.StandardOutput.ReadToEndAsync(); stderr=$process.StandardError.ReadToEndAsync()}
         if (!$process.WaitForExit(15000)) {throw 'Owned VM cleanup helper did not finish.'}
         $State.vm_cleanup_exit_code=$process.ExitCode
-        if ($process.ExitCode -ne 0) {throw "Owned VM cleanup helper exited with $($process.ExitCode)."}
+        if ($process.ExitCode -ne 0) {
+            if ($owner.status -eq 'live' -and $owner.process.HasExited) {
+                # Keep the actual nonzero helper result, but do not invent a
+                # cleanup failure after the held original process has exited.
+                $State.vm_cleanup_action = 'original-exited-during-helper'
+            } else {throw "Owned VM cleanup helper exited with $($process.ExitCode)."}
+        } else {$State.vm_cleanup_action = 'helper-completed'}
     } catch {
         Set-SmallTvRuntimeCleanupFailure $State 'stop owned VM' $_.Exception.Message
     } finally {
+        if ($null -ne $owner -and $null -ne $owner.process) {$owner.process.Dispose()}
         if ($null -ne $child) {
             Stop-SmallTvRuntimeChild $child $State
             $stdout = Read-SmallTvRuntimePipe $child 'stdout' $State

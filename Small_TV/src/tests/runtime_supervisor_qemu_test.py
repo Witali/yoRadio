@@ -18,6 +18,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--yoradio', type=Path, required=True)
     parser.add_argument('--qemu-root', type=Path, required=True)
+    parser.add_argument('--qemu', type=Path, help='Explicit candidate executable; preserve the frozen helper bundle')
     parser.add_argument('--dependency-root', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
@@ -28,12 +29,13 @@ def main():
     pwsh = Path(shutil.which('pwsh') or '')
     assert pwsh.is_file(), 'PowerShell 7 required'
     run = out / 'runtime'
+    executable = (args.qemu or args.qemu_root / 'bin/qemu-system-riscv32.exe').resolve()
     control = Path(str(run) + '-supervisor')
     inputs = [Path(__file__), Path(__file__).with_name('runtime_supervisor_fixture.py'),
               tools / 'runtime_supervisor.ps1', tools / 'runtime_cleanup.psm1', tools / 'runtime_state_io.psm1',
               root / 'firmware/development/small-tv-esp32c2-reconstructed/app.bin',
               root / '.build/small-tv-esp32c2/small_tv_reconstructed.elf',
-              args.qemu_root / 'bin/qemu-system-riscv32.exe', pwsh]
+              executable, pwsh]
     sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
     hashes = {str(path): sha(path) for path in inputs}
     report = dict(passed=False, all_functionality_verified=False, scope=__doc__,
@@ -43,6 +45,8 @@ def main():
         '-YoradioRoot', str(root), '-QemuRoot', str(args.qemu_root.resolve()),
         '-DependencyRoot', str(args.dependency_root.resolve()), '-OutputDirectory', str(run),
         '-Cycles', '100000', '-IntervalSeconds', '15']
+    if args.qemu:
+        command += ['-QemuExecutable', str(executable)]
     kernel = ctypes.WinDLL('kernel32', use_last_error=True)
     kernel.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
     kernel.OpenProcess.restype = wintypes.HANDLE
@@ -76,7 +80,7 @@ def main():
             command_line = identity['CommandLine'].replace('/', '\\').lower()
             if role == 'vm':
                 assert session['name'].lower() in command_line
-                assert Path(identity['ExecutablePath']).resolve() == (args.qemu_root / 'bin/qemu-system-riscv32.exe').resolve()
+                assert Path(identity['ExecutablePath']).resolve() == executable
             else:
                 expected = 'runtime_qemu.py' if role == 'workload' else 'runtime_run_guard.py'
                 assert expected in command_line and str(run).replace('/', '\\').lower() in command_line

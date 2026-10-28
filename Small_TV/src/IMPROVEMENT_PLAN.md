@@ -403,6 +403,21 @@ Dispatch checkpoint25Oct: [WIFI_TIMER_DISPATCH.md](tests/WIFI_TIMER_DISPATCH.md)
 wdev_funcs_init pointer registration после link, invalid IDs и прежние valid IDs.
 Отдельно разобрать событие11: factory max_idle/native keep_alive wrappers
 соответствуют по форме, transitive callee semantics пока не подтверждены.
+Guard checkpoint25Oct: [WIFI_TIMER_GUARD.md](tests/WIFI_TIMER_GUARD.md) — отдельная
+task worktree, appC91294FC/ELF9E4EC88D, DEBUGoff build и post-link checks pass.
+Guard46B отсекает14..255 до vendor entry, сохраняет free ownership и valid/null
+paths. Найденный в ELF ppTask — ROM trampoline, поэтому отдельно проверен
+настоящий event8/table+356 путь и весь successful-allocation initializer tail
+для4feature combinations. 518compiled-instruction cases и replay pass,
+unguarded control воспроизводит OOB. QEMU preflight4/churn40 на main9135 завершены:
+32/320HTTP,2/20outages, обе supervision/guard пары exit0; runtime replay отвергает
+28controls. Независимые network/display/final gates и H10 нового build ещё нужны;
+прежние9C1A/76B5 long runs не заменять и не суммировать.
+Дополнительный CODEC-REPRO follow-up: свежий jconfigint BUILD20→25Oct меняет
+library SHA и cache codec ID при тех жеcodec sources. Зафиксировать reproducible
+build inputs/date, проверить два paths/dates и отсутствие лишней Flash cache
+перезаписи; настоящее изменение codec должно сохранять invalidation. Не убирать
+library identity из ownership guard ради совпадения. Пока это не исправлено.
 
 ## 6. Приёмка окончательной версии и правила работы
 
@@ -425,17 +440,35 @@ retained median loss12..220B и требуют объяснения; порог�
 остановки неизвестна. Сохранены numeric prefix и12negative controls:
 [RUNTIME_MEMORY.md](tests/RUNTIME_MEMORY.md). Для слитого QEMU main9135fc89ce
 отдельный pin2DF90327:4-cycle preflight и40-cycle qualification прошли с22actual
-outages/352HTTP и terminalguards. Новый H1025Oct11:23UTC запущен отдельно на
-полные86400guest s; earlyrecord0 сохранён. H10/retained-loss investigation и весь
-прежний scope остаются открытыми. Детали runtime-main-validation-20261025.json.
+outages/352HTTP и terminalguards. Новый H10 от 25Oct11:23UTC запрашивал полные
+86400 guest seconds, но завершился неуспешно: 526 циклов, 4207 HTTP, 8 outages,
+9040.980895 наблюдённых секунд и timeout на `/start_upload`. Supervisor terminal
+failed, workload exit 1; исходные владельцы завершились. Архив и replay:
+[RUNTIME_MAIN_FAILURE.md](tests/RUNTIME_MAIN_FAILURE.md). Сохранены 535 Windows
+WSAEventSelect warnings, причина timeout пока неизвестна. Bounded pre-cleanup
+failure-state capture реализован: [RUNTIME_FAILURE_CAPTURE.md](tests/RUNTIME_FAILURE_CAPTURE.md),
+20 host tests, actual QEMU ordering/identity/read-only probe и 11 rejection controls
+pass. Файл сохранён до stop, 96 reads / 2230 bytes / 0,047 host seconds.
+Это намеренная host failure после настоящего HTTP 200; исходный timeout ещё нужно
+воспроизвести в отдельной длительной ВМ с этим observer.
+H10, retained-loss investigation и весь прежний scope остаются открытыми.
 Для разбора retained loss добавлен отдельный opt-in metadata observer:
 [HEAP_TOPOLOGY.md](tests/HEAP_TOPOLOGY.md). Exact ROM/linked TLSF replay, 11+8
 новых host tests и базовые 16+25 tests pass. 4+40 cycles / 22 outages / 352 HTTP,
 46 snapshots / 92 inventories и 38 negative controls квалифицированы. ROM
 контроль доказывает возможность 12-byte padding при тех же запросах, но не
 объясняет прежний H10. Далее typed TCP PCB/TIME_WAIT attribution и длительный
-контроль с обычным cadence; thresholds и требования 24h не меняются. Отдельно
-исправить idempotent cleanup уже закрытой driver ВМ. Main H10 не изменять.
+контроль с обычным cadence; thresholds и требования 24h не меняются.
+Повторный cleanup уже закрытой driver ВМ исправлен:
+[RUNTIME_CLEANUP.md](tests/RUNTIME_CLEANUP.md), 13 actual Windows cases,
+10 прежних supervisor cases, реальная QEMU filesystem fault и replay закрытой
+H10 session прошли. Diagnostic identity error не отменяет попытку helper.
+Pre-cleanup failure-state capture проверен отдельно; обычный preflight нового
+observer тоже прошёл: 4 цикла, 32 HTTP, 2 outages, terminal guards/supervisor,
+без diagnostic artifact на успехе. Новая отдельная diagnostic ВМ запущена
+25Oct16:42UTC на 86400 guest seconds, interval15/outage60. Это pending:
+cycle-zero/owners сохранены, причина исторического timeout ещё не установлена.
+Сохранённый failed H10 и его pinned inputs не изменять.
 TCP [gate и attribution](tests/TCP_HEAP_ATTRIBUTION.md) готовы: native selected
 fields, exact live allocations, PCB/segment/pbuf chains и shared accounting,
 33host tests+25baseline,4+40actualcycles/22outages/352HTTP,46observed snapshots и
@@ -446,7 +479,9 @@ actual sampled queued segments/pbufs не было, их target traffic probe о
 Matched metadata controls запущены25Oct13:40/13:42UTC вsoak-main/soak-v8,
 по28800guest seconds/interval15/outageEvery60 наproducer23b641680. Early0 и
 4owneridentities каждый сохранены. Это pending, не8hpass; их producer inputs
-в текущей копии не менять. Основной24hH10 идёт в своей прежней копии отдельно.
+в текущей копии не менять. Основной H10 уже завершился с ошибкой; эти отдельные
+controls его не заменяют. CIM recheck 25Oct15:55UTC подтвердил все восемь исходных
+владельцев controls, 323/317 циклов и running guards; это ещё не terminal 8h pass.
 Диагностический слой [TCP_TREND_ATTRIBUTION.md](tests/TCP_TREND_ATTRIBUTION.md)
 проверен на исходных завершённых 4+40 циклах, с 22 math и 8 CLI host-тестами.
 Он использует те же центральные снимки, что исходные медианы, явно сохраняет

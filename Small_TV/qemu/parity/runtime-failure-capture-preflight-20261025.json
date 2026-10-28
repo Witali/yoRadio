@@ -1,0 +1,128 @@
+{
+  "schema": "small-tv-failure-capture-normal-preflight-v1",
+  "passed": true,
+  "all_functionality_verified": false,
+  "h10_checks_passed": false,
+  "physical_hardware_tested": false,
+  "producer_commit": "70cd3e5bef443c772a714a826ab6a72ea69e38de",
+  "app_sha256": "c91294fca6acb16283605eef8aedcf98102d7a8ad42076c09b058594a5c97e93",
+  "elf_sha256": "9e4ec88d6e85ae58fa3e164362f1b10491f9edef0feaa4af8c52c9fa88446e24",
+  "qemu_sha256": "2df903276e66afe0095ad19afd6d8b7201bcca3fbda073f3edb958934aef0001",
+  "validator_source": "Small_TV/src/tests/verify_runtime_candidate_evidence.py",
+  "validator_sha256": "c8461b9945bfbdacf86962b2b9a19cb3efc0350f622f8837e9e9414ad8cbc21e",
+  "validation_functions": [
+    "validate",
+    "rejections",
+    "validate_owners",
+    "owner_rejections"
+  ],
+  "result": {
+    "passed": true,
+    "cycles": 4,
+    "outages": 2,
+    "http_requests": 32,
+    "elapsed_guest_seconds": 18.816259,
+    "minimum_sampled_free_heap_bytes": 55056,
+    "minimum_sdk_sum_of_per_heap_minima_bytes": 43680,
+    "minimum_task_stack_fill_bytes": 480,
+    "maximum_http_or_batch_guest_seconds": 4.080201000000002,
+    "h10_checks_passed": false,
+    "rejected_controls": [
+      "emulator-identity",
+      "cycles",
+      "rom-counters",
+      "weather",
+      "duration",
+      "guard",
+      "uart-reset",
+      "supervisor"
+    ],
+    "owner_rejected_controls": [
+      "live-original-owner",
+      "missing-original-owner",
+      "changed-vm-name",
+      "wrong-workload-pid"
+    ],
+    "no_failure_capture_on_success": true,
+    "inputs_rehashed": true,
+    "producer_commit": "70cd3e5bef443c772a714a826ab6a72ea69e38de"
+  },
+  "reports": [
+    {
+      "name": "report.json",
+      "file": "failure-capture-normal-preflight-20261025/report.json.gz",
+      "sha256": "2416f06193d3acf09886cd5128c3a5507b0ba44f89131a5a35d12344cad0ff60",
+      "gzip_sha256": "6dfc6fd404ae13943f3602f7b506f112a17c2110a60a4800e7c2a91adb2fff56",
+      "bytes": 26484,
+      "gzip_bytes": 4586
+    },
+    {
+      "name": "events.jsonl",
+      "file": "failure-capture-normal-preflight-20261025/events.jsonl.gz",
+      "sha256": "b27e4a0954795f9e878eece4b0d515c60fa15830bca3efed0d61100b6805bb2d",
+      "gzip_sha256": "488bb49e1a23cce2408ed7e7fffcae9de12c64fa4b8f1b0b7c6bc091c8a85204",
+      "bytes": 10393,
+      "gzip_bytes": 1109
+    },
+    {
+      "name": "uptime-guard.json",
+      "file": "failure-capture-normal-preflight-20261025/uptime-guard.json.gz",
+      "sha256": "70e317967217efd31bfe6ebca27a6b70d5faa2d61c4e9c3b4251a63a97155403",
+      "gzip_sha256": "c807873b068236306ccb96c5c68bbe12998c183fbf978dd7f2e2ea3d220cb60e",
+      "bytes": 359,
+      "gzip_bytes": 244
+    },
+    {
+      "name": "supervisor.json",
+      "file": "failure-capture-normal-preflight-20261025/supervisor.json.gz",
+      "sha256": "78d7091c50aa24b290c1f61830b0937ab1c86c2e0c7398ea7e92731ac0777135",
+      "gzip_sha256": "f4e90a89d8f82ce09de7d8ac10844ab74b91cf5b901aaab25ddd229ee973b042",
+      "bytes": 1889,
+      "gzip_bytes": 828
+    },
+    {
+      "name": "uart.log",
+      "file": "failure-capture-normal-preflight-20261025/uart.log.gz",
+      "sha256": "3b1d1a21e371e398882c8757fd8ad2147141ba0474af7a53e1c97aaa56e00663",
+      "gzip_sha256": "e95be8b11e59307a6bb8aad1324be89472175973a45e4688865e823d60acb868",
+      "bytes": 651,
+      "gzip_bytes": 354
+    },
+    {
+      "name": "start.json",
+      "file": "failure-capture-normal-preflight-20261025/start.json.gz",
+      "sha256": "ecb7123b48abf47927f2f827fb07798626cece7a2f1011cb4d9288e4da1623a1",
+      "gzip_sha256": "fb0cef7a40a8599766ce287ab50a7d7fb05b75fdb327e2c9abbd23234aaa75ce",
+      "bytes": 6910,
+      "gzip_bytes": 2368
+    },
+    {
+      "name": "processes-before.json",
+      "file": "failure-capture-normal-preflight-20261025/processes-before.json.gz",
+      "sha256": "2caf5c6e154f0bcd1667e79364073cab8a7440726c62246dd74af98aa421f3eb",
+      "gzip_sha256": "1bbfeadd654c0f027538fcbf4e19514c7872fd859ea92efd64e63586fbbc7dc0",
+      "bytes": 779,
+      "gzip_bytes": 324
+    },
+    {
+      "name": "processes-after.json",
+      "file": "failure-capture-normal-preflight-20261025/processes-after.json.gz",
+      "sha256": "cda8bb4c6283e5bda4b04f619d56c4e7979f28baec39367a94185cadcb800ee7",
+      "gzip_sha256": "6e4004aa00fa914d4d7b0a2afca4ab93759c3d4ea8ed0b2c61c517ac92dba2e0",
+      "bytes": 639,
+      "gzip_bytes": 207
+    },
+    {
+      "name": "verified.json",
+      "file": "failure-capture-normal-preflight-20261025/verified.json.gz",
+      "sha256": "a58c625256afb69dd3f4cede45969d77da24cfc765d5566ae389f0b6387c7c19",
+      "gzip_sha256": "8b101f055eef2df4de75564bbb9161a63eb4155b91dfa9e406d475bdd2648f5e",
+      "bytes": 813,
+      "gzip_bytes": 426
+    }
+  ],
+  "limitations": [
+    "Independent short normal-path preflight only; no 24-hour or full-functionality acceptance.",
+    "No failure capture file or metadata was emitted on the successful path."
+  ]
+}
