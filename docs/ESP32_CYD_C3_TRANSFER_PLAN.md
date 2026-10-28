@@ -110,6 +110,13 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   два tiny finite случая получают совпадающие arbitrary-length integer floors
   после уточнения до4096 bits. Это host oracle для следующих правок, не реализация
   certified gain на MCU и не доказательство универсальной достаточности4096 bits.
+  Для MCU добавлена [основа направленной арифметики](../idf/components/native_vorbis_bigfloat/README.md):
+  точные dyadic inputs, проверяемые add/sub/mul/div/sqrt и arbitrary-length floor.
+  [Host-проверка](../tests/results/vorbis-bigfloat-20261028/CHECKPOINT.md) проходит
+  701 сценарий в обоих limb models и 1288 отказов памяти с восстановлением.
+  [LX6/RV32 source profiles](../tests/results/vorbis-bigfloat-20261028/SOURCE_PROFILES.md)
+  также проходят; это компиляция, а не выполнение новой арифметики в SDK/QEMU.
+  Направленные pi/ln2/sine bounds, сам gain и его продолжение через синтез ещё нужны.
   Комментарии/порядок заголовков и транспортная семантика остаются вне raw API.
   Native resource/performance полного radio/TLS/TFT и physical также открыты.
   Все прежние отложенные пункты сохраняются; повторно они не запускались.
@@ -2046,3 +2053,25 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Это только host-эталон по supplied Bark index: MCU implementation, certified
   Bark selection, wider IMDCT/history, новый PCM, Ogg/audio-task/resources/physical
   им не закрыты. Предыдущие deferred scopes и core bindings сохраняются.
+
+- 2026-10-28, CYD-C3-14: добавлена [проверяемая базовая арифметика LibBF](../idf/components/native_vorbis_bigfloat/README.md)
+  для следующего certified gain слоя. Оригинальные файлы автора сохранены;
+  отдельная portable-копия имеет две точные правки: корректный int temporary
+  для SDK int32_t/long и guard нулевой длины memcpy, найденный UBSan.
+  Операции готовят private result и сохраняют destination при отказе; память
+  растёт до освобождения старого блока, shrink/free не требуют allocation,
+  sticky OOM сохраняется до явного retry. Floor экспортирует signed integer
+  произвольной длины без int64 narrowing. Engine envelope 1048576 bits является
+  проверяемой границей ресурсов, а не новым ограничением формата Vorbis.
+  [ASan/UBSan checkpoint](../tests/results/vorbis-bigfloat-20261028/CHECKPOINT.md):
+  по 701 точному Fraction/isqrt сценарию на host64/forced32, 463/825 OOM ordinals,
+  1643 capacity refusals и 1253 alias checks в каждом режиме; dense 8192-bit
+  произведения исполняют настоящий NTT. [Source profiles](../tests/results/vorbis-bigfloat-20261028/SOURCE_PROFILES.md)
+  дают восемь ELF32 объектов LX6/RV32 и чистые adapter/header -Werror проверки.
+  [Разбор предупреждений](CYD_VORBIS_BIGFLOAT_WARNING_REVIEW.md) сохраняет 42
+  creator diagnostics на цель: 11 относятся к проверяемому closure, остальные
+  требуют отдельного контракта при использовании исключённых функций. Никакого
+  подавления предупреждений или ослабления санитайзеров нет. Все actual failures
+  сохранены. Это ещё не MCU runtime или полный floor0 gain: directed constants/
+  trig bounds, Bark certificate, wider IMDCT/history, Ogg/audio-task и ресурсы
+  полного radio/TLS/TFT остаются, вместе с физической приёмкой и прежними deferred.

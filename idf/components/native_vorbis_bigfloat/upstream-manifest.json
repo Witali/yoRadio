@@ -1,0 +1,69 @@
+{
+  "schema": "native-vorbis-bigfloat-upstream-v1",
+  "creator": "Fabrice Bellard",
+  "version": "2025-06-03",
+  "source": "https://bellard.org/libbf/libbf-2025-06-03.tar.gz",
+  "archive_sha256": "4b23394d67a4a3c3266a38b66831094523fffb5d01974a5c05a0327b36b0a340",
+  "archive_bytes": 150365,
+  "license": "MIT; notices preserved in original source/header files",
+  "modifications": [
+    {
+      "id": "picolibc-int32-result-local",
+      "original": "upstream/libbf.c",
+      "original_sha256": "8abc36c9feaeaeb04729e3494c6b693611a518442d11c6546c86bc08b30a1228",
+      "modified": "portable/libbf.c",
+      "modified_sha256": "158da48780e54571ae2ce56ef7049f9829f62817c005009c9018bdf74d92a378",
+      "patch": "portability.patch",
+      "occurrences": 1,
+      "old": "    return bf_get_int32(pres, a, flags);",
+      "new": "    int value;\n    int status = bf_get_int32(&value, a, flags);\n    *pres = value;\n    return status;",
+      "reason": "On pinned native picolibc int32_t is long while bf_get_int32 output is int*. Use a real int output, preserve status, then assign to slimb_t without pointer aliasing.",
+      "patch_sha256": "cd15a88f0718bb2f18e2b8b269a57983315ef28617b2e836b3bba07391389a42"
+    },
+    {
+      "id": "zero-length-copy-nonnull",
+      "original": "upstream/libbf.c",
+      "original_sha256": "8abc36c9feaeaeb04729e3494c6b693611a518442d11c6546c86bc08b30a1228",
+      "modified": "portable/libbf.c",
+      "modified_sha256": "158da48780e54571ae2ce56ef7049f9829f62817c005009c9018bdf74d92a378",
+      "patch": "portability.patch",
+      "occurrences": 1,
+      "old": "    memcpy(r->tab, a->tab, a->len * sizeof(limb_t));",
+      "new": "    if (a->len != 0)\n        memcpy(r->tab, a->tab, a->len * sizeof(limb_t));",
+      "reason": "Host03 UBSan confirmed zero+zero addition reaches bf_set memcpy(NULL,NULL,0), violating the nonnull C builtin contract; skip exactly the zero-length copy.",
+      "patch_sha256": "cd15a88f0718bb2f18e2b8b269a57983315ef28617b2e836b3bba07391389a42"
+    }
+  ],
+  "files": [
+    {
+      "path": "upstream/libbf.c",
+      "bytes": 242338,
+      "sha256": "8abc36c9feaeaeb04729e3494c6b693611a518442d11c6546c86bc08b30a1228"
+    },
+    {
+      "path": "upstream/libbf.h",
+      "bytes": 18029,
+      "sha256": "6376f2965cef49ad9e1351ff99e3dce4c6e9961d9e59e75de45aad63a1724c8a"
+    },
+    {
+      "path": "upstream/cutils.c",
+      "bytes": 6105,
+      "sha256": "a1ec96510f657c9f585d42083c527b25cbccd480a28d31c6fa2d25f705ccaeeb"
+    },
+    {
+      "path": "upstream/cutils.h",
+      "bytes": 4771,
+      "sha256": "92084de8f384cdd746f9fc86d8378acd178dc726cb79fbed3dbd3c642aa475a2"
+    },
+    {
+      "path": "upstream/list.h",
+      "bytes": 3091,
+      "sha256": "484a604d8996a9c23c23d453ec5017af05b2c74de4bb34da8abcd5f5b5880f3e"
+    },
+    {
+      "path": "upstream/readme.txt",
+      "bytes": 7638,
+      "sha256": "e5e5919ae21c0878c2b58508005a9c4c9acf182e00f14eadb99e55ac1d7f2019"
+    }
+  ]
+}

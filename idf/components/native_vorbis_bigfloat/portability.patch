@@ -1,0 +1,25 @@
+--- a/upstream/libbf.c
++++ b/portable/libbf.c
+@@ -310,7 +310,8 @@
+     }
+     r->sign = a->sign;
+     r->expn = a->expn;
+-    memcpy(r->tab, a->tab, a->len * sizeof(limb_t));
++    if (a->len != 0)
++        memcpy(r->tab, a->tab, a->len * sizeof(limb_t));
+     return 0;
+ }
+ 
+@@ -1857,8 +1858,11 @@
+ static inline int bf_get_limb(slimb_t *pres, const bf_t *a, int flags)
+ {
+ #if LIMB_BITS == 32
+-    return bf_get_int32(pres, a, flags);
++    int value;
++    int status = bf_get_int32(&value, a, flags);
++    *pres = value;
++    return status;
+ #else
+     return bf_get_int64(pres, a, flags);
+ #endif
+ }
