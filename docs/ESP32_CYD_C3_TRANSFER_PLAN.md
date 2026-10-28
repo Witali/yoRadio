@@ -84,6 +84,20 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 ## Что осталось по переносу
 
+Актуальная очередь после квалификации 28 октября:
+
+- Vorbis: применение floor0 с сохранением provenance и широких конечных
+  диапазонов; overlap/history/reset, granule/EOS trimming и конечный PCM;
+  полный исходный corpus31/bound2/all14 relations и raw/audio-task integration.
+  IMDCT и полные окна уже имеют отдельные host-проверки, но ещё не составляют
+  завершённый новый decoder/runtime. Native/resource и отложенные gates остаются.
+- AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
+  прежний private owner-view сохраняет пометку «отложен».
+- FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
+- Память: radio/TLS traffic, фактический heap/IRAM/stack и выбор default-off
+  опций по измерениям. Общая физическая приёмка всех трёх выходов остаётся
+  отдельной работой после подключения платы; программные проверки продолжаются.
+
 **Уточнение после [аудита всех веток](CYD_OGG_VORBIS_BRANCH_AUDIT_20261025.md):**
 базовое воспроизведение Ogg/Vorbis уже есть в `main` и CYD/C3 runtime с августа.
 Его обеспечивает существующий декодер Espressif. Ниже остаются исправления
@@ -1802,3 +1816,15 @@ Stream остаётся на core0, decode/output на core1 с прежними
   suppression; C/C++ GCC обеих ISA и собственные frames128/144B сохранены.
   Исходные API/kernel, production и deferred scopes не менялись. Это вход для
   другого представления спектра, а не готовый floor0 gain/PCM или его native gate.
+
+- 2026-10-28, CYD-C3-14: добавлены [полные окна Vorbis](CYD_VORBIS_WINDOW_DESIGN.md)
+  для scaled binary64 IMDCT blocks. [Host-квалификация](../tests/results/vorbis-window-20261028/CHECKPOINT.md)
+  проходит все36 пар размеров и288 комбинаций flags: 8 160 коэффициентов
+  сравнены с70-digit Decimal sine series, 587 520 выходов — с независимым
+  scatter oracle; 5 272 отказа и3 494 013 assertions проходят ASan/UBSan.
+  Каждый отказ сохраняет фактические input/descriptor bytes до восстановления
+  injected NaN/Inf; восемь повреждённых captures отклонены pure reader.
+  Reference trailing-zero граница сохранена; exponent не изменяется.
+  Window Clang0/0, 16 fixture snapshot warnings разобраны без suppression;
+  C/C++ GCC обеих ISA и static own frames сохранены. Overlap/history,
+  granule/EOS, floor0/PCM, native gates и production integration остаются.
