@@ -1,0 +1,28 @@
+{
+  "verifier": "tests/verify-vorbis-floor0-spectrum-checkpoint.py",
+  "verifier_sha256": "54111a917d62228d90e654cb3e9559d70d99bfc8c5c165946433eb5ac294d4c3",
+  "tool_session_id": 72847,
+  "terminal": true,
+  "exit_code": 1,
+  "requested_report": ".build/vorbis-floor0-spectrum-checkpoint-replay-20261028-01.json",
+  "report_written": false,
+  "failed_phase": "Source profile stack-report text binding, after all math and frame numerical comparisons and corruption controls completed",
+  "error": "ValueError: unaltered compiler stack report",
+  "traceback": [
+    "Traceback (most recent call last):",
+    "  File \"C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\verify-vorbis-floor0-spectrum-checkpoint.py\", line 224, in <module>",
+    "    result=verify()",
+    "           ^^^^^^^^",
+    "  File \"C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\verify-vorbis-floor0-spectrum-checkpoint.py\", line 180, in verify",
+    "    need(members['profiles01/'+name].decode()==text, 'unaltered compiler stack report')",
+    "  File \"C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_synthesis_checkpoint.py\", line 10, in need",
+    "    raise ValueError(message)",
+    "ValueError: unaltered compiler stack report"
+  ],
+  "reason": "Archived compiler .su files contain CRLF bytes; the profile controller stored read_text() text with LF normalization. The verifier compared raw decoded text to that normalized text. Archive and member byte hashes remain pinned and checked.",
+  "correction": "Normalize only CRLF to LF for this report-text comparison; preserve original archived byte hashes and all numerical checks and bounds.",
+  "timing_observed": false,
+  "archived_code_executed": false,
+  "commands_reexecuted": 0,
+  "native_executed": false
+}

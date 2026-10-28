@@ -1,0 +1,206 @@
+{
+  "passed": true,
+  "members": 731,
+  "decoded_bytes": 128907598,
+  "math": {
+    "passed": true,
+    "rows": 81384,
+    "valid_products": 79210,
+    "invalid_source_rows": 2174,
+    "rounded_values": 66151,
+    "zero_products": 13059,
+    "exact_product_words": 2851560,
+    "source_magnitude_widths": 1087,
+    "nonzero_factor_widths": 53,
+    "working_top_values": 1661,
+    "maximum_product_bits": 1140,
+    "midpoint_ties": 10142,
+    "rounding_carries": 13518,
+    "decoder_executed": false,
+    "gain_executed": false,
+    "IMDCT_executed": false,
+    "PCM_executed": false
+  },
+  "math_corruption_controls": [
+    "magic",
+    "factor",
+    "valid",
+    "highest",
+    "rounded",
+    "source",
+    "magnitude",
+    "truncated",
+    "trailing"
+  ],
+  "frame": {
+    "passed": true,
+    "packets": 447,
+    "original_packets": 434,
+    "channels": 894,
+    "original_floor0_packets": 168,
+    "original_floor0_channels": 336,
+    "materialized_floor0_channels": 348,
+    "floor1_channels": 532,
+    "spectrum_values": 375680,
+    "time_values": 751360,
+    "exact_floor0_joint_values": 116960,
+    "nonzero_floor0_reference_values": 5376,
+    "distinct_decimal_gains": 1006,
+    "zero_channels": 5,
+    "minimum_original_log_fraction_bits": 50,
+    "maximum_floor0_relative_error": 4.850438525866904e-15,
+    "floor0_relative_bound": 2e-12,
+    "maximum_transform_normalized_error": 8.881784197001252e-16,
+    "transform_normwise_bound": 5e-12,
+    "front_end_original_packets": 434,
+    "synthetic_channels": 26,
+    "routed_channels": 14,
+    "route_counts": {
+      "0": 880,
+      "1": 2,
+      "2": 2,
+      "3": 4,
+      "4": 4,
+      "5": 2
+    },
+    "absent_floor_with_nonzero_residue": 1,
+    "near_unity_normalization_channels": 2,
+    "front_end_controls": {
+      "cases": 447,
+      "pool_refusals": 1559,
+      "checks": 5155393
+    },
+    "PCM_executed": false,
+    "full_codec_qualified": false
+  },
+  "frame_corruption_controls": [
+    "magic",
+    "packet",
+    "route",
+    "Bark",
+    "factor",
+    "spectrum",
+    "IMDCT",
+    "truncated",
+    "trailing",
+    "front-magic"
+  ],
+  "historical_attempts": {
+    "math01": {
+      "completed": false,
+      "passed": false,
+      "commands": 1
+    },
+    "math02": {
+      "completed": false,
+      "passed": false,
+      "commands": 3
+    },
+    "frame01": {
+      "completed": false,
+      "passed": false,
+      "commands": 1
+    },
+    "frame02": {
+      "completed": false,
+      "passed": false,
+      "commands": 2
+    },
+    "frame03": {
+      "completed": false,
+      "passed": false,
+      "commands": 3
+    },
+    "frame04": {
+      "completed": true,
+      "passed": true,
+      "commands": 3
+    },
+    "frame05": {
+      "completed": false,
+      "passed": false,
+      "commands": 0
+    },
+    "frame06": {
+      "completed": true,
+      "passed": true,
+      "commands": 3
+    },
+    "frame07": {
+      "completed": true,
+      "passed": true,
+      "commands": 3
+    }
+  },
+  "profile_commands": 10,
+  "ELF32_objects": 6,
+  "production_lint_warnings": 0,
+  "fixture_lint_warnings": {
+    "math": 0,
+    "frame": 12
+  },
+  "own_function_frames": {
+    "lx6-floor0_spectrum.su": {
+      "add_checked": 32,
+      "subtract_checked": 32,
+      "working_top": 48,
+      "frame_view": 96,
+      "affine_term": 32,
+      "affine_zero": 32,
+      "active_domain": 32,
+      "selected_samples": 48,
+      "factor_from_gain": 80,
+      "publish_route.isra": 32,
+      "native_vorbis_frame_floor0_prepare": 400,
+      "native_vorbis_frame_floor0_materialize": 272
+    },
+    "lx6-header.su": {
+      "native_vorbis_numeric_status_t (* floor0_prepare_probe())(const native_vorbis_packet_frame_t*, uint32_t, uint16_t*, size_t, native_vorbis_floor0_factor_t*, size_t, native_vorbis_floor0_spectrum_plan_t*)": 32,
+      "native_vorbis_numeric_status_t (* floor0_materialize_probe())(const native_vorbis_floor0_spectrum_plan_t*, double*, size_t, native_vorbis_transform_block_t*)": 32
+    },
+    "lx6-product.su": {
+      "bit_at": 32,
+      "lower_nonzero": 32,
+      "native_floor0_source_valid": 32,
+      "native_floor0_sample_valid": 32,
+      "native_floor0_sample_zero": 32,
+      "native_floor0_product": 176,
+      "native_floor0_round": 64
+    },
+    "rv32-floor0_spectrum.su": {
+      "add_checked": 0,
+      "subtract_checked": 0,
+      "working_top": 32,
+      "frame_view": 80,
+      "affine_term": 16,
+      "affine_zero": 16,
+      "active_domain": 32,
+      "selected_samples": 48,
+      "factor_from_gain": 80,
+      "publish_route.isra": 0,
+      "native_vorbis_frame_floor0_prepare": 384,
+      "native_vorbis_frame_floor0_materialize": 272
+    },
+    "rv32-header.su": {
+      "native_vorbis_numeric_status_t (* floor0_prepare_probe())(const native_vorbis_packet_frame_t*, uint32_t, uint16_t*, size_t, native_vorbis_floor0_factor_t*, size_t, native_vorbis_floor0_spectrum_plan_t*)": 0,
+      "native_vorbis_numeric_status_t (* floor0_materialize_probe())(const native_vorbis_floor0_spectrum_plan_t*, double*, size_t, native_vorbis_transform_block_t*)": 0
+    },
+    "rv32-product.su": {
+      "bit_at": 0,
+      "lower_nonzero": 0,
+      "native_floor0_source_valid": 0,
+      "native_floor0_sample_valid": 32,
+      "native_floor0_sample_zero": 0,
+      "native_floor0_product": 192,
+      "native_floor0_round": 64
+    }
+  },
+  "original_relations": 14,
+  "archived_code_executed": false,
+  "commands_reexecuted": 0,
+  "files_extracted": false,
+  "native_executed": false,
+  "overlap_executed": false,
+  "PCM_executed": false,
+  "full_codec_qualified": false
+}

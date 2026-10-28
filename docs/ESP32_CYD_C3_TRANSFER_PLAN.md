@@ -86,8 +86,8 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 Актуальная очередь после квалификации 28 октября:
 
-- Vorbis: применение floor0 с сохранением provenance и широких конечных
-  диапазонов; полный PCM-тракт и подключение granule/EOS к выдаче декодера;
+- Vorbis: сертификация точности floor0 и реализация оставшихся широких численных
+  маршрутов; полный PCM-тракт и подключение granule/EOS к выдаче декодера;
   полный исходный corpus31/bound2/all14 relations и raw/audio-task integration.
   IMDCT, окна и overlap/history/reset уже имеют отдельные host-проверки, но ещё
   не составляют завершённый новый decoder/runtime. Потери от underflow окна
@@ -99,10 +99,14 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   [Granule/EOS bookkeeping](CYD_VORBIS_TIMING_DESIGN.md) квалифицирован отдельно
   на всех434 исходных metadata events и безопасном Xiph reference subset;
   транспортные правила первой страницы и интеграция с decoded output остаются.
-  [Аудит исходных floor0 данных](CYD_VORBIS_FLOOR0_ROUTE_AUDIT_20261028.md)
-  подтверждает ordinary range всех168 пакетов/336 каналов: следующий этап —
-  frame→floor0 spectrum→IMDCT на всём исходном434-пакетном корпусе, с сохранением
-  отдельного wider/provenance пути и незакрытого full31 PCM gate.
+  [Применение floor0 к реальным packet frames](CYD_VORBIS_FLOOR0_SPECTRUM_DESIGN.md)
+  теперь проходит host-проверку всего исходного434-пакетного корпуса через
+  floor0/floor1 spectrum→прежний IMDCT. Ещё13 raw-packet случаев проверяют
+  специальные маршруты, provenance и нормализацию. Отдельное точное умножение
+  и однократное округление также проверены; оба новых C-модуля Clang0/0 и
+  source-only GCC LX6/RV32IMC. Это не полный PCM или универсальная гарантия
+  точности gain: wider/precision fallback, устранение underflow окна, native
+  и raw/audio-task integration остаются открытыми. Базовый Ogg/Vorbis уже работает.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1905,3 +1909,24 @@ Stream остаётся на core0, decode/output на core1 с прежними
   должно подключить floor0 к фактическим packet frames и прежнему IMDCT;
   extreme finite gain, precision refinement, window underflow и все прежние
   full31 PCM/bound2/all14 relations/production/deferred gates остаются открытыми.
+
+- 2026-10-28, CYD-C3-14: [floor0 из фактического packet frame](CYD_VORBIS_FLOOR0_SPECTRUM_DESIGN.md)
+  подключён к прежнему binary64 IMDCT отдельным, не выбранным production
+  компонентом. [Host-квалификация](../tests/results/vorbis-floor0-spectrum-20261028/CHECKPOINT.md)
+  сохраняет все434 исходных пакета/336 каналов floor0/532 канала floor1 и
+  добавляет13 raw-packet случаев. Точное умножение residue на dyadic factor
+  предшествует одному округлению;116 960 joint values совпадают с integer
+  oracle. Ошибка5 376 nonzero floor0 values максимум4.85044e-15 при прежнем
+  пределе2e-12;751 360 IMDCT values дают error/L1<=8.88178e-16 при5e-12.
+  4 522 отказы/5 155 393 guard checks и ASan/UBSan проходят; четырнадцать
+  relation identities сохранены, полный PCM ими не квалифицирован.
+  Отдельный math корпус покрывает81 384 строки/2 851 560 слов произведений/
+  66 151 округление для всех допустимых ширин, включая ties/carries.
+  Девять math и десять frame повреждённых captures отклонены pure reader.
+  Оба production C-модуля Clang0/0; шесть C/C++ ELF32 source objects для
+  LX6/RV32IMC и собственные static frames сохранены без SDK/task high-water
+  claims. Все ранние отказы WSL и ошибки fixture/controller сохранены.
+  General gain certification, полный wider/precision fallback, underflow окна,
+  full31 PCM/bound2/all14 relations, raw/audio-task/native/resources, физическая
+  приёмка и все прежние deferred scopes остаются открытыми. Привязки к ядрам,
+  backend, приоритеты, стеки и production selection не менялись.
