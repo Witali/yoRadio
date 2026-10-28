@@ -94,6 +94,8 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   явно воспроизведены; full-range PCM, native/resource и отложенные gates остаются.
   [Точная S16-граница двух слагаемых](CYD_VORBIS_PCM_PAIR_DESIGN.md) также
   реализована отдельно; это не доказательство точности предшествующего синтеза.
+  [Совместный host-контроллер overlap→PCM пока не подготовлен](CYD_VORBIS_OVERLAP_PCM_DEFERRED_20261028.md):
+  две записи отменены до dispatch без указанной причины; новых composed cases0.
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
 - FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
@@ -1857,3 +1859,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   suppression; C/C++ GCC обеих ISA, public own frame176B без callee/high-water.
   Это точность для переданных dyadic terms; window/IMDCT underflow/rounding,
   floor0, full31 PCM/all14 relations, runtime и производительность ещё открыты.
+
+- 2026-10-28, CYD-C3-14: [подготовка совместного overlap/PCM стенда отложена](CYD_VORBIS_OVERLAP_PCM_DEFERRED_20261028.md).
+  По отчёту субагента две записи нового Python-контроллера через apply_patch
+  вернули «aborted before dispatch» без причины/operation ID. Это не
+  подтверждённый cybersecurity rejection. Root проверил отсутствие controller
+  и build directory; compilation/runtime/captures для композиции не запускались.
+  Непроверенный C-wrapper сохранён в cold archive по точному SHA и удалён из
+  active fixtures после byte-equality/containment проверки. Отдельные host
+  overlap/PCM квалификации остаются действующими; совместный и full PCM gates
+  не закрыты. После команды остановки повторных запросов/других маршрутов нет.
