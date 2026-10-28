@@ -1,28 +1,75 @@
 # Контекст работы над восстановленной Small TV
 
-## Продолжение в отдельной рабочей копии — 2026-10-25
+## Текущий checkpoint — heap metadata, 2026-10-25
 
-Текущая разработка: `.worktree/small-tv-memory-retention`, ветка
-`codex/small-tv-memory-retention`, commits `135e61860` (exact TLSF metadata replay)
-и `82d901e2d` (TCP/IP mailbox gate), затем `23b641680` (typed TCP inventory и
-live-allocation attribution). Там обновлены полный IMPROVEMENT_PLAN,
-WORK_LOG и tests/HEAP_TOPOLOGY.md / tests/TCP_HEAP_ATTRIBUTION.md. 4+40-cycle
-heap qualification,46snapshots/92inventories и38negative controls pass;
-TCP prerequisite15host tests/real4cycles/5quiet samples/12controls pass.
-TCP PCB/segment/pbuf attribution готов:33real-ROM hosttests+25baseline,
-4+40actualcycles/46observed snapshots/76negativecontrols. Actualguest samples
-далиLISTEN/FIN_WAIT_2 PCB80..504B; queuedbuffer targetprobe и старые7warnings
-не закрыты. Там запущеныsoak-main/soak-v8 по28800guest seconds/15s/outageEvery60,
-25Oct13:40/13:42UTC,early0 и4positiveowneridentities каждый. Теперь runtime inputs
-обеих рабочих копий pinned; дальнейшие producer изменения — новая task worktree.
+Разработка продолжена в `.worktree/small-tv-memory-retention`, ветка
+`codex/small-tv-memory-retention`, от `b4a851041`. Основной H10 остаётся в
+`.worktree/small-tv-improvement-plan/.build/runtime-h10-main-20261025`, pin
+main-9135/2DF90327. Не менять его runtime helpers, SDK, ROM, app/ELF, profile,
+assets или frozen47files, не добавлять второй QMP/RSP client и не перезапускать.
+PID19884/8080/18380/18652 с creationUTC сохранены в исходном early process record;
+проверять реальные процессы, не один JSON status. Latest observation этой работы
+подтвердила все четыре owner/creationUTC и362cycles, oneROMboot/noerrors;
+это не terminal H10 pass.
 
-Эту рабочую копию пока сохранять как pinned input основного
-`.build/runtime-h10-main-20261025`. Не cherry-pick/merge сюда новые runtime
-helpers, не менять app/ELF/SDK/ROM/profile/assets/frozen47files и не присоединять
-второй observer. При последней CIM-проверке362cycles,4originalowners и точные
-creationUTC совпали; oneROMboot/noUARTerrors, H10 ещё running. Дополнительные
-короткие ВМ завершены. После настоящего terminal H10 выполнять полный audit,
-а не принимать старый JSON status за liveness или дополнять24h прежними7часами.
+Opt-in `-HeapTopology` квалифицирован отдельно: реальные C2 ROM и linked SDK
+walkers, metadata-only allocation geometry, 11+8 новых tests, базовые16+25,
+actual4+40cycles/22outages/352HTTP; replay46snapshots/92inventories и38negative
+controls pass. Архив heap-topology-validation-20261025.json; детали
+[HEAP_TOPOLOGY.md](tests/HEAP_TOPOLOGY.md). Factory/production binaries не менялись.
+ROM контроль показывает возможный padding12B при тех же requested sizes, но
+семь retained-loss warnings12..220B прежнего прерванного H10 пока не объяснены.
+
+TCP gate **и inventory/attribution** готовы:33real-ROM host tests+25baseline,
+actual4+40cycles/22outages/352HTTP,46observed snapshots и76semantic controls pass.
+Schema7/-TcpTopology подразумевает heap topology; gate/layout/allocations/walk/
+journal разделены. Qualified zero metadata prefix проверен по assembly текущего
+ELF, unknown ABI и free/interior/alias pointers отвергаются до чтения. Shared
+pbuf не удваивает capacity, busy остаётся явным пропуском. Source/app/QEMU не
+менялись. Документ/оставшиеся gates: tests/TCP_HEAP_ATTRIBUTION.md; архив
+tcp-inventory-validation-20261025.json (54refs/242895newgzipbytes).
+
+Actual sampled states только LISTEN/FIN_WAIT_2: listener80B, closingPCB212B с
+headers, TCP consumed80..504B, padding0 в этих46snapshots. Queued segments/pbufs
+пока проверены real-ROM host fixtures, не pending guest traffic. Старые7flags
+по-прежнему не объяснены. Windows переиспользовала2preflightPID послеterminal:
+новый owner record различает original exit и исчезновение PID,8controls/run.
+Ни чужие процессы, ни живые ВМ из-за этого не останавливались/перезапускались.
+
+Следом matched длинные controls main/V8 с interval15/outageEvery60, controlled
+queued traffic и unclassified deltas. Не заменять ими основной H10 и
+не смягчать thresholds. Исправить отдельным изменением redundant cleanup, когда
+driver уже закрыл ВМ: prototype получил connection refused, все owners отсутствуют.
+Failed prototype и exploratory40 без early0 не включены в qualification. Полный
+план, whole-image/fullsuite/fault/hardware scope остаются открытыми.
+
+## Два действующих metadata controls — producer23b641680, 2026-10-25
+
+В **этой** рабочей копии запущены отдельные `soak-main` и `soak-v8` в
+`.build/tcp-inventory-qemu-20261025/`, каждый28800guest seconds/interval15/
+outageEvery60/schema7. Main started13:40:41UTC, V8started13:42:23UTC; оба имеют
+genuine `-start.json` наcycle0 и `-processes.json` со всеми4positive owners/
+creationUTC. Pins:main2DF90327 иV8A5BE14C5, app9C1A83BD/ELF76B5CE37/ROM289CE00E,
+frozen47files без изменений. Actualinputs перечислены в каждом start/report.
+Не менять их, не перезапускать runs и не подключать второй QMP/RSP. Изменения
+producer или новые firmware builds выполнять в другой task worktree; новые
+offline analysis files/notes допустимы, если не меняют pinned inputs.
+
+Main owners supervisor40876/workload10056/guard2560/VM37236;
+V8owners27244/1044/10128/10776. Создание сверять **по файлам identity**, не только
+PID. На13:47:42UTC CIM подтвердил все12originalowners трёхruns:mainH10362cycles,
+soak-main13,soak-v8=9;oneROMboot/noerrors каждый. Это pending prefixes, не8h/24h
+приёмка. Не складывать их длительности. Сопоставимые controls нужны для воспроизведения
+старых7warnings на том же V8 и сравнения с main, а не для автоматического waiver.
+
+После terminal анализировать каждый fulljournal отдельно через current
+runtime_evidence.audit_run (extra roots C:/Work/yoRadio и C:/Work/QEMU-ESP32),
+tcp_coverage/tcp_series и runtime_trend. Сохранять вывод вне run directories.
+Для8h существующий analyze_runtime запускать с --diagnostic: это не H10.
+В объяснении median-loss не складывать независимые component medians: выбирать
+те же центральные observations, чтобы TCP+unclassified точно давали total loss.
+Thresholds/warmup/phases прежние. Реальный queuedtraffic, idempotentcleanup и
+whole-image/fullsuite/fault/hardware пункты остаются открытыми.
 
 Актуальные решения и рекомендации для продолжения сравнения заводской прошивки
 ESP32-C2 с собираемым C-проектом в `Small_TV/src`. История действий и результатов
@@ -3759,3 +3806,101 @@ This does not explain the OLD interrupted run: its four PIDs and same-run/V8
 scan were truly absent, independently of timestamp comparison. Pinned runtime
 helper sources use held process handles/command identities, not this ad-hoc
 timestamp comparison. Do not edit them for a probe-only formatting mistake.
+
+## CURRENT 2026-10-25 — TCP median diagnostics; producers remain frozen
+
+Worktree small-tv-memory-retention, producer23b641680, prior docs67556af2b.
+This turn is PROGRESS: read-only QEMU branch audit/push verified main9135fc89ce,
+then new offline attribution, host tests and real saved-journal CLI checks.
+No producer, firmware, SDK, frozen helper or live VM input changed.
+
+At resume CIM matched all12 original PID/name/creationUTC identities. Main H10
+had410 cycles; main/V8 controls61/57. Later offline prefix replays verified67/62
+cycles and68/63 snapshots,1167.278640/1069.220519 guest seconds. These remain
+pending prefixes before3600s warmup, never terminal8h/24h qualification.
+
+runtime_tcp_trend annotates the UNCHANGED original runtime_trend: same3600s
+warmup/windows, lcm(20,outage cadence), phase coverage and dynamic initial
+variation criteria. Use the SAME one/two central free-heap observations for
+both components. Equal-free ties retain ranges; even centers are distinct.
+Busy central candidates mean unknown attribution and remain in original free
+statistics. Signed TCP release can coexist with positive unclassified growth.
+No component ownership automatically excuses a retained-loss flag.
+
+22 math +8 CLI preservation/rejection tests passed. New CLI fully verified
+preflight4/churn40,5+41 snapshots; both correctly insufficient for steady-state
+trend. See tests/TCP_TREND_ATTRIBUTION.md and tcp-trend-validation-20261025.json:
+26 refs,14newgzip/24760bytes,12reused payloads. Reader replays original76controls
+and16new controls. Live prefixes are deliberately excluded from immutable proof.
+
+Do not modify live producer sources in this tree or the original H10 tree.
+Producer fixes need another task worktree. Remaining: full matched controls,
+old7loss flags12..220B, real queued guest buffers, already-dead VM cleanup,
+whole-image caller4207b120/undefined7581e..75896, final full suite and physical
+gates. No goal completion, no physical reset/flash and no automatic OTA addition.
+
+## CURRENT 2026-10-25 — selected timer gaps identified in factory and native
+
+After e572291ef, added separate match_factory_timers and reverse/native_timer_match.
+Actual call4207b120 belongs to pp_timer_coex_slice4207b11a..4207b12c.
+Four PM bodies4207581e..42075896 now matched by complete SDK models, plus five
+timer wrappers:9 bodies/238SDKbytes/210factorybytes/4localbranches. All9 native
+counterparts also matched the same full models and real ELF symbol targets.
+The32/28byte sleep-delay difference is permitted call relaxation, not omitted code.
+
+IMPORTANT: the shape matcher alone accepts a REAL neighboring timer wrapper.
+Require bound callee/global anchors, and local anchors scoped to object/section.
+Eight factory and two native controls rejected. See reference/SDK_TIMER_GAPS.md;
+two small evidence gzip files under parity/factory-timers-20261025 total6438bytes.
+No ELF/SDK/project/VM/producer modifications. Existing PM coexistence callees
+can differ across SDKs; no transitive/whole-image semantic equivalence claimed.
+
+Remaining immediate whole-image step: transient Ghidra metadata recovery for
+these bodies, timer dispatch callback registration/reachability, then other gaps.
+Main H10 and matched schema7 controls continue protected; old memory findings,
+cleanup fix, final suite and physical gates remain open. Keep full goal active.
+
+Latest authoritative CIM recheck25Oct14:24:02UTC: all12original identities match;
+mainH10=454cycles, schema7main/V8=105/100. All supervisors/guards running,
+oneROMboot/noUARTerrors each. Saved ignored owners-after-static-checks.json.
+No terminal result yet, and no durations are combined.
+
+## CURRENT 2026-10-25 — dispatch recovered; vendor invalid-ID defect to fix next
+
+Previous turn PROGRESS:e572291ef/c473d3caa. At resume all12CIM original identities
+matched; H10=457cycles, metadata main/V8=107/103, all guards running/oneboot/noerrors.
+No producer/firmware/SDK/frozen helper/live VM input changed this turn.
+
+audit_timer_dispatch links initial120B table14events+sentinel and17complete bodies
+per image. Factory table3FCB52F8/postslot3FCC3100/dispatcher420ACC28; native
+table3FCAC978/postslot3FCB5D98/dispatcher420D1486. Four register-shaped candidates
+reduced to one by the shared post slot. Native ID11 has explicit version names
+pp_timer_keep_alive/pm_keep_alive_timeout_process vs old max_idle names. A direct
+probe rejected old100B callee model against native128B body; review remains open.
+
+Transient Ghidra RecoverFactoryTimers +old3gap recovery, readOnly/noanalysis:
+21 qualified bodies,18created/3renamed,14callbackowners,global/local instruction
+delta143. Enumerable5143→5161,manager5148→5166. Both persistent projects'10files
+unchanged. v2 adds before-range counts; initial successful observation retained.
+
+New private CPU fixtures execute exact178B dispatcher bodies with declared
+callback/log/free stubs:1002cases, all256IDs+poison15..255/null/fallback/nullcb/ret0.
+REPRODUCED VENDOR DEFECT, NOT FIXED: table[id].id read precedes bounds checking;
+15..255 read one byte outside120B table at PCs420ACC62/420D14C0, then correctly
+reject/free. No out-of-table reads for0..14 (14 accesses the in-table sentinel).
+Do not preserve this known error in our final firmware. Tests are characterization.
+
+NEXT: new task worktree for a pre-dispatch ID guard preserving Wi-Fi message ABI
+and free ownership. Verify both ppTask direct reference and wdev_funcs_init
+function-pointer registration actually enter the guard after linking; a wrap flag
+alone is insufficient. Keep active app/ELF and producer trees frozen. Then review
+ID11 callee semantics and continue other computed aliases/callback/event sources.
+
+Evidence timer-dispatch-validation-20261025.json:28refs,15newgzip47112bytes,
+13reused payloads. Actual consumer replay:20ancestor+15newcontrols/1002cases,
+396GP/no gaps,5161enumerated. See tests/WIFI_TIMER_DISPATCH.md. Full goal stays
+active; retained-loss flags, H10/matched controls, cleanup/fullsuite/hardware open.
+
+LatestCIM25Oct14:47:09UTC: all12original owners live, H10=511cycles,
+schema7main/V8=162/158; guardsrunning/oneROMboot/noerrors. Ignored
+factory-timer-dispatch-20261025/owners-after-audit.json retains observation.

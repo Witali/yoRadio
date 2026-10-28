@@ -25,7 +25,7 @@ def validate_model(data, proof, model_path=None):
     model = json.loads(data)
     kind = identity.get('kind', 'network-stalled-peer-v1')
     if kind == 'qemu-main-merge-v1':
-        assert proof['schema_version'] == 2
+        assert proof['schema_version'] in (2, 3, 4)
         assert model['schema'] == 'qemu-main-merge-validation-v1'
         assert model['passed'] and not model['all_functionality_verified']
         assert re.fullmatch('[0-9a-f]{40}', model['compiled_source_commit'])
@@ -57,9 +57,10 @@ def model_rejections(data, proof):
     return rejected
 
 
-def validate(report,evidence,guard,supervisor,uart,cycles):
+def validate(report,evidence,guard,supervisor,uart,cycles,expected_schema=5):
     """Require complete workload, real reconnects, memory headroom and UART guard."""
-    require(report['schema_version']==5,'Expected explicit executable identity')
+    require(expected_schema in (5,6,7) and report['schema_version']==expected_schema,
+        'Expected matching runtime observation schema')
     require(report['passed'] and report['inputs_unchanged'] and report['no_panic'] and
         not report.get('error') and not report.get('cleanup_error'),'Failed workload')
     require(report['all_functionality_verified'] is False,'Overstated scope')
@@ -90,18 +91,31 @@ def validate(report,evidence,guard,supervisor,uart,cycles):
     require(supervisor['status']=='complete' and supervisor['passed'] and supervisor['sources_unchanged'] and
         supervisor['guard_exit_code']==supervisor['workload_exit_code']==0 and not supervisor['cleanup_errors'],
         'Supervisor did not finish successfully')
-    return dict(passed=True,cycles=cycles,outages=summary['outages'],http_requests=summary['http_requests'],
+    result=dict(passed=True,cycles=cycles,outages=summary['outages'],http_requests=summary['http_requests'],
         elapsed_guest_seconds=report['elapsed_guest_seconds'],
         minimum_sampled_free_heap_bytes=summary['minimum_sampled_free_heap_bytes'],
         minimum_sdk_sum_of_per_heap_minima_bytes=summary['minimum_sdk_sum_of_per_heap_minima_bytes'],
         minimum_task_stack_fill_bytes=min(summary['minimum_task_stack_fill_bytes_by_name'].values()),
         maximum_http_or_batch_guest_seconds=summary['maximum_http_or_batch_guest_seconds'],h10_checks_passed=False)
+    if expected_schema>=6:
+        require(evidence.get('verified_snapshots')==summary['snapshots'],'Missing topology instruction replay')
+        result.update(heap_topology_snapshots=summary['snapshots'],
+            heap_header_inventories=summary['snapshots']*len(summary['first_snapshot']['heap']['heaps']))
+    if expected_schema==7:
+        coverage=evidence.get('tcp_coverage',{})
+        require(coverage.get('snapshots')==summary['snapshots'] and coverage.get('observed',0)>0,
+            'Missing complete TCP replay or observed quiet TCP samples')
+        result['tcp_coverage']=coverage
+    return result
 
 
-def rejections(report,evidence,guard,supervisor,uart,cycles):
+def rejections(report,evidence,guard,supervisor,uart,cycles,expected_schema=5):
     """Reject altered identities, missing work and false guard conclusions."""
     rejected=[]
-    for case in ('emulator-identity','cycles','rom-counters','weather','duration','guard','uart-reset','supervisor'):
+    cases=['emulator-identity','cycles','rom-counters','weather','duration','guard','uart-reset','supervisor']
+    if expected_schema>=6:cases.append('skipped-topology-replay')
+    if expected_schema==7:cases.append('skipped-tcp-replay')
+    for case in cases:
         r,e,g,s,u=copy.deepcopy((report,evidence,guard,supervisor,uart))
         if case=='emulator-identity':r['qemu_sha256']='00'*32
         elif case=='cycles':r['completed_cycles']-=1
@@ -110,16 +124,48 @@ def rejections(report,evidence,guard,supervisor,uart,cycles):
         elif case=='duration':r['elapsed_guest_seconds']+=1
         elif case=='guard':g['passed']=False
         elif case=='uart-reset':u['rom_boots']=2;g['last_observation']=u
-        else:s['sources_unchanged']=False
-        try:validate(r,e,g,s,u,cycles)
+        elif case=='supervisor':s['sources_unchanged']=False
+        elif case=='skipped-topology-replay':e.pop('verified_snapshots',None)
+        else:e.pop('tcp_coverage',None)
+        try:validate(r,e,g,s,u,cycles,expected_schema)
         except ValueError:rejected.append(case)
         else:raise AssertionError('Invalid runtime evidence accepted: '+case)
     return rejected
 
 
-def verify(path,root,revision=None):
+def topology_rejections(snapshot,topology):
+    """Reject modified real-VM metadata even when ordinary heap totals still agree."""
+    rejected=[]
+    for case in ('missing-heap','fake-free-counter','wrong-dispatch','original-rom-walker',
+                 'missing-header','hidden-overhead','wrong-elf','unused-metadata'):
+        row=copy.deepcopy(snapshot);data=row['heap_topology'];part=data['heaps'][0]
+        if case=='missing-heap':data['heaps'].pop()
+        elif case=='fake-free-counter':
+            row['heap']['free_bytes']+=4;row['heap']['heaps'][0]['free_bytes']+=4
+            part['summary']['free_bytes']+=4
+            header=bytearray.fromhex(part['header_hex'])
+            offset=topology.layout['structures']['multi_heap_info']['fields']['free_bytes']['offset']
+            header[offset:offset+4]=part['summary']['free_bytes'].to_bytes(4,'little')
+            part['header_hex']=header.hex();part['inventory']['record']['free_counter']+=4
+        elif case=='wrong-dispatch':
+            table=bytearray.fromhex(data['dispatch_hex'])
+            offset=topology.dispatch_layout['fields']['tlsf_walk_pool']
+            table[offset:offset+4]=topology.walker.image.functions['tlsf_walk_pool']['address'].to_bytes(4,'little')
+            data['dispatch_hex']=table.hex()
+        elif case=='original-rom-walker':part['inventory']['record']['linked']=False
+        elif case=='missing-header':part['inventory']['record']['metadata_words'].pop()
+        elif case=='hidden-overhead':part['inventory']['allocated_header_bytes']=0
+        elif case=='wrong-elf':data['elf_sha256']='00'*32
+        else:part['inventory']['record']['metadata_words'].append([4,0])
+        try:topology.validate(row)
+        except (ValueError,KeyError,TypeError):rejected.append(case)
+        else:raise AssertionError('Invalid heap topology accepted: '+case)
+    return rejected
+
+
+def verify(path,root,revision=None,rom=None):
     """Recompute journals and check archived sources; no VM or firmware writes."""
-    proof=json.loads(path.read_text());assert proof['schema_version'] in (1,2) and proof['passed'] and not proof['h10_checks_passed']
+    proof=json.loads(path.read_text());assert proof['schema_version'] in (1,2,3) and proof['passed'] and not proof['h10_checks_passed']
     assert not proof['all_functionality_verified'] and not proof['physical_hardware_tested']
     model=proof['network_model_evidence'];model_path=None
     if proof['schema_version']==1:
@@ -129,6 +175,11 @@ def verify(path,root,revision=None):
     elf=(root/'.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()
     assert sha(app)==proof['app_sha256'] and sha(elf)==proof['elf_sha256']
     assert app[176:208]==bytes.fromhex(proof['elf_sha256'])
+    topology=None
+    if proof['schema_version']==3:
+        from runtime_heap_topology import HeapTopology
+        assert rom is not None and sha(rom.read_bytes())==proof['rom_sha256']
+        topology=HeapTopology(rom,root/'.build/small-tv-esp32c2/small_tv_reconstructed.elf')
     blobs={}
     for row in proof['blobs']:
         file=(path.parent/row['file']).resolve();assert file.is_relative_to(path.parent.resolve())
@@ -146,6 +197,22 @@ def verify(path,root,revision=None):
     assert b'Ran 25 tests' in files['unit/analysis-tests.log'] and b'OK' in files['unit/analysis-tests.log']
     stopped=json.loads(files['unit/qualification-processes.json'])
     assert stopped['passed'] and stopped['all_absent'] and len(set(stopped['checked_process_ids']))==8
+    if topology:
+        assert b'Ran 16 tests' in files['unit/memory-tests.log'] and b'OK' in files['unit/memory-tests.log']
+        for name,count in (('unit/instructions.json',11),('unit/topology.json',8)):
+            unit=json.loads(files[name]);assert unit['passed'] and unit['inputs_unchanged']
+            assert unit['tests']==count and unit['no_vm_or_hardware_access']
+            assert not unit['all_functionality_verified'] and not unit['failures'] and not unit['errors']
+            producer_prefix=proof['producer_root'].replace('\\','/').rstrip('/')+'/'
+            for filename,digest in unit['inputs_sha256'].items():
+                normalized=filename.replace('\\','/')
+                if normalized.endswith('/esp32c2_rev200_rom.elf'):
+                    assert digest==proof['rom_sha256']
+                elif normalized==producer_prefix+'.build/small-tv-esp32c2/small_tv_reconstructed.elf':
+                    assert digest==proof['elf_sha256']
+                else:
+                    assert normalized.startswith(producer_prefix)
+                    assert proof['source_pins'][normalized[len(producer_prefix):]]==digest
     results=[];controls=0
     for run in proof['runs']:
         prefix=run['name']+'/';read=lambda name:json.loads(files[prefix+name])
@@ -155,10 +222,18 @@ def verify(path,root,revision=None):
             for key in ('app_sha256','native_elf_sha256','qemu_sha256','inputs_sha256','duration_requested_guest_seconds'):
                 assert start[key]==report[key]
             assert start['guard']['source_sha256']==proof['source_pins']['Small_TV/src/tools/runtime_run_guard.py']
+            if topology:
+                assert start['capture_script_sha256']==sha(files['unit/capture-start.ps1'])
         assert report['app_sha256']==proof['app_sha256'] and report['native_elf_sha256']==proof['elf_sha256']
         assert report['qemu_sha256']==proof['qemu_sha256']
         for name,digest in report['inputs_sha256'].items():
-            relative=name.replace('\\','/').split('/small-tv-improvement-plan/',1)[-1]
+            normalized=name.replace('\\','/')
+            if proof['schema_version']==3:
+                # FIXED_TEST: keep the run prefix intact when resolving producer inputs.
+                producer_prefix=proof['producer_root'].replace('\\','/').rstrip('/')+'/'
+                relative=normalized[len(producer_prefix):] if normalized.startswith(producer_prefix) else ''
+            else:
+                relative=normalized.split('/small-tv-improvement-plan/',1)[-1]
             if relative.startswith('Small_TV/') and relative.endswith(('.py','.json')):
                 assert proof['source_pins'][relative]==digest
         data=files[prefix+'events.jsonl'];assert sha(data)==report['journal']['sha256']
@@ -166,9 +241,15 @@ def verify(path,root,revision=None):
         folder=(root/'.build/runtime-candidate-replay'/sha(data)).resolve()
         assert folder.is_relative_to((root/'.build').resolve());folder.mkdir(parents=True,exist_ok=True)
         journal=folder/'events.jsonl';journal.write_bytes(data)
-        evidence=journal_evidence(journal,proof['photo_chunks'],2,require_weather=True)
-        result=validate(report,evidence,guard,supervisor,uart,run['cycles'])
-        rejected=rejections(report,evidence,guard,supervisor,uart,run['cycles'])
+        evidence=journal_evidence(journal,proof['photo_chunks'],2,require_weather=True,
+            snapshot_check=topology.validate if topology else None)
+        schema=6 if topology else 5
+        result=validate(report,evidence,guard,supervisor,uart,run['cycles'],schema)
+        rejected=rejections(report,evidence,guard,supervisor,uart,run['cycles'],schema)
+        if topology:
+            rejected_topology=topology_rejections(evidence['summary']['first_snapshot'],topology)
+            assert rejected_topology==run['topology_rejected_controls']
+            controls+=len(rejected_topology)
         assert result==run['result'] and rejected==run['rejected_controls'];controls+=len(rejected);results.append(result)
     assert {r['cycles'] for r in results}=={4,40}
     return dict(passed=True,runs=results,unsafe_controls_rejected=controls+len(model_controls),h10_checks_passed=False)
@@ -180,7 +261,8 @@ def main():
     parser.add_argument('--proof',type=Path,required=True)
     parser.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[3])
     parser.add_argument('--source-revision')
-    args=parser.parse_args();print(json.dumps(verify(args.proof,args.root,args.source_revision)))
+    parser.add_argument('--rom',type=Path,help='Exact C2 ROM ELF, required for topology evidence')
+    args=parser.parse_args();print(json.dumps(verify(args.proof,args.root,args.source_revision,args.rom)))
 
 
 if __name__=='__main__':main()

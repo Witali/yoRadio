@@ -386,6 +386,23 @@ gapsпусты; firmware bytes и10файлов обоихпроектов не�
 См. [SDK_GAP_RECOVERY.md](reference/SDK_GAP_RECOVERY.md). Этот selected gap закрыт;
 caller4207b120/другие undefined functions, SDK/application boundary иполная
 достижимость остаютсяоткрытыми. Равенство разныхверсийSDK не заявлено.
+25Oct: [SDK_TIMER_GAPS.md](reference/SDK_TIMER_GAPS.md) закрывает selected
+идентификацию caller4207b120 как pp_timer_coex_slice и четырёх функций
+4207581e..42075896. Девять полных SDK тел проверены и в factory, и в native ELF;
+10 отрицательных controls pass. Регистрация/достижимость callback dispatch,
+transient Ghidra metadata recovery и остальные whole-image gaps остаются открытыми.
+Dispatch checkpoint25Oct: [WIFI_TIMER_DISPATCH.md](tests/WIFI_TIMER_DISPATCH.md)
+подтверждает initial table14 и 17 полных тел на каждый образ; transient recovery
+создал18/уточнил3 функции,143 инструкции только внутри qualified ranges,
+5161enumerated/396GP без изменения saved projects. 1002 host instruction cases,
+15новых и20прежних controls replay pass. Это не весь event lifecycle.
+Следующее исправление: guard ID до vendor pp_timer_do_process. Сейчас обе версии
+читают table[id].id до bounds check; ID15..255 дают OOB byte read, хотя затем
+отвергаются и освобождаются. Этот SDK defect намеренно не принимается как норма.
+В другой task worktree проверить ABI/free ownership, ppTask direct call и
+wdev_funcs_init pointer registration после link, invalid IDs и прежние valid IDs.
+Отдельно разобрать событие11: factory max_idle/native keep_alive wrappers
+соответствуют по форме, transitive callee semantics пока не подтверждены.
 
 ## 6. Приёмка окончательной версии и правила работы
 
@@ -411,6 +428,31 @@ retained median loss12..220B и требуют объяснения; порог�
 outages/352HTTP и terminalguards. Новый H1025Oct11:23UTC запущен отдельно на
 полные86400guest s; earlyrecord0 сохранён. H10/retained-loss investigation и весь
 прежний scope остаются открытыми. Детали runtime-main-validation-20261025.json.
+Для разбора retained loss добавлен отдельный opt-in metadata observer:
+[HEAP_TOPOLOGY.md](tests/HEAP_TOPOLOGY.md). Exact ROM/linked TLSF replay, 11+8
+новых host tests и базовые 16+25 tests pass. 4+40 cycles / 22 outages / 352 HTTP,
+46 snapshots / 92 inventories и 38 negative controls квалифицированы. ROM
+контроль доказывает возможность 12-byte padding при тех же запросах, но не
+объясняет прежний H10. Далее typed TCP PCB/TIME_WAIT attribution и длительный
+контроль с обычным cadence; thresholds и требования 24h не меняются. Отдельно
+исправить idempotent cleanup уже закрытой driver ВМ. Main H10 не изменять.
+TCP [gate и attribution](tests/TCP_HEAP_ATTRIBUTION.md) готовы: native selected
+fields, exact live allocations, PCB/segment/pbuf chains и shared accounting,
+33host tests+25baseline,4+40actualcycles/22outages/352HTTP,46observed snapshots и
+76negative controls pass. Подтверждены LISTEN/FIN_WAIT_2 PCB80..504B сheaders;
+actual sampled queued segments/pbufs не было, их target traffic probe открыт.
+Далее matched длительные controls main/V8 и разбор unclassified deltas; старые
+7flags и full/24h/hardware scope не закрываются короткой qualification.
+Matched metadata controls запущены25Oct13:40/13:42UTC вsoak-main/soak-v8,
+по28800guest seconds/interval15/outageEvery60 наproducer23b641680. Early0 и
+4owneridentities каждый сохранены. Это pending, не8hpass; их producer inputs
+в текущей копии не менять. Основной24hH10 идёт в своей прежней копии отдельно.
+Диагностический слой [TCP_TREND_ATTRIBUTION.md](tests/TCP_TREND_ATTRIBUTION.md)
+проверен на исходных завершённых 4+40 циклах, с 22 math и 8 CLI host-тестами.
+Он использует те же центральные снимки, что исходные медианы, явно сохраняет
+неоднозначность и busy, не меняет warmup/windows/phase coverage/flags. Архив
+воспроизводит 76 прежних и 16 новых rejection controls. Длительные controls,
+объяснение прежних потерь и все остальные gates остаются открытыми.
 Production builds для тестирования сохранять в
 `firmware/development/small-tv-esp32c2-reconstructed/`; releases не перезаписывать.
 При изменении QEMU сохранять CYD/C3 OLED и выполнять их отдельную regression.

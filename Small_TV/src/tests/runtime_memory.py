@@ -123,8 +123,8 @@ class MemorySnapshot:
             raise ValueError('Expected a 32-bit observed field')
         return int.from_bytes(raw, 'little')
 
-    def heaps(self, caps=4):
-        """Match IDF heap_caps_get_free/minimum_size, without calling guest code."""
+    def heap_descriptors(self, caps=4, crosscheck=True):
+        """Decode heap metadata once; optional topology reads bind to these extents."""
         pointer, seen, rows = self.symbol('registered_heaps'), set(), []
         while pointer:
             if pointer in seen or len(seen) >= 32:
@@ -143,17 +143,23 @@ class MemorySnapshot:
                 free = self.number('multi_heap_info', info, 'free_bytes')
                 minimum = self.number('multi_heap_info', info, 'minimum_free_bytes')
                 size = self.number('multi_heap_info', info, 'pool_size')
-                if self.validate_counters:
+                if crosscheck and self.validate_counters:
                     self.validate_counters(info, free, minimum)
                 start = self.number('heap_t_', heap, 'start')
                 end = self.number('heap_t_', heap, 'end')
                 if not 0 <= minimum <= free <= size <= end - start or not start <= pool < end:
                     raise ValueError('Inconsistent heap counters or pool extent')
-                rows.append({'free_bytes': free, 'minimum_free_bytes': minimum,
-                             'pool_size': size, 'caps': all_caps})
+                rows.append({'address': pool, 'start': start, 'end': end, 'header': info,
+                             'summary': {'free_bytes': free, 'minimum_free_bytes': minimum,
+                                         'pool_size': size, 'caps': all_caps}})
             pointer = self.number('heap_t_', heap, 'next')
         if not rows:
             raise ValueError('No initialized heap matching requested capabilities')
+        return rows
+
+    def heaps(self, caps=4):
+        """Match IDF heap_caps_get_free/minimum_size, without calling guest code."""
+        rows = [row['summary'] for row in self.heap_descriptors(caps)]
         return {'caps': caps, 'free_bytes': sum(row['free_bytes'] for row in rows),
                 'minimum_free_bytes': sum(row['minimum_free_bytes'] for row in rows), 'heaps': rows}
 

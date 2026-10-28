@@ -163,7 +163,8 @@ guard mutations и4самосогласованно rehashed, но ложных 
 $env:PYTHONPATH='C:/Work/yoRadio/.build/small-tv-parity/oracle-deps'
 & 'C:/Work/yoRadio/.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe' -B -X utf8 `
   Small_TV/src/tests/verify_runtime_candidate_evidence.py `
-  --proof Small_TV/qemu/parity/runtime-main-validation-20261025.json
+  --proof Small_TV/qemu/parity/runtime-main-validation-20261025.json `
+  --source-revision 79594bd02
 ```
 
 Новый H10 `.build/runtime-h10-main-20261025` запущен25Oct11:23:20UTC на полные
@@ -173,6 +174,21 @@ Early record сохранён наcycle0; после присоединения 
 retained-loss flags остаются открытым исследованием и не смягчают приёмку.
 
 ## Разделение модулей и способ измерения
+
+Schema7 (`-TcpTopology`) добавляет [typed TCP attribution](TCP_HEAP_ATTRIBUTION.md).
+33real-ROM host tests,4+40cycles/22outages/352HTTP и76negative controls pass;
+все46snapshots replay. Считаются фактические live capacities и headers без
+double counting shared buffers. Busy samples остаются пропусками. Короткие
+снимки показали PCB, а реальные queued segments/pbufs и длинный matched control
+ещё не квалифицированы. Прежние7retained-loss warnings остаются открытыми.
+
+Дополнительная opt-in schema 6 описана в [HEAP_TOPOLOGY.md](HEAP_TOPOLOGY.md).
+Точные ROM/linked TLSF instructions воспроизводят чтения только block headers,
+считают live capacity/headers и free block geometry; counters проверяются тем же
+ROM getter. Qualification 4+40 cycles / 22 outages / 352 HTTP завершилась,
+46 snapshots / 92 inventories replay и 38 negative controls pass. Это инструмент
+для расследования семи прежних retained-loss flags, а не объяснение их причины.
+Основной H10 на исходных schema 5 helpers не изменялся.
 
 - `runtime_memory.py` извлекает размеры/поля из DWARF текущего ELF, обходит
   зарегистрированные heaps и все FreeRTOS state lists. Он отвергает неверные

@@ -12,7 +12,9 @@ param(
     [ValidateRange(0,100000)][int]$Cycles = 0,
     [ValidateRange(1,604800)][int]$DurationSeconds = 86400,
     [ValidateRange(0.1,60)][double]$IntervalSeconds = 15,
-    [ValidateRange(0,100000)][int]$OutageEvery = 60
+    [ValidateRange(0,100000)][int]$OutageEvery = 60,
+    [switch]$HeapTopology,
+    [switch]$TcpTopology
 )
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'runtime_process.psm1') -Force
@@ -49,6 +51,8 @@ try {
     if ($Cycles) {$arguments+=@('-Cycles',"$Cycles")}
     # FIXED_TEST: preserve a separately pinned candidate through detached launch.
     if ($QemuExecutable) {$arguments+=@('-QemuExecutable',[IO.Path]::GetFullPath($QemuExecutable))}
+    if ($HeapTopology) {$arguments+=@('-HeapTopology')}
+    if ($TcpTopology) {$arguments+=@('-TcpTopology')}
     $state.process=Start-SmallTvDetachedProcess -FilePath (Get-Command pwsh).Source `
         -Arguments $arguments -WorkingDirectory $YoradioRoot
     $state.status='started_not_completed'

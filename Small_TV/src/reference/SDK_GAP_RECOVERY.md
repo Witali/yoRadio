@@ -97,3 +97,9 @@ checkpoint. SDK inputs должны иметь SHA-256:
 Исторические source identities поддерживает `--source-revision`. Старый
 full-image proof отдельно проходит с `--source-revision 36adbd6f7`, его девять
 negative controls сохранены. H10 остаётся отдельным живым тестом и не прерывался.
+
+Продолжение 25 октября: [SDK_TIMER_GAPS.md](SDK_TIMER_GAPS.md) идентифицирует
+caller `0x4207b120` и четыре следующих PM-обработчика, проверяет девять тел с
+пятью timer wrappers также против native ELF. Это уточнение имён/границ и
+selected instruction correspondence; persistent Ghidra recovery и регистрация
+диспетчерских callbacks остаются следующим шагом.

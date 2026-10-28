@@ -4633,44 +4633,281 @@ String подтвердил все4совпадения; VM не перезап�
 в пробе, не потеря процесса и не runtime-helper defect. У старогоH10 PID реально
 отсутствовали независимо от времени. Рекомендация сохранена вWORKING_NOTES.
 
-## 2026-10-25 — разработка перенесена без изменения H10 inputs
+## 2026-10-25 — точный TLSF inventory для расследования retained heap
 
-В отдельной codex/small-tv-memory-retention завершены commits135e61860 и82d901e2d.
-Первый квалифицирует exact ROM/linked TLSF metadata walk:11+8новыхhost tests,
-16+25baseline,4+40actualcycles/22outages/352HTTP,46snapshots/92inventories и
-38semanticnegativecontrols. Второй добавляет prerequisite безопасного TCP walk:
-15hosttests,actual4cycles/2outages/32HTTP,5blocked-empty-mailbox samples и
-12archivecontrols. Подробные proof/docs/log/полныйплан находятся в новой копии.
-Прошивка и QEMU source не менялись; physical device не тронут.
+Работа изолирована в codex/small-tv-memory-retention от b4a851041. Исходные
+4owners основного H10 подтверждены CIM с теми же creationUTC; 152cycles и
+один ROM boot/noerrors на первой проверке. Его sources/SDK/app/ELF/frozen47files
+не менялись, VM не перезапускалась и второй observer не подключался.
 
-Retained-loss12..220B прежнего прерванногоH10 не объяснён. ROMfixture доказывает
-возможность12Bpadding при тех жеlive requests, но не его участие в старыхflags.
-Следом nativeTCP PCB/pbuf attribution с gate, длинный контроль обычногоcadence,
-idempotentalready-stoppedVMcleanup и остальные пункты полного плана.
+Добавлены runtime_instruction_image/runtime_tlsf_instructions/runtime_heap_topology
+и opt-in -HeapTopology. Exact C2 ROM geometry1604/4/8 и настоящий linked SDK
+walker исполняются в private host RV32. Дополнительные guest reads ограничены
+typed heap/vtable headers и size words; payload reads/heap writes/code escapes
+запрещены hooks. Full dispatch80bytes квалифицируется как ROM default +2patches;
+reserved size/alignment slots действительно zero. Schema6 archivable transcript
+replay балансирует live capacity+4bytes/block с настоящим free counter.
 
-ОсновнойmainH10 остаётся здесь:4ownerPID/creationUTC повторно подтверждены,
-203cycles/lastsample3535.629206guest s/start25.097679,oneROMboot/noerrors,
-guardrunning. Эти runtime inputs не изменялись; новыхhelpers сюда не сливать до
-terminal result. Здесь обновлены только notes/log pointers, goalactive.
+11ROM/linked instruction tests, включая180random allocation/free/realloc steps,
+и8native-layout/topology tests прошли; baseline16memory/25analysis pass. ROM
+control показал12byte capacity padding при одинаковых live requests/count;
+после полного free исходный counter восстановился. Это возможный механизм,
+не доказательство причины7прежних12..220byte H10 warnings. Thresholds прежние.
 
-## 2026-10-25 — typed TCP checkpoint и protected matched controls
+Prototype с ошибочным nonzero dispatch-slot expectation провалился, исправление
+квалифицировано заново. Его driver закрыл VM; redundant supervisor cleanup затем
+получил connection refused, все4ownerIDs отсутствовали. Этот harness cleanup
+defect остаётся отдельным follow-up. Exploratory40completed/208.439375guest s
+не имеет genuineearly0 и не включён в qualification; повторный независимый run
+снимает early0 автоматически в той же launch invocation. Работавшая ВМ ради
+пропущенного capture не прерывалась, zero не подделывался.
 
-В новой копии codex/small-tv-memory-retention сохранён коммит23b641680:
-обход TCP lists/segments/pbuf metadata и точные allocation capacities. Прошли
-33real-ROM host tests,25baseline,4+40actual cycles/22outages/352HTTP,
-46observed snapshots и76semantic negative controls. Старые heap/gate checkpoints
-повторно прошли38+12controls. В target snapshots были LISTEN/FIN_WAIT_2;
-queued pbuf/segments пока проверены только host fixtures. Старые7memoryflags
-остаются открытыми, thresholds прежние.
+Qualifiedpreflight4cycles/22.839657guest s и bound40cycles/203.530398guest s:
+22STAoutages/352HTTP/10JPEGuploads, oneROMboot/noerrors, inputsunchanged,
+workload/guard/supervisor0. Затем CIM подтвердил отсутствие8directowners и
+same-run Python/QEMU children. MaxHTTPsecond4.038217guest s<6, minsampledfree54804,
+SDKsummin27104, minstackfill428B. Все46snapshots/92heapinventories replay pass.
 
-В ней запущены matched8h controls main/V8:soak-main25Oct13:40:41UTC и
-soak-v8=13:42:23UTC,28800guest seconds/interval15/outageEvery60/schema7.
-Start0 и4positive original owners/creationUTC сохранены для каждого; runtime inputs
-новой копии теперь тоже pinned. Последняя CIM13:47:42UTC подтвердила все12owners
-трёх runs: здешний mainH10 —362cycles/guest6272.078252, metadata-main13,
-metadata-v8=9, oneROMboot/noerrors каждый. Это pending prefixes, не8h/24hpass.
-Подробные identities, команды и следующие gates — в новых WORKING_NOTES/WORK_LOG.
+Proof heap-topology-validation-20261025.json:44raw/payloadrefs,196599newgzipbytes,
+reuseпрежнихpayloads. Consumer проверяет source/unit/ROM/ELF/app identity, настоящее
+early0 и38negativecontrols; самосогласованно falsecounter, ROMwalkersubstitution,
+missingheaders/replay и rehashed falseQEMUmanifest отвергнуты. Исправлена ошибка
+run-prefix переменной в новом schema3 consumer. Старый schema2 checkpoint отдельно
+replay сsource-revision79594bd02/20controls pass. ПолныеRAM/flash/UART/SDKarchives
+не добавлялись, firmware/QEMU source не менялись. См.tests/HEAP_TOPOLOGY.md.
 
-Код/SDK/app/ELF/ROM/frozen47files и живые VM в этой копии не менялись; здесь
-обновляются только notes/log pointers. Новые producer changes — другая task worktree;
-read-only offline analysis допустим без изменения pinned inputs. Полная цель active.
+Следующий шаг — typedTCP PCB/TIME_WAIT attribution и долгий диагностический
+контроль обычногоcadence; основной24hH10 и остальные пункты полного плана
+остаются открытыми. Внешняя физическая плата не затронута, goalactive.
+
+## 2026-10-25 — mailbox gate перед будущим TCP inventory
+
+TLSF checkpoint сохранён focusedcommit135e61860, рабочая копия была clean.
+Следующее исследование нашло synchronization prerequisite: native core-locking
+выключен, поэтому vTaskDelay чужой задачи не гарантирует quiescent TCP lists.
+Assembly linked sys_thread_tcpip42034632/132bytes сверена с sys_arch.c; DWARF
+lwip_task exprloc подтверждён независимо от compiler suffix. tcpip_mbox — pointer
+на sys_mbox_s с embedded queue, а не pointer на ещё один queue handle.
+
+runtime_tcp_gate.py использует ELF-specific qualified policy76B5CE37 и selected
+native fields. Empty mailbox, TCB event container, currenttask, полный owner/list
+и exacteventitem проверяются read-only. Busy возвращает явный отказ от дальнейшего
+walk, corrupt metadata — ошибку. Packet/queue-storage/TCB-context не читаются.
+Сохраняется scalar/list transcript с точным replay. Предварительный exploratory
+DWARF script попытался вычислить размер чужого flexible array и получил KeyError;
+новый parser читает только нужные поля. Actual QueueDefinition tag вместо xQUEUE.
+
+15hosttests pass. В отдельной настоящей QEMU VM unchanged runtime4cycles/
+2STAoutages/32HTTP/23.110207guest s,5same-stop samples, все5quiet. Underlying heap
+instruction replay pass, oneROMboot/noerrors; отдельный UARTguard не запускался.
+Foregroundprobe0, PID39284 и same-run Python/QEMU processes отсутствуют поCIM.
+Это gateprobe, не новая40cycle/H10 qualification и не TCP attribution.
+
+tcp-mailbox-gate-validation-20261025.json:27raw/payloadrefs/45308newgzipbytes,
+12semantic negative controls; verifier перепроверяет layout, source/unit/app/
+ELF/ROM, exactsame-stop SHA и raw reads, actual heap inventories. FullRAM/flash/
+UART/ELF не добавлялись. tests/TCP_HEAP_ATTRIBUTION.md фиксирует actualPCB/seg/
+pbuf ABI и оставшиеся steps, включая shared pbuf и containing allocation mapping.
+
+Основной H10 повторно проверен по4PID и exactcreationUTC:203cycles,
+lastsample3535.629206guest s, start25.097679, guardrunning, oneROMboot/noerrors.
+Это около3510guest seconds prefix, не24hpass. Ни его VM/inputs, ни физическое
+устройство не менялись. Продолжить TCP attribution, обычный длинный контроль,
+idempotent cleanup и весь оставшийся IMPROVEMENT_PLAN; goalactive.
+
+## 2026-10-25 — TCP lists, buffer metadata и exact allocation attribution
+
+Предыдущий goal turn дал progress:135e61860/82d901e2d и pointer983313540,
+real host/VM checks. Новое продолжение сначала проверило currentcleanbranch и
+4originalH10PID/creationUTC:210cycles,oneROMboot/noerrors. Его inputs не менялись.
+
+Добавлены runtime_tcp_layout, runtime_tcp_allocations, runtime_tcp_snapshot и
+runtime_tcp_journal; native ABI/state enum, fourPCBlists, send/ooseq/refused
+segments/pbufs, distinct sharing/refcounts/queue lengths/timers. Actual live
+block bounds получены callbacks точных ROM/linked instructions. Qualified
+metadata prefix0 проверен по linked do_memp_malloc_pool→mem_malloc→malloc и
+SDK/config(no tasktracking/poisoning/stats). Packet payload не читается; metadata
+alias/free/interior/cross-boundary pointers отвергаются до transport read.
+
+Новые -TcpTopology/--tcp-topology даютschema7, imply heap; старые5/6 сохранены.
+Mailbox gate вызывается до TCP walk, busy не становится нулевым TCP расходом.
+Отдельная replay/coverage class сохраняет additive TCP/unclassified consumed
+series, не приписывает неизвестные allocations сети и не обещает requested size.
+31initialhosttests pass; после двух journal cases acceptedv2 содержит33pass.
+Все используют actualROM malloc/free и native fields.25baseline audit/trend pass.
+
+Actualpreflight4/22.240650guest s иchurn40/203.479499guest s завершены:
+22STAoutages/352HTTP,10JPEGuploads во втором, workload/guard/supervisor0,
+sourceunchanged,oneROMboot/noerrors. MaxHTTP4.118874<6, minsampledfree54672,
+SDKsummin20308,minstackfill428 во втором.46TCP samples observed/92heapinventories
+replay. Только LISTEN/FIN_WAIT_2, peak3PCBs, TCP consumed80..504B. ActualPCB
+capacities76/208, headers4each,padding0; никакого queuedpbuf/segment в этих
+моментах не было. Реальная pending-traffic qualification остаётся отдельной.
+
+Первый ad-hoc cleanup probe ошибочно считал живыми любые процессы с прежними
+PID. CIM показал2повторноиспользованных PID(другие images,creationпослеterminal
+13:04:15UTC). Ничего не остановлено и VM не перезапущена; до nextlaunch
+проверены original owner exits. Новый scoped owner record/consumer различает
+originalexit/PIDabsence, проверяет roles, retained IDs/VM identity и UTCcreation.
+8negativeownercontrols/run включают живого исходного владельца и falseabsence.
+У churn40 все4PID после выхода действительно отсутствовали.
+
+tcp-inventory-validation-20261025.json:54raw/payloadrefs/242895newgzipbytes;
+полный replay source/unit/model/app/ELF/ROM/early0/typedreads/series и76semantic
+negativecontrols. Shared producer payloads reused, fullRAM/flash/UART/ELF/SDK
+archives не добавлены. Heap/gate legacy readers проверяются с135e61860/82d901e2d;
+новаяschema4 evidence использует отдельный verify_tcp_inventory_evidence.
+
+Старые7retained-loss flags12..220B не закрыты. Далее matched longcontrols на
+main2DF90327 и прежнемV8A5BE14C5, обычный15s/outageEvery60; затем pendingtraffic,
+unclassified deltas и cleanup уже закрытойVM. Полныйплан/fullimage/final/hardware
+scope и основнойH10 остаются активными, physicaldevice не тронут.
+
+## 2026-10-25 — producer23b641680 и два сопоставимых8h controls
+
+TCP checkpoint закоммичен23b6416805c3a5c00db179ab3a094eabdc402758.
+Отдельные CLI replay нового76controls, старогоheap38controls с135e61860 и
+старогоgate12controls с82d901e2d прошли. Workingcopy была clean; QEMU binaries
+перед запуском вновь совпали сmain2DF90327 иV8A5BE14C5. OriginalmainH10 на тех
+же4PID/creationUTC,341cycles/guest5904.619039,oneROMboot/noerrors.
+
+Запущены matched metadata controls на unchanged app/ELF9C1A83BD/76B5CE37,
+по28800guest seconds,interval15/outageEvery60,schema7. Earlyrecords captured0
+в той же launch invocation, затем CIM подтвердил4positive owners каждого.
+Run folders `.build/tcp-inventory-qemu-20261025/soak-main` и `soak-v8`; sibling
+`-start.json`/`-processes.json`/`-supervisor/` сохранять. Producer inputs в этой
+копии теперь pinned; новые их исправления/firmware builds — другая task worktree.
+
+| Run | Role | PID | Creation UTC |
+| --- | --- | ---: | --- |
+| main | supervisor | 40876 | 2026-10-25T13:40:41.8450240Z |
+| main | workload | 10056 | 2026-10-25T13:40:42.3564590Z |
+| main | guard | 2560 | 2026-10-25T13:41:25.1035970Z |
+| main | VM | 37236 | 2026-10-25T13:40:54.8297010Z |
+| V8 | supervisor | 27244 | 2026-10-25T13:42:23.9677670Z |
+| V8 | workload | 1044 | 2026-10-25T13:42:24.3646190Z |
+| V8 | guard | 10128 | 2026-10-25T13:43:06.7923920Z |
+| V8 | VM | 10776 | 2026-10-25T13:42:36.0331800Z |
+
+VMnames SmallTV-6ff6545a23db иSmallTV-6ebdccab147c. Повторная CIM-проверка на
+13:47:42UTC подтвердила все12originalowners трёхruns:mainH10362cycles/
+guest6272.078252,soak-main13cycles/guest265.678434,soak-v8=9/guest197.138608.
+Guardrunning/oneROMboot/noerrors каждый; это pending prefixes, не8h/24hpass.
+Метаданные наблюдения three-runs-owners.json в ignored runbase. Старые7часов,
+новые8+8 и основной24h не складывать. Не рестартовать из-за probe timeout.
+
+Далее full-journal matched comparison и разбор additive TCP/unclassified loss;
+не складывать независимые medians. Old7flags, pending guestbuffer probes,
+idempotent already-deadVMcleanup и fullimage/final/hardware scope открыты.
+Frozen47files/SDK/ROM/app/assets/ELF/три protected VMs не менялись; goalactive.
+
+## 2026-10-25 — офлайн-компоненты исходных медиан памяти
+
+Предыдущий запрос о QEMU завершён проверкой всех пяти worktrees/веток и реальным
+push main: 9135fc89ce уже опубликован. Единственная резервная ветка дублирует
+962cda7a6f с устаревшим README-путём; уникальных model/test changes в ней нет.
+Новые фиктивные merges не создавались.
+
+При возобновлении плана authoritative CIM подтвердил все 12 исходных owners с
+точными creation UTC: основной H10 410 cycles, controls main/V8 61/57 cycles.
+Supervisor running; сами JSON-файлы не считались доказательством liveness.
+Все три ВМ, producer inputs, app/ELF и frozen tools сохранены без изменений.
+
+Добавлены runtime_tcp_trend и analyze_tcp_runtime. Полный schema7 replay
+предшествует расчёту. Исходный runtime_trend и его критерии не изменены:
+3600s warmup/window, lcm(20,outage cadence), полное покрытие фаз и прежние flags
+по последовательному спаду/разбросу первого окна. Компоненты берутся из тех же
+центральных снимков; независимые медианы не складываются. Equal-free ties
+сохраняют ranges и distinct observations; busy не превращается в нулевой расход.
+TCP release и unclassified growth остаются знаковыми и точно дают исходную loss.
+
+22 math + 8 real CLI protection tests pass. Реальные CLI на завершённых 4+40
+cycles воспроизвели 46 снимков и прежний insufficient_steady_state_data. На
+live prefixes main/V8 проверены 67/62 cycles, 68/63 snapshots, 1167.278640/
+1069.220519 guest seconds; pending и до конца прогрева, не 8h или H10 pass.
+
+Архив tcp-trend-validation-20261025: 26 refs, 14 новых gzip / 24760 bytes,
+12 reused payloads. Consumer повторяет исходный ROM/TCP replay и 76 controls,
+потом сверяет paired series и новые CLI findings; 16 новых altered-report
+controls отвергаются. Описание и команды в tests/TCP_TREND_ATTRIBUTION.md.
+Неизменяемый архив не содержит изменяющихся soak prefixes или полных RAM/flash.
+
+Старые 7 retained-loss flags не объяснены, пороги не ослаблены. Дальше полные
+controls и unclassified deltas, реальные queued buffers, cleanup закрытой ВМ,
+whole-image/full suite/24h/physical gates. Весь исходный scope и goal активны.
+
+## 2026-10-25 — selected PM/timer gaps сверены в обе стороны
+
+После e572291ef продолжен whole-image пункт, без изменения pinned producers.
+В libpp.a/pp_timer.o relocation pm_coex_slice_timeout_process указала на
+pp_timer_coex_slice. Полные factory bytes уточнили caller4207b120: это call
+в wrapper4207b11a..4207b12c. При пробе обнаружилась важная неоднозначность:
+такой же shape matcher принимает соседний wrapper4207b108 с другим callee.
+Новый match_factory_timers требует реальные callee/shared state anchors,
+включая scoped object-local .LANCHOR0; одним совпадением fixed bits не ограничен.
+
+Четыре тела4207581e..42075896 определены как pm_dream_timeout_process,
+pm_sleep_delay_timeout_process, pm_disconnected_sleep_delay_timeout_process и
+pm_coex_restart_timeout_process. Вместе с пятью timer wrappers: 238 SDK bytes,
+210 linked factory bytes, 4 local branches. Предыдущие три SDK anchors заново
+проверяются по тем же immutable libraries, исходные/установленные SDK не меняются.
+
+Новый reverse/native_timer_match проверил эти же девять моделей на native
+ELF76B5CE37: полные тела, реальные ELF callee/global names и shared local state
+совпали после permitted relocation/relaxation. Разница sleep-delay32/28 bytes —
+разрешённое call relaxation. Transitive SDK implementations не приравниваются.
+Восемь factory и две native подмены отвергнуты, включая настоящего соседнего
+двойника и изменённое return value. Артефакты — два gzip / 6438 bytes; источники,
+точные replay-команды и ограничения в reference/SDK_TIMER_GAPS.md.
+
+Persistent Ghidra DB и firmware не изменены. Уточнены имена/границы выбранных
+SDK gaps; callback registration, достижимость, другие whole-image gaps,
+retained loss/длительные runs и final/hardware scope остаются открытыми.
+
+На 14:24:02 UTC повторно сверены все 12 исходных PID/name/creationUTC. Основной
+H10 —454 complete cycles, metadata main/V8 —105/100. Все supervisor/guards
+running, по одному ROM boot, UART errors пусты. Запись owners-after-static-checks
+в ignored tcp-trend-analysis-20261025; это liveness/prefix, не итог qualification.
+
+## 2026-10-25 — timer table, dispatcher и bounded transient recovery
+
+Предыдущий goal turn дал progress: e572291ef/c473d3caa. На старте снова CIM
+подтвердил все12 original owner identities; H10=457 cycles, schema7 main/V8=
+107/103. Три guards/supervisors running, один ROM boot и no UART errors.
+Pinned app/ELF/SDK/producers/frozen tools и ВМ в этом продолжении не менялись.
+
+Новый audit_timer_dispatch связал initialized SDK table120B/14event IDs плюс
+sentinel с17 полными телами на каждый образ. Все SDK relocation masks/local
+branches и shared anchors проверены. Из четырёх setter lookalikes единственная
+register/post пара использует один slot: factory3FCC3100/native3FCB5D98.
+Table addresses3FCB52F8/3FCAC978, dispatcher420ACC28/420D1486. Native event11
+имеет явные names pp_timer_keep_alive/pm_keep_alive_timeout_process вместо
+старых max_idle names; transitive equivalence не заявлена. Предварительный
+full-body probe старой100B callee model не совпал с новым128B телом; нужен review.
+
+RecoverFactoryTimers в новой disposable copy с -readOnly/-noanalysis:
+18 created+3 existing renamed, 21 qualified bodies и14 table owners. Enumerated
+5143→5161, manager5148→5166; global+local instruction deltas ровно143, program
+memory hashes unchanged. Повторный headless добавил точный before-range count;
+это осмысленная проверка границ, не перезапуск firmware/ВМ. Оба runs завершились,
+все10 исходных и10 copied project files остались прежними. Full graph хранится
+ignored; архив использует только delta и старые адресные payloads.
+
+Приватный host Unicorn выполнил1002 случая точных178B dispatcher bodies:
+все256 IDs, poison prefetch для15..255, null, permutation fallback, null callback
+и callback return0. Callback/log/free — declared external stubs. Обнаружен SDK
+defect в обоих образах: pre-bound byte read за table для15..255, PC420ACC62/
+420D14C0. После него invalid message отвергается и освобождается; valid0..13
+не проявляют OOB. Production bug пока НЕ исправлен, tests это characterization,
+не разрешение переносить ошибку. Guard нужно делать в другой firmware worktree,
+с проверкой всех direct/pointer входов и free/ABI ownership.
+
+timer-dispatch-validation-20261025:28refs,15newgzip/47112bytes,13reused payloads.
+Consumer реально воспроизвёл ancestor20controls,1002instructioncases и15 новых
+table/recovery controls; bounded metadata и full xref audit396GP прошли.
+Детали/команда в tests/WIFI_TIMER_DISPATCH.md. Цель, прочие whole-image gaps,
+старые memory losses, текущие длительные tests, full suite и hardware открыты.
+
+Повторная CIM-проверка14:47:09UTC подтвердила все12 original owners: H10=511
+complete cycles, schema7 main/V8=162/158. Guards running, oneboot/noUARTerrors.
+owners-after-audit.json сохранён в ignored base; elapsed durations не складываются.

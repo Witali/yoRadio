@@ -13,7 +13,9 @@ param(
     [ValidateRange(0,100000)][int]$Cycles = 0,
     [ValidateRange(1,604800)][int]$DurationSeconds = 86400,
     [ValidateRange(0.1,60)][double]$IntervalSeconds = 15,
-    [ValidateRange(0,100000)][int]$OutageEvery = 60
+    [ValidateRange(0,100000)][int]$OutageEvery = 60,
+    [switch]$HeapTopology,
+    [switch]$TcpTopology
 )
 $ErrorActionPreference = 'Stop'
 $cleanupModule = Join-Path $PSScriptRoot 'runtime_cleanup.psm1'
@@ -73,6 +75,8 @@ try {
         '--outage-every', "$OutageEvery", '--outage-seconds', '1') + $length
     # FIXED_TEST: pass a candidate by its own path, leaving frozen tools untouched.
     if ($QemuExecutable) {$arguments += @('--qemu', [IO.Path]::GetFullPath($QemuExecutable))}
+    if ($HeapTopology) {$arguments += @('--heap-topology')}
+    if ($TcpTopology) {$arguments += @('--tcp-topology')}
     $workload = Start-Child $arguments 'workload'
     $state.workload_pid=$workload.process.Id
     $state.workload_started_utc=$workload.process.StartTime.ToUniversalTime().ToString('o')
