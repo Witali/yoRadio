@@ -1,0 +1,1809 @@
+{
+  "passed": true,
+  "completed": true,
+  "native_decoder_tested": false,
+  "resize_retry_qualified": false,
+  "physical_device": false,
+  "external_network": false,
+  "commands": [
+    {
+      "name": "version",
+      "argv": [
+        "ffmpeg.exe",
+        "-version"
+      ],
+      "state": "complete",
+      "pid": 1680,
+      "exit_status": 0,
+      "stdout_sha256": "ccf923e713e82e8b3d7b4534dca9347bfc69618112d3b7fdc02d7d148512476c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "encoder-help",
+      "argv": [
+        "ffmpeg.exe",
+        "-hide_banner",
+        "-h",
+        "encoder=libopus"
+      ],
+      "state": "complete",
+      "pid": 22512,
+      "exit_status": 0,
+      "stdout_sha256": "0e710f793382d62ab38a807f25268eee742c19fa68883dc6b6fccaf9f40cf70e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "source-decode",
+      "argv": [
+        "ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\esp32c3_calibration\\flac-level8.flac",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-long-fixture-20261030-01\\source.pcm"
+      ],
+      "state": "complete",
+      "pid": 9508,
+      "exit_status": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "encode",
+      "argv": [
+        "ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-f",
+        "s16le",
+        "-ar",
+        "48000",
+        "-ac",
+        "2",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-long-fixture-20261030-01\\source.pcm",
+        "-map",
+        "0:a:0",
+        "-map_metadata",
+        "-1",
+        "-c:a",
+        "libopus",
+        "-b:a",
+        "510k",
+        "-vbr",
+        "off",
+        "-application",
+        "audio",
+        "-frame_duration",
+        "120",
+        "-fflags",
+        "+bitexact",
+        "-flags:a",
+        "+bitexact",
+        "-f",
+        "ogg",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-long-fixture-20261030-01\\encode.ogg"
+      ],
+      "state": "complete",
+      "pid": 19856,
+      "exit_status": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d6b7f2adff886a36d0d834bff051e66c5525f66924c0397ea639498b429a5714"
+    },
+    {
+      "name": "repeat-encode",
+      "argv": [
+        "ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-f",
+        "s16le",
+        "-ar",
+        "48000",
+        "-ac",
+        "2",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-long-fixture-20261030-01\\source.pcm",
+        "-map",
+        "0:a:0",
+        "-map_metadata",
+        "-1",
+        "-c:a",
+        "libopus",
+        "-b:a",
+        "510k",
+        "-vbr",
+        "off",
+        "-application",
+        "audio",
+        "-frame_duration",
+        "120",
+        "-fflags",
+        "+bitexact",
+        "-flags:a",
+        "+bitexact",
+        "-f",
+        "ogg",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-long-fixture-20261030-01\\repeat-encode.ogg"
+      ],
+      "state": "complete",
+      "pid": 14804,
+      "exit_status": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e5676de3ab4aeda4e1e0620f559b03c037721fcbab077f726e58c2b680211f56"
+    },
+    {
+      "name": "libopus-playback",
+      "argv": [
+        "ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-c:a",
+        "libopus",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-long-fixture-20261030-01\\stereo-510-120ms.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-long-fixture-20261030-01\\playback.pcm"
+      ],
+      "state": "complete",
+      "pid": 25736,
+      "exit_status": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source": {
+    "path": "tests/fixtures/esp32c3_calibration/flac-level8.flac",
+    "bytes": 1771852,
+    "sha256": "d9a54de9e470158428bb340d2278baa6a36a5f5571ea8083af390ec46ca39aad"
+  },
+  "generator_sha256": "b31791eb3ba1a4f7159db4cfb06358b7cf52e512417e40993f9bc1ca70fc76d6",
+  "tool": {
+    "name": "ffmpeg.exe",
+    "sha256": "09948d4cdd0650da6ff5a87577469f2a218dc2615ae379f8f734d24c49de0f73",
+    "libopus_version_reported": false
+  },
+  "source_pcm": {
+    "bytes": 2112000,
+    "sha256": "a063803277ddaaac6ebb459f70c5d87a5cb35cda786a616ce43805cfb783fb20",
+    "frames": 528000
+  },
+  "fixture": {
+    "file": "stereo-510-120ms.ogg",
+    "bytes": 707097,
+    "sha256": "b6237ae8df98d3fabbea252eec82b291a46dfdb537cb5b9f537bf5e00bcd7679"
+  },
+  "audit": {
+    "pages": [
+      {
+        "sequence": 0,
+        "flags": 2,
+        "granule": 0,
+        "encoded_bytes": 47,
+        "completed_audio": 0,
+        "decoded_frames_through_page": 0
+      },
+      {
+        "sequence": 1,
+        "flags": 0,
+        "granule": 0,
+        "encoded_bytes": 74,
+        "completed_audio": 0,
+        "decoded_frames_through_page": 0
+      },
+      {
+        "sequence": 2,
+        "flags": 0,
+        "granule": 46080,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 46080
+      },
+      {
+        "sequence": 3,
+        "flags": 0,
+        "granule": 92160,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 92160
+      },
+      {
+        "sequence": 4,
+        "flags": 0,
+        "granule": 138240,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 138240
+      },
+      {
+        "sequence": 5,
+        "flags": 0,
+        "granule": 184320,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 184320
+      },
+      {
+        "sequence": 6,
+        "flags": 0,
+        "granule": 230400,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 230400
+      },
+      {
+        "sequence": 7,
+        "flags": 0,
+        "granule": 276480,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 276480
+      },
+      {
+        "sequence": 8,
+        "flags": 0,
+        "granule": 322560,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 322560
+      },
+      {
+        "sequence": 9,
+        "flags": 0,
+        "granule": 368640,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 368640
+      },
+      {
+        "sequence": 10,
+        "flags": 0,
+        "granule": 414720,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 414720
+      },
+      {
+        "sequence": 11,
+        "flags": 0,
+        "granule": 460800,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 460800
+      },
+      {
+        "sequence": 12,
+        "flags": 0,
+        "granule": 506880,
+        "encoded_bytes": 61475,
+        "completed_audio": 8,
+        "decoded_frames_through_page": 506880
+      },
+      {
+        "sequence": 13,
+        "flags": 4,
+        "granule": 528312,
+        "encoded_bytes": 30751,
+        "completed_audio": 4,
+        "decoded_frames_through_page": 529920
+      }
+    ],
+    "page_count": 14,
+    "all_page_crcs_valid": true,
+    "audio_packet_count": 92,
+    "packet_samples": {
+      "5760": 92
+    },
+    "packet_duration_ms": 120,
+    "samples_per_packet": 5760,
+    "channels": 2,
+    "sample_rate": 48000,
+    "raw_frames": 529920,
+    "preskip": 312,
+    "eos_granule": 528312,
+    "initial_granule_offset": 0,
+    "tail_frames": 1608,
+    "playback_frames": 528000,
+    "playback_pcm16_bytes": 2112000,
+    "maximum_packet_pcm16_bytes": 23040,
+    "maximum_packet_encoded_bytes": 7650,
+    "packets": [
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      },
+      {
+        "mode": "CELT",
+        "stereo": true,
+        "frames": 6,
+        "samples": 5760,
+        "samples_per_frame": 960,
+        "bytes": 7650,
+        "frame_bytes": [
+          1273,
+          1273,
+          1273,
+          1273,
+          1273,
+          1273
+        ]
+      }
+    ]
+  },
+  "playback": {
+    "bytes": 2112000,
+    "sha256": "3a8bfed01bc8ea7867cc07946a4e0dbdf6505db46fde8c4608d001d39db2fd5d"
+  },
+  "repeated_encoding_byte_identical": true
+}

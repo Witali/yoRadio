@@ -90,6 +90,9 @@ above remains a decoder-integration reference, not the final playback oracle.
   requires capacity for up to 5760 samples per channel: 23040 PCM16 stereo bytes.
   These exceed the initial output buffer and require a measured public resize
   retry test, including input-consumption behavior.
+  The [reproducible 120 ms fixture](../tests/fixtures/opus_ogg_long_packets/README.md)
+  is ready: 92 legal packets, CRC/timeline guards and independent complete
+  libopus playback pass. MCU decoding and resize behavior remain unqualified.
 - Deliberate backpressure, actual HTTP/TLS/TFT traffic, production resources
   and physical audio/output backends remain separate gates.
 
