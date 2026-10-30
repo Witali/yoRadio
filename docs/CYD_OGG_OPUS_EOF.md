@@ -121,9 +121,13 @@ before production integration. No new observer is selected by this checkpoint.
   libopus playback pass. The [whole-input public resize checkpoint](../tests/results/cyd-opus-20261030/RESIZE.md)
   observes two genuine insufficient-buffer results: consumed=0, decoded=0,
   needed=23040 with initial capacity 12288. Both fresh retry strategies match
-  the sufficient-capacity baseline of 2119680 raw bytes. Fragmented-input and
-  actual-task resize, nonzero error consumption and OOM remain unqualified;
-  this result does not justify changing production input advancement.
+  the sufficient-capacity baseline of 2119680 raw bytes.
+  [Fragmented-input resize](../tests/results/cyd-opus-20261030/STREAM_RESIZE.md)
+  also passes 4096/257/1-byte feeds with the exact production pending/EOF
+  helpers. Each schedule witnesses one nonterminal resize with consumed=0 and
+  decoded=0, then matches all raw PCM. Actual-task resize, nonzero error
+  consumption, empty-input retries and OOM remain unqualified. These results
+  do not justify changing production input advancement.
 - Deliberate backpressure, actual HTTP/TLS/TFT traffic, production resources
   and physical audio/output backends remain separate gates.
 

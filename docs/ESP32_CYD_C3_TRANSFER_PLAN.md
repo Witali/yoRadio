@@ -2164,3 +2164,11 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Это не trim fix. Следующий слой должен учитывать encoded timeline/64-bit
   granules и ownership на границах links, сохраняя Espressif synthesis;
   собственная арифметика Vorbis и private scopes остаются отложенными.
+
+- 2026-10-30, CYD-C3-14, [fragmented Opus resize](../tests/results/cyd-opus-20261030/STREAM_RESIZE.md):
+  4096/257/1-byte feeds с production pending/EOF headers полностью совпадают
+  с whole-input raw baseline 2119680 B. Во всех трёх случаях реально выполнен
+  nonterminal resize 12288→23040 с consumed=0 и decoded=0; cleanup и все native
+  statuses проходят. Nonzero consumed-on-error, empty retry, OOM, actual tasks
+  и playback trim этим не закрываются. Изменений production caller не требуется
+  на основании наблюдённых zero-consumption retries.
