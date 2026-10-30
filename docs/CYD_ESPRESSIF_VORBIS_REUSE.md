@@ -89,6 +89,21 @@ decoder branch. Its native AAC consumed-on-resize and zero-input PCM retry
 remain separate. Pending storage participates in generation/codec/error/EOF
 cleanup and the maintenance release predicate.
 
+The whole CYD task test found another public-boundary difference: with all
+703,584 encoded bytes consumed, supplying EOS only in a later empty control
+packet returned 2,110,464 PCM bytes instead of 2,112,000. A read-only trace
+confirmed that the deficit already existed at the vendor output, before the
+PCM queue. No input bytes were lost and no decoder/allocator error occurred.
+
+CYD now keeps one encoded Ogg byte until it knows whether more data or EOF
+follows. At EOF that actual final byte carries `eos=true`. At most two borrowed
+segments are processed; the lookahead itself allocates no heap and does not
+concatenate ordinary packet bodies. Empty draining continues until both input
+consumption and decoded PCM are zero. Generation/codec changes, errors, Stop
+and maintenance clear the held byte. The vendor archives, other codec paths,
+12,288-byte output buffer and task profiles are unchanged. This new adapter is
+selected in the CYD Ogg caller; C3's existing private repair stays unchanged.
+
 These changes preserve the production task affinities, priorities, stacks,
 display configuration and audio backend selection. They do not enable the C3
 private Vorbis repair, custom numerical components or old deferred experiments.
@@ -127,8 +142,22 @@ feeds. Complete PCM is identical across both architectures and all schedules;
 the historical prefix remains exact. Original failed attempts and a precisely
 documented post-run data-reader correction are retained.
 
-After those gates, full production audio-task streaming, Stop/reopen,
-maintenance, queue backpressure and radio/TLS/TFT resource qualification remain
-necessary. The disconnected board also leaves physical audio/throughput and
-the three output backends unqualified. Vendor reuse does not prove universal
-Vorbis conformance or close requirements of the deferred custom decoder.
+The [actual CYD task checkpoint](../tests/results/cyd-vorbis-task-20261030/NATIVE.md)
+now passes ordered EOF, Stop/reopen and maintenance/resume through the complete
+production audio service and real SDK queues/tasks. Each complete run matches
+the full direct-vendor PCM reference; five real HTTP clients and public decoder
+handles close. [Host regressions](../tests/results/cyd-vorbis-task-20261030/HOST.md)
+cover final-byte EOS, packet splits and cleanup, with current target compilation.
+
+The task checkpoint uses explicit transport/output-hardware seams. Real
+HTTP/TLS/TFT traffic, deliberate backpressure, production resource margins,
+physical audio/throughput and all three output backends remain to qualify.
+Vendor reuse does not prove universal Vorbis conformance or close requirements
+of the deferred custom decoder.
+
+The next software regression is Opus, which shares `NATIVE_CODEC_OGG` and the
+new EOF adapter. Use the existing `opus-510.ogg` fixture to establish a complete
+unchanged-vendor baseline, compare segmented EOF delivery, then repeat the
+three actual task cases. The old C3 calibration covers interior windows and
+does not supply a full EOF reference. Opus pre-skip must be subtracted from its
+final granule; Vorbis's byte/hash reference cannot be reused for Opus.
