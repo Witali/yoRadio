@@ -2154,3 +2154,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   полный raw PCM совпадает с baseline (2119680 B). Это не доказывает поведение
   при nonzero consumed-on-error, fragmented input, actual tasks или OOM. Эти
   gates остаются; production caller не менялся на основании одного full feed.
+
+- 2026-10-30, CYD-C3-14, [public parser observation](../tests/results/cyd-opus-20261030/PARSER.md):
+  supported pass-through callback с неизменёнными Espressif decoder ops не
+  меняет PCM/metadata/consumption на 20/120 ms fixtures. Все 682 успешных
+  callbacks возвращают нулевые sample/duration/padding/total-size поля;
+  брать из них trim bounds нельзя. Сохранены fixture-derived emission-window
+  hashes, оригинальная ошибка public include paths и fresh passing rerun.
+  Это не trim fix. Следующий слой должен учитывать encoded timeline/64-bit
+  granules и ownership на границах links, сохраняя Espressif synthesis;
+  собственная арифметика Vorbis и private scopes остаются отложенными.

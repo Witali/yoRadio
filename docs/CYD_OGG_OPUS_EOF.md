@@ -81,6 +81,32 @@ continued packets, terminal page bounds, Stop/generation changes and chained
 logical streams need explicit ownership and tests. The raw vendor identity
 above remains a decoder-integration reference, not the final playback oracle.
 
+The [public parser observation](../tests/results/cyd-opus-20261030/PARSER.md)
+uses Espressif's documented registration callback and unchanged vendor decoder
+operations. Paired stock/pass-through instances produce identical whole PCM,
+metadata and consumption for both 20 ms and 120 ms fixtures. Every one of 682
+successful callbacks reports zero for sample count, duration, both padding
+fields and total size. These fields therefore provide no observed trim bounds
+for these fixtures. The reported extra-data frame-duration value also differs
+from the encoded packet duration and must not be used as its timing oracle.
+
+A separate read-only hash of raw emission positions [312,528312) is retained
+for each fixture. It is a same-vendor position reference, not an implemented
+trim filter or independent proof of sample alignment. The original missing
+public-include-path compilation failure and corrected fresh passing campaign
+are both preserved.
+
+The next trim implementation needs an application-owned encoded timeline
+observer while retaining Espressif synthesis. Bound its memory and expose input
+progress plus an acknowledged link-boundary event, so later chained headers
+cannot overwrite bounds for PCM still being drained. Feed original encoded
+bytes once; pending-prefix replay and resize retries must not advance it twice.
+Keep granules in checked 64-bit 48 kHz frame units. Separate provisional page
+header bounds from CRC-verified completion, and report unknown alignment on
+missing continuation, sequence gaps or truncation. Initial offsets, first-page
+EOS, nil pages, multiple links in one input and lifecycle reset need host tests
+before production integration. No new observer is selected by this checkpoint.
+
 ## Additional software gates
 
 - Correct and qualify sample-accurate Ogg Opus pre-skip/end trimming against an
