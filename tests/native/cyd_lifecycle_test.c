@@ -31,6 +31,8 @@ typedef void *QueueHandle_t, *RingbufHandle_t;
 #define ESP_AUDIO_SIMPLE_DEC_TYPE_OGG 4
 #define ESP_AUDIO_SIMPLE_DEC_TYPE_MP3 1
 #define ESP_AUDIO_ERR_OK 0
+#define ESP_AUDIO_ERR_MEM_LACK -2
+#define ESP_AUDIO_ERR_NOT_SUPPORT -7
 #define ESP_AUDIO_ERR_BUFF_NOT_ENOUGH -8
 #define ESP_OK 0
 #define ESP_FAIL -1
@@ -46,11 +48,15 @@ static native_state_t state;
 static jmp_buf task_exit;
 static void (*empty_hook)(void);
 static void (*receive_hook)(void);
+static void (*delay_hook)(void);
 static atomic_uint s_generation;
 static unsigned open_handles, opens, closes, writes, flushes, discards;
 static unsigned eos_frames;
 static bool fail_open, fail_realloc, fail_process, fail_write, fail_flush, fail_config, cancel_acquire, fail_queue;
 static bool oversized_frame;
+static bool header_only;
+static unsigned process_calls, delay_calls, emit_on_call;
+static int open_error;
 static int info_result;
 static uint32_t info_rate=48000, expected_rate=48000;
 static int64_t test_now_us;
@@ -69,7 +75,10 @@ static bool short_input_stats;
 static void *s_start_control;
 #endif
 static int64_t esp_timer_get_time(void) {return test_now_us;}
-static void vTaskDelay(unsigned ticks) {(void)ticks;assert(false);}
+static void vTaskDelay(unsigned ticks) {
+    assert(ticks==1); ++delay_calls;
+    if (delay_hook) delay_hook();
+}
 static void native_audio_output_discard_pcm(void) { ++discards; }
 static int native_audio_output_flush_pcm(void) { ++flushes; return fail_flush ? ESP_FAIL : ESP_OK; }
 static int native_audio_output_configure(uint32_t rate) { assert(rate == expected_rate); return fail_config ? ESP_FAIL : ESP_OK; }
@@ -92,16 +101,18 @@ static void esp_opus_dec_register(void) {}
 static void esp_audio_simple_dec_register_default(void) {}
 static int esp_audio_simple_dec_open(const esp_audio_simple_dec_cfg_t *cfg, void **handle) {
     (void)cfg;
-    if (fail_open) return ESP_FAIL;
+    if (fail_open) return open_error;
     *handle = malloc(8); assert(*handle); ++opens; ++open_handles; eos_frames=2; return ESP_OK;
 }
 static void esp_audio_simple_dec_close(void *handle) { assert(open_handles); --open_handles; ++closes; free(handle); }
 static int esp_audio_simple_dec_process(void *handle, esp_audio_simple_dec_raw_t *raw,
                                       esp_audio_simple_dec_out_t *out) {
     assert(handle && out->len >= 16);
+    ++process_calls;
     if (fail_process) return ESP_FAIL;
-    raw->consumed = raw->len;
-    out->decoded_size = raw->len ? 16 : eos_frames ? (--eos_frames, 8) : 0;
+    raw->consumed = header_only && raw->len ? 1 : raw->len;
+    out->decoded_size = header_only ? (emit_on_call==process_calls ? 16 : 0)
+        : raw->len ? 16 : eos_frames ? (--eos_frames, 8) : 0;
     memset(out->buffer, raw->len ? raw->buffer[0] : 0xee, out->decoded_size);
     if (oversized_frame) out->decoded_size=out->len+4; // Declared size only; vendor writes stay inside its capacity.
     return ESP_OK;
@@ -211,11 +222,12 @@ static int xQueueOverwrite(void *q, const void *p) {
 
 static void begin(unsigned gen) {
     assert(!open_handles);
-    encoded=(test_ring_t){0}; pcm=(test_ring_t){0}; empty_hook=receive_hook=NULL;
+    encoded=(test_ring_t){0}; pcm=(test_ring_t){0}; empty_hook=receive_hook=delay_hook=NULL;
     opens=closes=writes=flushes=discards=0;
     fail_open=fail_realloc=fail_process=fail_write=fail_flush=fail_config=cancel_acquire=false;
     health_decoder_faults=health_output_faults=0;
     oversized_frame=false;info_result=ESP_OK;info_rate=expected_rate=48000;test_now_us=0;
+    header_only=false;process_calls=delay_calls=emit_on_call=0;open_error=ESP_FAIL;
     cancel_prefill=false;prefill_queries=0;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     short_input_stats=false;
@@ -245,6 +257,16 @@ static void decode_once_then_stop(void) {
     empty_hook=NULL;
 }
 static void fail_next_decode(void) { fail_process=true; empty_hook=NULL; input(active_generation,AUDIO_CONTINUE,3); }
+static void stop_during_delay(void) { delay_hook=NULL; audio_service_stop(); }
+static void recover_after_failed_open(void) {
+    empty_hook=NULL; fail_open=false;
+    assert(audio_service_play("http://recovery.example/audio",NATIVE_CODEC_OGG)==ESP_OK);
+    active_generation=atomic_load(&s_generation);
+    input(active_generation,AUDIO_CONTINUE,3);
+    input(active_generation,AUDIO_END_EOF,0);
+    ((encoded_packet_t *)encoded.items[encoded.used-2])->codec=NATIVE_CODEC_OGG;
+    ((encoded_packet_t *)encoded.items[encoded.used-1])->codec=NATIVE_CODEC_OGG;
+}
 static void switch_before_receive_returns(void) {
     receive_hook=NULL;
     assert(audio_service_play("http://new.example/audio",NATIVE_CODEC_AAC)==ESP_OK);
@@ -332,13 +354,60 @@ int main(void) {
 
     begin(6); fail_open=true; input(6,AUDIO_CONTINUE,3); run_task(decoder_task);
     assert(!open_handles && pcm.used==1); run_task(output_task);
+#ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
     assert(!strcmp(state.stream_format,"decoder allocation failed"));
+#else
+    assert(!strcmp(state.stream_format,"decode failed"));
+#endif
     assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_OPEN);
 #ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
     assert(health_decoder_result==0); // Opaque legacy factory returns NULL, no numeric error.
 #else
     assert(health_decoder_result==ESP_FAIL);
 #endif
+    // The public Ogg decoder path runs even in the custom AAC/MP3 variants.
+    // Consume 96 bytes over three encoded packets without PCM or queue waits.
+    begin(90); header_only=true;
+    const unsigned header_sizes[]={17,29,50};
+    for(unsigned i=0;i<3;++i) {
+        input(90,AUDIO_CONTINUE,header_sizes[i]);
+        ((encoded_packet_t *)encoded.items[i])->codec=NATIVE_CODEC_OGG;
+    }
+    input(90,AUDIO_END_EOF,0);
+    ((encoded_packet_t *)encoded.items[3])->codec=NATIVE_CODEC_OGG;
+    run_task(decoder_task);
+    assert(process_calls==97 && delay_calls==3 && pcm.used==1);
+    assert(opens==1 && closes==1 && !open_handles && !health_decoder_faults);
+    run_task(output_task); assert(!writes && flushes==1);
+
+    // A decoder can produce PCM on the call that yields. Stop must prevent
+    // that frame from publishing format or entering the output queue.
+    begin(91); header_only=true; emit_on_call=32; delay_hook=stop_during_delay;
+    input(91,AUDIO_CONTINUE,32);
+    ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_OGG;
+    run_task(decoder_task);
+    assert(process_calls==32 && delay_calls==1 && !pcm.used && !state.audio_running);
+    assert(!state.sample_rate_hz && !state.codec[0] && !health_decoder_faults);
+    assert(opens==1 && closes==1 && !open_handles);
+    assert(atomic_load(&s_decoder_released_generation)==atomic_load(&s_generation));
+    run_task(output_task); assert(!writes);
+
+    // Preserve the vendor error category, then reopen through the actual task
+    // on a new generation without resetting its local workspace variables.
+    for(unsigned i=0;i<2;++i) {
+        begin(92+2*i); fail_open=true;
+        open_error=i ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_NOT_SUPPORT;
+        input(active_generation,AUDIO_CONTINUE,3);
+        ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_OGG;
+        empty_hook=recover_after_failed_open;
+        run_task(decoder_task);
+        assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_OPEN);
+        assert(health_decoder_result==open_error && opens==1 && closes==1 && !open_handles);
+        assert(pcm.used==5);
+        pcm_packet_t *failed=pcm.items[0];
+        assert(failed->end_of_stream==(i ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED));
+        run_task(output_task); assert(writes==3 && flushes==1);
+    }
     begin(7); fail_realloc=true; input(7,AUDIO_CONTINUE,3);
     ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_FLAC;
     run_task(decoder_task);
@@ -524,6 +593,7 @@ int main(void) {
     puts("PASS CYD PDM: flush final tail once with zero padding; discard/reset without replay; ASan/UBSan");
     puts("PASS CYD: cancellation during queue waits; Play while output wakes; 2000 concurrent Play/Stop commands and stale callbacks");
     puts("PASS CYD: AAC drain closes decoder after cached PCM; MP3 continues in the same generation; only final EOF flushes output");
+    puts("PASS CYD vendor: header-only fairness across packets; Stop during yield; distinct open error/OOM; same-task reopen");
     assert(!pthread_mutex_destroy(s_control_lock)); free(s_control_lock);
     assert(!pthread_mutex_destroy(state.lock)); free(state.lock);
     return 0;

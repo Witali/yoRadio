@@ -59,6 +59,7 @@ static inline void xSemaphoreGive(SemaphoreHandle_t p) { assert(!pthread_mutex_u
 size_t strlcpy(char *, const char *, size_t);
 ''')
     (OUT/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
+    (OUT/'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
     source = (MAIN/'audio_service.c').read_text()
     first = source.index('#define STREAM_CHUNK_SIZE')
     last = source.index('static esp_audio_simple_dec_type_t')
@@ -127,6 +128,7 @@ size_t strlcpy(char *, const char *, size_t);
                       ROOT/'idf/components/native_stream/include/stream_bitrate.h',
                       MAIN/'input_prefill.h',
                       MAIN/'native_health.h',
+                      MAIN/'native_output_metrics.h',
                       *[MAIN/name for name in ('audio_service.c','native_state.c','native_state.h',
                                               'native_audio_output.c','native_audio_output.h')]]},
     }, indent=2)+'\n')

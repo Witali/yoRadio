@@ -837,6 +837,7 @@ static void decoder_task(void *argument) {
     uint32_t generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
     uint32_t failed_generation = 0;
+    uint32_t process_calls = 0;
 #if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
     bool input_prefilled = false;
 #endif
@@ -989,7 +990,8 @@ static void decoder_task(void *argument) {
                     failure_result = (int32_t)open_result;
                     ESP_LOGE(TAG, "%s decoder open failed: %d",
                              codec_name(codec), open_result);
-                    end_reason = AUDIO_END_ALLOCATION_FAILED;
+                    end_reason = open_result == ESP_AUDIO_ERR_MEM_LACK
+                        ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED;
                 }
             }
         }
@@ -1054,6 +1056,10 @@ static void decoder_task(void *argument) {
             raw.consumed = 0;
             esp_audio_err_t result =
                 esp_audio_simple_dec_process(decoder, &raw, &frame);
+            // PCM backpressure normally gives the idle task time to run.
+            // Header-only input can consume many packets without producing PCM.
+            if ((++process_calls & 31U) == 0U) vTaskDelay(1);
+            if (generation != atomic_load(&s_generation)) break;
             failure_stage = NATIVE_HEALTH_PROCESS;
             failure_result = (int32_t)result;
             if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
