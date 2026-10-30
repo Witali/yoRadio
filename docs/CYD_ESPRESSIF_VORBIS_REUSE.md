@@ -155,9 +155,12 @@ physical audio/throughput and all three output backends remain to qualify.
 Vendor reuse does not prove universal Vorbis conformance or close requirements
 of the deferred custom decoder.
 
-The next software regression is Opus, which shares `NATIVE_CODEC_OGG` and the
-new EOF adapter. Use the existing `opus-510.ogg` fixture to establish a complete
-unchanged-vendor baseline, compare segmented EOF delivery, then repeat the
-three actual task cases. The old C3 calibration covers interior windows and
-does not supply a full EOF reference. Opus pre-skip must be subtracted from its
-final granule; Vorbis's byte/hash reference cannot be reused for Opus.
+The [Opus sibling regression](CYD_OGG_OPUS_EOF.md), through the same
+`NATIVE_CODEC_OGG` caller, now passes a complete unchanged-vendor baseline,
+4096/257/1-byte feeds and all three actual CYD task cases. It exposed a separate
+playback correctness gap: the vendor returns 2115840 raw bytes for this fixture,
+while its Opus pre-skip and terminal granule require 2112000 playback bytes.
+Independent libopus playback confirms that length. Sample-accurate trimming
+remains required; raw integration equality does not close it. Legal long-packet
+resize behavior also remains to qualify. The old C3 interior calibration and
+Vorbis byte/hash reference cannot substitute for these Opus gates.

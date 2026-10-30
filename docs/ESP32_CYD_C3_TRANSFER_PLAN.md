@@ -92,10 +92,13 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   на обеих целях, в том числе при подаче по одному байту. [Полный CYD audio task](../tests/results/cyd-vorbis-task-20261030/NATIVE.md)
   теперь проходит ordered EOF, Stop/reopen и maintenance/resume в QEMU.
   Передача последнего Ogg-байта вместе с EOS восстановила все 2112000 PCM-байт
-  без изменения vendor, буфера и core/priority/stack. Следом проверить Opus
-  через тот же Ogg caller: полный baseline `opus-510.ogg`, segmented EOF и
-  три actual-task случая; старые C3 interior windows не являются EOF-эталоном.
-  Затем — radio/TLS/TFT ресурсы и deliberate backpressure. Собственную
+  без изменения vendor, буфера и core/priority/stack. [Opus через тот же caller](CYD_OGG_OPUS_EOF.md)
+  также проходит полный vendor baseline, 4096/257/1-byte feeds и три actual-task
+  случая. Обнаружено обязательное незавершённое исправление: pre-skip/end trim
+  Ogg Opus — vendor выдаёт 2115840 raw bytes вместо требуемых 2112000 playback
+  bytes. Следом — обрезка по реальной timeline с независимым эталоном и public
+  resize для длинных пакетов до 120 ms; старые C3 interior windows их не закрывают.
+  Radio/TLS/TFT ресурсы и deliberate backpressure остаются отдельно. Собственную
   арифметику не подключать.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
   **отложена по прямому указанию пользователя**. Исходники, незавершённые тесты
@@ -2128,3 +2131,18 @@ Stream остаётся на core0, decode/output на core1 с прежними
   minimum free heap стенда — 169476 B. [Host/GCC/lint](../tests/results/cyd-vorbis-task-20261030/HOST.md)
   также проходят. Это явные transport/output seams, а не physical/radio/TLS/TFT
   resource acceptance. Следующий regression — Opus через общий Ogg EOF caller.
+
+- 2026-10-30, CYD-C3-14, [Opus sibling regression](CYD_OGG_OPUS_EOF.md):
+  неизменённый LX6 vendor проходит полный data-bearing-EOS baseline и
+  4096/257/1-byte separate-EOF feeds. [Actual CYD tasks](../tests/results/cyd-opus-20261030/TASK.md)
+  проходят EOF, partial Stop/reopen и maintenance/resume; все пять decoder/HTTP
+  owners закрыты, исходные cores/priorities/stacks и 12288 B output сохранены.
+  19 negative witness checks не принимают неполные/подменённые native records.
+  Исходный nonpass ошибочного reader assertion сохранён, fresh native rerun
+  проходит. Все full outputs — 2115840 raw bytes с одинаковым SHA.
+  [Независимая Ogg timeline/libopus проверка](../tests/results/cyd-opus-20261030/DIRECT.md)
+  доказывает обязательный playback trim gap: pre-skip 312 и tail 648 оставляют
+  528000 frames / 2112000 bytes. Это требуется исправить; raw regression не
+  объявляется standard-complete. Также остаются public resize на 120 ms packets,
+  другие modes, backpressure и radio/TLS/TFT/physical gates. Custom/private
+  deferred scopes не возобновлялись.
