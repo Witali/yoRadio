@@ -67,7 +67,7 @@ def main():
            'queue_failure','wide_epoch','timeout_read','timeout_open','timeout_headers','timeout_close','timeout_cleanup',
            'late_encoded','late_pcm','output_write','output_disable','control_reading','staging',
            'back_to_back','pause_failure','delete_failure','resume_queue_failure','empty_receive_epoch','stopped_no_resume','pending_resume',
-           'native_aac','legacy_arena','retry_cleanup','terminal_cleanup','retry_watchdog_off','retry_backoff','shared_arena_tail','legacy_discard_fail','stream_alloc_failure']
+           'native_aac','legacy_arena','retry_cleanup','terminal_cleanup','retry_watchdog_off','retry_backoff','shared_arena_tail','legacy_discard_fail','stream_alloc_failure','vendor_pending']
     variants=args.variant or ['native-staged','native-direct','custom-staged','custom-direct']
     report=dict(passed=False,scope=__doc__,variants={},negative_controls={},commands=[],
                 complete_matrix=not args.case and not args.variant,mutants_enabled=not args.skip_mutants,

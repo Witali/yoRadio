@@ -4,6 +4,7 @@
 #include "audio_completion.h"
 #include "decoder_pcm.h"
 #include "decoder_resources.h"
+#include "decoder_pending_input.h"
 #include "decoder_registration.h"
 #include "decoder_arena.h"
 
@@ -1406,6 +1407,7 @@ static void decoder_task(void *argument) {
     size_t output_size = 0;
     esp_audio_simple_dec_handle_t decoder = NULL;
     native_aac_decoder_t *aac_decoder = NULL;
+    decoder_pending_input_t pending = {0};
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
     custom_flac_decoder_t *flac_decoder = NULL;
 #endif
@@ -1431,6 +1433,7 @@ static void decoder_task(void *argument) {
 #endif
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
+            decoder_pending_input_clear(&pending);
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             bool had_legacy_decoder = legacy_decoder != NULL;
 #endif
@@ -1480,9 +1483,10 @@ static void decoder_task(void *argument) {
         }
         if (failed_generation && failed_generation == generation) {
             decoder_resources_release(&decoder, &aac_decoder, &output, &output_size);
+            decoder_pending_input_clear(&pending);
         }
         size_t item_size = 0;
-        heap_fragment_probe_poll(!decoder && !aac_decoder && !output
+        heap_fragment_probe_poll(!decoder && !aac_decoder && !output && !pending.data
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
                                  && !flac_decoder
 #endif
@@ -1513,7 +1517,7 @@ static void decoder_task(void *argument) {
                 generation == atomic_load(&s_generation)) {
                 // AUTO forces ordinary workspace release above. Confirm the
                 // optional reusable arena too before acknowledging quiescence.
-                bool released = !decoder && !aac_decoder && !output;
+                bool released = !decoder && !aac_decoder && !output && !pending.data;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
                 released = released && !flac_decoder;
 #endif
@@ -1561,6 +1565,7 @@ static void decoder_task(void *argument) {
             }
         }
         if (packet->generation != generation || packet->codec != codec) {
+            decoder_pending_input_clear(&pending);
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
             native_aac_decoder_destroy(aac_decoder);
@@ -1709,6 +1714,7 @@ static void decoder_task(void *argument) {
                             ? "NO MEMORY" : "DECODER ERROR");
                     failed_generation = generation;
                     decoder_resources_release(&decoder, &aac_decoder, &output, &output_size);
+                    decoder_pending_input_clear(&pending);
                 }
 #ifdef YORADIO_CODEC_BENCHMARK
                 if (open_result == ESP_AUDIO_ERR_OK) {
@@ -1849,6 +1855,28 @@ static void decoder_task(void *argument) {
             .len = packet->data_size,
             .eos = packet->end_of_stream,
         };
+        bool input_owned = false;
+        if (!aac_decoder) {
+            uint32_t input_size;
+            decoder_pending_input_status_t input_result = decoder_pending_input_prepare(
+                &pending, packet->data, packet->data_size,
+                &raw.buffer, &input_size, &input_owned);
+            if (input_result != DECODER_PENDING_INPUT_OK) {
+                cpu_profiler_decoder_failure(codec, DECODER_FAILURE_PROCESS,
+                    input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                        ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER,
+                    packet->end_of_stream, packet->data_size);
+                state_set_audio(generation, false,
+                    input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                        ? "NO MEMORY" : "decoder input error");
+                failed_generation = generation;
+                decoder_resources_release(&decoder, &aac_decoder, &output, &output_size);
+                decoder_pending_input_clear(&pending);
+                return_decoded_packet(packet, failed_generation);
+                continue;
+            }
+            raw.len = input_size;
+        }
         bool retry_pcm = false;
         while (raw.len || raw.eos || retry_pcm) {
             retry_pcm = false;
@@ -1974,6 +2002,26 @@ static void decoder_task(void *argument) {
                 }
             }
             decode_stats_report(&stats, esp_timer_get_time());
+            if (!aac_decoder && !raw.consumed && !frame.decoded_size && raw.len) {
+                // The public parser can need a longer prefix without having
+                // consumed the short input. Keep it until the next packet.
+                decoder_pending_input_status_t input_result = raw.eos
+                    ? DECODER_PENDING_INPUT_INVALID
+                    : decoder_pending_input_retain(&pending, raw.buffer,
+                                                   raw.len, input_owned);
+                if (input_result != DECODER_PENDING_INPUT_OK) {
+                    cpu_profiler_decoder_failure(codec, DECODER_FAILURE_PROCESS,
+                        raw.eos ? ESP_AUDIO_ERR_DATA_LACK
+                            : input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                                ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER,
+                        packet->end_of_stream, raw.len);
+                    state_set_audio(generation, false,
+                        input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                            ? "NO MEMORY" : "decoder input error");
+                    failed_generation = generation;
+                }
+                break;
+            }
             if (!raw.consumed && !frame.decoded_size && !raw.eos) {
                 ESP_LOGE(TAG, "%s decoder made no input progress",
                          codec_name(codec));
@@ -1987,6 +2035,7 @@ static void decoder_task(void *argument) {
         }
         if (packet->end_of_stream || failed_generation == generation) {
             decoder_resources_release(&decoder, &aac_decoder, &output, &output_size);
+            decoder_pending_input_clear(&pending);
         }
         return_decoded_packet(packet, failed_generation);
     }

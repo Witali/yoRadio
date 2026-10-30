@@ -138,6 +138,28 @@ int main(int argc,char **argv) {
         }
     }
 #endif
+    else if(!strcmp(scenario,"vendor_pending")) {
+        vendor_prefix_mode=true;vendor_prefix_calls=0;arm("vendor_prefix");
+        start_play(NATIVE_CODEC_OGG);await_barrier();
+        assert(pending_input_owners==1&&decoder_handles==1);
+        begin_async(1500);await_acks(MAINTENANCE_STREAM);
+        assert(!maintenance_acked(MAINTENANCE_DECODER)&&pending_input_owners==1);
+        release_barrier();join_begin(ESP_OK);
+        assert(!pending_input_owners&&!decoder_handles);end_ok(false);
+
+        vendor_prefix_calls=0;arm("vendor_prefix");
+        start_play(NATIVE_CODEC_OGG);await_barrier();
+        assert(pending_input_owners==1&&decoder_handles==1);
+        audio_service_stop();release_barrier();
+        int64_t end=esp_timer_get_time()+2000000;
+        while(pending_input_owners||decoder_handles||http_clients||
+              atomic_load(&s_decoder_released_generation)!=atomic_load(&s_generation)) {
+            assert(esp_timer_get_time()<end);vTaskDelay(1);
+        }
+        vendor_prefix_mode=false;
+        start_play(NATIVE_CODEC_AAC);await_driver();begin_ok();
+        assert(!pending_input_owners);end_ok(false);
+    }
     else if(!strcmp(scenario,"empty_receive_epoch")) {
         start_play(NATIVE_CODEC_FLAC);await_driver();no_body=true;arm("decoder_empty");await_barrier();
         assert(decoder_handles==1);hold_codec_close=true;codec_close_entered=false;

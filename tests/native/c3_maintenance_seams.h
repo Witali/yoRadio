@@ -36,8 +36,25 @@ typedef struct {uint8_t *buffer;size_t len,consumed;unsigned eos;} esp_audio_sim
 typedef struct {uint8_t *buffer;size_t len,needed_size,decoded_size;} esp_audio_simple_dec_out_t;
 typedef struct {uint32_t sample_rate,bitrate;uint8_t bits_per_sample,channel;} esp_audio_simple_dec_info_t;
 enum {ESP_AUDIO_ERR_OK=0,ESP_AUDIO_ERR_BUFF_NOT_ENOUGH=-8,ESP_AUDIO_ERR_MEM_LACK=-9,
-      ESP_AUDIO_ERR_DATA_LACK=-10,ESP_AUDIO_ERR_FAIL=-11,ESP_AUDIO_SIMPLE_DEC_TYPE_MP3=1,ESP_AUDIO_SIMPLE_DEC_TYPE_AAC,
+      ESP_AUDIO_ERR_DATA_LACK=-10,ESP_AUDIO_ERR_FAIL=-11,ESP_AUDIO_ERR_INVALID_PARAMETER=-12,ESP_AUDIO_SIMPLE_DEC_TYPE_MP3=1,ESP_AUDIO_SIMPLE_DEC_TYPE_AAC,
       ESP_AUDIO_SIMPLE_DEC_TYPE_FLAC,ESP_AUDIO_SIMPLE_DEC_TYPE_OGG};
+static atomic_uint pending_input_owners, vendor_prefix_calls;
+static atomic_bool vendor_prefix_mode;
+static void *pending_input_realloc(void *pointer,size_t bytes) {
+    assert(role==ROLE_DECODER);
+    void *resized=realloc(pointer,bytes);
+    if(resized&&!pointer)++pending_input_owners;
+    return resized;
+}
+static void pending_input_free(void *pointer) {
+    if(pointer){assert(role==ROLE_DECODER&&pending_input_owners==1);--pending_input_owners;}
+    free(pointer);
+}
+#define realloc pending_input_realloc
+#define free pending_input_free
+#include "decoder_pending_input.h"
+#undef free
+#undef realloc
 #include "native_aac_decoder.h"
 #include "custom_flac_adapter.h"
 #include "custom_legacy_adapter.h"
@@ -55,7 +72,15 @@ static void codec_destroy(void *p) {if(!p)return;assert(role==ROLE_DECODER&&deco
 int decoder_register_codecs(void) {return ESP_OK;}
 static int esp_audio_simple_dec_open(const esp_audio_simple_dec_cfg_t *cfg,void **out) {*out=codec_create(cfg->dec_type);return ESP_OK;}
 static void esp_audio_simple_dec_close(void *p) {codec_destroy(p);}
-static int esp_audio_simple_dec_process(void *p,esp_audio_simple_dec_raw_t *raw,esp_audio_simple_dec_out_t *out) {assert(role==ROLE_DECODER&&p);barrier_hit("codec");raw->consumed=raw->len;out->decoded_size=raw->len?3072:0;assert(out->len>=out->decoded_size);memset(out->buffer,0x11,out->decoded_size);return ESP_OK;}
+static int esp_audio_simple_dec_process(void *p,esp_audio_simple_dec_raw_t *raw,esp_audio_simple_dec_out_t *out) {
+    assert(role==ROLE_DECODER&&p);barrier_hit("codec");
+    if(vendor_prefix_mode){
+        if(++vendor_prefix_calls==2)barrier_hit("vendor_prefix");
+        return ESP_OK;
+    }
+    raw->consumed=raw->len;out->decoded_size=raw->len?3072:0;
+    assert(out->len>=out->decoded_size);memset(out->buffer,0x11,out->decoded_size);return ESP_OK;
+}
 static int esp_audio_simple_dec_get_info(void *p,esp_audio_simple_dec_info_t *out) {assert(role==ROLE_DECODER&&p);*out=(esp_audio_simple_dec_info_t){16000,128000,16,1};return ESP_OK;}
 native_aac_decoder_t *native_aac_decoder_create(void) {return codec_create(ESP_AUDIO_SIMPLE_DEC_TYPE_AAC);}
 void native_aac_decoder_destroy(native_aac_decoder_t *p) {codec_destroy(p);}

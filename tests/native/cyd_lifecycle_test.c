@@ -32,6 +32,8 @@ typedef void *QueueHandle_t, *RingbufHandle_t;
 #define ESP_AUDIO_SIMPLE_DEC_TYPE_MP3 1
 #define ESP_AUDIO_ERR_OK 0
 #define ESP_AUDIO_ERR_MEM_LACK -2
+#define ESP_AUDIO_ERR_DATA_LACK -3
+#define ESP_AUDIO_ERR_INVALID_PARAMETER -5
 #define ESP_AUDIO_ERR_NOT_SUPPORT -7
 #define ESP_AUDIO_ERR_BUFF_NOT_ENOUGH -8
 #define ESP_OK 0
@@ -56,6 +58,11 @@ static bool fail_open, fail_realloc, fail_process, fail_write, fail_flush, fail_
 static bool oversized_frame;
 static bool header_only;
 static unsigned process_calls, delay_calls, emit_on_call;
+static bool fragmented_input, stalled_eof;
+static unsigned minimum_input;
+static size_t verified_input, verified_pcm;
+static unsigned pending_allocations, fail_pending_at;
+static void *tracked_allocations[8];
 static int open_error;
 static int info_result;
 static uint32_t info_rate=48000, expected_rate=48000;
@@ -92,6 +99,11 @@ static void audio_level_led_update_pcm(const uint8_t *p, size_t n, uint8_t b, ui
 }
 static int native_audio_output_write_pcm(const uint8_t *p, size_t n, uint8_t b, uint8_t c) {
     assert(state.audio_running && n && b == 16 && c == 2);
+    if (fragmented_input) {
+        assert(n%4==0);
+        for(size_t i=0;i<n;++i) assert(p[i]==(uint8_t)(0x40+(verified_pcm+i)/4));
+        verified_pcm+=n;
+    }
     last_sample = *p; ++writes; return fail_write ? ESP_FAIL : ESP_OK;
 }
 static const char *esp_err_to_name(int result) { (void)result; return "test"; }
@@ -110,6 +122,18 @@ static int esp_audio_simple_dec_process(void *handle, esp_audio_simple_dec_raw_t
     assert(handle && out->len >= 16);
     ++process_calls;
     if (fail_process) return ESP_FAIL;
+    if (fragmented_input) {
+        // A public decoder can wait for an entire prefix without consuming a
+        // short fragment. Check every still-visible byte, not just its length.
+        for(size_t i=0;i<raw->len;++i) assert(raw->buffer[i]==(uint8_t)(0x40+verified_input+i));
+        raw->consumed=0;out->decoded_size=0;
+        if(raw->len<minimum_input && (!raw->eos || stalled_eof)) return ESP_OK;
+        raw->consumed=raw->eos ? raw->len : 2;
+        assert(raw->consumed*4<=out->len);
+        for(size_t i=0;i<raw->consumed;++i) memset(out->buffer+4*i,raw->buffer[i],4);
+        out->decoded_size=raw->consumed*4;verified_input+=raw->consumed;
+        return ESP_OK;
+    }
     raw->consumed = header_only && raw->len ? 1 : raw->len;
     out->decoded_size = header_only ? (emit_on_call==process_calls ? 16 : 0)
         : raw->len ? 16 : eos_frames ? (--eos_frames, 8) : 0;
@@ -146,7 +170,18 @@ static int custom_legacy_decoder_feed(custom_legacy_decoder_t *p, const uint8_t 
 #endif
 static void *test_realloc(void *p, size_t n) {
     if (fail_realloc) return NULL;
-    return realloc(p,n);
+    // The PCM allocation is 12288 B; pending-prefix tests use capacities <=32.
+    if(n<4096 && ++pending_allocations==fail_pending_at) return NULL;
+    unsigned slot=0;
+    if(p) {while(slot<8 && tracked_allocations[slot]!=p) ++slot;assert(slot<8);}
+    else {while(slot<8 && tracked_allocations[slot]) ++slot;assert(slot<8);}
+    void *larger=realloc(p,n);
+    if(larger) tracked_allocations[slot]=larger;
+    return larger;
+}
+static void test_free(void *p) {
+    for(unsigned i=0;i<8;++i) if(tracked_allocations[i]==p) tracked_allocations[i]=NULL;
+    free(p);
 }
 static int xRingbufferSendAcquire(void *ring, void **p, size_t size, unsigned wait) {
     (void)ring; (void)wait;
@@ -182,8 +217,10 @@ size_t strlcpy(char *to, const char *from, size_t capacity) {
     size_t n=strlen(from); if (capacity) { size_t copy=n<capacity-1?n:capacity-1; memcpy(to,from,copy); to[copy]=0; } return n;
 }
 #define realloc test_realloc
+#define free test_free
 #include "production.inc"
 #undef realloc
+#undef free
 
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 // Queue ownership is covered separately with the actual shared queue. Here
@@ -222,12 +259,15 @@ static int xQueueOverwrite(void *q, const void *p) {
 
 static void begin(unsigned gen) {
     assert(!open_handles);
+    for(unsigned i=0;i<8;++i) assert(!tracked_allocations[i]);
     encoded=(test_ring_t){0}; pcm=(test_ring_t){0}; empty_hook=receive_hook=delay_hook=NULL;
     opens=closes=writes=flushes=discards=0;
     fail_open=fail_realloc=fail_process=fail_write=fail_flush=fail_config=cancel_acquire=false;
     health_decoder_faults=health_output_faults=0;
     oversized_frame=false;info_result=ESP_OK;info_rate=expected_rate=48000;test_now_us=0;
     header_only=false;process_calls=delay_calls=emit_on_call=0;open_error=ESP_FAIL;
+    fragmented_input=stalled_eof=false;minimum_input=4;verified_input=verified_pcm=0;
+    pending_allocations=fail_pending_at=0;
     cancel_prefill=false;prefill_queries=0;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     short_input_stats=false;
@@ -251,6 +291,11 @@ static void input(unsigned gen, unsigned reason, unsigned bytes) {
     p->data_size=bytes; memset(p->data,0x37,bytes);
     assert(xRingbufferSendComplete(s_encoded,p));
 }
+static void fragment(unsigned gen,native_codec_t codec,unsigned reason,size_t offset,unsigned bytes) {
+    input(gen,reason,bytes);
+    encoded_packet_t *packet=encoded.items[encoded.used-1];packet->codec=codec;
+    for(unsigned i=0;i<bytes;++i) packet->data[i]=(uint8_t)(0x40+offset+i);
+}
 static void decode_once_then_stop(void) {
     audio_service_stop(); empty_hook=NULL;
     // Give the real task a timeout iteration to observe the new generation.
@@ -266,6 +311,41 @@ static void recover_after_failed_open(void) {
     input(active_generation,AUDIO_END_EOF,0);
     ((encoded_packet_t *)encoded.items[encoded.used-2])->codec=NATIVE_CODEC_OGG;
     ((encoded_packet_t *)encoded.items[encoded.used-1])->codec=NATIVE_CODEC_OGG;
+}
+static void recover_after_pending_failure(void) {
+    empty_hook=NULL;fail_pending_at=0;
+    assert(audio_service_play("http://prefix-recovery.example/audio",NATIVE_CODEC_OGG)==ESP_OK);
+    active_generation=atomic_load(&s_generation);
+    fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_CONTINUE,0,20);
+    fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_END_EOF,20,0);
+}
+static void pending_contract_tests(void) {
+    decoder_pending_input_t pending={0};
+    uint8_t external[]={0x40,0x41,0x42,0x43};
+    uint8_t *buffer=NULL;uint32_t length=0;bool owned=true;
+    assert(decoder_pending_input_prepare(&pending,external,4,&buffer,&length,&owned)==DECODER_PENDING_INPUT_OK);
+    assert(buffer==external && length==4 && !owned && !pending.data && !pending_allocations);
+    assert(decoder_pending_input_retain(&pending,external,1,false)==DECODER_PENDING_INPUT_OK);
+    uint8_t *saved=pending.data;size_t capacity=pending.capacity;
+    fail_pending_at=pending_allocations+1;
+    assert(decoder_pending_input_prepare(&pending,external,32,&buffer,&length,&owned)==DECODER_PENDING_INPUT_NO_MEMORY);
+    assert(pending.data==saved && pending.size==1 && pending.capacity==capacity && pending.data[0]==0x40);
+    assert(buffer==external && length==4 && !owned);
+    assert(decoder_pending_input_prepare(&pending,external,UINT32_MAX,&buffer,&length,&owned)==DECODER_PENDING_INPUT_TOO_LARGE);
+    assert(pending.data==saved && pending.size==1 && buffer==external && length==4 && !owned);
+    assert(decoder_pending_input_prepare(&pending,NULL,1,&buffer,&length,&owned)==DECODER_PENDING_INPUT_INVALID);
+    assert(pending.data==saved && pending.size==1);
+    fail_pending_at=0;
+    assert(decoder_pending_input_prepare(&pending,external+1,3,&buffer,&length,&owned)==DECODER_PENDING_INPUT_OK);
+    assert(owned && length==4 && !pending.size && !memcmp(buffer,external,4));
+    assert(decoder_pending_input_retain(&pending,buffer+1,3,true)==DECODER_PENDING_INPUT_OK);
+    assert(pending.size==3 && !memcmp(pending.data,external+1,3));
+    // Release must clear retained storage even if no decoder was published.
+    esp_audio_simple_dec_handle_t decoder=NULL;uint8_t *output=NULL;size_t output_size=0;
+    decoder_release(&decoder,&output,&output_size,&pending);
+    assert(!pending.data && !pending.size && !pending.capacity);
+    decoder_pending_input_clear(&pending);
+    for(unsigned i=0;i<8;++i) assert(!tracked_allocations[i]);
 }
 static void switch_before_receive_returns(void) {
     receive_hook=NULL;
@@ -323,6 +403,7 @@ static int pdm_write_block(const int16_t *samples, size_t count) {
 
 int main(void) {
     native_state_init(&state);
+    pending_contract_tests();
     begin(1); input(1,AUDIO_CONTINUE,3); input(1,AUDIO_END_EOF,0);
     run_task(decoder_task);
     assert(opens==1 && closes==1 && !open_handles && state.audio_running);
@@ -408,6 +489,60 @@ int main(void) {
         assert(failed->end_of_stream==(i ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED));
         run_task(output_task); assert(writes==3 && flushes==1);
     }
+    // Retain complete distinct byte sequences through 1-byte and uneven input.
+    // A 4-byte minimum followed by 2-byte consumes exercises borrowed and owned
+    // suffixes after partial consumption, not just a fixed initial signature.
+    const unsigned split_patterns[3][20]={
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {7,1,5,2,5}, {4,4,3,7,2}};
+    for(unsigned pattern=0;pattern<3;++pattern) {
+        begin(100+pattern);fragmented_input=true;size_t offset=0;
+        for(unsigned i=0;i<(pattern ? 5U : 20U);++i) {
+            unsigned bytes=split_patterns[pattern][i];
+            fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_CONTINUE,offset,bytes);offset+=bytes;
+        }
+        assert(offset==20);
+        fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_END_EOF,offset,0);
+        run_task(decoder_task);
+        assert(verified_input==20 && pending_allocations && opens==1 && closes==1 && !open_handles);
+        assert(!health_decoder_faults);
+        run_task(output_task);assert(verified_pcm==80 && flushes==1);
+    }
+    // No following bytes can satisfy an incomplete retained prefix at EOF.
+    begin(103);fragmented_input=stalled_eof=true;
+    for(unsigned i=0;i<3;++i) fragment(103,NATIVE_CODEC_OGG,AUDIO_CONTINUE,i,1);
+    fragment(103,NATIVE_CODEC_OGG,AUDIO_END_EOF,3,0);run_task(decoder_task);
+    assert(!verified_input && opens==1 && closes==1 && !open_handles);
+    assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_PROCESS);
+    assert(health_decoder_result==ESP_AUDIO_ERR_DATA_LACK && pcm.used==1);
+    run_task(output_task);assert(!writes && !strcmp(state.stream_format,"decode failed"));
+
+    // Fail the initial prefix copy and the later append growth independently.
+    // Old retained bytes survive a failed realloc until the actual task frees
+    // them, then a fresh Play succeeds using the same task-local owner fields.
+    for(unsigned failure=1;failure<=2;++failure) {
+        begin(104+failure);fragmented_input=true;minimum_input=20;fail_pending_at=failure;
+        for(unsigned i=0;i<20;++i) fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_CONTINUE,i,1);
+        empty_hook=recover_after_pending_failure;run_task(decoder_task);
+        assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_PROCESS);
+        assert(health_decoder_result==ESP_AUDIO_ERR_MEM_LACK && opens==2 && closes==2 && !open_handles);
+        assert(((pcm_packet_t *)pcm.items[0])->end_of_stream==AUDIO_END_ALLOCATION_FAILED);
+        assert(verified_input==20);run_task(output_task);assert(verified_pcm==80 && flushes==1);
+    }
+    begin(107);fragmented_input=true;
+    fragment(107,NATIVE_CODEC_OGG,AUDIO_CONTINUE,0,7);
+    empty_hook=decode_once_then_stop;run_task(decoder_task);
+    assert(pending_allocations && verified_input==4 && opens==1 && closes==1 && !open_handles);
+    assert(atomic_load(&s_decoder_released_generation)==atomic_load(&s_generation));
+    run_task(output_task);assert(!writes && !health_decoder_faults);
+
+    // A codec switch in the same generation discards the old partial prefix.
+    begin(108);fragmented_input=true;
+    fragment(108,NATIVE_CODEC_OGG,AUDIO_CONTINUE,0,2);
+    fragment(108,NATIVE_CODEC_FLAC,AUDIO_CONTINUE,0,6);
+    fragment(108,NATIVE_CODEC_FLAC,AUDIO_END_EOF,6,0);run_task(decoder_task);
+    assert(verified_input==6 && opens==2 && closes==2 && !open_handles && !health_decoder_faults);
+    run_task(output_task);assert(verified_pcm==24 && flushes==1);
     begin(7); fail_realloc=true; input(7,AUDIO_CONTINUE,3);
     ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_FLAC;
     run_task(decoder_task);
@@ -594,6 +729,7 @@ int main(void) {
     puts("PASS CYD: cancellation during queue waits; Play while output wakes; 2000 concurrent Play/Stop commands and stale callbacks");
     puts("PASS CYD: AAC drain closes decoder after cached PCM; MP3 continues in the same generation; only final EOF flushes output");
     puts("PASS CYD vendor: header-only fairness across packets; Stop during yield; distinct open error/OOM; same-task reopen");
+    puts("PASS CYD vendor: exact fragmented prefixes and PCM; retained-input OOM/reopen, Stop/codec cleanup and truncated EOF");
     assert(!pthread_mutex_destroy(s_control_lock)); free(s_control_lock);
     assert(!pthread_mutex_destroy(state.lock)); free(state.lock);
     return 0;

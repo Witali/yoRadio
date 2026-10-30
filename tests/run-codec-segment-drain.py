@@ -13,7 +13,7 @@ from run_output_dma_host import host,run
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output',type=Path,default=ROOT/'.build/codec-segment-drain')
 out=parser.parse_args().output
-out.mkdir(parents=True,exist_ok=True)
+out.mkdir(parents=True,exist_ok=False)
 main=ROOT/'idf/esp32c3-oled-native/main'
 source=main/'audio_service.c'
 harness=ROOT/'tests/native/codec_segment_drain_test.c'
@@ -37,8 +37,10 @@ binary=out/'test'
 log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
          'UBSAN_OPTIONS=halt_on_error=1',host(binary)])
 (out/'run.log').write_bytes(log)
-paths=[source,main/'audio_completion.h',failure_header,probe_header,harness,Path(__file__).resolve()]
-(out/'report.json').write_text(json.dumps(dict(passed=True,cases=30,
+paths=[source,main/'audio_completion.h',main/'decoder_pending_input.h',
+       ROOT/'idf/components/native_stream/include/decoder_pending_input.h',
+       failure_header,probe_header,harness,Path(__file__).resolve()]
+(out/'report.json').write_text(json.dumps(dict(passed=True,cases=39,legacy_cases=30,
     source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in paths},
     scope='Actual decoder loop and completion routing; deterministic SDK/native-AAC stubs, not real DSP or timing'),indent=2)+'\n')
 print(log.decode(),end='')

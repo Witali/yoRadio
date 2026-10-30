@@ -7,9 +7,20 @@
 #include <stdio.h>
 #include "audio_completion.h"
 
+static bool fail_pending_allocation;
+static unsigned pending_allocations;
+static void *pending_realloc(void *pointer, size_t bytes) {
+    ++pending_allocations;
+    return fail_pending_allocation ? NULL : realloc(pointer, bytes);
+}
+#define realloc pending_realloc
+#include "decoder_pending_input.h"
+#undef realloc
+
 #define ESP_LOGE(...) ((void)0)
 #define ESP_LOGW(...) ((void)0)
-enum { ESP_AUDIO_ERR_OK, ESP_AUDIO_ERR_BUFF_NOT_ENOUGH, ESP_AUDIO_ERR_FAIL };
+enum { ESP_AUDIO_ERR_OK, ESP_AUDIO_ERR_BUFF_NOT_ENOUGH, ESP_AUDIO_ERR_FAIL,
+       ESP_AUDIO_ERR_MEM_LACK, ESP_AUDIO_ERR_INVALID_PARAMETER, ESP_AUDIO_ERR_DATA_LACK };
 enum { NATIVE_CODEC_MP3, NATIVE_CODEC_AAC };
 typedef int esp_audio_err_t;
 /* FAILURE_DECLARATIONS */
@@ -24,13 +35,15 @@ static unsigned closes, returned, end_markers, pcm_frames, error_status, scenari
 static unsigned fault_count, fault_codec, fault_completion, fault_bytes;
 static decoder_failure_stage_t fault_stage;
 static int32_t fault_result;
+static bool fragments;
+static unsigned expected_encoded;
 static void cpu_profiler_decoder_failure(uint32_t codec, decoder_failure_stage_t stage,
         int32_t result, uint32_t completion, uint32_t input_bytes) {
     assert(!closes); // Capture before decoder cleanup, preserving the original marker.
     ++fault_count;fault_codec=codec;fault_stage=stage;fault_result=result;
     fault_completion=completion;fault_bytes=input_bytes;
 }
-static uint8_t captured[8];
+static uint8_t captured[64];
 static void *s_encoded;
 static uint64_t esp_timer_get_time(void) { static uint64_t now;return ++now; }
 static void vTaskDelay(unsigned n) { (void)n; }
@@ -45,9 +58,22 @@ static bool decoder_pcm_resize(uint8_t **output,size_t *size,size_t needed) {
 static esp_audio_err_t esp_audio_simple_dec_process(fake_decoder_t *d,
         esp_audio_simple_dec_raw_t *raw,esp_audio_simple_dec_out_t *out) {
     assert(d);++d->call;
+    if (fragments) {
+        if (raw->len < 4) return ESP_AUDIO_ERR_OK;
+        for (unsigned i=0;i<4;++i) assert(raw->buffer[i]==expected_encoded+i);
+        memcpy(out->buffer, raw->buffer, 4);
+        expected_encoded += 4;
+        raw->consumed = out->decoded_size = 4;
+        return ESP_AUDIO_ERR_OK;
+    }
     if(scenario==2) {atomic_fetch_add(&s_generation,1);return ESP_AUDIO_ERR_OK;}
     if(scenario==3)return ESP_AUDIO_ERR_FAIL;
-    if(out->len<4) {out->needed_size=4;return ESP_AUDIO_ERR_BUFF_NOT_ENOUGH;}
+    if(out->len<4) {
+        out->needed_size=4;
+        if (scenario==5) raw->consumed=raw->len;
+        return ESP_AUDIO_ERR_BUFF_NOT_ENOUGH;
+    }
+    if (scenario==5) assert(d->call==2 && raw->len==0);
     raw->consumed=raw->len;
     if(d->produced<(raw->eos?2U:1U)) {
         memset(out->buffer,0x30+d->produced,4);out->decoded_size=4;++d->produced;
@@ -78,7 +104,8 @@ static void decode_stats_report(decode_stats_t *s,uint64_t now) {(void)s;(void)n
 static bool send_pcm(decode_stats_t *s,unsigned generation,const esp_audio_simple_dec_info_t *info,
         const uint8_t *pcm,size_t bytes) {
     (void)s;assert(generation==atomic_load(&s_generation));assert(info->sample_rate==48000);
-    assert(!closes && bytes==4 && pcm_frames<2);memcpy(captured+4*pcm_frames,pcm,4);++pcm_frames;return true;
+    assert(!closes && bytes==4 && pcm_frames<sizeof(captured)/4);
+    memcpy(captured+4*pcm_frames,pcm,4);++pcm_frames;return true;
 }
 static void decoder_resources_release(fake_decoder_t **sdk,fake_decoder_t **aac,uint8_t **out,size_t *size) {
     assert(!(*sdk && *aac));free(*sdk);free(*aac);*sdk=*aac=NULL;
@@ -88,17 +115,19 @@ static void encoded_return(void *queue,encoded_packet_t *packet) {(void)queue;(v
 static bool send_pcm_end(unsigned generation,unsigned reason) {
     if(generation!=atomic_load(&s_generation))return false;
     assert(audio_completion_is_terminal(reason));
-    assert(closes==1 && pcm_frames==2);++end_markers;return true;
+    assert(closes==1 && (fragments || pcm_frames==2));++end_markers;return true;
 }
 /* PRODUCTION_RETURN */
 
 static void exercise(bool native,unsigned reason,unsigned mode) {
     scenario=mode;closes=returned=end_markers=pcm_frames=error_status=0;
     fault_count=0;
+    fragments=false;fail_pending_allocation=false;pending_allocations=0;
     memset(captured,0,sizeof(captured));atomic_store(&s_generation,7);
     fake_decoder_t *allocated=calloc(1,sizeof(*allocated));assert(allocated);
     fake_decoder_t *decoder=native?NULL:allocated,*aac_decoder=native?allocated:NULL;
-    uint8_t *output=malloc(mode==1 || mode==4?1:4);size_t output_size=mode==1 || mode==4?1:4;
+    decoder_pending_input_t pending={0};
+    uint8_t *output=malloc(mode==1 || mode==4 || mode==5?1:4);size_t output_size=mode==1 || mode==4 || mode==5?1:4;
     uint8_t data=0xff;
     encoded_packet_t input={7,reason,&data,reason?0:1},*packet=&input;
     unsigned generation=7,failed_generation=0;
@@ -109,7 +138,7 @@ static void exercise(bool native,unsigned reason,unsigned mode) {
 /* PRODUCTION_DECODE */
     } while(false);
     assert(returned==1);
-    if(mode>=2) {
+    if(mode>=2 && mode<=4) {
         assert(!pcm_frames && !end_markers);
         assert(error_status==(mode>=3));
     } else {
@@ -118,16 +147,63 @@ static void exercise(bool native,unsigned reason,unsigned mode) {
         assert(end_markers==(unsigned)audio_completion_is_terminal(reason));
         for(unsigned i=0;i<expected*4;++i)assert(captured[i]==0x30+i/4);
     }
-    assert(fault_count==(mode>=3));
+    assert(fault_count==(mode==3 || mode==4));
     if(fault_count) {
         assert(fault_codec==(unsigned)codec && fault_completion==reason);
         assert(fault_bytes==(reason?0U:1U));
         assert(fault_stage==(mode==3?DECODER_FAILURE_PROCESS:DECODER_FAILURE_PCM));
         assert(fault_result==(mode==3?ESP_AUDIO_ERR_FAIL:ESP_AUDIO_ERR_BUFF_NOT_ENOUGH));
     }
-    assert(closes==((reason || mode>=3)?1U:0U));
+    assert(closes==((reason || mode==3 || mode==4)?1U:0U));
     if(decoder || aac_decoder)decoder_resources_release(&decoder,&aac_decoder,&output,&output_size);
+    decoder_pending_input_clear(&pending);
     assert(!decoder && !aac_decoder && !output && !output_size);
+    assert(!pending_allocations);
+    if (mode==5) assert(native && stats.input_bytes==1);
+}
+
+static void fragmented(const unsigned *sizes, size_t count, unsigned mode) {
+    scenario=0;closes=returned=end_markers=pcm_frames=error_status=0;
+    fault_count=expected_encoded=pending_allocations=0;
+    fragments=true;fail_pending_allocation=false;
+    memset(captured,0,sizeof(captured));atomic_store(&s_generation,7);
+    fake_decoder_t *decoder=calloc(1,sizeof(*decoder)),*aac_decoder=NULL;
+    assert(decoder);
+    decoder_pending_input_t pending={0};
+    uint8_t *output=malloc(4);size_t output_size=4;
+    assert(output);
+    uint8_t data[32];for(unsigned i=0;i<sizeof(data);++i)data[i]=(uint8_t)i;
+    unsigned generation=7,failed_generation=0,offset=0;
+    int codec=NATIVE_CODEC_MP3;
+    decode_stats_t stats={0};esp_audio_simple_dec_info_t stream_info={0};
+    bool stream_info_ready=false,first_frame_memory_logged=false;
+    for(size_t i=0;i<=count;++i) {
+        bool eos=i==count;
+        unsigned bytes=eos?0:sizes[i];
+        assert(offset+bytes<=sizeof(data));
+        encoded_packet_t input={7,eos?AUDIO_END_EOF:AUDIO_CONTINUE,data+offset,bytes},*packet=&input;
+        fail_pending_allocation=(mode==1 || mode==4) || (mode==2 && i==1);
+        do {
+/* PRODUCTION_DECODE */
+        } while(false);
+        offset+=bytes;
+        if(failed_generation) break;
+    }
+    if (mode) {
+        assert(failed_generation==7 && fault_count==1 && closes==1 && error_status==1 && !end_markers);
+        assert(fault_stage==DECODER_FAILURE_PROCESS);
+        assert(fault_result==(mode==3?ESP_AUDIO_ERR_DATA_LACK:ESP_AUDIO_ERR_MEM_LACK));
+        assert(expected_encoded==(mode==4?4U:0U));
+    } else {
+        assert(!failed_generation && !fault_count && closes==1 && !error_status && end_markers==1);
+        assert(expected_encoded==offset && stats.input_bytes==offset && pcm_frames*4==offset);
+        assert(!memcmp(captured,data,offset));
+        assert(returned==count+1);
+    }
+    assert(!decoder && !aac_decoder && !output && !output_size);
+    assert(!pending.data && !pending.size && !pending.capacity);
+    assert(pending_allocations>0 || count==0);
+    fragments=false;fail_pending_allocation=false;
 }
 int main(void) {
     for(unsigned native=0;native<2;++native)
@@ -137,4 +213,22 @@ int main(void) {
             exercise(native,AUDIO_CONTINUE,mode);
         }
     puts("PASS 30 actual decoder-loop cases: cached PCM drain, resize, EOF, cancellation, error diagnostics before cleanup; DSP mocked");
+    exercise(true,AUDIO_CONTINUE,5);
+    puts("PASS native AAC: consumed input on resize is not replayed; zero-input PCM retry remains active");
+    const unsigned one_byte[]={1,1,1,1,1,1,1,1,1,1,1,1};
+    const unsigned suffixes[]={5,6,1};
+    const unsigned mixed[]={2,3,2,5};
+    const unsigned first[]={1};
+    const unsigned grow[]={1,16};
+    const unsigned truncated[]={3};
+    const unsigned borrowed_suffix[]={5};
+    fragmented(one_byte,12,0);
+    fragmented(suffixes,3,0);
+    fragmented(mixed,4,0);
+    fragmented(first,1,1);
+    fragmented(grow,2,2);
+    fragmented(truncated,1,3);
+    fragmented(borrowed_suffix,1,4);
+    fragmented(NULL,0,0);
+    puts("PASS vendor input: exact fragmented bytes and owned suffixes; retain/growth OOM; truncated and empty EOF; pending owner cleared");
 }

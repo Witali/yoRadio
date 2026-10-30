@@ -10,6 +10,7 @@
 #include "board_config.h"
 #include "decoder_registration.h"
 #include "esp_audio_simple_dec.h"
+#include "decoder_pending_input.h"
 #include "esp_check.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
@@ -808,12 +809,14 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
 #endif
 
 static void decoder_release(esp_audio_simple_dec_handle_t *decoder,
-                             uint8_t **output, size_t *output_size) {
+                             uint8_t **output, size_t *output_size,
+                             decoder_pending_input_t *pending) {
     if (*decoder) esp_audio_simple_dec_close(*decoder);
     *decoder = NULL;
     free(*output);
     *output = NULL;
     *output_size = 0;
+    decoder_pending_input_clear(pending);
 }
 
 #if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
@@ -824,6 +827,7 @@ static void decoder_task(void *argument) {
     (void)argument;
     uint8_t *output = NULL;
     size_t output_size = 0;
+    decoder_pending_input_t pending = {0};
     esp_audio_simple_dec_handle_t decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
     // The shared core has process-global sample workspace. This task is its
@@ -846,7 +850,7 @@ static void decoder_task(void *argument) {
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation ||
             atomic_load(&s_failed_generation) == current_generation) {
-            decoder_release(&decoder, &output, &output_size);
+            decoder_release(&decoder, &output, &output_size, &pending);
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
@@ -870,7 +874,7 @@ static void decoder_task(void *argument) {
             // cannot be followed by an old late commit or a control packet.
             if (maintenance_active() && maintenance_acked(MAINTENANCE_STREAM) &&
                 generation == atomic_load(&s_generation)) {
-                decoder_release(&decoder, &output, &output_size);
+                decoder_release(&decoder, &output, &output_size, &pending);
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
                 if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
                 flac_decoder = NULL;
@@ -916,6 +920,7 @@ static void decoder_task(void *argument) {
 #endif
         ) goto packet_done;
         if (packet->generation != generation || packet->codec != codec) {
+            decoder_pending_input_clear(&pending);
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
@@ -1042,9 +1047,23 @@ static void decoder_task(void *argument) {
         if (!decoder) {
             goto packet_done;
         }
+        uint8_t *input_buffer;
+        uint32_t input_size;
+        bool input_owned;
+        decoder_pending_input_status_t input_result = decoder_pending_input_prepare(
+            &pending, packet->data, packet->data_size,
+            &input_buffer, &input_size, &input_owned);
+        if (input_result != DECODER_PENDING_INPUT_OK) {
+            failure_stage = NATIVE_HEALTH_PROCESS;
+            failure_result = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
+            end_reason = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED;
+            goto packet_done;
+        }
         esp_audio_simple_dec_raw_t raw = {
-            .buffer = packet->data,
-            .len = packet->data_size,
+            .buffer = input_buffer,
+            .len = input_size,
             .eos = packet->end_of_stream,
         };
         while (raw.len || raw.eos) {
@@ -1113,10 +1132,20 @@ static void decoder_task(void *argument) {
                     break;
                 }
             }
-            if (!raw.consumed && !frame.decoded_size && !raw.eos) {
-                ESP_LOGE(TAG, "%s decoder made no input progress",
-                         codec_name(codec));
-                end_reason = AUDIO_END_DECODE_FAILED;
+            if (!raw.consumed && !frame.decoded_size && raw.len) {
+                if (raw.eos) {
+                    failure_result = ESP_AUDIO_ERR_DATA_LACK;
+                    end_reason = AUDIO_END_DECODE_FAILED;
+                } else {
+                    input_result = decoder_pending_input_retain(
+                        &pending, raw.buffer, raw.len, input_owned);
+                    if (input_result != DECODER_PENDING_INPUT_OK) {
+                        failure_result = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                            ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
+                        end_reason = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                            ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED;
+                    }
+                }
                 break;
             }
             // Ogg may retain several packets: EOS drains until no PCM remains.
@@ -1129,7 +1158,7 @@ packet_done:
                 packet->generation == atomic_load(&s_generation))
                 native_health_decoder_failure(packet->generation, (uint32_t)packet->codec,
                     failure_stage, failure_result, end_reason, packet->data_size);
-            decoder_release(&decoder, &output, &output_size);
+            decoder_release(&decoder, &output, &output_size, &pending);
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;

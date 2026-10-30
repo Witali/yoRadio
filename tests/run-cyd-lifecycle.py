@@ -63,7 +63,7 @@ size_t strlcpy(char *, const char *, size_t);
     source = (MAIN/'audio_service.c').read_text()
     first = source.index('#define STREAM_CHUNK_SIZE')
     last = source.index('static esp_audio_simple_dec_type_t')
-    generated = source[first:last]
+    generated = '#include "decoder_pending_input.h"\n' + source[first:last]
     generated += re.search(r'^#define STREAM_INPUT_ACTIVE[^\n]+', source, re.M).group(0)+'\n'
     generated += source[source.index('static uint32_t s_decoder_bitrate_generation'):
                         source.index('static void state_set_decoder_bitrate')]
@@ -126,6 +126,7 @@ size_t strlcpy(char *, const char *, size_t);
                       ROOT/'idf/components/native_stream/include/audio_completion.h',
                       ROOT/'idf/components/native_stream/include/adaptive_input.h',
                       ROOT/'idf/components/native_stream/include/stream_bitrate.h',
+                      ROOT/'idf/components/native_stream/include/decoder_pending_input.h',
                       MAIN/'input_prefill.h',
                       MAIN/'native_health.h',
                       MAIN/'native_output_metrics.h',
