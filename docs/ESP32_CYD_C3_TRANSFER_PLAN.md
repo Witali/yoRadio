@@ -2146,3 +2146,11 @@ Stream остаётся на core0, decode/output на core1 с прежними
   объявляется standard-complete. Также остаются public resize на 120 ms packets,
   другие modes, backpressure и radio/TLS/TFT/physical gates. Custom/private
   deferred scopes не возобновлялись.
+
+- 2026-10-30, CYD-C3-14, [120 ms Opus public resize](../tests/results/cyd-opus-20261030/RESIZE.md):
+  whole-input baseline с 24576 B output и два отдельных decoder instances с
+  начальными 12288 B проходят на неизменённом LX6 vendor. Оба реально возвращают
+  insufficient buffer: consumed=0, decoded=0, needed=23040; после realloc и retry
+  полный raw PCM совпадает с baseline (2119680 B). Это не доказывает поведение
+  при nonzero consumed-on-error, fragmented input, actual tasks или OOM. Эти
+  gates остаются; production caller не менялся на основании одного full feed.

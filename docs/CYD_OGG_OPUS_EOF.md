@@ -92,7 +92,12 @@ above remains a decoder-integration reference, not the final playback oracle.
   retry test, including input-consumption behavior.
   The [reproducible 120 ms fixture](../tests/fixtures/opus_ogg_long_packets/README.md)
   is ready: 92 legal packets, CRC/timeline guards and independent complete
-  libopus playback pass. MCU decoding and resize behavior remain unqualified.
+  libopus playback pass. The [whole-input public resize checkpoint](../tests/results/cyd-opus-20261030/RESIZE.md)
+  observes two genuine insufficient-buffer results: consumed=0, decoded=0,
+  needed=23040 with initial capacity 12288. Both fresh retry strategies match
+  the sufficient-capacity baseline of 2119680 raw bytes. Fragmented-input and
+  actual-task resize, nonzero error consumption and OOM remain unqualified;
+  this result does not justify changing production input advancement.
 - Deliberate backpressure, actual HTTP/TLS/TFT traffic, production resources
   and physical audio/output backends remain separate gates.
 
