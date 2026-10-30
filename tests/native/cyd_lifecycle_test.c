@@ -59,6 +59,11 @@ static bool oversized_frame;
 static bool header_only;
 static unsigned process_calls, delay_calls, emit_on_call;
 static bool fragmented_input, stalled_eof;
+static bool require_nonempty_eos, ogg_eos_started;
+static bool verify_ogg_bytes;
+static unsigned mock_codec, ogg_credits, ogg_eos_nonempty, ogg_eos_empty;
+static unsigned ogg_pcm_frames;
+static size_t expected_ogg_bytes;
 static unsigned minimum_input;
 static size_t verified_input, verified_pcm;
 static unsigned pending_allocations, fail_pending_at;
@@ -103,6 +108,15 @@ static int native_audio_output_write_pcm(const uint8_t *p, size_t n, uint8_t b, 
         assert(n%4==0);
         for(size_t i=0;i<n;++i) assert(p[i]==(uint8_t)(0x40+(verified_pcm+i)/4));
         verified_pcm+=n;
+    } else if(verify_ogg_bytes) {
+        size_t encoded_pcm=(expected_ogg_bytes/3)*16;
+        assert(verified_pcm+n<=encoded_pcm+16);
+        for(size_t i=0;i<n;++i) {
+            size_t position=verified_pcm+i;
+            uint8_t expected=position<encoded_pcm ? (uint8_t)(0x40+position/16) : 0xee;
+            assert(p[i]==expected);
+        }
+        verified_pcm+=n;
     }
     last_sample = *p; ++writes; return fail_write ? ESP_FAIL : ESP_OK;
 }
@@ -112,8 +126,8 @@ static void esp_vorbis_dec_register(void) {}
 static void esp_opus_dec_register(void) {}
 static void esp_audio_simple_dec_register_default(void) {}
 static int esp_audio_simple_dec_open(const esp_audio_simple_dec_cfg_t *cfg, void **handle) {
-    (void)cfg;
     if (fail_open) return open_error;
+    mock_codec=cfg->dec_type;ogg_credits=ogg_pcm_frames=0;ogg_eos_started=false;
     *handle = malloc(8); assert(*handle); ++opens; ++open_handles; eos_frames=2; return ESP_OK;
 }
 static void esp_audio_simple_dec_close(void *handle) { assert(open_handles); --open_handles; ++closes; free(handle); }
@@ -122,6 +136,11 @@ static int esp_audio_simple_dec_process(void *handle, esp_audio_simple_dec_raw_t
     assert(handle && out->len >= 16);
     ++process_calls;
     if (fail_process) return ESP_FAIL;
+    if(mock_codec==ESP_AUDIO_SIMPLE_DEC_TYPE_OGG && !header_only && raw->eos) {
+        if(!ogg_eos_started && require_nonempty_eos) assert(raw->len);
+        ogg_eos_started=true;
+        if(raw->len) ++ogg_eos_nonempty;else ++ogg_eos_empty;
+    }
     if (fragmented_input) {
         // A public decoder can wait for an entire prefix without consuming a
         // short fragment. Check every still-visible byte, not just its length.
@@ -132,6 +151,22 @@ static int esp_audio_simple_dec_process(void *handle, esp_audio_simple_dec_raw_t
         assert(raw->consumed*4<=out->len);
         for(size_t i=0;i<raw->consumed;++i) memset(out->buffer+4*i,raw->buffer[i],4);
         out->decoded_size=raw->consumed*4;verified_input+=raw->consumed;
+        return ESP_OK;
+    }
+    if(mock_codec==ESP_AUDIO_SIMPLE_DEC_TYPE_OGG && !header_only) {
+        if(verify_ogg_bytes) {
+            for(size_t i=0;i<raw->len;++i) assert(raw->buffer[i]==(uint8_t)(0x40+verified_input+i));
+            verified_input+=raw->len;
+        }
+        raw->consumed=raw->len;
+        ogg_credits+=(unsigned)raw->len;
+        out->decoded_size=(ogg_credits/3)*16;ogg_credits%=3;
+        assert(out->decoded_size<=out->len);
+        for(size_t i=0;i<out->decoded_size;i+=16)
+            memset(out->buffer+i,verify_ogg_bytes ? 0x40+ogg_pcm_frames++ : raw->buffer[0],16);
+        if(!raw->len && raw->eos && eos_frames) {
+            out->decoded_size=(--eos_frames,8);memset(out->buffer,0xee,8);
+        }
         return ESP_OK;
     }
     raw->consumed = header_only && raw->len ? 1 : raw->len;
@@ -267,6 +302,8 @@ static void begin(unsigned gen) {
     oversized_frame=false;info_result=ESP_OK;info_rate=expected_rate=48000;test_now_us=0;
     header_only=false;process_calls=delay_calls=emit_on_call=0;open_error=ESP_FAIL;
     fragmented_input=stalled_eof=false;minimum_input=4;verified_input=verified_pcm=0;
+    require_nonempty_eos=ogg_eos_started=false;ogg_eos_nonempty=ogg_eos_empty=0;
+    verify_ogg_bytes=false;expected_ogg_bytes=0;
     pending_allocations=fail_pending_at=0;
     cancel_prefill=false;prefill_queries=0;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
@@ -319,6 +356,13 @@ static void recover_after_pending_failure(void) {
     fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_CONTINUE,0,20);
     fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_END_EOF,20,0);
 }
+static void stop_and_reopen_ogg(void) {
+    empty_hook=NULL;audio_service_stop();
+    assert(audio_service_play("http://ogg-tail-reopen.example/audio",NATIVE_CODEC_OGG)==ESP_OK);
+    active_generation=atomic_load(&s_generation);
+    fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_CONTINUE,0,9);
+    fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_END_EOF,9,0);
+}
 static void pending_contract_tests(void) {
     decoder_pending_input_t pending={0};
     uint8_t external[]={0x40,0x41,0x42,0x43};
@@ -342,10 +386,30 @@ static void pending_contract_tests(void) {
     assert(pending.size==3 && !memcmp(pending.data,external+1,3));
     // Release must clear retained storage even if no decoder was published.
     esp_audio_simple_dec_handle_t decoder=NULL;uint8_t *output=NULL;size_t output_size=0;
-    decoder_release(&decoder,&output,&output_size,&pending);
+    decoder_eof_input_t eof_input={.present=true,.byte=0x55};
+    decoder_release(&decoder,&output,&output_size,&pending,&eof_input);
     assert(!pending.data && !pending.size && !pending.capacity);
+    assert(!eof_input.present && !eof_input.byte);
     decoder_pending_input_clear(&pending);
     for(unsigned i=0;i<8;++i) assert(!tracked_allocations[i]);
+}
+static void eof_contract_tests(void) {
+    decoder_eof_input_t input={0};decoder_eof_segment_t segments[2];uint8_t previous=0;
+    uint8_t first[]={1,2,3},next[]={4,5};
+    assert(decoder_eof_input_prepare(&input,true,first,3,false,&previous,segments)==1);
+    assert(segments[0].data==first && segments[0].size==2 && !segments[0].eos);
+    assert(input.present && input.byte==3);
+    assert(decoder_eof_input_prepare(&input,true,next,2,false,&previous,segments)==2);
+    assert(previous==3 && segments[0].data==&previous && segments[0].size==1 && !segments[0].eos);
+    assert(segments[1].data==next && segments[1].size==1 && !segments[1].eos && input.byte==5);
+    assert(decoder_eof_input_prepare(&input,true,NULL,0,false,&previous,segments)==0 && input.byte==5);
+    assert(decoder_eof_input_prepare(&input,true,NULL,0,true,&previous,segments)==1);
+    assert(previous==5 && segments[0].data==&previous && segments[0].size==1 && segments[0].eos && !input.present);
+    assert(decoder_eof_input_prepare(&input,true,NULL,0,true,&previous,segments)==1);
+    assert(!segments[0].size && segments[0].eos);
+    assert(decoder_eof_input_prepare(&input,true,first,1,false,&previous,segments)==0 && input.byte==1);
+    assert(decoder_eof_input_prepare(&input,false,next,2,false,&previous,segments)==1);
+    assert(!input.present && segments[0].data==next && segments[0].size==2 && !segments[0].eos);
 }
 static void switch_before_receive_returns(void) {
     receive_hook=NULL;
@@ -404,6 +468,7 @@ static int pdm_write_block(const int16_t *samples, size_t count) {
 int main(void) {
     native_state_init(&state);
     pending_contract_tests();
+    eof_contract_tests();
     begin(1); input(1,AUDIO_CONTINUE,3); input(1,AUDIO_END_EOF,0);
     run_task(decoder_task);
     assert(opens==1 && closes==1 && !open_handles && state.audio_running);
@@ -464,7 +529,7 @@ int main(void) {
     // A decoder can produce PCM on the call that yields. Stop must prevent
     // that frame from publishing format or entering the output queue.
     begin(91); header_only=true; emit_on_call=32; delay_hook=stop_during_delay;
-    input(91,AUDIO_CONTINUE,32);
+    input(91,AUDIO_CONTINUE,33);
     ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_OGG;
     run_task(decoder_task);
     assert(process_calls==32 && delay_calls==1 && !pcm.used && !state.audio_running);
@@ -543,6 +608,37 @@ int main(void) {
     fragment(108,NATIVE_CODEC_FLAC,AUDIO_END_EOF,6,0);run_task(decoder_task);
     assert(verified_input==6 && opens==2 && closes==2 && !open_handles && !health_decoder_faults);
     run_task(output_task);assert(verified_pcm==24 && flushes==1);
+
+    // The Ogg mock credits three encoded bytes per PCM frame, independent of
+    // call boundaries. Its first EOS must contain the genuine final byte;
+    // subsequent empty EOS calls release both cached tail frames exactly once.
+    const unsigned ogg_patterns[3][9]={{9},{1,1,1,1,1,1,1,1,1},{2,4,3}};
+    const unsigned ogg_counts[]={1,9,3};
+    for(unsigned pattern=0;pattern<3;++pattern) {
+        begin(110+pattern);verify_ogg_bytes=require_nonempty_eos=true;expected_ogg_bytes=9;
+        size_t offset=0;
+        for(unsigned i=0;i<ogg_counts[pattern];++i) {
+            unsigned bytes=ogg_patterns[pattern][i];
+            fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_CONTINUE,offset,bytes);offset+=bytes;
+        }
+        fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_END_EOF,offset,0);run_task(decoder_task);
+        assert(verified_input==9 && ogg_eos_nonempty==1 && ogg_eos_empty==3 && !ogg_credits);
+        assert(opens==1 && closes==1 && !open_handles && !health_decoder_faults);
+        run_task(output_task);assert(verified_pcm==64 && flushes==1);
+    }
+    for(unsigned first=0;first<=4;first+=4) {
+        begin(114+first);verify_ogg_bytes=require_nonempty_eos=true;expected_ogg_bytes=9;
+        if(first) fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_CONTINUE,0,first);
+        fragment(active_generation,NATIVE_CODEC_OGG,AUDIO_END_EOF,first,9-first);run_task(decoder_task);
+        assert(verified_input==9 && ogg_eos_nonempty==1 && ogg_eos_empty==3 && !health_decoder_faults);
+        run_task(output_task);assert(verified_pcm==64 && flushes==1);
+    }
+    begin(119);verify_ogg_bytes=require_nonempty_eos=true;expected_ogg_bytes=9;
+    fragment(119,NATIVE_CODEC_OGG,AUDIO_CONTINUE,0,1);empty_hook=stop_and_reopen_ogg;
+    run_task(decoder_task);
+    assert(verified_input==9 && opens==2 && closes==2 && !open_handles && !health_decoder_faults);
+    assert(ogg_eos_nonempty==1 && ogg_eos_empty==3);
+    run_task(output_task);assert(verified_pcm==64 && flushes==1);
     begin(7); fail_realloc=true; input(7,AUDIO_CONTINUE,3);
     ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_FLAC;
     run_task(decoder_task);
@@ -730,6 +826,7 @@ int main(void) {
     puts("PASS CYD: AAC drain closes decoder after cached PCM; MP3 continues in the same generation; only final EOF flushes output");
     puts("PASS CYD vendor: header-only fairness across packets; Stop during yield; distinct open error/OOM; same-task reopen");
     puts("PASS CYD vendor: exact fragmented prefixes and PCM; retained-input OOM/reopen, Stop/codec cleanup and truncated EOF");
+    puts("PASS CYD Ogg: zero-copy EOF lookahead, exact byte order and cached PCM tail across packet splits; Stop/reopen clears tail");
     assert(!pthread_mutex_destroy(s_control_lock)); free(s_control_lock);
     assert(!pthread_mutex_destroy(state.lock)); free(state.lock);
     return 0;

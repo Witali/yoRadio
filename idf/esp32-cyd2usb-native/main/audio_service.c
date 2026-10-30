@@ -11,6 +11,7 @@
 #include "decoder_registration.h"
 #include "esp_audio_simple_dec.h"
 #include "decoder_pending_input.h"
+#include "decoder_eof_input.h"
 #include "esp_check.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
@@ -810,13 +811,15 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
 
 static void decoder_release(esp_audio_simple_dec_handle_t *decoder,
                              uint8_t **output, size_t *output_size,
-                             decoder_pending_input_t *pending) {
+                             decoder_pending_input_t *pending,
+                             decoder_eof_input_t *eof_input) {
     if (*decoder) esp_audio_simple_dec_close(*decoder);
     *decoder = NULL;
     free(*output);
     *output = NULL;
     *output_size = 0;
     decoder_pending_input_clear(pending);
+    decoder_eof_input_clear(eof_input);
 }
 
 #if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
@@ -828,6 +831,7 @@ static void decoder_task(void *argument) {
     uint8_t *output = NULL;
     size_t output_size = 0;
     decoder_pending_input_t pending = {0};
+    decoder_eof_input_t eof_input = {0};
     esp_audio_simple_dec_handle_t decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
     // The shared core has process-global sample workspace. This task is its
@@ -850,7 +854,7 @@ static void decoder_task(void *argument) {
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation ||
             atomic_load(&s_failed_generation) == current_generation) {
-            decoder_release(&decoder, &output, &output_size, &pending);
+            decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
@@ -874,7 +878,7 @@ static void decoder_task(void *argument) {
             // cannot be followed by an old late commit or a control packet.
             if (maintenance_active() && maintenance_acked(MAINTENANCE_STREAM) &&
                 generation == atomic_load(&s_generation)) {
-                decoder_release(&decoder, &output, &output_size, &pending);
+                decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
                 if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
                 flac_decoder = NULL;
@@ -921,6 +925,7 @@ static void decoder_task(void *argument) {
         ) goto packet_done;
         if (packet->generation != generation || packet->codec != codec) {
             decoder_pending_input_clear(&pending);
+            decoder_eof_input_clear(&eof_input);
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
@@ -1047,109 +1052,122 @@ static void decoder_task(void *argument) {
         if (!decoder) {
             goto packet_done;
         }
-        uint8_t *input_buffer;
-        uint32_t input_size;
-        bool input_owned;
-        decoder_pending_input_status_t input_result = decoder_pending_input_prepare(
-            &pending, packet->data, packet->data_size,
-            &input_buffer, &input_size, &input_owned);
-        if (input_result != DECODER_PENDING_INPUT_OK) {
-            failure_stage = NATIVE_HEALTH_PROCESS;
-            failure_result = input_result == DECODER_PENDING_INPUT_NO_MEMORY
-                ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
-            end_reason = input_result == DECODER_PENDING_INPUT_NO_MEMORY
-                ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED;
-            goto packet_done;
-        }
-        esp_audio_simple_dec_raw_t raw = {
-            .buffer = input_buffer,
-            .len = input_size,
-            .eos = packet->end_of_stream,
-        };
-        while (raw.len || raw.eos) {
-            if (generation != atomic_load(&s_generation)) break;
-            esp_audio_simple_dec_out_t frame = {
-                .buffer = output,
-                .len = output_size,
+        uint8_t previous_byte;
+        decoder_eof_segment_t segments[2];
+        unsigned segment_count = decoder_eof_input_prepare(&eof_input,
+            codec == NATIVE_CODEC_OGG, packet->data, packet->data_size,
+            packet->end_of_stream != AUDIO_CONTINUE, &previous_byte, segments);
+        for (unsigned segment = 0; segment < segment_count; ++segment) {
+            uint8_t *input_buffer;
+            uint32_t input_size;
+            bool input_owned;
+            decoder_pending_input_status_t input_result = decoder_pending_input_prepare(
+                &pending, segments[segment].data, segments[segment].size,
+                &input_buffer, &input_size, &input_owned);
+            if (input_result != DECODER_PENDING_INPUT_OK) {
+                failure_stage = NATIVE_HEALTH_PROCESS;
+                failure_result = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                    ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
+                end_reason = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                    ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED;
+                goto packet_done;
+            }
+            esp_audio_simple_dec_raw_t raw = {
+                .buffer = input_buffer,
+                .len = input_size,
+                .eos = segments[segment].eos,
             };
-            raw.consumed = 0;
-            esp_audio_err_t result =
-                esp_audio_simple_dec_process(decoder, &raw, &frame);
-            // PCM backpressure normally gives the idle task time to run.
-            // Header-only input can consume many packets without producing PCM.
-            if ((++process_calls & 31U) == 0U) vTaskDelay(1);
-            if (generation != atomic_load(&s_generation)) break;
-            failure_stage = NATIVE_HEALTH_PROCESS;
-            failure_result = (int32_t)result;
-            if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
-                if (frame.needed_size <= output_size) {
+            bool segment_complete = !raw.len && !raw.eos;
+            while (raw.len || raw.eos) {
+                if (generation != atomic_load(&s_generation)) break;
+                esp_audio_simple_dec_out_t frame = {
+                    .buffer = output,
+                    .len = output_size,
+                };
+                raw.consumed = 0;
+                esp_audio_err_t result =
+                    esp_audio_simple_dec_process(decoder, &raw, &frame);
+                // PCM backpressure normally gives the idle task time to run.
+                // Header-only input can consume many packets without producing PCM.
+                if ((++process_calls & 31U) == 0U) vTaskDelay(1);
+                if (generation != atomic_load(&s_generation)) break;
+                failure_stage = NATIVE_HEALTH_PROCESS;
+                failure_result = (int32_t)result;
+                if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
+                    if (frame.needed_size <= output_size) {
+                        end_reason = AUDIO_END_DECODE_FAILED;
+                        break;
+                    }
+                    uint8_t *larger = realloc(output, frame.needed_size);
+                    if (!larger) {
+                        end_reason = AUDIO_END_ALLOCATION_FAILED;
+                        break;
+                    }
+                    output = larger;
+                    output_size = frame.needed_size;
+                    continue;
+                }
+                if (result != ESP_AUDIO_ERR_OK) {
+                    ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
+                             result);
                     end_reason = AUDIO_END_DECODE_FAILED;
                     break;
                 }
-                uint8_t *larger = realloc(output, frame.needed_size);
-                if (!larger) {
-                    end_reason = AUDIO_END_ALLOCATION_FAILED;
-                    break;
-                }
-                output = larger;
-                output_size = frame.needed_size;
-                continue;
-            }
-            if (result != ESP_AUDIO_ERR_OK) {
-                ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
-                         result);
-                end_reason = AUDIO_END_DECODE_FAILED;
-                break;
-            }
-            if (raw.consumed > raw.len) {
-                ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
-                         codec_name(codec), (unsigned long)raw.consumed,
-                         (unsigned long)raw.len);
-                end_reason = AUDIO_END_DECODE_FAILED;
-                break;
-            }
-            if (frame.decoded_size > output_size) {
-                failure_result = ESP_FAIL;
-                end_reason = AUDIO_END_DECODE_FAILED;
-                break;
-            }
-            raw.buffer += raw.consumed;
-            raw.len -= raw.consumed;
-            if (frame.decoded_size) {
-                esp_audio_simple_dec_info_t info = {0};
-                esp_audio_err_t info_result = esp_audio_simple_dec_get_info(decoder, &info);
-                if (info_result != ESP_AUDIO_ERR_OK || !publish_stream_info(generation,codec,&info)) {
-                    failure_stage = NATIVE_HEALTH_INFO;
-                    failure_result = info_result == ESP_AUDIO_ERR_OK ? ESP_FAIL : (int32_t)info_result;
+                if (raw.consumed > raw.len) {
+                    ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
+                             codec_name(codec), (unsigned long)raw.consumed,
+                             (unsigned long)raw.len);
                     end_reason = AUDIO_END_DECODE_FAILED;
                     break;
                 }
-                if (!send_pcm(generation, &info, output,frame.decoded_size)) {
-                    failure_stage = NATIVE_HEALTH_PCM;
+                if (frame.decoded_size > output_size) {
                     failure_result = ESP_FAIL;
-                    ESP_LOGW(TAG, "PCM buffer stalled");
-                    end_reason = AUDIO_END_BUFFER_STALLED;
+                    end_reason = AUDIO_END_DECODE_FAILED;
                     break;
                 }
-            }
-            if (!raw.consumed && !frame.decoded_size && raw.len) {
-                if (raw.eos) {
-                    failure_result = ESP_AUDIO_ERR_DATA_LACK;
-                    end_reason = AUDIO_END_DECODE_FAILED;
-                } else {
-                    input_result = decoder_pending_input_retain(
-                        &pending, raw.buffer, raw.len, input_owned);
-                    if (input_result != DECODER_PENDING_INPUT_OK) {
-                        failure_result = input_result == DECODER_PENDING_INPUT_NO_MEMORY
-                            ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
-                        end_reason = input_result == DECODER_PENDING_INPUT_NO_MEMORY
-                            ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED;
+                raw.buffer += raw.consumed;
+                raw.len -= raw.consumed;
+                if (frame.decoded_size) {
+                    esp_audio_simple_dec_info_t info = {0};
+                    esp_audio_err_t info_result = esp_audio_simple_dec_get_info(decoder, &info);
+                    if (info_result != ESP_AUDIO_ERR_OK || !publish_stream_info(generation,codec,&info)) {
+                        failure_stage = NATIVE_HEALTH_INFO;
+                        failure_result = info_result == ESP_AUDIO_ERR_OK ? ESP_FAIL : (int32_t)info_result;
+                        end_reason = AUDIO_END_DECODE_FAILED;
+                        break;
+                    }
+                    if (!send_pcm(generation, &info, output,frame.decoded_size)) {
+                        failure_stage = NATIVE_HEALTH_PCM;
+                        failure_result = ESP_FAIL;
+                        ESP_LOGW(TAG, "PCM buffer stalled");
+                        end_reason = AUDIO_END_BUFFER_STALLED;
+                        break;
                     }
                 }
-                break;
+                if (!raw.consumed && !frame.decoded_size && raw.len) {
+                    if (raw.eos) {
+                        failure_result = ESP_AUDIO_ERR_DATA_LACK;
+                        end_reason = AUDIO_END_DECODE_FAILED;
+                    } else {
+                        input_result = decoder_pending_input_retain(
+                            &pending, raw.buffer, raw.len, input_owned);
+                        segment_complete = input_result == DECODER_PENDING_INPUT_OK;
+                        if (input_result != DECODER_PENDING_INPUT_OK) {
+                            failure_result = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                                ? ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
+                            end_reason = input_result == DECODER_PENDING_INPUT_NO_MEMORY
+                                ? AUDIO_END_ALLOCATION_FAILED : AUDIO_END_DECODE_FAILED;
+                        }
+                    }
+                    break;
+                }
+                // Ogg may retain several packets: EOS drains until no PCM remains.
+                if (raw.eos ? (!raw.len && !frame.decoded_size && !raw.consumed) : raw.len == 0) {
+                    segment_complete = true;
+                    break;
+                }
             }
-            // Ogg may retain several packets: EOS drains until no PCM remains.
-            if (raw.eos ? (!raw.len && !frame.decoded_size) : raw.len == 0) break;
+            if (!segment_complete || generation != atomic_load(&s_generation)) break;
         }
 packet_done:
         if (end_reason) {
@@ -1158,7 +1176,7 @@ packet_done:
                 packet->generation == atomic_load(&s_generation))
                 native_health_decoder_failure(packet->generation, (uint32_t)packet->codec,
                     failure_stage, failure_result, end_reason, packet->data_size);
-            decoder_release(&decoder, &output, &output_size, &pending);
+            decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
