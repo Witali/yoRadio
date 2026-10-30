@@ -72,6 +72,23 @@ failure; unsupported or invalid decoder setup reports a decode failure and
 retains the original numeric error in health diagnostics. Opaque custom
 factories still report allocation failure when returning `NULL`.
 
+The direct public decoder experiment also found that a successful call can
+leave a short input prefix unconsumed and produce no PCM. CYD now retains that
+exact suffix and appends the next packet before retrying. The shared
+[pending-input owner](../idf/components/native_stream/include/decoder_pending_input.h)
+borrows normal packets directly and allocates only for such a retained suffix.
+An explicit ownership flag selects copy versus in-place move; no comparison
+between unrelated pointers is needed. Checked allocation and the public API's
+32-bit input length remain resource/representation limits rather than format
+clipping. Stop, codec changes, terminal completion and maintenance clear the
+owner. A remaining suffix at EOF without progress fails explicitly instead
+of looping forever.
+
+C3 uses the same owner through a local forwarding header, only in its vendor
+decoder branch. Its native AAC consumed-on-resize and zero-input PCM retry
+remain separate. Pending storage participates in generation/codec/error/EOF
+cleanup and the maintenance release predicate.
+
 These changes preserve the production task affinities, priorities, stacks,
 display configuration and audio backend selection. They do not enable the C3
 private Vorbis repair, custom numerical components or old deferred experiments.
@@ -84,11 +101,31 @@ cancellation, error propagation and ownership; it does not execute Espressif's
 binary decoder. A separate valid-stream SDK/QEMU diagnostic exercises the
 unchanged target-specific vendor libraries through their public Ogg API.
 
+The historical C3 lifecycle test made only one empty-EOF process call. Its
+2,107,648-byte PCM result omits 1,088 stereo frames from this fixture's final
+granule of 528,000. The new diagnostic keeps that exact historical output as a
+mandatory prefix and separately requires the full 2,112,000-byte result. A
+matching full digest across schedules/architectures is an integration regression
+identity; it is not an independent numeric oracle for the newly drained tail.
+First-use retained heap is reported separately from stable repeat-stream heap.
+
 [Host evidence](../tests/results/cyd-espressif-reuse-20261030/HOST.md) records
 all six passing lifecycle variants and the control that resets the counter at
 each input packet and fails the intended scheduling assertion. Focused
 esp-clang-tidy analysis of the current production audio service completes with
 zero errors and one existing shared-header enum-initialization warning.
+
+The [retained-prefix host checkpoint](../tests/results/cyd-espressif-reuse-20261030/PENDING_HOST.md)
+adds exact fragmented-byte/PCM tests, allocation refusal/recovery and ownership
+checks, plus current Xtensa compilation in all three selected configurations.
+The [C3 checkpoint](../tests/results/cyd-espressif-reuse-20261030/C3_PENDING.md)
+adds 39 decode-loop cases, 152 maintenance cases, 13 semantic controls and
+actual RV32 compilation, while preserving native AAC behavior.
+The [native checkpoint](../tests/results/cyd-espressif-reuse-20261030/NATIVE.md)
+executes unchanged vendor decoding on both MCUs, including all 703,584 one-byte
+feeds. Complete PCM is identical across both architectures and all schedules;
+the historical prefix remains exact. Original failed attempts and a precisely
+documented post-run data-reader correction are retained.
 
 After those gates, full production audio-task streaming, Stop/reopen,
 maintenance, queue backpressure and radio/TLS/TFT resource qualification remain
