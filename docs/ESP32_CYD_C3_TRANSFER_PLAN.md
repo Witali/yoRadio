@@ -96,8 +96,11 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   также проходит полный vendor baseline, 4096/257/1-byte feeds и три actual-task
   случая. Обнаружено обязательное незавершённое исправление: pre-skip/end trim
   Ogg Opus — vendor выдаёт 2115840 raw bytes вместо требуемых 2112000 playback
-  bytes. Следом — обрезка по реальной timeline с независимым эталоном и public
-  resize для длинных пакетов до 120 ms; старые C3 interior windows их не закрывают.
+  bytes. Public resize для пакетов до 120 ms теперь проверен на whole/fragmented
+  input и [actual CYD tasks](../tests/results/cyd-opus-20261030/LONG_TASK.md):
+  все пять handles реально увеличивают output 12288→23040 и успешно повторяют
+  вызов с прежним input. Следом — обрезка по реальной timeline с независимым
+  эталоном; старые C3 interior windows её не закрывают.
   Radio/TLS/TFT ресурсы и deliberate backpressure остаются отдельно. Собственную
   арифметику не подключать.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
@@ -2172,3 +2175,15 @@ Stream остаётся на core0, decode/output на core1 с прежними
   statuses проходят. Nonzero consumed-on-error, empty retry, OOM, actual tasks
   и playback trim этим не закрываются. Изменений production caller не требуется
   на основании наблюдённых zero-consumption retries.
+
+- 2026-11-01, CYD-C3-14, сохранён и независимо проверен [actual-task 120 ms checkpoint](../tests/results/cyd-opus-20261030/LONG_TASK.md).
+  Исходный native campaign завершился успешно: EOF, Stop/discard/reopen и
+  maintenance/token/stale rejection/resume дают полный raw baseline 2119680 B.
+  Во всех пяти реальных handles наблюдаются initial 12288 B, buffer error с
+  needed23040/consumed0/decoded0 и немедленный успешный retry на 23040 B.
+  Пять HTTP/decoder owners закрыты; cores/priorities/stacks сохранены.
+  Data-only verifier связывает 11 actual compiler TUs/416 dependencies и
+  отклоняет десять противоречивых resize transcripts. Исполняемые images и
+  flagged installed headers остаются локально; опубликованы точные hash/size
+  bindings без заявления о чтении исключённых bytes. Обязательный playback
+  trim, OOM/backpressure и full radio/TLS/TFT/physical gates не закрыты.

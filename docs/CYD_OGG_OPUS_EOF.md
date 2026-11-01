@@ -125,9 +125,15 @@ before production integration. No new observer is selected by this checkpoint.
   [Fragmented-input resize](../tests/results/cyd-opus-20261030/STREAM_RESIZE.md)
   also passes 4096/257/1-byte feeds with the exact production pending/EOF
   helpers. Each schedule witnesses one nonterminal resize with consumed=0 and
-  decoded=0, then matches all raw PCM. Actual-task resize, nonzero error
-  consumption, empty-input retries and OOM remain unqualified. These results
-  do not justify changing production input advancement.
+  decoded=0, then matches all raw PCM. The [actual CYD task resize checkpoint](../tests/results/cyd-opus-20261030/LONG_TASK.md)
+  also passes T0 EOF, T1 Stop/discard/reopen and T2 maintenance/resume. All five
+  real decoder handles start at 12288 bytes, return a measured buffer error
+  needing 23040, and immediately retry successfully with unchanged input and
+  zero error consumption/output. Original task cores, priorities and stacks
+  remain unchanged. Ten contradictory resize transcripts are rejected by the
+  standalone evidence verifier. Nonzero error consumption, empty-input retries
+  and OOM remain unqualified. These results do not justify changing production
+  input advancement and do not implement the required playback trimming.
 - Deliberate backpressure, actual HTTP/TLS/TFT traffic, production resources
   and physical audio/output backends remain separate gates.
 

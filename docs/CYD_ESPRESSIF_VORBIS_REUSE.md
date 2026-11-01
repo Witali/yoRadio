@@ -161,6 +161,9 @@ The [Opus sibling regression](CYD_OGG_OPUS_EOF.md), through the same
 playback correctness gap: the vendor returns 2115840 raw bytes for this fixture,
 while its Opus pre-skip and terminal granule require 2112000 playback bytes.
 Independent libopus playback confirms that length. Sample-accurate trimming
-remains required; raw integration equality does not close it. Legal long-packet
-resize behavior also remains to qualify. The old C3 interior calibration and
-Vorbis byte/hash reference cannot substitute for these Opus gates.
+remains required; raw integration equality does not close it. Legal 120 ms
+packets now pass [whole/fragmented input and actual CYD task resizing](../tests/results/cyd-opus-20261030/LONG_TASK.md),
+including five measured 12288-to-23040-byte buffer transitions and immediate
+successful retries. Nonzero error consumption, allocation failure and deliberate
+backpressure remain open. The old C3 interior calibration and Vorbis byte/hash
+reference cannot substitute for these Opus gates.
