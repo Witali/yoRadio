@@ -28,6 +28,10 @@ public:
         processEnabled(sample);
     }
     void processBlock(int16_t *samples, size_t frames, uint8_t channels);
+    // One envelope/time advance per frame, observing and limiting every
+    // channel. Aligned host-endian PCM, one through eight channels; invalid
+    // geometry is a no-op. The original first-two-channel API stays unchanged.
+    void processMultichannelBlock(int16_t *samples, size_t frames, uint8_t channels);
 
 private:
     static constexpr uint16_t kUnityGainQ12 = 4096U;

@@ -119,6 +119,28 @@ void AudioNormalizer::processBlock(int16_t *samples, size_t frames,
     }
 }
 
+void AudioNormalizer::processMultichannelBlock(int16_t *samples, size_t frames,
+                                              uint8_t channels) {
+    if(!m_enabled || !samples || !frames || !channels || channels > 8 ||
+       frames > SIZE_MAX / (static_cast<size_t>(channels) * sizeof(*samples))) return;
+    for(size_t frame = 0; frame < frames; ++frame) {
+        int16_t *input = samples + frame * channels;
+        uint32_t peak = 0;
+        for(uint8_t channel = 0; channel < channels; ++channel) {
+            const uint32_t value = absoluteSample(input[channel]);
+            if(value > peak) peak = value;
+        }
+        if(peak > m_blockPeak) m_blockPeak = static_cast<uint16_t>(peak);
+        ++m_blockCount;
+        for(uint8_t channel = 0; channel < channels; ++channel) {
+            const int32_t amplified =
+                (static_cast<int32_t>(input[channel]) * m_gainQ12) >> 12;
+            input[channel] = softLimit(amplified);
+        }
+        if(m_blockCount >= m_blockFrames) updateGainTarget();
+    }
+}
+
 void AudioNormalizer::updateGainTarget() {
     uint32_t targetGain = kUnityGainQ12;
     if(m_blockPeak >= kNoiseFloor) {

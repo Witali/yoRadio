@@ -1,0 +1,199 @@
+{
+  "passed": true,
+  "baseline": false,
+  "production_selected": false,
+  "physical_hardware": false,
+  "sources": [
+    {
+      "path": "tests/run-cyd-surround-normalizer.py",
+      "snapshot": "sources/tests/run-cyd-surround-normalizer.py",
+      "bytes": 5818,
+      "sha256": "c6949f4074a593eb1a44eb72adac241e689b7edc34b670223e9031b8187cfbc3"
+    },
+    {
+      "path": "tests/native/cyd_surround_normalizer.cpp",
+      "snapshot": "sources/tests/native/cyd_surround_normalizer.cpp",
+      "bytes": 4920,
+      "sha256": "570b7f6c9efdd9dc3bc339567f20d26bb67a216981e6d27e218646caa9adbe04"
+    },
+    {
+      "path": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+      "snapshot": "sources/yoRadio/src/audioI2S/AudioNormalizer.cpp",
+      "bytes": 6625,
+      "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+    },
+    {
+      "path": "yoRadio/src/audioI2S/AudioNormalizer.h",
+      "snapshot": "sources/yoRadio/src/audioI2S/AudioNormalizer.h",
+      "bytes": 4368,
+      "sha256": "19bdcde3307eb4ac02d48885e79a2be66a5ceaa54da6fe976bd71b15f4e7cb9f"
+    },
+    {
+      "path": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+      "snapshot": "sources/idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+      "bytes": 1057,
+      "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+    },
+    {
+      "path": "idf/components/native_audio_normalizer/native_audio_normalizer.h",
+      "snapshot": "sources/idf/components/native_audio_normalizer/native_audio_normalizer.h",
+      "bytes": 1121,
+      "sha256": "ef4f18fbdda2967fec3a4933ba214692c9f19574f5660b14624e61118eb5f755"
+    }
+  ],
+  "commands": [
+    {
+      "name": "compiler-version",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/g++",
+        "--version"
+      ],
+      "state": "complete",
+      "pid": 7036,
+      "exit_status": 0,
+      "elapsed_seconds": 0.25,
+      "stdout": {
+        "path": "compiler-version.stdout.log",
+        "bytes": 246,
+        "sha256": "59d1cbef41d4ae78d5063d525b7aa13d18dc0493ea00537efc19b2ee398cb5a8"
+      },
+      "stderr": {
+        "path": "compiler-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "compiler-realpath",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/readlink",
+        "-f",
+        "/usr/bin/g++"
+      ],
+      "state": "complete",
+      "pid": 28700,
+      "exit_status": 0,
+      "elapsed_seconds": 0.203,
+      "stdout": {
+        "path": "compiler-realpath.stdout.log",
+        "bytes": 33,
+        "sha256": "f7a6144c8c789c9bcc8c4453008a7c1e2e95a9002039e11840175972d4bc081d"
+      },
+      "stderr": {
+        "path": "compiler-realpath.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "compiler-sha256",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/sha256sum",
+        "/usr/bin/x86_64-linux-gnu-g++-13"
+      ],
+      "state": "complete",
+      "pid": 27024,
+      "exit_status": 0,
+      "elapsed_seconds": 0.203,
+      "stdout": {
+        "path": "compiler-sha256.stdout.log",
+        "bytes": 99,
+        "sha256": "520eb2bf5712c3e4f7d54fb4a9e50b15450c3f15aceeeb9404fae6a8f3ea6df4"
+      },
+      "stderr": {
+        "path": "compiler-sha256.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/g++",
+        "-std=c++17",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wshadow",
+        "-Wformat=2",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-surround-normalizer-20261101-01/sources/yoRadio/src/audioI2S",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-surround-normalizer-20261101-01/sources/idf/components/native_audio_normalizer",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-surround-normalizer-20261101-01/sources/tests/native/cyd_surround_normalizer.cpp",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-surround-normalizer-20261101-01/sources/yoRadio/src/audioI2S/AudioNormalizer.cpp",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-surround-normalizer-20261101-01/sources/idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-surround-normalizer-20261101-01/surround-normalizer"
+      ],
+      "state": "complete",
+      "pid": 27372,
+      "exit_status": 0,
+      "elapsed_seconds": 10.328,
+      "stdout": {
+        "path": "build.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "test",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-surround-normalizer-20261101-01/surround-normalizer"
+      ],
+      "state": "complete",
+      "pid": 34756,
+      "exit_status": 0,
+      "elapsed_seconds": 0.438,
+      "stdout": {
+        "path": "test.stdout.log",
+        "bytes": 115,
+        "sha256": "bbb3cbc35e90dc417fbe690e1223ab9fccc0f1d83921a1f4118d84a6e0fe9696"
+      },
+      "stderr": {
+        "path": "test.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "compiler_version": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "compiler_identity": "1353e9bdd29a7295c7226bf6c63abccce056d8cac31f112e5cdbecc3f28c2769  /usr/bin/x86_64-linux-gnu-g++-13",
+  "binary": {
+    "bytes": 286176,
+    "sha256": "8b718fe5ca6378d13461aa4c49faae903d262031d4cfd59fc9518a6f20f1b616",
+    "local_only": true
+  },
+  "all_source_bindings_current": true,
+  "results": {
+    "passed": true,
+    "mode": "all_channels",
+    "streams": 128,
+    "samples": 2359296,
+    "differences": 0,
+    "legacy_multichannel_gaps": 0
+  }
+}

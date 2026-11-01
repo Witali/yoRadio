@@ -19,6 +19,10 @@ void native_audio_normalizer_reset(void);
 void native_audio_normalizer_process(int16_t samples[2]);
 void native_audio_normalizer_process_block(int16_t *samples, size_t frames,
                                            uint8_t channels);
+// Output-owner only. One through eight aligned host-endian PCM16 channels
+// share one detector/envelope update per frame; invalid geometry is a no-op.
+void native_audio_normalizer_process_multichannel_block(int16_t *samples,
+    size_t frames, uint8_t channels);
 
 #ifdef __cplusplus
 }

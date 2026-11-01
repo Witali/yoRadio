@@ -29,3 +29,8 @@ extern "C" void native_audio_normalizer_process_block(
     int16_t *samples, size_t frames, uint8_t channels) {
     normalizer.processBlock(samples, frames, channels);
 }
+
+extern "C" void native_audio_normalizer_process_multichannel_block(
+    int16_t *samples, size_t frames, uint8_t channels) {
+    normalizer.processMultichannelBlock(samples, frames, channels);
+}
