@@ -8,14 +8,15 @@ import struct
 import subprocess
 import sys
 import time
+import zipfile
 ROOT=Path(__file__).resolve().parents[1]
 REPO=ROOT.parent.parent if ROOT.parent.name=='.worktree' else ROOT
 VENDOR=REPO/'.idf/esp-adf-libs/esp_audio_codec'
 PUBLIC='idf/components/native_vorbis_xiph/upstream/libogg'
 CONFIG='idf/components/native_vorbis_xiph/platform'
 SOURCES=['idf/esp32-cyd2usb-native/main/'+n for n in ('opus_family1_playback.h','opus_family1_decoder.h')]
-SOURCES+=['idf/components/native_stream/include/'+n for n in ('ogg_opus_audio_packets.h','ogg_page_input.h','ogg_opus_timeline.h','opus_pcm_trim.h','opus_family1_mapping.h','opus_multistream_framing.h')]
-SOURCES+=['tests/native/opus_family1_playback_host.c','tests/native/opus_family1_public.h','tests/fixtures/opus_header_gain/generate.py','tests/run-opus-family1-playback.py',PUBLIC+'/include/ogg/ogg.h',PUBLIC+'/include/ogg/os_types.h',PUBLIC+'/COPYING',CONFIG+'/ogg/config_types.h']
+SOURCES+=['idf/components/native_stream/include/'+n for n in ('ogg_opus_audio_packets.h','ogg_page_input.h','ogg_opus_timeline.h','opus_pcm_trim.h','opus_family1_mapping.h','opus_multistream_framing.h','opus_tags_stream.h')]
+SOURCES+=['tests/native/opus_family1_playback_host.c','tests/native/opus_family1_playback_size.c','tests/native/opus_family1_public.h','tests/fixtures/opus_header_gain/generate.py','tests/run-opus-family1-playback.py',PUBLIC+'/include/ogg/ogg.h',PUBLIC+'/include/ogg/os_types.h',PUBLIC+'/COPYING',CONFIG+'/ogg/config_types.h']
 LONG=ROOT/'tests/fixtures/opus_ogg_long_packets/stereo-510-120ms.ogg'
 LONG_SHA='b6237ae8df98d3fabbea252eec82b291a46dfdb537cb5b9f537bf5e00bcd7679'
 def need(value,why):
@@ -51,6 +52,12 @@ def main():
         for name in SOURCES:freeze(ROOT/name,Path('sources')/name)
         for name in ('include/decoder/impl/esp_opus_dec.h','include/decoder/esp_audio_dec_reg.h','include/decoder/esp_audio_dec.h','include/esp_audio_types.h'):
             freeze(VENDOR/name,Path('sources/vendor')/name)
+        checkpoint=ROOT/'tests/results/cyd-opus-family1-playback-20261101';old=json.loads((checkpoint/'manifest.json').read_bytes());archive=checkpoint/old['archive']['path']
+        need(pin(archive)=={k:old['archive'][k] for k in ('bytes','sha256')},'immutable prior adapter checkpoint archive');old_sha=old['canonical_source_sha256']['idf/esp32-cyd2usb-native/main/opus_family1_playback.h']
+        with zipfile.ZipFile(archive) as z:before=z.read('blobs/'+old_sha)
+        need(hashlib.sha256(before).hexdigest()==old_sha,'prior public adapter source identity, layout-only compilation')
+        before_header=out/'layout-before/opus_family1_playback.h';before_header.parent.mkdir();before_header.write_bytes(before)
+        report['layout_reference']=dict(snapshot='layout-before/opus_family1_playback.h',**pin(before_header),checkpoint_manifest_sha256=sha(checkpoint/'manifest.json'),checkpoint_archive_sha256=sha(archive))
         paths=[]
         for c in (3,6,8):
             name='channels'+str(c)+'.packets';path=reference/name;expected=evidence['channels'+str(c)]['files'][name]
@@ -75,15 +82,29 @@ def main():
             '-I'+host(out/'sources/vendor/include/decoder/impl'),'-I'+host(out/'sources'/PUBLIC/'include'),'-I'+host(out/'sources'/CONFIG),
             host(out/'sources/tests/native/opus_family1_playback_host.c'),'-l:libopus.so.0','-l:libogg.so.0','-lm','-o',host(binary)])
         report['executable']=dict(path=binary.name,local_only=True,**pin(binary));report['compiler_dependencies']=dict(path='playback.d',**pin(out/'playback.d'));save()
+        includes=['-I'+host(out/'sources/idf/esp32-cyd2usb-native/main'),'-I'+host(out/'sources/idf/components/native_stream/include'),'-I'+host(out/'sources/vendor/include'),
+            '-I'+host(out/'sources/vendor/include/decoder'),'-I'+host(out/'sources/vendor/include/decoder/impl')]
+        report['layout_executables']=[];report['host_layout']={}
+        for label in ('before','after'):
+            executable=out/('layout-'+label+'-owner');prefix=['-I'+host(out/'layout-before')] if label=='before' else []
+            command('layout-'+label+'-build',['/usr/bin/gcc','-std=c11','-O2','-Wall','-Wextra','-Werror','-Wpedantic',*prefix,*includes,host(out/'sources/tests/native/opus_family1_playback_size.c'),'-o',host(executable)])
+            report['layout_executables'].append(dict(path=executable.name,local_only=True,**pin(executable)));report['host_layout'][label]=json.loads(command('layout-'+label+'-run',[host(executable)]))
+        before_size=report['host_layout']['before'];after_size=report['host_layout']['after']
+        need(before_size['adapter_bytes']-after_size['adapter_bytes']==1992 and before_size['static_zero_bytes']==0 and after_size['static_zero_bytes']==2048,'measured HOST owner shrink2048B minus56B streamed Tags state')
+        nm=command('nm-path',['readlink','-f','/usr/bin/nm']).decode().strip();report['nm_identity']=command('nm-sha',['sha256sum',nm]).decode().strip()
+        symbol=next(line for line in command('static-zero-symbol',[nm,'-S','--defined-only',host(binary)]).decode().splitlines() if line.endswith(' ofp_zero_chunk'))
+        need(int(symbol.split()[1],16)==2048 and symbol.split()[2]=='r','actual read-only static zero symbol');report['static_zero_symbol']=symbol
         result=json.loads(command('test',['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1',host(binary),*[host(p) for p in paths]]))
-        need(result['passed'] and result['positive_schedules']==33 and result['host_contract_controls']==25 and result['eos_close_retry']==1 and
+        need(result['passed'] and result['positive_schedules']==34 and result['host_contract_controls']==27 and result['eos_close_retry']==1 and
             result['maximum_unique_plane_bytes']==92160 and result['maximum_output_chunk_bytes']==2048 and result['whole_original_120ms_packets']==92 and
             result['gain_metadata_only'] and result['scripted_host_statuses'] and result['native_esp_oom_qualified'] is False,'complete real synthesis/held-page/close/refusal inventory')
         report['measurements']=result
         for name,library,identity in libraries:need(command(name+'-post-sha',['sha256sum',library]).decode().strip()==identity,'unchanged creator library')
         need(command('compiler-post-sha',['sha256sum',compiler]).decode().strip()==report['compiler_identity'],'unchanged compiler')
+        need(command('nm-post-sha',['sha256sum',nm]).decode().strip()==report['nm_identity'],'unchanged symbol reader')
         for row in report['sources']:need(pin(row['path'])==pin(out/row['snapshot'])==dict(bytes=row['bytes'],sha256=row['sha256']),'all original/frozen inputs current')
-        report.update(passed=True,completed=True,all_source_bindings_current=True);print(json.dumps(dict(passed=True,capture=out.relative_to(ROOT).as_posix(),measurements=result)));return 0
+        need(pin(before_header)=={k:report['layout_reference'][k] for k in ('bytes','sha256')},'unchanged layout-only historical source')
+        report.update(passed=True,completed=True,all_source_bindings_current=True);print(json.dumps(dict(passed=True,capture=out.relative_to(ROOT).as_posix(),measurements=result,host_layout=report['host_layout'])));return 0
     except Exception as error:
         report['failure']=dict(type=type(error).__name__,reason=str(error));print(json.dumps(dict(passed=False,failure=report['failure'])));return 1
     finally:save()

@@ -23,15 +23,19 @@
  * After successful abandon the caller must separately reset its page owner;
  * abandon does NOT fake an ACK or claim an incomplete link drained.
  *
- * Comment validation, container resynchronization/multiplexing and legal live
- * joins are the existing timeline's separate gates, not expanded by this file.
- * The 61440B cap applies only after TAGS. Peak allocations remain resource
+ * Tags length/count and declared UTF-8 are streamed without comment allocation;
+ * arbitrary binary tail is permitted. Tag names/R128 gains are not interpreted.
+ * Container resynchronization/multiplexing and legal live joins remain separate
+ * timeline gates. The 61440B cap applies only after TAGS. Peak allocations remain resource
  * gates: verified page + optional packet prefix + real public handles + scratch
- * <=23040B + <=92160B unique mapped-channel planes; output gathers <=2048B.
+ * <=23040B + <=92160B unique mapped-channel planes. Output gathers <=2048B in
+ * the already-owned raw scratch AFTER every needed stream's PCM was staged.
+ * All-silent maps use immutable zero storage, not a per-owner stack/heap chunk.
  */
 #include "ogg_opus_audio_packets.h"
 #include "opus_family1_decoder.h"
 #include "opus_pcm_trim.h"
+#include "opus_tags_stream.h"
 #ifndef OFP_REALLOC
 #define OFP_REALLOC realloc
 #endif
@@ -40,6 +44,7 @@
 #endif
 
 enum { OFP_CHUNK_FRAMES=128, OFP_RATE=48000 };
+static const uint8_t ofp_zero_chunk[OFP_CHUNK_FRAMES*8*2]={0};
 typedef enum {
     OFP_OK=0,OFP_ARGUMENT,OFP_MOVED,OFP_BUSY,OFP_CANCELLED,OFP_CONTAINER,
     OFP_HEADER,OFP_PACKET,OFP_PACKET_POLICY,OFP_MEMORY,OFP_DECODER,OFP_TRIM,
@@ -64,6 +69,7 @@ typedef struct opus_family1_playback {
     opus_family1_decoder decoder;
     ogg_opus_audio_packets packets;
     opus_pcm_trim trim;
+    opus_tags_stream tags;
     opus_family1_plan plan;
     uint8_t head[29],head_bytes;
     uint8_t plane_for_speaker[8],plane_slot[8],plane_channel[8],plane_count;
@@ -74,7 +80,6 @@ typedef struct opus_family1_playback {
     uint64_t close_page_token;
     ofp_phase phase;
     bool blocked,stage_active;
-    uint8_t chunk[OFP_CHUNK_FRAMES*8*2];
 } opus_family1_playback;
 
 static inline ofp_result ofp_code(ofp_status code) {
@@ -103,7 +108,7 @@ static inline ofp_result ofp_abandon(opus_family1_playback *s) {
         s->blocked=true;
         ofp_result r=ofp_code(OFP_CLEANUP);r.decoder=closed;r.cleanup_pending=closed.cleanup_pending;return r;
     }
-    opk_reset(&s->packets);opt_reset(&s->trim);OFP_FREE(s->planes);s->planes=NULL;s->capacity=0;
+    opk_reset(&s->packets);opt_reset(&s->trim);ots_reset(&s->tags);OFP_FREE(s->planes);s->planes=NULL;s->capacity=0;
     s->source=NULL;s->head_bytes=0;s->plane_count=0;s->samples=0;s->generation=s->serial=0;
     s->close_page_token=0;s->blocked=s->stage_active=false;s->phase=OFP_EMPTY;
     memset(s->produced,0,sizeof(s->produced));return ofp_code(OFP_OK);
@@ -167,10 +172,20 @@ static inline bool ofp_sink_finish(void *opaque) {
     while(remaining) {
         if(ofp_sink_cancelled(c))return false;
         size_t frames=remaining>OFP_CHUNK_FRAMES?OFP_CHUNK_FRAMES:remaining,written=0;
-        if(of1_gather_s16(views,s->plan.channels,first,frames,s->chunk,sizeof(s->chunk),&written)!=OF1_OK) {
-            c->error=OFP_DECODER;c->detail=OFD_CONTRACT;return false;
+        const uint8_t *chunk=ofp_zero_chunk;
+        if(s->plan.needed) {
+            /* Public decode has returned and all referenced samples now live
+             * in independent planes. No next decode/close occurs until this
+             * synchronous output callback returns, so scratch is reusable.
+             */
+            if(!s->decoder.scratch || of1_gather_s16(views,s->plan.channels,first,frames,s->decoder.scratch,s->decoder.capacity,&written)!=OF1_OK) {
+                c->error=OFP_DECODER;c->detail=OFD_CONTRACT;return false;
+            }
+            chunk=s->decoder.scratch;
+        } else {
+            written=frames*frame_bytes;
         }
-        if(!c->cb->output48_s16le(c->cb->context,s->generation,&s->plan,s->chunk,written)) {
+        if(!c->cb->output48_s16le(c->cb->context,s->generation,&s->plan,chunk,written)) {
             c->error=c->cb->cancelled(c->cb->context)?OFP_CANCELLED:OFP_OUTPUT;return false;
         }
         first+=frames;remaining-=frames;
@@ -197,7 +212,7 @@ static inline ofp_result ofp_close_eos(opus_family1_playback *s,ogg_page_input *
     if(audio && !opk_finish_link(&s->packets))return ofp_block(s,OFP_PACKET,OPK_INVALID);
     /* Empty links end on TAGS, before an AUDIO page lease exists. */
     if(!audio)opk_reset(&s->packets);
-    opt_reset(&s->trim);OFP_FREE(s->planes);s->planes=NULL;s->capacity=0;s->head_bytes=s->plane_count=0;
+    opt_reset(&s->trim);ots_reset(&s->tags);OFP_FREE(s->planes);s->planes=NULL;s->capacity=0;s->head_bytes=s->plane_count=0;
     s->phase=OFP_EMPTY;s->source=NULL;s->close_page_token=0;return ofp_code(OFP_OK);
 }
 
@@ -241,11 +256,14 @@ static inline ofp_result ofp_page(opus_family1_playback *s,ogg_page_input *input
         }
         opus_pcm_trim_status trimmed=opt_begin(&s->trim,s->generation,plan.pre_skip,plan.channels);
         if(trimmed!=OPT_OK)return ofp_block(s,OFP_TRIM,trimmed);
+        if(!ots_begin(&s->tags,input))return ofp_block(s,OFP_HEADER,OTS_ARGUMENT);
         s->phase=OFP_TAGS;return ofp_ack_headers(s,input);
     }
     if(input->event.flags&OOPT_HEAD)return ofp_block(s,OFP_CONTAINER,OPI_INVALID);
     if(s->phase==OFP_TAGS) {
-        if(!(input->event.flags&OOPT_TAGS))return ofp_ack_headers(s,input);
+        opus_tags_status tags=ots_page(&s->tags,input);
+        if(tags<0)return ofp_block(s,OFP_HEADER,tags);
+        if(tags==OTS_MORE)return ofp_ack_headers(s,input);
         if(!opk_start_link(&s->packets,input))return ofp_block(s,OFP_PACKET,OPK_INVALID);
         if(!eos) {
             ofd_result opened=ofd_open(&s->decoder,s->head,s->head_bytes,s->generation,api);

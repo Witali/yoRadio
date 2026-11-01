@@ -159,6 +159,8 @@ static bool output(void *opaque,uint32_t generation,const opus_family1_plan *pla
     output_context *c=opaque;const reference *r=c->reference;++c->calls;
     assert(generation==42 && plan->channels==r->channels && plan->pre_skip==r->pre_skip && plan->input_rate==44100 && plan->header_gain_q8==1536 &&
         bytes && bytes<=128u*r->channels*2u && bytes%(r->channels*2u)==0);
+    if(plan->needed)assert(pcm==owner->decoder.scratch && owner->decoder.capacity>=bytes && owner->decoder.active && stats.live);
+    else assert(pcm==ofp_zero_chunk && !owner->decoder.scratch && !stats.live);
     size_t frames=bytes/(r->channels*2u);assert(c->emitted<=r->logical_frames && frames<=r->logical_frames-c->emitted);
     assert(!memcmp(pcm,r->pcm+(r->pre_skip+c->emitted)*r->channels*2u,bytes));
     if(c->calls==c->cancel_output){c->cancelled=true;return false;}
@@ -205,6 +207,18 @@ static physical make(const corpus *source,unsigned style,unsigned serial,bool lo
     return p;
 }
 static void physical_free(physical *p){free(p->data);free(p->head);free(p->tags);}
+static void replace_tags(physical *p) {
+    size_t at=0,copied=0;unsigned page_number=0;
+    while(at<p->size && copied<p->tags_bytes) {
+        uint8_t *start=p->data+at;unsigned count=start[26];size_t header=27u+count,bytes=0;for(unsigned i=0;i<count;++i)bytes+=start[27+i];
+        if(page_number) {
+            assert(bytes<=p->tags_bytes-copied);if(bytes)memcpy(start+header,p->tags+copied,bytes);copied+=bytes;
+            ogg_page checked={.header=start,.header_len=(long)header,.body=start+header,.body_len=(long)bytes};ogg_page_checksum_set(&checked);
+        }
+        ++page_number;at+=header+bytes;
+    }
+    assert(copied==p->tags_bytes);
+}
 static void creator_walk(const physical *bytes,const corpus *source) {
     ogg_sync_state sync;ogg_stream_state stream;assert(!ogg_sync_init(&sync) && !ogg_stream_init(&stream,(int)bytes->serial));size_t at=0;unsigned pages=0,packets=0;
     while(at<bytes->size) {
@@ -324,6 +338,26 @@ static void malformed_unused(const corpus *source) {
     assert(result.code==OFP_DECODER && result.decoder.code==OFD_FRAMING && !result.decoder.public_error_known && input.ready && !stats.decodes && !out.published && !stats.live);
     clean(&s,&input);physical_free(&bytes);free(packets[0]);free(packets);++controls;
 }
+static void tag_boundary(const corpus *source,const reference *ref,unsigned failure_mode) {
+    physical bytes=make(source,1,103,true,false);
+    const uint8_t scalar[4]={0xf0,0x90,0x80,0x80};memcpy(bytes.tags+65024,scalar,4);
+    if(failure_mode==1)bytes.tags[65026]=0xff;
+    if(failure_mode==2)put32(bytes.tags+8,UINT32_MAX);
+    replace_tags(&bytes);creator_walk(&bytes,source);ogg_page_input input={0};opi_reset(&input,42);opus_family1_playback s={0};reset_backend(&s);
+    output_context out={.reference=ref};ofp_callbacks cb=callbacks(&out);reader r={.chunk=257};bool refused=false;
+    while(ready(&input,&bytes,&r)) {
+        opus_tags_stream before=s.tags;ofp_result result=ofp_page(&s,&input,&cb,NULL);
+        if(result.code!=OFP_OK) {
+            assert(failure_mode && result.code==OFP_HEADER && result.detail==(failure_mode==1?OTS_UTF8:OTS_INVALID) && input.ready &&
+                !stats.opens && !out.published && !memcmp(&s.tags,&before,sizeof(before)) && s.tags.parser.bytes==65025 && s.blocked);
+            refused=true;break;
+        }
+        assert(!input.ready);++acknowledged;
+    }
+    if(failure_mode){assert(refused);++controls;}
+    else {assert(!refused && out.emitted==ref->logical_frames && opi_finish(&input)==OPI_FINISHED && !ofp_has_input(&s));++positives;}
+    clean(&s,&input);physical_free(&bytes);
+}
 static void chain(const corpus *sources,const reference *refs) {
     ogg_page_input input={0};opi_reset(&input,42);opus_family1_playback s={0};reset_backend(&s);
     for(unsigned link=0;link<3;++link) {
@@ -347,6 +381,7 @@ int main(int argc,char **argv) {
     failure(source+2,ref+2,FAIL_PACKET,1);failure(source+2,ref+2,FAIL_OUTPUT,1);failure(source+2,ref+2,FAIL_OUTPUT,3);failure(source+2,ref+2,CANCEL_YIELD,1);
     failure(source+2,ref+2,CANCEL_OUTPUT,3);failure(source+2,ref+2,CANCEL_OPEN,1);failure(source+2,ref+2,CANCEL_HEAD,1);
     close_retry(source+2,ref+2);abandon_retry(source+2,ref+2);moved(source+2,ref+2);malformed_unused(source+2);
+    for(unsigned mode=0;mode<3;++mode)tag_boundary(source+2,ref+2,mode);
     for(unsigned i=0;i<4;++i){free(ref[i].pcm);corpus_free(source+i);}free(growth_ref.pcm);corpus_free(&growth);
     assert(!stats.live && !plane_alloc.pointer && !scratch_alloc.pointer && !packet_alloc.pointer);
     printf("{\"suite\":\"opus-family1-playback\",\"passed\":true,\"positive_schedules\":%u,\"host_contract_controls\":%u,\"creator_libogg_walks\":%u,\"actual_page_acks\":%u,\"creator_pcm_samples_exact\":%" PRIu64
