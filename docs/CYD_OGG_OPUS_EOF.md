@@ -30,9 +30,18 @@ and 18 contradictory transcript controls bind the production implementation.
 The chain reaches a minimum of 52024 free heap bytes in this diagnostic. Full
 network/TLS/TFT margins, linked production exports and physical output are still
 required; a 65307-byte encoded page is additional storage. Nonzero OpusHead
-output gain is also an open playback gap: a separate complete paired observation
+output gain is also an open playback gap: a [complete paired observation](../tests/results/cyd-opus-header-gain-20261101/README.md)
 found identical stock PCM for zero/+6/-6 dB headers. Application gain remains to
 implement and qualify. This checkpoint does not claim universal conformance.
+
+That gain experiment preserves all 551 original audio packets and every byte
+outside the OpusHead gain/CRC fields. Six fresh public decoder handles
+(zero/+6/-6 dB, whole/257-byte input) produce identical nonzero raw PCM, including
+energy and peak. Independent public libopus float decoding followed by explicit
+normative gain gives three distinct unclipped signals. This establishes ignored
+gain for this fixture, without deriving behavior from missing public fields.
+The correction must apply header gain in addition to player volume/normalization,
+preserve unity output and qualify signed-range rounding/clipping and link resets.
 
 ## Measured direct-vendor regression
 

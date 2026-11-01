@@ -1,0 +1,2873 @@
+{
+  "schema": 1,
+  "observation_passed": true,
+  "header_gain_support": false,
+  "production_gain_added": false,
+  "private_abi_used": false,
+  "full_numeric_conformance_claim": false,
+  "canonical_source_sha256": {
+    "tests/fixtures/opus_header_gain/generate.py": "e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+    "tests/fixtures/opus_header_gain/README.md": "82aeb300143fb08efc1b63284997ed8288c8cfa521fc8429026eb0e2bc59daca",
+    "tests/test-opus-header-gain.py": "c29930bc23bac55bbeae1c5433ed619d5c83919838de67494e387bad0ed678be",
+    "tests/run-cyd-opus-header-gain-qemu.py": "4e93e7d3380a1ea6e3a31926b36227c0aa02273f175450fef749e48020d43961",
+    "tests/run-opus-header-gain-reference.py": "f27f0c1251f66b29dcd90218f046ae0778b0d30b19ebc273aca70b32706cd296",
+    "tests/native/opus_header_gain_reference.c": "71bf2a75d3051510d1cec4ab70c17bf6f4f218579c0e3d31214f8367b865d20b",
+    "tests/target/cyd_opus_header_gain_qemu/CMakeLists.txt": "0042994abaeddc970cd9b767ea62adf97da4139c895458791155553513954666",
+    "tests/target/cyd_opus_header_gain_qemu/partitions.csv": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b",
+    "tests/target/cyd_opus_header_gain_qemu/README.md": "c9303796c2d38889a567394b4a992b2190c2e2404726b04372371db43e23cb12",
+    "tests/target/cyd_opus_header_gain_qemu/sdk-build.ps1": "eaa743cc781a44d4013a2b8c6c9a5718fd314ec29a568da9ef44f09630ef8658",
+    "tests/target/cyd_opus_header_gain_qemu/sdkconfig.common.defaults": "038db22b349c3b047226f6ca5a742574b93ca66f11e3fe9d5975c32aea45d07d",
+    "tests/target/cyd_opus_header_gain_qemu/main/CMakeLists.txt": "f32a47c41838147db7ebd739c935c78e20438d981980e8b8f336bd390b36e806",
+    "tests/target/cyd_opus_header_gain_qemu/main/main.c": "ff63d3965c092d04853df66ea6e77e89aa2ed96a252dc89a16fb8e80cd2c0653"
+  },
+  "archive": {
+    "path": "captures.zip",
+    "sha256": "2c019cb3663bd01c939250830993200cd24184162971e6f4330adc203a99689f",
+    "bytes": 1261940
+  },
+  "logical_files": 99,
+  "physical_blobs": 61,
+  "files": [
+    {
+      "path": "data01/generation01/manifest.json",
+      "sha256": "c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "bytes": 1808,
+      "blob": "blobs/c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "role": "original-fixture-generation"
+    },
+    {
+      "path": "data01/generation02/manifest.json",
+      "sha256": "c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "bytes": 1808,
+      "blob": "blobs/c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "role": "original-fixture-generation"
+    },
+    {
+      "path": "data01/report.json",
+      "sha256": "f958f992bfd46bde9cfb412adc0a66579d6ff33ce6cc5989d0bc0dc983569282",
+      "bytes": 2409,
+      "blob": "blobs/f958f992bfd46bde9cfb412adc0a66579d6ff33ce6cc5989d0bc0dc983569282",
+      "role": "original-evidence"
+    },
+    {
+      "path": "data01/sources/tests/fixtures/esp32c3_calibration/opus-510.ogg",
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "blob": "blobs/53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "role": "frozen-source"
+    },
+    {
+      "path": "data01/sources/tests/fixtures/opus_header_gain/generate.py",
+      "sha256": "e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "bytes": 7190,
+      "blob": "blobs/e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "role": "frozen-source"
+    },
+    {
+      "path": "data01/sources/tests/test-opus-header-gain.py",
+      "sha256": "3a026db31e687fefab737d3adc8faaad6631d80fd8df005f9a90a2b6f9d2f3bc",
+      "bytes": 4592,
+      "blob": "blobs/3a026db31e687fefab737d3adc8faaad6631d80fd8df005f9a90a2b6f9d2f3bc",
+      "role": "frozen-source"
+    },
+    {
+      "path": "data02/generation01/manifest.json",
+      "sha256": "c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "bytes": 1808,
+      "blob": "blobs/c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "role": "original-fixture-generation"
+    },
+    {
+      "path": "data02/generation02/manifest.json",
+      "sha256": "c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "bytes": 1808,
+      "blob": "blobs/c51ac356b633a6fd8d202760a77c82595c64d60b3e61b89365b03433d9bd1417",
+      "role": "original-fixture-generation"
+    },
+    {
+      "path": "data02/report.json",
+      "sha256": "f66139d4b3123e9e38097be369348d1543d545fa6cb89750bf680926753f4f11",
+      "bytes": 2496,
+      "blob": "blobs/f66139d4b3123e9e38097be369348d1543d545fa6cb89750bf680926753f4f11",
+      "role": "original-evidence"
+    },
+    {
+      "path": "data02/sources/tests/fixtures/esp32c3_calibration/opus-510.ogg",
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "blob": "blobs/53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "role": "frozen-source"
+    },
+    {
+      "path": "data02/sources/tests/fixtures/opus_header_gain/generate.py",
+      "sha256": "e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "bytes": 7190,
+      "blob": "blobs/e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "role": "frozen-source"
+    },
+    {
+      "path": "data02/sources/tests/test-opus-header-gain.py",
+      "sha256": "c29930bc23bac55bbeae1c5433ed619d5c83919838de67494e387bad0ed678be",
+      "bytes": 5235,
+      "blob": "blobs/c29930bc23bac55bbeae1c5433ed619d5c83919838de67494e387bad0ed678be",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/actual-compiler-closure.json",
+      "sha256": "271ba4b27f32100f320d9af114769f2411ef496a3c30bc36fbfac151262033e9",
+      "bytes": 159058,
+      "blob": "blobs/271ba4b27f32100f320d9af114769f2411ef496a3c30bc36fbfac151262033e9",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build.stderr.log",
+      "sha256": "c8161dfc2ebe2307b6d700c3460d2763306ae5559423ba54152819b7041faee5",
+      "bytes": 372,
+      "blob": "blobs/c8161dfc2ebe2307b6d700c3460d2763306ae5559423ba54152819b7041faee5",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/build.stdout.log",
+      "sha256": "d6252d6c6fee5ea91495ce49b908e5be7409a365b6edf8a92b096a3c6dfadc79",
+      "bytes": 105,
+      "blob": "blobs/d6252d6c6fee5ea91495ce49b908e5be7409a365b6edf8a92b096a3c6dfadc79",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/build/CMakeCache.txt",
+      "sha256": "bddf4ec11e3a44d129c10f79a71de1b1dbaa13dab6612de7a0af1b000a7a6e7b",
+      "bytes": 31458,
+      "blob": "blobs/bddf4ec11e3a44d129c10f79a71de1b1dbaa13dab6612de7a0af1b000a7a6e7b",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/build.ninja",
+      "sha256": "ee5e430b19529e41028a2d9249ce4cd46670cbaa942697f4e2c8ae49e347eaef",
+      "bytes": 3428991,
+      "blob": "blobs/ee5e430b19529e41028a2d9249ce4cd46670cbaa942697f4e2c8ae49e347eaef",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/compile_commands.json",
+      "sha256": "d20e6c2e6fcdce5de4830a5af69301afbb67bbe0208242fc788764c89779448e",
+      "bytes": 2776833,
+      "blob": "blobs/d20e6c2e6fcdce5de4830a5af69301afbb67bbe0208242fc788764c89779448e",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/config/sdkconfig.h",
+      "sha256": "301fb1876a94fb1aeb32da0c54b278ba3b984c017d0ced3eba0d47b98b12c9a2",
+      "bytes": 28132,
+      "blob": "blobs/301fb1876a94fb1aeb32da0c54b278ba3b984c017d0ced3eba0d47b98b12c9a2",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/config/sdkconfig.json",
+      "sha256": "af62dc76b7833ef341373d07ff718292bd9b680f2aaad5d8165c4a0ac4ece6a4",
+      "bytes": 31234,
+      "blob": "blobs/af62dc76b7833ef341373d07ff718292bd9b680f2aaad5d8165c4a0ac4ece6a4",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/cyd_opus_header_gain_qemu.map",
+      "sha256": "f96147cd13fcd26521a0e51c6bb0102644137b56383bdcef7510c5b87ea955fb",
+      "bytes": 4321454,
+      "blob": "blobs/f96147cd13fcd26521a0e51c6bb0102644137b56383bdcef7510c5b87ea955fb",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/esp-idf/main/CMakeFiles/__idf_main.dir/decoder_registration.c.su",
+      "sha256": "d8623ab12589a2f190953c8120e3062ab50b2b17e9c015ab04e09e1f426c3a14",
+      "bytes": 326,
+      "blob": "blobs/d8623ab12589a2f190953c8120e3062ab50b2b17e9c015ab04e09e1f426c3a14",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/esp-idf/main/CMakeFiles/__idf_main.dir/main.c.su",
+      "sha256": "63fb294c67d1917797e2ea8321e8add458465b13b7e984fc96e29c43a1d47888",
+      "bytes": 527,
+      "blob": "blobs/63fb294c67d1917797e2ea8321e8add458465b13b7e984fc96e29c43a1d47888",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/flasher_args.json",
+      "sha256": "57c5b867a97645468f8bf356d3da59b98c0d4429c388496f3f3616baa0988eec",
+      "bytes": 969,
+      "blob": "blobs/57c5b867a97645468f8bf356d3da59b98c0d4429c388496f3f3616baa0988eec",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/build/project_description.json",
+      "sha256": "04ae4b8d90f78fc3ad7dc68c218bbb2ba00d9cbe7d7f5717a3255228bffcec90",
+      "bytes": 142635,
+      "blob": "blobs/04ae4b8d90f78fc3ad7dc68c218bbb2ba00d9cbe7d7f5717a3255228bffcec90",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/compiler-deps-0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-0.stdout.log",
+      "sha256": "580499c75fa38d31aa400f0594541af69b7d9a53588b19ccbbdd13a17dc4826b",
+      "bytes": 6444,
+      "blob": "blobs/580499c75fa38d31aa400f0594541af69b7d9a53588b19ccbbdd13a17dc4826b",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-1.stdout.log",
+      "sha256": "fb3146833c22dfc6d6ca2afe2b0ace15e77263578129a3f5ccaa772b6d3e8f6d",
+      "bytes": 5348,
+      "blob": "blobs/fb3146833c22dfc6d6ca2afe2b0ace15e77263578129a3f5ccaa772b6d3e8f6d",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-2.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-2.stdout.log",
+      "sha256": "e9b86a789a9df5c64b4f978641e8bd4986357ea9dc57e5e8401b4d1c263df56e",
+      "bytes": 8398,
+      "blob": "blobs/e9b86a789a9df5c64b4f978641e8bd4986357ea9dc57e5e8401b4d1c263df56e",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-3.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-3.stdout.log",
+      "sha256": "35b6ba740f9328ef9fda0b867a43fd0488235957fb7a86e664cbba3c2ba7de84",
+      "bytes": 16765,
+      "blob": "blobs/35b6ba740f9328ef9fda0b867a43fd0488235957fb7a86e664cbba3c2ba7de84",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-4.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-deps-4.stdout.log",
+      "sha256": "542fc8ce1309170f002984950b1f7fa7a266de2442b38fd4d1a7f05742aaa6a6",
+      "bytes": 8481,
+      "blob": "blobs/542fc8ce1309170f002984950b1f7fa7a266de2442b38fd4d1a7f05742aaa6a6",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-version.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/compiler-version.stdout.log",
+      "sha256": "2bc27a9674734ab4e4a07514743a150bc75331b49299574b9218e21a51e62c0e",
+      "bytes": 272,
+      "blob": "blobs/2bc27a9674734ab4e4a07514743a150bc75331b49299574b9218e21a51e62c0e",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/merge.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/merge.stdout.log",
+      "sha256": "e670bdc9adc57a2031d270754101fbdc45f9047536422f49da0f1d8295620212",
+      "bytes": 306,
+      "blob": "blobs/e670bdc9adc57a2031d270754101fbdc45f9047536422f49da0f1d8295620212",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/project/CMakeLists.txt",
+      "sha256": "0042994abaeddc970cd9b767ea62adf97da4139c895458791155553513954666",
+      "bytes": 210,
+      "blob": "blobs/0042994abaeddc970cd9b767ea62adf97da4139c895458791155553513954666",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/README.md",
+      "sha256": "c9303796c2d38889a567394b4a992b2190c2e2404726b04372371db43e23cb12",
+      "bytes": 1241,
+      "blob": "blobs/c9303796c2d38889a567394b4a992b2190c2e2404726b04372371db43e23cb12",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/main/CMakeLists.txt",
+      "sha256": "f32a47c41838147db7ebd739c935c78e20438d981980e8b8f336bd390b36e806",
+      "bytes": 435,
+      "blob": "blobs/f32a47c41838147db7ebd739c935c78e20438d981980e8b8f336bd390b36e806",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/main/decoder_pending_input.h",
+      "sha256": "b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "bytes": 3668,
+      "blob": "blobs/b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/main/decoder_registration.c",
+      "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+      "bytes": 1240,
+      "blob": "blobs/64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/main/decoder_registration.h",
+      "sha256": "54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+      "bytes": 360,
+      "blob": "blobs/54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/main/main.c",
+      "sha256": "ff63d3965c092d04853df66ea6e77e89aa2ed96a252dc89a16fb8e80cd2c0653",
+      "bytes": 8023,
+      "blob": "blobs/ff63d3965c092d04853df66ea6e77e89aa2ed96a252dc89a16fb8e80cd2c0653",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/partitions.csv",
+      "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b",
+      "bytes": 96,
+      "blob": "blobs/d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/sdk-build.ps1",
+      "sha256": "eaa743cc781a44d4013a2b8c6c9a5718fd314ec29a568da9ef44f09630ef8658",
+      "bytes": 3366,
+      "blob": "blobs/eaa743cc781a44d4013a2b8c6c9a5718fd314ec29a568da9ef44f09630ef8658",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/project/sdkconfig.common.defaults",
+      "sha256": "038db22b349c3b047226f6ca5a742574b93ca66f11e3fe9d5975c32aea45d07d",
+      "bytes": 1219,
+      "blob": "blobs/038db22b349c3b047226f6ca5a742574b93ca66f11e3fe9d5975c32aea45d07d",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/qemu.stderr.log",
+      "sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "bytes": 25,
+      "blob": "blobs/9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/qemu.stdout.log",
+      "sha256": "581b89e97f62bdb8efdbef87eb347906ce4eb178a94890624a25e7f3507c4278",
+      "bytes": 5497,
+      "blob": "blobs/581b89e97f62bdb8efdbef87eb347906ce4eb178a94890624a25e7f3507c4278",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/report.json",
+      "sha256": "f6a7e622d053862f60a7aa518d8b13ce5e7fc84029603a320622829d097f28a7",
+      "bytes": 90919,
+      "blob": "blobs/f6a7e622d053862f60a7aa518d8b13ce5e7fc84029603a320622829d097f28a7",
+      "role": "original-evidence"
+    },
+    {
+      "path": "native01/sdk-build.stderr.log",
+      "sha256": "ce6831613a0eb3e093403a17368d5c3594aa74f697eadb9a3048e47be9a6dcbe",
+      "bytes": 478,
+      "blob": "blobs/ce6831613a0eb3e093403a17368d5c3594aa74f697eadb9a3048e47be9a6dcbe",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/sdk-build.stdout.log",
+      "sha256": "b2f0b470eeff8aeb6f3c0b8d8da45ae12a465f979f86a2dec680549c6d1a43d9",
+      "bytes": 84896,
+      "blob": "blobs/b2f0b470eeff8aeb6f3c0b8d8da45ae12a465f979f86a2dec680549c6d1a43d9",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/sdk-child.json",
+      "sha256": "4b52c7eecf0d27c5068d5ac7d7e79cc832aa72a6ac39e3e2546c5f90a3da4519",
+      "bytes": 955,
+      "blob": "blobs/4b52c7eecf0d27c5068d5ac7d7e79cc832aa72a6ac39e3e2546c5f90a3da4519",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/sdk-clean.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/sdk-clean.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/sdk-head.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/sdk-head.stdout.log",
+      "sha256": "1d19bc0de0b888051c0efbda64366dcd9719579be4d57a8e376bfd5cfedac38c",
+      "bytes": 41,
+      "blob": "blobs/1d19bc0de0b888051c0efbda64366dcd9719579be4d57a8e376bfd5cfedac38c",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/sdkconfig",
+      "sha256": "b3d3b399e55a16733734ec272bef0d4af315e9d1e87b953160ada40b2e4d62e8",
+      "bytes": 50337,
+      "blob": "blobs/b3d3b399e55a16733734ec272bef0d4af315e9d1e87b953160ada40b2e4d62e8",
+      "role": "actual-build-artifact"
+    },
+    {
+      "path": "native01/sources/compiler-dependencies/522310a94c3c7196/sdkconfig.h",
+      "sha256": "301fb1876a94fb1aeb32da0c54b278ba3b984c017d0ced3eba0d47b98b12c9a2",
+      "bytes": 28132,
+      "blob": "blobs/301fb1876a94fb1aeb32da0c54b278ba3b984c017d0ced3eba0d47b98b12c9a2",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/sources/controller.py",
+      "sha256": "4e93e7d3380a1ea6e3a31926b36227c0aa02273f175450fef749e48020d43961",
+      "bytes": 23328,
+      "blob": "blobs/4e93e7d3380a1ea6e3a31926b36227c0aa02273f175450fef749e48020d43961",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/sources/fixture-generator.py",
+      "sha256": "e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "bytes": 7190,
+      "blob": "blobs/e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/sources/fixtures/opus-510.ogg",
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "blob": "blobs/53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "role": "frozen-source"
+    },
+    {
+      "path": "native01/symbols.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/symbols.stdout.log",
+      "sha256": "00d31cda3f72454f261521147a6dfbfa544a16119ebac37db5643fbc8196e5bc",
+      "bytes": 87744,
+      "blob": "blobs/00d31cda3f72454f261521147a6dfbfa544a16119ebac37db5643fbc8196e5bc",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/vendor-clean.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/vendor-clean.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/vendor-head.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "native01/vendor-head.stdout.log",
+      "sha256": "e7a50e8a0c5dcce9db40fe380576928746051cd4d196e28aa8a96aaf355297f8",
+      "bytes": 41,
+      "blob": "blobs/e7a50e8a0c5dcce9db40fe380576928746051cd4d196e28aa8a96aaf355297f8",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-post-sha256.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-post-sha256.stdout.log",
+      "sha256": "753014b5ade9aa80a0f7d61cdec1afc98a2372e1a40ed4b2658a2d0501e6c7f2",
+      "bytes": 99,
+      "blob": "blobs/753014b5ade9aa80a0f7d61cdec1afc98a2372e1a40ed4b2658a2d0501e6c7f2",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-realpath.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-realpath.stdout.log",
+      "sha256": "a35fa4bf46e652fcb2323e848f8a71e92d00493e3021c894683a5162ca4fbda8",
+      "bytes": 33,
+      "blob": "blobs/a35fa4bf46e652fcb2323e848f8a71e92d00493e3021c894683a5162ca4fbda8",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-sha256.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-sha256.stdout.log",
+      "sha256": "753014b5ade9aa80a0f7d61cdec1afc98a2372e1a40ed4b2658a2d0501e6c7f2",
+      "bytes": 99,
+      "blob": "blobs/753014b5ade9aa80a0f7d61cdec1afc98a2372e1a40ed4b2658a2d0501e6c7f2",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-version.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/compiler-version.stdout.log",
+      "sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+      "bytes": 246,
+      "blob": "blobs/8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-path.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-path.stdout.log",
+      "sha256": "1547f28687059094a883eefed42117ca5a67ed21f06968e19fa0fe212ecfea41",
+      "bytes": 72,
+      "blob": "blobs/1547f28687059094a883eefed42117ca5a67ed21f06968e19fa0fe212ecfea41",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-post-sha256.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-post-sha256.stdout.log",
+      "sha256": "109911d57c12051e82faa2647b46bafa36131e051abfeffee29f474ecd962fc8",
+      "bytes": 109,
+      "blob": "blobs/109911d57c12051e82faa2647b46bafa36131e051abfeffee29f474ecd962fc8",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-realpath.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-realpath.stdout.log",
+      "sha256": "0a7e12984ccc0da008a102ebf07c2ebb98fb89010bcf0fa897e0b72c396983f9",
+      "bytes": 43,
+      "blob": "blobs/0a7e12984ccc0da008a102ebf07c2ebb98fb89010bcf0fa897e0b72c396983f9",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-sha256.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/libopus-sha256.stdout.log",
+      "sha256": "109911d57c12051e82faa2647b46bafa36131e051abfeffee29f474ecd962fc8",
+      "bytes": 109,
+      "blob": "blobs/109911d57c12051e82faa2647b46bafa36131e051abfeffee29f474ecd962fc8",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/minus6-reference.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/minus6-reference.stdout.log",
+      "sha256": "8cd4664551e029e82c7b7c85cbdb32ad1eedfc1da2f7c2a3684c6418e147765d",
+      "bytes": 405,
+      "blob": "blobs/8cd4664551e029e82c7b7c85cbdb32ad1eedfc1da2f7c2a3684c6418e147765d",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/plus6-reference.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/plus6-reference.stdout.log",
+      "sha256": "52733271287f67f9bb5a5dce710099d47f2c5212a4de93134c739c3d39852152",
+      "bytes": 405,
+      "blob": "blobs/52733271287f67f9bb5a5dce710099d47f2c5212a4de93134c739c3d39852152",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/reference-build.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/reference-build.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/report.json",
+      "sha256": "1f8762536d0d0ba0d0e22c8396adff412a4bd013d8dfd8ea7ef25cb562647619",
+      "bytes": 16115,
+      "blob": "blobs/1f8762536d0d0ba0d0e22c8396adff412a4bd013d8dfd8ea7ef25cb562647619",
+      "role": "original-evidence"
+    },
+    {
+      "path": "reference01/sources/tests/fixtures/esp32c3_calibration/opus-510.ogg",
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "blob": "blobs/53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "role": "frozen-source"
+    },
+    {
+      "path": "reference01/sources/tests/fixtures/opus_header_gain/generate.py",
+      "sha256": "e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "bytes": 7190,
+      "blob": "blobs/e829248b557318fa5025fa512f0fd3c6db9020ffceac70d15e295ce9ca372a3b",
+      "role": "frozen-source"
+    },
+    {
+      "path": "reference01/sources/tests/native/opus_header_gain_reference.c",
+      "sha256": "71bf2a75d3051510d1cec4ab70c17bf6f4f218579c0e3d31214f8367b865d20b",
+      "bytes": 3914,
+      "blob": "blobs/71bf2a75d3051510d1cec4ab70c17bf6f4f218579c0e3d31214f8367b865d20b",
+      "role": "frozen-source"
+    },
+    {
+      "path": "reference01/sources/tests/run-opus-header-gain-reference.py",
+      "sha256": "f27f0c1251f66b29dcd90218f046ae0778b0d30b19ebc273aca70b32706cd296",
+      "bytes": 7610,
+      "blob": "blobs/f27f0c1251f66b29dcd90218f046ae0778b0d30b19ebc273aca70b32706cd296",
+      "role": "frozen-source"
+    },
+    {
+      "path": "reference01/zero-reference.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "unchanged-original-log"
+    },
+    {
+      "path": "reference01/zero-reference.stdout.log",
+      "sha256": "85615e333d49310b2dcae497e619ca154ed29a35925e6f9e498d109597903d44",
+      "bytes": 385,
+      "blob": "blobs/85615e333d49310b2dcae497e619ca154ed29a35925e6f9e498d109597903d44",
+      "role": "unchanged-original-log"
+    }
+  ],
+  "omitted_local_files": {
+    "native01/sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec.h": {
+      "sha256": "8713fb9801824c9e041db2a7f6624a397f12be92477a5100005928427e0eb941",
+      "bytes": 9237,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec_default.h": {
+      "sha256": "16440cffb02f12aef9ca2eb527d762a603cb9fdc8ee49607317853793d5ca689",
+      "bytes": 2412,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec_default.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec_reg.h": {
+      "sha256": "b883d6edf6f08d6114426b17d4a2678b16824b65feb2849cf266431a04717756",
+      "bytes": 3682,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec_reg.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_aac_dec.h": {
+      "sha256": "cc8cf26a5c500ec26e45485b6eb8009189ec1013abed354a7c1a3715b2992994",
+      "bytes": 5828,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_aac_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_adpcm_dec.h": {
+      "sha256": "007c81a6ba029abc5af88187cd38c98ce56e9132d247040c8a26f15dc086b002",
+      "bytes": 5420,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_adpcm_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_alac_dec.h": {
+      "sha256": "b701bf0a88490a678e3626a5e706fb2cc703c47dda96c42c1ae27ac4a7ee5fc8",
+      "bytes": 5289,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_alac_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_amrnb_dec.h": {
+      "sha256": "356be049b0e0bb1918ff3ba31770895ecaf7547b07588b4097b8ee929bdc48e3",
+      "bytes": 4820,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_amrnb_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_amrwb_dec.h": {
+      "sha256": "370477f748324f47f7c4b1a18c16d9c20b21c3b9d86302b268306d51e761a194",
+      "bytes": 4765,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_amrwb_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_flac_dec.h": {
+      "sha256": "abe7831ed896380d9abceee0cf37c54c155dadbde9e0c0ca38de88a2b92fb84a",
+      "bytes": 4714,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_flac_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_g711_dec.h": {
+      "sha256": "426138d1e8442bc00bbfe46dcb862a9e6b13077fd0711d743a0bf6714710d1bc",
+      "bytes": 6338,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_g711_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_g722_dec.h": {
+      "sha256": "37fd6dee878cd44f7d18a39ef8426bb32c5018a3692b809355c97e9b4633b168",
+      "bytes": 4842,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_g722_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_lc3_dec.h": {
+      "sha256": "1206cba31df6a7904f37cb2a8960a8cd99a73f9243dffa7310f8062e563d04a4",
+      "bytes": 7538,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_lc3_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_mp3_dec.h": {
+      "sha256": "8f8f78fcf09e31cd3b07d8f7d7e51b5357f27addca27bd0e26bc724029658b17",
+      "bytes": 4771,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_mp3_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_opus_dec.h": {
+      "sha256": "356d78a3ec9628c39c215d8cb94b0b362df10fe9cf44679ec0c568916814d00a",
+      "bytes": 7183,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_opus_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_pcm_dec.h": {
+      "sha256": "574c7333ec93cf79e5d327f4fdb0950a67dfd7895e9c29739806ba18628f4a7e",
+      "bytes": 4280,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_pcm_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_sbc_dec.h": {
+      "sha256": "34c7f2577db3595618e7ca4d63c634dcf572f2958383bf7e9b9e1d106b63be94",
+      "bytes": 7069,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_sbc_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_vorbis_dec.h": {
+      "sha256": "288aada7336181f878240a6df6c891f88a8e20ced3de38e50bb80b1c29bee8a4",
+      "bytes": 5690,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/decoder/impl/esp_vorbis_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc.h": {
+      "sha256": "a149c1a8e6dd84b8f2b0a7c49ad6ff6952a9867005a0d1664850bb489b76a095",
+      "bytes": 9552,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc_default.h": {
+      "sha256": "06eb3b0ae9478703b7934630fcd3465c2c035025a73cdb8c636e380ca003453d",
+      "bytes": 2292,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc_default.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc_reg.h": {
+      "sha256": "7b3f352efb83e66e733ad268ff6c26cd348281c9fa370f928158147355a9f066",
+      "bytes": 4459,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc_reg.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_aac_enc.h": {
+      "sha256": "2af2e7ebc71d23d3117714eb73bb289eeb3767920c1dbf88bf44fecf88159105",
+      "bytes": 8968,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_aac_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_adpcm_enc.h": {
+      "sha256": "057adaaa847045e080cb299bd9b5e72ec8007703e9d23a02801a944816de0bdd",
+      "bytes": 6354,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_adpcm_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_alac_enc.h": {
+      "sha256": "9b91bccf8afdd1e525652bbb37f919edb2fe19faed08bf4e1e88ac4d4408a798",
+      "bytes": 6702,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_alac_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_amrnb_enc.h": {
+      "sha256": "980f798d6e2f2c6bdcc09a63cddc419435ed10e44ea04538aa44b5d7d0d76c6c",
+      "bytes": 8332,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_amrnb_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_amrwb_enc.h": {
+      "sha256": "6be915f750c1d4a3bf55527e38e7e1f5c8b6654f0a5287b6ed6eb6d7e7169f95",
+      "bytes": 8339,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_amrwb_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_g711_enc.h": {
+      "sha256": "0062aa61b3d4ef73a0c7e34f5c86e5d000fedd5d19152e07278372df7a4d7626",
+      "bytes": 7766,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_g711_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_g722_enc.h": {
+      "sha256": "aefc0d04bdc4f76dcf84c810bc595780b384e16a571da6bcffde1640a1e24be3",
+      "bytes": 8151,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_g722_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_lc3_enc.h": {
+      "sha256": "c60a366751a4a564ce761a629db66db0ec0b0d4a764378fe6f75861dfb44749d",
+      "bytes": 8777,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_lc3_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_opus_enc.h": {
+      "sha256": "ea9a53135c01ece2ab9f11426f8f31685cb8b50da0a4bf7a862ea1fcdc3c153f",
+      "bytes": 13188,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_opus_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_pcm_enc.h": {
+      "sha256": "ba8b7393f86aba32c291a565c7ccd61d8bf1502ce2a13c31a7a4ca9b5a6f714c",
+      "bytes": 6703,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_pcm_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_sbc_enc.h": {
+      "sha256": "11f81293affb4d225c9cb1e12fc99c503a74e5b0c1ff1e73a320f386ee1d6eba",
+      "bytes": 11016,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/encoder/impl/esp_sbc_enc.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/esp_audio_codec_version.h": {
+      "sha256": "85a13584cacea472cb1fe16b73a892c7250071584c210503bffae7ccceb1d6cb",
+      "bytes": 2512,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/esp_audio_codec_version.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/esp_audio_types.h": {
+      "sha256": "da5c32ca78b8f9e50b8ca2b72ec0fec5dc66ff7c4e70ba7eb5d1ffc134ab6dd3",
+      "bytes": 4936,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/esp_audio_types.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/esp_sbc_def.h": {
+      "sha256": "6958477ec7d55b511725f8aea60b45547e2b47212b8d6e990f0f3e66a69e4fd1",
+      "bytes": 2600,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/esp_sbc_def.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec.h": {
+      "sha256": "94b5f996b8276f9b4fb291d4878d73201b5fd6aacc8e67c2ff87cdfde2e39750",
+      "bytes": 13931,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec_default.h": {
+      "sha256": "ecc35de5b4b63c46139136fa605e4e6257e2cd4cd203677a0e9302d33018194f",
+      "bytes": 2369,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec_default.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec_reg.h": {
+      "sha256": "de08e5c318810652de0c66c463bd99fed84369705a4ad8533ff42ffce02aaef1",
+      "bytes": 3241,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec_reg.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/esp_es_parse_types.h": {
+      "sha256": "27cc20b9ccd4f08936e09ef82974137a254e5d50e63c7728f21a103edf40489c",
+      "bytes": 9990,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/esp_es_parse_types.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_m4a_dec.h": {
+      "sha256": "59b9595b68ad31ab7b0c542229be3852c77d9199888a31abc7e9d2c2bb3cd19e",
+      "bytes": 5248,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_m4a_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_m4a_parse.h": {
+      "sha256": "57b00a9046a4b3fb43022d622bcf530d4a19fbfd5428537ff824f5573392b085",
+      "bytes": 2605,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_m4a_parse.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ogg_dec.h": {
+      "sha256": "2278956ebddd3ad03c08fdcc682dc8ae08c185f57bdd45ad2a0ebe7fde7b551c",
+      "bytes": 4187,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ogg_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ogg_parse.h": {
+      "sha256": "1b49166ad991de46f1ecbed08047ffaf5554d0b0c7d3baedf730ab1bca26ad80",
+      "bytes": 2848,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ogg_parse.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ts_dec.h": {
+      "sha256": "72842c8a6b84e152c24ff0961b91109a2abac780b05ba2f4f6ad8f42f2a6dd91",
+      "bytes": 5085,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ts_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ts_parse.h": {
+      "sha256": "cfc1b6064c1820943b3e7db8144d16a25ba82764177a36d8071a0c619beeb177",
+      "bytes": 2298,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ts_parse.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_wav_dec.h": {
+      "sha256": "7683056a2b66224e213f146a9cd7195e8f07d49fe5abadef0d746f68c85895f0",
+      "bytes": 3817,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_wav_dec.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_wav_parse.h": {
+      "sha256": "6368179b23b1f610493c9c88321d074bce99b53dfa7d765844b40f857210d7a1",
+      "bytes": 2363,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_wav_parse.h"
+    },
+    "native01/sources/vendor/esp_audio_codec/src/audio_decoder_reg.c": {
+      "sha256": "01e9cb3f14ebe20cc9e78d844c046e77166ddc44df18fa0d7f0a6fd712488c0f",
+      "bytes": 4331,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/src/audio_decoder_reg.c"
+    },
+    "native01/sources/vendor/esp_audio_codec/src/audio_encoder_reg.c": {
+      "sha256": "675feeed1c81b716058530a168be6ccdf9174ce2431bec2a529431b80b5ac063",
+      "bytes": 3538,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/src/audio_encoder_reg.c"
+    },
+    "native01/sources/vendor/esp_audio_codec/src/simple_decoder_reg.c": {
+      "sha256": "387c826bf080fcb06d87804951cea52156e962a0efa08ba6361136e8704b7064",
+      "bytes": 1467,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/src/simple_decoder_reg.c"
+    },
+    "native01/sources/vendor/esp_audio_codec/lib/esp32/libesp_audio_codec.a": {
+      "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+      "bytes": 4384572,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/lib/esp32/libesp_audio_codec.a"
+    },
+    "native01/sources/vendor/esp_audio_codec/lib/esp32/libesp_audio_simple_dec.a": {
+      "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+      "bytes": 156872,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/lib/esp32/libesp_audio_simple_dec.a"
+    },
+    "native01/sources/vendor/esp_audio_codec/CHANGELOG.md": {
+      "sha256": "ca38839a2cd137aa50bb4fda22f12a5dfdae6841bc7468ac05948a03f16626a7",
+      "bytes": 7284,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/CHANGELOG.md"
+    },
+    "native01/sources/vendor/esp_audio_codec/CMakeLists.txt": {
+      "sha256": "30d3a30ef49e029447afcf1aea28bc02a45414e1c1b64cf4da6b5f0d63e11029",
+      "bytes": 2067,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/CMakeLists.txt"
+    },
+    "native01/sources/vendor/esp_audio_codec/idf_component.yml": {
+      "sha256": "804fd34627f294c7461b63d7b1dcc7261638e136b1c9f24f3ddd7124f3d45c43",
+      "bytes": 556,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/idf_component.yml"
+    },
+    "native01/sources/vendor/esp_audio_codec/Kconfig": {
+      "sha256": "dbc13dca8ebe94c4025a8fbf186b493d039f3f182a23113cadad9ce8b4d844bc",
+      "bytes": 6128,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/Kconfig"
+    },
+    "native01/sources/vendor/esp_audio_codec/LICENSE": {
+      "sha256": "ef11bc50a8cdcad79a756363e82b6c1a62d0409ad183a7e46e17aa089734b199",
+      "bytes": 1185,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/LICENSE"
+    },
+    "native01/sources/vendor/esp_audio_codec/README.md": {
+      "sha256": "48b5938d59ab0752c385acd2a1367571ab5228c3325823ae71216bbf44da3d01",
+      "bytes": 16508,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/README.md"
+    },
+    "native01/sources/vendor/esp_audio_codec/README_CN.md": {
+      "sha256": "cabe7343f45269da12945c7ec195ab0d294d4e85ddba1ecbaad035896171d061",
+      "bytes": 15423,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/vendor/esp_audio_codec/README_CN.md"
+    },
+    "native01/sources/compiler-dependencies/0e810b957b260b0e/stdbool.h": {
+      "sha256": "85c7055c3c43090548b29d09a38cfd967ed1b4f23be98a7b52bde66b2122e653",
+      "bytes": 1490,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0e810b957b260b0e/stdbool.h"
+    },
+    "native01/sources/compiler-dependencies/110bcd3befa2171e/stdint.h": {
+      "sha256": "c6484b28eeacf1b6377a24f627042e36578670938192c3ad379d5d5602670d6f",
+      "bytes": 12540,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/110bcd3befa2171e/stdint.h"
+    },
+    "native01/sources/compiler-dependencies/d8d03ac05a067a4a/cdefs.h": {
+      "sha256": "ca55927fa7ae083a8c1f1b1bb8d094ec7c0bded221a240aa5362216959f7dc36",
+      "bytes": 499,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/d8d03ac05a067a4a/cdefs.h"
+    },
+    "native01/sources/compiler-dependencies/a118342523852615/cdefs.h": {
+      "sha256": "c9bf4fd409ed28a7b0f61a00193b62164c1a11dddbbfad1370ca2c60bb57d27d",
+      "bytes": 19742,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a118342523852615/cdefs.h"
+    },
+    "native01/sources/compiler-dependencies/3e188f3671b202d6/config.h": {
+      "sha256": "d6f6fe6178508f8808699666940fc4ce2d64509060e64cec13592b6d43c90272",
+      "bytes": 8587,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/3e188f3671b202d6/config.h"
+    },
+    "native01/sources/compiler-dependencies/247c413834015a21/ieeefp.h": {
+      "sha256": "55d171ce1583efdf5507d60ff5cee92d57b69c8952078f7e04abcceae7f83edb",
+      "bytes": 14385,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/247c413834015a21/ieeefp.h"
+    },
+    "native01/sources/compiler-dependencies/0308a092563c6aee/features.h": {
+      "sha256": "e5ba04175c424e1dd74f781066394b10b04ad3a0a92191e5510d0c1489bb9c2a",
+      "bytes": 14207,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0308a092563c6aee/features.h"
+    },
+    "native01/sources/compiler-dependencies/0ba4d5168dd0992b/picolibc.h": {
+      "sha256": "f45c4fb79a45518c8b4cee5b7019931891fdec510d21cd4393d28482eb884449",
+      "bytes": 3602,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0ba4d5168dd0992b/picolibc.h"
+    },
+    "native01/sources/compiler-dependencies/075f0eedcf9d1dfd/float.h": {
+      "sha256": "3d7029b424eea68b4c2603cdf095c94f3b8a188f134aac25328271dd9b75facf",
+      "bytes": 21430,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/075f0eedcf9d1dfd/float.h"
+    },
+    "native01/sources/compiler-dependencies/88f76aea2e2bc586/_default_types.h": {
+      "sha256": "27f8a718fc89397117254832c4ac2ab2dabd8e0dc7847b76460b0c0cdb2fa04f",
+      "bytes": 8756,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/88f76aea2e2bc586/_default_types.h"
+    },
+    "native01/sources/compiler-dependencies/74948eb61c8a7af8/stddef.h": {
+      "sha256": "472a84e536689fc48e861b2415b229742e133d09bbf1c8fd8e0fe89ab5712f04",
+      "bytes": 14134,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/74948eb61c8a7af8/stddef.h"
+    },
+    "native01/sources/compiler-dependencies/9025bf1a9799d34d/_intsup.h": {
+      "sha256": "acca8771a05e2effaaf7019cd1c1fefe2426f8255f0b5a1eec59f05c7c9321a4",
+      "bytes": 5805,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9025bf1a9799d34d/_intsup.h"
+    },
+    "native01/sources/compiler-dependencies/8d127562c727b5cd/_stdint.h": {
+      "sha256": "06480c0354947c53153841fcfc7f93f79d5459d9d8072eec7ae663ea9def60af",
+      "bytes": 1781,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/8d127562c727b5cd/_stdint.h"
+    },
+    "native01/sources/compiler-dependencies/d3e24c131a1ed58e/stdlib.h": {
+      "sha256": "e86d335cbf4495010f926a082297b5aebd745983a7487cb2d1abd99ce1f80b17",
+      "bytes": 14024,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/d3e24c131a1ed58e/stdlib.h"
+    },
+    "native01/sources/compiler-dependencies/75d0f02544843fd8/stdlib.h": {
+      "sha256": "ca6afd3778d215889f9bf4e18e4ed5670f9481cd47e6025d44ab78c8b660f098",
+      "bytes": 200,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/75d0f02544843fd8/stdlib.h"
+    },
+    "native01/sources/compiler-dependencies/7092b5b9c427fe91/alloca.h": {
+      "sha256": "82c2183e2aca74ec5feee3655f4aeadc2c470d23256a915805a57dc9c80af8b8",
+      "bytes": 406,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/7092b5b9c427fe91/alloca.h"
+    },
+    "native01/sources/compiler-dependencies/35bed762e99ebb39/_locale.h": {
+      "sha256": "9c33916e9c0deb89f68a9babf700502cf2cf6c6fb4b7d7b0fadd93c7fc6c8a29",
+      "bytes": 232,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/35bed762e99ebb39/_locale.h"
+    },
+    "native01/sources/compiler-dependencies/0d1be6b2be619620/_wait.h": {
+      "sha256": "34ea7550f9f53458dcfda21a87ed97a88735ab3b06a1a442b12322b6519bf8f4",
+      "bytes": 2222,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0d1be6b2be619620/_wait.h"
+    },
+    "native01/sources/compiler-dependencies/6c57909da5685c5b/stdio.h": {
+      "sha256": "90d3a5e0472fa01b898824c6ac0c9e0a8f2dfcfcb1cc956bdb0b7686fd5a188d",
+      "bytes": 1997,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/6c57909da5685c5b/stdio.h"
+    },
+    "native01/sources/compiler-dependencies/a5d537b687b20ccb/stdio.h": {
+      "sha256": "fa5fd2c984f49147daa57ac03066d469b45e2021294fa676e9abe0646f13be7f",
+      "bytes": 18272,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a5d537b687b20ccb/stdio.h"
+    },
+    "native01/sources/compiler-dependencies/78339ed32d1bb89b/stdarg.h": {
+      "sha256": "3014f1490722369be2ab7e10a3bd88a53435083fea5fc30fb8b6f87520684bb7",
+      "bytes": 4310,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/78339ed32d1bb89b/stdarg.h"
+    },
+    "native01/sources/compiler-dependencies/a52c48ae4e2d37db/lock.h": {
+      "sha256": "698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0",
+      "bytes": 1927,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a52c48ae4e2d37db/lock.h"
+    },
+    "native01/sources/compiler-dependencies/01f7f71cc4b4094e/lock.h": {
+      "sha256": "2f7ff3de05941dd0c910a16d8a565efaa30b3c44b783c9c942066e436c022815",
+      "bytes": 2052,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/01f7f71cc4b4094e/lock.h"
+    },
+    "native01/sources/compiler-dependencies/a65f1ee56b58fe80/_types.h": {
+      "sha256": "947d8a55d20d7f0eb56091cb94b2e9caba55305b6a03cd2eb26faf35c1be6ff1",
+      "bytes": 7005,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a65f1ee56b58fe80/_types.h"
+    },
+    "native01/sources/compiler-dependencies/8b39a5f69a557684/_types.h": {
+      "sha256": "31f3742d445b0e7607c8ca270d4c84c1a4897c39ad2a3b04adc00a8364fbad8d",
+      "bytes": 170,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/8b39a5f69a557684/_types.h"
+    },
+    "native01/sources/compiler-dependencies/a17f82b7f30a1841/assert.h": {
+      "sha256": "da9d3e078ae9faf35a89e957f32fcf9af9b26bd9338b7b0e37cc2acc64967b3e",
+      "bytes": 1540,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a17f82b7f30a1841/assert.h"
+    },
+    "native01/sources/compiler-dependencies/197f5a6796031af4/assert.h": {
+      "sha256": "b77dea645f2c12a0ab75d9bbd32182ef3873f4559e2e29e9c1ca638206633e97",
+      "bytes": 3025,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/197f5a6796031af4/assert.h"
+    },
+    "native01/sources/compiler-dependencies/9351343b816aa6f7/inttypes.h": {
+      "sha256": "2d3ca459ac0680e350841a779cfda484118de328484e7c1074149b900804e2a2",
+      "bytes": 9293,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9351343b816aa6f7/inttypes.h"
+    },
+    "native01/sources/compiler-dependencies/50c4660d21a02225/string.h": {
+      "sha256": "2e198a6dda9c77f15b7f8143185c1f2f8e39a84fe2779653397a6cb75196f0b2",
+      "bytes": 8340,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/50c4660d21a02225/string.h"
+    },
+    "native01/sources/compiler-dependencies/2547e3eed6b62f8c/strings.h": {
+      "sha256": "36b5cab31f6ed0b6951458c6b3eb32f4d907362b4346c79289eef19d38b9d022",
+      "bytes": 2971,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/2547e3eed6b62f8c/strings.h"
+    },
+    "native01/sources/compiler-dependencies/5c9f6d4e9d08d2b5/string.h": {
+      "sha256": "c1891d16631f057d16b09dc3927bd3eb675fb7ca39fce4d4612db056685757d2",
+      "bytes": 178,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/5c9f6d4e9d08d2b5/string.h"
+    },
+    "native01/sources/compiler-dependencies/13a3921ffe284f68/FreeRTOS.h": {
+      "sha256": "48b40c0aac027b626659fb6bc2d3f6493a435fe0dd584a3ad8348181610c2cff",
+      "bytes": 54659,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/13a3921ffe284f68/FreeRTOS.h"
+    },
+    "native01/sources/compiler-dependencies/1589ebfc09ca4e40/FreeRTOSConfig.h": {
+      "sha256": "e6c70da4ffa8572cced9790d1e8f8b6ade4e4142258f04e1b30db25c4eb5f919",
+      "bytes": 13709,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/1589ebfc09ca4e40/FreeRTOSConfig.h"
+    },
+    "native01/sources/compiler-dependencies/377f60574cf370e7/FreeRTOSConfig_arch.h": {
+      "sha256": "0f3556ba5536330ec016753faf7c5169d35aa735489ed691f35a3dfbce543525",
+      "bytes": 5237,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/377f60574cf370e7/FreeRTOSConfig_arch.h"
+    },
+    "native01/sources/compiler-dependencies/1dad66b1835f80ff/xtensa_config.h": {
+      "sha256": "a7ce32bd193ba8a0e2ba51f928212dee6b5246baf084258169be0d0f1dde2e9f",
+      "bytes": 7999,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/1dad66b1835f80ff/xtensa_config.h"
+    },
+    "native01/sources/compiler-dependencies/749c3b39192d14f2/hal.h": {
+      "sha256": "75c8543a013bebff07cea0ec102a5e1ea6729d113b95f85d7d4264381067c5e0",
+      "bytes": 66426,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/749c3b39192d14f2/hal.h"
+    },
+    "native01/sources/compiler-dependencies/9d23d8b2ec2697bf/core.h": {
+      "sha256": "197e7e669f68aae13b3b794aa246b2d43e61d4fb97ada7f48dd0650bc38efc4a",
+      "bytes": 56540,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9d23d8b2ec2697bf/core.h"
+    },
+    "native01/sources/compiler-dependencies/00d5c4346ed30e27/xtensa-versions.h": {
+      "sha256": "42ff7a171bc375ab6ff6538a86fed72c166f4bffd794bf21e7439def96bbd42b",
+      "bytes": 22147,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/00d5c4346ed30e27/xtensa-versions.h"
+    },
+    "native01/sources/compiler-dependencies/85647cadab01be9d/core-isa.h": {
+      "sha256": "01be181f2af6561e9ac989acc16c8821dbb09429dc78aa41417b2027a43b9e0b",
+      "bytes": 31090,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/85647cadab01be9d/core-isa.h"
+    },
+    "native01/sources/compiler-dependencies/470575517caa5aa7/core-matmap.h": {
+      "sha256": "e708801e778133d3b549d41f2c5de56ef3511c26643b82fd9c3259532062d8e9",
+      "bytes": 16511,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/470575517caa5aa7/core-matmap.h"
+    },
+    "native01/sources/compiler-dependencies/8117e705db102fbe/tie.h": {
+      "sha256": "fa50cab1c49044dbc8c1eef3203b7c5da2d70880f938e96186ae0df2c0219b8d",
+      "bytes": 8780,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/8117e705db102fbe/tie.h"
+    },
+    "native01/sources/compiler-dependencies/1b86e90c9284ea02/system.h": {
+      "sha256": "4225c3395a713e64d9b304a2fd6fcda137db55041b7b9cccd9973e8ebd84b10e",
+      "bytes": 12892,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/1b86e90c9284ea02/system.h"
+    },
+    "native01/sources/compiler-dependencies/703125e4ed5ffdd7/xtensa_context.h": {
+      "sha256": "ee37e92f730bfd214ea860b0850c94552b6ce3667d8abf5c440174cb15081643",
+      "bytes": 17713,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/703125e4ed5ffdd7/xtensa_context.h"
+    },
+    "native01/sources/compiler-dependencies/61749459644c15dd/corebits.h": {
+      "sha256": "c2bf5a6551e07894a86cd4fd7f3ff620b253d1116cd30d2f06d986693baacfb7",
+      "bytes": 9182,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/61749459644c15dd/corebits.h"
+    },
+    "native01/sources/compiler-dependencies/f92f3d197fcab169/xtruntime-frames.h": {
+      "sha256": "fffd9018c2d3ec78ebd86810644a0975800691dd983af1d93c651747432368a4",
+      "bytes": 6891,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/f92f3d197fcab169/xtruntime-frames.h"
+    },
+    "native01/sources/compiler-dependencies/68f8f185155e99fc/reent.h": {
+      "sha256": "d0a15017e67afebce04591a1c9ff766cff5747ec6882cf52988994928f0e667f",
+      "bytes": 816,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/68f8f185155e99fc/reent.h"
+    },
+    "native01/sources/compiler-dependencies/b6ce99cd6eaa6702/projdefs.h": {
+      "sha256": "8fdc0f9cb69a99e780997f6adfd060f3ec9723b61779583463cbbdc026f5e0fe",
+      "bytes": 6964,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/b6ce99cd6eaa6702/projdefs.h"
+    },
+    "native01/sources/compiler-dependencies/9e94cfc651854de9/portable.h": {
+      "sha256": "e9e51b9d52474778593132c5410cb13b62dc66c51b33072b4424a46bdb83bd41",
+      "bytes": 10324,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9e94cfc651854de9/portable.h"
+    },
+    "native01/sources/compiler-dependencies/9d89c4f1f1fcfe57/deprecated_definitions.h": {
+      "sha256": "d9ae29adc8192871e111a6325db8cbef0a89c5f6915a29fbe7bafee601e4a70c",
+      "bytes": 7966,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9d89c4f1f1fcfe57/deprecated_definitions.h"
+    },
+    "native01/sources/compiler-dependencies/d4f376851930b3a2/portmacro.h": {
+      "sha256": "6400442b731b8cd9ec7ab8f2e95c279fdeac16abe632321d78fd25ca0a0f589c",
+      "bytes": 26212,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/d4f376851930b3a2/portmacro.h"
+    },
+    "native01/sources/compiler-dependencies/f1aecc29f625a33a/xtruntime.h": {
+      "sha256": "cbb10148f0035e57773e58095f84b191b07e35b8468d5399d0291ce60668a6a0",
+      "bytes": 9970,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/f1aecc29f625a33a/xtruntime.h"
+    },
+    "native01/sources/compiler-dependencies/4cdc532594b5c78f/xt_specreg.h": {
+      "sha256": "d02444311214d2813a5e91b611e4ac3bfa3aa74a3760f94f680e8555010886a1",
+      "bytes": 4014,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/4cdc532594b5c78f/xt_specreg.h"
+    },
+    "native01/sources/compiler-dependencies/4aa8593253e73a8d/xtruntime-core-state.h": {
+      "sha256": "4829265c2f40cb852c3a9ae736757e2f3670e35757c355af6aa784df9cc933f1",
+      "bytes": 8363,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/4aa8593253e73a8d/xtruntime-core-state.h"
+    },
+    "native01/sources/compiler-dependencies/5eccebcf71d21d7a/xt_instr_macros.h": {
+      "sha256": "fba11b7a78f78b7db9fe88089df7e89a7e61a1947e7323f5870755c14d65077f",
+      "bytes": 3600,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/5eccebcf71d21d7a/xt_instr_macros.h"
+    },
+    "native01/sources/compiler-dependencies/cccdc1d808e807c0/spinlock.h": {
+      "sha256": "137648da45e78bb98696578b7bf0d48bc3c897f2afabfec85cb174190b55cc44",
+      "bytes": 7363,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/cccdc1d808e807c0/spinlock.h"
+    },
+    "native01/sources/compiler-dependencies/69a35265a1320e88/esp_cpu.h": {
+      "sha256": "ae39d341b1da703ac811d07124106855a0bdd2dcdbeea537fe0b431aef643da3",
+      "bytes": 21250,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/69a35265a1320e88/esp_cpu.h"
+    },
+    "native01/sources/compiler-dependencies/124a781d1250036e/soc_caps.h": {
+      "sha256": "b526678c75c70d4551ad23b88d5e6e8fffbd998b48b746a55e321171a1763ca7",
+      "bytes": 19424,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/124a781d1250036e/soc_caps.h"
+    },
+    "native01/sources/compiler-dependencies/90684ce436d702c0/soc_caps_eval.h": {
+      "sha256": "c7c84ee66072712fd2648abe3f2dfdae99c13392e06acdd42cad61969e94dceb",
+      "bytes": 1390,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/90684ce436d702c0/soc_caps_eval.h"
+    },
+    "native01/sources/compiler-dependencies/58597dcea1f10be3/xtensa_api.h": {
+      "sha256": "183ed84074e19d6c6ca70c9e8047359e135529dd77951495251db4b2c578d8b0",
+      "bytes": 5599,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/58597dcea1f10be3/xtensa_api.h"
+    },
+    "native01/sources/compiler-dependencies/5fe5d190cfe25950/xt_utils.h": {
+      "sha256": "786521e05b8c2b2c88d8092e0f7a20040268a6daa5153416c1cc7dff3111babd",
+      "bytes": 7725,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/5fe5d190cfe25950/xt_utils.h"
+    },
+    "native01/sources/compiler-dependencies/ae7af13b5a8486f2/extreg.h": {
+      "sha256": "94d740ed3d5dee27d605e09f2688e4316eb77d38a08588e9e0a4329dcc131065",
+      "bytes": 721,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/ae7af13b5a8486f2/extreg.h"
+    },
+    "native01/sources/compiler-dependencies/0df2e46ed4ca6bb3/esp_bit_defs.h": {
+      "sha256": "57e8755b450fa6f2eafc3039d05a6e1005ae8b281bc7a675b6134901640d9366",
+      "bytes": 2603,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0df2e46ed4ca6bb3/esp_bit_defs.h"
+    },
+    "native01/sources/compiler-dependencies/d558fb761bbff329/esp_attr.h": {
+      "sha256": "0824daaf9ae85576060c55c150ab7dbbf71c7c25c944dba17780f55ea0becf7b",
+      "bytes": 10528,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/d558fb761bbff329/esp_attr.h"
+    },
+    "native01/sources/compiler-dependencies/6485d6754c14540d/esp_assert.h": {
+      "sha256": "26c87768a5f4f48c0814612b0eae95cc81925b397c55cb95e37905d4c433a80f",
+      "bytes": 1695,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/6485d6754c14540d/esp_assert.h"
+    },
+    "native01/sources/compiler-dependencies/29265b4fda1d4163/esp_intr_alloc.h": {
+      "sha256": "044c839b71b34bdc43f11c041718de798c04e208a700b88627e073d75d98742a",
+      "bytes": 20038,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/29265b4fda1d4163/esp_intr_alloc.h"
+    },
+    "native01/sources/compiler-dependencies/5890d5e740bf4966/esp_err.h": {
+      "sha256": "fb8741c6ede62e133e7c21df7b0a6e36017dfa51d57506d05a4533dae7826e8f",
+      "bytes": 6795,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/5890d5e740bf4966/esp_err.h"
+    },
+    "native01/sources/compiler-dependencies/5650454abaa9002d/esp_compiler.h": {
+      "sha256": "af3c27cf0b9e836043a3cc45c9a4494267ecb0d41e20d4b57ef49b548e19c057",
+      "bytes": 3027,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/5650454abaa9002d/esp_compiler.h"
+    },
+    "native01/sources/compiler-dependencies/d489615a24ca1914/esp_intr_types.h": {
+      "sha256": "a506525611511663aac000109befd1e6ddc0e92a795edbd2b57f7453906b37eb",
+      "bytes": 1038,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/d489615a24ca1914/esp_intr_types.h"
+    },
+    "native01/sources/compiler-dependencies/7ede5243b6ad4541/crosscore_int.h": {
+      "sha256": "461c47100a815be0271e61578e3c40b536dd6f6f8a27e6456e5e1ef68d94c89e",
+      "bytes": 2398,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/7ede5243b6ad4541/crosscore_int.h"
+    },
+    "native01/sources/compiler-dependencies/06cd273c155eed90/esp_macros.h": {
+      "sha256": "90740d56e457c8b599318caa60b17d845c458008244cd87b4a7cc1c7e4c39260",
+      "bytes": 3839,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/06cd273c155eed90/esp_macros.h"
+    },
+    "native01/sources/compiler-dependencies/70e587816eceb858/esp_memory_utils.h": {
+      "sha256": "bc13e442f27b69ddf01f5fcb9483a4e1bf2580353f8d9d118d212d5834c27c45",
+      "bytes": 11886,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/70e587816eceb858/esp_memory_utils.h"
+    },
+    "native01/sources/compiler-dependencies/e2ef2b7ea46838c4/soc.h": {
+      "sha256": "f31406d9ce67c09764a4f30311a24fc90a636d51e49cb2ca1193c9bfcf9301fd",
+      "bytes": 12670,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/e2ef2b7ea46838c4/soc.h"
+    },
+    "native01/sources/compiler-dependencies/ce5ccb232f87fc8f/interrupts.h": {
+      "sha256": "6805441a67900765f4b65d48a420366fcfa48e3a934264d80c093631a1350620",
+      "bytes": 6878,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/ce5ccb232f87fc8f/interrupts.h"
+    },
+    "native01/sources/compiler-dependencies/fa83b9f28610e6e5/reg_base.h": {
+      "sha256": "3b0c3f09ec427dad74b4b7c9d3474eee59f414ef9e6bda7d58d84aeaed7d13d5",
+      "bytes": 3419,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/fa83b9f28610e6e5/reg_base.h"
+    },
+    "native01/sources/compiler-dependencies/73beedb6029104d3/esp_newlib.h": {
+      "sha256": "c2cb5fdc3c9201bb83950b2875b31d819fc8d14880578c0a464d42156bef3e0c",
+      "bytes": 2200,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/73beedb6029104d3/esp_newlib.h"
+    },
+    "native01/sources/compiler-dependencies/dcf1de3ca1010b92/esp_heap_caps.h": {
+      "sha256": "2b7bf8037bd424b64aecd176d6aede0ba37ea1d27711e9bcb5ec262a202475b0",
+      "bytes": 22063,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/dcf1de3ca1010b92/esp_heap_caps.h"
+    },
+    "native01/sources/compiler-dependencies/dc39f9200e54c17e/multi_heap.h": {
+      "sha256": "f9a6751088d1742b039d5c8f2db1eecf82e74a20113f89a9ded3d9a09af22571",
+      "bytes": 10602,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/dc39f9200e54c17e/multi_heap.h"
+    },
+    "native01/sources/compiler-dependencies/0c0f6f0dad79140e/esp_rom_sys.h": {
+      "sha256": "d6dbf686c97d4c902b93628391dc275e408904b915c96623dc35746ba50d7762",
+      "bytes": 6392,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0c0f6f0dad79140e/esp_rom_sys.h"
+    },
+    "native01/sources/compiler-dependencies/20a49c55c181db20/reset_reasons.h": {
+      "sha256": "ec537800348e05fb6370348eb7054a395e247e3b6c9f1831ac408a68bf0a2c8b",
+      "bytes": 3331,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/20a49c55c181db20/reset_reasons.h"
+    },
+    "native01/sources/compiler-dependencies/a08d931f04ed3827/esp_system.h": {
+      "sha256": "6ef4c67298ecc8ce67f6818fb3bc6e4e97cf86273a7c458a769c8e69462dc9a5",
+      "bytes": 3956,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a08d931f04ed3827/esp_system.h"
+    },
+    "native01/sources/compiler-dependencies/6e8de0dfc1e46397/esp_idf_version.h": {
+      "sha256": "10eec73116b19e5fc959a56e07c7f394cefb8d59d3858108ab8c4d2b57bd253f",
+      "bytes": 1574,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/6e8de0dfc1e46397/esp_idf_version.h"
+    },
+    "native01/sources/compiler-dependencies/a2f678f507131142/portbenchmark.h": {
+      "sha256": "f030104f967a96d9432fecdc5fc9cbb2ad85b053ceeab9459b798dd300eba12f",
+      "bytes": 2070,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a2f678f507131142/portbenchmark.h"
+    },
+    "native01/sources/compiler-dependencies/132c020ff71f2652/limits.h": {
+      "sha256": "300fdce5c01169b6ce3ba182f74a9c068036a4e5fd29dae2eb481209c60116ba",
+      "bytes": 3918,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/132c020ff71f2652/limits.h"
+    },
+    "native01/sources/compiler-dependencies/34563869a3980032/syslimits.h": {
+      "sha256": "6fb8da6f30f9c6fca1da684518734608cde2b44791f68bdf5dca54ad8d760c06",
+      "bytes": 4679,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/34563869a3980032/syslimits.h"
+    },
+    "native01/sources/compiler-dependencies/a9671dc03cbd07e5/limits.h": {
+      "sha256": "c1db59d8d8a54dbc7e7dbc5ce2f25fd0451f8e01794e7964a15a3e6cc17566d3",
+      "bytes": 6507,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a9671dc03cbd07e5/limits.h"
+    },
+    "native01/sources/compiler-dependencies/9b0ee81cd5c0a1e8/mpu_wrappers.h": {
+      "sha256": "ba28ff804b2508b70869b7da3c7d3f00a562c2df2d82eed97761e6cd4e82ca2b",
+      "bytes": 11300,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9b0ee81cd5c0a1e8/mpu_wrappers.h"
+    },
+    "native01/sources/compiler-dependencies/f91e250031a2485f/idf_additions.h": {
+      "sha256": "07242a338ee967265f2c0a02bc67713d770a3e4abc4928cb55c698b20d85d94d",
+      "bytes": 27296,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/f91e250031a2485f/idf_additions.h"
+    },
+    "native01/sources/compiler-dependencies/c5e1ee29c39b94da/task.h": {
+      "sha256": "e5d2dd8cd12a077e42c2b3eb5e07d97ac9657591efb2af759dd99672c54436fa",
+      "bytes": 136095,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/c5e1ee29c39b94da/task.h"
+    },
+    "native01/sources/compiler-dependencies/74601b92f3eddc3c/list.h": {
+      "sha256": "5077e2f2d86f48489a012d785707efb3ea0278d5d0a6be198311869f8b878a87",
+      "bytes": 24498,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/74601b92f3eddc3c/list.h"
+    },
+    "native01/sources/compiler-dependencies/fe4c34eee0b5bb05/queue.h": {
+      "sha256": "81b0073fde402e1a35f97508cfd7fa03f4948e4bcf4bdee46befc155fe2be716",
+      "bytes": 64077,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/fe4c34eee0b5bb05/queue.h"
+    },
+    "native01/sources/compiler-dependencies/c298bfc2686a33e8/semphr.h": {
+      "sha256": "b7cdb4c58cba76a9ba0bdb1b1de7ec25b1ae067ed373992f43f5416a27295864",
+      "bytes": 48027,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/c298bfc2686a33e8/semphr.h"
+    },
+    "native01/sources/compiler-dependencies/f71bb79e8ff252bb/stream_buffer.h": {
+      "sha256": "ffa749fe4307feb2fe99a76f8763e392e97aec896e10f42969c86b1671ed19a8",
+      "bytes": 40167,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/f71bb79e8ff252bb/stream_buffer.h"
+    },
+    "native01/sources/compiler-dependencies/061af5174deed0c7/message_buffer.h": {
+      "sha256": "725b339a66d8ac7bdcd56a1a8fd33c348e07aa16a3561500b6074145193fa9c4",
+      "bytes": 38838,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/061af5174deed0c7/message_buffer.h"
+    },
+    "native01/sources/compiler-dependencies/72d1d6d0a716ca53/event_groups.h": {
+      "sha256": "0c01402d558792c46d4643df6be7b1f273bcbece255bcddd2f1c8ef22c5b1d74",
+      "bytes": 31667,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/72d1d6d0a716ca53/event_groups.h"
+    },
+    "native01/sources/compiler-dependencies/99b03da0f1665cdd/timers.h": {
+      "sha256": "c0faec0d3148f1213d22dd15979e39109e68b7201e6c3b01f6277ed7063c59de",
+      "bytes": 62425,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/99b03da0f1665cdd/timers.h"
+    },
+    "native01/sources/compiler-dependencies/f9cdb52c0cc6a645/esp_task_wdt.h": {
+      "sha256": "9b11e1d1e51186ab609add935a9564d96fedd57b2a94e50a04860b0aadcea95b",
+      "bytes": 8790,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/f9cdb52c0cc6a645/esp_task_wdt.h"
+    },
+    "native01/sources/compiler-dependencies/72ce902f1a0a77d8/crypto.h": {
+      "sha256": "b3cfca32e17621d50f096c27dd5325b0dd16d91cac294ba4ae328413d777bf91",
+      "bytes": 302640,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/72ce902f1a0a77d8/crypto.h"
+    },
+    "native01/sources/compiler-dependencies/0857431ed7746608/crypto_platform.h": {
+      "sha256": "84fbc510d255ed775c5a6fecf853e9106ed17432941730874bea212831cf4731",
+      "bytes": 3336,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0857431ed7746608/crypto_platform.h"
+    },
+    "native01/sources/compiler-dependencies/a982529719c8b315/private_access.h": {
+      "sha256": "635805e055eb1c66357715635d17ddbb3be46dd095b5c0abf1213f4ab196e5d9",
+      "bytes": 1517,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a982529719c8b315/private_access.h"
+    },
+    "native01/sources/compiler-dependencies/98aa5d8f6140566a/build_info.h": {
+      "sha256": "c1fbe204120de164c306b0afdb4b2ff8ad37f08190124d6b1a57750413d78e2f",
+      "bytes": 6930,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/98aa5d8f6140566a/build_info.h"
+    },
+    "native01/sources/compiler-dependencies/2fd4c39bdc0c2d46/crypto_config.h": {
+      "sha256": "0799e80cf6a55c19f0e6417f3ef8a970d46bf9bba0ae7596fc6b8edfa828b915",
+      "bytes": 79955,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/2fd4c39bdc0c2d46/crypto_config.h"
+    },
+    "native01/sources/compiler-dependencies/7a729426e2d59cb0/esp_config.h": {
+      "sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+      "bytes": 97401,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/7a729426e2d59cb0/esp_config.h"
+    },
+    "native01/sources/compiler-dependencies/2219b40d0db34eb0/esp_mem.h": {
+      "sha256": "47f635e795492c2b1a6ab666a946bb8107c7a57c617056fb5fbe3dc56cb56ea6",
+      "bytes": 261,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/2219b40d0db34eb0/esp_mem.h"
+    },
+    "native01/sources/compiler-dependencies/d90d0fb4dee740c8/crypto_adjust_config_synonyms.h": {
+      "sha256": "9bf57d6d55bb6f56b68a2d6ff6ff424698a273ce381d4d870ba8b8e75118ac0a",
+      "bytes": 1736,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/d90d0fb4dee740c8/crypto_adjust_config_synonyms.h"
+    },
+    "native01/sources/compiler-dependencies/348e1b067bb1b054/crypto_adjust_config_auto_enabled.h": {
+      "sha256": "06811ef949e9a3be7e3982e0503da157edad896730e7ea9816aa2e3c4cc57f3d",
+      "bytes": 843,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/348e1b067bb1b054/crypto_adjust_config_auto_enabled.h"
+    },
+    "native01/sources/compiler-dependencies/eb99a556b6ebe3f1/crypto_adjust_config_dependencies.h": {
+      "sha256": "ab85c613f69eccb421a0769acd2a4483def41ad985cb621e313793562606243e",
+      "bytes": 2041,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/eb99a556b6ebe3f1/crypto_adjust_config_dependencies.h"
+    },
+    "native01/sources/compiler-dependencies/a9028837191b3b16/crypto_adjust_config_key_pair_types.h": {
+      "sha256": "e9bc549bc1a77e7b6499a425fd0cbfb79ae17e05f4130b1188746602088e0fb8",
+      "bytes": 3653,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a9028837191b3b16/crypto_adjust_config_key_pair_types.h"
+    },
+    "native01/sources/compiler-dependencies/561ebe71f9f82147/crypto_adjust_config_derived.h": {
+      "sha256": "105379967508ac29326a27072e64efa835d6736d799a9b53b715a643bb02ff59",
+      "bytes": 4661,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/561ebe71f9f82147/crypto_adjust_config_derived.h"
+    },
+    "native01/sources/compiler-dependencies/63369029c29e58c9/crypto_adjust_config_enable_builtins.h": {
+      "sha256": "741a80a78107d129061b7dfa5151e7e07b1e96d99b476e31b37230d3dba92a84",
+      "bytes": 33112,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/63369029c29e58c9/crypto_adjust_config_enable_builtins.h"
+    },
+    "native01/sources/compiler-dependencies/9040eca03d31e08c/crypto_adjust_config_support.h": {
+      "sha256": "2b8b94e73c7abaeab8947b851559ee0bbabbac33934563ed1ee008f833e53d6c",
+      "bytes": 6734,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9040eca03d31e08c/crypto_adjust_config_support.h"
+    },
+    "native01/sources/compiler-dependencies/49b8ae7e7cb834c1/crypto_adjust_config_tweak_builtins.h": {
+      "sha256": "21e07ce2fa199e8d774c34627b0cecdaef4d2e4b3f59f7586ccf2809060b7a0d",
+      "bytes": 8537,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/49b8ae7e7cb834c1/crypto_adjust_config_tweak_builtins.h"
+    },
+    "native01/sources/compiler-dependencies/66b211bb7493c4b3/crypto_types.h": {
+      "sha256": "66c433f42a67531dcc623e499fa82f5b849a0c32e7df6b75da1195ec87dd52f7",
+      "bytes": 19047,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/66b211bb7493c4b3/crypto_types.h"
+    },
+    "native01/sources/compiler-dependencies/6cc3f2697ee6d566/crypto_values.h": {
+      "sha256": "50689ef6544bb0c3ab2977a6f112cfaa3f9d437864b4498916b3668d7f65cf47",
+      "bytes": 127203,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/6cc3f2697ee6d566/crypto_values.h"
+    },
+    "native01/sources/compiler-dependencies/0d02442bf3a1f740/crypto_sizes.h": {
+      "sha256": "cba6fb61d67e2d24e6b0745987c1252fafd8fde124179d4d81c1b100f5c63e35",
+      "bytes": 58009,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0d02442bf3a1f740/crypto_sizes.h"
+    },
+    "native01/sources/compiler-dependencies/6183cd950dd26833/crypto_struct.h": {
+      "sha256": "447a3024b2b29525d7f2a94bc33c878d536dc19c0c05a88d87eb41a01e7e8ff7",
+      "bytes": 23247,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/6183cd950dd26833/crypto_struct.h"
+    },
+    "native01/sources/compiler-dependencies/d81ce2d069ef56fb/crypto_driver_contexts_primitives.h": {
+      "sha256": "5cf910ec7147d8d3c31f40a54349c886387991dc7b797d3b3747e040d166859b",
+      "bytes": 5796,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/d81ce2d069ef56fb/crypto_driver_contexts_primitives.h"
+    },
+    "native01/sources/compiler-dependencies/eab797ae1dbdeb46/crypto_driver_common.h": {
+      "sha256": "0ecb630ef7a91cb6809fcf24caf6ac14ca951c67577f94b6ba30eeb1a7948e51",
+      "bytes": 1475,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/eab797ae1dbdeb46/crypto_driver_common.h"
+    },
+    "native01/sources/compiler-dependencies/e0c4289d2215b52e/crypto_builtin_primitives.h": {
+      "sha256": "a4a86545d2d4ba212dbf30f1d55a0db0d33d8ee29309cd5b919f4425840fa365",
+      "bytes": 4704,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/e0c4289d2215b52e/crypto_builtin_primitives.h"
+    },
+    "native01/sources/compiler-dependencies/91721794e3db96d9/md5.h": {
+      "sha256": "bf7f6e235097499d8fcafee906f6ed40f2caaf4366fa77e14b0f7d5682191f50",
+      "bytes": 5038,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/91721794e3db96d9/md5.h"
+    },
+    "native01/sources/compiler-dependencies/ce051e86b7fc91e1/ripemd160.h": {
+      "sha256": "78b0910b8dc5751fb67c591fd94df3feed8208517ea844ed27cd2967e390a290",
+      "bytes": 3218,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/ce051e86b7fc91e1/ripemd160.h"
+    },
+    "native01/sources/compiler-dependencies/a1298763500fc877/sha1.h": {
+      "sha256": "2bdaca4b04ca36f16a861fe7f9b0b94e5cfe5f42118be3c0941b47a15a5767a4",
+      "bytes": 7048,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a1298763500fc877/sha1.h"
+    },
+    "native01/sources/compiler-dependencies/67a7359968224a09/sha256.h": {
+      "sha256": "b21e820885b85e26de4de47fb25122603a14edd9ee5de4d093b2e0c25d557e8d",
+      "bytes": 6484,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/67a7359968224a09/sha256.h"
+    },
+    "native01/sources/compiler-dependencies/bfd458fbcca2a8ad/sha512.h": {
+      "sha256": "878e2dc9b2f5901a92d6903ca0d3045a9770f837da64fcc3e05922a97263032e",
+      "bytes": 6913,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/bfd458fbcca2a8ad/sha512.h"
+    },
+    "native01/sources/compiler-dependencies/0aeaa6883354725c/sha3.h": {
+      "sha256": "cc380c882c0de2c9db064918e4d1a7cc2f572eecbde3234e9ee31d23394e1d63",
+      "bytes": 6790,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0aeaa6883354725c/sha3.h"
+    },
+    "native01/sources/compiler-dependencies/0728f923a89377bb/cipher.h": {
+      "sha256": "9f35e8fa65d12083a306d41f39d2e3ffa621d8671cdb3cdf81f96f6949bbc9c1",
+      "bytes": 54389,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0728f923a89377bb/cipher.h"
+    },
+    "native01/sources/compiler-dependencies/b1598ce3c5c0e47d/platform_util.h": {
+      "sha256": "814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e",
+      "bytes": 8205,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/b1598ce3c5c0e47d/platform_util.h"
+    },
+    "native01/sources/compiler-dependencies/f7d26097adf6a8da/psa_crypto_driver_esp_sha_contexts.h": {
+      "sha256": "a1492e12f83de439627f351884850cb7e2837952abe1f11d98ecc2cc48a65a84",
+      "bytes": 4401,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/f7d26097adf6a8da/psa_crypto_driver_esp_sha_contexts.h"
+    },
+    "native01/sources/compiler-dependencies/85532140f0e1fc20/esp_types.h": {
+      "sha256": "bb0008a9ef42c5d6278763f99d1101b077ddb53dbfd597d462ef3c41025c7d56",
+      "bytes": 339,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/85532140f0e1fc20/esp_types.h"
+    },
+    "native01/sources/compiler-dependencies/433feed8e451632b/esp_rom_md5.h": {
+      "sha256": "a1e2304d4494d4a609fded28a715312842d79f5c892c34b156f51eb9972839b1",
+      "bytes": 3017,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/433feed8e451632b/esp_rom_md5.h"
+    },
+    "native01/sources/compiler-dependencies/76ae6f5469d4154b/psa_crypto_driver_esp_aes_contexts.h": {
+      "sha256": "6a5f052fd9c914fc0b77abe39b1507c7df31bbca8fad75d967c4bbb19325381c",
+      "bytes": 948,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/76ae6f5469d4154b/psa_crypto_driver_esp_aes_contexts.h"
+    },
+    "native01/sources/compiler-dependencies/3aa71f256e50e597/crypto_driver_contexts_composites.h": {
+      "sha256": "520264b266122f9027bdf952c3400ff0bd0caaaa638f6610b74ce8bf904253bb",
+      "bytes": 7905,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/3aa71f256e50e597/crypto_driver_contexts_composites.h"
+    },
+    "native01/sources/compiler-dependencies/9a4f295ecd59c19e/crypto_builtin_composites.h": {
+      "sha256": "b3cdc57ee3c0203b79dc2bcf50e708099a49dee0ac9c54284c31918f75ba4a7f",
+      "bytes": 9720,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/9a4f295ecd59c19e/crypto_builtin_composites.h"
+    },
+    "native01/sources/compiler-dependencies/53ca8e7de733f137/cmac.h": {
+      "sha256": "ee386bf0e40696ce2474bb87098f8d6427744c7048d869f39c09cf141a66a92e",
+      "bytes": 8486,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/53ca8e7de733f137/cmac.h"
+    },
+    "native01/sources/compiler-dependencies/a7708c6040b375ee/gcm.h": {
+      "sha256": "65073f4a78a63dd4aab577efc3ae5f81508934afe90878791ceaadd5130d3110",
+      "bytes": 17920,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/a7708c6040b375ee/gcm.h"
+    },
+    "native01/sources/compiler-dependencies/e0a858b061a91978/ccm.h": {
+      "sha256": "3f594fdcde7bd9d112f1087c2f4b53d92979ad821b20b96848011a2278139350",
+      "bytes": 26279,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/e0a858b061a91978/ccm.h"
+    },
+    "native01/sources/compiler-dependencies/6fc37dcc39a0a004/chachapoly.h": {
+      "sha256": "f39657cd70f519c1cf26b2513c54a980c9ae858b8f420af1d62f366078392419",
+      "bytes": 16003,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/6fc37dcc39a0a004/chachapoly.h"
+    },
+    "native01/sources/compiler-dependencies/0bf78409116153ae/poly1305.h": {
+      "sha256": "aaa2d15477142d68528084fdc8378507dc2a1ea392c5450114133b0557e2c2b5",
+      "bytes": 6246,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/0bf78409116153ae/poly1305.h"
+    },
+    "native01/sources/compiler-dependencies/97e64a56b1f92141/chacha20.h": {
+      "sha256": "28720f5bea5cea1e15d38e500224a2a0cd3c16208d3861538da5963eb61e785c",
+      "bytes": 8063,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/97e64a56b1f92141/chacha20.h"
+    },
+    "native01/sources/compiler-dependencies/55d9d73cacd39903/ecdsa.h": {
+      "sha256": "21742b85c25bc417e56a15413320cf18dbdec538e78cd60a8e3446d3a0cfeaa0",
+      "bytes": 32397,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/55d9d73cacd39903/ecdsa.h"
+    },
+    "native01/sources/compiler-dependencies/6a310bea898068e8/ecp.h": {
+      "sha256": "46a74c42e0068a56a0392e22026b39582b762bc148ae02108053959bedece5d0",
+      "bytes": 68396,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/6a310bea898068e8/ecp.h"
+    },
+    "native01/sources/compiler-dependencies/23a3d8e309b19091/bignum.h": {
+      "sha256": "eb7dd080223d8e8540a18543a53abc66029abf71e4a5993ebcbe215ab5ed0301",
+      "bytes": 49063,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/23a3d8e309b19091/bignum.h"
+    },
+    "native01/sources/compiler-dependencies/840135a9277ef27b/md.h": {
+      "sha256": "2d94df6535f1a0cf95734de68fd91f4097955f9c46b77eb59e258d76044c1d75",
+      "bytes": 21226,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/840135a9277ef27b/md.h"
+    },
+    "native01/sources/compiler-dependencies/f47d0aae7ee46822/ecjpake.h": {
+      "sha256": "1a8bfd0f645b3b35e53828762cd13a2187755a9d26db5f1ad11421557bf61643",
+      "bytes": 13186,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/f47d0aae7ee46822/ecjpake.h"
+    },
+    "native01/sources/compiler-dependencies/519906843fc0a02f/psa_crypto_driver_esp_cmac_contexts.h": {
+      "sha256": "6e41691a606b0e35681663d3c248f63374edb85dd0bfa92c2a8c444da22eaf86",
+      "bytes": 1166,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/519906843fc0a02f/psa_crypto_driver_esp_cmac_contexts.h"
+    },
+    "native01/sources/compiler-dependencies/5239b9e756d68276/psa_crypto_driver_esp_hmac_transparent_contexts.h": {
+      "sha256": "d2e6f4c1756a4fab67fcdc96f3200f4e2e6cdfa7a35caae3bc8b9060a261509f",
+      "bytes": 725,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/5239b9e756d68276/psa_crypto_driver_esp_hmac_transparent_contexts.h"
+    },
+    "native01/sources/compiler-dependencies/85c605c278cc06b2/crypto_driver_contexts_key_derivation.h": {
+      "sha256": "c71c4697a4a6e2bf7906215b49f7de5be25ba58a79a93c002501dd8c183f0178",
+      "bytes": 2183,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/85c605c278cc06b2/crypto_driver_contexts_key_derivation.h"
+    },
+    "native01/sources/compiler-dependencies/186e09e4647017ed/crypto_builtin_key_derivation.h": {
+      "sha256": "bcc0798dc0bfbca3d6e83acb04bccf42c847ea7f8e4634915f7611697cc82b15",
+      "bytes": 5109,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/186e09e4647017ed/crypto_builtin_key_derivation.h"
+    },
+    "native01/sources/compiler-dependencies/810ca5d0d83fa42e/crypto_extra.h": {
+      "sha256": "e838f925b64f7dceef6a9ff1d648890670d7f7c6795e8f26c310efc5bc6ba1e1",
+      "bytes": 94363,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/810ca5d0d83fa42e/crypto_extra.h"
+    },
+    "native01/sources/compiler-dependencies/957564802a36f2e3/crypto_compat.h": {
+      "sha256": "8b3934c712affcc24646dadd3d6f199d8577dcabc50ab55628e075f080d4f301",
+      "bytes": 2785,
+      "role": "installed-source-identity",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/sources/compiler-dependencies/957564802a36f2e3/crypto_compat.h"
+    },
+    "native01/build/cyd_opus_header_gain_qemu.elf": {
+      "sha256": "fd505cdd661310441148e3e0efeda3ec19e52d8d8799cafd536c1ec1b341c1bc",
+      "bytes": 5341624,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/cyd_opus_header_gain_qemu.elf"
+    },
+    "native01/qemu-flash.bin": {
+      "sha256": "4220162228f2d66a71ac49da5f7a6b26b1252e81c80e5f78e6000515dbb48de7",
+      "bytes": 4194304,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/qemu-flash.bin"
+    },
+    "native01/build/bootloader/bootloader.bin": {
+      "sha256": "7bd7aa894980fa7fc09df9787cb1a75e5147437a79c8b5d96453e84487549f54",
+      "bytes": 26096,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/bootloader/bootloader.bin"
+    },
+    "native01/build/partition_table/partition-table.bin": {
+      "sha256": "c9a826e85500d14d1854ce78e47452d4614a1be371bbd056278d2cb3398fbbfd",
+      "bytes": 3072,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/partition_table/partition-table.bin"
+    },
+    "native01/build/cyd_opus_header_gain_qemu.bin": {
+      "sha256": "0bc09efc0ca44329f8169eac57874743df020146a46cb24c81f3a054142d12c1",
+      "bytes": 2643840,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/cyd_opus_header_gain_qemu.bin"
+    },
+    "native01/project/main/gains.bin": {
+      "sha256": "29d4805939be9fe7bcad379cb66f162b0f435c6ad0f328caac79dc5137aa4da5",
+      "bytes": 2119069,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/project/main/gains.bin"
+    },
+    "native01/build/esp-idf/esp_audio_codec/CMakeFiles/__idf_esp_audio_codec.dir/src/audio_decoder_reg.c.obj": {
+      "sha256": "063ee3737ac69ba19c8378299031791d07d8096407d247eb3882927c360c2381",
+      "bytes": 8704,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/esp-idf/esp_audio_codec/CMakeFiles/__idf_esp_audio_codec.dir/src/audio_decoder_reg.c.obj"
+    },
+    "native01/build/esp-idf/esp_audio_codec/CMakeFiles/__idf_esp_audio_codec.dir/src/audio_encoder_reg.c.obj": {
+      "sha256": "285a91ee31e954549c4f9ccf0f7495e26ba180078c95ce667b23071d47a24dc8",
+      "bytes": 11176,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/esp-idf/esp_audio_codec/CMakeFiles/__idf_esp_audio_codec.dir/src/audio_encoder_reg.c.obj"
+    },
+    "native01/build/esp-idf/esp_audio_codec/CMakeFiles/__idf_esp_audio_codec.dir/src/simple_decoder_reg.c.obj": {
+      "sha256": "97c2765cd8703e71ac9e4f6c8ba7368a2e4a610a31b5b9ac23f361fd1e722aa4",
+      "bytes": 7476,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/esp-idf/esp_audio_codec/CMakeFiles/__idf_esp_audio_codec.dir/src/simple_decoder_reg.c.obj"
+    },
+    "native01/build/esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj": {
+      "sha256": "a1d87c83f57f92e649b948fcbfb00cdb3c96cc78ebc199c71dae1c0e6e6e661e",
+      "bytes": 64096,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/esp-idf/main/CMakeFiles/__idf_main.dir/main.c.obj"
+    },
+    "native01/build/esp-idf/main/CMakeFiles/__idf_main.dir/decoder_registration.c.obj": {
+      "sha256": "dc17f19640e22f0cd3091fd66b03a3f291132a79d285eff57e1a9aab66bc0331",
+      "bytes": 8328,
+      "role": "actual-build-artifact",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/esp-idf/main/CMakeFiles/__idf_main.dir/decoder_registration.c.obj"
+    },
+    "native01/build/bootloader/bootloader.elf": {
+      "sha256": "103db6370d2e1fb5b2db8ebb041efd5fa44cd256f0a45fff5dc6fcf0df222ae7",
+      "bytes": 488252,
+      "role": "local-diagnostic-image",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/bootloader/bootloader.elf"
+    },
+    "native01/build/bootloader/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_C.bin": {
+      "sha256": "2e17a82b1b3d62c0d63d2a940e35310d0f99983f44a2e91f48368edae07f15e9",
+      "bytes": 9832,
+      "role": "local-diagnostic-image",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/bootloader/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_C.bin"
+    },
+    "native01/build/bootloader/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_CXX.bin": {
+      "sha256": "1f2415b09fad4f709656624f0d5e7f9926ce931e2e0e0f7e3f9ba2591373ecef",
+      "bytes": 9856,
+      "role": "local-diagnostic-image",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/bootloader/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_CXX.bin"
+    },
+    "native01/build/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_C.bin": {
+      "sha256": "2e17a82b1b3d62c0d63d2a940e35310d0f99983f44a2e91f48368edae07f15e9",
+      "bytes": 9832,
+      "role": "local-diagnostic-image",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_C.bin"
+    },
+    "native01/build/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_CXX.bin": {
+      "sha256": "1f2415b09fad4f709656624f0d5e7f9926ce931e2e0e0f7e3f9ba2591373ecef",
+      "bytes": 9856,
+      "role": "local-diagnostic-image",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/cyd-opus-header-gain-20261101-01/build/CMakeFiles/4.0.3/CMakeDetermineCompilerABI_CXX.bin"
+    },
+    "reference01/reference": {
+      "sha256": "fa6d38a0f2579b1cd7b6763fccb52dc7ddc3c75f1f3a55cf4a4610e30c546676",
+      "bytes": 50336,
+      "role": "local-reference-executable",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-reference-20261101-01/reference"
+    },
+    "reference01/zero.packets": {
+      "sha256": "7ec930d40ea0703232a36be19ff24bfa0df11e7d99bc8949e6dc8f167cad02c1",
+      "bytes": 704761,
+      "role": "local-reference-data",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-reference-20261101-01/zero.packets"
+    },
+    "reference01/zero.pcm": {
+      "sha256": "8c05427b59e49b90243fcfd12cc9032305b1313dc8b5f13907dc9480ffa87085",
+      "bytes": 2115840,
+      "role": "local-reference-data",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-reference-20261101-01/zero.pcm"
+    },
+    "reference01/plus6.packets": {
+      "sha256": "77ebe50fe9b3432ec0260575fdd58d8a8cad5bb55c736f1c46484be5646d8809",
+      "bytes": 704761,
+      "role": "local-reference-data",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-reference-20261101-01/plus6.packets"
+    },
+    "reference01/plus6.pcm": {
+      "sha256": "4fb6f6ac4b72902f2a157c4239f3e2993cbb0c37bacac6094a118d4da01ea115",
+      "bytes": 2115840,
+      "role": "local-reference-data",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-reference-20261101-01/plus6.pcm"
+    },
+    "reference01/minus6.packets": {
+      "sha256": "561b6788598f2c3e16071b8ab8097c9996bcff88e76e1c86c1e7093f146dd1c7",
+      "bytes": 704761,
+      "role": "local-reference-data",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-reference-20261101-01/minus6.packets"
+    },
+    "reference01/minus6.pcm": {
+      "sha256": "dacae7e4b209b18e045ab739da5b3edced5bb2256dcdc225c0df7fed82082908",
+      "bytes": 2115840,
+      "role": "local-reference-data",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-reference-20261101-01/minus6.pcm"
+    },
+    "data01/generation01/minus6.ogg": {
+      "sha256": "64429aff298089246d452e2eef4977f464bb11388b84aaa1154ac9528609b95c",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-01/generation01/minus6.ogg"
+    },
+    "data01/generation01/plus6.ogg": {
+      "sha256": "353ffe0eaa74f44e49cb3d131e728025224f54c50b0a0cc2e41e9b7c1db1bffa",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-01/generation01/plus6.ogg"
+    },
+    "data01/generation01/zero.ogg": {
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-01/generation01/zero.ogg"
+    },
+    "data01/generation02/minus6.ogg": {
+      "sha256": "64429aff298089246d452e2eef4977f464bb11388b84aaa1154ac9528609b95c",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-01/generation02/minus6.ogg"
+    },
+    "data01/generation02/plus6.ogg": {
+      "sha256": "353ffe0eaa74f44e49cb3d131e728025224f54c50b0a0cc2e41e9b7c1db1bffa",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-01/generation02/plus6.ogg"
+    },
+    "data01/generation02/zero.ogg": {
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-01/generation02/zero.ogg"
+    },
+    "data02/generation01/minus6.ogg": {
+      "sha256": "64429aff298089246d452e2eef4977f464bb11388b84aaa1154ac9528609b95c",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-02/generation01/minus6.ogg"
+    },
+    "data02/generation01/plus6.ogg": {
+      "sha256": "353ffe0eaa74f44e49cb3d131e728025224f54c50b0a0cc2e41e9b7c1db1bffa",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-02/generation01/plus6.ogg"
+    },
+    "data02/generation01/zero.ogg": {
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-02/generation01/zero.ogg"
+    },
+    "data02/generation02/minus6.ogg": {
+      "sha256": "64429aff298089246d452e2eef4977f464bb11388b84aaa1154ac9528609b95c",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-02/generation02/minus6.ogg"
+    },
+    "data02/generation02/plus6.ogg": {
+      "sha256": "353ffe0eaa74f44e49cb3d131e728025224f54c50b0a0cc2e41e9b7c1db1bffa",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-02/generation02/plus6.ogg"
+    },
+    "data02/generation02/zero.ogg": {
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319,
+      "role": "local-derived-gain-fixture",
+      "original_retained_locally": true,
+      "byte_payload_published": false,
+      "local_path": ".build/opus-header-gain-tests-20261101-02/generation02/zero.ogg"
+    }
+  },
+  "native_measurements": {
+    "cases": [
+      {
+        "id": 0,
+        "gain_q8": 0,
+        "chunk": 706319,
+        "input": 706319,
+        "calls": 552,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "energy": 12668839949307,
+        "absolute": 2783974037,
+        "nonzero": 1057006,
+        "clips": 0,
+        "peak": 15293,
+        "data_eos": 551,
+        "empty_eos": 1,
+        "coalesces": 0,
+        "before": 258476,
+        "after": 258376,
+        "stack_free": 3948,
+        "core": 1,
+        "priority": 3
+      },
+      {
+        "id": 0,
+        "gain_q8": 0,
+        "chunk": 257,
+        "input": 706319,
+        "calls": 2750,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "energy": 12668839949307,
+        "absolute": 2783974037,
+        "nonzero": 1057006,
+        "clips": 0,
+        "peak": 15293,
+        "data_eos": 1,
+        "empty_eos": 1,
+        "coalesces": 0,
+        "before": 258376,
+        "after": 258376,
+        "stack_free": 3948,
+        "core": 1,
+        "priority": 3
+      },
+      {
+        "id": 1,
+        "gain_q8": 1536,
+        "chunk": 706319,
+        "input": 706319,
+        "calls": 552,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "energy": 12668839949307,
+        "absolute": 2783974037,
+        "nonzero": 1057006,
+        "clips": 0,
+        "peak": 15293,
+        "data_eos": 551,
+        "empty_eos": 1,
+        "coalesces": 0,
+        "before": 258376,
+        "after": 258376,
+        "stack_free": 3948,
+        "core": 1,
+        "priority": 3
+      },
+      {
+        "id": 1,
+        "gain_q8": 1536,
+        "chunk": 257,
+        "input": 706319,
+        "calls": 2750,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "energy": 12668839949307,
+        "absolute": 2783974037,
+        "nonzero": 1057006,
+        "clips": 0,
+        "peak": 15293,
+        "data_eos": 1,
+        "empty_eos": 1,
+        "coalesces": 0,
+        "before": 258376,
+        "after": 258376,
+        "stack_free": 3948,
+        "core": 1,
+        "priority": 3
+      },
+      {
+        "id": 2,
+        "gain_q8": -1536,
+        "chunk": 706319,
+        "input": 706319,
+        "calls": 552,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "energy": 12668839949307,
+        "absolute": 2783974037,
+        "nonzero": 1057006,
+        "clips": 0,
+        "peak": 15293,
+        "data_eos": 551,
+        "empty_eos": 1,
+        "coalesces": 0,
+        "before": 258376,
+        "after": 258376,
+        "stack_free": 3948,
+        "core": 1,
+        "priority": 3
+      },
+      {
+        "id": 2,
+        "gain_q8": -1536,
+        "chunk": 257,
+        "input": 706319,
+        "calls": 2750,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "energy": 12668839949307,
+        "absolute": 2783974037,
+        "nonzero": 1057006,
+        "clips": 0,
+        "peak": 15293,
+        "data_eos": 1,
+        "empty_eos": 1,
+        "coalesces": 0,
+        "before": 258376,
+        "after": 258376,
+        "stack_free": 3948,
+        "core": 1,
+        "priority": 3
+      }
+    ],
+    "gain_behavior": "ignored_for_this_complete_fixture",
+    "header_gain_applied": false,
+    "zero_baseline_reproduced": true,
+    "signal_nonzero": true,
+    "heap_min": 227772,
+    "stack_free": 3948,
+    "retained_after_unregister": 100,
+    "full_pcm_independent_numeric_oracle": false,
+    "production_gain_added": false,
+    "universal_conformance_qualified": false
+  },
+  "reference_measurements": {
+    "zero": {
+      "reference": "libopus 1.4",
+      "gain_q8": 0,
+      "factor": 1,
+      "packets": 551,
+      "raw_frames": 528960,
+      "pcm_bytes": 2115840,
+      "energy": 12669054620577,
+      "absolute": 2783956723,
+      "nonzero": 1057018,
+      "clips": 0,
+      "peak": 15296,
+      "raw_float_peak": 0.46678730845451355,
+      "raw_float_energy": 11798.973594067453,
+      "rounding": "nearest_ties_away_from_zero_then_clip",
+      "library_header_gain_used": false,
+      "numeric_conformance_claim": false
+    },
+    "plus6": {
+      "reference": "libopus 1.4",
+      "gain_q8": 1536,
+      "factor": 1.9952623149688795,
+      "packets": 551,
+      "raw_frames": 528960,
+      "pcm_bytes": 2115840,
+      "energy": 50436401681516,
+      "absolute": 5554722666,
+      "nonzero": 1057112,
+      "clips": 0,
+      "peak": 30519,
+      "raw_float_peak": 0.46678730845451355,
+      "raw_float_energy": 11798.973594067453,
+      "rounding": "nearest_ties_away_from_zero_then_clip",
+      "library_header_gain_used": false,
+      "numeric_conformance_claim": false
+    },
+    "minus6": {
+      "reference": "libopus 1.4",
+      "gain_q8": -1536,
+      "factor": 0.5011872336272722,
+      "packets": 551,
+      "raw_frames": 528960,
+      "pcm_bytes": 2115840,
+      "energy": 3182321936424,
+      "absolute": 1395283100,
+      "nonzero": 1056861,
+      "clips": 0,
+      "peak": 7666,
+      "raw_float_peak": 0.46678730845451355,
+      "raw_float_energy": 11798.973594067453,
+      "rounding": "nearest_ties_away_from_zero_then_clip",
+      "library_header_gain_used": false,
+      "numeric_conformance_claim": false
+    }
+  },
+  "native_original_report_sha256": "f6a7e622d053862f60a7aa518d8b13ce5e7fc84029603a320622829d097f28a7",
+  "reference_original_report_sha256": "1f8762536d0d0ba0d0e22c8396adff412a4bd013d8dfd8ea7ef25cb562647619"
+}

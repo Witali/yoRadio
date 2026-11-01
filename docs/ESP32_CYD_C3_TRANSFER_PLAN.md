@@ -2279,3 +2279,12 @@ Stream остаётся на core0, decode/output на core1 с прежними
   full radio/TLS/TFT margin этим не квалифицирован. Header gain пока открыт:
   paired stock decode zero/+6/-6 dB дал одинаковый PCM; исправление готовится
   отдельно. Linked exports/full lint и остальные gates остаются в очереди.
+
+- 2026-11-01, CYD-C3-14, [OpusHead gain observation](../tests/results/cyd-opus-header-gain-20261101/README.md):
+  все 551 audio packets исходного полного потока одинаковы, меняются только
+  gain/CRC bytes. Шесть свежих public handles для zero/+6/-6 dB × whole/257
+  дают идентичный ненулевой PCM/energy/peak. Independent libopus float decode
+  с явным нормативным множителем даёт три разных сигнала без clipping.
+  Отсутствующий gain подтверждён runtime, а не предположением по public fields.
+  Это остающаяся коррекция playback: gain должен суммироваться с player gain;
+  implementation/range/rounding/chain reset ещё не закрыты этим observation gate.

@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+set(EXTRA_COMPONENT_DIRS "$ENV{OPUS_GAIN_VENDOR}")
+set(COMPONENTS main esp_audio_codec)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(cyd_opus_header_gain_qemu)
