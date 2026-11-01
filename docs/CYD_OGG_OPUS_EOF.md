@@ -43,6 +43,16 @@ gain for this fixture, without deriving behavior from missing public fields.
 The correction must apply header gain in addition to player volume/normalization,
 preserve unity output and qualify signed-range rounding/clipping and link resets.
 
+The [required family-0/1 playback support](https://www.rfc-editor.org/rfc/rfc7845.html#section-5.1.1.5)
+is another explicit open gate. A player must handle valid mappings in those
+families even when channel count exceeds its physical outputs. Recognition of
+family 1 by the metadata observer does not establish playback support. Current
+clipping binds its channel count to OpusHead, while physical output accepts
+mono/stereo; encoded-channel and actual playback layouts need separate handling.
+Public vendor mono/stereo wording alone does not prove failure on multichannel
+input. Complete 3/6/8-channel stock-vendor and wrapper experiments, followed by
+correct full-channel mixing where needed, must establish the actual behavior.
+
 ## Measured direct-vendor regression
 
 The complete existing `tests/fixtures/esp32c3_calibration/opus-510.ogg` is

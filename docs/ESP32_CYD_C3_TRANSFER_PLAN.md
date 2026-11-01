@@ -101,28 +101,22 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 расширенный Vorbis отложен и не включён в эти пять активных блоков; перенос
 аппаратно-специфичных дисплеев/выводов C3 исключён.
 
-- Vorbis: существующий декодер Espressif переиспользуется через публичные
-  интерфейсы. Настройки, регистрация, жизненный цикл, обработка ошибок и
-  отдельные Xtensa/RISC-V архивы проверены. Общий pending-input owner проверен
-  на обеих целях, в том числе при подаче по одному байту. [Полный CYD audio task](../tests/results/cyd-vorbis-task-20261030/NATIVE.md)
-  теперь проходит ordered EOF, Stop/reopen и maintenance/resume в QEMU.
-  Передача последнего Ogg-байта вместе с EOS восстановила все 2112000 PCM-байт
-  без изменения vendor, буфера и core/priority/stack. [Opus через тот же caller](CYD_OGG_OPUS_EOF.md)
-  также проходит полный vendor baseline, 4096/257/1-byte feeds и три actual-task
-  случая. Обнаружено обязательное незавершённое исправление: pre-skip/end trim
-  Ogg Opus — vendor выдаёт 2115840 raw bytes вместо требуемых 2112000 playback
-  bytes. Public resize для пакетов до 120 ms теперь проверен на whole/fragmented
-  input и [actual CYD tasks](../tests/results/cyd-opus-20261030/LONG_TASK.md):
-  все пять handles реально увеличивают output 12288→23040 и успешно повторяют
-  вызов с прежним input. Следом — обрезка по реальной timeline с независимым
-  эталоном; старые C3 interior windows её не закрывают. Последующий
-  [actual-task checkpoint](../tests/results/cyd-ogg-playback-task-20261101/README.md)
-  уже подключает CRC-verified metadata и clipping в default CYD caller:
-  обе Opus fixtures дают 2112000 logical bytes, Vorbis сохраняет PCM, цепочка
-  трёх links проходит без промежуточного EOF. Новая открытая коррекция —
-  nonzero OpusHead gain; прочие modes/mappings/rates и ресурсы остаются.
-  Radio/TLS/TFT ресурсы и deliberate backpressure остаются отдельно. Собственную
-  арифметику не подключать.
+- Ogg/Vorbis/Opus: переиспользуется неизменённый Espressif decoder с отдельными
+  Xtensa/RISC-V архивами. Общий pending owner проверен на обеих целях, включая
+  one-byte feeds. В default CYD caller уже подключены CRC-verified pages,
+  sample-accurate Opus pre-skip/end clipping и per-link drain/close/reopen.
+  [Полные actual tasks](../tests/results/cyd-ogg-playback-task-20261101/README.md)
+  проходят девять lifecycle cases и цепочку трёх кодеков в одном HTTP:
+  обе Opus fixtures дают 2112000 logical bytes, Vorbis сохраняет прежний PCM,
+  все 18 decoder handles/16 clients закрыты, cores/priorities/stacks сохранены.
+  Public resize 12288→23040 на 120 ms packets проверен отдельно и в pipeline.
+  Входы: [playback wrapper](../idf/esp32-cyd2usb-native/main/ogg_playback.h),
+  [page owner](../idf/components/native_stream/include/ogg_page_input.h),
+  [PCM spans](../idf/components/native_stream/include/opus_pcm_trim.h).
+  Остаются [header gain](../tests/results/cyd-opus-header-gain-20261101/README.md),
+  обязательная mapping-family-1 playback поддержка с корректным hardware layout,
+  другие modes и resource/error gates. Полная radio/TLS/TFT и physical приёмка
+  остаются отдельно. Собственную арифметику Vorbis не подключать.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
   **отложена по прямому указанию пользователя**. Исходники, незавершённые тесты
   и уже полученные результаты сохранены в [записи отложенной работы](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md).
