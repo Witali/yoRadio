@@ -152,8 +152,9 @@ static bool cancelled(void *context)
     return state.cancelled || state.mode == CANCEL_BEFORE;
 }
 static bool output(void *context, const esp_audio_simple_dec_info_t *info,
-                   const uint8_t *pcm, size_t bytes)
+                   const uint8_t *pcm, size_t bytes, int16_t gain_q8)
 {
+    assert(gain_q8 == 0);
     assert(context == &state && state.owner->input.ready && state.owner->input.event.crc_verified);
     assert(info->sample_rate == 48000 && info->channel == 2 && info->bits_per_sample == 16 && bytes && !(bytes % 4));
     int16_t first, last;

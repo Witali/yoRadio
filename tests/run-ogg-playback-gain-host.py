@@ -12,12 +12,17 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO = ROOT.parent.parent if ROOT.parent.name == '.worktree' else ROOT
+VENDOR = REPO / '.idf/esp-adf-libs/esp_audio_codec'
 HARNESS = Path('tests/native/ogg_playback_gain_host.c')
 MAIN = Path('idf/esp32-cyd2usb-native/main')
 SHARED = Path('idf/components/native_stream/include')
-STUB = Path('tests/target/cyd_ogg_playback_qemu/host_include')
-INPUTS = [HARNESS, MAIN / 'ogg_playback.h', STUB / 'esp_audio_simple_dec.h',
-          *[SHARED / n for n in ('ogg_page_input.h','opus_pcm_trim.h','ogg_opus_timeline.h','decoder_pending_input.h','pcm_header_gain.h')]]
+INPUTS = [HARNESS, Path('tests/native/ogg_legacy_raw_unselected.c'),
+          *[MAIN / n for n in ('ogg_playback.h','opus_family1_playback.h','opus_family1_decoder.h')],
+          *[SHARED / n for n in ('ogg_page_input.h','opus_pcm_trim.h','ogg_opus_timeline.h','decoder_pending_input.h','pcm_header_gain.h',
+             'opus_tags_stream.h','ogg_opus_audio_packets.h','opus_family1_mapping.h','opus_multistream_framing.h','pcm_channel_layout.h')]]
+PUBLIC_HEADERS = ('esp_audio_types.h','decoder/esp_audio_dec.h','decoder/esp_audio_dec_reg.h',
+                  'decoder/impl/esp_opus_dec.h','simple_dec/esp_audio_simple_dec.h')
 
 
 def need(condition, reason):
@@ -75,6 +80,11 @@ def main():
             snapshot.parent.mkdir(parents=True, exist_ok=True)
             snapshot.write_bytes(body)
             report['sources'].append(dict(path=relative.as_posix(), snapshot=snapshot.relative_to(out).as_posix(), bytes=len(body), sha256=sha(body)))
+        for name in PUBLIC_HEADERS:
+            original = VENDOR / 'include' / name
+            body = original.read_bytes(); snapshot = out / 'sources/vendor/include' / name
+            snapshot.parent.mkdir(parents=True, exist_ok=True); snapshot.write_bytes(body)
+            report['sources'].append(dict(path=str(original.resolve()), snapshot=snapshot.relative_to(out).as_posix(), bytes=len(body), sha256=sha(body)))
         save()
         report['compiler_version'] = command('compiler-version',['/usr/bin/gcc','--version']).decode().splitlines()[0]
         compiler = command('compiler-realpath',['/usr/bin/readlink','-f','/usr/bin/gcc']).decode().strip()
@@ -83,8 +93,9 @@ def main():
         binary = out / 'ogg-playback-gain-host'
         command('build',['/usr/bin/gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-Wpedantic','-Wshadow',
                          '-Wformat=2','-Wstrict-prototypes','-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
-                         '-I'+host(out/'sources'/MAIN),'-I'+host(out/'sources'/SHARED),'-I'+host(out/'sources'/STUB),
-                         host(out/'sources'/HARNESS),'-lm','-o',host(binary)])
+                         *['-I'+host(out/'sources/vendor/include'/name) for name in ('','decoder','decoder/impl','simple_dec')],
+                         '-I'+host(out/'sources'/MAIN),'-I'+host(out/'sources'/SHARED),
+                         host(out/'sources'/HARNESS),host(out/'sources/tests/native/ogg_legacy_raw_unselected.c'),'-lm','-o',host(binary)])
         report['binary'] = dict(path=binary.name, bytes=binary.stat().st_size, sha256=sha(binary.read_bytes()), local_only=True)
         report['state'] = 'running'
         stdout = command('test',['/usr/bin/env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',

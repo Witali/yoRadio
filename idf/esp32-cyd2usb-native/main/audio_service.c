@@ -844,8 +844,9 @@ static bool ogg_output_cancelled(void *user) {
            context->generation == atomic_load(&s_failed_generation);
 }
 
-static bool ogg_output_pcm(void *user, const esp_audio_simple_dec_info_t *info,
-                           const uint8_t *pcm, size_t bytes, int16_t header_gain_q8) {
+static bool ogg_output_layout(void *user, const esp_audio_simple_dec_info_t *info,
+                              const uint8_t *pcm, size_t bytes,
+                              int16_t header_gain_q8, pcm_channel_layout layout) {
     ogg_output_context_t *context = user;
     if (ogg_output_cancelled(context)) return false;
     if (!publish_stream_info(context->generation, NATIVE_CODEC_OGG, info)) {
@@ -853,12 +854,22 @@ static bool ogg_output_pcm(void *user, const esp_audio_simple_dec_info_t *info,
         return false;
     }
     return send_pcm_with_metadata(context->generation, info, pcm, bytes,
-                                   header_gain_q8, PCM_CHANNEL_LAYOUT_LEGACY);
+                                   header_gain_q8, layout);
+}
+
+static bool ogg_output_pcm(void *user, const esp_audio_simple_dec_info_t *info,
+                           const uint8_t *pcm, size_t bytes, int16_t header_gain_q8) {
+    return ogg_output_layout(user, info, pcm, bytes, header_gain_q8,
+                             PCM_CHANNEL_LAYOUT_LEGACY);
 }
 
 static void ogg_output_yield(void *user) {
     (void)user;
     vTaskDelay(1);
+}
+
+static void ogg_reset_for_task(ogg_playback *playback, uint32_t generation) {
+    while (!ogp_reset(playback, generation)) vTaskDelay(1);
 }
 #endif
 
@@ -912,7 +923,7 @@ static void decoder_task(void *argument) {
             atomic_load(&s_failed_generation) == current_generation) {
             decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
-            ogp_reset(&ogg, 0);
+            ogg_reset_for_task(&ogg, 0);
 #endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
@@ -939,7 +950,7 @@ static void decoder_task(void *argument) {
                 generation == atomic_load(&s_generation)) {
                 decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
-                ogp_reset(&ogg, 0);
+                ogg_reset_for_task(&ogg, 0);
 #endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
                 if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
@@ -994,7 +1005,7 @@ static void decoder_task(void *argument) {
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
-            ogp_reset(&ogg, packet->generation);
+            ogg_reset_for_task(&ogg, packet->generation);
 #endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
@@ -1044,6 +1055,16 @@ static void decoder_task(void *argument) {
                              codec_name(codec));
                     end_reason = AUDIO_END_ALLOCATION_FAILED;
                 }
+            } else
+#endif
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+            if (codec == NATIVE_CODEC_OGG) {
+                /* Only the verified HEAD can select simple Ogg synthesis or
+                 * documented raw multistream handles. Do not hold an unused
+                 * simple decoder/PCM buffer alongside the family1 owners. */
+                free(output);
+                output = NULL;
+                output_size = 0;
             } else
 #endif
             {
@@ -1130,6 +1151,7 @@ static void decoder_task(void *argument) {
             const ogg_playback_callbacks callbacks = {
                 .cancelled = ogg_output_cancelled, .output = ogg_output_pcm,
                 .yield = ogg_output_yield, .context = &context,
+                .output_layout = ogg_output_layout,
             };
             int32_t cause = 0;
             ogg_playback_status status = ogp_feed(&ogg, packet->data,
@@ -1279,7 +1301,7 @@ packet_done:
                     failure_stage, failure_result, end_reason, packet->data_size);
             decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
-            ogp_reset(&ogg, 0);
+            ogg_reset_for_task(&ogg, 0);
 #endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
