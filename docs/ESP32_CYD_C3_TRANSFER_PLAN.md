@@ -100,7 +100,9 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   input и [actual CYD tasks](../tests/results/cyd-opus-20261030/LONG_TASK.md):
   все пять handles реально увеличивают output 12288→23040 и успешно повторяют
   вызов с прежним input. Следом — обрезка по реальной timeline с независимым
-  эталоном; старые C3 interior windows её не закрывают.
+  эталоном; старые C3 interior windows её не закрывают. [Ограниченный metadata observer](../tests/results/ogg-opus-timeline-20261101/README.md)
+  уже проходит host/ASan/UBSan и сравнение длительностей с libopus, но ещё
+  не подключён к production caller и сам playback trim не реализует.
   Radio/TLS/TFT ресурсы и deliberate backpressure остаются отдельно. Собственную
   арифметику не подключать.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
@@ -2187,3 +2189,14 @@ Stream остаётся на core0, decode/output на core1 с прежними
   flagged installed headers остаются локально; опубликованы точные hash/size
   bindings без заявления о чтении исключённых bytes. Обязательный playback
   trim, OOM/backpressure и full radio/TLS/TFT/physical gates не закрыты.
+
+- 2026-11-01, CYD-C3-14, [bounded Ogg/Opus timeline checkpoint](../tests/results/ogg-opus-timeline-20261101/README.md):
+  metadata-only header хранит 512 B host state, не удерживает входные pointers,
+  packet bodies или PCM. Generation/token ACK защищает границы logical links;
+  provisional EOS bounds отделены от CRC-verified page events. GCC с ASan/UBSan
+  и leak detection проходит 525 cases, 159 semantic negatives, 403 reset positions
+  и десять full-fixture/split schedules; 219 public packet-duration сравнений
+  совпадают с libopus 1.4. Сохранены исходный sandbox launch nonpass и оба
+  actual passing host runs с разными source snapshots. Это metadata timing,
+  не PCM oracle и не полный validator. Production integration, MCU execution,
+  sample-position oracle и фактический playback trim остаются открытыми.

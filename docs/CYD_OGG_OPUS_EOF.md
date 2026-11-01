@@ -107,6 +107,29 @@ missing continuation, sequence gaps or truncation. Initial offsets, first-page
 EOS, nil pages, multiple links in one input and lifecycle reset need host tests
 before production integration. No new observer is selected by this checkpoint.
 
+### Bounded metadata observer checkpoint
+
+The standalone [timeline observer](../idf/components/native_stream/include/ogg_opus_timeline.h)
+now has a [host qualification checkpoint](../tests/results/ogg-opus-timeline-20261101/README.md).
+It retains no encoded input pointer, packet body or PCM buffer. Its host state
+is 512 bytes; events require generation/token acknowledgement before input can
+advance past a logical-link boundary. It observes known mapping families
+0/1/2/3/255 and separates provisional EOS-header bounds from CRC-verified pages.
+
+The authoritative host run passes 525 cases, 159 semantic negatives, 403 reset
+positions and ten whole/4096/257/one-byte/seeded fixture runs under GCC with
+ASan, UBSan and leak detection. All 219 public packet-duration comparisons agree
+with installed libopus 1.4. These compare timing metadata, not decoded PCM.
+The initial sandbox launch failure and earlier passing pre-reference run are
+preserved separately from the authoritative source snapshot.
+
+This header is not connected to either production audio service. It does not
+implement playback trimming, validate every compressed-packet/tag detail, or
+establish sample alignment of Espressif output. Unknown mapping families,
+concurrent serials and unaligned streams have explicit status results. MCU
+execution, caller ordering/buffering and an independent sample-position oracle
+remain required before integrating the trim correction.
+
 ## Additional software gates
 
 - Correct and qualify sample-accurate Ogg Opus pre-skip/end trimming against an
