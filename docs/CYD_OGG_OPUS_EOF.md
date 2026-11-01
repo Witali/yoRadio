@@ -29,15 +29,24 @@ and 18 contradictory transcript controls bind the production implementation.
 
 The chain reaches a minimum of 52024 free heap bytes in this diagnostic. Full
 network/TLS/TFT margins, linked production exports and physical output are still
-required; a 65307-byte encoded page is additional storage. Nonzero OpusHead
-output gain is also an open playback gap: a [complete paired observation](../tests/results/cyd-opus-header-gain-20261101/README.md)
+required; a 65307-byte encoded page is additional storage. A
+[complete paired observation](../tests/results/cyd-opus-header-gain-20261101/README.md)
 found identical stock PCM for zero/+6/-6 dB headers. The
 [output-owner correction](../tests/results/cyd-header-gain-output-20261101/README.md)
 now combines header and player gain before wide mono mixing and final
 saturation. Its three-backend host qualification preserves the zero-gain
-regression exactly. Ordered packet metadata and the complete actual-task gain
-pipeline still need their separate qualification. This checkpoint does not
-claim universal conformance.
+regression exactly. The subsequent
+[complete actual-task gain checkpoint](../tests/results/cyd-ogg-gain-task-20261101/README.md)
+passes 24 SDK/QEMU cases through the real PDM renderer, including a nine-link
+same-HTTP chain. Each queued PCM packet carries its signed gain, so opening a
+later decoder cannot overwrite calibration for earlier queued audio. All 32
+complete output links match independent full mono goldens, including Vorbis
+bypass/reset and the +48 dB / low-player-volume anti-early-clipping case.
+All 38 decoders and 30 clients close; original cores/priorities/stacks remain.
+Minimum diagnostic heap is 51824 bytes; output unused stack is 1528 bytes.
+Adaptive normalization is disabled through its real settings API for this
+matrix. Enabled-normalizer, full radio/TLS/TFT and physical qualification remain
+separate; this checkpoint does not claim universal codec conformance.
 
 That gain experiment preserves all 551 original audio packets and every byte
 outside the OpusHead gain/CRC fields. Six fresh public decoder handles
@@ -124,6 +133,9 @@ dependencies. Nineteen negative reference checks reject missing commands,
 artifacts and harness sources, or changed QEMU/image/core/archive identities.
 
 ## Required playback-trimming correction
+
+This section retains the measurements and design requirements from before
+integration. The current default implementation and its task gates are above.
 
 The measured raw output is **not standard-complete Ogg Opus playback**.
 [RFC 7845 sections 4.2–4.4](https://www.rfc-editor.org/rfc/rfc7845.html#section-4.2)
@@ -235,7 +247,7 @@ not a promise of negligible extra heap in the CYD profile.
 ## Additional software gates
 
 - The default production task now passes the qualified sample-accurate trim
-  cases above. Qualify nonzero header gain, other legal packet modes/mappings,
+  and ordered nonzero-header-gain cases above. Qualify other legal packet modes/mappings,
   broader rate semantics and remaining resource/error cases before claiming
   complete playback-format coverage.
 - Cover legal packet modes and durations, including 120 ms stereo packets.
@@ -260,7 +272,8 @@ not a promise of negligible extra heap in the CYD profile.
   remain unchanged. Ten contradictory resize transcripts are rejected by the
   standalone evidence verifier. Nonzero error consumption, empty-input retries
   and OOM remain unqualified. These results do not justify changing production
-  input advancement and do not implement the required playback trimming.
+  input advancement. These historical resize-only gates did not implement
+  trimming; the current default is qualified by the later task gates above.
 - Deliberate backpressure, actual HTTP/TLS/TFT traffic, production resources
   and physical audio/output backends remain separate gates.
 

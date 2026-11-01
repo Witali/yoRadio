@@ -45,9 +45,11 @@ def main():
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=False)
     files = [Path(__file__).relative_to(ROOT).as_posix(), TEST+'/task.c', TEST+'/allocations.cpp', TEST+'/registration.c',
              MAIN+'/audio_service.c', MAIN+'/native_state.c', MAIN+'/native_state.h',
-             MAIN+'/native_audio_output.c', MAIN+'/native_health.h', MAIN+'/decoder_registration.c',
+             MAIN+'/native_audio_output.c', MAIN+'/native_health.h', MAIN+'/native_output_metrics.h', MAIN+'/decoder_registration.c',
              MAIN+'/Kconfig.projbuild', MAIN+'/CMakeLists.txt',
              'idf/components/native_stream/include/audio_completion.h',
+             'idf/components/native_stream/include/decoder_pending_input.h',
+             'idf/components/native_stream/include/decoder_eof_input.h',
              CORE+'/flac_decoder.cpp', CORE+'/flac_decoder.h',
              ADAPTER+'/custom_flac_adapter.cpp', ADAPTER+'/custom_flac_adapter.h',
              'tools/audio_test_server/generate_flac_depths.py', 'tests/native/flac_bounds/Arduino.h']
@@ -76,12 +78,18 @@ static inline void xSemaphoreGive(SemaphoreHandle_t p) {assert(!pthread_mutex_un
 size_t strlcpy(char *,const char *,size_t);
 ''')
     (generated/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
+    (generated/'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
     source = (frozen/MAIN/'audio_service.c').read_text()
+    packet_end = source.index('} pcm_packet_t;') + len('} pcm_packet_t;')
+    packet_start = source.rfind('typedef struct {', 0, packet_end)
+    assert packet_start >= 0
+    (generated/'pcm-packet.inc').write_text(source[packet_start:packet_end] + '\n')
     start = source.index('#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM\ntypedef struct')
     callback = source[start:source.index('static void decoder_release(',start)]
     legacy_start = source.index('#ifdef YORADIO_CUSTOM_LEGACY_DECODER\ntypedef struct')
     callback = source[legacy_start:start] + callback
-    production = ''.join(function(source,name) for name in ('simple_decoder_type','codec_name','state_set_decoder_bitrate','publish_stream_info','send_pcm','send_pcm_end'))
+    production = '#include "decoder_pending_input.h"\n#include "decoder_eof_input.h"\n'
+    production += ''.join(function(source,name) for name in ('simple_decoder_type','codec_name','state_set_decoder_bitrate','publish_stream_info','send_pcm_with_header_gain','send_pcm','send_pcm_end'))
     production = function((frozen/MAIN/'native_audio_output.c').read_text(),'native_audio_output_supports_pcm') + production
     production += callback + function(source,'decoder_release') + function(source,'decoder_task')
     (generated/'production.inc').write_text(production)
@@ -174,8 +182,8 @@ size_t strlcpy(char *,const char *,size_t);
     mutants = {
         'source-depth-as-pcm': ('.bits_per_sample = info->pcm_bits_per_sample,','.bits_per_sample = info->bits_per_sample,'),
         'terminal-workspace-retained': ('packet_done:\n','packet_done:\n'),
-        'ack-before-release': ('                decoder_release(&decoder, &output, &output_size);',
-                               '                maintenance_ack(MAINTENANCE_DECODER);\n                decoder_release(&decoder, &output, &output_size);'),
+        'ack-before-release': ('                decoder_release(&decoder, &output, &output_size, &pending, &eof_input);',
+                               '                maintenance_ack(MAINTENANCE_DECODER);\n                decoder_release(&decoder, &output, &output_size, &pending, &eof_input);'),
     }
     mutant_results = []
     for name,(before,after) in mutants.items():

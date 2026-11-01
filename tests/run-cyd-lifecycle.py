@@ -69,7 +69,7 @@ size_t strlcpy(char *, const char *, size_t);
                         source.index('static void state_set_decoder_bitrate')]
     generated += function((MAIN/'native_audio_output.c').read_text(), 'native_audio_output_supports_pcm')
     for name in ('simple_decoder_type', 'codec_name', 'state_set_decoder_bitrate','publish_stream_info','state_set_audio',
-                 'fail_generation', 'send_encoded', 'send_pcm', 'send_pcm_end',
+                 'fail_generation', 'send_encoded', 'send_pcm_with_header_gain', 'send_pcm', 'send_pcm_end',
                  'CUSTOM', 'decoder_release', 'decoder_task', 'output_task',
                  'audio_service_play', 'audio_service_stop', 'audio_service_input_health'):
         if name == 'CUSTOM':
@@ -81,7 +81,9 @@ size_t strlcpy(char *, const char *, size_t);
             generated += function(source, name)
     (OUT/'production.inc').write_text(generated)
     output = (MAIN/'native_audio_output.c').read_text()
-    generated = '\n'.join(function(output, name) for name in (
+    generated = '#include "pcm_header_gain.h"\n'
+    generated += re.search(r'^static pcm_header_gain s_header_gain[^;]*;', output, re.M).group(0) + '\n'
+    generated += '\n'.join(function(output, name) for name in (
         'reset_resampler', 'pdm_flush', 'native_audio_output_discard_pcm',
         'native_audio_output_flush_pcm'))
     (OUT/'pdm-tail.inc').write_text(generated)

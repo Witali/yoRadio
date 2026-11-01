@@ -16,8 +16,8 @@ typedef int esp_err_t, esp_audio_err_t;
 typedef unsigned esp_audio_simple_dec_type_t;
 typedef void *esp_audio_simple_dec_handle_t;
 typedef struct { unsigned dec_type; void *dec_cfg; unsigned cfg_size; bool use_frame_dec; } esp_audio_simple_dec_cfg_t;
-typedef struct { uint8_t *buffer; size_t len, consumed; unsigned eos; } esp_audio_simple_dec_raw_t;
-typedef struct { uint8_t *buffer; size_t len, needed_size, decoded_size; } esp_audio_simple_dec_out_t;
+typedef struct { uint8_t *buffer; uint32_t len, consumed; unsigned eos; } esp_audio_simple_dec_raw_t;
+typedef struct { uint8_t *buffer; uint32_t len, needed_size, decoded_size; } esp_audio_simple_dec_out_t;
 typedef struct { uint32_t sample_rate, bitrate; uint8_t bits_per_sample, channel; } esp_audio_simple_dec_info_t;
 typedef void *RingbufHandle_t;
 #define ESP_AUDIO_SIMPLE_DEC_TYPE_AAC 2
@@ -25,6 +25,9 @@ typedef void *RingbufHandle_t;
 #define ESP_AUDIO_SIMPLE_DEC_TYPE_OGG 4
 #define ESP_AUDIO_SIMPLE_DEC_TYPE_MP3 1
 #define ESP_AUDIO_ERR_OK 0
+#define ESP_AUDIO_ERR_MEM_LACK -2
+#define ESP_AUDIO_ERR_DATA_LACK -3
+#define ESP_AUDIO_ERR_INVALID_PARAMETER -5
 #define ESP_AUDIO_ERR_BUFF_NOT_ENOUGH -8
 #define ESP_OK 0
 #define ESP_FAIL -1
@@ -38,10 +41,7 @@ typedef struct {
     uint32_t generation; native_codec_t codec;
     uint16_t data_size; uint8_t end_of_stream; uint8_t data[];
 } encoded_packet_t;
-typedef struct {
-    uint32_t generation, sample_rate; uint8_t bits_per_sample, channels;
-    uint16_t data_size; uint32_t end_of_stream; uint8_t data[];
-} pcm_packet_t;
+#include "pcm-packet.inc"
 #define DECODE_BUFFER_INITIAL 12288
 #define PCM_PACKET_DATA_SIZE 3072
 static native_state_t state, *s_state = &state;
@@ -68,6 +68,7 @@ extern void flac_test_finish(void);
 extern unsigned flac_test_errors;
 
 static int64_t esp_timer_get_time(void) { return 0; }
+static void vTaskDelay(unsigned ticks) { assert(ticks == 1); }
 static void assert_quiet(void) {
     assert(!flac_test_live() && !flac_test_workspace() && !vendor_live && !pending_pcm);
     ++quiescent_checks;
@@ -140,6 +141,7 @@ static int xRingbufferSendComplete(void *ring, void *p) {
         assert_quiet(); terminal_reason = packet->end_of_stream; return pdTRUE;
     }
     assert(packet->bits_per_sample == 16 && packet->channels == source_channels);
+    assert(packet->header_gain_q8 == 0);
     assert(packet->sample_rate == 48000 && packet->data_size % (source_channels * 2) == 0);
     assert(pcm_position + packet->data_size <= reference_size);
     assert(!memcmp(packet->data, reference_pcm + pcm_position, packet->data_size));

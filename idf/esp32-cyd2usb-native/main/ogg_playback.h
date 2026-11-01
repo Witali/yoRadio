@@ -14,6 +14,7 @@
 typedef struct {
     ogg_page_input input;
     opus_pcm_trim trim;
+    int16_t header_gain_q8;
     uint32_t generation;
     uint32_t calls;
 } ogg_playback;
@@ -26,7 +27,7 @@ typedef enum {
 typedef struct {
     bool (*cancelled)(void *context);
     bool (*output)(void *context, const esp_audio_simple_dec_info_t *info,
-                   const uint8_t *pcm, size_t bytes);
+                   const uint8_t *pcm, size_t bytes, int16_t header_gain_q8);
     void (*yield)(void *context);
     void *context;
 } ogg_playback_callbacks;
@@ -35,6 +36,7 @@ static inline void ogp_reset(ogg_playback *s, uint32_t generation)
 {
     opi_reset(&s->input, generation);
     opt_reset(&s->trim);
+    s->header_gain_q8 = 0;
     s->generation = generation;
     s->calls = 0;
 }
@@ -51,10 +53,25 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
 {
     const oopt_event *page = &s->input.event;
     bool eos = (page->flags & OOPT_LINK_END) != 0;
-    if ((page->flags & OOPT_HEAD) && page->opus &&
-        opt_begin(&s->trim, s->generation, page->pre_skip, page->channels) != OPT_OK) {
-        *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
-        return OGP_CONTAINER;
+    if ((page->flags & OOPT_HEAD) && page->opus) {
+        /* OpusHead is the sole completed packet on the verified BOS page.
+         * Its signed gain field is always at bytes 16..17 of that packet,
+         * including compatible header extensions and other mapping families.
+         */
+        size_t payload = 27u + s->input.page[26];
+        if (payload > s->input.size || s->input.size - payload < 19) {
+            *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
+            return OGP_CONTAINER;
+        }
+        unsigned encoded_gain = s->input.page[payload + 16] |
+                                (unsigned)s->input.page[payload + 17] << 8;
+        int32_t gain = encoded_gain < 32768u ? (int32_t)encoded_gain :
+                       (int32_t)encoded_gain - 65536;
+        if (opt_begin(&s->trim, s->generation, page->pre_skip, page->channels) != OPT_OK) {
+            *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
+            return OGP_CONTAINER;
+        }
+        s->header_gain_q8 = (int16_t)gain;
     }
     if (eos && page->opus && (!page->raw_end_known ||
         opt_end(&s->trim, s->generation, page->raw_end, page->raw_completed) != OPT_OK)) {
@@ -124,7 +141,8 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
                 return OGP_INFO;
             }
             if (span.size && !callbacks->output(callbacks->context, &info,
-                    *output + span.offset, span.size)) {
+                    *output + span.offset, span.size,
+                    page->opus ? s->header_gain_q8 : 0)) {
                 *cause = ESP_AUDIO_ERR_FAIL;
                 return callbacks->cancelled(callbacks->context) ? OGP_CANCELLED : OGP_OUTPUT;
             }
@@ -150,6 +168,7 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
         *decoder = NULL;
         decoder_pending_input_clear(pending);
         opt_reset(&s->trim);
+        s->header_gain_q8 = 0;
     }
     return opi_ack(&s->input, page->generation, page->token) ? OGP_OK : OGP_CONTAINER;
 }

@@ -91,7 +91,7 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 | Блок | Оставшаяся программная работа |
 | --- | --- |
-| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim и chaining уже подключены и проходят actual task gates. Header gain проходит финальную интеграцию; host DSP для трёх выходов проверен. Остались general mappings, другие modes/rate semantics, OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
+| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates; host DSP проверен для трёх выходов. Остались general mappings, проверка других modes/rate semantics, OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
 | AAC compact owners | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) уже перенесён; отдельная Xtensa ABI/PCM/OOM/lifetime адаптация compact owners ещё нужна. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Target OOM/backpressure/semantic controls и production watchdog/resource qualification. [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | Полный radio boot, actual TLS traffic и измерение heap/IRAM/stack до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
@@ -113,8 +113,13 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   Входы: [playback wrapper](../idf/esp32-cyd2usb-native/main/ogg_playback.h),
   [page owner](../idf/components/native_stream/include/ogg_page_input.h),
   [PCM spans](../idf/components/native_stream/include/opus_pcm_trim.h).
-  Остаются [header gain](../tests/results/cyd-opus-header-gain-20261101/README.md),
-  обязательная mapping-family-1 playback поддержка с корректным hardware layout,
+  [Header gain](../tests/results/cyd-ogg-gain-task-20261101/README.md)
+  теперь также проходит 24 actual-task случая, включая nine-link chain:
+  gain передаётся в каждом PCM-пакете и объединяется с player volume/balance
+  до финального ограничения. Все 32 полных mono spans совпадают с независимыми
+  эталонами; 38 decoder/30 HTTP owners закрыты. Minimum heap51824, output stack
+  free1528 относятся к диагностике; normalizer в этой target-матрице выключен.
+  Остаются обязательная mapping-family-1 playback поддержка с корректным layout,
   другие modes и resource/error gates. Полная radio/TLS/TFT и physical приёмка
   остаются отдельно. Собственную арифметику Vorbis не подключать.
   [Диагностика family1](../tests/results/cyd-opus-family1-20261101/README.md)
