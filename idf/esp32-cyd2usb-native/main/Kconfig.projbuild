@@ -11,6 +11,17 @@ menu "yoRadio native firmware"
             continues to report confirmed PCM parameters because the public
             API does not identify nominal HE/PS source profiles.
 
+    config YORADIO_OGG_TIMELINE
+        bool "Verify Ogg pages and honor Opus playback bounds"
+        default y
+        help
+            Check each complete Ogg page before decoding. Use the stream's
+            actual Opus pre-skip and terminal granule for playback, and drain
+            each logical link before reopening the next one. Allocates one
+            encoded page of up to 65307 bytes in addition to codec workspace.
+            Disabling this option selects the raw vendor playback path, which
+            can emit Opus priming samples and end padding.
+
     config YORADIO_NATIVE_WEB
         bool
         default y

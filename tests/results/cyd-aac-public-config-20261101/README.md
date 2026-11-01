@@ -11,6 +11,13 @@ backend, matching C3's public preference. It is hidden when that vendor backend
 is disabled. Status continues to report confirmed PCM parameters; the public
 API does not prove nominal HE/PS source labels.
 
+This checkpoint records the AAC integration revision in commit `aa6857b0c`.
+Later Ogg options legitimately extend the same Kconfig file. Its original
+tested Kconfig bytes remain frozen here; the verifier explicitly reports
+whether today's configuration still matches and offers `--require-current`
+to enforce that additional check. Executed canonical readers remain pinned.
+This historical gate does not qualify a later edited configuration or audio TU.
+
 ## Actual public decoder execution
 
 SDK 6.0.2 / classic dual-core ESP32 QEMU campaign **02** completes all **36**

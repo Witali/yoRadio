@@ -91,7 +91,7 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 | Блок | Оставшаяся программная работа |
 | --- | --- |
-| Ogg/Opus и Espressif reuse | Подключить проверенный metadata observer, реализовать sample-accurate pre-skip/end trim и проверить PCM alignment независимым эталоном; затем OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
+| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim и chaining уже подключены и проходят actual task gates. Остались header gain, другие modes/mappings/rate semantics, OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
 | AAC compact owners | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) уже перенесён; отдельная Xtensa ABI/PCM/OOM/lifetime адаптация compact owners ещё нужна. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Target OOM/backpressure/semantic controls и production watchdog/resource qualification. [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | Полный radio boot, actual TLS traffic и измерение heap/IRAM/stack до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
@@ -115,9 +115,12 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   input и [actual CYD tasks](../tests/results/cyd-opus-20261030/LONG_TASK.md):
   все пять handles реально увеличивают output 12288→23040 и успешно повторяют
   вызов с прежним input. Следом — обрезка по реальной timeline с независимым
-  эталоном; старые C3 interior windows её не закрывают. [Ограниченный metadata observer](../tests/results/ogg-opus-timeline-20261101/README.md)
-  уже проходит host/ASan/UBSan и сравнение длительностей с libopus, но ещё
-  не подключён к production caller и сам playback trim не реализует.
+  эталоном; старые C3 interior windows её не закрывают. Последующий
+  [actual-task checkpoint](../tests/results/cyd-ogg-playback-task-20261101/README.md)
+  уже подключает CRC-verified metadata и clipping в default CYD caller:
+  обе Opus fixtures дают 2112000 logical bytes, Vorbis сохраняет PCM, цепочка
+  трёх links проходит без промежуточного EOF. Новая открытая коррекция —
+  nonzero OpusHead gain; прочие modes/mappings/rates и ресурсы остаются.
   Radio/TLS/TFT ресурсы и deliberate backpressure остаются отдельно. Собственную
   арифметику не подключать.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
@@ -2265,3 +2268,14 @@ Stream остаётся на core0, decode/output на core1 с прежними
   проходят. Исходные compile/reader nonpasses сохранены. Compact owners,
   production AAC task lifecycle, implicit late SBR/OOM/backpressure и full-app
   resources ещё нужны; private/reset и FLAC target deferrals не возобновлялись.
+
+- 2026-11-01, CYD-C3-14, [default production Ogg timeline](../tests/results/cyd-ogg-playback-task-20261101/README.md):
+  подключены verified pages, реальные Opus pre-skip/end bounds, отдельный
+  public decoder на logical link и полная owner cleanup перед maintenance ACK.
+  Actual SDK/QEMU с полными TUs проходит девять lifecycle cases и тройную
+  same-HTTP/same-generation цепочку; все 18 handles/16 clients закрыты.
+  Исходные core/priority/stack сохранены. Пройдены 18 contradictory controls,
+  actual closure — 11 TUs/421 deps. Minimum diagnostic heap цепочки — 52024 B;
+  full radio/TLS/TFT margin этим не квалифицирован. Header gain пока открыт:
+  paired stock decode zero/+6/-6 dB дал одинаковый PCM; исправление готовится
+  отдельно. Linked exports/full lint и остальные gates остаются в очереди.

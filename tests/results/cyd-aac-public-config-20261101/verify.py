@@ -1,4 +1,5 @@
 """Verify saved public AAC evidence without running archived code or native tools."""
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -18,6 +19,9 @@ def sha(body): return hashlib.sha256(body).hexdigest()
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--require-current',action='store_true')
+    args=parser.parse_args()
     manifest=json.loads((FOLDER/'manifest.json').read_bytes())
     pin=manifest['archive'];archive=FOLDER/pin['path']
     need(archive.name=='captures.zip' and sha(archive.read_bytes())==pin['sha256'] and archive.stat().st_size==pin['bytes'], 'exact evidence archive')
@@ -52,8 +56,18 @@ def main():
         else:
             need(name in omitted and omitted[name]['sha256']==digest and (size is None or omitted[name]['bytes']==size), 'omitted identity; bytes not re-read')
 
+    current_kconfig_matches=True
     for name,digest in manifest['canonical_source_sha256'].items():
-        need(sha((ROOT/name).read_bytes())==digest,'unchanged reviewed canonical source: '+name)
+        matches=sha((ROOT/name).read_bytes())==digest
+        if name=='idf/esp32-cyd2usb-native/main/Kconfig.projbuild':
+            # Later Ogg options evolve this file. Authenticate the original
+            # tested bytes, without treating that historical gate as a test
+            # of the later configuration. Executed readers stay exact-pinned.
+            need(any(sha(body)==digest for body in data.values()),'original tested Kconfig payload')
+            current_kconfig_matches=matches
+            if args.require_current:need(matches,'current configuration differs from historical revision')
+        else:
+            need(matches,'unchanged reviewed canonical source: '+name)
     controller=ROOT/'tests/run-cyd-aac-public-config-qemu.py'
     spec=importlib.util.spec_from_file_location('reviewed_public_aac_reader',controller)
     reader=importlib.util.module_from_spec(spec);spec.loader.exec_module(reader)
@@ -122,7 +136,8 @@ def main():
         need(row['source_sha256']==manifest['compiled_current_audio_service_sha256'],'all six compile the same current integration source')
     print(json.dumps(dict(passed=True,native_cases=36,kconfig_cases=8,production_TU_profiles=6,
         rejected_transcript_controls=len(mutations),logical_files=len(data),omitted_local_files=len(omitted),
-        compact_owner_ported=False,native_production_pipeline_executed=False,omitted_binary_bytes_read=False)))
+        compact_owner_ported=False,native_production_pipeline_executed=False,omitted_binary_bytes_read=False,
+        current_kconfig_matches_historical_revision=current_kconfig_matches)))
 
 
 if __name__=='__main__':main()

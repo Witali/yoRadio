@@ -6,6 +6,34 @@ accepts arbitrary input sizes; raw Opus instead requires complete frames.
 These are different contracts. The new regression uses the Ogg container path
 and the unchanged LX6 archives, not C3's RISC-V archives or private repairs.
 
+The default CYD path now uses `YORADIO_OGG_TIMELINE`: one CRC-verified page,
+stream-derived Opus clipping and a separately drained public decoder per
+logical link. The original lookahead caller remains the explicitly disabled
+timeline option's raw-vendor fallback. Historical raw-output measurements below
+remain decoder regression references, rather than current default playback.
+
+## Production task integration
+
+The [actual CYD task checkpoint](../tests/results/cyd-ogg-playback-task-20261101/README.md)
+passes nine EOF/Stop/maintenance cases across complete 20/120 ms Opus and Vorbis,
+plus Opus→Vorbis→Opus chaining within one HTTP session/generation. Both Opus
+streams emit 2112000 logical PCM bytes with the independently positioned
+stock-vendor window hashes; Vorbis preserves its earlier complete PCM. One
+terminal PCM EOF follows all three chain links. All 18 public decoders and
+16 SDK HTTP clients close, with the original task cores/priorities/stacks.
+
+All page/trim storage is released on generation change, codec change, terminal
+completion and maintenance before its decoder acknowledgement. The six actual
+long-packet resize/retry pairs remain measured. The 11-TU/421-dependency closure
+and 18 contradictory transcript controls bind the production implementation.
+
+The chain reaches a minimum of 52024 free heap bytes in this diagnostic. Full
+network/TLS/TFT margins, linked production exports and physical output are still
+required; a 65307-byte encoded page is additional storage. Nonzero OpusHead
+output gain is also an open playback gap: a separate complete paired observation
+found identical stock PCM for zero/+6/-6 dB headers. Application gain remains to
+implement and qualify. This checkpoint does not claim universal conformance.
+
 ## Measured direct-vendor regression
 
 The complete existing `tests/fixtures/esp32c3_calibration/opus-510.ogg` is
@@ -164,8 +192,10 @@ not a promise of negligible extra heap in the CYD profile.
 
 ## Additional software gates
 
-- Correct and qualify sample-accurate Ogg Opus pre-skip/end trimming against an
-  independent reference before marking playback semantics complete.
+- The default production task now passes the qualified sample-accurate trim
+  cases above. Qualify nonzero header gain, other legal packet modes/mappings,
+  broader rate semantics and remaining resource/error cases before claiming
+  complete playback-format coverage.
 - Cover legal packet modes and durations, including 120 ms stereo packets.
   The [official Opus decoder API](https://opus-codec.org/docs/opus_api-1.5/group__opus__decoder.html)
   requires capacity for up to 5760 samples per channel: 23040 PCM16 stereo bytes.

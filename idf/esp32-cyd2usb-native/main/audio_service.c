@@ -36,6 +36,9 @@
 #include "stream_bitrate.h"
 #include "stream_probe.h"
 #include "sdkconfig.h"
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+#include "ogg_playback.h"
+#endif
 #ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
 #include "aac_public_config.h"
 #endif
@@ -812,6 +815,35 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
 }
 #endif
 
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+typedef struct {
+    uint32_t generation;
+    bool info_failed;
+} ogg_output_context_t;
+
+static bool ogg_output_cancelled(void *user) {
+    const ogg_output_context_t *context = user;
+    return context->generation != atomic_load(&s_generation) ||
+           context->generation == atomic_load(&s_failed_generation);
+}
+
+static bool ogg_output_pcm(void *user, const esp_audio_simple_dec_info_t *info,
+                           const uint8_t *pcm, size_t bytes) {
+    ogg_output_context_t *context = user;
+    if (ogg_output_cancelled(context)) return false;
+    if (!publish_stream_info(context->generation, NATIVE_CODEC_OGG, info)) {
+        context->info_failed = true;
+        return false;
+    }
+    return send_pcm(context->generation, info, pcm, bytes);
+}
+
+static void ogg_output_yield(void *user) {
+    (void)user;
+    vTaskDelay(1);
+}
+#endif
+
 static void decoder_release(esp_audio_simple_dec_handle_t *decoder,
                              uint8_t **output, size_t *output_size,
                              decoder_pending_input_t *pending,
@@ -835,6 +867,9 @@ static void decoder_task(void *argument) {
     size_t output_size = 0;
     decoder_pending_input_t pending = {0};
     decoder_eof_input_t eof_input = {0};
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+    ogg_playback ogg = {0};
+#endif
     esp_audio_simple_dec_handle_t decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
     // The shared core has process-global sample workspace. This task is its
@@ -858,6 +893,9 @@ static void decoder_task(void *argument) {
         if (generation != current_generation ||
             atomic_load(&s_failed_generation) == current_generation) {
             decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+            ogp_reset(&ogg, 0);
+#endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
@@ -882,6 +920,9 @@ static void decoder_task(void *argument) {
             if (maintenance_active() && maintenance_acked(MAINTENANCE_STREAM) &&
                 generation == atomic_load(&s_generation)) {
                 decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+                ogp_reset(&ogg, 0);
+#endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
                 if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
                 flac_decoder = NULL;
@@ -919,6 +960,9 @@ static void decoder_task(void *argument) {
         }
 #endif
         if (!packet->data_size && end_reason && !decoder
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+            && !ogp_has_input(&ogg)
+#endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             && !flac_decoder
 #endif
@@ -931,6 +975,9 @@ static void decoder_task(void *argument) {
             decoder_eof_input_clear(&eof_input);
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+            ogp_reset(&ogg, packet->generation);
+#endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
@@ -1055,6 +1102,32 @@ static void decoder_task(void *argument) {
                              codec_name(codec), result);
                     end_reason = AUDIO_END_DECODE_FAILED;
                 }
+            }
+            goto packet_done;
+        }
+#endif
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+        if (codec == NATIVE_CODEC_OGG) {
+            ogg_output_context_t context = {.generation = generation};
+            const ogg_playback_callbacks callbacks = {
+                .cancelled = ogg_output_cancelled, .output = ogg_output_pcm,
+                .yield = ogg_output_yield, .context = &context,
+            };
+            int32_t cause = 0;
+            ogg_playback_status status = ogp_feed(&ogg, packet->data,
+                packet->data_size, packet->end_of_stream != AUDIO_CONTINUE,
+                &decoder, &output, &output_size, &pending, &callbacks, &cause);
+            if (status != OGP_OK && status != OGP_CANCELLED &&
+                generation == atomic_load(&s_generation)) {
+                failure_stage = status == OGP_INFO || context.info_failed
+                    ? NATIVE_HEALTH_INFO : status == OGP_OUTPUT
+                    ? NATIVE_HEALTH_PCM : NATIVE_HEALTH_PROCESS;
+                failure_result = cause;
+                end_reason = status == OGP_MEMORY ? AUDIO_END_ALLOCATION_FAILED
+                    : status == OGP_OUTPUT && !context.info_failed
+                    ? AUDIO_END_BUFFER_STALLED : AUDIO_END_DECODE_FAILED;
+                ESP_LOGW(TAG, "Ogg playback error: %d (%ld)",
+                         (int)status, (long)cause);
             }
             goto packet_done;
         }
@@ -1187,6 +1260,9 @@ packet_done:
                 native_health_decoder_failure(packet->generation, (uint32_t)packet->codec,
                     failure_stage, failure_result, end_reason, packet->data_size);
             decoder_release(&decoder, &output, &output_size, &pending, &eof_input);
+#ifdef CONFIG_YORADIO_OGG_TIMELINE
+            ogp_reset(&ogg, 0);
+#endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
             flac_decoder = NULL;
