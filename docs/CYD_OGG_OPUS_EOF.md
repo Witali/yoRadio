@@ -58,12 +58,10 @@ The correction must apply header gain in addition to player volume/normalization
 preserve unity output and qualify signed-range rounding/clipping and link resets.
 
 The [required family-0/1 playback support](https://www.rfc-editor.org/rfc/rfc7845.html#section-5.1.1.5)
-is another explicit open gate. A player must handle valid mappings in those
-families even when channel count exceeds its physical outputs. Recognition of
-family 1 by the metadata observer does not establish playback support. Current
-clipping binds its channel count to OpusHead. The output API accepts nonzero
-channel counts but its current mono renderer consumes only the first two;
-acceptance of wide PCM is not correct surround mixing.
+applies even when the logical channel count exceeds the physical outputs.
+Production family1 dispatch and all-speaker mixing are now implemented;
+their complete actual-task/resource qualification remains open. Merely
+recognizing family1 or accepting wide PCM is insufficient evidence of playback.
 
 The [complete family-1 observation](../tests/results/cyd-opus-family1-20261101/README.md)
 now establishes a real stock-Ogg gap: all twelve 3/6/8-channel stock/wrapper
@@ -78,12 +76,42 @@ and independently reconstructed common framing produce byte-identical native
 PCM. Every case returns to its original free heap. This proves an available
 reuse mechanism for those default layouts, not completed production support.
 
-The remaining implementation must reconstruct packets across verified pages,
-preserve trim and queued gain, and mix every mapped speaker for CYD. It must
-also handle valid duplicate indices, index255 silence and unused coded
-channels: the output count need not equal the decoded count. The existing
-first-two-channel renderer and default-layout-only diagnostics do not close
-this gate.
+### Current multichannel integration
+
+The [production dispatcher](../idf/esp32-cyd2usb-native/main/ogg_playback.h)
+selects the [public raw-stream adapter](../idf/esp32-cyd2usb-native/main/opus_family1_playback.h)
+after the verified OpusHead identifies family1. The same page owner reconstructs
+packets across pages; streaming Tags validation precedes public decoder opens.
+Whole-packet staging preserves the public synthesis cadence, pre-skip/end trim,
+duplicate mappings, index255 silence and unused coded streams. A refused close
+retains the anchored configuration, handles, page/prefix leases and PCM planes;
+the playback owner's reset cannot replace its generation/configuration or
+release that storage until close succeeds. The service's cancellation generation
+is a separate control mechanism.
+
+The [integrated HOST gate](../tests/results/cyd-ogg-family1-dispatch-host-20261101/README.md)
+passes 43 schedules and 12 explicitly HOST controls under ASan/UBSan, with
+12983296 exact creator PCM samples. It covers selected C1–8 mappings, active
+C8 120/100ms packets, both family1/family0 chain orders and close-refusal
+ownership. The [standalone native adapter](../tests/results/cyd-opus-family1-playback-native-20261101/README.md)
+passes 12 independent public-native references and 22 schedules; its scope does
+not include active C8/120ms application playback or the complete radio tasks.
+
+[Every queued PCM packet](../tests/results/cyd-pcm-layout-metadata-20261101/README.md)
+carries its logical speaker layout alongside header gain. The
+[three output backends](../tests/results/cyd-surround-output-20261101/README.md)
+mix all logical Vorbis-order speakers when that layout is selected, including
+all-channel normalization with the existing512-byte scratch. Ordinary LEGACY
+layout retains its established first-two-channel behavior. These output HOST
+gates do not replace the complete family1 task gate.
+
+The new full-task diagnostic has not passed yet. Original nonpassing attempts
+are retained; completed independent references or individual EOF/Stop cases
+are partial evidence. Corrections to a new observer must preserve production
+sources, fixtures, exact source/mono comparisons and original task profiles.
+Application OOM, watchdog/resource margins and full radio/TLS/TFT behavior must
+be established from their own observations rather than inferred from a failed
+diagnostic assertion or from the standalone adapter.
 
 ## Additional legal packet-mode observations
 
