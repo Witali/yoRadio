@@ -130,6 +130,16 @@ concurrent serials and unaligned streams have explicit status results. MCU
 execution, caller ordering/buffering and an independent sample-position oracle
 remain required before integrating the trim correction.
 
+The [nil-page differential checkpoint](../tests/results/ogg-opus-nil-page-20261101/README.md)
+then found and corrected a continuation check: a zero-segment page has no first
+packet segment for its continuation bit to describe. Packet state survives the
+nil page while sequence checks still cover every page. Public libogg 1.3.5
+comparisons pass all 140 split schedules after the fix; the original 60 valid
+schedule rejections and five CRC-status mismatches remain preserved. The
+unchanged original host suite also passes against the repaired header. The
+historical checkpoint verifies its original source revision explicitly, and
+the successor verifies this correction; neither qualifies PCM integration.
+
 ## Additional software gates
 
 - Correct and qualify sample-accurate Ogg Opus pre-skip/end trimming against an

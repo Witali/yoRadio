@@ -7,6 +7,14 @@ leak detection. Its state occupies **512 bytes** on this x86-64 host. The
 production audio service does not use it yet; it neither synthesizes PCM nor
 implements pre-skip/end trimming. Espressif decoding remains unchanged.
 
+This is the historical observer revision from commit `f70c13354`, header SHA
+`b5a5c60e8015efdcbe8339abb37ad6067967d227b09d8e81c074947f53e8a531`.
+The later [nil-page differential checkpoint](../ogg-opus-nil-page-20261101/README.md)
+corrects a continuation check. Original campaign bytes remain unchanged here;
+the verifier authenticates that frozen original header and explicitly reports
+whether the current header still matches it. A historical pass does not
+qualify an edited header; the successor checkpoint supplies that regression.
+
 The observer consumes each original encoded byte once, retaining a fixed page
 header/lacing table and at most 19 identification bytes or two audio TOC bytes.
 It retains no input pointers, encoded packet bodies or PCM. All timing counts

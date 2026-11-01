@@ -2225,3 +2225,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   форматирования или firmware patches. Все исключённые image/FS/ROM payloads
   имеют локальные hash/size bindings. Это продвижение границы эмулятора, а
   не успешный полный radio boot; TLS traffic/resources и physical gates открыты.
+
+- 2026-11-01, CYD-C3-14, [nil-page continuation correction](../tests/results/ogg-opus-nil-page-20261101/README.md):
+  public libogg differential baseline выявил 60 отказов допустимых split
+  schedules и пять неверных CRC classifications. Continuation bit теперь
+  проверяется только на страницах с packet data; sequence проверяется на всех
+  страницах. Все 140 differential schedules и неизменённая исходная host suite
+  проходят с ASan/UBSan/leaks. Все исходные nonpasses, включая противоречивый
+  reader report после TypeError, сохранены и не принимаются как passing gates.
+  Первоначальный checkpoint продолжает проверять точную старую source revision;
+  current repaired header квалифицирован отдельным successor checkpoint.

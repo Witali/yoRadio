@@ -6,6 +6,8 @@ import zipfile
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
+ORIGINAL_HEADER = 'idf/components/native_stream/include/ogg_opus_timeline.h'
+ORIGINAL_HEADER_SHA = 'b5a5c60e8015efdcbe8339abb37ad6067967d227b09d8e81c074947f53e8a531'
 
 
 def need(condition, reason):
@@ -58,8 +60,15 @@ def main():
             need(sha(body) == source['sha256'] and len(body) == source['bytes'],
                  'original frozen source binding')
             if campaign == '03':
-                need((ROOT / source['path']).read_bytes() == body,
-                     'authoritative source differs from repository')
+                if source['path'] == ORIGINAL_HEADER:
+                    # A later nil-page fix legitimately changes production
+                    # sources. This historical gate authenticates the exact
+                    # earlier source, without qualifying the later revision.
+                    need(sha(body) == ORIGINAL_HEADER_SHA,
+                         'exact original qualified observer revision')
+                else:
+                    need((ROOT / source['path']).read_bytes() == body,
+                         'unchanged original harness/fixture/runner binding')
         for command in report['commands']:
             need(command['state'] == 'complete' and command['pid'] > 0 and
                  isinstance(command['exit_status'], int), 'actual terminal native command')
@@ -121,7 +130,9 @@ def main():
             need(len(records) == 11, 'original pre-reference run stays distinct')
     print(json.dumps({'passed': True, 'logical_files': len(rows), 'physical_blobs': len(bodies),
                       'executables_omitted': len(manifest['local_only_executables']),
-                      'metadata_only': True, 'playback_trim_implemented': False}))
+                      'metadata_only': True, 'playback_trim_implemented': False,
+                      'current_header_matches_historical_revision':
+                          sha((ROOT / ORIGINAL_HEADER).read_bytes()) == ORIGINAL_HEADER_SHA}))
 
 
 if __name__ == '__main__':

@@ -221,7 +221,13 @@ static inline oopt_status oopt_header(ogg_opus_timeline *s)
     } else {
         if (!s->active) return OOPT_UNALIGNED;
         if (serial != s->serial) return OOPT_UNSUPPORTED;
-        if (seq != s->next_sequence || continued != s->packet_open)
+        /* A nil page has no first segment for the continuation bit to
+         * describe. Preserve the previous packet's state across it; RFC 7845
+         * section 3 compares the previous/next pages with packet data.
+         * Sequence checking still includes every page, including nil pages.
+         */
+        if (seq != s->next_sequence ||
+            (h[26] && continued != s->packet_open))
             return OOPT_UNALIGNED;
     }
     s->next_sequence = seq + UINT32_C(1);
