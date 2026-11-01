@@ -85,6 +85,25 @@ channels: the output count need not equal the decoded count. The existing
 first-two-channel renderer and default-layout-only diagnostics do not close
 this gate.
 
+## Additional legal packet-mode observations
+
+The [49-stream creator corpus](../tests/results/opus-packet-modes-20261101/README.md)
+passes 196 complete stock/wrapper whole/split cases and 24 separate public
+raw-handle controls. All inputs are consumed, all output geometries agree,
+and each wrapper output equals its complete stock playback window. The corpus
+covers ten SILK/hybrid/CELT base duration profiles, codes0–3, CBR/VBR, padding,
+48-frame/120ms packets and legal absent coded frames after warm-up. These are
+actual synthesis observations, extending the earlier TOC-duration-only tests.
+
+The unaltered consecutive coded inputs have no observed clipping. Constructed
+repeated-frame and PLC inputs are separate: a repeated 2.5ms frame can drive
+both creator and vendor output into severe clipping. Creator float output is
+identical after code0 repacketization, while its clipped integer output can
+depend on packet cadence. The native aggregate/code0/presized/retry controls
+all match stock Ogg; these results do not justify a parser or retry workaround.
+Full numeric conformance, remaining bandwidth/channel transitions, production
+task/resource coverage and the other open gates remain unqualified.
+
 ## Measured direct-vendor regression
 
 The complete existing `tests/fixtures/esp32c3_calibration/opus-510.ogg` is

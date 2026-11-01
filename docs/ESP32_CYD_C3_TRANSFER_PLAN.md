@@ -130,6 +130,12 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   Production demux, произвольные допустимые mappings и полное сведение каналов
   ещё нужны. Текущий output API принимает wide PCM, но использует первые два
   канала; это не корректный surround downmix.
+  [Дополнительная mode-матрица](../tests/results/opus-packet-modes-20261101/README.md)
+  проходит 196 complete stock/wrapper случаев по 49 creator streams и 24 raw
+  controls без отказов API. SILK/hybrid/CELT, codes0–3, padding, 48-frame120ms
+  и legal absent frames проверены реальным декодированием. Numeric observations
+  для исходных последовательных, повторённых и PLC потоков разделены; полная
+  codec conformance не заявлена. Оснований менять parser/retry по этим данным нет.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
   **отложена по прямому указанию пользователя**. Исходники, незавершённые тесты
   и уже полученные результаты сохранены в [записи отложенной работы](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md).
