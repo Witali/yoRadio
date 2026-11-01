@@ -1,0 +1,480 @@
+{
+  "passed": true,
+  "production_selected": false,
+  "hardware_executed": false,
+  "source": [
+    {
+      "path": "tests/run-pcm-speaker-mix-host.py",
+      "snapshot": "sources/tests/run-pcm-speaker-mix-host.py",
+      "bytes": 7763,
+      "sha256": "b1f2889b4eec7c26dfb516b1a999d6157f12bdb263c2a658c53c131b212f1f24"
+    },
+    {
+      "path": "idf/components/native_stream/include/pcm_speaker_mix.h",
+      "snapshot": "sources/idf/components/native_stream/include/pcm_speaker_mix.h",
+      "bytes": 3225,
+      "sha256": "e2f45bc75a6a36572017505dc0e0ea8121f631f4ea58cb3db1bcebd60dbf925e"
+    },
+    {
+      "path": "tests/native/pcm_speaker_mix_host.c",
+      "snapshot": "sources/tests/native/pcm_speaker_mix_host.c",
+      "bytes": 4167,
+      "sha256": "f1608be6799998ea7d1172c262336a903a332458cc9c1d652f66f4d52ce5465e"
+    }
+  ],
+  "commands": [
+    {
+      "name": "compiler-version",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "--version"
+      ],
+      "state": "complete",
+      "pid": 12396,
+      "exit_status": 0,
+      "elapsed_seconds": 1.953,
+      "stdout": {
+        "path": "compiler-version.stdout.log",
+        "bytes": 246,
+        "sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048"
+      },
+      "stderr": {
+        "path": "compiler-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "compiler-realpath",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/readlink",
+        "-f",
+        "/usr/bin/gcc"
+      ],
+      "state": "complete",
+      "pid": 27896,
+      "exit_status": 0,
+      "elapsed_seconds": 1.985,
+      "stdout": {
+        "path": "compiler-realpath.stdout.log",
+        "bytes": 33,
+        "sha256": "a35fa4bf46e652fcb2323e848f8a71e92d00493e3021c894683a5162ca4fbda8"
+      },
+      "stderr": {
+        "path": "compiler-realpath.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "compiler-sha256",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/sha256sum",
+        "/usr/bin/x86_64-linux-gnu-gcc-13"
+      ],
+      "state": "complete",
+      "pid": 27772,
+      "exit_status": 0,
+      "elapsed_seconds": 1.812,
+      "stdout": {
+        "path": "compiler-sha256.stdout.log",
+        "bytes": 99,
+        "sha256": "753014b5ade9aa80a0f7d61cdec1afc98a2372e1a40ed4b2658a2d0501e6c7f2"
+      },
+      "stderr": {
+        "path": "compiler-sha256.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wshadow",
+        "-Wformat=2",
+        "-Wstrict-prototypes",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-speaker-mix-host-20261101-02/sources/idf/components/native_stream/include",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-speaker-mix-host-20261101-02/sources/tests/native/pcm_speaker_mix_host.c",
+        "-lm",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-speaker-mix-host-20261101-02/pcm-speaker-mix-host"
+      ],
+      "state": "complete",
+      "pid": 25292,
+      "exit_status": 0,
+      "elapsed_seconds": 3.485,
+      "stdout": {
+        "path": "build.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "test",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-speaker-mix-host-20261101-02/pcm-speaker-mix-host"
+      ],
+      "state": "complete",
+      "pid": 21004,
+      "exit_status": 0,
+      "elapsed_seconds": 1.218,
+      "stdout": {
+        "path": "test.stdout.log",
+        "bytes": 4636,
+        "sha256": "8b34f95ce662ca1ee420edf4fe89082a4d009119ef5d6800fbc38fa049e94759"
+      },
+      "stderr": {
+        "path": "test.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "decimal_precisions": [
+    100,
+    160
+  ],
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "compiler_identity": "1b99826121ae6682a634e5efe09bd3e3df58ce58e0b28f849114ab5b89139c26  /usr/bin/x86_64-linux-gnu-gcc-13",
+  "binary": {
+    "bytes": 93104,
+    "sha256": "d7f2e700f5f72d57d7faa28f595bc4786e73269270bc29968343850a1332dd80",
+    "local_only": true
+  },
+  "all_sources_current": true,
+  "exact_coefficients": 72,
+  "native_summary": {
+    "passed": true,
+    "impulses": 36,
+    "controls": 104,
+    "production_selected": false
+  },
+  "headroom": [
+    {
+      "channels": 1,
+      "wide": "0x1.fdfcp+22",
+      "headroom_preserved": true
+    },
+    {
+      "channels": 2,
+      "wide": "0x1.fdfcp+22",
+      "headroom_preserved": true
+    },
+    {
+      "channels": 3,
+      "wide": "0x1.fdfcp+22",
+      "headroom_preserved": true
+    },
+    {
+      "channels": 4,
+      "wide": "0x1.fdfbfffffffffp+22",
+      "headroom_preserved": true
+    },
+    {
+      "channels": 5,
+      "wide": "0x1.fdfcp+23",
+      "headroom_preserved": true
+    },
+    {
+      "channels": 6,
+      "wide": "0x1.fdfbfffffffffp+23",
+      "headroom_preserved": true
+    },
+    {
+      "channels": 7,
+      "wide": "0x1.fdfcp+23",
+      "headroom_preserved": true
+    },
+    {
+      "channels": 8,
+      "wide": "0x1.fdfcp+23",
+      "headroom_preserved": true
+    }
+  ],
+  "coefficients": [
+    {
+      "channels": 1,
+      "index": 0,
+      "left": "0x1p+0",
+      "right": "0x1p+0",
+      "impulse": "0x1.fffcp+14"
+    },
+    {
+      "channels": 2,
+      "index": 0,
+      "left": "0x1p+0",
+      "right": "0x0p+0",
+      "impulse": "0x1.fffcp+13"
+    },
+    {
+      "channels": 2,
+      "index": 1,
+      "left": "0x0p+0",
+      "right": "0x1p+0",
+      "impulse": "0x1.fffcp+13"
+    },
+    {
+      "channels": 3,
+      "index": 0,
+      "left": "0x1.2bec333018867p-1",
+      "right": "0x0p+0",
+      "impulse": "0x1.2be9db57b2264p+13"
+    },
+    {
+      "channels": 3,
+      "index": 1,
+      "left": "0x1.a827999fcef32p-2",
+      "right": "0x1.a827999fcef32p-2",
+      "impulse": "0x1.a82449509bb38p+13"
+    },
+    {
+      "channels": 3,
+      "index": 2,
+      "left": "0x0p+0",
+      "right": "0x1.2bec333018867p-1",
+      "impulse": "0x1.2be9db57b2264p+13"
+    },
+    {
+      "channels": 4,
+      "index": 0,
+      "left": "0x1.b0cb174df99c7p-2",
+      "right": "0x0p+0",
+      "impulse": "0x1.b0c7b5b7cb008p+12"
+    },
+    {
+      "channels": 4,
+      "index": 1,
+      "left": "0x0p+0",
+      "right": "0x1.b0cb174df99c7p-2",
+      "impulse": "0x1.b0c7b5b7cb008p+12"
+    },
+    {
+      "channels": 4,
+      "index": 2,
+      "left": "0x1.76cf5d0b09955p-2",
+      "right": "0x1.b0cb174df99c7p-3",
+      "impulse": "0x1.279825241a7fcp+13"
+    },
+    {
+      "channels": 4,
+      "index": 3,
+      "left": "0x1.b0cb174df99c7p-3",
+      "right": "0x1.76cf5d0b09955p-2",
+      "impulse": "0x1.279825241a7fcp+13"
+    },
+    {
+      "channels": 5,
+      "index": 0,
+      "left": "0x1.4d35e534d2d23p-1",
+      "right": "0x0p+0",
+      "impulse": "0x1.4d334ac908689p+13"
+    },
+    {
+      "channels": 5,
+      "index": 1,
+      "left": "0x1.d73b18e77ad54p-2",
+      "right": "0x1.d73b18e77ad54p-2",
+      "impulse": "0x1.d7376a7149065p+13"
+    },
+    {
+      "channels": 5,
+      "index": 2,
+      "left": "0x0p+0",
+      "right": "0x1.4d35e534d2d23p-1",
+      "impulse": "0x1.4d334ac908689p+13"
+    },
+    {
+      "channels": 5,
+      "index": 3,
+      "left": "0x1.20919bbd065a1p-1",
+      "right": "0x1.4d35e534d2d23p-2",
+      "impulse": "0x1.c728fffe53144p+13"
+    },
+    {
+      "channels": 5,
+      "index": 4,
+      "left": "0x1.4d35e534d2d23p-2",
+      "right": "0x1.20919bbd065a1p-1",
+      "impulse": "0x1.c728fffe53144p+13"
+    },
+    {
+      "channels": 6,
+      "index": 0,
+      "left": "0x1.0ee1e16f3bc1ep-1",
+      "right": "0x0p+0",
+      "impulse": "0x1.0edfc3ab78e37p+13"
+    },
+    {
+      "channels": 6,
+      "index": 1,
+      "left": "0x1.7f15e28526bd1p-2",
+      "right": "0x1.7f15e28526bd1p-2",
+      "impulse": "0x1.7f12e45961b2cp+13"
+    },
+    {
+      "channels": 6,
+      "index": 2,
+      "left": "0x0p+0",
+      "right": "0x1.0ee1e16f3bc1ep-1",
+      "impulse": "0x1.0edfc3ab78e37p+13"
+    },
+    {
+      "channels": 6,
+      "index": 3,
+      "left": "0x1.d52e96a7ff403p-2",
+      "right": "0x1.0ee1e16f3bc1ep-2",
+      "impulse": "0x1.720557fb2569cp+13"
+    },
+    {
+      "channels": 6,
+      "index": 4,
+      "left": "0x1.0ee1e16f3bc1ep-2",
+      "right": "0x1.d52e96a7ff403p-2",
+      "impulse": "0x1.720557fb2569cp+13"
+    },
+    {
+      "channels": 6,
+      "index": 5,
+      "left": "0x1.7f15e28526bd1p-2",
+      "right": "0x1.7f15e28526bd1p-2",
+      "impulse": "0x1.7f12e45961b2cp+13"
+    },
+    {
+      "channels": 7,
+      "index": 0,
+      "left": "0x1.d23cca6f87e6ap-2",
+      "right": "0x0p+0",
+      "impulse": "0x1.d23925f5f3079p+12"
+    },
+    {
+      "channels": 7,
+      "index": 1,
+      "left": "0x1.49adff02622a8p-2",
+      "right": "0x1.49adff02622a8p-2",
+      "impulse": "0x1.49ab6ba66425cp+13"
+    },
+    {
+      "channels": 7,
+      "index": 2,
+      "left": "0x0p+0",
+      "right": "0x1.d23cca6f87e6ap-2",
+      "impulse": "0x1.d23925f5f3079p+12"
+    },
+    {
+      "channels": 7,
+      "index": 3,
+      "left": "0x1.93c6034e78089p-2",
+      "right": "0x1.d23cca6f87e6ap-3",
+      "impulse": "0x1.3e6fb75eb577bp+13"
+    },
+    {
+      "channels": 7,
+      "index": 4,
+      "left": "0x1.d23cca6f87e6ap-3",
+      "right": "0x1.93c6034e78089p-2",
+      "impulse": "0x1.3e6fb75eb577bp+13"
+    },
+    {
+      "channels": 7,
+      "index": 5,
+      "left": "0x1.1d82cf0577c87p-2",
+      "right": "0x1.1d82cf0577c87p-2",
+      "impulse": "0x1.1d8093ffd9bd8p+13"
+    },
+    {
+      "channels": 7,
+      "index": 6,
+      "left": "0x1.49adff02622a8p-2",
+      "right": "0x1.49adff02622a8p-2",
+      "impulse": "0x1.49ab6ba66425cp+13"
+    },
+    {
+      "channels": 8,
+      "index": 0,
+      "left": "0x1.8df564b8f5089p-2",
+      "right": "0x0p+0",
+      "impulse": "0x1.8df248ce2b96ap+12"
+    },
+    {
+      "channels": 8,
+      "index": 1,
+      "left": "0x1.1966321d130efp-2",
+      "right": "0x1.1966321d130efp-2",
+      "impulse": "0x1.1963ff50aed4dp+13"
+    },
+    {
+      "channels": 8,
+      "index": 2,
+      "left": "0x0p+0",
+      "right": "0x1.8df564b8f5089p-2",
+      "impulse": "0x1.8df248ce2b96ap+12"
+    },
+    {
+      "channels": 8,
+      "index": 3,
+      "left": "0x1.58a46929f7e88p-2",
+      "right": "0x1.8df564b8f5089p-3",
+      "impulse": "0x1.0fcd6e241daffp+13"
+    },
+    {
+      "channels": 8,
+      "index": 4,
+      "left": "0x1.8df564b8f5089p-3",
+      "right": "0x1.58a46929f7e88p-2",
+      "impulse": "0x1.0fcd6e241daffp+13"
+    },
+    {
+      "channels": 8,
+      "index": 5,
+      "left": "0x1.58a46929f7e88p-2",
+      "right": "0x1.8df564b8f5089p-3",
+      "impulse": "0x1.0fcd6e241daffp+13"
+    },
+    {
+      "channels": 8,
+      "index": 6,
+      "left": "0x1.8df564b8f5089p-3",
+      "right": "0x1.58a46929f7e88p-2",
+      "impulse": "0x1.0fcd6e241daffp+13"
+    },
+    {
+      "channels": 8,
+      "index": 7,
+      "left": "0x1.1966321d130efp-2",
+      "right": "0x1.1966321d130efp-2",
+      "impulse": "0x1.1963ff50aed4dp+13"
+    }
+  ],
+  "final_s16_rounding_qualified": false,
+  "enabled_normalizer_qualified": false
+}
