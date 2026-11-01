@@ -1,0 +1,9 @@
+PASS CYD: delayed PCM precedes EOF/error; decoder/PCM freed on EOF, Stop, OOM and failure
+PASS CYD: stale generations cannot decode/play/publish; output failure is preserved; PCM frame alignment
+PASS CYD PDM: flush final tail once with zero padding; discard/reset without replay; ASan/UBSan
+PASS CYD: cancellation during queue waits; Play while output wakes; 2000 concurrent Play/Stop commands and stale callbacks
+PASS CYD: AAC drain closes decoder after cached PCM; MP3 continues in the same generation; only final EOF flushes output
+PASS CYD vendor: header-only fairness across packets; Stop during yield; distinct open error/OOM; same-task reopen
+PASS CYD vendor: exact fragmented prefixes and PCM; retained-input OOM/reopen, Stop/codec cleanup and truncated EOF
+PASS CYD Ogg: zero-copy EOF lookahead, exact byte order and cached PCM tail across packet splits; Stop/reopen clears tail
+PASS CYD PCM metadata: ordered layout/gain across queued links; legacy reset, signed limits, stale rejection, refusal and cancellation

@@ -31,6 +31,23 @@ def main():
     parser.add_argument('--output', type=Path, default=OUT)
     OUT = parser.parse_args().output.resolve()
     OUT.mkdir(parents=True, exist_ok=True)
+    source_files = [Path(__file__), ROOT/'tests/native/cyd_lifecycle_test.c',
+                    ROOT/'tests/native/audio_power_seam.h',
+                    *[ROOT/'idf/components/native_stream/include'/name for name in (
+                        'audio_completion.h', 'adaptive_input.h', 'stream_bitrate.h',
+                        'decoder_pending_input.h', 'decoder_eof_input.h',
+                        'pcm_header_gain.h', 'pcm_channel_layout.h')],
+                    *[MAIN/name for name in ('input_prefill.h', 'native_health.h', 'native_output_metrics.h',
+                        'audio_service.c', 'native_state.c', 'native_state.h',
+                        'native_audio_output.c', 'native_audio_output.h')]]
+    source_hashes = {}
+    for path in source_files:
+        body = path.read_bytes()
+        name = path.relative_to(ROOT).as_posix()
+        snapshot = OUT/'sources'/name
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        snapshot.write_bytes(body)
+        source_hashes[name] = hashlib.sha256(body).hexdigest()
     (OUT/'freertos').mkdir(exist_ok=True)
     (OUT/'freertos/FreeRTOS.h').write_text('''#pragma once
 #include <stddef.h>
@@ -63,13 +80,13 @@ size_t strlcpy(char *, const char *, size_t);
     source = (MAIN/'audio_service.c').read_text()
     first = source.index('#define STREAM_CHUNK_SIZE')
     last = source.index('static esp_audio_simple_dec_type_t')
-    generated = '#include "decoder_pending_input.h"\n#include "decoder_eof_input.h"\n' + source[first:last]
+    generated = '#include "decoder_pending_input.h"\n#include "decoder_eof_input.h"\n#include "pcm_channel_layout.h"\n' + source[first:last]
     generated += re.search(r'^#define STREAM_INPUT_ACTIVE[^\n]+', source, re.M).group(0)+'\n'
     generated += source[source.index('static uint32_t s_decoder_bitrate_generation'):
                         source.index('static void state_set_decoder_bitrate')]
     generated += function((MAIN/'native_audio_output.c').read_text(), 'native_audio_output_supports_pcm')
     for name in ('simple_decoder_type', 'codec_name', 'state_set_decoder_bitrate','publish_stream_info','state_set_audio',
-                 'fail_generation', 'send_encoded', 'send_pcm_with_header_gain', 'send_pcm', 'send_pcm_end',
+                 'fail_generation', 'send_encoded', 'send_pcm_with_metadata', 'send_pcm', 'send_pcm_end',
                  'CUSTOM', 'decoder_release', 'decoder_task', 'output_task',
                  'audio_service_play', 'audio_service_stop', 'audio_service_input_health'):
         if name == 'CUSTOM':
@@ -78,13 +95,23 @@ size_t strlcpy(char *, const char *, size_t);
         else:
             if name == 'decoder_task':
                 generated += '#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0\n#include "input_prefill.h"\n#endif\n'
+            # Exercise ordered PCM metadata in the real output task without
+            # replacing this suite's existing simple-decoder platform model.
+            # The complete Ogg decoder path has its own SDK/task campaigns.
+            if name == 'output_task':
+                generated += '#define CONFIG_YORADIO_OGG_TIMELINE 1\n'
             generated += function(source, name)
+            if name == 'output_task':
+                generated += '#undef CONFIG_YORADIO_OGG_TIMELINE\n'
     (OUT/'production.inc').write_text(generated)
     output = (MAIN/'native_audio_output.c').read_text()
-    generated = '#include "pcm_header_gain.h"\n'
-    generated += re.search(r'^static pcm_header_gain s_header_gain[^;]*;', output, re.M).group(0) + '\n'
+    generated = '#include "pcm_header_gain.h"\n#include "pcm_channel_layout.h"\n'
+    for ctype, name in (('pcm_header_gain', 's_header_gain'),
+                        ('pcm_channel_layout', 's_channel_layout'),
+                        ('uint8_t', 's_layout_channels')):
+        generated += re.search(r'^static ' + ctype + r'\s+' + name + r'\s*;', output, re.M).group(0) + '\n'
     generated += '\n'.join(function(output, name) for name in (
-        'reset_resampler', 'pdm_flush', 'native_audio_output_discard_pcm',
+        'reset_pcm_metadata', 'reset_resampler', 'pdm_flush', 'native_audio_output_discard_pcm',
         'native_audio_output_flush_pcm'))
     (OUT/'pdm-tail.inc').write_text(generated)
     results = {}
@@ -117,24 +144,15 @@ size_t strlcpy(char *, const char *, size_t);
             results[name] = log.decode()
             print(name+':\n'+log.decode(), end='')
     except subprocess.CalledProcessError as error:
+        (OUT/'failure.log').write_bytes(error.output)
         print(error.output.decode(errors='replace'), file=sys.stderr)
         raise
+    assert all(hashlib.sha256((ROOT/name).read_bytes()).hexdigest() == digest
+               for name, digest in source_hashes.items()), 'source bytes changed during lifecycle checks'
     (OUT/'report.json').write_text(json.dumps({
         'passed': True, 'physical_hardware': False,
         'variants': results, 'compiler': run(['gcc','--version']).decode().splitlines()[0],
-        'source_sha256': {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in [Path(__file__), ROOT/'tests/native/cyd_lifecycle_test.c',
-                      ROOT/'tests/native/audio_power_seam.h',
-                      ROOT/'idf/components/native_stream/include/audio_completion.h',
-                      ROOT/'idf/components/native_stream/include/adaptive_input.h',
-                      ROOT/'idf/components/native_stream/include/stream_bitrate.h',
-                      ROOT/'idf/components/native_stream/include/decoder_pending_input.h',
-                      ROOT/'idf/components/native_stream/include/decoder_eof_input.h',
-                      MAIN/'input_prefill.h',
-                      MAIN/'native_health.h',
-                      MAIN/'native_output_metrics.h',
-                      *[MAIN/name for name in ('audio_service.c','native_state.c','native_state.h',
-                                              'native_audio_output.c','native_audio_output.h')]]},
+        'source_sha256': source_hashes,
     }, indent=2)+'\n')
 
 

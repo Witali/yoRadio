@@ -7,6 +7,7 @@
 #include <string.h>
 #include "native_state.h"
 #include "audio_completion.h"
+#include "pcm_channel_layout.h"
 #include "stream_probe.h"
 #include "stream_bitrate.h"
 #include "native_health.h"
@@ -80,6 +81,17 @@ static uint32_t active_generation;
 static uint8_t last_sample;
 static unsigned prefill_queries;
 static bool cancel_prefill;
+static bool metadata_case, fail_metadata;
+static unsigned metadata_step, metadata_layout_calls, metadata_gain_calls, metadata_writes;
+static pcm_channel_layout applied_layout;
+static uint8_t applied_channels;
+static int16_t applied_gain;
+static struct {
+    pcm_channel_layout layout;
+    uint8_t channels;
+    int16_t gain;
+    size_t bytes;
+} metadata_records[8];
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 static bool short_input_stats;
 #endif
@@ -91,19 +103,39 @@ static void vTaskDelay(unsigned ticks) {
     assert(ticks==1); ++delay_calls;
     if (delay_hook) delay_hook();
 }
-static void native_audio_output_discard_pcm(void) { ++discards; }
-static int native_audio_output_flush_pcm(void) { ++flushes; return fail_flush ? ESP_FAIL : ESP_OK; }
+static void native_audio_output_discard_pcm(void) { ++discards; metadata_step=0; }
+static int native_audio_output_flush_pcm(void) { ++flushes; metadata_step=0; return fail_flush ? ESP_FAIL : ESP_OK; }
 static int native_audio_output_configure(uint32_t rate) { assert(rate == expected_rate); return fail_config ? ESP_FAIL : ESP_OK; }
 static const char *native_audio_output_name(void) { return "test"; }
 static void native_audio_output_idle(void) {}
 static int native_audio_output_pause(void) { return ESP_OK; }
 static void native_audio_output_request_pause(bool requested) { (void)requested; }
+/* Explicit output-driver seams. Arithmetic/layout validation is qualified by
+ * run-cyd-surround-output.py; this suite checks FIFO metadata and call order. */
+static int native_audio_output_set_channel_layout(pcm_channel_layout layout,uint8_t channels) {
+    assert(!metadata_step && channels);
+    ++metadata_layout_calls;
+    if(fail_metadata)return ESP_FAIL;
+    assert(layout==PCM_CHANNEL_LAYOUT_LEGACY || (layout==PCM_CHANNEL_LAYOUT_VORBIS && channels<=8));
+    applied_layout=layout;applied_channels=channels;metadata_step=1;return ESP_OK;
+}
+static int native_audio_output_set_header_gain(int16_t gain) {
+    assert(metadata_step==1);++metadata_gain_calls;applied_gain=gain;metadata_step=2;return ESP_OK;
+}
 static void audio_level_led_update_peak(int peak) { (void)peak; }
 static void audio_level_led_update_pcm(const uint8_t *p, size_t n, uint8_t b, uint8_t c) {
     (void)p; (void)n; (void)b; (void)c;
 }
 static int native_audio_output_write_pcm(const uint8_t *p, size_t n, uint8_t b, uint8_t c) {
-    assert(state.audio_running && n && b == 16 && c == 2);
+    assert(state.audio_running && n && b==16 && metadata_step==2 && applied_channels==c);
+    metadata_step=0;
+    if(metadata_case) {
+        assert(metadata_writes<sizeof(metadata_records)/sizeof(metadata_records[0]));
+        metadata_records[metadata_writes].layout=applied_layout;
+        metadata_records[metadata_writes].channels=c;
+        metadata_records[metadata_writes].gain=applied_gain;
+        metadata_records[metadata_writes++].bytes=n;
+    } else assert(c==2 && applied_layout==PCM_CHANNEL_LAYOUT_LEGACY && !applied_gain);
     if (fragmented_input) {
         assert(n%4==0);
         for(size_t i=0;i<n;++i) assert(p[i]==(uint8_t)(0x40+(verified_pcm+i)/4));
@@ -306,6 +338,10 @@ static void begin(unsigned gen) {
     verify_ogg_bytes=false;expected_ogg_bytes=0;
     pending_allocations=fail_pending_at=0;
     cancel_prefill=false;prefill_queries=0;
+    metadata_case=fail_metadata=false;
+    metadata_step=metadata_layout_calls=metadata_gain_calls=metadata_writes=0;
+    applied_layout=PCM_CHANNEL_LAYOUT_LEGACY;applied_channels=0;applied_gain=0;
+    memset(metadata_records,0,sizeof(metadata_records));
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     short_input_stats=false;
 #endif
@@ -322,6 +358,58 @@ static void begin(unsigned gen) {
     native_state_begin_audio(&state,gen,"test","connecting");
 }
 static void run_task(void (*task)(void *)) { if (!setjmp(task_exit)) task(NULL); }
+static void pcm_metadata_contract_tests(void) {
+    uint8_t bytes[3600]={0};
+    esp_audio_simple_dec_info_t info={48000,0,16,3};
+    begin(91);metadata_case=true;native_state_set_audio(&state,91,true,"playing");
+    assert(sizeof(pcm_packet_t)==20 && send_pcm_with_metadata(91,&info,bytes,sizeof(bytes),1536,PCM_CHANNEL_LAYOUT_VORBIS));
+    assert(pcm.used==2);
+    info.channel=8;
+    assert(send_pcm_with_metadata(91,&info,bytes,2048,-1536,PCM_CHANNEL_LAYOUT_VORBIS));
+    /* Latest published format already describes the successor while the
+     * first link's two queued packets still require their original metadata. */
+    assert(publish_stream_info(91,NATIVE_CODEC_OGG,&info));
+    info.channel=2;assert(send_pcm(91,&info,bytes,16));
+    assert(pcm.used==4);
+    for(unsigned i=0;i<pcm.used;++i) {
+        const pcm_packet_t *packet=pcm.items[i];
+        assert(packet->channels==(i<2?3:i==2?8:2));
+        assert(packet->header_gain_q8==(i<2?1536:i==2?-1536:0));
+        assert(packet->channel_layout==(i<3?PCM_CHANNEL_LAYOUT_VORBIS:PCM_CHANNEL_LAYOUT_LEGACY));
+        assert(packet->data_size%(packet->channels*2u)==0 && (uintptr_t)packet->data%4==0);
+    }
+    run_task(output_task);
+    assert(writes==4 && metadata_writes==4 && metadata_layout_calls==4 && metadata_gain_calls==4 && !metadata_step);
+    for(unsigned i=0;i<4;++i) {
+        assert(metadata_records[i].channels==(i<2?3:i==2?8:2));
+        assert(metadata_records[i].gain==(i<2?1536:i==2?-1536:0));
+        assert(metadata_records[i].layout==(i<3?PCM_CHANNEL_LAYOUT_VORBIS:PCM_CHANNEL_LAYOUT_LEGACY));
+    }
+    assert(metadata_records[0].bytes+metadata_records[1].bytes==sizeof(bytes));
+    begin(92);info.channel=3;
+    assert(!send_pcm_with_metadata(92,&info,bytes,6,0,(pcm_channel_layout)99));
+    assert(!send_pcm_with_metadata(92,&info,bytes,5,0,PCM_CHANNEL_LAYOUT_VORBIS));
+    info.channel=9;assert(!send_pcm_with_metadata(92,&info,bytes,18,0,PCM_CHANNEL_LAYOUT_VORBIS));
+    info.channel=0;assert(!send_pcm_with_metadata(92,&info,bytes,0,0,PCM_CHANNEL_LAYOUT_VORBIS));
+    assert(!pcm.used);
+    begin(93);info.channel=3;
+    assert(send_pcm_with_metadata(93,&info,bytes,6,1536,PCM_CHANNEL_LAYOUT_VORBIS));
+    atomic_store(&s_generation,94);run_task(output_task);
+    assert(!writes && !metadata_layout_calls && !metadata_gain_calls);
+    begin(95);metadata_case=true;fail_metadata=true;
+    assert(send_pcm_with_metadata(95,&info,bytes,6,1536,PCM_CHANNEL_LAYOUT_VORBIS));
+    run_task(output_task);
+    assert(!writes && metadata_layout_calls==1 && !metadata_gain_calls && health_output_faults==1);
+    assert(health_output_stage==NATIVE_HEALTH_OUTPUT_WRITE);
+    begin(96);cancel_acquire=true;
+    assert(!send_pcm_with_metadata(96,&info,bytes,6,1536,PCM_CHANNEL_LAYOUT_VORBIS) && !pcm.used);
+    begin(97);metadata_case=true;native_state_set_audio(&state,97,true,"playing");
+    info.channel=1;assert(send_pcm_with_metadata(97,&info,bytes,2,INT16_MIN,PCM_CHANNEL_LAYOUT_VORBIS));
+    info.channel=2;assert(send_pcm_with_metadata(97,&info,bytes,4,INT16_MAX,PCM_CHANNEL_LAYOUT_VORBIS));
+    run_task(output_task);
+    assert(metadata_writes==2 && metadata_records[0].gain==INT16_MIN && metadata_records[1].gain==INT16_MAX);
+    assert(!health_decoder_faults && !health_output_faults);
+}
 static void input(unsigned gen, unsigned reason, unsigned bytes) {
     encoded_packet_t *p=calloc(1,sizeof(*p)+bytes); assert(p);
     p->generation=gen; p->codec=NATIVE_CODEC_AAC; p->end_of_stream=reason;
@@ -781,6 +869,7 @@ int main(void) {
     assert(state.channels==1 && state.pcm_channels==1 && state.format_is_pcm);
     free(pcm.items[0]);free(pcm.items[1]);
 #endif
+    pcm_metadata_contract_tests();
     begin(100);
     pthread_t first, second;
     assert(!pthread_create(&first,NULL,command_thread,(void *)0));
@@ -827,6 +916,7 @@ int main(void) {
     puts("PASS CYD vendor: header-only fairness across packets; Stop during yield; distinct open error/OOM; same-task reopen");
     puts("PASS CYD vendor: exact fragmented prefixes and PCM; retained-input OOM/reopen, Stop/codec cleanup and truncated EOF");
     puts("PASS CYD Ogg: zero-copy EOF lookahead, exact byte order and cached PCM tail across packet splits; Stop/reopen clears tail");
+    puts("PASS CYD PCM metadata: ordered layout/gain across queued links; legacy reset, signed limits, stale rejection, refusal and cancellation");
     assert(!pthread_mutex_destroy(s_control_lock)); free(s_control_lock);
     assert(!pthread_mutex_destroy(state.lock)); free(state.lock);
     return 0;

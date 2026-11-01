@@ -50,6 +50,7 @@ def main():
              'idf/components/native_stream/include/audio_completion.h',
              'idf/components/native_stream/include/decoder_pending_input.h',
              'idf/components/native_stream/include/decoder_eof_input.h',
+             'idf/components/native_stream/include/pcm_channel_layout.h',
              CORE+'/flac_decoder.cpp', CORE+'/flac_decoder.h',
              ADAPTER+'/custom_flac_adapter.cpp', ADAPTER+'/custom_flac_adapter.h',
              'tools/audio_test_server/generate_flac_depths.py', 'tests/native/flac_bounds/Arduino.h']
@@ -88,8 +89,8 @@ size_t strlcpy(char *,const char *,size_t);
     callback = source[start:source.index('static void decoder_release(',start)]
     legacy_start = source.index('#ifdef YORADIO_CUSTOM_LEGACY_DECODER\ntypedef struct')
     callback = source[legacy_start:start] + callback
-    production = '#include "decoder_pending_input.h"\n#include "decoder_eof_input.h"\n'
-    production += ''.join(function(source,name) for name in ('simple_decoder_type','codec_name','state_set_decoder_bitrate','publish_stream_info','send_pcm_with_header_gain','send_pcm','send_pcm_end'))
+    production = '#include "decoder_pending_input.h"\n#include "decoder_eof_input.h"\n#include "pcm_channel_layout.h"\n'
+    production += ''.join(function(source,name) for name in ('simple_decoder_type','codec_name','state_set_decoder_bitrate','publish_stream_info','send_pcm_with_metadata','send_pcm','send_pcm_end'))
     production = function((frozen/MAIN/'native_audio_output.c').read_text(),'native_audio_output_supports_pcm') + production
     production += callback + function(source,'decoder_release') + function(source,'decoder_task')
     (generated/'production.inc').write_text(production)

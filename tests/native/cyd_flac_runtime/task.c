@@ -8,6 +8,7 @@
 #include "native_state.h"
 #include "native_health.h"
 #include "audio_completion.h"
+#include "pcm_channel_layout.h"
 #include "custom_flac_adapter.h"
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
@@ -142,6 +143,7 @@ static int xRingbufferSendComplete(void *ring, void *p) {
     }
     assert(packet->bits_per_sample == 16 && packet->channels == source_channels);
     assert(packet->header_gain_q8 == 0);
+    assert(packet->channel_layout == PCM_CHANNEL_LAYOUT_LEGACY);
     assert(packet->sample_rate == 48000 && packet->data_size % (source_channels * 2) == 0);
     assert(pcm_position + packet->data_size <= reference_size);
     assert(!memcmp(packet->data, reference_pcm + pcm_position, packet->data_size));

@@ -83,6 +83,7 @@ typedef struct {
     uint8_t channels;
     uint16_t data_size;
     int16_t header_gain_q8;
+    uint8_t channel_layout;
     uint32_t end_of_stream;
     uint8_t data[];
 } pcm_packet_t;
@@ -721,11 +722,15 @@ static void stream_task(void *argument) {
     }
 }
 
-static bool send_pcm_with_header_gain(uint32_t generation,
+static bool send_pcm_with_metadata(uint32_t generation,
                      const esp_audio_simple_dec_info_t *info,
-                     const uint8_t *data, size_t size, int16_t header_gain_q8) {
+                     const uint8_t *data, size_t size, int16_t header_gain_q8,
+                     pcm_channel_layout channel_layout) {
     size_t frame_bytes = (size_t)info->channel * info->bits_per_sample / 8U;
-    if (!native_audio_output_supports_pcm(info->bits_per_sample, info->channel) ||
+    if ((channel_layout != PCM_CHANNEL_LAYOUT_LEGACY &&
+         channel_layout != PCM_CHANNEL_LAYOUT_VORBIS) ||
+        (channel_layout == PCM_CHANNEL_LAYOUT_VORBIS && info->channel > 8) ||
+        !native_audio_output_supports_pcm(info->bits_per_sample, info->channel) ||
         !frame_bytes || frame_bytes > PCM_PACKET_DATA_SIZE ||
         size % frame_bytes) return false;
     while (size) {
@@ -745,6 +750,7 @@ static bool send_pcm_with_header_gain(uint32_t generation,
         packet->channels = info->channel;
         packet->data_size = (uint16_t)chunk;
         packet->header_gain_q8 = header_gain_q8;
+        packet->channel_layout = (uint8_t)channel_layout;
         packet->end_of_stream = AUDIO_CONTINUE;
         memcpy(packet->data, data, chunk);
         if (xRingbufferSendComplete(s_pcm, packet) != pdTRUE) return false;
@@ -757,7 +763,8 @@ static bool send_pcm_with_header_gain(uint32_t generation,
 static bool send_pcm(uint32_t generation,
                      const esp_audio_simple_dec_info_t *info,
                      const uint8_t *data, size_t size) {
-    return send_pcm_with_header_gain(generation, info, data, size, 0);
+    return send_pcm_with_metadata(generation, info, data, size, 0,
+                                   PCM_CHANNEL_LAYOUT_LEGACY);
 }
 
 static bool send_pcm_end(uint32_t generation, uint8_t reason) {
@@ -845,8 +852,8 @@ static bool ogg_output_pcm(void *user, const esp_audio_simple_dec_info_t *info,
         context->info_failed = true;
         return false;
     }
-    return send_pcm_with_header_gain(context->generation, info, pcm, bytes,
-                                     header_gain_q8);
+    return send_pcm_with_metadata(context->generation, info, pcm, bytes,
+                                   header_gain_q8, PCM_CHANNEL_LAYOUT_LEGACY);
 }
 
 static void ogg_output_yield(void *user) {
@@ -1395,7 +1402,10 @@ static void output_task(void *argument) {
         }
         esp_err_t result = ESP_OK;
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
-        result = native_audio_output_set_header_gain(packet->header_gain_q8);
+        result = native_audio_output_set_channel_layout(
+            (pcm_channel_layout)packet->channel_layout, packet->channels);
+        if (result == ESP_OK)
+            result = native_audio_output_set_header_gain(packet->header_gain_q8);
 #endif
         if (result == ESP_OK) {
             audio_level_led_update_pcm(packet->data, packet->data_size,
