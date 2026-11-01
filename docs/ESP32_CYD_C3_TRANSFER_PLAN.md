@@ -92,7 +92,7 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 | Блок | Оставшаяся программная работа |
 | --- | --- |
 | Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates; host DSP проверен для трёх выходов. Остались general mappings, проверка других modes/rate semantics, OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
-| AAC compact owners | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) уже перенесён; отдельная Xtensa ABI/PCM/OOM/lifetime адаптация compact owners ещё нужна. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
+| AAC compact owners | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) и [48 actual-task сценариев](../tests/results/cyd-aac-playback-task-20261101/README.md) завершены. Отдельная Xtensa ABI/PCM/OOM/lifetime адаптация compact owners ещё нужна; private scopes остаются отложенными. Late SBR/PS отмечены как ограничения vendor, без заявления о полной поддержке этих переходов. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Production watchdog/resource qualification и обычная регрессия. Target OOM/backpressure/semantic controls [явно отложены](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md). [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | Полный radio boot, actual TLS traffic и измерение heap/IRAM/stack до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
 | Финальные сборки и регрессия | Обновить production exports актуального кода для PDM, continuous DAC и legacy DAC; проверить совместную работу перенесённых функций. [Wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md). |
@@ -127,9 +127,14 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   [Публичная композиция raw Opus](../tests/results/cyd-opus-multistream-public-20261101/README.md)
   успешно декодирует те же полные fixtures: 22 handles, 242 calls, обе формы
   framing дают побайтно одинаковый PCM, heap после каждого случая восстановлен.
-  Production demux, произвольные допустимые mappings и полное сведение каналов
-  ещё нужны. Текущий output API принимает wide PCM, но использует первые два
-  канала; это не корректный surround downmix.
+  Production demux и выбор нового caller для произвольных допустимых mappings
+  ещё требуют полной интеграции. [Явное сведение всех логических каналов](../tests/results/cyd-surround-output-20261101/README.md)
+  уже реализовано для трёх выходов: по 23904 vectors/384 packets, all-channel
+  normalizer и неизменный scratch512. Старый layout по умолчанию использует
+  первые два канала; новый Vorbis-order layout выбирается явно. [PCM FIFO](../tests/results/cyd-pcm-layout-metadata-20261101/README.md)
+  сохраняет layout/gain каждого packet до output owner; шесть HOST lifecycle
+  профилей и обычная FLAC520 регрессия проходят. Это не actual-task приёмка
+  нового family1 dispatch или измерение MCU throughput.
   [Дополнительная mode-матрица](../tests/results/opus-packet-modes-20261101/README.md)
   проходит 196 complete stock/wrapper случаев по 49 creator streams и 24 raw
   controls без отказов API. SILK/hybrid/CELT, codes0–3, padding, 48-frame120ms
@@ -149,9 +154,11 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   подключает эту проверку до открытия decoder и переиспользует его scratch
   после сохранения PCM всех нужных streams. Проверены 34 positive schedules,
   27 controls и 3975424 exact PCM samples; размер owner на HOST уменьшился
-  с 2768 до 776 B, это не измерение стека ESP32. Production selection ещё
-  требует FIFO speaker-layout metadata, полного output integration и
-  SDK/resource gates. Вход validator — [opus_tags_stream.h](../idf/components/native_stream/include/opus_tags_stream.h).
+  с 2768 до 776 B, это не измерение стека ESP32. FIFO speaker-layout metadata
+  и output DSP завершены отдельными HOST gates; production selection ещё
+  требует полного dispatch integration и SDK/resource gates. Вход validator —
+  [opus_tags_stream.h](../idf/components/native_stream/include/opus_tags_stream.h),
+  output setter — [native_audio_output.h](../idf/esp32-cyd2usb-native/main/native_audio_output.h).
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
   **отложена по прямому указанию пользователя**. Исходники, незавершённые тесты
   и уже полученные результаты сохранены в [записи отложенной работы](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md).
