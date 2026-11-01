@@ -42,6 +42,10 @@ The helper allocates nothing and never feeds a watchdog.
 
 ## Verification
 
+The [saved HOST/frontend checkpoint](../tests/results/stream-fairness-20261101/README.md)
+retains exact reports, logs, source snapshots and the separate first failures.
+Its data-only verifier can require that every qualified source is still current.
+
 - [CYD HTTP/ICY tests](../tests/run-cyd-stream.py): 55 stream cases and 80
   settings requests pass with ASan/UBSan. New cases check exact positive-read
   audio and ICY output, no per-read delay without elapsed time, Stop during the

@@ -1,0 +1,3202 @@
+{
+  "schema": 1,
+  "checkpoint_complete": true,
+  "fairness_commit": "7ea48df71bb9605e5a70f935ff649a01d9b23c2f",
+  "HOST_qualified": true,
+  "CYD_syntax_qualified": true,
+  "C3_SDK_qualified": false,
+  "native_fairness_qualified": false,
+  "physical_qualified": false,
+  "watchdog_settings_changed": false,
+  "native05_historical_status": "NONPASS",
+  "canonical_source_sha256": {
+    "idf/components/native_stream/include/stream_fairness.h": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+    "idf/esp32-cyd2usb-native/main/audio_service.c": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+    "idf/esp32c3-oled-native/main/audio_service.c": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+    "tests/run-stream-connection-retry.py": "b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+    "tests/native/stream_connection_retry_test.c": "37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+    "tests/run-cyd-stream.py": "0c3619af403b6638f00f094912c46ecffd93ed8bc64aea4b40fb1df2adec872f",
+    "tests/native/cyd_stream_test.c": "2a9f3c964e241a139832e970dae8f2d79fe627deb2777776994e743198e62300",
+    "tests/run-audio-power.py": "7bc307e1e534f44e718b7c8e1c8f5029adb33358b937e30cd074e61764ce7c76",
+    "tests/native/audio_power_control_test.c": "36db0532173fe353f2531c1ecf49825772db0e598fd9780665f44504753f4c56",
+    "tests/native/audio_power_cyd_stream_test.c": "3bd68d23cb68549b5fd1333d3567aefe45012eff1d4e582b966deca60a2177f2",
+    "tests/native/audio_power_seam.h": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+    "tests/results/stream-fairness-20261101/verify.py": "45938d1bdf284a4316262191690ca7a826c1812704f47dd97acc4d8e657ea66c"
+  },
+  "captures": {
+    "c3-plain01": ".build/c3-stream-fairness-plain-20261101-01",
+    "c3-plain02": ".build/c3-stream-fairness-plain-20261101-02",
+    "c3-retain01": ".build/c3-stream-fairness-retain-adaptive-20261101-01",
+    "c3-growth01": ".build/c3-stream-fairness-growth-power-20261101-01",
+    "cyd-stream01": ".build/cyd-stream-fairness-20261101-01",
+    "cyd-stream02": ".build/cyd-stream-fairness-20261101-02",
+    "power01": ".build/audio-power-stream-fairness-20261101-01",
+    "power02": ".build/audio-power-stream-fairness-20261101-02",
+    "syntax01": ".build/cyd-stream-fairness-syntax-20261101-01",
+    "native05-audit": ".build/cyd-family1-task-native05-watchdog-audit-20261101-01",
+    "native05-backtrace": ".build/cyd-family1-task-native05-backtrace-20261101-01",
+    "native05-retention": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01"
+  },
+  "archive": {
+    "path": "captures.zip",
+    "bytes": 611765,
+    "sha256": "5bc22860aec6d20bb8f2ecaee2e11e5f575d7068cd6e3cc357fa4bf66ae004c0"
+  },
+  "logical_files": 409,
+  "physical_blobs": 153,
+  "files": [
+    {
+      "path": "c3-plain01/build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/build.log"
+    },
+    {
+      "path": "c3-plain01/esp_err.h",
+      "sha256": "aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "bytes": 14,
+      "blob": "blobs/aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/esp_err.h"
+    },
+    {
+      "path": "c3-plain01/freertos/FreeRTOS.h",
+      "sha256": "5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "bytes": 264,
+      "blob": "blobs/5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "c3-plain01/report.json",
+      "sha256": "48a0d12dc932d248c57cd82fa2fb0df23ec73bd8592de6d6467c6d385ff9d9a5",
+      "bytes": 2977,
+      "blob": "blobs/48a0d12dc932d248c57cd82fa2fb0df23ec73bd8592de6d6467c6d385ff9d9a5",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/report.json"
+    },
+    {
+      "path": "c3-plain01/run.log",
+      "sha256": "313f9935a4b3e836e7f2d2d83189b8061da8804f2a5ba34db38a35491f6d8187",
+      "bytes": 213,
+      "blob": "blobs/313f9935a4b3e836e7f2d2d83189b8061da8804f2a5ba34db38a35491f6d8187",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/run.log"
+    },
+    {
+      "path": "c3-plain01/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/audio_service.c",
+      "sha256": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "bytes": 115828,
+      "blob": "blobs/9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/icy_title.c",
+      "sha256": "f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "bytes": 295,
+      "blob": "blobs/f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/icy_title.c"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/icy_title.h",
+      "sha256": "727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "bytes": 154,
+      "blob": "blobs/727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/icy_title.h"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/stream_http_reader.c",
+      "sha256": "3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "bytes": 2739,
+      "blob": "blobs/3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/stream_http_reader.c"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/stream_http_reader.h",
+      "sha256": "caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "bytes": 505,
+      "blob": "blobs/caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/stream_http_reader.h"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/stream_probe.h",
+      "sha256": "a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "bytes": 157,
+      "blob": "blobs/a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/stream_probe.h"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/stream_tags.h",
+      "sha256": "3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "bytes": 156,
+      "blob": "blobs/3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/stream_tags.h"
+    },
+    {
+      "path": "c3-plain01/sources/idf/esp32c3-oled-native/main/tls_path_profile.h",
+      "sha256": "43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "bytes": 1600,
+      "blob": "blobs/43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/idf/esp32c3-oled-native/main/tls_path_profile.h"
+    },
+    {
+      "path": "c3-plain01/sources/tests/native/audio_power_seam.h",
+      "sha256": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "bytes": 1886,
+      "blob": "blobs/c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/tests/native/audio_power_seam.h"
+    },
+    {
+      "path": "c3-plain01/sources/tests/native/stream_connection_retry_test.c",
+      "sha256": "a76a6608c353570f06759f835f22de9a65828a5f4f3bccecb72fc83313035eab",
+      "bytes": 22918,
+      "blob": "blobs/a76a6608c353570f06759f835f22de9a65828a5f4f3bccecb72fc83313035eab",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/tests/native/stream_connection_retry_test.c"
+    },
+    {
+      "path": "c3-plain01/sources/tests/run-stream-connection-retry.py",
+      "sha256": "b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "bytes": 8407,
+      "blob": "blobs/b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/tests/run-stream-connection-retry.py"
+    },
+    {
+      "path": "c3-plain01/sources/tools/codec_benchmark/run_output_dma_host.py",
+      "sha256": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "bytes": 5788,
+      "blob": "blobs/5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/sources/tools/codec_benchmark/run_output_dma_host.py"
+    },
+    {
+      "path": "c3-plain01/test.c",
+      "sha256": "42278a38817ec87b4948cb9c0e1654961133b3bf8302082bea1e03536461d736",
+      "bytes": 51782,
+      "blob": "blobs/42278a38817ec87b4948cb9c0e1654961133b3bf8302082bea1e03536461d736",
+      "original": ".build/c3-stream-fairness-plain-20261101-01/test.c"
+    },
+    {
+      "path": "c3-plain02/build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/build.log"
+    },
+    {
+      "path": "c3-plain02/esp_err.h",
+      "sha256": "aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "bytes": 14,
+      "blob": "blobs/aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/esp_err.h"
+    },
+    {
+      "path": "c3-plain02/freertos/FreeRTOS.h",
+      "sha256": "5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "bytes": 264,
+      "blob": "blobs/5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "c3-plain02/report.json",
+      "sha256": "357c7b451a73f6bda38277fc86bfee0c3568f13b66991ab739582c4b88b77e81",
+      "bytes": 3203,
+      "blob": "blobs/357c7b451a73f6bda38277fc86bfee0c3568f13b66991ab739582c4b88b77e81",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/report.json"
+    },
+    {
+      "path": "c3-plain02/run.log",
+      "sha256": "1d78d42b8076b6eef32a881cac3ea55e8514944d16e6d7870487055a308d7f89",
+      "bytes": 78,
+      "blob": "blobs/1d78d42b8076b6eef32a881cac3ea55e8514944d16e6d7870487055a308d7f89",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/run.log"
+    },
+    {
+      "path": "c3-plain02/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/audio_service.c",
+      "sha256": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "bytes": 115828,
+      "blob": "blobs/9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/icy_title.c",
+      "sha256": "f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "bytes": 295,
+      "blob": "blobs/f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/icy_title.c"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/icy_title.h",
+      "sha256": "727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "bytes": 154,
+      "blob": "blobs/727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/icy_title.h"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/stream_http_reader.c",
+      "sha256": "3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "bytes": 2739,
+      "blob": "blobs/3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/stream_http_reader.c"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/stream_http_reader.h",
+      "sha256": "caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "bytes": 505,
+      "blob": "blobs/caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/stream_http_reader.h"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/stream_probe.h",
+      "sha256": "a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "bytes": 157,
+      "blob": "blobs/a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/stream_probe.h"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/stream_tags.h",
+      "sha256": "3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "bytes": 156,
+      "blob": "blobs/3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/stream_tags.h"
+    },
+    {
+      "path": "c3-plain02/sources/idf/esp32c3-oled-native/main/tls_path_profile.h",
+      "sha256": "43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "bytes": 1600,
+      "blob": "blobs/43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/idf/esp32c3-oled-native/main/tls_path_profile.h"
+    },
+    {
+      "path": "c3-plain02/sources/tests/native/audio_power_seam.h",
+      "sha256": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "bytes": 1886,
+      "blob": "blobs/c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/tests/native/audio_power_seam.h"
+    },
+    {
+      "path": "c3-plain02/sources/tests/native/stream_connection_retry_test.c",
+      "sha256": "37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "bytes": 23189,
+      "blob": "blobs/37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/tests/native/stream_connection_retry_test.c"
+    },
+    {
+      "path": "c3-plain02/sources/tests/run-stream-connection-retry.py",
+      "sha256": "b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "bytes": 8407,
+      "blob": "blobs/b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/tests/run-stream-connection-retry.py"
+    },
+    {
+      "path": "c3-plain02/sources/tools/codec_benchmark/run_output_dma_host.py",
+      "sha256": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "bytes": 5788,
+      "blob": "blobs/5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/sources/tools/codec_benchmark/run_output_dma_host.py"
+    },
+    {
+      "path": "c3-plain02/test.c",
+      "sha256": "50b508f51c1c1186b2706814083da5913106f77477e4ea2564407febf2cb8e7d",
+      "bytes": 52053,
+      "blob": "blobs/50b508f51c1c1186b2706814083da5913106f77477e4ea2564407febf2cb8e7d",
+      "original": ".build/c3-stream-fairness-plain-20261101-02/test.c"
+    },
+    {
+      "path": "c3-retain01/build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/build.log"
+    },
+    {
+      "path": "c3-retain01/esp_err.h",
+      "sha256": "aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "bytes": 14,
+      "blob": "blobs/aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/esp_err.h"
+    },
+    {
+      "path": "c3-retain01/freertos/FreeRTOS.h",
+      "sha256": "5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "bytes": 264,
+      "blob": "blobs/5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "c3-retain01/report.json",
+      "sha256": "27dc10a9a6ce44c626523fb943c8b562470004ef6dc1e8ebd2d31109d1a2e220",
+      "bytes": 3340,
+      "blob": "blobs/27dc10a9a6ce44c626523fb943c8b562470004ef6dc1e8ebd2d31109d1a2e220",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/report.json"
+    },
+    {
+      "path": "c3-retain01/run.log",
+      "sha256": "1d78d42b8076b6eef32a881cac3ea55e8514944d16e6d7870487055a308d7f89",
+      "bytes": 78,
+      "blob": "blobs/1d78d42b8076b6eef32a881cac3ea55e8514944d16e6d7870487055a308d7f89",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/run.log"
+    },
+    {
+      "path": "c3-retain01/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/audio_service.c",
+      "sha256": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "bytes": 115828,
+      "blob": "blobs/9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/icy_title.c",
+      "sha256": "f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "bytes": 295,
+      "blob": "blobs/f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/icy_title.c"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/icy_title.h",
+      "sha256": "727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "bytes": 154,
+      "blob": "blobs/727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/icy_title.h"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/stream_http_reader.c",
+      "sha256": "3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "bytes": 2739,
+      "blob": "blobs/3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/stream_http_reader.c"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/stream_http_reader.h",
+      "sha256": "caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "bytes": 505,
+      "blob": "blobs/caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/stream_http_reader.h"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/stream_probe.h",
+      "sha256": "a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "bytes": 157,
+      "blob": "blobs/a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/stream_probe.h"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/stream_tags.h",
+      "sha256": "3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "bytes": 156,
+      "blob": "blobs/3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/stream_tags.h"
+    },
+    {
+      "path": "c3-retain01/sources/idf/esp32c3-oled-native/main/tls_path_profile.h",
+      "sha256": "43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "bytes": 1600,
+      "blob": "blobs/43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/idf/esp32c3-oled-native/main/tls_path_profile.h"
+    },
+    {
+      "path": "c3-retain01/sources/tests/native/audio_power_seam.h",
+      "sha256": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "bytes": 1886,
+      "blob": "blobs/c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/tests/native/audio_power_seam.h"
+    },
+    {
+      "path": "c3-retain01/sources/tests/native/stream_connection_retry_test.c",
+      "sha256": "37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "bytes": 23189,
+      "blob": "blobs/37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/tests/native/stream_connection_retry_test.c"
+    },
+    {
+      "path": "c3-retain01/sources/tests/run-stream-connection-retry.py",
+      "sha256": "b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "bytes": 8407,
+      "blob": "blobs/b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/tests/run-stream-connection-retry.py"
+    },
+    {
+      "path": "c3-retain01/sources/tools/codec_benchmark/run_output_dma_host.py",
+      "sha256": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "bytes": 5788,
+      "blob": "blobs/5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/sources/tools/codec_benchmark/run_output_dma_host.py"
+    },
+    {
+      "path": "c3-retain01/test.c",
+      "sha256": "50b508f51c1c1186b2706814083da5913106f77477e4ea2564407febf2cb8e7d",
+      "bytes": 52053,
+      "blob": "blobs/50b508f51c1c1186b2706814083da5913106f77477e4ea2564407febf2cb8e7d",
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/test.c"
+    },
+    {
+      "path": "c3-growth01/build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/build.log"
+    },
+    {
+      "path": "c3-growth01/esp_err.h",
+      "sha256": "aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "bytes": 14,
+      "blob": "blobs/aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/esp_err.h"
+    },
+    {
+      "path": "c3-growth01/freertos/FreeRTOS.h",
+      "sha256": "5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "bytes": 264,
+      "blob": "blobs/5732be5d00a0f1b535aed3568d989e055cc910efd75fc26bcb710525d3f38b39",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "c3-growth01/report.json",
+      "sha256": "29f594c78f65b687e43bbbc10b129fc9450c3db1ad4dd752ff13750eced3c0e5",
+      "bytes": 4031,
+      "blob": "blobs/29f594c78f65b687e43bbbc10b129fc9450c3db1ad4dd752ff13750eced3c0e5",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/report.json"
+    },
+    {
+      "path": "c3-growth01/run.log",
+      "sha256": "294f38d3f64043649b052838ba2e91c587244c46a62038652aa6abfee960ed5e",
+      "bytes": 78,
+      "blob": "blobs/294f38d3f64043649b052838ba2e91c587244c46a62038652aa6abfee960ed5e",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/run.log"
+    },
+    {
+      "path": "c3-growth01/sources/idf/components/native_network_power/include/native_network_power.h",
+      "sha256": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+      "bytes": 1423,
+      "blob": "blobs/9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/components/native_network_power/include/native_network_power.h"
+    },
+    {
+      "path": "c3-growth01/sources/idf/components/native_network_power/native_network_power.c",
+      "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "bytes": 3231,
+      "blob": "blobs/b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/components/native_network_power/native_network_power.c"
+    },
+    {
+      "path": "c3-growth01/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/audio_service.c",
+      "sha256": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "bytes": 115828,
+      "blob": "blobs/9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/icy_title.c",
+      "sha256": "f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "bytes": 295,
+      "blob": "blobs/f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/icy_title.c"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/icy_title.h",
+      "sha256": "727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "bytes": 154,
+      "blob": "blobs/727b75318cb7f123996b09bda2ee4ff3b5256ec9fff69678f379f13f536d2d8c",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/icy_title.h"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/stream_http_reader.c",
+      "sha256": "3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "bytes": 2739,
+      "blob": "blobs/3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/stream_http_reader.c"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/stream_http_reader.h",
+      "sha256": "caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "bytes": 505,
+      "blob": "blobs/caada88921723df95c4a83ebedbb9168a6ef4421074dbd04ae0fcfe937eaa412",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/stream_http_reader.h"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/stream_probe.h",
+      "sha256": "a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "bytes": 157,
+      "blob": "blobs/a028ca161a8f0faf4c3958b14187bf3d16db6f25ff8d29c6525fd836095668b7",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/stream_probe.h"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/stream_tags.h",
+      "sha256": "3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "bytes": 156,
+      "blob": "blobs/3d4cab11545e2b12c86c47cc8275153cb2a460707f83099a29f575d9e9ac7caa",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/stream_tags.h"
+    },
+    {
+      "path": "c3-growth01/sources/idf/esp32c3-oled-native/main/tls_path_profile.h",
+      "sha256": "43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "bytes": 1600,
+      "blob": "blobs/43f136becf0d81786371e8af1e4884d21fb8e03aca74a9e04079d229c1c9469c",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/idf/esp32c3-oled-native/main/tls_path_profile.h"
+    },
+    {
+      "path": "c3-growth01/sources/tests/native/audio_power_seam.h",
+      "sha256": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "bytes": 1886,
+      "blob": "blobs/c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/tests/native/audio_power_seam.h"
+    },
+    {
+      "path": "c3-growth01/sources/tests/native/stream_connection_retry_test.c",
+      "sha256": "37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "bytes": 23189,
+      "blob": "blobs/37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/tests/native/stream_connection_retry_test.c"
+    },
+    {
+      "path": "c3-growth01/sources/tests/run-stream-connection-retry.py",
+      "sha256": "b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "bytes": 8407,
+      "blob": "blobs/b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/tests/run-stream-connection-retry.py"
+    },
+    {
+      "path": "c3-growth01/sources/tools/codec_benchmark/run_output_dma_host.py",
+      "sha256": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "bytes": 5788,
+      "blob": "blobs/5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/sources/tools/codec_benchmark/run_output_dma_host.py"
+    },
+    {
+      "path": "c3-growth01/test.c",
+      "sha256": "50b508f51c1c1186b2706814083da5913106f77477e4ea2564407febf2cb8e7d",
+      "bytes": 52053,
+      "blob": "blobs/50b508f51c1c1186b2706814083da5913106f77477e4ea2564407febf2cb8e7d",
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/test.c"
+    },
+    {
+      "path": "cyd-stream01/esp_err.h",
+      "sha256": "65f160ad8a66dd2d609643e34fcf54d0462b1e2dfe1ac086940680f411c4b7df",
+      "bytes": 38,
+      "blob": "blobs/65f160ad8a66dd2d609643e34fcf54d0462b1e2dfe1ac086940680f411c4b7df",
+      "original": ".build/cyd-stream-fairness-20261101-01/esp_err.h"
+    },
+    {
+      "path": "cyd-stream01/failed-command.log",
+      "sha256": "045b86bde8bf5cf87abd0f356e2e48919e5aef409077457aefd7301bb076fc37",
+      "bytes": 858,
+      "blob": "blobs/045b86bde8bf5cf87abd0f356e2e48919e5aef409077457aefd7301bb076fc37",
+      "original": ".build/cyd-stream-fairness-20261101-01/failed-command.log"
+    },
+    {
+      "path": "cyd-stream01/freertos/FreeRTOS.h",
+      "sha256": "371b15c42c88624eae2c91888aa172dbbb98b63bf78385021f5cc06902ff370d",
+      "bytes": 753,
+      "blob": "blobs/371b15c42c88624eae2c91888aa172dbbb98b63bf78385021f5cc06902ff370d",
+      "original": ".build/cyd-stream-fairness-20261101-01/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "cyd-stream01/freertos/semphr.h",
+      "sha256": "3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "bytes": 23,
+      "blob": "blobs/3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "original": ".build/cyd-stream-fairness-20261101-01/freertos/semphr.h"
+    },
+    {
+      "path": "cyd-stream01/production.inc",
+      "sha256": "285a4128c2e1b5a70ba05e7bbd7d5ae3e34d6bc5c2447c768754af663067ebbd",
+      "bytes": 41520,
+      "blob": "blobs/285a4128c2e1b5a70ba05e7bbd7d5ae3e34d6bc5c2447c768754af663067ebbd",
+      "original": ".build/cyd-stream-fairness-20261101-01/production.inc"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_audio_settings/native_audio_settings.h",
+      "sha256": "21d0492056a4f52a2d065918d975bc461db677fe82fb739eaacd6b3786ce19c7",
+      "bytes": 1468,
+      "blob": "blobs/21d0492056a4f52a2d065918d975bc461db677fe82fb739eaacd6b3786ce19c7",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_audio_settings/native_audio_settings.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_storage/include/radio_control.h",
+      "sha256": "53781046f01bb24c33e461f5e070a65a55d92d5109c14f27e92121332d1e6e74",
+      "bytes": 1424,
+      "blob": "blobs/53781046f01bb24c33e461f5e070a65a55d92d5109c14f27e92121332d1e6e74",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_storage/include/radio_control.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/icy_title.c",
+      "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "bytes": 2162,
+      "blob": "blobs/b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/icy_title.c"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/adaptive_input.h",
+      "sha256": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "bytes": 4058,
+      "blob": "blobs/e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/adaptive_input.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/audio_completion.h",
+      "sha256": "d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "bytes": 1490,
+      "blob": "blobs/d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/audio_completion.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/decoder_eof_input.h",
+      "sha256": "22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "bytes": 1705,
+      "blob": "blobs/22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/decoder_eof_input.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/decoder_pending_input.h",
+      "sha256": "b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "bytes": 3668,
+      "blob": "blobs/b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/decoder_pending_input.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/icy_title.h",
+      "sha256": "2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "bytes": 796,
+      "blob": "blobs/2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/icy_title.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/json_buffer.h",
+      "sha256": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "bytes": 2405,
+      "blob": "blobs/0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/json_buffer.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h",
+      "sha256": "425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "bytes": 6702,
+      "blob": "blobs/425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/ogg_opus_timeline.h",
+      "sha256": "48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "bytes": 19415,
+      "blob": "blobs/48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/ogg_opus_timeline.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/ogg_page_input.h",
+      "sha256": "dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "bytes": 5201,
+      "blob": "blobs/dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/ogg_page_input.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/opus_family1_mapping.h",
+      "sha256": "4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "bytes": 5509,
+      "blob": "blobs/4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_family1_mapping.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/opus_multistream_framing.h",
+      "sha256": "85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "bytes": 4619,
+      "blob": "blobs/85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_multistream_framing.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/opus_pcm_trim.h",
+      "sha256": "c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "bytes": 3498,
+      "blob": "blobs/c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_pcm_trim.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/opus_tags_stream.h",
+      "sha256": "61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "bytes": 7437,
+      "blob": "blobs/61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_tags_stream.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/pcm_channel_layout.h",
+      "sha256": "08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "bytes": 277,
+      "blob": "blobs/08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/pcm_channel_layout.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/pcm_header_gain.h",
+      "sha256": "cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "bytes": 4912,
+      "blob": "blobs/cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/pcm_header_gain.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/pcm_speaker_mix.h",
+      "sha256": "4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "bytes": 3598,
+      "blob": "blobs/4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/pcm_speaker_mix.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_bitrate.h",
+      "sha256": "358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "bytes": 1472,
+      "blob": "blobs/358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_bitrate.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_body.h",
+      "sha256": "20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "bytes": 2604,
+      "blob": "blobs/20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_body.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_confirm.h",
+      "sha256": "58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "bytes": 6488,
+      "blob": "blobs/58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_confirm.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_encoded_router.h",
+      "sha256": "b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "bytes": 8130,
+      "blob": "blobs/b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_encoded_router.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_frames.h",
+      "sha256": "ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "bytes": 8457,
+      "blob": "blobs/ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_frames.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_probe.h",
+      "sha256": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "bytes": 5313,
+      "blob": "blobs/92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_probe.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_staging.h",
+      "sha256": "811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "bytes": 6727,
+      "blob": "blobs/811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_staging.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_start.h",
+      "sha256": "54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "bytes": 8081,
+      "blob": "blobs/54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_start.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/stream_tags.h",
+      "sha256": "b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "bytes": 1514,
+      "blob": "blobs/b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_tags.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/tls_stream_result.h",
+      "sha256": "8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "bytes": 435,
+      "blob": "blobs/8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/tls_stream_result.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/components/native_stream/include/websocket_message.h",
+      "sha256": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "bytes": 8005,
+      "blob": "blobs/02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/components/native_stream/include/websocket_message.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/audio_service.c",
+      "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "bytes": 75982,
+      "blob": "blobs/445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/audio_service.c"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/native_health.h",
+      "sha256": "5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "bytes": 3166,
+      "blob": "blobs/5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_health.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/native_health_json.c",
+      "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad",
+      "bytes": 6754,
+      "blob": "blobs/01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_health_json.c"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/native_output_metrics.h",
+      "sha256": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "bytes": 1631,
+      "blob": "blobs/67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_output_metrics.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "bytes": 10461,
+      "blob": "blobs/ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_state.c"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/native_state.h",
+      "sha256": "28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "bytes": 3471,
+      "blob": "blobs/28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_state.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/radio_control.h",
+      "sha256": "a57ed94971c10294a55076261d03a4c1442d50d66ed42af2f2dc7bb8a54c711b",
+      "bytes": 80,
+      "blob": "blobs/a57ed94971c10294a55076261d03a4c1442d50d66ed42af2f2dc7bb8a54c711b",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/radio_control.h"
+    },
+    {
+      "path": "cyd-stream01/sources/idf/esp32-cyd2usb-native/main/web_service.c",
+      "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8",
+      "bytes": 28023,
+      "blob": "blobs/f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/web_service.c"
+    },
+    {
+      "path": "cyd-stream01/sources/tests/native/audio_power_seam.h",
+      "sha256": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "bytes": 1886,
+      "blob": "blobs/c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/tests/native/audio_power_seam.h"
+    },
+    {
+      "path": "cyd-stream01/sources/tests/native/cyd_stream_test.c",
+      "sha256": "2a9f3c964e241a139832e970dae8f2d79fe627deb2777776994e743198e62300",
+      "bytes": 36810,
+      "blob": "blobs/2a9f3c964e241a139832e970dae8f2d79fe627deb2777776994e743198e62300",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/tests/native/cyd_stream_test.c"
+    },
+    {
+      "path": "cyd-stream01/sources/tests/run-cyd-lifecycle.py",
+      "sha256": "64e04a440cfc832e4534ecae5b4f0bda3079c10843da516ba61a5fee6f603598",
+      "bytes": 8385,
+      "blob": "blobs/64e04a440cfc832e4534ecae5b4f0bda3079c10843da516ba61a5fee6f603598",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/tests/run-cyd-lifecycle.py"
+    },
+    {
+      "path": "cyd-stream01/sources/tests/run-cyd-stream.py",
+      "sha256": "2e8a5d123affbc6546a191750687d67e71637fe0fcf9edca3d3bbb39fad0e63a",
+      "bytes": 8713,
+      "blob": "blobs/2e8a5d123affbc6546a191750687d67e71637fe0fcf9edca3d3bbb39fad0e63a",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/tests/run-cyd-stream.py"
+    },
+    {
+      "path": "cyd-stream01/sources/tools/codec_benchmark/run_output_dma_host.py",
+      "sha256": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "bytes": 5788,
+      "blob": "blobs/5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "original": ".build/cyd-stream-fairness-20261101-01/sources/tools/codec_benchmark/run_output_dma_host.py"
+    },
+    {
+      "path": "cyd-stream02/build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/cyd-stream-fairness-20261101-02/build.log"
+    },
+    {
+      "path": "cyd-stream02/esp_crt_bundle.h",
+      "sha256": "5aa2c127e49921fd3d7b0704ce774473edfea56ee8b39d9d3e6a5fe959f21bac",
+      "bytes": 87,
+      "blob": "blobs/5aa2c127e49921fd3d7b0704ce774473edfea56ee8b39d9d3e6a5fe959f21bac",
+      "original": ".build/cyd-stream-fairness-20261101-02/esp_crt_bundle.h"
+    },
+    {
+      "path": "cyd-stream02/esp_err.h",
+      "sha256": "65f160ad8a66dd2d609643e34fcf54d0462b1e2dfe1ac086940680f411c4b7df",
+      "bytes": 38,
+      "blob": "blobs/65f160ad8a66dd2d609643e34fcf54d0462b1e2dfe1ac086940680f411c4b7df",
+      "original": ".build/cyd-stream-fairness-20261101-02/esp_err.h"
+    },
+    {
+      "path": "cyd-stream02/freertos/FreeRTOS.h",
+      "sha256": "371b15c42c88624eae2c91888aa172dbbb98b63bf78385021f5cc06902ff370d",
+      "bytes": 753,
+      "blob": "blobs/371b15c42c88624eae2c91888aa172dbbb98b63bf78385021f5cc06902ff370d",
+      "original": ".build/cyd-stream-fairness-20261101-02/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "cyd-stream02/freertos/semphr.h",
+      "sha256": "3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "bytes": 23,
+      "blob": "blobs/3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "original": ".build/cyd-stream-fairness-20261101-02/freertos/semphr.h"
+    },
+    {
+      "path": "cyd-stream02/production.inc",
+      "sha256": "8d060a1ad2951bef43553f9555d4a478eee5389d45f5bb560d3bd94b6a1eab51",
+      "bytes": 41556,
+      "blob": "blobs/8d060a1ad2951bef43553f9555d4a478eee5389d45f5bb560d3bd94b6a1eab51",
+      "original": ".build/cyd-stream-fairness-20261101-02/production.inc"
+    },
+    {
+      "path": "cyd-stream02/report.json",
+      "sha256": "5588b29faa8b2197bb77a371b22a562ab67d40a3eee90288431352b0581fa2a9",
+      "bytes": 9083,
+      "blob": "blobs/5588b29faa8b2197bb77a371b22a562ab67d40a3eee90288431352b0581fa2a9",
+      "original": ".build/cyd-stream-fairness-20261101-02/report.json"
+    },
+    {
+      "path": "cyd-stream02/sdkconfig.h",
+      "sha256": "9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "bytes": 62,
+      "blob": "blobs/9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "original": ".build/cyd-stream-fairness-20261101-02/sdkconfig.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_audio_settings/native_audio_settings.h",
+      "sha256": "21d0492056a4f52a2d065918d975bc461db677fe82fb739eaacd6b3786ce19c7",
+      "bytes": 1468,
+      "blob": "blobs/21d0492056a4f52a2d065918d975bc461db677fe82fb739eaacd6b3786ce19c7",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_audio_settings/native_audio_settings.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_storage/include/radio_control.h",
+      "sha256": "53781046f01bb24c33e461f5e070a65a55d92d5109c14f27e92121332d1e6e74",
+      "bytes": 1424,
+      "blob": "blobs/53781046f01bb24c33e461f5e070a65a55d92d5109c14f27e92121332d1e6e74",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_storage/include/radio_control.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/icy_title.c",
+      "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "bytes": 2162,
+      "blob": "blobs/b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/icy_title.c"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/adaptive_input.h",
+      "sha256": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "bytes": 4058,
+      "blob": "blobs/e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/adaptive_input.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/audio_completion.h",
+      "sha256": "d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "bytes": 1490,
+      "blob": "blobs/d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/audio_completion.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/decoder_eof_input.h",
+      "sha256": "22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "bytes": 1705,
+      "blob": "blobs/22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/decoder_eof_input.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/decoder_pending_input.h",
+      "sha256": "b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "bytes": 3668,
+      "blob": "blobs/b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/decoder_pending_input.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/icy_title.h",
+      "sha256": "2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "bytes": 796,
+      "blob": "blobs/2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/icy_title.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/json_buffer.h",
+      "sha256": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "bytes": 2405,
+      "blob": "blobs/0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/json_buffer.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h",
+      "sha256": "425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "bytes": 6702,
+      "blob": "blobs/425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/ogg_opus_timeline.h",
+      "sha256": "48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "bytes": 19415,
+      "blob": "blobs/48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/ogg_opus_timeline.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/ogg_page_input.h",
+      "sha256": "dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "bytes": 5201,
+      "blob": "blobs/dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/ogg_page_input.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/opus_family1_mapping.h",
+      "sha256": "4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "bytes": 5509,
+      "blob": "blobs/4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_family1_mapping.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/opus_multistream_framing.h",
+      "sha256": "85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "bytes": 4619,
+      "blob": "blobs/85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_multistream_framing.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/opus_pcm_trim.h",
+      "sha256": "c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "bytes": 3498,
+      "blob": "blobs/c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_pcm_trim.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/opus_tags_stream.h",
+      "sha256": "61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "bytes": 7437,
+      "blob": "blobs/61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_tags_stream.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/pcm_channel_layout.h",
+      "sha256": "08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "bytes": 277,
+      "blob": "blobs/08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/pcm_channel_layout.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/pcm_header_gain.h",
+      "sha256": "cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "bytes": 4912,
+      "blob": "blobs/cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/pcm_header_gain.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/pcm_speaker_mix.h",
+      "sha256": "4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "bytes": 3598,
+      "blob": "blobs/4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/pcm_speaker_mix.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_bitrate.h",
+      "sha256": "358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "bytes": 1472,
+      "blob": "blobs/358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_bitrate.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_body.h",
+      "sha256": "20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "bytes": 2604,
+      "blob": "blobs/20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_body.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_confirm.h",
+      "sha256": "58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "bytes": 6488,
+      "blob": "blobs/58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_confirm.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_encoded_router.h",
+      "sha256": "b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "bytes": 8130,
+      "blob": "blobs/b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_encoded_router.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_frames.h",
+      "sha256": "ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "bytes": 8457,
+      "blob": "blobs/ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_frames.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_probe.h",
+      "sha256": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "bytes": 5313,
+      "blob": "blobs/92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_probe.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_staging.h",
+      "sha256": "811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "bytes": 6727,
+      "blob": "blobs/811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_staging.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_start.h",
+      "sha256": "54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "bytes": 8081,
+      "blob": "blobs/54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_start.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/stream_tags.h",
+      "sha256": "b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "bytes": 1514,
+      "blob": "blobs/b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_tags.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/tls_stream_result.h",
+      "sha256": "8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "bytes": 435,
+      "blob": "blobs/8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/tls_stream_result.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/components/native_stream/include/websocket_message.h",
+      "sha256": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "bytes": 8005,
+      "blob": "blobs/02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/components/native_stream/include/websocket_message.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/audio_service.c",
+      "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "bytes": 75982,
+      "blob": "blobs/445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/audio_service.c"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/native_health.h",
+      "sha256": "5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "bytes": 3166,
+      "blob": "blobs/5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_health.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/native_health_json.c",
+      "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad",
+      "bytes": 6754,
+      "blob": "blobs/01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_health_json.c"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/native_output_metrics.h",
+      "sha256": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "bytes": 1631,
+      "blob": "blobs/67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_output_metrics.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "bytes": 10461,
+      "blob": "blobs/ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_state.c"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/native_state.h",
+      "sha256": "28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "bytes": 3471,
+      "blob": "blobs/28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_state.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h",
+      "sha256": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "bytes": 976,
+      "blob": "blobs/45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/radio_control.h",
+      "sha256": "a57ed94971c10294a55076261d03a4c1442d50d66ed42af2f2dc7bb8a54c711b",
+      "bytes": 80,
+      "blob": "blobs/a57ed94971c10294a55076261d03a4c1442d50d66ed42af2f2dc7bb8a54c711b",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/radio_control.h"
+    },
+    {
+      "path": "cyd-stream02/sources/idf/esp32-cyd2usb-native/main/web_service.c",
+      "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8",
+      "bytes": 28023,
+      "blob": "blobs/f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/web_service.c"
+    },
+    {
+      "path": "cyd-stream02/sources/tests/native/audio_power_seam.h",
+      "sha256": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "bytes": 1886,
+      "blob": "blobs/c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/tests/native/audio_power_seam.h"
+    },
+    {
+      "path": "cyd-stream02/sources/tests/native/cyd_stream_test.c",
+      "sha256": "2a9f3c964e241a139832e970dae8f2d79fe627deb2777776994e743198e62300",
+      "bytes": 36810,
+      "blob": "blobs/2a9f3c964e241a139832e970dae8f2d79fe627deb2777776994e743198e62300",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/tests/native/cyd_stream_test.c"
+    },
+    {
+      "path": "cyd-stream02/sources/tests/run-cyd-lifecycle.py",
+      "sha256": "64e04a440cfc832e4534ecae5b4f0bda3079c10843da516ba61a5fee6f603598",
+      "bytes": 8385,
+      "blob": "blobs/64e04a440cfc832e4534ecae5b4f0bda3079c10843da516ba61a5fee6f603598",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/tests/run-cyd-lifecycle.py"
+    },
+    {
+      "path": "cyd-stream02/sources/tests/run-cyd-stream.py",
+      "sha256": "0c3619af403b6638f00f094912c46ecffd93ed8bc64aea4b40fb1df2adec872f",
+      "bytes": 9043,
+      "blob": "blobs/0c3619af403b6638f00f094912c46ecffd93ed8bc64aea4b40fb1df2adec872f",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/tests/run-cyd-stream.py"
+    },
+    {
+      "path": "cyd-stream02/sources/tools/codec_benchmark/run_output_dma_host.py",
+      "sha256": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "bytes": 5788,
+      "blob": "blobs/5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+      "original": ".build/cyd-stream-fairness-20261101-02/sources/tools/codec_benchmark/run_output_dma_host.py"
+    },
+    {
+      "path": "cyd-stream02/test.log",
+      "sha256": "c48c51822194964def012341130dd60cd8bd5894be74f3ae402b9d3f8ac1f438",
+      "bytes": 7746,
+      "blob": "blobs/c48c51822194964def012341130dd60cd8bd5894be74f3ae402b9d3f8ac1f438",
+      "original": ".build/cyd-stream-fairness-20261101-02/test.log"
+    },
+    {
+      "path": "power01/c3/controls-types.inc",
+      "sha256": "2ae33ec1634116b06bd174046116d2d0a46fdee938ad23a11711ba731a7fb0b2",
+      "bytes": 1053,
+      "blob": "blobs/2ae33ec1634116b06bd174046116d2d0a46fdee938ad23a11711ba731a7fb0b2",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/controls-types.inc"
+    },
+    {
+      "path": "power01/c3/controls.inc",
+      "sha256": "cfd263b488e187767cb5df23d906f80d55521f23fbbd463cc5d4131d67e5c4e0",
+      "bytes": 3792,
+      "blob": "blobs/cfd263b488e187767cb5df23d906f80d55521f23fbbd463cc5d4131d67e5c4e0",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/controls.inc"
+    },
+    {
+      "path": "power01/c3/esp_crt_bundle.h",
+      "sha256": "3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "bytes": 83,
+      "blob": "blobs/3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/esp_crt_bundle.h"
+    },
+    {
+      "path": "power01/c3/esp_err.h",
+      "sha256": "4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "bytes": 179,
+      "blob": "blobs/4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/esp_err.h"
+    },
+    {
+      "path": "power01/c3/freertos/FreeRTOS.h",
+      "sha256": "5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "bytes": 914,
+      "blob": "blobs/5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "power01/c3/freertos/semphr.h",
+      "sha256": "3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "bytes": 23,
+      "blob": "blobs/3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/freertos/semphr.h"
+    },
+    {
+      "path": "power01/c3/sdkconfig.h",
+      "sha256": "9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "bytes": 62,
+      "blob": "blobs/9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/sdkconfig.h"
+    },
+    {
+      "path": "power01/c3-controls-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3-controls-build.log"
+    },
+    {
+      "path": "power01/c3-controls-test.log",
+      "sha256": "c6e95ef7c89d0fd458a1e879d8b7b6105f74912e9ac879b97dabc1141fc07781",
+      "bytes": 128,
+      "blob": "blobs/c6e95ef7c89d0fd458a1e879d8b7b6105f74912e9ac879b97dabc1141fc07781",
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3-controls-test.log"
+    },
+    {
+      "path": "power01/cyd/controls-types.inc",
+      "sha256": "b9cfaca392aa1350ce9201b2e9127e543ea1916c92eb2ad1d05ee339017c0df3",
+      "bytes": 1016,
+      "blob": "blobs/b9cfaca392aa1350ce9201b2e9127e543ea1916c92eb2ad1d05ee339017c0df3",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd/controls-types.inc"
+    },
+    {
+      "path": "power01/cyd/controls.inc",
+      "sha256": "30804b22bc83ed230e988b73ecac52b443ddefe374c2f5c41ba6021ffab41e74",
+      "bytes": 2206,
+      "blob": "blobs/30804b22bc83ed230e988b73ecac52b443ddefe374c2f5c41ba6021ffab41e74",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd/controls.inc"
+    },
+    {
+      "path": "power01/cyd/esp_crt_bundle.h",
+      "sha256": "3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "bytes": 83,
+      "blob": "blobs/3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd/esp_crt_bundle.h"
+    },
+    {
+      "path": "power01/cyd/esp_err.h",
+      "sha256": "4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "bytes": 179,
+      "blob": "blobs/4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd/esp_err.h"
+    },
+    {
+      "path": "power01/cyd/freertos/FreeRTOS.h",
+      "sha256": "5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "bytes": 914,
+      "blob": "blobs/5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "power01/cyd/freertos/semphr.h",
+      "sha256": "3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "bytes": 23,
+      "blob": "blobs/3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd/freertos/semphr.h"
+    },
+    {
+      "path": "power01/cyd/sdkconfig.h",
+      "sha256": "9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "bytes": 62,
+      "blob": "blobs/9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd/sdkconfig.h"
+    },
+    {
+      "path": "power01/cyd-controls-build.log",
+      "sha256": "2631343fec5b4939f9247cb93d65fe0bbaabece265ead285c48424975be47098",
+      "bytes": 677,
+      "blob": "blobs/2631343fec5b4939f9247cb93d65fe0bbaabece265ead285c48424975be47098",
+      "original": ".build/audio-power-stream-fairness-20261101-01/cyd-controls-build.log"
+    },
+    {
+      "path": "power01/sources/idf/components/native_network_power/include/native_network_power.h",
+      "sha256": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+      "bytes": 1423,
+      "blob": "blobs/9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_network_power/include/native_network_power.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_network_power/native_network_power.c",
+      "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "bytes": 3231,
+      "blob": "blobs/b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_network_power/native_network_power.c"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/icy_title.c",
+      "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "bytes": 2162,
+      "blob": "blobs/b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/icy_title.c"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/adaptive_input.h",
+      "sha256": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "bytes": 4058,
+      "blob": "blobs/e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/adaptive_input.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/audio_completion.h",
+      "sha256": "d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "bytes": 1490,
+      "blob": "blobs/d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/audio_completion.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/decoder_eof_input.h",
+      "sha256": "22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "bytes": 1705,
+      "blob": "blobs/22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/decoder_eof_input.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/decoder_pending_input.h",
+      "sha256": "b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "bytes": 3668,
+      "blob": "blobs/b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/decoder_pending_input.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/icy_title.h",
+      "sha256": "2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "bytes": 796,
+      "blob": "blobs/2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/icy_title.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/json_buffer.h",
+      "sha256": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "bytes": 2405,
+      "blob": "blobs/0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/json_buffer.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h",
+      "sha256": "425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "bytes": 6702,
+      "blob": "blobs/425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/ogg_opus_timeline.h",
+      "sha256": "48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "bytes": 19415,
+      "blob": "blobs/48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/ogg_opus_timeline.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/ogg_page_input.h",
+      "sha256": "dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "bytes": 5201,
+      "blob": "blobs/dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/ogg_page_input.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/opus_family1_mapping.h",
+      "sha256": "4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "bytes": 5509,
+      "blob": "blobs/4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_family1_mapping.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/opus_multistream_framing.h",
+      "sha256": "85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "bytes": 4619,
+      "blob": "blobs/85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_multistream_framing.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/opus_pcm_trim.h",
+      "sha256": "c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "bytes": 3498,
+      "blob": "blobs/c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_pcm_trim.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/opus_tags_stream.h",
+      "sha256": "61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "bytes": 7437,
+      "blob": "blobs/61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/opus_tags_stream.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/pcm_channel_layout.h",
+      "sha256": "08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "bytes": 277,
+      "blob": "blobs/08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/pcm_channel_layout.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/pcm_header_gain.h",
+      "sha256": "cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "bytes": 4912,
+      "blob": "blobs/cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/pcm_header_gain.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/pcm_speaker_mix.h",
+      "sha256": "4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "bytes": 3598,
+      "blob": "blobs/4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/pcm_speaker_mix.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_bitrate.h",
+      "sha256": "358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "bytes": 1472,
+      "blob": "blobs/358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_bitrate.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_body.h",
+      "sha256": "20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "bytes": 2604,
+      "blob": "blobs/20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_body.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_confirm.h",
+      "sha256": "58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "bytes": 6488,
+      "blob": "blobs/58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_confirm.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_encoded_router.h",
+      "sha256": "b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "bytes": 8130,
+      "blob": "blobs/b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_encoded_router.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_frames.h",
+      "sha256": "ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "bytes": 8457,
+      "blob": "blobs/ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_frames.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_probe.h",
+      "sha256": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "bytes": 5313,
+      "blob": "blobs/92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_probe.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_staging.h",
+      "sha256": "811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "bytes": 6727,
+      "blob": "blobs/811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_staging.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_start.h",
+      "sha256": "54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "bytes": 8081,
+      "blob": "blobs/54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_start.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/stream_tags.h",
+      "sha256": "b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "bytes": 1514,
+      "blob": "blobs/b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/stream_tags.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/tls_stream_result.h",
+      "sha256": "8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "bytes": 435,
+      "blob": "blobs/8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/tls_stream_result.h"
+    },
+    {
+      "path": "power01/sources/idf/components/native_stream/include/websocket_message.h",
+      "sha256": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "bytes": 8005,
+      "blob": "blobs/02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/components/native_stream/include/websocket_message.h"
+    },
+    {
+      "path": "power01/sources/idf/esp32-cyd2usb-native/main/audio_service.c",
+      "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "bytes": 75982,
+      "blob": "blobs/445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/audio_service.c"
+    },
+    {
+      "path": "power01/sources/idf/esp32-cyd2usb-native/main/audio_service.h",
+      "sha256": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+      "bytes": 1718,
+      "blob": "blobs/2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/audio_service.h"
+    },
+    {
+      "path": "power01/sources/idf/esp32-cyd2usb-native/main/native_health.h",
+      "sha256": "5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "bytes": 3166,
+      "blob": "blobs/5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_health.h"
+    },
+    {
+      "path": "power01/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "bytes": 10461,
+      "blob": "blobs/ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_state.c"
+    },
+    {
+      "path": "power01/sources/idf/esp32-cyd2usb-native/main/native_state.h",
+      "sha256": "28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "bytes": 3471,
+      "blob": "blobs/28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_state.h"
+    },
+    {
+      "path": "power01/sources/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h",
+      "sha256": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "bytes": 976,
+      "blob": "blobs/45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h"
+    },
+    {
+      "path": "power01/sources/idf/esp32c3-oled-native/main/audio_service.c",
+      "sha256": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "bytes": 115828,
+      "blob": "blobs/9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    {
+      "path": "power01/sources/idf/esp32c3-oled-native/main/audio_service.h",
+      "sha256": "21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61",
+      "bytes": 1815,
+      "blob": "blobs/21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32c3-oled-native/main/audio_service.h"
+    },
+    {
+      "path": "power01/sources/idf/esp32c3-oled-native/main/native_state.c",
+      "sha256": "1a0810c82a0593656313fccad8cd10b5afb9098d765e531bcd3196e0f1135425",
+      "bytes": 9741,
+      "blob": "blobs/1a0810c82a0593656313fccad8cd10b5afb9098d765e531bcd3196e0f1135425",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32c3-oled-native/main/native_state.c"
+    },
+    {
+      "path": "power01/sources/idf/esp32c3-oled-native/main/native_state.h",
+      "sha256": "9401dc2f6b6fc1dc91945908be840ac1db8cf4222e1e6bec4829c501f155e6ef",
+      "bytes": 3444,
+      "blob": "blobs/9401dc2f6b6fc1dc91945908be840ac1db8cf4222e1e6bec4829c501f155e6ef",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/idf/esp32c3-oled-native/main/native_state.h"
+    },
+    {
+      "path": "power01/sources/tests/native/audio_power_control_test.c",
+      "sha256": "36db0532173fe353f2531c1ecf49825772db0e598fd9780665f44504753f4c56",
+      "bytes": 4282,
+      "blob": "blobs/36db0532173fe353f2531c1ecf49825772db0e598fd9780665f44504753f4c56",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/tests/native/audio_power_control_test.c"
+    },
+    {
+      "path": "power01/sources/tests/native/audio_power_cyd_stream_test.c",
+      "sha256": "3bd68d23cb68549b5fd1333d3567aefe45012eff1d4e582b966deca60a2177f2",
+      "bytes": 6976,
+      "blob": "blobs/3bd68d23cb68549b5fd1333d3567aefe45012eff1d4e582b966deca60a2177f2",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/tests/native/audio_power_cyd_stream_test.c"
+    },
+    {
+      "path": "power01/sources/tests/run-audio-power.py",
+      "sha256": "cd59d77eee2dd98de0163025f1ef61f2ce3d9d3afab75d8d28338f02a146f621",
+      "bytes": 8311,
+      "blob": "blobs/cd59d77eee2dd98de0163025f1ef61f2ce3d9d3afab75d8d28338f02a146f621",
+      "original": ".build/audio-power-stream-fairness-20261101-01/sources/tests/run-audio-power.py"
+    },
+    {
+      "path": "power02/c3/controls-types.inc",
+      "sha256": "2ae33ec1634116b06bd174046116d2d0a46fdee938ad23a11711ba731a7fb0b2",
+      "bytes": 1053,
+      "blob": "blobs/2ae33ec1634116b06bd174046116d2d0a46fdee938ad23a11711ba731a7fb0b2",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/controls-types.inc"
+    },
+    {
+      "path": "power02/c3/controls.inc",
+      "sha256": "cfd263b488e187767cb5df23d906f80d55521f23fbbd463cc5d4131d67e5c4e0",
+      "bytes": 3792,
+      "blob": "blobs/cfd263b488e187767cb5df23d906f80d55521f23fbbd463cc5d4131d67e5c4e0",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/controls.inc"
+    },
+    {
+      "path": "power02/c3/esp_crt_bundle.h",
+      "sha256": "3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "bytes": 83,
+      "blob": "blobs/3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/esp_crt_bundle.h"
+    },
+    {
+      "path": "power02/c3/esp_err.h",
+      "sha256": "4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "bytes": 179,
+      "blob": "blobs/4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/esp_err.h"
+    },
+    {
+      "path": "power02/c3/freertos/FreeRTOS.h",
+      "sha256": "5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "bytes": 914,
+      "blob": "blobs/5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "power02/c3/freertos/semphr.h",
+      "sha256": "3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "bytes": 23,
+      "blob": "blobs/3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/freertos/semphr.h"
+    },
+    {
+      "path": "power02/c3/sdkconfig.h",
+      "sha256": "9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "bytes": 62,
+      "blob": "blobs/9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/sdkconfig.h"
+    },
+    {
+      "path": "power02/c3-controls-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3-controls-build.log"
+    },
+    {
+      "path": "power02/c3-controls-test.log",
+      "sha256": "c6e95ef7c89d0fd458a1e879d8b7b6105f74912e9ac879b97dabc1141fc07781",
+      "bytes": 128,
+      "blob": "blobs/c6e95ef7c89d0fd458a1e879d8b7b6105f74912e9ac879b97dabc1141fc07781",
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3-controls-test.log"
+    },
+    {
+      "path": "power02/cyd/controls-types.inc",
+      "sha256": "b9cfaca392aa1350ce9201b2e9127e543ea1916c92eb2ad1d05ee339017c0df3",
+      "bytes": 1016,
+      "blob": "blobs/b9cfaca392aa1350ce9201b2e9127e543ea1916c92eb2ad1d05ee339017c0df3",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/controls-types.inc"
+    },
+    {
+      "path": "power02/cyd/controls.inc",
+      "sha256": "30804b22bc83ed230e988b73ecac52b443ddefe374c2f5c41ba6021ffab41e74",
+      "bytes": 2206,
+      "blob": "blobs/30804b22bc83ed230e988b73ecac52b443ddefe374c2f5c41ba6021ffab41e74",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/controls.inc"
+    },
+    {
+      "path": "power02/cyd/esp_crt_bundle.h",
+      "sha256": "3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "bytes": 83,
+      "blob": "blobs/3e3ca32ec61bfc753187f58b4b80d5858650b8b619e2dbb84845167626a046c7",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/esp_crt_bundle.h"
+    },
+    {
+      "path": "power02/cyd/esp_err.h",
+      "sha256": "4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "bytes": 179,
+      "blob": "blobs/4b3b270aa737acd1fb626a1aa76d210d95b5f9d2b951354b10e7f7813fbcb461",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/esp_err.h"
+    },
+    {
+      "path": "power02/cyd/freertos/FreeRTOS.h",
+      "sha256": "5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "bytes": 914,
+      "blob": "blobs/5d6547d8fbb81c414809361e2e1887d3a09954b83a7a61155f288d86970a140a",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/freertos/FreeRTOS.h"
+    },
+    {
+      "path": "power02/cyd/freertos/semphr.h",
+      "sha256": "3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "bytes": 23,
+      "blob": "blobs/3603569144fa9c10215bb10032ec00b45cbbf1b950988ea3226b0c89e105f5d5",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/freertos/semphr.h"
+    },
+    {
+      "path": "power02/cyd/sdkconfig.h",
+      "sha256": "9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "bytes": 62,
+      "blob": "blobs/9c1a83e2ffeaa72ec13c3d9d9a83af9e929a532893c504412f0a219f69a4e699",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/sdkconfig.h"
+    },
+    {
+      "path": "power02/cyd/stream-types.inc",
+      "sha256": "a8ccae63dd8b238c4149139c0d350cc65f14dc262a3ad472cd4306c7e9ab77f4",
+      "bytes": 908,
+      "blob": "blobs/a8ccae63dd8b238c4149139c0d350cc65f14dc262a3ad472cd4306c7e9ab77f4",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/stream-types.inc"
+    },
+    {
+      "path": "power02/cyd/stream.inc",
+      "sha256": "f9823f1d66ba5c19ccd471b54ac2ec80062dd7571d94c886627d08410374d2f5",
+      "bytes": 20008,
+      "blob": "blobs/f9823f1d66ba5c19ccd471b54ac2ec80062dd7571d94c886627d08410374d2f5",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/stream.inc"
+    },
+    {
+      "path": "power02/cyd-controls-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd-controls-build.log"
+    },
+    {
+      "path": "power02/cyd-controls-test.log",
+      "sha256": "655f196435809e99392ed0fbf79ebb143eeb588efce815b85a668422ea3a528c",
+      "bytes": 127,
+      "blob": "blobs/655f196435809e99392ed0fbf79ebb143eeb588efce815b85a668422ea3a528c",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd-controls-test.log"
+    },
+    {
+      "path": "power02/cyd-stream-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd-stream-build.log"
+    },
+    {
+      "path": "power02/cyd-stream-test.log",
+      "sha256": "19d4e3e218091b3eef6cc75493a9f846fa4f95e521636a62749a3ba357453b3a",
+      "bytes": 138,
+      "blob": "blobs/19d4e3e218091b3eef6cc75493a9f846fa4f95e521636a62749a3ba357453b3a",
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd-stream-test.log"
+    },
+    {
+      "path": "power02/report.json",
+      "sha256": "18ea59723d923bc5faf6d58abe25cd94aa62edf97aee6be8fbf8da45ddb06561",
+      "bytes": 12045,
+      "blob": "blobs/18ea59723d923bc5faf6d58abe25cd94aa62edf97aee6be8fbf8da45ddb06561",
+      "original": ".build/audio-power-stream-fairness-20261101-02/report.json"
+    },
+    {
+      "path": "power02/sources/idf/components/native_network_power/include/native_network_power.h",
+      "sha256": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+      "bytes": 1423,
+      "blob": "blobs/9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_network_power/include/native_network_power.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_network_power/native_network_power.c",
+      "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "bytes": 3231,
+      "blob": "blobs/b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_network_power/native_network_power.c"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/icy_title.c",
+      "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "bytes": 2162,
+      "blob": "blobs/b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/icy_title.c"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/adaptive_input.h",
+      "sha256": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "bytes": 4058,
+      "blob": "blobs/e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/adaptive_input.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/audio_completion.h",
+      "sha256": "d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "bytes": 1490,
+      "blob": "blobs/d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/audio_completion.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/decoder_eof_input.h",
+      "sha256": "22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "bytes": 1705,
+      "blob": "blobs/22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/decoder_eof_input.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/decoder_pending_input.h",
+      "sha256": "b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "bytes": 3668,
+      "blob": "blobs/b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/decoder_pending_input.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/icy_title.h",
+      "sha256": "2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "bytes": 796,
+      "blob": "blobs/2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/icy_title.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/json_buffer.h",
+      "sha256": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "bytes": 2405,
+      "blob": "blobs/0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/json_buffer.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h",
+      "sha256": "425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "bytes": 6702,
+      "blob": "blobs/425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/ogg_opus_audio_packets.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/ogg_opus_timeline.h",
+      "sha256": "48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "bytes": 19415,
+      "blob": "blobs/48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/ogg_opus_timeline.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/ogg_page_input.h",
+      "sha256": "dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "bytes": 5201,
+      "blob": "blobs/dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/ogg_page_input.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/opus_family1_mapping.h",
+      "sha256": "4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "bytes": 5509,
+      "blob": "blobs/4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_family1_mapping.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/opus_multistream_framing.h",
+      "sha256": "85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "bytes": 4619,
+      "blob": "blobs/85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_multistream_framing.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/opus_pcm_trim.h",
+      "sha256": "c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "bytes": 3498,
+      "blob": "blobs/c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_pcm_trim.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/opus_tags_stream.h",
+      "sha256": "61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "bytes": 7437,
+      "blob": "blobs/61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/opus_tags_stream.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/pcm_channel_layout.h",
+      "sha256": "08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "bytes": 277,
+      "blob": "blobs/08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/pcm_channel_layout.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/pcm_header_gain.h",
+      "sha256": "cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "bytes": 4912,
+      "blob": "blobs/cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/pcm_header_gain.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/pcm_speaker_mix.h",
+      "sha256": "4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "bytes": 3598,
+      "blob": "blobs/4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/pcm_speaker_mix.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_bitrate.h",
+      "sha256": "358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "bytes": 1472,
+      "blob": "blobs/358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_bitrate.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_body.h",
+      "sha256": "20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "bytes": 2604,
+      "blob": "blobs/20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_body.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_confirm.h",
+      "sha256": "58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "bytes": 6488,
+      "blob": "blobs/58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_confirm.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_encoded_router.h",
+      "sha256": "b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "bytes": 8130,
+      "blob": "blobs/b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_encoded_router.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_frames.h",
+      "sha256": "ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "bytes": 8457,
+      "blob": "blobs/ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_frames.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_probe.h",
+      "sha256": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "bytes": 5313,
+      "blob": "blobs/92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_probe.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_staging.h",
+      "sha256": "811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "bytes": 6727,
+      "blob": "blobs/811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_staging.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_start.h",
+      "sha256": "54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "bytes": 8081,
+      "blob": "blobs/54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_start.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/stream_tags.h",
+      "sha256": "b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "bytes": 1514,
+      "blob": "blobs/b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/stream_tags.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/tls_stream_result.h",
+      "sha256": "8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "bytes": 435,
+      "blob": "blobs/8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/tls_stream_result.h"
+    },
+    {
+      "path": "power02/sources/idf/components/native_stream/include/websocket_message.h",
+      "sha256": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "bytes": 8005,
+      "blob": "blobs/02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/components/native_stream/include/websocket_message.h"
+    },
+    {
+      "path": "power02/sources/idf/esp32-cyd2usb-native/main/audio_service.c",
+      "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "bytes": 75982,
+      "blob": "blobs/445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/audio_service.c"
+    },
+    {
+      "path": "power02/sources/idf/esp32-cyd2usb-native/main/audio_service.h",
+      "sha256": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+      "bytes": 1718,
+      "blob": "blobs/2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/audio_service.h"
+    },
+    {
+      "path": "power02/sources/idf/esp32-cyd2usb-native/main/native_health.h",
+      "sha256": "5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "bytes": 3166,
+      "blob": "blobs/5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_health.h"
+    },
+    {
+      "path": "power02/sources/idf/esp32-cyd2usb-native/main/native_output_metrics.h",
+      "sha256": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "bytes": 1631,
+      "blob": "blobs/67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_output_metrics.h"
+    },
+    {
+      "path": "power02/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "bytes": 10461,
+      "blob": "blobs/ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_state.c"
+    },
+    {
+      "path": "power02/sources/idf/esp32-cyd2usb-native/main/native_state.h",
+      "sha256": "28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "bytes": 3471,
+      "blob": "blobs/28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_state.h"
+    },
+    {
+      "path": "power02/sources/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h",
+      "sha256": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "bytes": 976,
+      "blob": "blobs/45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h"
+    },
+    {
+      "path": "power02/sources/idf/esp32c3-oled-native/main/audio_service.c",
+      "sha256": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "bytes": 115828,
+      "blob": "blobs/9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    {
+      "path": "power02/sources/idf/esp32c3-oled-native/main/audio_service.h",
+      "sha256": "21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61",
+      "bytes": 1815,
+      "blob": "blobs/21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32c3-oled-native/main/audio_service.h"
+    },
+    {
+      "path": "power02/sources/idf/esp32c3-oled-native/main/native_state.c",
+      "sha256": "1a0810c82a0593656313fccad8cd10b5afb9098d765e531bcd3196e0f1135425",
+      "bytes": 9741,
+      "blob": "blobs/1a0810c82a0593656313fccad8cd10b5afb9098d765e531bcd3196e0f1135425",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32c3-oled-native/main/native_state.c"
+    },
+    {
+      "path": "power02/sources/idf/esp32c3-oled-native/main/native_state.h",
+      "sha256": "9401dc2f6b6fc1dc91945908be840ac1db8cf4222e1e6bec4829c501f155e6ef",
+      "bytes": 3444,
+      "blob": "blobs/9401dc2f6b6fc1dc91945908be840ac1db8cf4222e1e6bec4829c501f155e6ef",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/idf/esp32c3-oled-native/main/native_state.h"
+    },
+    {
+      "path": "power02/sources/tests/native/audio_power_control_test.c",
+      "sha256": "36db0532173fe353f2531c1ecf49825772db0e598fd9780665f44504753f4c56",
+      "bytes": 4282,
+      "blob": "blobs/36db0532173fe353f2531c1ecf49825772db0e598fd9780665f44504753f4c56",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/tests/native/audio_power_control_test.c"
+    },
+    {
+      "path": "power02/sources/tests/native/audio_power_cyd_stream_test.c",
+      "sha256": "3bd68d23cb68549b5fd1333d3567aefe45012eff1d4e582b966deca60a2177f2",
+      "bytes": 6976,
+      "blob": "blobs/3bd68d23cb68549b5fd1333d3567aefe45012eff1d4e582b966deca60a2177f2",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/tests/native/audio_power_cyd_stream_test.c"
+    },
+    {
+      "path": "power02/sources/tests/run-audio-power.py",
+      "sha256": "7bc307e1e534f44e718b7c8e1c8f5029adb33358b937e30cd074e61764ce7c76",
+      "bytes": 8542,
+      "blob": "blobs/7bc307e1e534f44e718b7c8e1c8f5029adb33358b937e30cd074e61764ce7c76",
+      "original": ".build/audio-power-stream-fairness-20261101-02/sources/tests/run-audio-power.py"
+    },
+    {
+      "path": "syntax01/audio_service.d",
+      "sha256": "f230bed3258946b2e34e896bbb940e2df7a99ff50a8da67409a4bf29068216cd",
+      "bytes": 26142,
+      "blob": "blobs/f230bed3258946b2e34e896bbb940e2df7a99ff50a8da67409a4bf29068216cd",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/audio_service.d"
+    },
+    {
+      "path": "syntax01/compiler.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/compiler.stderr.log"
+    },
+    {
+      "path": "syntax01/compiler.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/compiler.stdout.log"
+    },
+    {
+      "path": "syntax01/config/kconfig_menus.json",
+      "sha256": "b7a5d44f8c92e67d625c919df97cc7f9406cb0ec5ecda4d85ab6eb41391ba2be",
+      "bytes": 2448028,
+      "blob": "blobs/b7a5d44f8c92e67d625c919df97cc7f9406cb0ec5ecda4d85ab6eb41391ba2be",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/config/kconfig_menus.json"
+    },
+    {
+      "path": "syntax01/config/sdkconfig.cmake",
+      "sha256": "984d002f8de5eeadc1d62198153dbe6acaba0b3dab511e60f4ebfcfb75aab527",
+      "bytes": 110053,
+      "blob": "blobs/984d002f8de5eeadc1d62198153dbe6acaba0b3dab511e60f4ebfcfb75aab527",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/config/sdkconfig.cmake"
+    },
+    {
+      "path": "syntax01/config/sdkconfig.h",
+      "sha256": "f664acafb0bf0b6e3ad2e52ac71c201a8ad756a4996aa4e7eca419649786b1e2",
+      "bytes": 42278,
+      "blob": "blobs/f664acafb0bf0b6e3ad2e52ac71c201a8ad756a4996aa4e7eca419649786b1e2",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/config/sdkconfig.h"
+    },
+    {
+      "path": "syntax01/config/sdkconfig.json",
+      "sha256": "8f841adbaff60bf3280a2549b27fe686d9402ac8264f2b20a73d4fa8b4565bf9",
+      "bytes": 49569,
+      "blob": "blobs/8f841adbaff60bf3280a2549b27fe686d9402ac8264f2b20a73d4fa8b4565bf9",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/config/sdkconfig.json"
+    },
+    {
+      "path": "syntax01/report.json",
+      "sha256": "e1a4dd000b4946357f25d5db9678bfd42f05894cae9501ef3dca4cb4d74179df",
+      "bytes": 35740,
+      "blob": "blobs/e1a4dd000b4946357f25d5db9678bfd42f05894cae9501ef3dca4cb4d74179df",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/report.json"
+    },
+    {
+      "path": "syntax01/response-inputs/cflags",
+      "sha256": "013b1d04ec46cdd098661fc869aae3b79a0c119d481cd724dd2ecb27cb8878b7",
+      "bytes": 219,
+      "blob": "blobs/013b1d04ec46cdd098661fc869aae3b79a0c119d481cd724dd2ecb27cb8878b7",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/response-inputs/cflags"
+    },
+    {
+      "path": "syntax01/response-inputs/picolibc.specs",
+      "sha256": "b771df871d63795e83181350770a0ae32a7d6e54b5eeaf92944c0a8772316741",
+      "bytes": 3144,
+      "blob": "blobs/b771df871d63795e83181350770a0ae32a7d6e54b5eeaf92944c0a8772316741",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/response-inputs/picolibc.specs"
+    },
+    {
+      "path": "syntax01/sources/controller.py",
+      "sha256": "01af70e87285b82d26dd3eaf9ebc0337e65ceb5815019636ccb70aa392d7bdbb",
+      "bytes": 4751,
+      "blob": "blobs/01af70e87285b82d26dd3eaf9ebc0337e65ceb5815019636ccb70aa392d7bdbb",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/controller.py"
+    },
+    {
+      "path": "syntax01/sources/main/aac_public_config.h",
+      "sha256": "2566eef86464868475b308c0c2bcc03a46bec46703698ef7666ee6f857152b37",
+      "bytes": 359,
+      "blob": "blobs/2566eef86464868475b308c0c2bcc03a46bec46703698ef7666ee6f857152b37",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/aac_public_config.h"
+    },
+    {
+      "path": "syntax01/sources/main/audio_service.c",
+      "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "bytes": 75982,
+      "blob": "blobs/445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/audio_service.c"
+    },
+    {
+      "path": "syntax01/sources/main/audio_service.h",
+      "sha256": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+      "bytes": 1718,
+      "blob": "blobs/2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/audio_service.h"
+    },
+    {
+      "path": "syntax01/sources/main/board_config.h",
+      "sha256": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+      "bytes": 1023,
+      "blob": "blobs/40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/board_config.h"
+    },
+    {
+      "path": "syntax01/sources/main/compat/httpd_rfc6455/native_httpd_headers.h",
+      "sha256": "6153a79a85c4e159066510136630cf1a0b178a394b72c151841edc92aa12ea6e",
+      "bytes": 12368,
+      "blob": "blobs/6153a79a85c4e159066510136630cf1a0b178a394b72c151841edc92aa12ea6e",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/compat/httpd_rfc6455/native_httpd_headers.h"
+    },
+    {
+      "path": "syntax01/sources/main/compat/idf6_i2s_compat.h",
+      "sha256": "8f986ad61957513a31906824bb40492e7d91c7d933354dcbdf1599865e559812",
+      "bytes": 2361,
+      "blob": "blobs/8f986ad61957513a31906824bb40492e7d91c7d933354dcbdf1599865e559812",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/compat/idf6_i2s_compat.h"
+    },
+    {
+      "path": "syntax01/sources/main/cyd_display.h",
+      "sha256": "75726839982c12d746b52046831488247991b0626f75a347feebe4d347cfb75e",
+      "bytes": 1377,
+      "blob": "blobs/75726839982c12d746b52046831488247991b0626f75a347feebe4d347cfb75e",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/cyd_display.h"
+    },
+    {
+      "path": "syntax01/sources/main/decoder_registration.h",
+      "sha256": "54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+      "bytes": 360,
+      "blob": "blobs/54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/decoder_registration.h"
+    },
+    {
+      "path": "syntax01/sources/main/http_request_buffer.h",
+      "sha256": "70b3eccc1d0f8ee51094edaf205fe2a2c317b9c877a4d3d55ea6999480b28deb",
+      "bytes": 361,
+      "blob": "blobs/70b3eccc1d0f8ee51094edaf205fe2a2c317b9c877a4d3d55ea6999480b28deb",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/http_request_buffer.h"
+    },
+    {
+      "path": "syntax01/sources/main/input_prefill.h",
+      "sha256": "f58a2305605c6af327ac25232ffe67f2e17190788524066caa2e6f4bdbaa1f96",
+      "bytes": 998,
+      "blob": "blobs/f58a2305605c6af327ac25232ffe67f2e17190788524066caa2e6f4bdbaa1f96",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/input_prefill.h"
+    },
+    {
+      "path": "syntax01/sources/main/native_audio_output.h",
+      "sha256": "b6c72c14cf64879479dbd913018be2b3a1a918c47effd9a4ec55068e569935e5",
+      "bytes": 2734,
+      "blob": "blobs/b6c72c14cf64879479dbd913018be2b3a1a918c47effd9a4ec55068e569935e5",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/native_audio_output.h"
+    },
+    {
+      "path": "syntax01/sources/main/native_health.h",
+      "sha256": "5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "bytes": 3166,
+      "blob": "blobs/5c286050755d4201e989b81721824407782d89cb344c4c4f7a8d3be8145a8b0c",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/native_health.h"
+    },
+    {
+      "path": "syntax01/sources/main/native_input_reclaim.h",
+      "sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+      "bytes": 1498,
+      "blob": "blobs/2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/native_input_reclaim.h"
+    },
+    {
+      "path": "syntax01/sources/main/native_output_metrics.h",
+      "sha256": "67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "bytes": 1631,
+      "blob": "blobs/67dd24bce5f1a97a4fca986af3853a6469173d0ecd5687112f6529ad4a6bcae9",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/native_output_metrics.h"
+    },
+    {
+      "path": "syntax01/sources/main/native_state.h",
+      "sha256": "28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "bytes": 3471,
+      "blob": "blobs/28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/native_state.h"
+    },
+    {
+      "path": "syntax01/sources/main/native_tls_early_mpi.h",
+      "sha256": "2f5244849db636bfe738548d4196f24cbdac5236b6b94bee3642993ea587eb77",
+      "bytes": 536,
+      "blob": "blobs/2f5244849db636bfe738548d4196f24cbdac5236b6b94bee3642993ea587eb77",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/native_tls_early_mpi.h"
+    },
+    {
+      "path": "syntax01/sources/main/native_tls_rx_reserve.h",
+      "sha256": "45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "bytes": 976,
+      "blob": "blobs/45d1a19433885425f3a54697b54be7de27d88b59d5f1481b959d6412dbec4b86",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/native_tls_rx_reserve.h"
+    },
+    {
+      "path": "syntax01/sources/main/network_netif.h",
+      "sha256": "cc53f1590ecabe6a72ee023b95d7cb09919eadd6aba545306adc8343be1b8b24",
+      "bytes": 921,
+      "blob": "blobs/cc53f1590ecabe6a72ee023b95d7cb09919eadd6aba545306adc8343be1b8b24",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/network_netif.h"
+    },
+    {
+      "path": "syntax01/sources/main/network_profiles.h",
+      "sha256": "7f01b3c850e5f5f13950e4bbcf4c26e2a5a2fa837e633ba0035bdbb2710a64ea",
+      "bytes": 730,
+      "blob": "blobs/7f01b3c850e5f5f13950e4bbcf4c26e2a5a2fa837e633ba0035bdbb2710a64ea",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/network_profiles.h"
+    },
+    {
+      "path": "syntax01/sources/main/network_runtime.h",
+      "sha256": "44906b5208143021f3f2f42699545c2e96a3b0c2dceb96e6b8b9ace35433fd72",
+      "bytes": 1349,
+      "blob": "blobs/44906b5208143021f3f2f42699545c2e96a3b0c2dceb96e6b8b9ace35433fd72",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/network_runtime.h"
+    },
+    {
+      "path": "syntax01/sources/main/network_service.h",
+      "sha256": "ea2b158159975a6bd13963eb461bbb39269f91e9910388d9d8a0916b162e5b2d",
+      "bytes": 1659,
+      "blob": "blobs/ea2b158159975a6bd13963eb461bbb39269f91e9910388d9d8a0916b162e5b2d",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/network_service.h"
+    },
+    {
+      "path": "syntax01/sources/main/network_settings.h",
+      "sha256": "fc7c79da8fb40872fb36a43c9bfdc32015a2aa4e74b2232a5925e649ff8d24b6",
+      "bytes": 1313,
+      "blob": "blobs/fc7c79da8fb40872fb36a43c9bfdc32015a2aa4e74b2232a5925e649ff8d24b6",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/network_settings.h"
+    },
+    {
+      "path": "syntax01/sources/main/network_status.h",
+      "sha256": "3e5006a5eecfc3ea896af90f7c0bddba8200bca78f2af251129f76a122867b44",
+      "bytes": 1440,
+      "blob": "blobs/3e5006a5eecfc3ea896af90f7c0bddba8200bca78f2af251129f76a122867b44",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/network_status.h"
+    },
+    {
+      "path": "syntax01/sources/main/ogg_playback.h",
+      "sha256": "a65ca9bcedbbebb88054e59802cc1529f01bfe442eaafce582a8c2e47d43265e",
+      "bytes": 13441,
+      "blob": "blobs/a65ca9bcedbbebb88054e59802cc1529f01bfe442eaafce582a8c2e47d43265e",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/ogg_playback.h"
+    },
+    {
+      "path": "syntax01/sources/main/opus_family1_decoder.h",
+      "sha256": "aeb25af6c6eac8e3e93c4f0580d7f37531dd6fd439cb45f1e2b0bca02c9e1516",
+      "bytes": 8439,
+      "blob": "blobs/aeb25af6c6eac8e3e93c4f0580d7f37531dd6fd439cb45f1e2b0bca02c9e1516",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/opus_family1_decoder.h"
+    },
+    {
+      "path": "syntax01/sources/main/opus_family1_playback.h",
+      "sha256": "100012b04a3a7c7e6e9af2291605e13ed43faa888ede1f37f9b720c7ac07f8e0",
+      "bytes": 17129,
+      "blob": "blobs/100012b04a3a7c7e6e9af2291605e13ed43faa888ede1f37f9b720c7ac07f8e0",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/opus_family1_playback.h"
+    },
+    {
+      "path": "syntax01/sources/main/radio_control.h",
+      "sha256": "a57ed94971c10294a55076261d03a4c1442d50d66ed42af2f2dc7bb8a54c711b",
+      "bytes": 80,
+      "blob": "blobs/a57ed94971c10294a55076261d03a4c1442d50d66ed42af2f2dc7bb8a54c711b",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/radio_control.h"
+    },
+    {
+      "path": "syntax01/sources/main/radio_control_platform.h",
+      "sha256": "c1e8658c113bd1995fd94707acce9e743b4dc299e67eed1ed79bb4fb04632c9b",
+      "bytes": 159,
+      "blob": "blobs/c1e8658c113bd1995fd94707acce9e743b4dc299e67eed1ed79bb4fb04632c9b",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/radio_control_platform.h"
+    },
+    {
+      "path": "syntax01/sources/main/time_service.h",
+      "sha256": "ec288898ac91a6295f1f28b7ee40127e2d984815bad0c3bff71a8c70d6dc0b4a",
+      "bytes": 824,
+      "blob": "blobs/ec288898ac91a6295f1f28b7ee40127e2d984815bad0c3bff71a8c70d6dc0b4a",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/time_service.h"
+    },
+    {
+      "path": "syntax01/sources/main/time_settings.h",
+      "sha256": "c9649a330e44d86aaf866534f169a93220b0a4b4bfed6b9aed3763d247de8f12",
+      "bytes": 610,
+      "blob": "blobs/c9649a330e44d86aaf866534f169a93220b0a4b4bfed6b9aed3763d247de8f12",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/time_settings.h"
+    },
+    {
+      "path": "syntax01/sources/main/vorbis_repair/floor1_render.h",
+      "sha256": "3b24c3980895de79c2b3cd6460e31182d7fbc5192d474bc7e88be1fe9f917b4b",
+      "bytes": 7986,
+      "blob": "blobs/3b24c3980895de79c2b3cd6460e31182d7fbc5192d474bc7e88be1fe9f917b4b",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/vorbis_repair/floor1_render.h"
+    },
+    {
+      "path": "syntax01/sources/main/vorbis_repair_abi.h",
+      "sha256": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+      "bytes": 19182,
+      "blob": "blobs/e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/vorbis_repair_abi.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_network_settings.h",
+      "sha256": "e78555d1a9d708dd3933d0ce7ef4d046a5b59a0f7ae3491092d0173e8fc79319",
+      "bytes": 178,
+      "blob": "blobs/e78555d1a9d708dd3933d0ce7ef4d046a5b59a0f7ae3491092d0173e8fc79319",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_network_settings.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_ota.h",
+      "sha256": "31eb71b6bd425311f17ceddba60c173666267cbfd2cf2ba689ebc302fdf1f409",
+      "bytes": 313,
+      "blob": "blobs/31eb71b6bd425311f17ceddba60c173666267cbfd2cf2ba689ebc302fdf1f409",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_ota.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_pages.h",
+      "sha256": "43329d2e883f1c2441f42d0fe0bf2556d7690f6fb68a396b3a57227daa578960",
+      "bytes": 116,
+      "blob": "blobs/43329d2e883f1c2441f42d0fe0bf2556d7690f6fb68a396b3a57227daa578960",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_pages.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_reboot.h",
+      "sha256": "281b0e908d5432589394564a31d9d030c43f2ab7ea9138be4e58eb84bb8748e9",
+      "bytes": 1835,
+      "blob": "blobs/281b0e908d5432589394564a31d9d030c43f2ab7ea9138be4e58eb84bb8748e9",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_reboot.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_service.h",
+      "sha256": "8e01388cbdc78378fd44fcd9d370df36399351a3881d9576547b9f27d195ce66",
+      "bytes": 122,
+      "blob": "blobs/8e01388cbdc78378fd44fcd9d370df36399351a3881d9576547b9f27d195ce66",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_service.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_static.h",
+      "sha256": "71245617169ee6bb011981f98aa0296940a4e975242617c6ae363b707f221578",
+      "bytes": 263,
+      "blob": "blobs/71245617169ee6bb011981f98aa0296940a4e975242617c6ae363b707f221578",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_static.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_time.h",
+      "sha256": "589ae0577cfd13f2eac4a72bb7b657f3415704307fe732476c68b6589412b612",
+      "bytes": 154,
+      "blob": "blobs/589ae0577cfd13f2eac4a72bb7b657f3415704307fe732476c68b6589412b612",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_time.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_upload.h",
+      "sha256": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+      "bytes": 671,
+      "blob": "blobs/c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_upload.h"
+    },
+    {
+      "path": "syntax01/sources/main/web_wifi.h",
+      "sha256": "5ddaa1855ebe13e35015f016947b09c79cf1341c872b01d5c041a4c115ef0bca",
+      "bytes": 215,
+      "blob": "blobs/5ddaa1855ebe13e35015f016947b09c79cf1341c872b01d5c041a4c115ef0bca",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/web_wifi.h"
+    },
+    {
+      "path": "syntax01/sources/main/websocket_service.h",
+      "sha256": "56e48009d410a06b95d38f53a6ae7cecb9ac32ba37378876591ca3b726389083",
+      "bytes": 1909,
+      "blob": "blobs/56e48009d410a06b95d38f53a6ae7cecb9ac32ba37378876591ca3b726389083",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/main/websocket_service.h"
+    },
+    {
+      "path": "syntax01/sources/shared/adaptive_input.h",
+      "sha256": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "bytes": 4058,
+      "blob": "blobs/e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/adaptive_input.h"
+    },
+    {
+      "path": "syntax01/sources/shared/audio_completion.h",
+      "sha256": "d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "bytes": 1490,
+      "blob": "blobs/d5558a6b91dd6007701345f3b29185cbf134e536c20099a3d98b6e4deeb4ab8e",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/audio_completion.h"
+    },
+    {
+      "path": "syntax01/sources/shared/decoder_eof_input.h",
+      "sha256": "22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "bytes": 1705,
+      "blob": "blobs/22d8b3dbc62bc859eab3a8ac5fd233caf95f7ff02e2ad8d324411d8ca5698019",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/decoder_eof_input.h"
+    },
+    {
+      "path": "syntax01/sources/shared/decoder_pending_input.h",
+      "sha256": "b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "bytes": 3668,
+      "blob": "blobs/b2909f70834598599c479315ff110064d81ca4308c116715408134fddc81ddbb",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/decoder_pending_input.h"
+    },
+    {
+      "path": "syntax01/sources/shared/icy_title.h",
+      "sha256": "2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "bytes": 796,
+      "blob": "blobs/2d33676aa71dfef1fe4b0c687f9cf5f70822b89bfbd277c294e9e6fe9c26aa90",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/icy_title.h"
+    },
+    {
+      "path": "syntax01/sources/shared/json_buffer.h",
+      "sha256": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "bytes": 2405,
+      "blob": "blobs/0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/json_buffer.h"
+    },
+    {
+      "path": "syntax01/sources/shared/ogg_opus_audio_packets.h",
+      "sha256": "425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "bytes": 6702,
+      "blob": "blobs/425db226163b11ff618a059caded4276d9a9db88ff6a1ddd29e6d6bebc1832df",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/ogg_opus_audio_packets.h"
+    },
+    {
+      "path": "syntax01/sources/shared/ogg_opus_timeline.h",
+      "sha256": "48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "bytes": 19415,
+      "blob": "blobs/48e5fec3225ba326c990dd9a88f85ae7f10ac93750986ff9cc33700a959201b3",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/ogg_opus_timeline.h"
+    },
+    {
+      "path": "syntax01/sources/shared/ogg_page_input.h",
+      "sha256": "dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "bytes": 5201,
+      "blob": "blobs/dc60c33bf272396a92c6280b0044e94dee041d968abd936765610ec8135803f4",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/ogg_page_input.h"
+    },
+    {
+      "path": "syntax01/sources/shared/opus_family1_mapping.h",
+      "sha256": "4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "bytes": 5509,
+      "blob": "blobs/4933c1e9e85e9de0f759d1c15d5b1753f44c8f3372ff5a4c8b3e6188a9d03e01",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/opus_family1_mapping.h"
+    },
+    {
+      "path": "syntax01/sources/shared/opus_multistream_framing.h",
+      "sha256": "85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "bytes": 4619,
+      "blob": "blobs/85930f2110fb3746aeca375483bdb49bd64b37252bed4ede68f361527e974f6e",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/opus_multistream_framing.h"
+    },
+    {
+      "path": "syntax01/sources/shared/opus_pcm_trim.h",
+      "sha256": "c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "bytes": 3498,
+      "blob": "blobs/c548a45f22842875f8185aae1788cb0c5901eb5400945ada9031775a91947936",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/opus_pcm_trim.h"
+    },
+    {
+      "path": "syntax01/sources/shared/opus_tags_stream.h",
+      "sha256": "61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "bytes": 7437,
+      "blob": "blobs/61c1ee5f9d2054a2ebfae5018e17fefb0bda331b4cad2c4cd4287d5e28d9a21b",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/opus_tags_stream.h"
+    },
+    {
+      "path": "syntax01/sources/shared/pcm_channel_layout.h",
+      "sha256": "08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "bytes": 277,
+      "blob": "blobs/08447dfda865d21668ee12114d9e8dd680e19edce076dcbd6ffda9bb670dba66",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/pcm_channel_layout.h"
+    },
+    {
+      "path": "syntax01/sources/shared/pcm_header_gain.h",
+      "sha256": "cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "bytes": 4912,
+      "blob": "blobs/cb87bc984ae5f21894d08e13465494add9124c4203230b8766a3cd8b566498f6",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/pcm_header_gain.h"
+    },
+    {
+      "path": "syntax01/sources/shared/pcm_speaker_mix.h",
+      "sha256": "4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "bytes": 3598,
+      "blob": "blobs/4833be7aec900fd6e703938edcde7bfb22091035de96d9babd9aca532988ce0c",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/pcm_speaker_mix.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_bitrate.h",
+      "sha256": "358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "bytes": 1472,
+      "blob": "blobs/358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_bitrate.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_body.h",
+      "sha256": "20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "bytes": 2604,
+      "blob": "blobs/20ecc5ba5ddf4beff6531a650929dd362143936ce19fedd61238ede0f21cee0f",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_body.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_confirm.h",
+      "sha256": "58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "bytes": 6488,
+      "blob": "blobs/58bba5d7640e6c51ae6602a758f146d08ed968a84645d86be592d4761aff1635",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_confirm.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_encoded_router.h",
+      "sha256": "b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "bytes": 8130,
+      "blob": "blobs/b39cf61a4c4a4d98186c05c6f66ffbbde985de752f71b2788453046f46c88f5a",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_encoded_router.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_fairness.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_frames.h",
+      "sha256": "ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "bytes": 8457,
+      "blob": "blobs/ebae5c35ed8444f2669e1a02c2af2615107c29d8bb9f0f97b6b160211a2b66fa",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_frames.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_probe.h",
+      "sha256": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "bytes": 5313,
+      "blob": "blobs/92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_probe.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_staging.h",
+      "sha256": "811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "bytes": 6727,
+      "blob": "blobs/811abb564af108bb95610ca10f10d28821f2822055909d797fee8de403b9cf14",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_staging.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_start.h",
+      "sha256": "54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "bytes": 8081,
+      "blob": "blobs/54af3e485379e8e8609b4f1a24babd4465c2ddc36cdac1976c643ed4e24a03ec",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_start.h"
+    },
+    {
+      "path": "syntax01/sources/shared/stream_tags.h",
+      "sha256": "b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "bytes": 1514,
+      "blob": "blobs/b77a06031809de209fe99d2d1192e0e47395c7db1d54518b291ec31ba65fb408",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/stream_tags.h"
+    },
+    {
+      "path": "syntax01/sources/shared/tls_stream_result.h",
+      "sha256": "8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "bytes": 435,
+      "blob": "blobs/8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/tls_stream_result.h"
+    },
+    {
+      "path": "syntax01/sources/shared/websocket_message.h",
+      "sha256": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "bytes": 8005,
+      "blob": "blobs/02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/shared/websocket_message.h"
+    },
+    {
+      "path": "syntax01/sources/windows_compile_command.py",
+      "sha256": "1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d",
+      "bytes": 4107,
+      "blob": "blobs/1c9a8a7349e60481ef71e0a1dc92d600753b4c7cc72d472de83d63b10452121d",
+      "original": ".build/cyd-stream-fairness-syntax-20261101-01/sources/windows_compile_command.py"
+    },
+    {
+      "path": "native05-audit/report.json",
+      "sha256": "14c17fbaf445c04a0376d986675a036be66809d39832b95b980297cb80f879f5",
+      "bytes": 15384,
+      "blob": "blobs/14c17fbaf445c04a0376d986675a036be66809d39832b95b980297cb80f879f5",
+      "original": ".build/cyd-family1-task-native05-watchdog-audit-20261101-01/report.json"
+    },
+    {
+      "path": "native05-backtrace/report.json",
+      "sha256": "81cdc2b2e3827c78407caf278ea979c5801d7ed597979bfcc2f1d430f8df611d",
+      "bytes": 2240,
+      "blob": "blobs/81cdc2b2e3827c78407caf278ea979c5801d7ed597979bfcc2f1d430f8df611d",
+      "original": ".build/cyd-family1-task-native05-backtrace-20261101-01/report.json"
+    },
+    {
+      "path": "native05-backtrace/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "blob": "blobs/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original": ".build/cyd-family1-task-native05-backtrace-20261101-01/stderr.log"
+    },
+    {
+      "path": "native05-backtrace/stdout.log",
+      "sha256": "388b04b090be7fe4790403c0b84d5b385dc5e5a44f143143fe8952935cd7ce9d",
+      "bytes": 773,
+      "blob": "blobs/388b04b090be7fe4790403c0b84d5b385dc5e5a44f143143fe8952935cd7ce9d",
+      "original": ".build/cyd-family1-task-native05-backtrace-20261101-01/stdout.log"
+    },
+    {
+      "path": "native05-retention/manifest.json",
+      "sha256": "204d917c8fe82eaed2d61e57804c7ae9f9dbf12e8a160e6f61890257a2826c68",
+      "bytes": 8077,
+      "blob": "blobs/204d917c8fe82eaed2d61e57804c7ae9f9dbf12e8a160e6f61890257a2826c68",
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/manifest.json"
+    },
+    {
+      "path": "canonical/idf/components/native_stream/include/stream_fairness.h",
+      "sha256": "a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "bytes": 989,
+      "blob": "blobs/a97770fdff14948ad592a0356d04c7bf2744f36ad4673207aa700ccb8e740b22",
+      "original": "idf/components/native_stream/include/stream_fairness.h"
+    },
+    {
+      "path": "canonical/idf/esp32-cyd2usb-native/main/audio_service.c",
+      "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "bytes": 75982,
+      "blob": "blobs/445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b",
+      "original": "idf/esp32-cyd2usb-native/main/audio_service.c"
+    },
+    {
+      "path": "canonical/idf/esp32c3-oled-native/main/audio_service.c",
+      "sha256": "9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "bytes": 115828,
+      "blob": "blobs/9c451f9c7dd591cfc4b27ae7c22dab88eae456a19fb404690f5b6db6b5a725ef",
+      "original": "idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    {
+      "path": "canonical/tests/run-stream-connection-retry.py",
+      "sha256": "b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "bytes": 8407,
+      "blob": "blobs/b1d38d7773acaad1fe3cd52a479d3c3bab13e1283b571a2e14117d1766eb0357",
+      "original": "tests/run-stream-connection-retry.py"
+    },
+    {
+      "path": "canonical/tests/native/stream_connection_retry_test.c",
+      "sha256": "37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "bytes": 23189,
+      "blob": "blobs/37ff5d1cc18a346e474c3d5271c0885859ca545ff55e352aa6f18adee4bce167",
+      "original": "tests/native/stream_connection_retry_test.c"
+    },
+    {
+      "path": "canonical/tests/run-cyd-stream.py",
+      "sha256": "0c3619af403b6638f00f094912c46ecffd93ed8bc64aea4b40fb1df2adec872f",
+      "bytes": 9043,
+      "blob": "blobs/0c3619af403b6638f00f094912c46ecffd93ed8bc64aea4b40fb1df2adec872f",
+      "original": "tests/run-cyd-stream.py"
+    },
+    {
+      "path": "canonical/tests/native/cyd_stream_test.c",
+      "sha256": "2a9f3c964e241a139832e970dae8f2d79fe627deb2777776994e743198e62300",
+      "bytes": 36810,
+      "blob": "blobs/2a9f3c964e241a139832e970dae8f2d79fe627deb2777776994e743198e62300",
+      "original": "tests/native/cyd_stream_test.c"
+    },
+    {
+      "path": "canonical/tests/run-audio-power.py",
+      "sha256": "7bc307e1e534f44e718b7c8e1c8f5029adb33358b937e30cd074e61764ce7c76",
+      "bytes": 8542,
+      "blob": "blobs/7bc307e1e534f44e718b7c8e1c8f5029adb33358b937e30cd074e61764ce7c76",
+      "original": "tests/run-audio-power.py"
+    },
+    {
+      "path": "canonical/tests/native/audio_power_control_test.c",
+      "sha256": "36db0532173fe353f2531c1ecf49825772db0e598fd9780665f44504753f4c56",
+      "bytes": 4282,
+      "blob": "blobs/36db0532173fe353f2531c1ecf49825772db0e598fd9780665f44504753f4c56",
+      "original": "tests/native/audio_power_control_test.c"
+    },
+    {
+      "path": "canonical/tests/native/audio_power_cyd_stream_test.c",
+      "sha256": "3bd68d23cb68549b5fd1333d3567aefe45012eff1d4e582b966deca60a2177f2",
+      "bytes": 6976,
+      "blob": "blobs/3bd68d23cb68549b5fd1333d3567aefe45012eff1d4e582b966deca60a2177f2",
+      "original": "tests/native/audio_power_cyd_stream_test.c"
+    },
+    {
+      "path": "canonical/tests/native/audio_power_seam.h",
+      "sha256": "c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "bytes": 1886,
+      "blob": "blobs/c160e7f753398c569cfc8eb0af9d0a91c5aef9ac9655e039bb67ebcdd054b90d",
+      "original": "tests/native/audio_power_seam.h"
+    },
+    {
+      "path": "canonical/tests/results/stream-fairness-20261101/verify.py",
+      "sha256": "45938d1bdf284a4316262191690ca7a826c1812704f47dd97acc4d8e657ea66c",
+      "bytes": 8754,
+      "blob": "blobs/45938d1bdf284a4316262191690ca7a826c1812704f47dd97acc4d8e657ea66c",
+      "original": "tests/results/stream-fairness-20261101/verify.py"
+    }
+  ],
+  "omitted_local_files": {
+    "c3-plain01/test": {
+      "sha256": "2e8a33a057ee4dafcd2dc78ec37550a09dc3016e86986578538cb5878990530f",
+      "bytes": 185784,
+      "original": ".build/c3-stream-fairness-plain-20261101-01/test",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "c3-plain02/test": {
+      "sha256": "e60f3046cafdb6fa500de45e255d77c723209288d6a69742b07d4e527c0ffa37",
+      "bytes": 186384,
+      "original": ".build/c3-stream-fairness-plain-20261101-02/test",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "c3-retain01/test": {
+      "sha256": "4dc3cfc9776a62367f71413cf97ee6b68c39760c64334dbff94809dadc618409",
+      "bytes": 187904,
+      "original": ".build/c3-stream-fairness-retain-adaptive-20261101-01/test",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "c3-growth01/test": {
+      "sha256": "587434353f764cb091fd35b7a01154dc23bc500c52f8c9c43be027a1a6f77587",
+      "bytes": 217784,
+      "original": ".build/c3-stream-fairness-growth-power-20261101-01/test",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "cyd-stream02/test": {
+      "sha256": "915395832ae1336242535c3850d572133d86494c473de929021d2672d86784c2",
+      "bytes": 540296,
+      "original": ".build/cyd-stream-fairness-20261101-02/test",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "power01/c3/controls": {
+      "sha256": "2ef852378d8a3b53c7a03e3a1daff9e84c4037d4a0f3e1217f42fee5450e3c8d",
+      "bytes": 160768,
+      "original": ".build/audio-power-stream-fairness-20261101-01/c3/controls",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "power02/c3/controls": {
+      "sha256": "9bffb82ec74d8927224934070f305b7dd770aa7074bfd13281f30f90c1e47031",
+      "bytes": 160768,
+      "original": ".build/audio-power-stream-fairness-20261101-02/c3/controls",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "power02/cyd/controls": {
+      "sha256": "3ff9e938b6dbdbcf5265cca6ab0e52a468b4a01543d108e643737742d0fb038d",
+      "bytes": 162840,
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/controls",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "power02/cyd/stream": {
+      "sha256": "45e1966713c3948d5821c02aa887fd4c1ab70d7334aeb379599bcc225ba03ff6",
+      "bytes": 267896,
+      "original": ".build/audio-power-stream-fairness-20261101-02/cyd/stream",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-0.pcm": {
+      "sha256": "646154893a402ae1f1bcfaf85c6cabb6bc7f710d9df7bf2c1995e3d12476b754",
+      "bytes": 57600,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-0.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-1.pcm": {
+      "sha256": "9f9787e6a23021131a7cc1dfe7b212c4a802bacf8bd42a72c4315a6e9783c55a",
+      "bytes": 115200,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-1.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-10.pcm": {
+      "sha256": "38b8ff58fa41e618d276d2e7fe0ad08c4b5b1633cb6085bfdb4c30b159bb1aa3",
+      "bytes": 153600,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-10.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-11.pcm": {
+      "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0",
+      "bytes": 2112000,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-11.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-12.pcm": {
+      "sha256": "2998560f1ef6fa1158cefa6bc2a96c071726834e5d8cb9ec731f28b64cbfd84f",
+      "bytes": 153600,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-12.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-2.pcm": {
+      "sha256": "2998560f1ef6fa1158cefa6bc2a96c071726834e5d8cb9ec731f28b64cbfd84f",
+      "bytes": 153600,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-2.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-3.pcm": {
+      "sha256": "a23cb87563c260c3f7319186b1b0604ec3fe1b5af3e261b732f1e1e8662020b4",
+      "bytes": 19200,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-3.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-4.pcm": {
+      "sha256": "495cc22bd63a14ce8f2dc909ba521cf5a452225d9e16daa56bdd6d3617b5893f",
+      "bytes": 38400,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-4.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-5.pcm": {
+      "sha256": "850d9dcee940c330fc7867a7e1ebb656ca60da3c2c1bf191923b6629289170d8",
+      "bytes": 57600,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-5.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-6.pcm": {
+      "sha256": "598036d99472e00610c55c7ae10d2fd4355ee1670bce8b427f2559ef5bd424d3",
+      "bytes": 76800,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-6.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-7.pcm": {
+      "sha256": "55873fecc61a79e87ca550c7072e38ccdd7ecb600ace286fe4717952a97c42b0",
+      "bytes": 96000,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-7.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-8.pcm": {
+      "sha256": "883922d18f1b7425e2f9753826f35a432e9b7d245cf04aa3a9a8b9c2b2c5f898",
+      "bytes": 115200,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-8.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/local-reference-pcm/reference-9.pcm": {
+      "sha256": "2a9e29216ae917ab77139e37b00275c2bfb73ab1ae61215a00bdb5113ecb7a38",
+      "bytes": 134400,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/local-reference-pcm/reference-9.pcm",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-retention/metadata-only.zip": {
+      "sha256": "f21ee511d716833ec15806b5ccbe4cfaafa5749256b332ed5d7415d8fa254bfc",
+      "bytes": 10245,
+      "original": ".build/cyd-family1-task-native05-watchdog-retention-20261101-01/metadata-only.zip",
+      "reason": "binary-or-executable-payload",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/report.json": {
+      "sha256": "7fba682c7035b7d09c4b84d3c490fe8a15faa65ebd24146c26dc06068535e34c",
+      "bytes": 198337,
+      "original": ".build/cyd-family1-playback-task-20261101-05/report.json",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/source-manifest.json": {
+      "sha256": "41ca2b90277dd8732a2408f5976a55ab0f201ff156c6a8383030d3affdd2052b",
+      "bytes": 202257,
+      "original": ".build/cyd-family1-playback-task-20261101-05/source-manifest.json",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/execution-bundle.json": {
+      "sha256": "07c6c3a3dce606d701668b5bc53af6cf43ca07ddd5fa64243526e3ae0552f8e2",
+      "bytes": 569523,
+      "original": ".build/cyd-family1-playback-task-20261101-05/execution-bundle.json",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/actual-compiler-closure.json": {
+      "sha256": "eabab7b768a179e64e21a3346be860dfc9211c510426ca359fe57a7b0d7a2354",
+      "bytes": 577091,
+      "original": ".build/cyd-family1-playback-task-20261101-05/actual-compiler-closure.json",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/sdk-child.json": {
+      "sha256": "066b8c577502e4576642e8910c3971734efdff0146d2c9df5e7d0c0e5747a080",
+      "bytes": 1013,
+      "original": ".build/cyd-family1-playback-task-20261101-05/sdk-child.json",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/sdkconfig": {
+      "sha256": "62e23dcd84d779d99924d690d4d0ca1260bb34efeccced890234129dd18694ed",
+      "bytes": 83460,
+      "original": ".build/cyd-family1-playback-task-20261101-05/sdkconfig",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/qemu.stdout.log": {
+      "sha256": "a8af7e2e2c2d67032d660d630e652c426f7cf81cca56a21aa5e4b6b7d47ca3f5",
+      "bytes": 13475023,
+      "original": ".build/cyd-family1-playback-task-20261101-05/qemu.stdout.log",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/qemu.stderr.log": {
+      "sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096",
+      "bytes": 25,
+      "original": ".build/cyd-family1-playback-task-20261101-05/qemu.stderr.log",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    },
+    "native05-original/qemu-flash.bin": {
+      "sha256": "8c923c85fe20c38da0390f342c9cdac820b5a9ca8b95abeb84b1ed0cd7148e2c",
+      "bytes": 4194304,
+      "original": ".build/cyd-family1-playback-task-20261101-05/qemu-flash.bin",
+      "reason": "historical-native-original-identity-only",
+      "categories": [],
+      "original_retained_locally": true,
+      "byte_payload_published": false
+    }
+  }
+}

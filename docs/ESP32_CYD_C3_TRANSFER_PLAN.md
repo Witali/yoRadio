@@ -82,6 +82,14 @@ allocation и численные настройки C3 являются канд
 CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang обеих целей проходят;
 это исправление переносимости, физическая приёмка и остальные gates ниже остаются.
 
+[Ограниченное уступание CPU stream-задачами](STREAM_TASK_FAIRNESS.md) добавлено
+в CYD и C3 после реального IDLE0 watchdog в изолированном one-byte Opus прогоне.
+Общий бюджет20ms и один RTOS tick сохраняют данные и прежние task bindings;
+[HOST/frontend checkpoint](../tests/results/stream-fairness-20261101/README.md)
+проходит C3 42/42/47, CYD55 и power10/9/9, actual Xtensa syntax без ошибок.
+Полный updated SDK/QEMU gate ещё не закрыт; исходный watchdog-прогон остаётся
+NONPASS, аппаратные временные и ресурсные гарантии из HOST не следуют.
+
 ## Что осталось по переносу
 
 После уточнения пользователя 28 октября, состояние на 1 ноября 2026 года:
