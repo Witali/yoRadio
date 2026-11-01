@@ -22,14 +22,17 @@ def main():
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     main = ROOT / 'idf/esp32-cyd2usb-native/main'
+    shared = ROOT / 'idf/components/native_stream/include'
     files = [main/'native_audio_output.c', main/'native_audio_output.h',
              ROOT/'tests/native/cyd_output_pause_test.c', Path(__file__).resolve(),
-             ROOT/'tests/native/cyd_output_metrics_noop.h']
+             ROOT/'tests/native/cyd_output_metrics_noop.h',
+             *[shared/name for name in ('pcm_header_gain.h', 'pcm_channel_layout.h', 'pcm_speaker_mix.h')]]
     for p in files:
         target = out/'sources'/p.relative_to(ROOT)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(p.read_bytes())
-    source = re.sub(r'^#include[^\n]*\n', '', files[0].read_text(), flags=re.M)
+    source = '#include "pcm_header_gain.h"\n#include "pcm_channel_layout.h"\n#include "pcm_speaker_mix.h"\n'
+    source += re.sub(r'^#include[^\n]*\n', '', files[0].read_text(), flags=re.M)
     variants = {'pdm': 'PDM', 'dac': 'DAC', 'legacy': 'LEGACY_DAC'}
     results, negative = {}, {}
     for name, define in variants.items():
@@ -40,7 +43,8 @@ def main():
                    '-Wno-unused-function', '-Wno-unused-variable',
                    '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
                    '-fno-pie', '-no-pie', '-DCONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_'+define+'=1',
-                   '-I'+host(work), '-I'+host(ROOT/'tests/native'), host(files[2]), '-o', host(work/'test')]
+                   '-I'+host(work), '-I'+host(ROOT/'tests/native'), '-I'+host(shared),
+                   host(files[2]), '-lm', '-o', host(work/'test')]
         try:
             build = run(command)
         except subprocess.CalledProcessError as e:

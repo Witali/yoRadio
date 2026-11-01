@@ -1,6 +1,7 @@
 #include "native_audio_output.h"
 #include "native_output_metrics.h"
 #include "pcm_header_gain.h"
+#include "pcm_speaker_mix.h"
 
 #include <limits.h>
 #include <stdbool.h>
@@ -52,6 +53,29 @@ typedef struct {
 // Only the output owner updates this ordered per-packet calibration. The
 // decoded PCM and the adaptive normalizer's detector/limiter stay unchanged.
 static pcm_header_gain s_header_gain;
+static pcm_channel_layout s_channel_layout;
+static uint8_t s_layout_channels;
+static pcm_speaker_mix s_speaker_mix;
+
+static void reset_pcm_metadata(void) {
+    phg_reset(&s_header_gain);
+    s_channel_layout = PCM_CHANNEL_LAYOUT_LEGACY;
+    s_layout_channels = 0;
+}
+
+esp_err_t native_audio_output_set_channel_layout(pcm_channel_layout layout,
+                                                 uint8_t channels) {
+    if (!channels || (layout != PCM_CHANNEL_LAYOUT_LEGACY &&
+                      layout != PCM_CHANNEL_LAYOUT_VORBIS) ||
+        (layout == PCM_CHANNEL_LAYOUT_VORBIS && channels > 8))
+        return ESP_ERR_NOT_SUPPORTED;
+    if (layout == s_channel_layout && channels == s_layout_channels) return ESP_OK;
+    if (layout == PCM_CHANNEL_LAYOUT_VORBIS && !psm_begin(&s_speaker_mix, channels))
+        return ESP_ERR_NOT_SUPPORTED;
+    s_channel_layout = layout;
+    s_layout_channels = channels;
+    return ESP_OK;
+}
 
 esp_err_t native_audio_output_set_header_gain(int16_t gain_q8) {
     if (s_header_gain.active && s_header_gain.gain_q8 == gain_q8) return ESP_OK;
@@ -132,12 +156,14 @@ static atomic_bool s_pause_requested;
 static uint32_t s_pcm_sample_rate = 16000U;
 static uint8_t s_pcm_channels;
 static uint8_t s_pcm_bits;
+static pcm_channel_layout s_pcm_channel_layout;
 static int16_t s_normalizer_scratch[NORMALIZER_CHUNK_FRAMES * 2U];
 
 static void reset_pcm_normalizer(void) {
     native_audio_normalizer_reset();
     s_pcm_channels = 0;
     s_pcm_bits = 0;
+    s_pcm_channel_layout = PCM_CHANNEL_LAYOUT_LEGACY;
 }
 
 static void pcm_normalizer_set_sample_rate(uint32_t sample_rate) {
@@ -168,11 +194,13 @@ static bool sync_normalizer_configuration(uint8_t channels, uint8_t bits) {
         s_normalizer_config = next;
     }
     bool requested = atomic_exchange(&s_normalizer_reset_pending, false);
-    if (requested || s_pcm_channels != channels || s_pcm_bits != bits) {
+    if (requested || s_pcm_channels != channels || s_pcm_bits != bits ||
+        s_pcm_channel_layout != s_channel_layout) {
         native_audio_normalizer_reset();
     }
     s_pcm_channels = channels;
     s_pcm_bits = bits;
+    s_pcm_channel_layout = s_channel_layout;
     return next.enabled;
 }
 
@@ -196,12 +224,17 @@ typedef struct {
     uint8_t sample_bytes;
     bool normalize;
     bool header_gain;
+    bool valid;
+    bool speaker_layout;
+    pcm_speaker_mono speaker_gains;
     double header_left;
     double header_right;
 } pcm_reader_t;
 
 static pcm_reader_t pcm_reader_begin(const uint8_t *data, size_t frames,
                                       uint8_t bits, uint8_t channels) {
+    if (s_channel_layout == PCM_CHANNEL_LAYOUT_VORBIS && channels != s_layout_channels)
+        return (pcm_reader_t){0};
     pcm_reader_t reader = {
         .data = data,
         .frame_bytes = (size_t)channels * (bits / 8U),
@@ -211,35 +244,57 @@ static pcm_reader_t pcm_reader_begin(const uint8_t *data, size_t frames,
             native_audio_settings_get_balance()),
         .channels = channels,
         .sample_bytes = bits / 8U,
-        .normalize = sync_normalizer_configuration(channels, bits),
+        .valid = true,
+        .speaker_layout = s_channel_layout == PCM_CHANNEL_LAYOUT_VORBIS && channels > 2,
     };
     reader.header_gain = s_header_gain.active && s_header_gain.gain_q8;
-    if (reader.header_gain) {
-        double factor_q15 = s_header_gain.factor / SAMPLE_GAIN_SCALE;
+    if (reader.header_gain || reader.speaker_layout) {
+        double factor_q15 = (reader.header_gain ? s_header_gain.factor : 1.0) / SAMPLE_GAIN_SCALE;
         reader.header_left = factor_q15 * reader.gains.left;
         reader.header_right = factor_q15 * reader.gains.right;
     }
+    if (reader.speaker_layout &&
+        !psm_scale(&s_speaker_mix, reader.header_left, reader.header_right,
+                   &reader.speaker_gains)) {
+        reader.valid = false;
+        return reader;
+    }
+    reader.normalize = sync_normalizer_configuration(channels, bits);
     return reader;
 }
 
 // Combine calibration and user gain before clipping; retain headroom through
 // the mono mix too, so opposing channels can cancel without an early limiter.
 // Only finite validated factors and bounded S16 projections reach this path.
-static int16_t pcm_header_mono_values(int16_t left, int16_t right,
-                                     const pcm_reader_t *reader) {
-    double value = (double)left * reader->header_left;
-    if (reader->channels > 1)
-        value = (value + (double)right * reader->header_right) * 0.5;
+static int16_t pcm_round_s16(double value) {
     if (value >= INT16_MAX) return INT16_MAX;
     if (value <= INT16_MIN) return INT16_MIN;
     return value >= 0.0 ? (int16_t)(int32_t)(value + 0.5)
                         : (int16_t)-(int32_t)(-value + 0.5);
 }
 
+static int16_t pcm_header_mono_values(int16_t left, int16_t right,
+                                     const pcm_reader_t *reader) {
+    double value = (double)left * reader->header_left;
+    if (reader->channels > 1)
+        value = (value + (double)right * reader->header_right) * 0.5;
+    return pcm_round_s16(value);
+}
+
+static int16_t pcm_speaker_sample(const uint8_t *frame, uint8_t sample_bytes,
+                                   const pcm_reader_t *reader) {
+    int16_t samples[8];
+    for (uint8_t channel = 0; channel < reader->channels; ++channel)
+        samples[channel] = pcm_sample_to_s16(frame + channel * sample_bytes, sample_bytes);
+    return pcm_round_s16(psm_value(&reader->speaker_gains, samples));
+}
+
 static int16_t pcm_reader_next(pcm_reader_t *reader) {
     if (!reader->normalize) {
         const uint8_t *frame =
             reader->data + reader->position++ * reader->frame_bytes;
+        if (reader->speaker_layout)
+            return pcm_speaker_sample(frame, reader->sample_bytes, reader);
         if (reader->sample_bytes == sizeof(int16_t) && !reader->header_gain) {
             return pcm_mono_sample(frame, reader->channels, &reader->gains);
         }
@@ -251,12 +306,18 @@ static int16_t pcm_reader_next(pcm_reader_t *reader) {
         return pcm_mono_values(left, right, reader->channels, &reader->gains);
     }
 
-    uint8_t normalized_channels = reader->channels > 1 ? 2 : 1;
+    uint8_t normalized_channels = reader->speaker_layout ? reader->channels :
+                                 reader->channels > 1 ? 2 : 1;
     if (reader->buffered_index == reader->buffered_frames) {
         size_t chunk = reader->frames - reader->position;
         if (chunk > NORMALIZER_CHUNK_FRAMES) chunk = NORMALIZER_CHUNK_FRAMES;
+        // Reuse the same512-byte scratch: more channels reduce batch frames,
+        // while the normalizer still advances once per complete audio frame.
+        size_t capacity = NORMALIZER_CHUNK_FRAMES * 2U / normalized_channels;
+        if (chunk > capacity) chunk = capacity;
         // Keep the decoder's PCM read-only and tolerate unaligned input.
-        // CYD's mono mixer consumes the first two channels of wider layouts.
+        // Legacy wider layouts consume their first two channels. Explicit
+        // speaker layouts preserve every logical channel through normalization.
         for (size_t frame = 0; frame < chunk; ++frame) {
             const uint8_t *input = reader->data +
                 (reader->position + frame) * reader->frame_bytes;
@@ -270,14 +331,20 @@ static int16_t pcm_reader_next(pcm_reader_t *reader) {
                                           reader->sample_bytes);
             }
         }
-        native_audio_normalizer_process_block(
-            s_normalizer_scratch, chunk, normalized_channels);
+        if (reader->speaker_layout)
+            native_audio_normalizer_process_multichannel_block(
+                s_normalizer_scratch, chunk, normalized_channels);
+        else
+            native_audio_normalizer_process_block(
+                s_normalizer_scratch, chunk, normalized_channels);
         reader->buffered_frames = chunk;
         reader->buffered_index = 0;
     }
     const uint8_t *frame = (const uint8_t *)(s_normalizer_scratch +
         reader->buffered_index++ * normalized_channels);
     ++reader->position;
+    if (reader->speaker_layout)
+        return pcm_speaker_sample(frame, sizeof(int16_t), reader);
     if (reader->header_gain) {
         int16_t left, right = 0;
         memcpy(&left, frame, sizeof(left));
@@ -562,6 +629,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frame_bytes = (size_t)channels * (bits_per_sample / 8U);
     size_t frames = size / frame_bytes;
     pcm_reader_t reader = pcm_reader_begin(data, frames, bits_per_sample, channels);
+    if (!reader.valid) return ESP_ERR_NOT_SUPPORTED;
     for (size_t frame = 0; frame < frames; ++frame) {
         ESP_RETURN_ON_ERROR(
             pdm_write_resampled(pcm_reader_next(&reader)),
@@ -576,14 +644,14 @@ void native_audio_output_idle(void) {
 }
 
 void native_audio_output_discard_pcm(void) {
-    phg_reset(&s_header_gain);
+    reset_pcm_metadata();
     s_buffered_samples = 0;
     reset_resampler();
     reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
-    phg_reset(&s_header_gain);
+    reset_pcm_metadata();
     esp_err_t result = pdm_flush();
     reset_resampler();
     reset_pcm_normalizer();
@@ -664,6 +732,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frame_bytes = (size_t)channels * (bits_per_sample / 8U);
     size_t frames = size / frame_bytes;
     pcm_reader_t reader = pcm_reader_begin(data, frames, bits_per_sample, channels);
+    if (!reader.valid) return ESP_ERR_NOT_SUPPORTED;
     size_t buffered = 0;
     for (size_t frame = 0; frame < frames; ++frame) {
         int32_t value = (pcm_reader_next(&reader) >> 8) + 128;
@@ -699,13 +768,13 @@ const char *native_audio_output_name(void) {
 }
 
 void native_audio_output_discard_pcm(void) {
-    phg_reset(&s_header_gain);
+    reset_pcm_metadata();
     // Continuous DAC has no software PCM tail or resampler history.
     reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
-    phg_reset(&s_header_gain);
+    reset_pcm_metadata();
     reset_pcm_normalizer();
     return ESP_OK;
 }
@@ -873,6 +942,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t capacity = LEGACY_OUTPUT_BYTES / sizeof(uint32_t);
     size_t buffered = 0;
     pcm_reader_t reader = pcm_reader_begin(data, frames, bits_per_sample, channels);
+    if (!reader.valid) return ESP_ERR_NOT_SUPPORTED;
     for (size_t frame = 0; frame < frames; ++frame) {
         int16_t pcm = pcm_reader_next(&reader);
         for (uint32_t phase = 0; phase < LEGACY_OVERSAMPLE_FACTOR; ++phase) {
@@ -901,13 +971,13 @@ const char *native_audio_output_name(void) {
 }
 
 void native_audio_output_discard_pcm(void) {
-    phg_reset(&s_header_gain);
+    reset_pcm_metadata();
     s_legacy_fractional_error = 0;
     reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
-    phg_reset(&s_header_gain);
+    reset_pcm_metadata();
     // Each legacy write submits its complete on-the-fly conversion.
     s_legacy_fractional_error = 0;
     reset_pcm_normalizer();

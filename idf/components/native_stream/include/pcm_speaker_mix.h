@@ -77,8 +77,15 @@ static inline bool psm_scale(const pcm_speaker_mix *mix, double left,
 static inline double psm_value(const pcm_speaker_mono *mono,
                                 const int16_t *channels)
 {
-    double result = 0;
-    for (uint8_t i = 0; i < mono->channels; ++i)
-        result += (double)channels[i] * mono->weight[i];
-    return result;
+    double result = 0, correction = 0;
+    for (uint8_t i = 0; i < mono->channels; ++i) {
+        double value = (double)channels[i] * mono->weight[i];
+        double next = result + value;
+        // Preserve addition residuals at cancellation and final-round ties.
+        // Coefficients/products remain binary64; this is not exact-real DSP.
+        correction += fabs(result) >= fabs(value)
+            ? (result - next) + value : (value - next) + result;
+        result = next;
+    }
+    return result + correction;
 }

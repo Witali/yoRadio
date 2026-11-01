@@ -37,9 +37,10 @@ static uint8_t native_audio_settings_get_volume(void) {return 254;}
 static int8_t native_audio_settings_get_balance(void) {return 0;}
 static int native_audio_settings_set_volume(uint8_t v) {(void)v;return ESP_OK;}
 static int native_audio_settings_set_balance(int8_t v) {(void)v;return ESP_OK;}
-static void native_audio_normalizer_configure(bool e,uint8_t g,int8_t t,uint16_t m,uint32_t r) {(void)e;(void)g;(void)t;(void)m;(void)r;}
+static void native_audio_normalizer_configure(bool e,uint8_t g,int8_t t,uint16_t m,uint32_t r) {assert(!e);(void)g;(void)t;(void)m;(void)r;}
 static void native_audio_normalizer_reset(void) {}
-static void native_audio_normalizer_process_block(int16_t *p,size_t n,uint8_t c) {(void)p;(void)n;(void)c;}
+static void native_audio_normalizer_process_block(int16_t *p,size_t n,uint8_t c) {(void)p;(void)n;(void)c;assert(!"disabled normalization must not process PCM");}
+static void native_audio_normalizer_process_multichannel_block(int16_t *p,size_t n,uint8_t c) {(void)p;(void)n;(void)c;assert(!"disabled normalization must not process mapped PCM");}
 
 typedef struct { atomic_bool allocated,running; } driver_t;
 static driver_t driver;

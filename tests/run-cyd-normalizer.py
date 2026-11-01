@@ -36,6 +36,8 @@ def main():
     normalizer = ROOT / 'yoRadio/src/audioI2S'
     source = source_path.read_text()
     gain_header = ROOT / 'idf/components/native_stream/include/pcm_header_gain.h'
+    layout_header = gain_header.with_name('pcm_channel_layout.h')
+    speaker_header = gain_header.with_name('pcm_speaker_mix.h')
     common = source[source.index('static int16_t scale_sample_q15('):
                     source.index('#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_PDM')]
     constants = ''
@@ -66,7 +68,7 @@ def main():
             '-c', host(path), '-o', host(obj)]))
         shared_objects.append(host(obj))
     for backend, branch in branches.items():
-        generated = '#include "pcm_header_gain.h"\n' + constants + common
+        generated = '#include "pcm_header_gain.h"\n#include "pcm_channel_layout.h"\n#include "pcm_speaker_mix.h"\n' + constants + common
         if backend == 'dac':
             generated += gain.function(branch, 'dac_write_block')
         if backend == 'legacy':
@@ -103,7 +105,7 @@ def main():
         (out / (backend + '.log')).write_bytes(log)
         results[backend] = log.decode().strip()
         print(backend + ': ' + results[backend])
-    files = [source_path, case_path, bridge_path, Path(__file__).resolve(), gain_header,
+    files = [source_path, case_path, bridge_path, Path(__file__).resolve(), gain_header, layout_header, speaker_header,
              ROOT / 'tests/run-cyd-output-gain.py',
              adapter / 'native_audio_normalizer.cpp',
              adapter / 'native_audio_normalizer.h', adapter / 'CMakeLists.txt',

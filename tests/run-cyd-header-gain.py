@@ -82,7 +82,8 @@ def main():
     files = [production, production.with_suffix('.h'), harness, platform_file, bridge,
              adapter / 'native_audio_normalizer.cpp', adapter / 'native_audio_normalizer.h',
              algorithm / 'AudioNormalizer.cpp', algorithm / 'AudioNormalizer.h',
-             include / 'pcm_header_gain.h', ROOT / 'tests/native/cyd_output_metrics_noop.h',
+             include / 'pcm_header_gain.h', include / 'pcm_channel_layout.h', include / 'pcm_speaker_mix.h',
+             ROOT / 'tests/native/cyd_output_metrics_noop.h',
              ROOT / 'tests/run-cyd-output-gain.py', ROOT / 'tools/codec_benchmark/run_output_dma_host.py',
              Path(__file__).resolve()]
     report = dict(passed=False, state='preparing', variants={}, sources={},
@@ -141,7 +142,7 @@ static int dac_continuous_write(void *handle, const void *data, size_t size,
         save()
         for backend, branch in branches.items():
             p = platform
-            generated = '#include "pcm_header_gain.h"\n' + constants + common
+            generated = '#include "pcm_header_gain.h"\n#include "pcm_channel_layout.h"\n#include "pcm_speaker_mix.h"\n' + constants + common
             if backend == 'pdm':
                 for name in ('pdm_write_resampled', 'pdm_flush', 'reset_resampler'):
                     p = p.replace(gain.function(p, name).rstrip(), '', 1)

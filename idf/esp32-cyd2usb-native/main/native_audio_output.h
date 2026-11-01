@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "esp_err.h"
+#include "pcm_channel_layout.h"
 
 esp_err_t native_audio_output_init(void);
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate);
@@ -22,6 +23,11 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
 // Header calibration follows adaptive normalization and combines with user
 // volume/balance before the final mono saturation; decoder PCM is immutable.
 esp_err_t native_audio_output_set_header_gain(int16_t gain_q8);
+// Output owner only, after configure and before PCM. Vorbis order supports
+// one through eight logical speakers; mono/stereo retain their legacy math.
+// Refusal preserves the previous layout. Discard/flush/pause restore legacy.
+esp_err_t native_audio_output_set_channel_layout(pcm_channel_layout layout,
+                                                 uint8_t channels);
 void native_audio_output_set_volume(uint8_t volume);
 uint8_t native_audio_output_get_volume(void);
 void native_audio_output_set_balance(int8_t balance);

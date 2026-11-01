@@ -45,6 +45,11 @@ static void native_audio_normalizer_process_block(int16_t *pcm, size_t frames,
     (void)pcm; (void)frames; (void)channels;
     assert(!"disabled normalization must not process or copy PCM");
 }
+static void native_audio_normalizer_process_multichannel_block(
+    int16_t *pcm, size_t frames, uint8_t channels) {
+    (void)pcm; (void)frames; (void)channels;
+    assert(!"disabled normalization must not process mapped PCM");
+}
 
 static int capture(const void *data, size_t size) {
     assert(size <= sizeof(captured) - captured_size);
