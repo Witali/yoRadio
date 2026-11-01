@@ -217,9 +217,47 @@ observed emulator boundary; complete radio boot, static RX loans, TLS traffic
 and production resource margins remain unqualified. The original failed
 attempts and local-only image identities are preserved separately.
 
+## Actual TLS traffic in isolated SDK/QEMU
+
+The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)
+adds real TCP/TLS traffic through SDK OpenETH, the public ESP-TLS API and a local
+independent peer. The pinned SDK6.0.2 profile retains RX16384/TX4096, hardware
+MPI/AES/SHA, and the canonical build-local reservation/reclaim/MPI helpers.
+Seven complete 65536-byte responses and 28 full 16384-byte plaintext records
+match their independent digests. Two clients operate simultaneously on both
+cores, with distinct static and heap RX buffers. All ten actual allocations,
+frees and bundle attaches balance. Certificate/hostname verification stays
+enabled against a fresh diagnostic CA; wrong-name and handshake-close attempts
+are refused. A truncated record yields native read0/body0: the diagnostic
+rejects that incomplete response without inventing a TLS alert. Subsequent
+complete requests succeed.
+
+An explicit real public-allocator pressure probe runs with verified TLS and
+protected READY/READING/WRITING input owners live. One genuine NULL recovers
+after one IDLE-slot release within the unchanged budget of four; all retained
+data and owners survive, and complete traffic resumes. This does not establish
+that a TLS-internal handshake allocation itself exhausted memory.
+
+The archived guest/server/compiler records and forty contradiction controls
+retain the original disk-exhaustion and diagnostic failures. OpenETH multicast
+filter diagnostics and one recovered RX-frame drop remain in the successful
+transcript. Generated keys, certificates, bundle/images, binaries and flagged
+payloads stay whole and local by hash/size; the public data verifier does not
+read them or execute archived code. GCC recipes/version records are retained,
+but that isolated campaign did not separately record a before/after executable
+hash. Final production compiler provenance remains its own gate.
+
+This qualifies isolated traffic and helper ownership with the diagnostic
+Ethernet interface. Complete radio boot, Wi-Fi/TFT/audio headroom, physical
+timing and default activation remain separate. Production options stay off by
+default. The source entries remain
+[RX reservation](../idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c),
+[bounded input reclaim](../idf/esp32-cyd2usb-native/main/native_input_reclaim.c)
+and [early MPI](../idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c).
+
 ## Remaining work
 
-- Finish radio-boot, network-traffic and physical qualification of the
+- Finish complete radio-boot, concurrent radio/WebUI/OTA traffic and physical qualification of the
   CYD-specific TLS/full-record RX reservation against the
   [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
   CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity
