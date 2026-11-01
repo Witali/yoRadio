@@ -2235,3 +2235,12 @@ Stream остаётся на core0, decode/output на core1 с прежними
   reader report после TypeError, сохранены и не принимаются как passing gates.
   Первоначальный checkpoint продолжает проверять точную старую source revision;
   current repaired header квалифицирован отдельным successor checkpoint.
+
+- 2026-11-01, CYD-C3-14, [verified-page ownership и PCM spans](../tests/results/ogg-page-input-20261101/README.md):
+  добавлены owner одной CRC-verified encoded page и allocation-free clipping
+  raw PCM по реальным pre-skip/end bounds. GCC/ASan/UBSan/leaks проходят 276
+  page cases, 204 clipping cases и все allocation ordinals обоих полных fixtures
+  с recovery и abandonment. Максимальный encoded page buffer — 65307 B;
+  это дополнительная память, требующая actual target/full-app измерения.
+  Helpers ещё не выбраны в production. Следом — независимый PCM position
+  oracle, actual public-wrapper decode/chaining и полная CYD task integration.

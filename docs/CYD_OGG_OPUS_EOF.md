@@ -140,6 +140,18 @@ unchanged original host suite also passes against the repaired header. The
 historical checkpoint verifies its original source revision explicitly, and
 the successor verifies this correction; neither qualifies PCM integration.
 
+The [verified-page owner and PCM-span checkpoint](../tests/results/ogg-page-input-20261101/README.md)
+supplies the next two building blocks. The owner copies at most one complete
+encoded page (up to 65307 bytes) and exposes only its verified event/bytes.
+The span helper clips already aligned raw PCM in 48 kHz frames per channel,
+without changing samples or allocating PCM. Host ASan/UBSan/leak checks pass
+276 page cases, 204 span cases and every allocation ordinal for both complete
+fixtures, including refusal/retry and abandonment. The unchanged observer
+regression also passes. Neither helper is production-selected yet; public
+vendor ordering, target memory margins, independent sample alignment and the
+complete task integration remain required. A full page is encoded storage,
+not a promise of negligible extra heap in the CYD profile.
+
 ## Additional software gates
 
 - Correct and qualify sample-accurate Ogg Opus pre-skip/end trimming against an
