@@ -136,6 +136,15 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   и legal absent frames проверены реальным декодированием. Numeric observations
   для исходных последовательных, повторённых и PLC потоков разделены; полная
   codec conformance не заявлена. Оснований менять parser/retry по этим данным нет.
+  Семейство1 подготовлено отдельными проверенными слоями:
+  [mapping/framing](../tests/results/cyd-opus-family1-helpers-20261101/README.md),
+  [пакеты из verified pages](../tests/results/cyd-opus-packet-owner-20261101/README.md),
+  [публичные decoder owners](../tests/results/cyd-opus-decoder-owner-20261101/README.md)
+  и [невыбранный playback adapter](../tests/results/cyd-opus-family1-playback-20261101/README.md).
+  Вход нового caller — [opus_family1_playback.h](../idf/esp32-cyd2usb-native/main/opus_family1_playback.h).
+  HOST даёт 33 positive schedules/25 controls и 3898624 exact PCM samples;
+  production selection ещё требует streaming Tags length/UTF-8 validator,
+  FIFO speaker-layout metadata, полного output integration и SDK/resource gates.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
   **отложена по прямому указанию пользователя**. Исходники, незавершённые тесты
   и уже полученные результаты сохранены в [записи отложенной работы](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md).
