@@ -1,6 +1,6 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-10-28. Ветка: `codex/esp32-cyd-c3-review`.
+Обновлено: 2026-11-01. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
@@ -93,7 +93,7 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 | --- | --- |
 | Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates; host DSP проверен для трёх выходов. Остались general mappings, проверка других modes/rate semantics, OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
 | AAC compact owners | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) уже перенесён; отдельная Xtensa ABI/PCM/OOM/lifetime адаптация compact owners ещё нужна. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
-| FLAC | Target OOM/backpressure/semantic controls и production watchdog/resource qualification. [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
+| FLAC | Production watchdog/resource qualification и обычная регрессия. Target OOM/backpressure/semantic controls [явно отложены](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md). [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | Полный radio boot, actual TLS traffic и измерение heap/IRAM/stack до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
 | Финальные сборки и регрессия | Обновить production exports актуального кода для PDM, continuous DAC и legacy DAC; проверить совместную работу перенесённых функций. [Wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md). |
 
@@ -143,8 +143,15 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   и [невыбранный playback adapter](../tests/results/cyd-opus-family1-playback-20261101/README.md).
   Вход нового caller — [opus_family1_playback.h](../idf/esp32-cyd2usb-native/main/opus_family1_playback.h).
   HOST даёт 33 positive schedules/25 controls и 3898624 exact PCM samples;
-  production selection ещё требует streaming Tags length/UTF-8 validator,
-  FIFO speaker-layout metadata, полного output integration и SDK/resource gates.
+  Отдельный [streaming Tags validator](../tests/results/cyd-opus-tags-stream-20261101/README.md)
+  теперь проверяет длины и UTF-8 без выделения целого комментария; разрешённый
+  бинарный хвост принимается. [HOST successor адаптера](../tests/results/cyd-opus-family1-playback-tags-20261101/README.md)
+  подключает эту проверку до открытия decoder и переиспользует его scratch
+  после сохранения PCM всех нужных streams. Проверены 34 positive schedules,
+  27 controls и 3975424 exact PCM samples; размер owner на HOST уменьшился
+  с 2768 до 776 B, это не измерение стека ESP32. Production selection ещё
+  требует FIFO speaker-layout metadata, полного output integration и
+  SDK/resource gates. Вход validator — [opus_tags_stream.h](../idf/components/native_stream/include/opus_tags_stream.h).
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
   **отложена по прямому указанию пользователя**. Исходники, незавершённые тесты
   и уже полученные результаты сохранены в [записи отложенной работы](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md).
@@ -198,7 +205,9 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 - AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
   прежний private owner-view сохраняет пометку «отложен».
-- FLAC: target OOM/backpressure/semantic controls и физическое vendor/custom A/B.
+- FLAC: production watchdog/resource qualification и физическое vendor/custom A/B.
+  Target OOM/backpressure/semantic controls остаются явно отложенными; обычные
+  520-case HOST регрессии не возобновляют этот scope.
 - Память: radio/TLS traffic, фактический heap/IRAM/stack и выбор default-off
   опций по измерениям. Общая физическая приёмка всех трёх выходов остаётся
   отдельной работой после подключения платы; программные проверки продолжаются.
