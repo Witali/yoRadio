@@ -35,6 +35,7 @@ def main():
     adapter = ROOT / 'idf/components/native_audio_normalizer'
     normalizer = ROOT / 'yoRadio/src/audioI2S'
     source = source_path.read_text()
+    gain_header = ROOT / 'idf/components/native_stream/include/pcm_header_gain.h'
     common = source[source.index('static int16_t scale_sample_q15('):
                     source.index('#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_PDM')]
     constants = ''
@@ -65,7 +66,7 @@ def main():
             '-c', host(path), '-o', host(obj)]))
         shared_objects.append(host(obj))
     for backend, branch in branches.items():
-        generated = constants + common
+        generated = '#include "pcm_header_gain.h"\n' + constants + common
         if backend == 'dac':
             generated += gain.function(branch, 'dac_write_block')
         if backend == 'legacy':
@@ -86,13 +87,13 @@ def main():
                 'gcc', '-std=c11', *common_flags,
                 '-Wno-unused-function', '-Wno-unused-variable',
                 '-DTEST_' + backend.upper() + '=1', '-I' + host(ROOT / 'tests/native'), '-I' + host(adapter),
-                '-c', host(unit), '-o', host(obj)]))
+                '-I' + host(gain_header.parent), '-c', host(unit), '-o', host(obj)]))
             (out / (backend + '-link.log')).write_bytes(run([
                 'g++', *common_flags, '-no-pie', host(obj), *shared_objects,
                 '-Wl,--wrap=native_audio_normalizer_configure',
                 '-Wl,--wrap=native_audio_normalizer_reset',
                 '-Wl,--wrap=native_audio_normalizer_process_block',
-                '-o', host(binary)]))
+                '-lm', '-o', host(binary)]))
             log = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                        'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
         except subprocess.CalledProcessError as error:
@@ -102,7 +103,7 @@ def main():
         (out / (backend + '.log')).write_bytes(log)
         results[backend] = log.decode().strip()
         print(backend + ': ' + results[backend])
-    files = [source_path, case_path, bridge_path, Path(__file__).resolve(),
+    files = [source_path, case_path, bridge_path, Path(__file__).resolve(), gain_header,
              ROOT / 'tests/run-cyd-output-gain.py',
              adapter / 'native_audio_normalizer.cpp',
              adapter / 'native_audio_normalizer.h', adapter / 'CMakeLists.txt',

@@ -35,6 +35,7 @@ def main():
     source_path = ROOT / 'idf/esp32-cyd2usb-native/main/native_audio_output.c'
     case_path = ROOT / 'tests/native/cyd_output_gain_test.c'
     source = source_path.read_text()
+    gain_header = ROOT / 'idf/components/native_stream/include/pcm_header_gain.h'
     common = source[source.index('static int16_t scale_sample_q15('):
                     source.index('#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_PDM')]
     # Count actual coefficient evaluations while preserving its arithmetic.
@@ -60,7 +61,7 @@ static pcm_gains_t pcm_channel_gains(''', 1)
     }
     results = {}
     for backend, branch in branches.items():
-        generated = constants + common
+        generated = '#include "pcm_header_gain.h"\n' + constants + common
         if backend == 'dac':
             generated += function(branch, 'dac_write_block')
         if backend == 'legacy':
@@ -78,7 +79,7 @@ static pcm_gains_t pcm_channel_gains(''', 1)
                 '-Wno-unused-function', '-Wno-unused-variable',
                 '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
                 '-fno-pie', '-no-pie', '-DTEST_' + backend.upper() + '=1', '-I' + host(ROOT / 'tests/native'),
-                host(unit), '-o', host(binary)]))
+                '-I' + host(gain_header.parent), host(unit), '-lm', '-o', host(binary)]))
             log = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                        'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
         except subprocess.CalledProcessError as error:
@@ -88,7 +89,7 @@ static pcm_gains_t pcm_channel_gains(''', 1)
         (out / (backend + '.log')).write_bytes(log)
         results[backend] = log.decode().strip()
         print(backend + ': ' + results[backend])
-    files = [source_path, case_path, Path(__file__).resolve()]
+    files = [source_path, case_path, Path(__file__).resolve(), gain_header]
     files.append(ROOT / 'tests/native/cyd_output_metrics_noop.h')
     hashes = {}
     for path in files:

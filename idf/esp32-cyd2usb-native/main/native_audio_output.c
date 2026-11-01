@@ -1,5 +1,6 @@
 #include "native_audio_output.h"
 #include "native_output_metrics.h"
+#include "pcm_header_gain.h"
 
 #include <limits.h>
 #include <stdbool.h>
@@ -47,6 +48,19 @@ typedef struct {
     uint32_t left;
     uint32_t right;
 } pcm_gains_t;
+
+// Only the output owner updates this ordered per-packet calibration. The
+// decoded PCM and the adaptive normalizer's detector/limiter stay unchanged.
+static pcm_header_gain s_header_gain;
+
+esp_err_t native_audio_output_set_header_gain(int16_t gain_q8) {
+    if (s_header_gain.active && s_header_gain.gain_q8 == gain_q8) return ESP_OK;
+    pcm_header_gain next = {0};
+    if (phg_begin(&next, 0, gain_q8) != PHG_OK ||
+        !isfinite(next.factor * (2.0 * 32768.0))) return ESP_FAIL;
+    s_header_gain = next;
+    return ESP_OK;
+}
 
 static pcm_gains_t pcm_channel_gains(uint8_t channels, uint8_t volume,
                                     int8_t balance) {
@@ -181,11 +195,14 @@ typedef struct {
     uint8_t channels;
     uint8_t sample_bytes;
     bool normalize;
+    bool header_gain;
+    double header_left;
+    double header_right;
 } pcm_reader_t;
 
 static pcm_reader_t pcm_reader_begin(const uint8_t *data, size_t frames,
                                       uint8_t bits, uint8_t channels) {
-    return (pcm_reader_t){
+    pcm_reader_t reader = {
         .data = data,
         .frame_bytes = (size_t)channels * (bits / 8U),
         .frames = frames,
@@ -196,19 +213,41 @@ static pcm_reader_t pcm_reader_begin(const uint8_t *data, size_t frames,
         .sample_bytes = bits / 8U,
         .normalize = sync_normalizer_configuration(channels, bits),
     };
+    reader.header_gain = s_header_gain.active && s_header_gain.gain_q8;
+    if (reader.header_gain) {
+        double factor_q15 = s_header_gain.factor / SAMPLE_GAIN_SCALE;
+        reader.header_left = factor_q15 * reader.gains.left;
+        reader.header_right = factor_q15 * reader.gains.right;
+    }
+    return reader;
+}
+
+// Combine calibration and user gain before clipping; retain headroom through
+// the mono mix too, so opposing channels can cancel without an early limiter.
+// Only finite validated factors and bounded S16 projections reach this path.
+static int16_t pcm_header_mono_values(int16_t left, int16_t right,
+                                     const pcm_reader_t *reader) {
+    double value = (double)left * reader->header_left;
+    if (reader->channels > 1)
+        value = (value + (double)right * reader->header_right) * 0.5;
+    if (value >= INT16_MAX) return INT16_MAX;
+    if (value <= INT16_MIN) return INT16_MIN;
+    return value >= 0.0 ? (int16_t)(int32_t)(value + 0.5)
+                        : (int16_t)-(int32_t)(-value + 0.5);
 }
 
 static int16_t pcm_reader_next(pcm_reader_t *reader) {
     if (!reader->normalize) {
         const uint8_t *frame =
             reader->data + reader->position++ * reader->frame_bytes;
-        if (reader->sample_bytes == sizeof(int16_t)) {
+        if (reader->sample_bytes == sizeof(int16_t) && !reader->header_gain) {
             return pcm_mono_sample(frame, reader->channels, &reader->gains);
         }
         int16_t left = pcm_sample_to_s16(frame, reader->sample_bytes);
         int16_t right = reader->channels > 1
             ? pcm_sample_to_s16(frame + reader->sample_bytes, reader->sample_bytes)
             : 0;
+        if (reader->header_gain) return pcm_header_mono_values(left, right, reader);
         return pcm_mono_values(left, right, reader->channels, &reader->gains);
     }
 
@@ -239,6 +278,12 @@ static int16_t pcm_reader_next(pcm_reader_t *reader) {
     const uint8_t *frame = (const uint8_t *)(s_normalizer_scratch +
         reader->buffered_index++ * normalized_channels);
     ++reader->position;
+    if (reader->header_gain) {
+        int16_t left, right = 0;
+        memcpy(&left, frame, sizeof(left));
+        if (normalized_channels > 1) memcpy(&right, frame + sizeof(right), sizeof(right));
+        return pcm_header_mono_values(left, right, reader);
+    }
     return pcm_mono_sample(frame, normalized_channels, &reader->gains);
 }
 
@@ -531,12 +576,14 @@ void native_audio_output_idle(void) {
 }
 
 void native_audio_output_discard_pcm(void) {
+    phg_reset(&s_header_gain);
     s_buffered_samples = 0;
     reset_resampler();
     reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
+    phg_reset(&s_header_gain);
     esp_err_t result = pdm_flush();
     reset_resampler();
     reset_pcm_normalizer();
@@ -652,11 +699,13 @@ const char *native_audio_output_name(void) {
 }
 
 void native_audio_output_discard_pcm(void) {
+    phg_reset(&s_header_gain);
     // Continuous DAC has no software PCM tail or resampler history.
     reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
+    phg_reset(&s_header_gain);
     reset_pcm_normalizer();
     return ESP_OK;
 }
@@ -852,11 +901,13 @@ const char *native_audio_output_name(void) {
 }
 
 void native_audio_output_discard_pcm(void) {
+    phg_reset(&s_header_gain);
     s_legacy_fractional_error = 0;
     reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
+    phg_reset(&s_header_gain);
     // Each legacy write submits its complete on-the-fly conversion.
     s_legacy_fractional_error = 0;
     reset_pcm_normalizer();

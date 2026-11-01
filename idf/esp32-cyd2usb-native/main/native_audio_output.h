@@ -16,6 +16,12 @@ bool native_audio_output_supports_pcm(uint8_t bits_per_sample,
 esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels);
+// Output owner only: consume the current PCM packet's signed Q7.8 dB metadata
+// after configure and before write_pcm. Identity is the startup/lifecycle
+// default. Changed gains are validated before replacing the cached factor.
+// Header calibration follows adaptive normalization and combines with user
+// volume/balance before the final mono saturation; decoder PCM is immutable.
+esp_err_t native_audio_output_set_header_gain(int16_t gain_q8);
 void native_audio_output_set_volume(uint8_t volume);
 uint8_t native_audio_output_get_volume(void);
 void native_audio_output_set_balance(int8_t balance);
