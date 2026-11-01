@@ -36,6 +36,9 @@
 #include "stream_bitrate.h"
 #include "stream_probe.h"
 #include "sdkconfig.h"
+#ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
+#include "aac_public_config.h"
+#endif
 #ifdef CONFIG_YORADIO_TLS_INPUT_RECLAIM
 #include "native_input_reclaim.h"
 #endif
@@ -994,6 +997,13 @@ static void decoder_task(void *argument) {
                     .cfg_size = 0,
                     .use_frame_dec = false,
                 };
+#ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
+                esp_aac_dec_cfg_t aac_config = native_aac_public_config();
+                if (codec == NATIVE_CODEC_AAC) {
+                    cfg.dec_cfg = &aac_config;
+                    cfg.cfg_size = sizeof(aac_config);
+                }
+#endif
                 esp_audio_err_t open_result =
                     esp_audio_simple_dec_open(&cfg, &decoder);
                 if (open_result != ESP_AUDIO_ERR_OK) {

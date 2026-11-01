@@ -167,3 +167,19 @@ including five measured 12288-to-23040-byte buffer transitions and immediate
 successful retries. Nonzero error consumption, allocation failure and deliberate
 backpressure remain open. The old C3 interior calibration and Vorbis byte/hash
 reference cannot substitute for these Opus gates.
+
+## Public AAC configuration transferred separately
+
+The [public AAC-Plus checkpoint](../tests/results/cyd-aac-public-config-20261101/README.md)
+closes a separate C3/CYD configuration gap. CYD now passes the documented
+`esp_aac_dec_cfg_t` for AAC, with vendor-only `YORADIO_AAC_PLUS` defaulting on
+as on C3. The former NULL configuration decodes only the lower-rate AAC core.
+All 36 complete LC/HE/HEv2 public decoder cases pass, including split input and
+caller-owned config lifetime. LC PCM stays exact; HE recovers the full sample
+rate and HEv2 recovers stereo. Eight actual Kconfig cases and six SDK 6.0.2
+production-TU compiler profiles cover the option and all three outputs.
+
+This is public configuration reuse. It does not port C3's compact internal
+owners or private RISC-V ABI machinery, and it does not qualify production AAC
+task lifecycle, implicit late SBR, OOM/backpressure or full radio resource use.
+Those remaining requirements and explicit deferrals are unchanged.

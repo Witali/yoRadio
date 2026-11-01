@@ -92,7 +92,7 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 | Блок | Оставшаяся программная работа |
 | --- | --- |
 | Ogg/Opus и Espressif reuse | Подключить проверенный metadata observer, реализовать sample-accurate pre-skip/end trim и проверить PCM alignment независимым эталоном; затем OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
-| AAC compact owners | Отдельная Xtensa ABI/PCM/OOM/lifetime адаптация. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
+| AAC compact owners | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) уже перенесён; отдельная Xtensa ABI/PCM/OOM/lifetime адаптация compact owners ещё нужна. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Target OOM/backpressure/semantic controls и production watchdog/resource qualification. [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | Полный radio boot, actual TLS traffic и измерение heap/IRAM/stack до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
 | Финальные сборки и регрессия | Обновить production exports актуального кода для PDM, continuous DAC и legacy DAC; проверить совместную работу перенесённых функций. [Wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md). |
@@ -2255,3 +2255,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   yield только в диагностике. Full PCM/hex/images остаются локально с hash/size
   bindings; published verifier не заявляет повторный расчёт исключённых samples.
   Production clipping/chaining, gain/rate/mappings и full-app gates ещё нужны.
+
+- 2026-11-01, AAC public configuration subset, [native/host/GCC checkpoint](../tests/results/cyd-aac-public-config-20261101/README.md):
+  CYD получил vendor-only AAC_PLUS default y и public cfg при открытии AAC.
+  Все 36 полных LC/HE/HEv2 decode cases проходят; LC PCM прежний, HE использует
+  полную частоту, HEv2 — реальное stereo. Отдельный caller-lifetime witness
+  проходит во всех opens после возврата/перезаписи локального config.
+  Actual Kconfig8 и production audio_service.c GCC6 (три выхода × on/off)
+  проходят. Исходные compile/reader nonpasses сохранены. Compact owners,
+  production AAC task lifecycle, implicit late SBR/OOM/backpressure и full-app
+  resources ещё нужны; private/reset и FLAC target deferrals не возобновлялись.

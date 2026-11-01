@@ -1,5 +1,16 @@
 menu "yoRadio native firmware"
 
+    config YORADIO_AAC_PLUS
+        bool "Decode full HE-AAC SBR/PS with Espressif AAC"
+        depends on YORADIO_AAC_DECODER_ESPRESSIF
+        default y
+        help
+            Reconstruct the high-frequency SBR band and HE-AAC v2 stereo using
+            the vendor's public AAC-Plus configuration. Uses more CPU and RAM.
+            If disabled, the decoder produces the lower-rate AAC core. Status
+            continues to report confirmed PCM parameters because the public
+            API does not identify nominal HE/PS source profiles.
+
     config YORADIO_NATIVE_WEB
         bool
         default y
