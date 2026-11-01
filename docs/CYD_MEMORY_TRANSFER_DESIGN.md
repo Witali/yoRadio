@@ -201,6 +201,22 @@ supports a flash-model/profile compatibility limitation, with the exact failing
 transaction still unproven. The original images/configurations are preserved;
 radio-boot and physical gates remain open.
 
+The [preserved 1 November replay checkpoint](../tests/results/cyd-production-boot-replay-20261101/README.md)
+uses the same unchanged ON/OFF images with the selected IDF6-compatible QEMU.
+Both ordinary profiles now pass flash initialization and reach the project log
+after early MPI, then fail SPIFFS mount. The original volume is present and
+its geometry/magic match the SDK; all 589824 bytes also match a complete
+stopped-CPU QIO readback. This readback does not demonstrate a guest mount.
+
+With the explicit GPIO-matrix receive-delay profile, both unchanged images
+pass SPIFFS mount and reach display-driver entry, then panic in Wi-Fi PHY
+initialization. All original reports remain NONPASS, including emulator exits
+with status zero after a guest panic. No formatting, replacement filesystem,
+firmware byte patch or forced ready state is used. These results advance the
+observed emulator boundary; complete radio boot, static RX loans, TLS traffic
+and production resource margins remain unqualified. The original failed
+attempts and local-only image identities are preserved separately.
+
 ## Remaining work
 
 - Finish radio-boot, network-traffic and physical qualification of the
