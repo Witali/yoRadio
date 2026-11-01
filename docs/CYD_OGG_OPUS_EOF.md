@@ -2,7 +2,7 @@
 
 Opus shares the CYD `NATIVE_CODEC_OGG` caller with Vorbis, including the pending
 input owner and final-byte EOS lookahead. The public Espressif Ogg interface
-accepts arbitrary input sizes; raw Opus instead requires complete frames.
+accepts arbitrary input sizes; raw Opus instead requires complete encoded packets.
 These are different contracts. The new regression uses the Ogg container path
 and the unchanged LX6 archives, not C3's RISC-V archives or private repairs.
 
@@ -31,8 +31,13 @@ The chain reaches a minimum of 52024 free heap bytes in this diagnostic. Full
 network/TLS/TFT margins, linked production exports and physical output are still
 required; a 65307-byte encoded page is additional storage. Nonzero OpusHead
 output gain is also an open playback gap: a [complete paired observation](../tests/results/cyd-opus-header-gain-20261101/README.md)
-found identical stock PCM for zero/+6/-6 dB headers. Application gain remains to
-implement and qualify. This checkpoint does not claim universal conformance.
+found identical stock PCM for zero/+6/-6 dB headers. The
+[output-owner correction](../tests/results/cyd-header-gain-output-20261101/README.md)
+now combines header and player gain before wide mono mixing and final
+saturation. Its three-backend host qualification preserves the zero-gain
+regression exactly. Ordered packet metadata and the complete actual-task gain
+pipeline still need their separate qualification. This checkpoint does not
+claim universal conformance.
 
 That gain experiment preserves all 551 original audio packets and every byte
 outside the OpusHead gain/CRC fields. Six fresh public decoder handles
@@ -47,11 +52,29 @@ The [required family-0/1 playback support](https://www.rfc-editor.org/rfc/rfc784
 is another explicit open gate. A player must handle valid mappings in those
 families even when channel count exceeds its physical outputs. Recognition of
 family 1 by the metadata observer does not establish playback support. Current
-clipping binds its channel count to OpusHead, while physical output accepts
-mono/stereo; encoded-channel and actual playback layouts need separate handling.
-Public vendor mono/stereo wording alone does not prove failure on multichannel
-input. Complete 3/6/8-channel stock-vendor and wrapper experiments, followed by
-correct full-channel mixing where needed, must establish the actual behavior.
+clipping binds its channel count to OpusHead. The output API accepts nonzero
+channel counts but its current mono renderer consumes only the first two;
+acceptance of wide PCM is not correct surround mixing.
+
+The [complete family-1 observation](../tests/results/cyd-opus-family1-20261101/README.md)
+now establishes a real stock-Ogg gap: all twelve 3/6/8-channel stock/wrapper
+whole/split cases return public NOT_SUPPORT without PCM. Creator libopus and
+libogg independently validate the complete fixtures. This refusal is not a
+permitted format simplification or a proved allocation failure.
+
+The [public raw-handle composition](../tests/results/cyd-opus-multistream-public-20261101/README.md)
+then decodes the same complete fixtures in six cases, with 22 real handle
+open/close pairs and 242 successful calls. Original self-delimited segments
+and independently reconstructed common framing produce byte-identical native
+PCM. Every case returns to its original free heap. This proves an available
+reuse mechanism for those default layouts, not completed production support.
+
+The remaining implementation must reconstruct packets across verified pages,
+preserve trim and queued gain, and mix every mapped speaker for CYD. It must
+also handle valid duplicate indices, index255 silence and unused coded
+channels: the output count need not equal the decoded count. The existing
+first-two-channel renderer and default-layout-only diagnostics do not close
+this gate.
 
 ## Measured direct-vendor regression
 

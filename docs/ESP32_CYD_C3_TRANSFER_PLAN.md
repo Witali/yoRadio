@@ -91,7 +91,7 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 | Блок | Оставшаяся программная работа |
 | --- | --- |
-| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim и chaining уже подключены и проходят actual task gates. Остались header gain, другие modes/mappings/rate semantics, OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
+| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim и chaining уже подключены и проходят actual task gates. Header gain проходит финальную интеграцию; host DSP для трёх выходов проверен. Остались general mappings, другие modes/rate semantics, OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
 | AAC compact owners | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) уже перенесён; отдельная Xtensa ABI/PCM/OOM/lifetime адаптация compact owners ещё нужна. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Target OOM/backpressure/semantic controls и production watchdog/resource qualification. [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | Полный radio boot, actual TLS traffic и измерение heap/IRAM/stack до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
@@ -117,6 +117,14 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
   обязательная mapping-family-1 playback поддержка с корректным hardware layout,
   другие modes и resource/error gates. Полная radio/TLS/TFT и physical приёмка
   остаются отдельно. Собственную арифметику Vorbis не подключать.
+  [Диагностика family1](../tests/results/cyd-opus-family1-20261101/README.md)
+  подтверждает NOT_SUPPORT во всех 12 stock/wrapper случаях 3/6/8 каналов.
+  [Публичная композиция raw Opus](../tests/results/cyd-opus-multistream-public-20261101/README.md)
+  успешно декодирует те же полные fixtures: 22 handles, 242 calls, обе формы
+  framing дают побайтно одинаковый PCM, heap после каждого случая восстановлен.
+  Production demux, произвольные допустимые mappings и полное сведение каналов
+  ещё нужны. Текущий output API принимает wide PCM, но использует первые два
+  канала; это не корректный surround downmix.
 - Разработка собственного Vorbis с расширенной поддержкой стандарта
   **отложена по прямому указанию пользователя**. Исходники, незавершённые тесты
   и уже полученные результаты сохранены в [записи отложенной работы](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md).
