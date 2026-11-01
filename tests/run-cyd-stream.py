@@ -27,7 +27,8 @@ def main():
     sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/native/audio_power_seam.h',
         ROOT/'tests/run-cyd-lifecycle.py',ROOT/'tools/codec_benchmark/run_output_dma_host.py',
         *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h',
-                                'native_health.h','native_health_json.c','native_output_metrics.h','radio_control.h')],
+                                'native_health.h','native_health_json.c','native_output_metrics.h','radio_control.h',
+                                'native_tls_rx_reserve.h')],
         SHARED/'icy_title.c',*sorted((SHARED/'include').glob('*.h')),
         ROOT/'idf/components/native_storage/include/radio_control.h',
         ROOT/'idf/components/native_audio_settings/native_audio_settings.h']
@@ -63,8 +64,11 @@ size_t strlcpy(char *, const char *, size_t);
 ''')
     (OUT/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
     (OUT/'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
+    (OUT/'sdkconfig.h').write_text('#pragma once\n#define CONFIG_YORADIO_TLS_STATIC_RX_RESERVE 0\n')
+    (OUT/'esp_crt_bundle.h').write_text('#pragma once\n/* Explicit HTTP seam is declared by the test before production.inc. */\n')
     source=(frozen_main/'audio_service.c').read_text()
-    unit=source[source.index('#define STREAM_CHUNK_SIZE'):source.index('static esp_audio_simple_dec_type_t')]
+    unit='#include "native_tls_rx_reserve.h"\n#include "stream_fairness.h"\n'
+    unit+=source[source.index('#define STREAM_CHUNK_SIZE'):source.index('static esp_audio_simple_dec_type_t')]
     for name in ('codec_name','state_set_audio','stream_header_event','open_stream',
                  'read_stream','send_encoded','stream_transport_reset',
                  'stream_initial_pending','stream_confirmation_expired',

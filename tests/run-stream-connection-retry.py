@@ -45,6 +45,7 @@ def main():
     tags_header = source.with_name('stream_tags.h')
     icy = source.with_name('icy_title.c')
     icy_header = source.with_name('icy_title.h')
+    fairness_header = ROOT/'idf/components/native_stream/include/stream_fairness.h'
     harness = ROOT/'tests/native/stream_connection_retry_test.c'
     text = source.read_text()
     start = text.index('static void dispose_http_client(')
@@ -74,15 +75,28 @@ def main():
         .replace('/* PRODUCTION_OPEN_STREAM */', open_code)
         .replace('/* PRODUCTION_STREAM_TASK */', task_code))
     unit.write_text(unit.read_text().replace('/* PRODUCTION_STREAM_HELPERS */', helpers))
-    inputs = (source, reader, reader_header, profile_header, probe_header, tags_header, icy, icy_header, harness, ROOT/'tests/native/audio_power_seam.h', Path(__file__).resolve())
+    inputs = (source, reader, reader_header, profile_header, probe_header, tags_header, icy, icy_header, fairness_header, harness, ROOT/'tests/native/audio_power_seam.h', ROOT/'tools/codec_benchmark/run_output_dma_host.py', Path(__file__).resolve())
     power=ROOT/'idf/components/native_network_power'
     if args.network_power:inputs += (power/'native_network_power.c',power/'include/native_network_power.h')
     for path in inputs:
         saved = args.output/'sources'/path.relative_to(ROOT)
         saved.parent.mkdir(parents=True, exist_ok=True)
         saved.write_bytes(path.read_bytes())
+    source_hashes={path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
+    commands=[]
+    def execute(command,label):
+        commands.append(command)
+        try:
+            result=run(command)
+        except subprocess.CalledProcessError as error:
+            (args.output/(label+'.log')).write_bytes(error.output)
+            (args.output/'report.json').write_text(json.dumps(dict(passed=False,stage=label,returncode=error.returncode,
+                source_sha256=source_hashes,commands=commands,scope='HOST transport/RTOS seams; no physical timing or SDK execution'),indent=2)+'\n')
+            raise
+        (args.output/(label+'.log')).write_bytes(result)
+        return result
     binary = args.output/'test'
-    (args.output/'build.log').write_bytes(run(['gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra',
+    execute(['gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra',
         '-Werror', '-fsanitize=address,undefined', '-fno-pie', '-no-pie',
         f'-DCONFIG_YORADIO_STREAM_READ_TIMEOUT_MS={args.read_timeout_ms}',
         f'-DCONFIG_YORADIO_STREAM_READ_BYTES={args.read_size}',
@@ -90,20 +104,20 @@ def main():
         *(['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1'] if args.adaptive_input else []),
         *(['-DCONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS=4'] if args.flac_input_growth else []),
         *(['-DAUDIO_POWER_INTEGRATION=1','-I'+host(args.output),'-I'+host(power),'-I'+host(power/'include'),'-pthread'] if args.network_power else []),
-        '-I', host(source.parent), '-I',host(ROOT/'tests/native'), host(unit), host(icy), '-o', host(binary)]))
-    result = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
-                  'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
-    (args.output/'run.log').write_bytes(result)
-    cases = 42 if args.flac_input_growth else 37
+        '-I', host(args.output/'sources/idf/components/native_stream/include'),
+        '-I', host(source.parent), '-I',host(ROOT/'tests/native'), host(unit), host(icy), '-o', host(binary)],'build')
+    result = execute(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
+                  'UBSAN_OPTIONS=halt_on_error=1', host(binary)],'run')
+    cases = 47 if args.flac_input_growth else 42
     assert f'PASS stream retry cases={cases};'.encode() in result
+    assert all(hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==digest for name,digest in source_hashes.items()),'Bound source changed during HOST execution'
     (args.output/'report.json').write_text(json.dumps(dict(passed=True, cases=cases,
         flac_input_growth=args.flac_input_growth,
         tls_retain_rx=args.tls_retain_rx,
         adaptive_input=args.adaptive_input,
         read_timeout_ms=args.read_timeout_ms,
         read_size=args.read_size,
-        source_sha256={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-                       for p in inputs},
+        source_sha256=source_hashes,commands=commands,fairness_cases=5,
         scope='Actual open_stream, retry scheduling and stream_task with deterministic platform stubs; '
               'HTTP lifetime/cancellation, not physical TLS/network or PCM quality'), indent=2)+'\n')
     print(result.decode())

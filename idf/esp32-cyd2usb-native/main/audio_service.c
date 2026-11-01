@@ -34,6 +34,7 @@
 #include "network_service.h"
 #include "stream_body.h"
 #include "stream_bitrate.h"
+#include "stream_fairness.h"
 #include "stream_probe.h"
 #include "sdkconfig.h"
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
@@ -673,8 +674,15 @@ static void stream_task(void *argument) {
             (int64_t)STREAM_PROBE_TIMEOUT_MS * 1000;
         bool read_failed = false;
         uint8_t end_reason = AUDIO_END_EOF;
+        stream_fairness_t fairness;
+        stream_fairness_begin(&fairness, (uint64_t)esp_timer_get_time());
         while (atomic_load(&s_generation) == command.generation &&
                atomic_load(&s_failed_generation) != command.generation) {
+            if (stream_fairness_due(&fairness, (uint64_t)esp_timer_get_time())) {
+                vTaskDelay(1);
+                stream_fairness_begin(&fairness, (uint64_t)esp_timer_get_time());
+                continue; // Recheck Stop/failure before reading the old client.
+            }
             if (read_failed) { end_reason=AUDIO_END_READ_FAILED; break; }
             if ((stream_initial_pending(input.codec, input.first) &&
                 esp_timer_get_time() >= probe_deadline) || stream_confirmation_expired()) {

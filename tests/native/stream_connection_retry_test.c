@@ -8,6 +8,7 @@
 #include <setjmp.h>
 #include "icy_title.h"
 #include "stream_probe.h"
+#include "stream_fairness.h"
 /* PRODUCTION_PROFILE_HEADER */
 #define AUDIO_PROBE_FLAG(field, value) ((void)0)
 #define AUDIO_PROBE_STAMP(field) ((void)0)
@@ -78,7 +79,7 @@ static void tls_input_reserve_prepare_connection(void) {
 }
 #endif
 static attempt_t attempts[16];
-static unsigned attempt_count, attempt_limit, eos_count, eof_reason, close_count;
+static unsigned attempt_count, attempt_limit, eos_count, eof_reason, eos_generation, close_count;
 static unsigned connection_close_headers;
 static int64_t now_us, attempt_times[16], event_us;
 static unsigned event_kind, stop_after_attempt;
@@ -92,6 +93,15 @@ static bool send_ok;
 static uint8_t timeout_sec;
 static int64_t open_duration_us, header_duration_us, read_step_us;
 static char last_url[512], last_state[64];
+static unsigned body_read_calls, fairness_delays, fairness_delay_ticks;
+static bool observe_fairness, stop_in_fairness_delay;
+static const uint8_t *body_bytes;
+static size_t body_size, body_offset, body_chunk;
+static unsigned body_retry_every, body_metadata_interval, title_calls;
+static uint8_t captured_audio[256];
+static size_t captured_audio_bytes;
+static char captured_title[32];
+static void fairness_delay_event(void);
 
 static void *stream_malloc(size_t size) { assert(!input_buffer); return input_buffer = malloc(size); }
 static int64_t esp_timer_get_time(void) { return now_us; }
@@ -99,8 +109,21 @@ static bool runtime_settings_get_watchdog(void) { return watchdog; }
 static uint8_t runtime_settings_get_station_timeout_sec(void) { return timeout_sec; }
 static const char *esp_err_to_name(int error) { (void)error; return "stub"; }
 static void vTaskDelete(void *unused) { (void)unused; assert(false); }
-static void vTaskDelay(unsigned ticks) { now_us += (int64_t)ticks * 1000; }
+static void vTaskDelay(unsigned ticks) {
+    now_us += (int64_t)ticks * 1000;
+    if (client.live && ticks == 1) {
+        ++fairness_delays; fairness_delay_ticks += ticks;
+        if (observe_fairness) fairness_delay_event();
+    }
+}
 #include "audio_power_seam.h"
+static void fairness_delay_event(void) {
+    if (stop_in_fairness_delay) {
+        unsigned generation = atomic_fetch_add(&s_generation, 1) + 1;
+        network_service_audio_accept(generation, false);
+        stop_in_fairness_delay = false;
+    }
+}
 static bool maintenance_active(void) {return false;}
 static void maintenance_ack(unsigned bits) {(void)bits;assert(false);}
 static void maintenance_park(uint32_t generation) {(void)generation;assert(false);}
@@ -116,19 +139,31 @@ static void native_state_publish_bitrate(void *state, uint32_t gen, uint32_t rat
     (void)state; (void)gen; (void)rate;assert(source==NATIVE_BITRATE_ICY);
 }
 static native_codec_t codec_from_content_type(const char *type) { (void)type; return NATIVE_CODEC_AAC; }
-static void publish_icy_title(uint32_t gen, const char *title) { (void)gen; (void)title; }
+static void publish_icy_title(uint32_t gen, const char *title) {
+    if (body_bytes && title && *title) {
+        assert(gen == atomic_load(&s_generation));
+        assert(strlen(title) < sizeof(captured_title));
+        strcpy(captured_title, title); ++title_calls;
+    }
+}
 static void stream_bitrate_add(uint32_t gen, stream_bitrate_meter_t *meter, size_t size) {
     (void)gen; (void)meter; (void)size;
 }
 static bool send_stream_audio(uint32_t gen, native_codec_t *codec, const void *data,
                               size_t size, bool *first, stream_probe_t *probe) {
     (void)gen; (void)codec; (void)data; (void)size; (void)first; (void)probe;
+    if (body_bytes) {
+        assert(gen == atomic_load(&s_generation));
+        assert(size <= sizeof(captured_audio) - captured_audio_bytes);
+        memcpy(captured_audio + captured_audio_bytes, data, size);
+        captured_audio_bytes += size; *first = false;
+    }
     return send_ok;
 }
 /* PRODUCTION_STREAM_HELPERS */
 static bool send_encoded(uint32_t gen, native_codec_t codec, const void *data, size_t size, uint8_t eos) {
     (void)gen; (void)codec; (void)data; (void)size;
-    ++eos_count; eof_reason = eos; return true;
+    ++eos_count; eof_reason = eos; eos_generation = gen; return true;
 }
 static void queue_play(const char *url) {
     unsigned gen = atomic_fetch_add(&s_generation, 1) + 1;
@@ -205,12 +240,26 @@ static void esp_http_client_cleanup(esp_http_client_handle_t c) { assert(c->live
 /* PRODUCTION_DISPOSE_CLIENT */
 static void esp_http_client_set_timeout_ms(esp_http_client_handle_t c, int timeout) { c->timeout_ms = timeout; }
 static int esp_http_client_get_response_header(esp_http_client_handle_t c, const char *key, char **value) {
-    (void)c; (void)key; (void)value; return ESP_FAIL;
+    (void)c;
+    if (body_metadata_interval && !strcmp(key, "icy-metaint")) {
+        assert(body_metadata_interval == 4); *value = "4"; return ESP_OK;
+    }
+    return ESP_FAIL;
 }
 static int esp_http_client_read(esp_http_client_handle_t c, char *data, size_t size) {
     assert(c->timeout_ms == CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS);
     assert(size == CONFIG_YORADIO_STREAM_READ_BYTES);
     now_us += read_step_us;
+    ++body_read_calls;
+    if (body_bytes) {
+        if (body_retry_every && body_read_calls % body_retry_every == 0)
+            return -ESP_ERR_HTTP_EAGAIN;
+        size_t bytes = body_size - body_offset;
+        if (bytes > body_chunk) bytes = body_chunk;
+        if (bytes > size) bytes = size;
+        if (bytes) memcpy(data, body_bytes + body_offset, bytes);
+        body_offset += bytes; return (int)bytes;
+    }
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
     ++read_calls;
     if (ready_on_read && read_calls == ready_on_read)
@@ -244,11 +293,16 @@ static void reset(unsigned count) {
     memset(attempt_times, 0, sizeof(attempt_times));
     atomic_store(&s_generation, 0); atomic_store(&s_decoder_released_generation, 0);
     attempt_count = eos_count = close_count = event_kind = stop_after_attempt = 0;
+    eos_generation = 0;
     connection_close_headers = 0;
     now_us = event_us = 0; attempt_limit = count;
     watchdog = send_ok = true; init_oom = cancel_in_open = queued = false;
     input_buffer = NULL; read_result = read_tls_error = 0; client.live = false;
     timeout_sec = 10; open_duration_us = header_duration_us = read_step_us = 0;
+    body_read_calls = fairness_delays = fairness_delay_ticks = 0;
+    observe_fairness = stop_in_fairness_delay = false;
+    body_bytes = NULL; body_size = body_offset = body_chunk = captured_audio_bytes = 0;
+    body_retry_every = body_metadata_interval = title_calls = 0; captured_title[0] = 0;
     last_state[0] = last_url[0] = 0;
     for (unsigned i=0; i<count; ++i) attempts[i].status = 503;
     queue_play("http://fixture/first");
@@ -319,7 +373,8 @@ int main(void) {
     assert(attempt_count==1 && !eos_count && !strcmp(last_state,"station unavailable")); ++cases;
     reset(1); attempts[0].status=200; timeout_sec=2; read_result=-ESP_ERR_HTTP_EAGAIN;
     read_step_us=1000000; execute();
-    assert(eof_reason==AUDIO_END_UNAVAILABLE && now_us==2000000); ++cases;
+    assert(eof_reason==AUDIO_END_UNAVAILABLE && body_read_calls==2 && fairness_delays==1 && fairness_delay_ticks==1);
+    assert(now_us==2000000+(int64_t)fairness_delay_ticks*1000); ++cases;
     reset(1); attempts[0].status=200; read_result=32; read_tls_error=TEST_TLS_ALLOCATION_ERROR;
     execute(); assert(eof_reason==AUDIO_END_READ_FAILED && close_count==2); ++cases;
     reset(1); attempts[0].status=200; read_result=ESP_FAIL;
@@ -343,5 +398,40 @@ int main(void) {
     read_result=ESP_FAIL;
     execute(); assert(growth_calls==1 && finish_calls==1 && eof_reason==AUDIO_END_READ_FAILED); ++cases;
 #endif
+    // Real stream-loop positive reads must not require a blocking transport or
+    // full queue to reach a lower-priority scheduling opportunity. Clock reads
+    // remain side-effect-free; only transport work and actual delay advance it.
+    uint8_t payload[64]; for (unsigned i=0; i<sizeof(payload); ++i) payload[i]=(uint8_t)(i+1);
+    reset(1); attempts[0].status=200; observe_fairness=true;
+    body_bytes=payload; body_size=63; body_chunk=7; read_step_us=5000;
+    execute(); assert(eof_reason==AUDIO_END_EOF && body_offset==63 && body_read_calls==10);
+    assert(captured_audio_bytes==63 && !memcmp(captured_audio,payload,63));
+    assert(fairness_delays==2 && fairness_delay_ticks==2 && now_us==52000); ++cases;
+    // A complete sub-slice stream does not acquire a per-read artificial wait.
+    reset(1); attempts[0].status=200; observe_fairness=true;
+    body_bytes=payload; body_size=63; body_chunk=7; read_step_us=1000;
+    execute(); assert(eof_reason==AUDIO_END_EOF && body_read_calls==10 && !fairness_delays && now_us==10000);
+    assert(captured_audio_bytes==63 && !memcmp(captured_audio,payload,63)); ++cases;
+    // Metadata-only reads and ordinary EAGAIN consume the same elapsed budget;
+    // the actual ICY parser still publishes one exact title and audio bytes.
+    static const uint8_t icy_body[]="ABCD\x01" "StreamTitle='X';" "EFGH\x00" "IJKL";
+    reset(1); attempts[0].status=200; observe_fairness=true;
+    body_bytes=icy_body; body_size=sizeof(icy_body)-1; body_chunk=1;
+    body_metadata_interval=4; body_retry_every=5; read_step_us=5000;
+    execute(); assert(eof_reason==AUDIO_END_EOF && body_offset==30 && body_read_calls==38);
+    assert(title_calls==1 && !strcmp(captured_title,"X"));
+    assert(captured_audio_bytes==12 && !memcmp(captured_audio,"ABCDEFGHIJKL",12));
+    assert(fairness_delays==9 && now_us==190000+(int64_t)fairness_delay_ticks*1000); ++cases;
+    // Stop accepted during the production fairness delay must be observed by
+    // the loop condition before another socket read or obsolete publication.
+    reset(1); attempts[0].status=200; observe_fairness=stop_in_fairness_delay=true;
+    body_bytes=payload; body_size=64; body_chunk=4; read_step_us=5000;
+    execute(); assert(body_read_calls==4 && body_offset==16 && fairness_delays==1 && eos_count==1);
+    assert(eos_generation==queued_command.generation && eos_generation!=atomic_load(&s_generation));
+    assert(captured_audio_bytes==16 && !memcmp(captured_audio,payload,16)); ++cases;
+    reset(1); attempts[0].status=200; observe_fairness=stop_in_fairness_delay=true;
+    read_result=-ESP_ERR_HTTP_EAGAIN; read_step_us=5000;
+    execute(); assert(body_read_calls==4 && fairness_delays==1 && eos_count==1 && !captured_audio_bytes);
+    assert(eos_generation==queued_command.generation && eos_generation!=atomic_load(&s_generation)); ++cases;
     printf("PASS stream retry cases=%u; HTTP ownership, cancellation, EOF and error gates\n", cases);
 }

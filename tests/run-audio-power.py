@@ -35,7 +35,9 @@ def main():
     files=[Path(__file__).relative_to(ROOT).as_posix(),'tests/native/audio_power_control_test.c','tests/native/audio_power_cyd_stream_test.c',POWER+'/native_network_power.c',POWER+'/include/native_network_power.h']
     for project in ['esp32c3-oled-native','esp32-cyd2usb-native']:
         files += ['idf/'+project+'/main/'+name for name in ['audio_service.c','audio_service.h','native_state.c','native_state.h']]
-    files += ['idf/esp32-cyd2usb-native/main/native_health.h']
+    files += ['idf/esp32-cyd2usb-native/main/native_health.h',
+              'idf/esp32-cyd2usb-native/main/native_output_metrics.h',
+              'idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.h']
     files += [p.relative_to(ROOT).as_posix() for p in (ROOT/'idf/components/native_stream/include').glob('*.h')]
     files += ['idf/components/native_stream/icy_title.c']
     hashes={}
@@ -72,6 +74,8 @@ size_t strlcpy(char *,const char *,size_t);
 ''')
         (folder/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
         (folder/'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n#define ESP_OK 0\n#define ESP_FAIL (-1)\n#define ESP_ERR_INVALID_ARG (-2)\n#define ESP_ERR_INVALID_STATE (-3)\n#define ESP_ERR_TIMEOUT (-4)\n')
+        (folder/'sdkconfig.h').write_text('#pragma once\n#define CONFIG_YORADIO_TLS_STATIC_RX_RESERVE 0\n')
+        (folder/'esp_crt_bundle.h').write_text('#pragma once\n/* Explicit HTTP seam is declared by the test before stream.inc. */\n')
         main=frozen/'idf'/project/'main';source=(main/'audio_service.c').read_text()
         start=source.index('typedef struct {\n    uint32_t generation;\n    native_codec_t requested_codec;');end=source.index('} play_command_t;',start)+len('} play_command_t;')
         types=source[start:end]+'\n';start=source.index('enum { MAINTENANCE_OFF,');end=source.index('static bool maintenance_active(',start);types+=source[start:end]
@@ -92,13 +96,15 @@ size_t strlcpy(char *,const char *,size_t);
                 first=source.index(marker);last=source.index(endmarker,first)+len(endmarker);stream_types+=source[first:last]+'\n'
             stream_types+='enum {AUDIO_START_OFF,AUDIO_STARTING,AUDIO_START_READY};\n'+re.search(r'^#define STREAM_INPUT_ACTIVE[^\n]+',source,re.M).group(0)+'\n'
             (folder/'stream-types.inc').write_text(stream_types)
-            stream=''.join(function(source,name) for name in ['codec_name','state_set_audio','stream_header_event','open_stream','read_stream','send_encoded','stream_transport_reset','stream_initial_pending','stream_confirmation_expired','send_stream_audio','finish_stream_audio','stream_audio','stream_title','stream_task','audio_service_play','audio_service_stop'])
+            stream='#include "native_tls_rx_reserve.h"\n#include "stream_fairness.h"\n'
+            stream+=''.join(function(source,name) for name in ['codec_name','state_set_audio','stream_header_event','open_stream','read_stream','send_encoded','stream_transport_reset','stream_initial_pending','stream_confirmation_expired','send_stream_audio','finish_stream_audio','stream_audio','stream_title','stream_task','audio_service_play','audio_service_stop'])
             (folder/'stream.inc').write_text(stream)
             stream_command=command.copy();stream_command.remove('-DPOWER_CYD=1')
             stream_command[stream_command.index(host(frozen/'tests/native/audio_power_control_test.c'))]=host(frozen/'tests/native/audio_power_cyd_stream_test.c')
             stream_command[1:1]=['-I'+host(frozen/'idf/components/native_stream/include'),host(frozen/'idf/components/native_stream/icy_title.c')]
             stream_command[-1]=host(folder/'stream')
             execute(stream_command,'cyd-stream-build');result=execute(env+[host(folder/'stream')],'cyd-stream-test');results['cyd-receive']=result.stdout.decode()
+    assert all(hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==expected for name,expected in hashes.items()),'Source changed during power/receive checks'
     report=dict(passed=True,scope=__doc__,physical_hardware=False,sanitizers=['ASan','UBSan'],source_sha256=hashes,commands=commands,controls=results)
     (out/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(results))
 

@@ -11,6 +11,7 @@
 #include "stream_probe.h"
 #include "stream_body.h"
 #include "stream_bitrate.h"
+#include "stream_fairness.h"
 #include "json_buffer.h"
 #include "native_health.h"
 #include "radio_control.h"
@@ -49,6 +50,9 @@ static test_client_t client;
 static jmp_buf task_exit;
 static uint64_t clock_us;
 static uint32_t read_advance_us;
+static unsigned positive_delays;
+static size_t first_positive_delay_offset;
+static bool last_read_positive, cancel_fairness_delay;
 static unsigned queued, opens, fetches, redirects, reads, cleanups, closes, deletes;
 static unsigned encoded_bytes, terminal, packets, selected_codec, cases;
 static unsigned eagain, chunk_size, open_delay_ms, header_delay_ms;
@@ -148,7 +152,18 @@ void native_health_stream_failure(uint32_t generation,uint32_t completion,int32_
 }
 
 static int64_t esp_timer_get_time(void) { return (int64_t)clock_us; }
-static void vTaskDelay(unsigned ticks) { clock_us+=(uint64_t)ticks*1000; }
+static void vTaskDelay(unsigned ticks) {
+    clock_us+=(uint64_t)ticks*1000;
+    if(ticks==1 && last_read_positive) {
+        if(!positive_delays)first_positive_delay_offset=body_offset;
+        ++positive_delays;last_read_positive=false;
+        if(cancel_fairness_delay) {
+            cancel_fairness_delay=false;
+            unsigned generation=atomic_fetch_add(&s_generation,1)+1;
+            native_state_begin_audio(&state,generation,NULL,"stopped");
+        }
+    }
+}
 static void vTaskDelete(void *task) { assert(!task); ++deletes; }
 static int esp_crt_bundle_attach(void *p) { (void)p; return ESP_OK; }
 static const char *esp_err_to_name(int error) { (void)error; return "test"; }
@@ -252,6 +267,7 @@ static int esp_http_client_cleanup(esp_http_client_handle_t c) {
 }
 static int esp_http_client_read(esp_http_client_handle_t c,char *buffer,int size) {
     assert(c==&client && c->open && last_timeout==250);++reads;
+    last_read_positive=false;
     if(eagain){--eagain;clock_us+=250000;tls_error=ESP_ERR_MBEDTLS_SSL_READ_FAILED;tls_code=-ESP_TLS_ERR_SSL_TIMEOUT;return -ESP_ERR_HTTP_EAGAIN;}
     if(cancel_read){cancel_read=false;unsigned gen=atomic_fetch_add(&s_generation,1)+1;native_state_begin_audio(&state,gen,NULL,"stopped");}
     size_t left=body_size-body_offset;
@@ -259,6 +275,7 @@ static int esp_http_client_read(esp_http_client_handle_t c,char *buffer,int size
     clock_us+=read_advance_us;
     size_t n=left<chunk_size?left:chunk_size;if(n>(size_t)size)n=(size_t)size;
     memcpy(buffer,body_data+body_offset,n);body_offset+=n;
+    last_read_positive=n>0;
     if(fatal_tls||retry_tls){tls_error=ESP_ERR_MBEDTLS_SSL_READ_FAILED;tls_code=fatal_tls?12345:-ESP_TLS_ERR_SSL_WANT_READ;fatal_tls=retry_tls=false;}
     return (int)n;
 }
@@ -301,6 +318,7 @@ static int xRingbufferSendComplete(void *ring,void *data) {
 static void setup(const uint8_t *data,size_t size,unsigned chunk) {
     assert(!task_buffer);++cases;memset(&client,0,sizeof(client));
     clock_us=0;read_advance_us=0;queued=opens=fetches=redirects=reads=cleanups=closes=deletes=0;
+    positive_delays=0;first_positive_delay_offset=0;last_read_positive=cancel_fairness_delay=false;
     encoded_bytes=terminal=packets=0;selected_codec=NATIVE_CODEC_AUTO;
     health_stream_failures=0;
     eagain=open_delay_ms=header_delay_ms=0;chunk_size=chunk;
@@ -325,6 +343,44 @@ static void play(void) {
 static void exact(const uint8_t *expected,size_t size,unsigned codec,unsigned reason) {
     assert(encoded_bytes==size && !memcmp(captured,expected,size));
     assert(selected_codec==codec && terminal==reason && cleanups==1 && !client.open);
+}
+
+static void test_stream_fairness(const uint8_t *aac,size_t aac_bytes) {
+    stream_fairness_t budget;
+    stream_fairness_begin(&budget,1000);
+    assert(!stream_fairness_due(&budget,1000));
+    assert(!stream_fairness_due(&budget,20999));
+    assert(stream_fairness_due(&budget,21000));
+    assert(stream_fairness_due(&budget,21000)); // A query cannot rebase without a block.
+    stream_fairness_begin(&budget,22000); // Rebase after the caller's actual tick.
+    assert(!stream_fairness_due(&budget,41999) && stream_fairness_due(&budget,42000));
+    stream_fairness_begin(&budget,UINT64_MAX-10000);
+    assert(!stream_fairness_due(&budget,9998) && stream_fairness_due(&budget,9999));
+
+    uint8_t audio[240];assert(aac_bytes==12);
+    for(size_t i=0;i<sizeof(audio);i+=aac_bytes)memcpy(audio+i,aac,aac_bytes);
+    const unsigned chunks[]={1,257};
+    for(size_t i=0;i<sizeof(chunks)/sizeof(chunks[0]);++i) {
+        setup(audio,sizeof(audio),chunks[i]);read_advance_us=1000;play();
+        exact(audio,sizeof(audio),NATIVE_CODEC_AAC,AUDIO_END_EOF);
+        unsigned positive_reads=(sizeof(audio)+chunks[i]-1)/chunks[i];
+        assert(reads==positive_reads+1 && positive_delays==positive_reads/20);
+    }
+    setup(audio,sizeof(audio),1);play();exact(audio,sizeof(audio),NATIVE_CODEC_AAC,AUDIO_END_EOF);
+    assert(!positive_delays && reads==sizeof(audio)+1); // No per-read throughput cap.
+
+    uint8_t wire[46]={0};memcpy(wire,aac,5);wire[5]=2;
+    const char title[]="StreamTitle='fairness';";
+    memcpy(wire+6,title,sizeof(title)-1);memcpy(wire+38,aac+5,5);
+    wire[43]=0;memcpy(wire+44,aac+10,2);
+    setup(wire,sizeof(wire),1);interval_text="5";read_advance_us=1000;play();
+    exact(aac,aac_bytes,NATIVE_CODEC_AAC,AUDIO_END_EOF);
+    assert(positive_delays==2 && first_positive_delay_offset==20 && !strcmp(state.title,"fairness"));
+
+    setup(audio,sizeof(audio),1);read_advance_us=10000;cancel_fairness_delay=true;play();
+    assert(positive_delays==1 && reads==2 && body_offset==2 && !encoded_bytes && !terminal &&
+           cleanups==1 && !client.open && !strcmp(state.stream_format,"stopped") && !health_stream_failures);
+    puts("PASS CYD stream fairness: timed positive reads and ICY metadata yield, zero-time fragments uncapped, Stop during tick prevents next read, unsigned timer wrap");
 }
 
 static int call_settings(int method,const char *query) {
@@ -425,6 +481,7 @@ int main(void) {
     for(unsigned f=0;f<4;++f)for(unsigned chunk=1;chunk<=2048;chunk=chunk==1?7:chunk==7?2048:2049) {
         setup(fixtures[f],sizes[f],chunk);play();exact(fixtures[f],sizes[f],codecs[f],AUDIO_END_EOF);
     }
+    test_stream_fairness(aac,sizeof(aac));
     setup(aac,sizeof(aac),2048);eagain=2;retry_tls=true;play();exact(aac,sizeof(aac),NATIVE_CODEC_AAC,AUDIO_END_EOF);
     assert(reads==4 && clock_us>=500000);
     setup(aac,sizeof(aac),2048);fatal_tls=true;play();exact(aac,sizeof(aac),NATIVE_CODEC_AAC,AUDIO_END_READ_FAILED);

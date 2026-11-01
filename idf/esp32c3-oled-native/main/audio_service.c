@@ -22,6 +22,7 @@
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "stream_http_reader.h"
+#include "stream_fairness.h"
 #include "stream_probe.h"
 #include "stream_bitrate.h"
 #ifdef CONFIG_YORADIO_HTTP_RELEASE_REQUEST_BUFFER
@@ -1068,7 +1069,14 @@ static void stream_task(void *argument) {
 #ifdef YORADIO_INPUT_EXPANSION_ENABLED
         bool input_growth_attempted = false;
 #endif
+        stream_fairness_t fairness;
+        stream_fairness_begin(&fairness, (uint64_t)esp_timer_get_time());
         while (atomic_load(&s_generation) == command.generation) {
+            if (stream_fairness_due(&fairness, (uint64_t)esp_timer_get_time())) {
+                vTaskDelay(1);
+                stream_fairness_begin(&fairness, (uint64_t)esp_timer_get_time());
+                continue;
+            }
             if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
                 stream_confirmation_expired()) {
                 format_unknown = true;
