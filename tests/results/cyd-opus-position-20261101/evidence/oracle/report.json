@@ -1,0 +1,673 @@
+{
+  "schema": 1,
+  "passed": true,
+  "completed": true,
+  "metadata_only": false,
+  "numeric_conformance_claim": false,
+  "production_trim_implemented": false,
+  "physical_hardware": false,
+  "sources": [
+    {
+      "path": "tests/run-cyd-opus-position-oracle.py",
+      "snapshot": "sources/tests/run-cyd-opus-position-oracle.py",
+      "bytes": 13727,
+      "sha256": "1b05009e9b2791ac3689bc2f52dddbc9b50eb1ecb7ac16e4f568c0de0342bc29"
+    },
+    {
+      "path": "tests/results/cyd-opus-position-20261101/source/reference.c",
+      "snapshot": "sources/tests/results/cyd-opus-position-20261101/source/reference.c",
+      "bytes": 5924,
+      "sha256": "e77858d844712233bf77c6ead837cdf0b941646d4f0280ca89099b53b25a0020"
+    },
+    {
+      "path": "tests/run-cyd-opus-position-qemu.py",
+      "snapshot": "sources/tests/run-cyd-opus-position-qemu.py",
+      "bytes": 20119,
+      "sha256": "c0992277844e6cf47447d7c36190533a35140dfc7713bb6aa1819aa96b5f9547"
+    },
+    {
+      "path": "tests/fixtures/esp32c3_calibration/opus-510.ogg",
+      "snapshot": "sources/tests/fixtures/esp32c3_calibration/opus-510.ogg",
+      "bytes": 706319,
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11"
+    },
+    {
+      "path": "tests/fixtures/opus_ogg_long_packets/stereo-510-120ms.ogg",
+      "snapshot": "sources/tests/fixtures/opus_ogg_long_packets/stereo-510-120ms.ogg",
+      "bytes": 707097,
+      "sha256": "b6237ae8df98d3fabbea252eec82b291a46dfdb537cb5b9f537bf5e00bcd7679"
+    }
+  ],
+  "commands": [
+    {
+      "name": "compiler-version",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "--version"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 32816,
+      "elapsed_seconds": 0.14,
+      "stdout": {
+        "path": "compiler-version.stdout.log",
+        "bytes": 246,
+        "sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048"
+      },
+      "stderr": {
+        "path": "compiler-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "compiler-realpath",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "readlink",
+        "-f",
+        "/usr/bin/gcc"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 5000,
+      "elapsed_seconds": 0.156,
+      "stdout": {
+        "path": "compiler-realpath.stdout.log",
+        "bytes": 33,
+        "sha256": "a35fa4bf46e652fcb2323e848f8a71e92d00493e3021c894683a5162ca4fbda8"
+      },
+      "stderr": {
+        "path": "compiler-realpath.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "compiler-sha256",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "sha256sum",
+        "/usr/bin/x86_64-linux-gnu-gcc-13"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 5876,
+      "elapsed_seconds": 0.172,
+      "stdout": {
+        "path": "compiler-sha256.stdout.log",
+        "bytes": 99,
+        "sha256": "753014b5ade9aa80a0f7d61cdec1afc98a2372e1a40ed4b2658a2d0501e6c7f2"
+      },
+      "stderr": {
+        "path": "compiler-sha256.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "libopus-path",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-print-file-name=libopus.so.0"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 33328,
+      "elapsed_seconds": 0.156,
+      "stdout": {
+        "path": "libopus-path.stdout.log",
+        "bytes": 72,
+        "sha256": "1547f28687059094a883eefed42117ca5a67ed21f06968e19fa0fe212ecfea41"
+      },
+      "stderr": {
+        "path": "libopus-path.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "libopus-realpath",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "readlink",
+        "-f",
+        "/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libopus.so.0"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 14356,
+      "elapsed_seconds": 0.125,
+      "stdout": {
+        "path": "libopus-realpath.stdout.log",
+        "bytes": 43,
+        "sha256": "0a7e12984ccc0da008a102ebf07c2ebb98fb89010bcf0fa897e0b72c396983f9"
+      },
+      "stderr": {
+        "path": "libopus-realpath.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "libopus-sha256",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "sha256sum",
+        "/usr/lib/x86_64-linux-gnu/libopus.so.0.9.0"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 31104,
+      "elapsed_seconds": 0.11,
+      "stdout": {
+        "path": "libopus-sha256.stdout.log",
+        "bytes": 109,
+        "sha256": "109911d57c12051e82faa2647b46bafa36131e051abfeffee29f474ecd962fc8"
+      },
+      "stderr": {
+        "path": "libopus-sha256.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "reference-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wformat=2",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/sources/tests/results/cyd-opus-position-20261101/source/reference.c",
+        "-l:libopus.so.0",
+        "-lm",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/reference"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 16172,
+      "elapsed_seconds": 0.844,
+      "stdout": {
+        "path": "reference-build.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "reference-build.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "F20-reference",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/reference",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F20.packets",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F20-vendor-raw.pcm",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F20-libopus-raw.pcm",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F20-libopus-playback.pcm"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 33152,
+      "elapsed_seconds": 2.687,
+      "stdout": {
+        "path": "F20-reference.stdout.log",
+        "bytes": 606,
+        "sha256": "9cba5a56a70d4a3dfc008e406a66f8fe7d07a4cb7d446ad73ddbf4b886692b98"
+      },
+      "stderr": {
+        "path": "F20-reference.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "F120-reference",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/reference",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F120.packets",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F120-vendor-raw.pcm",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F120-libopus-raw.pcm",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-opus-position-oracle-20261101-01/F120-libopus-playback.pcm"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 3648,
+      "elapsed_seconds": 4.656,
+      "stdout": {
+        "path": "F120-reference.stdout.log",
+        "bytes": 607,
+        "sha256": "9ef3094477e2df6e494cc762325a6c509dd08428f222a53797a16b4788a11910"
+      },
+      "stderr": {
+        "path": "F120-reference.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "libopus-post-sha256",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "sha256sum",
+        "/usr/lib/x86_64-linux-gnu/libopus.so.0.9.0"
+      ],
+      "state": "complete",
+      "exit_status": 0,
+      "pid": 7616,
+      "elapsed_seconds": 0.125,
+      "stdout": {
+        "path": "libopus-post-sha256.stdout.log",
+        "bytes": 109,
+        "sha256": "109911d57c12051e82faa2647b46bafa36131e051abfeffee29f474ecd962fc8"
+      },
+      "stderr": {
+        "path": "libopus-post-sha256.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "native_capture": ".build/cyd-opus-position-qemu-20261101-02",
+  "native_report": {
+    "path": ".build/cyd-opus-position-qemu-20261101-02/report.json",
+    "bytes": 68876,
+    "sha256": "a91ee13f0222b9e6ec22060b35ebab2ef52aa32fdf850c752b3847c7384b5b52"
+  },
+  "native_measurements": {
+    "cases": {
+      "F20": {
+        "input": 706319,
+        "calls": 552,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "window_begin": 312,
+        "window_end": 528312,
+        "window_bytes": 2112000,
+        "window_sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f",
+        "heap_before": 258484,
+        "heap_after": 258384,
+        "stack_free": 3876,
+        "raw_pcm_path": "F20-vendor-raw.pcm",
+        "hex_records": 8265
+      },
+      "F120": {
+        "input": 707097,
+        "calls": 93,
+        "frames": 92,
+        "pcm": 2119680,
+        "sha256": "670f7787b470d0e8bc101856bc16e42ed0cb15ef85abf3a0214db0261f4cb684",
+        "window_begin": 312,
+        "window_end": 528312,
+        "window_bytes": 2112000,
+        "window_sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0",
+        "heap_before": 258384,
+        "heap_after": 258384,
+        "stack_free": 3876,
+        "raw_pcm_path": "F120-vendor-raw.pcm",
+        "hex_records": 8280
+      }
+    },
+    "public_api_only": true,
+    "full_pcm_captured": true,
+    "production_trim_implemented": false,
+    "independent_alignment_proven": false
+  },
+  "compiler": {
+    "version": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "identity": "1b99826121ae6682a634e5efe09bd3e3df58ce58e0b28f849114ab5b89139c26  /usr/bin/x86_64-linux-gnu-gcc-13"
+  },
+  "libopus_identity": "63ddaf057d71c53090607e0467eb308640c3b39b0f189e5b937e9c397be2f676  /usr/lib/x86_64-linux-gnu/libopus.so.0.9.0",
+  "reference_executable": {
+    "path": "reference",
+    "local_only": true,
+    "bytes": 41912,
+    "sha256": "a081ad69d09ac05f61d4f1f384c897376e26c59b8bb1f48387d38c4f20113fa5"
+  },
+  "fixtures": {
+    "F20": {
+      "encoded": {
+        "path": "tests/fixtures/esp32c3_calibration/opus-510.ogg",
+        "bytes": 706319,
+        "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11"
+      },
+      "pages": [
+        {
+          "sequence": 0,
+          "granule": 0,
+          "packet_begin": 0,
+          "packet_end": 1,
+          "eos": false
+        },
+        {
+          "sequence": 1,
+          "granule": 0,
+          "packet_begin": 1,
+          "packet_end": 2,
+          "eos": false
+        },
+        {
+          "sequence": 2,
+          "granule": 40320,
+          "packet_begin": 2,
+          "packet_end": 44,
+          "eos": false
+        },
+        {
+          "sequence": 3,
+          "granule": 81600,
+          "packet_begin": 44,
+          "packet_end": 87,
+          "eos": false
+        },
+        {
+          "sequence": 4,
+          "granule": 121920,
+          "packet_begin": 87,
+          "packet_end": 129,
+          "eos": false
+        },
+        {
+          "sequence": 5,
+          "granule": 163200,
+          "packet_begin": 129,
+          "packet_end": 172,
+          "eos": false
+        },
+        {
+          "sequence": 6,
+          "granule": 203520,
+          "packet_begin": 172,
+          "packet_end": 214,
+          "eos": false
+        },
+        {
+          "sequence": 7,
+          "granule": 244800,
+          "packet_begin": 214,
+          "packet_end": 257,
+          "eos": false
+        },
+        {
+          "sequence": 8,
+          "granule": 285120,
+          "packet_begin": 257,
+          "packet_end": 299,
+          "eos": false
+        },
+        {
+          "sequence": 9,
+          "granule": 326400,
+          "packet_begin": 299,
+          "packet_end": 342,
+          "eos": false
+        },
+        {
+          "sequence": 10,
+          "granule": 366720,
+          "packet_begin": 342,
+          "packet_end": 384,
+          "eos": false
+        },
+        {
+          "sequence": 11,
+          "granule": 408000,
+          "packet_begin": 384,
+          "packet_end": 427,
+          "eos": false
+        },
+        {
+          "sequence": 12,
+          "granule": 448320,
+          "packet_begin": 427,
+          "packet_end": 469,
+          "eos": false
+        },
+        {
+          "sequence": 13,
+          "granule": 489600,
+          "packet_begin": 469,
+          "packet_end": 512,
+          "eos": false
+        },
+        {
+          "sequence": 14,
+          "granule": 528312,
+          "packet_begin": 512,
+          "packet_end": 553,
+          "eos": true
+        }
+      ],
+      "packet_transport": {
+        "path": "F20.packets",
+        "bytes": 704765,
+        "sha256": "b871c710e92dbee14e279977834ebddca807d93df932eece563a275f40f59362"
+      },
+      "comparison": {
+        "reference": "libopus 1.4",
+        "packets": 551,
+        "raw_frames": 528960,
+        "logical_frames": 528000,
+        "channels": 2,
+        "preskip": 312,
+        "eos_granule": 528312,
+        "candidate_windows": 961,
+        "samples_per_candidate": 1056000,
+        "best_offset": 312,
+        "best_ties": 1,
+        "best_squared_error": 1446940,
+        "second_offset": 311,
+        "second_squared_error": 17407331889317,
+        "aligned_max_abs": 9,
+        "aligned_exact_samples": 457174,
+        "aligned_within1_samples": 886455,
+        "aligned_signed_error": -9852,
+        "reference_signal_power": 12668936071481,
+        "aligned_rmse": 1.17055898328,
+        "raw_same_position_squared_error": 1447344,
+        "unique_sample_position_observed": true,
+        "numeric_conformance_claim": false
+      },
+      "vendor_raw": {
+        "path": "F20-vendor-raw.pcm",
+        "bytes": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b"
+      },
+      "reference_raw": {
+        "path": "F20-libopus-raw.pcm",
+        "bytes": 2115840,
+        "sha256": "1dae76c55e2589ba82487f74749ab211bd79231b26cf3f85ea6f3663a7121a05"
+      },
+      "reference_playback": {
+        "path": "F20-libopus-playback.pcm",
+        "bytes": 2112000,
+        "sha256": "0599a438cba19b6bb957bbbb3e424d75efeb772098cd72bbe8e7e5d0a0dea2de"
+      }
+    },
+    "F120": {
+      "encoded": {
+        "path": "tests/fixtures/opus_ogg_long_packets/stereo-510-120ms.ogg",
+        "bytes": 707097,
+        "sha256": "b6237ae8df98d3fabbea252eec82b291a46dfdb537cb5b9f537bf5e00bcd7679"
+      },
+      "pages": [
+        {
+          "sequence": 0,
+          "granule": 0,
+          "packet_begin": 0,
+          "packet_end": 1,
+          "eos": false
+        },
+        {
+          "sequence": 1,
+          "granule": 0,
+          "packet_begin": 1,
+          "packet_end": 2,
+          "eos": false
+        },
+        {
+          "sequence": 2,
+          "granule": 46080,
+          "packet_begin": 2,
+          "packet_end": 10,
+          "eos": false
+        },
+        {
+          "sequence": 3,
+          "granule": 92160,
+          "packet_begin": 10,
+          "packet_end": 18,
+          "eos": false
+        },
+        {
+          "sequence": 4,
+          "granule": 138240,
+          "packet_begin": 18,
+          "packet_end": 26,
+          "eos": false
+        },
+        {
+          "sequence": 5,
+          "granule": 184320,
+          "packet_begin": 26,
+          "packet_end": 34,
+          "eos": false
+        },
+        {
+          "sequence": 6,
+          "granule": 230400,
+          "packet_begin": 34,
+          "packet_end": 42,
+          "eos": false
+        },
+        {
+          "sequence": 7,
+          "granule": 276480,
+          "packet_begin": 42,
+          "packet_end": 50,
+          "eos": false
+        },
+        {
+          "sequence": 8,
+          "granule": 322560,
+          "packet_begin": 50,
+          "packet_end": 58,
+          "eos": false
+        },
+        {
+          "sequence": 9,
+          "granule": 368640,
+          "packet_begin": 58,
+          "packet_end": 66,
+          "eos": false
+        },
+        {
+          "sequence": 10,
+          "granule": 414720,
+          "packet_begin": 66,
+          "packet_end": 74,
+          "eos": false
+        },
+        {
+          "sequence": 11,
+          "granule": 460800,
+          "packet_begin": 74,
+          "packet_end": 82,
+          "eos": false
+        },
+        {
+          "sequence": 12,
+          "granule": 506880,
+          "packet_begin": 82,
+          "packet_end": 90,
+          "eos": false
+        },
+        {
+          "sequence": 13,
+          "granule": 528312,
+          "packet_begin": 90,
+          "packet_end": 94,
+          "eos": true
+        }
+      ],
+      "packet_transport": {
+        "path": "F120.packets",
+        "bytes": 704204,
+        "sha256": "979de18bc8f1e9e6ed11dc0ab9dfda43549927bac1f2ea723f5448ee4e651e70"
+      },
+      "comparison": {
+        "reference": "libopus 1.4",
+        "packets": 92,
+        "raw_frames": 529920,
+        "logical_frames": 528000,
+        "channels": 2,
+        "preskip": 312,
+        "eos_granule": 528312,
+        "candidate_windows": 1921,
+        "samples_per_candidate": 1056000,
+        "best_offset": 312,
+        "best_ties": 1,
+        "best_squared_error": 1450780,
+        "second_offset": 313,
+        "second_squared_error": 17407329428100,
+        "aligned_max_abs": 9,
+        "aligned_exact_samples": 456821,
+        "aligned_within1_samples": 885649,
+        "aligned_signed_error": -10016,
+        "reference_signal_power": 12668892664028,
+        "aligned_rmse": 1.17211121357,
+        "raw_same_position_squared_error": 1451271,
+        "unique_sample_position_observed": true,
+        "numeric_conformance_claim": false
+      },
+      "vendor_raw": {
+        "path": "F120-vendor-raw.pcm",
+        "bytes": 2119680,
+        "sha256": "670f7787b470d0e8bc101856bc16e42ed0cb15ef85abf3a0214db0261f4cb684"
+      },
+      "reference_raw": {
+        "path": "F120-libopus-raw.pcm",
+        "bytes": 2119680,
+        "sha256": "05a144078c67781c82e50a500cb3a1205ac76f1b2307d53a30ad6dba5e7f89d8"
+      },
+      "reference_playback": {
+        "path": "F120-libopus-playback.pcm",
+        "bytes": 2112000,
+        "sha256": "1d39d97aaa6178501bbe7abd0d7953afafcc289ffdfac53513e259d3dc6bedf0"
+      }
+    }
+  },
+  "all_source_bindings_unchanged": true
+}

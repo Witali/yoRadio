@@ -1,0 +1,2281 @@
+{
+  "target": "esp32",
+  "passed": true,
+  "completed": true,
+  "commands": [
+    {
+      "name": "vendor-head",
+      "argv": [
+        "C:\\Program Files\\Git\\cmd\\git.exe",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\esp-adf-libs",
+        "rev-parse",
+        "HEAD"
+      ],
+      "state": "complete",
+      "timeout_seconds": 60,
+      "pid": 26880,
+      "exit_status": 0,
+      "elapsed_seconds": 0.07899999999790452,
+      "stdout_sha256": "e7a50e8a0c5dcce9db40fe380576928746051cd4d196e28aa8a96aaf355297f8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "vendor-clean",
+      "argv": [
+        "C:\\Program Files\\Git\\cmd\\git.exe",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\esp-adf-libs",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "state": "complete",
+      "timeout_seconds": 60,
+      "pid": 33148,
+      "exit_status": 0,
+      "elapsed_seconds": 0.09299999999348074,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "sdk-head",
+      "argv": [
+        "C:\\Program Files\\Git\\cmd\\git.exe",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "rev-parse",
+        "HEAD"
+      ],
+      "state": "complete",
+      "timeout_seconds": 60,
+      "pid": 33424,
+      "exit_status": 0,
+      "elapsed_seconds": 0.11000000001513399,
+      "stdout_sha256": "1d19bc0de0b888051c0efbda64366dcd9719579be4d57a8e376bfd5cfedac38c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "sdk-clean",
+      "argv": [
+        "C:\\Program Files\\Git\\cmd\\git.exe",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "state": "complete",
+      "timeout_seconds": 60,
+      "pid": 5636,
+      "exit_status": 0,
+      "elapsed_seconds": 2.1089999999967404,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build",
+      "argv": [
+        "runtime-path-redacted:pwsh.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02\\project\\sdk-build.ps1",
+        "-Campaign",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02",
+        "-SdkDirectory",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "-ToolsDirectory",
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2",
+        "-PythonExecutable",
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "-Target",
+        "esp32"
+      ],
+      "state": "complete",
+      "timeout_seconds": 1200,
+      "pid": 18880,
+      "exit_status": 0,
+      "elapsed_seconds": 165.21899999998277,
+      "stdout_sha256": "d6252d6c6fee5ea91495ce49b908e5be7409a365b6edf8a92b096a3c6dfadc79",
+      "stderr_sha256": "c8161dfc2ebe2307b6d700c3460d2763306ae5559423ba54152819b7041faee5"
+    },
+    {
+      "name": "symbols",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe",
+        "-n",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02\\build\\cyd_opus_position_qemu.elf"
+      ],
+      "state": "complete",
+      "timeout_seconds": 60,
+      "pid": 28816,
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999991385266,
+      "stdout_sha256": "8868785dfeed45d5692f9d3ba646104fa814fefa6f2b1d8c28949e26ab7a99aa",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "merge",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "-m",
+        "esptool",
+        "--chip",
+        "esp32",
+        "merge-bin",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02\\qemu-flash.bin",
+        "--flash-mode",
+        "dio",
+        "--flash-size",
+        "4MB",
+        "--flash-freq",
+        "40m",
+        "0x1000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02\\build\\bootloader\\bootloader.bin",
+        "0x8000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02\\build\\partition_table\\partition-table.bin",
+        "0x10000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02\\build\\cyd_opus_position_qemu.bin",
+        "--pad-to-size",
+        "4MB"
+      ],
+      "state": "complete",
+      "timeout_seconds": 60,
+      "pid": 28128,
+      "exit_status": 0,
+      "elapsed_seconds": 0.40599999998812564,
+      "stdout_sha256": "33c6427a13d8e5749be73ba452dd56940c5a0a4be206f554d400bc8546dc491c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "qemu",
+      "argv": [
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-05\\qemu-system-xtensa.exe",
+        "-audiodev",
+        "none,id=quiet",
+        "-M",
+        "esp32,audiodev=quiet",
+        "-smp",
+        "2",
+        "-L",
+        "C:\\Work\\QEMU-ESP32\\pc-bios",
+        "-display",
+        "none",
+        "-monitor",
+        "none",
+        "-serial",
+        "stdio",
+        "-no-reboot",
+        "-snapshot",
+        "-nic",
+        "none",
+        "-drive",
+        "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-opus-position-qemu-20261101-02\\qemu-flash.bin,if=mtd,format=raw"
+      ],
+      "state": "complete",
+      "timeout_seconds": 1200,
+      "pid": 6596,
+      "exit_status": 0,
+      "elapsed_seconds": 74.875,
+      "stdout_sha256": "8c70d63581ebf6a3cd61edbbab6b9cb420786c2c2014133d839a439f9591b1f4",
+      "stderr_sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096"
+    }
+  ],
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-opus-position-qemu.py": {
+      "snapshot": "sources/controller.py",
+      "sha256": "c0992277844e6cf47447d7c36190533a35140dfc7713bb6aa1819aa96b5f9547",
+      "bytes": 20119
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_opus_position_qemu\\CMakeLists.txt": {
+      "snapshot": "project/CMakeLists.txt",
+      "sha256": "010fd8eb45df280ea089afa7086caf9b27315cf1089aa921e099ff4e14426a5d",
+      "bytes": 207
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_opus_position_qemu\\main\\CMakeLists.txt": {
+      "snapshot": "project/main/CMakeLists.txt",
+      "sha256": "4590dc20f8c18a198889601cdc08623171ceb4d949f30c19489fb5e393cced6d",
+      "bytes": 537
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_opus_position_qemu\\main\\main.c": {
+      "snapshot": "project/main/main.c",
+      "sha256": "61e56c67dfdd744fb5270474c6bdaf9496b542008c3f75387a3137bbea9ba065",
+      "bytes": 6751
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_opus_position_qemu\\partitions.csv": {
+      "snapshot": "project/partitions.csv",
+      "sha256": "73e95a6cb5a7bb4e08558db3bd60010de311e076cf0eeae43a3392eb28237575",
+      "bytes": 99
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_opus_position_qemu\\README.md": {
+      "snapshot": "project/README.md",
+      "sha256": "2eabc6b5ed9f785141e5dc0a00f1f6c541439e788e45ecb87aa51e89d977c43b",
+      "bytes": 1009
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_opus_position_qemu\\sdk-build.ps1": {
+      "snapshot": "project/sdk-build.ps1",
+      "sha256": "07dc553fe9fc9fadc060ab00a3968391c88ef1fbd3e02ac74e32b7bb0c52c5d9",
+      "bytes": 3422
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_opus_position_qemu\\sdkconfig.common.defaults": {
+      "snapshot": "project/sdkconfig.common.defaults",
+      "sha256": "1a47bfab088521091c30a1497dee0ee02ac54c3e0bf441fce8b9d7c69e3321d7",
+      "bytes": 1253
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\esp32c3_calibration\\opus-510.ogg": {
+      "snapshot": "project/main/fixture20.ogg",
+      "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+      "bytes": 706319
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\opus_ogg_long_packets\\stereo-510-120ms.ogg": {
+      "snapshot": "project/main/fixture120.ogg",
+      "sha256": "b6237ae8df98d3fabbea252eec82b291a46dfdb537cb5b9f537bf5e00bcd7679",
+      "bytes": 707097
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\verify-cyd-opus-direct-checkpoint.py": {
+      "snapshot": "sources/fixture-auditors/short.py",
+      "sha256": "50bb1a2b372629dbe720ba612cbbbcf90977598258278c741192ec0d4ded815c",
+      "bytes": 13972
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\opus_ogg_long_packets\\generate.py": {
+      "snapshot": "sources/fixture-auditors/long.py",
+      "sha256": "b31791eb3ba1a4f7159db4cfb06358b7cf52e512417e40993f9bc1ca70fc76d6",
+      "bytes": 12396
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\decoder_registration.c": {
+      "snapshot": "project/main/decoder_registration.c",
+      "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+      "bytes": 1240
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\decoder_registration.h": {
+      "snapshot": "project/main/decoder_registration.h",
+      "sha256": "54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+      "bytes": 360
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec.h",
+      "sha256": "8713fb9801824c9e041db2a7f6624a397f12be92477a5100005928427e0eb941",
+      "bytes": 9237
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec_default.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec_default.h",
+      "sha256": "16440cffb02f12aef9ca2eb527d762a603cb9fdc8ee49607317853793d5ca689",
+      "bytes": 2412
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec_reg.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/esp_audio_dec_reg.h",
+      "sha256": "b883d6edf6f08d6114426b17d4a2678b16824b65feb2849cf266431a04717756",
+      "bytes": 3682
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_aac_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_aac_dec.h",
+      "sha256": "cc8cf26a5c500ec26e45485b6eb8009189ec1013abed354a7c1a3715b2992994",
+      "bytes": 5828
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_adpcm_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_adpcm_dec.h",
+      "sha256": "007c81a6ba029abc5af88187cd38c98ce56e9132d247040c8a26f15dc086b002",
+      "bytes": 5420
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_alac_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_alac_dec.h",
+      "sha256": "b701bf0a88490a678e3626a5e706fb2cc703c47dda96c42c1ae27ac4a7ee5fc8",
+      "bytes": 5289
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_amrnb_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_amrnb_dec.h",
+      "sha256": "356be049b0e0bb1918ff3ba31770895ecaf7547b07588b4097b8ee929bdc48e3",
+      "bytes": 4820
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_amrwb_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_amrwb_dec.h",
+      "sha256": "370477f748324f47f7c4b1a18c16d9c20b21c3b9d86302b268306d51e761a194",
+      "bytes": 4765
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_flac_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_flac_dec.h",
+      "sha256": "abe7831ed896380d9abceee0cf37c54c155dadbde9e0c0ca38de88a2b92fb84a",
+      "bytes": 4714
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_g711_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_g711_dec.h",
+      "sha256": "426138d1e8442bc00bbfe46dcb862a9e6b13077fd0711d743a0bf6714710d1bc",
+      "bytes": 6338
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_g722_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_g722_dec.h",
+      "sha256": "37fd6dee878cd44f7d18a39ef8426bb32c5018a3692b809355c97e9b4633b168",
+      "bytes": 4842
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_lc3_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_lc3_dec.h",
+      "sha256": "1206cba31df6a7904f37cb2a8960a8cd99a73f9243dffa7310f8062e563d04a4",
+      "bytes": 7538
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_mp3_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_mp3_dec.h",
+      "sha256": "8f8f78fcf09e31cd3b07d8f7d7e51b5357f27addca27bd0e26bc724029658b17",
+      "bytes": 4771
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_opus_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_opus_dec.h",
+      "sha256": "356d78a3ec9628c39c215d8cb94b0b362df10fe9cf44679ec0c568916814d00a",
+      "bytes": 7183
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_pcm_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_pcm_dec.h",
+      "sha256": "574c7333ec93cf79e5d327f4fdb0950a67dfd7895e9c29739806ba18628f4a7e",
+      "bytes": 4280
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_sbc_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_sbc_dec.h",
+      "sha256": "34c7f2577db3595618e7ca4d63c634dcf572f2958383bf7e9b9e1d106b63be94",
+      "bytes": 7069
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_vorbis_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/decoder/impl/esp_vorbis_dec.h",
+      "sha256": "288aada7336181f878240a6df6c891f88a8e20ced3de38e50bb80b1c29bee8a4",
+      "bytes": 5690
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\esp_audio_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc.h",
+      "sha256": "a149c1a8e6dd84b8f2b0a7c49ad6ff6952a9867005a0d1664850bb489b76a095",
+      "bytes": 9552
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\esp_audio_enc_default.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc_default.h",
+      "sha256": "06eb3b0ae9478703b7934630fcd3465c2c035025a73cdb8c636e380ca003453d",
+      "bytes": 2292
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\esp_audio_enc_reg.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/esp_audio_enc_reg.h",
+      "sha256": "7b3f352efb83e66e733ad268ff6c26cd348281c9fa370f928158147355a9f066",
+      "bytes": 4459
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_aac_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_aac_enc.h",
+      "sha256": "2af2e7ebc71d23d3117714eb73bb289eeb3767920c1dbf88bf44fecf88159105",
+      "bytes": 8968
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_adpcm_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_adpcm_enc.h",
+      "sha256": "057adaaa847045e080cb299bd9b5e72ec8007703e9d23a02801a944816de0bdd",
+      "bytes": 6354
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_alac_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_alac_enc.h",
+      "sha256": "9b91bccf8afdd1e525652bbb37f919edb2fe19faed08bf4e1e88ac4d4408a798",
+      "bytes": 6702
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_amrnb_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_amrnb_enc.h",
+      "sha256": "980f798d6e2f2c6bdcc09a63cddc419435ed10e44ea04538aa44b5d7d0d76c6c",
+      "bytes": 8332
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_amrwb_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_amrwb_enc.h",
+      "sha256": "6be915f750c1d4a3bf55527e38e7e1f5c8b6654f0a5287b6ed6eb6d7e7169f95",
+      "bytes": 8339
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_g711_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_g711_enc.h",
+      "sha256": "0062aa61b3d4ef73a0c7e34f5c86e5d000fedd5d19152e07278372df7a4d7626",
+      "bytes": 7766
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_g722_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_g722_enc.h",
+      "sha256": "aefc0d04bdc4f76dcf84c810bc595780b384e16a571da6bcffde1640a1e24be3",
+      "bytes": 8151
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_lc3_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_lc3_enc.h",
+      "sha256": "c60a366751a4a564ce761a629db66db0ec0b0d4a764378fe6f75861dfb44749d",
+      "bytes": 8777
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_opus_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_opus_enc.h",
+      "sha256": "ea9a53135c01ece2ab9f11426f8f31685cb8b50da0a4bf7a862ea1fcdc3c153f",
+      "bytes": 13188
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_pcm_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_pcm_enc.h",
+      "sha256": "ba8b7393f86aba32c291a565c7ccd61d8bf1502ce2a13c31a7a4ca9b5a6f714c",
+      "bytes": 6703
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\encoder\\impl\\esp_sbc_enc.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/encoder/impl/esp_sbc_enc.h",
+      "sha256": "11f81293affb4d225c9cb1e12fc99c503a74e5b0c1ff1e73a320f386ee1d6eba",
+      "bytes": 11016
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\esp_audio_codec_version.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/esp_audio_codec_version.h",
+      "sha256": "85a13584cacea472cb1fe16b73a892c7250071584c210503bffae7ccceb1d6cb",
+      "bytes": 2512
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\esp_audio_types.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/esp_audio_types.h",
+      "sha256": "da5c32ca78b8f9e50b8ca2b72ec0fec5dc66ff7c4e70ba7eb5d1ffc134ab6dd3",
+      "bytes": 4936
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\esp_sbc_def.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/esp_sbc_def.h",
+      "sha256": "6958477ec7d55b511725f8aea60b45547e2b47212b8d6e990f0f3e66a69e4fd1",
+      "bytes": 2600
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec.h",
+      "sha256": "94b5f996b8276f9b4fb291d4878d73201b5fd6aacc8e67c2ff87cdfde2e39750",
+      "bytes": 13931
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec_default.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec_default.h",
+      "sha256": "ecc35de5b4b63c46139136fa605e4e6257e2cd4cd203677a0e9302d33018194f",
+      "bytes": 2369
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec_reg.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/esp_audio_simple_dec_reg.h",
+      "sha256": "de08e5c318810652de0c66c463bd99fed84369705a4ad8533ff42ffce02aaef1",
+      "bytes": 3241
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_es_parse_types.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/esp_es_parse_types.h",
+      "sha256": "27cc20b9ccd4f08936e09ef82974137a254e5d50e63c7728f21a103edf40489c",
+      "bytes": 9990
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_m4a_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_m4a_dec.h",
+      "sha256": "59b9595b68ad31ab7b0c542229be3852c77d9199888a31abc7e9d2c2bb3cd19e",
+      "bytes": 5248
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_m4a_parse.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_m4a_parse.h",
+      "sha256": "57b00a9046a4b3fb43022d622bcf530d4a19fbfd5428537ff824f5573392b085",
+      "bytes": 2605
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_ogg_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ogg_dec.h",
+      "sha256": "2278956ebddd3ad03c08fdcc682dc8ae08c185f57bdd45ad2a0ebe7fde7b551c",
+      "bytes": 4187
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_ogg_parse.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ogg_parse.h",
+      "sha256": "1b49166ad991de46f1ecbed08047ffaf5554d0b0c7d3baedf730ab1bca26ad80",
+      "bytes": 2848
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_ts_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ts_dec.h",
+      "sha256": "72842c8a6b84e152c24ff0961b91109a2abac780b05ba2f4f6ad8f42f2a6dd91",
+      "bytes": 5085
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_ts_parse.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_ts_parse.h",
+      "sha256": "cfc1b6064c1820943b3e7db8144d16a25ba82764177a36d8071a0c619beeb177",
+      "bytes": 2298
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_wav_dec.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_wav_dec.h",
+      "sha256": "7683056a2b66224e213f146a9cd7195e8f07d49fe5abadef0d746f68c85895f0",
+      "bytes": 3817
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\impl\\esp_wav_parse.h": {
+      "snapshot": "sources/vendor/esp_audio_codec/include/simple_dec/impl/esp_wav_parse.h",
+      "sha256": "6368179b23b1f610493c9c88321d074bce99b53dfa7d765844b40f857210d7a1",
+      "bytes": 2363
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\src\\audio_decoder_reg.c": {
+      "snapshot": "sources/vendor/esp_audio_codec/src/audio_decoder_reg.c",
+      "sha256": "01e9cb3f14ebe20cc9e78d844c046e77166ddc44df18fa0d7f0a6fd712488c0f",
+      "bytes": 4331
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\src\\audio_encoder_reg.c": {
+      "snapshot": "sources/vendor/esp_audio_codec/src/audio_encoder_reg.c",
+      "sha256": "675feeed1c81b716058530a168be6ccdf9174ce2431bec2a529431b80b5ac063",
+      "bytes": 3538
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\src\\simple_decoder_reg.c": {
+      "snapshot": "sources/vendor/esp_audio_codec/src/simple_decoder_reg.c",
+      "sha256": "387c826bf080fcb06d87804951cea52156e962a0efa08ba6361136e8704b7064",
+      "bytes": 1467
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a": {
+      "snapshot": "sources/vendor/esp_audio_codec/lib/esp32/libesp_audio_codec.a",
+      "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+      "bytes": 4384572
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a": {
+      "snapshot": "sources/vendor/esp_audio_codec/lib/esp32/libesp_audio_simple_dec.a",
+      "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+      "bytes": 156872
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\CHANGELOG.md": {
+      "snapshot": "sources/vendor/esp_audio_codec/CHANGELOG.md",
+      "sha256": "ca38839a2cd137aa50bb4fda22f12a5dfdae6841bc7468ac05948a03f16626a7",
+      "bytes": 7284
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\CMakeLists.txt": {
+      "snapshot": "sources/vendor/esp_audio_codec/CMakeLists.txt",
+      "sha256": "30d3a30ef49e029447afcf1aea28bc02a45414e1c1b64cf4da6b5f0d63e11029",
+      "bytes": 2067
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\idf_component.yml": {
+      "snapshot": "sources/vendor/esp_audio_codec/idf_component.yml",
+      "sha256": "804fd34627f294c7461b63d7b1dcc7261638e136b1c9f24f3ddd7124f3d45c43",
+      "bytes": 556
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\Kconfig": {
+      "snapshot": "sources/vendor/esp_audio_codec/Kconfig",
+      "sha256": "dbc13dca8ebe94c4025a8fbf186b493d039f3f182a23113cadad9ce8b4d844bc",
+      "bytes": 6128
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\LICENSE": {
+      "snapshot": "sources/vendor/esp_audio_codec/LICENSE",
+      "sha256": "ef11bc50a8cdcad79a756363e82b6c1a62d0409ad183a7e46e17aa089734b199",
+      "bytes": 1185
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\README.md": {
+      "snapshot": "sources/vendor/esp_audio_codec/README.md",
+      "sha256": "48b5938d59ab0752c385acd2a1367571ab5228c3325823ae71216bbf44da3d01",
+      "bytes": 16508
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\README_CN.md": {
+      "snapshot": "sources/vendor/esp_audio_codec/README_CN.md",
+      "sha256": "cabe7343f45269da12945c7ec195ab0d294d4e85ddba1ecbaad035896171d061",
+      "bytes": 15423
+    }
+  },
+  "tools": {
+    "python": {
+      "path": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+      "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14"
+    },
+    "qemu": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-qemu-idf6-build-05\\qemu-system-xtensa.exe",
+      "sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d"
+    },
+    "powershell": {
+      "path": "runtime-path-redacted",
+      "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139"
+    },
+    "git": {
+      "path": "C:\\Program Files\\Git\\cmd\\git.exe",
+      "sha256": "81ef35ae005ca9318018d18e3327578ce939fb99feaad6b2d7c8ab15f3de8db5"
+    },
+    "compiler": {
+      "path": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    }
+  },
+  "production_firmware": false,
+  "physical_device": false,
+  "custom_decoder": false,
+  "private_abi_used": false,
+  "target_executed": true,
+  "full_conformance_qualified": false,
+  "roms": {
+    "esp32-v3-rom-app.bin": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442",
+    "esp32-v3-rom.bin": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b",
+    "esp32c3-rom.bin": "0de1e65020e803bea0d7443dca149d61895e01fca3bb9c82d073234eebd73f99",
+    "esp32s3_rev0_rom.bin": "b5c7090cc22efce51c1323cef31ca96fcd673a5b1d1b1017e219d393f2659913"
+  },
+  "fixture_audits": {
+    "short": {
+      "pages": 15,
+      "valid_crc_pages": 15,
+      "consecutive_pages": true,
+      "reconstructed_packets": 553,
+      "audio_packets": 551,
+      "all_audio_celt_20ms": true,
+      "raw_frames": 528960,
+      "pre_skip_frames": 312,
+      "eos_granule": 528312,
+      "initial_granule_offset": 0,
+      "end_trim_frames": 648,
+      "logical_playback_frames": 528000,
+      "logical_pcm16_stereo_bytes": 2112000
+    },
+    "long": {
+      "pages": [
+        {
+          "sequence": 0,
+          "flags": 2,
+          "granule": 0,
+          "encoded_bytes": 47,
+          "completed_audio": 0,
+          "decoded_frames_through_page": 0
+        },
+        {
+          "sequence": 1,
+          "flags": 0,
+          "granule": 0,
+          "encoded_bytes": 74,
+          "completed_audio": 0,
+          "decoded_frames_through_page": 0
+        },
+        {
+          "sequence": 2,
+          "flags": 0,
+          "granule": 46080,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 46080
+        },
+        {
+          "sequence": 3,
+          "flags": 0,
+          "granule": 92160,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 92160
+        },
+        {
+          "sequence": 4,
+          "flags": 0,
+          "granule": 138240,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 138240
+        },
+        {
+          "sequence": 5,
+          "flags": 0,
+          "granule": 184320,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 184320
+        },
+        {
+          "sequence": 6,
+          "flags": 0,
+          "granule": 230400,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 230400
+        },
+        {
+          "sequence": 7,
+          "flags": 0,
+          "granule": 276480,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 276480
+        },
+        {
+          "sequence": 8,
+          "flags": 0,
+          "granule": 322560,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 322560
+        },
+        {
+          "sequence": 9,
+          "flags": 0,
+          "granule": 368640,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 368640
+        },
+        {
+          "sequence": 10,
+          "flags": 0,
+          "granule": 414720,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 414720
+        },
+        {
+          "sequence": 11,
+          "flags": 0,
+          "granule": 460800,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 460800
+        },
+        {
+          "sequence": 12,
+          "flags": 0,
+          "granule": 506880,
+          "encoded_bytes": 61475,
+          "completed_audio": 8,
+          "decoded_frames_through_page": 506880
+        },
+        {
+          "sequence": 13,
+          "flags": 4,
+          "granule": 528312,
+          "encoded_bytes": 30751,
+          "completed_audio": 4,
+          "decoded_frames_through_page": 529920
+        }
+      ],
+      "page_count": 14,
+      "all_page_crcs_valid": true,
+      "audio_packet_count": 92,
+      "packet_samples": {
+        "5760": 92
+      },
+      "packet_duration_ms": 120,
+      "samples_per_packet": 5760,
+      "channels": 2,
+      "sample_rate": 48000,
+      "raw_frames": 529920,
+      "preskip": 312,
+      "eos_granule": 528312,
+      "initial_granule_offset": 0,
+      "tail_frames": 1608,
+      "playback_frames": 528000,
+      "playback_pcm16_bytes": 2112000,
+      "maximum_packet_pcm16_bytes": 23040,
+      "maximum_packet_encoded_bytes": 7650,
+      "packets": [
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        },
+        {
+          "mode": "CELT",
+          "stereo": true,
+          "frames": 6,
+          "samples": 5760,
+          "samples_per_frame": 960,
+          "bytes": 7650,
+          "frame_bytes": [
+            1273,
+            1273,
+            1273,
+            1273,
+            1273,
+            1273
+          ]
+        }
+      ]
+    }
+  },
+  "generated_header_sha256": "57ade18ece1fb4ebf408c3718450d428196de19ea167e9d7e5445379ed775f65",
+  "prepared": true,
+  "vendor_revision": "67b8d0e98f58c774b8652480893037273190e8dc",
+  "sdk_revision": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "fixture_sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+  "fixture_bytes": 706319,
+  "full_pcm_independent_oracle": false,
+  "output_capacity": 24576,
+  "build_outputs": {
+    "build/cyd_opus_position_qemu.elf": "0eb79f5c570576016c8ebe8d3a5a3ce00254b5d610e2e4132a84b30257f9f622",
+    "build/cyd_opus_position_qemu.map": "d6b8d6746f1ecbe3467facad36e74ee602397507b1d28ae2da7752a7d29119b3",
+    "qemu-flash.bin": "bfe09df09c1754d0a04252dcf9d6cbca30bd72e221bfa7208d36231ef280e57b",
+    "sdkconfig": "b3d3b399e55a16733734ec272bef0d4af315e9d1e87b953160ada40b2e4d62e8",
+    "sdk-child.json": "a75b87177da34763e7fd17cced6923daeb58448fa60f5cc9126748607da2fd53",
+    "build/bootloader/bootloader.bin": "b04e82f607535542c5e113479391df406da78dd9a9d9997e967562f3c4467d1c",
+    "build/partition_table/partition-table.bin": "c9a826e85500d14d1854ce78e47452d4614a1be371bbd056278d2cb3398fbbfd",
+    "build/cyd_opus_position_qemu.bin": "4c1d9978015db955ed97154f8e6c14f1fe04709c50367f72b6fd6aa446c880e9",
+    "build/compile_commands.json": "252c2fe7d195edff51e270639e93e11ce31a7e9f96a0741f60a915e7e32d4e76",
+    "build/project_description.json": "d9d396893b8d7cbea875604a604e3b497c5666373882300db2765b3ea3769593",
+    "build/flasher_args.json": "df5d396ab6f5cc544f1cc87d786642244adcae1245b3bdbc9d0652e29298ce85"
+  },
+  "measurements": {
+    "cases": {
+      "F20": {
+        "input": 706319,
+        "calls": 552,
+        "frames": 551,
+        "pcm": 2115840,
+        "sha256": "a773dc8a0db92aebd689c157bb504cd43e6d6544f8249362db57d59176cb316b",
+        "window_begin": 312,
+        "window_end": 528312,
+        "window_bytes": 2112000,
+        "window_sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f",
+        "heap_before": 258484,
+        "heap_after": 258384,
+        "stack_free": 3876,
+        "raw_pcm_path": "F20-vendor-raw.pcm",
+        "hex_records": 8265
+      },
+      "F120": {
+        "input": 707097,
+        "calls": 93,
+        "frames": 92,
+        "pcm": 2119680,
+        "sha256": "670f7787b470d0e8bc101856bc16e42ed0cb15ef85abf3a0214db0261f4cb684",
+        "window_begin": 312,
+        "window_end": 528312,
+        "window_bytes": 2112000,
+        "window_sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0",
+        "heap_before": 258384,
+        "heap_after": 258384,
+        "stack_free": 3876,
+        "raw_pcm_path": "F120-vendor-raw.pcm",
+        "hex_records": 8280
+      }
+    },
+    "public_api_only": true,
+    "full_pcm_captured": true,
+    "production_trim_implemented": false,
+    "independent_alignment_proven": false
+  },
+  "all_bound_inputs_current": true,
+  "public_api_only": true,
+  "padding_units_assumed": false,
+  "production_trim_implemented": false
+}

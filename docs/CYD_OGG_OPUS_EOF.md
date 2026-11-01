@@ -73,8 +73,18 @@ output hash are recorded separately. The bundled libopus version is not
 reported; this observation validates playback length, not byte-identical
 numeric conformance between implementations.
 
+The [independent full-stream position checkpoint](../tests/results/cyd-opus-position-20261101/README.md)
+now compares both complete 20/120 ms fixtures against public libopus 1.4 packet
+decoding. Every possible complete 528000-frame vendor window is compared over
+all 1056000 interleaved samples: 961 and 1921 candidates, respectively. Both
+have one best start at raw frame 312, matching their actual pre-skip; each ends
+at raw frame 528312. Maximum numeric difference is 9 PCM16 units and measured
+RMSE is approximately 1.17. This establishes an observed alignment for these
+two fixtures, without introducing a numeric-conformance tolerance or applying
+their constants to other streams. Production trimming is still not installed.
+
 The public simple-decoder metadata exposes no pre-skip or granule fields.
-Before changing playback, establish an independent sample-position oracle and
+Before changing playback, use the independent sample-position evidence and
 derive trimming from each stream's actual headers/page timeline. Do not apply
 fixture constants globally or silently trim twice. Initial granule offsets,
 continued packets, terminal page bounds, Stop/generation changes and chained

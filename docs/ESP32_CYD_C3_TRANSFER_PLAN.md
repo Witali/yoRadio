@@ -2244,3 +2244,14 @@ Stream остаётся на core0, decode/output на core1 с прежними
   это дополнительная память, требующая actual target/full-app измерения.
   Helpers ещё не выбраны в production. Следом — независимый PCM position
   oracle, actual public-wrapper decode/chaining и полная CYD task integration.
+
+- 2026-11-01, CYD-C3-14, [independent full-stream PCM position](../tests/results/cyd-opus-position-20261101/README.md):
+  stock LX6 vendor outputs обоих полных fixtures совпали с прежними raw/window
+  hashes. Независимый public libopus 1.4 decode сравнил все 961/1921 полных
+  528000-frame windows, каждый по всем 1056000 samples. Единственный best offset
+  обоих — 312 из фактического pre-skip; retained span заканчивается на 528312.
+  Измерены max abs9/RMSE≈1.17, без нового допуска numerical conformance.
+  Сохранены исходный watchdog nonpass от UART observation и passing rerun с
+  yield только в диагностике. Full PCM/hex/images остаются локально с hash/size
+  bindings; published verifier не заявляет повторный расчёт исключённых samples.
+  Production clipping/chaining, gain/rate/mappings и full-app gates ещё нужны.
