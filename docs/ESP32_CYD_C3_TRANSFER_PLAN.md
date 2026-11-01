@@ -84,7 +84,22 @@ CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang
 
 ## Что осталось по переносу
 
-Актуальная очередь после уточнения пользователя 28 октября:
+После уточнения пользователя 28 октября, состояние на 1 ноября 2026 года:
+
+Программная часть этапов 01–10 выполнена. До завершения оставшегося переноса
+есть пять блоков разного размера; их нельзя считать пятью небольшими правками.
+
+| Блок | Оставшаяся программная работа |
+| --- | --- |
+| Ogg/Opus и Espressif reuse | Подключить проверенный metadata observer, реализовать sample-accurate pre-skip/end trim и проверить PCM alignment независимым эталоном; затем OOM/backpressure и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
+| AAC compact owners | Отдельная Xtensa ABI/PCM/OOM/lifetime адаптация. Отложенные private scopes остаются отложенными. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
+| FLAC | Target OOM/backpressure/semantic controls и production watchdog/resource qualification. [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
+| Память и TLS | Полный radio boot, actual TLS traffic и измерение heap/IRAM/stack до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
+| Финальные сборки и регрессия | Обновить production exports актуального кода для PDM, continuous DAC и legacy DAC; проверить совместную работу перенесённых функций. [Wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md). |
+
+Физическая приёмка выделена отдельно и ждёт подключения платы. Собственный
+расширенный Vorbis отложен и не включён в эти пять активных блоков; перенос
+аппаратно-специфичных дисплеев/выводов C3 исключён.
 
 - Vorbis: существующий декодер Espressif переиспользуется через публичные
   интерфейсы. Настройки, регистрация, жизненный цикл, обработка ошибок и
@@ -2200,3 +2215,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   actual passing host runs с разными source snapshots. Это metadata timing,
   не PCM oracle и не полный validator. Production integration, MCU execution,
   sample-position oracle и фактический playback trim остаются открытыми.
+
+- 2026-11-01, CYD-C3-13/15, [production boot replay checkpoint](../tests/results/cyd-production-boot-replay-20261101/README.md):
+  точные прежние ON/OFF PDM images проходят старый QIO барьер на выбранном
+  IDF6-compatible QEMU. Обычные профили остаются NONPASS на SPIFFS mount;
+  отдельный GPIO-matrix receive-delay profile проходит mount и достигает
+  display-driver entry, затем падает в Wi-Fi PHY init. Сохранены исходные
+  reports/logs и полный stopped-CPU SPIFFS readback, без замены volume,
+  форматирования или firmware patches. Все исключённые image/FS/ROM payloads
+  имеют локальные hash/size bindings. Это продвижение границы эмулятора, а
+  не успешный полный radio boot; TLS traffic/resources и physical gates открыты.
