@@ -255,6 +255,35 @@ default. The source entries remain
 [bounded input reclaim](../idf/esp32-cyd2usb-native/main/native_input_reclaim.c)
 and [early MPI](../idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c).
 
+## Flash instruction cache and IRAM placement
+
+Classic ESP32 already executes ordinary IROM code through the bootloader-configured
+Flash MMU cache. Placing a function in Flash uses this path automatically.
+A cached instruction path can still incur cache misses; cached availability
+does not make the function usable while the cache is disabled.
+See the pinned SDK's [memory layout](https://docs.espressif.com/projects/esp-idf/en/v6.0.2/esp32/api-guides/memory-types.html)
+and [Flash concurrency rules](https://docs.espressif.com/projects/esp-idf/en/v6.0.2/esp32/api-reference/peripherals/spi_flash/spi_flash_concurrency.html).
+
+The 3 November native03 diagnostic map contains 618488 B in `.flash.text`
+and 49507 B in `.iram0.text`, plus 1028 B of interrupt vectors. Its initial
+pure-IRAM allocator region is 80536 B; this is not measured current free space.
+This image remains NONPASS at its final health-accounting guard and is not a
+full radio/TFT application or a cache-performance benchmark.
+
+That diagnostic profile already has `FREERTOS_IN_IRAM=n` and `RINGBUF_IN_IRAM=n`.
+The map attributes 6892 B of IRAM input sections to the heap archive, but this
+is a contributor size, not a promised saving. The pinned SDK's documented
+condition for `HEAP_PLACE_FUNCTION_INTO_FLASH` is not met while
+`SPI_MASTER_ISR_IN_IRAM=y`, as in this profile. Moving heap functions therefore
+requires reviewing the actual SPI/TFT ISR call and data dependencies first.
+The allocation-failure callback itself must retain its internal-memory-only
+path, including indirect calls and data accesses.
+
+No placement option or SDK configuration was changed by this audit. Further
+candidate savings require the final production map and complete ISR reachability
+checks. Cache-miss timing and audio/network/display tradeoffs require hardware
+measurements; QEMU observations do not establish them.
+
 ## Remaining work
 
 - Finish complete radio-boot, concurrent radio/WebUI/OTA traffic and physical qualification of the
