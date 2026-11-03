@@ -145,6 +145,23 @@ class ArtifactTests(unittest.TestCase):
             'ets_timer_arm', 'ets_timer_arm_us', 'ets_timer_disarm'})
         self.assertFalse(linked['full_runtime_lifecycle_proved'])
 
+    def test_wifi_bss_guard(self):
+        manifest = json.loads((ARCHIVE / 'manifest.json').read_text())
+        data = (ARCHIVE / 'wifi-bss-linkage.json').read_bytes()
+        linked = json.loads(data)
+        self.assertTrue(linked['passed'])
+        self.assertEqual(linked['app_sha256'], sha((ARCHIVE / 'app.bin').read_bytes()))
+        self.assertEqual(linked['elf_sha256'], manifest['elf_sha256'])
+        self.assertEqual(sha(data), manifest['bss_linkage_sha256'])
+        self.assertEqual(len(linked['sdk_references']), 1)
+        self.assertEqual(linked['sdk_references'][0]['section'], '.text.sta_recv_assoc')
+        rows = {row['name']: row for row in linked['layout']['functions']}
+        target = int(rows['ieee80211_set_bss_max_idle_period']['start'], 0)
+        calls = [b for b in rows['sta_recv_assoc']['symbol_bindings']
+                 if b['name'] == 'ieee80211_set_bss_max_idle_period']
+        self.assertEqual([b['address'] for b in calls], [target])
+        self.assertFalse(linked['whole_image_completeness_proved'])
+
 
 def main():
     """Write a fresh result on success and fail the caller on any integrity mismatch."""

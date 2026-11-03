@@ -1,6 +1,7 @@
 # План улучшения восстановленной Small TV
 
-Обновлено: 2026-10-26. База: `main` / `51cd114f9`; текущие checkpoints ниже.
+Обновлено: 2026-11-03. Продолжение от `smart-tv` / `9124ecbe6` в ветке
+`codex/small-tv-parity-20261103`; прежние checkpoints сохранены ниже.
 
 Цель — восстановить полезное поведение заводской прошивки ESP32-C2, исправляя
 её подтверждённые ошибки. Сопоставлять ассемблер, декомпиляцию и наш C-код в обе
@@ -352,6 +353,16 @@ GPIO18/LEDC, Wi-Fi, настройки/фото после потери пита
 кадры не подтверждают электрические состояния GPIO и RF.
 
 ## 5. Аудит всего заводского образа
+
+3 November 2026: `BSS-IE-LENGTH` исправлен в локальном C2 adapter без изменения
+общего SDK. Подтверждены short IE 0/1/2 в обеих прежних прошивках, реальные
+management/reassociation ingress и регистрация callback. 15 435 RV32 запусков,
+6 304 native, 3 727 privacy, 26 nothrow, 9 artifact и 17 correspondence checks pass;
+app `564ea463fc98` / ELF `e01db928f75f` архивированы. BSS по умолчанию остаётся off.
+См. [WIFI_BSS_LENGTH.md](tests/WIFI_BSS_LENGTH.md). Полный association lifecycle,
+RF, peer lifetime, full-suite/24h/hardware остаются открытыми. Новый приоритет
+пользователя — полная Ghidra-декомпиляция приложения с явным учётом пробелов;
+это не заменяет проверку соответствия и оставшиеся исправления.
 
 26Oct: [Storage fix](tests/NVS_STORAGE_FIX.md) возвращает точные ошибки через
 PageManager/Storage и освобождает temporary indices при каждом выходе.

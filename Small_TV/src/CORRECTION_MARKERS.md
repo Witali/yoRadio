@@ -130,6 +130,10 @@ body остаётся как контроль; ROM/table ingress провере�
 
 Найти все отметки из корня репозитория:
 
+`small_tv_wifi_set_bss_max_idle_period` in `app/network/wifi_bss.c` adds
+`FIXED_FACTORY` for short BSS Max Idle IEs, preserving valid period/options
+and logging. See [WIFI_BSS_LENGTH.md](tests/WIFI_BSS_LENGTH.md).
+
 ```powershell
 rg -n 'FIXED_FACTORY|FIXED_RECONSTRUCTION|FIXED_TEST|REQUESTED_CHANGE' Small_TV/src/app Small_TV/src/third_party/tjpgd Small_TV/src/tests Small_TV/src/tools
 ```

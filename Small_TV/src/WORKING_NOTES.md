@@ -1,5 +1,29 @@
 # Контекст работы над восстановленной Small TV
 
+## Продолжение в новом чате — 3 November 2026
+
+Recovered chat: «Определить контроллер и память». Continue from `smart-tv` /
+`9124ecbe6` in `.worktree/small-tv-parity-20261103`, branch
+`codex/small-tv-parity-20261103`. Both unfinished BSS qualification files were
+copied from the previous checkout, which remains unchanged.
+Hardware: ESP32-C2 / ESP8684H, 4 MiB flash, 272 KiB SRAM including 16 KiB cache,
+26 MHz crystal, ST7789-family 240×240 display. Identification is historical.
+
+`BSS-IE-LENGTH` is corrected and qualified: 15,435 RV32 executions, original
+24/24 and corrected 22/22 setter instruction starts; 6,304 native checks, 3,727
+privacy assertions, 26 nothrow cases, 9 artifact and 17 correspondence tests pass.
+App `564ea463fc98` / ELF `e01db928f75f`
+are saved under this worktree's firmware/development directory. The build gate
+checks the actual same-object SDK call. See [WIFI_BSS_LENGTH.md](tests/WIFI_BSS_LENGTH.md).
+Default BSS remains off. Full association/RF/peer lifetime and full-suite/24-hour/
+hardware remain open. No physical device was flashed or reset.
+
+New user priority: decompile the entire factory application with Ghidra and
+account for remaining gaps, preserving original projects and private data.
+The first full export and expanded SDK-gap analysis are local under
+`.build/factory-full-20261103/`; raw pseudocode is not approved for publication.
+The original feature-parity and bug-fixing objective remains in scope.
+
 ## Общая ветка smart-tv — 28 October 2026
 
 Current development is `.worktree/smart-tv-integration`, branch `smart-tv`.

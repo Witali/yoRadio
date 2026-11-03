@@ -1,5 +1,8 @@
 # Функциональные тесты Small TV ESP32-C2
 
+Short BSS Max Idle IE correction and 15,435 cross-image RV32 executions:
+[WIFI_BSS_LENGTH.md](WIFI_BSS_LENGTH.md).
+
 Offline production JPEG dependency и проверки повреждённых исходников/сборочного
 кэша описаны в [JPEG_DEPENDENCY_BUILD.md](JPEG_DEPENDENCY_BUILD.md). Компиляция
 adapter modules не означает включение нового декодера в UI/upload.

@@ -65,6 +65,8 @@ def inputs(root: Path) -> dict[str, str]:
     paths.update(root/name for name in ('tools/prepare_nvs_component.py', 'tools/nvs_component_sources.json',
                  'tools/verify_nvs_storage.py', 'tools/reverse/nvs_storage_linkage.py'))
     paths.update(root/name for name in ('tools/verify_wifi_keep_alive.py', 'tools/reverse/timer_event11_match.py'))
+    paths.update(root/name for name in ('tools/verify_wifi_bss.py', 'tools/reverse/bss_assoc.py',
+                                       'tools/reverse/wifi_producers.py'))
     return {p.relative_to(root.parent).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(paths)}
 
