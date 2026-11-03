@@ -14,8 +14,8 @@ VENDOR=REPO/'.idf/esp-adf-libs/esp_audio_codec'
 PUBLIC='idf/components/native_vorbis_xiph/upstream/libogg'
 CONFIG='idf/components/native_vorbis_xiph/platform'
 SOURCES=['idf/esp32-cyd2usb-native/main/'+n for n in ('ogg_playback.h','opus_family1_playback.h','opus_family1_decoder.h')]
-SOURCES+=['idf/components/native_stream/include/'+n for n in ('ogg_opus_audio_packets.h','ogg_page_input.h','ogg_opus_timeline.h','opus_pcm_trim.h','opus_family1_mapping.h','opus_multistream_framing.h','opus_tags_stream.h','decoder_pending_input.h','pcm_channel_layout.h')]
-SOURCES+=['tests/native/ogg_family1_dispatch_host.c','tests/native/opus_family1_playback_host.c','tests/native/opus_family1_public.h','tests/fixtures/opus_header_gain/generate.py','tests/run-ogg-family1-dispatch-host.py',PUBLIC+'/include/ogg/ogg.h',PUBLIC+'/include/ogg/os_types.h',PUBLIC+'/COPYING',CONFIG+'/ogg/config_types.h']
+SOURCES+=['idf/components/native_stream/include/'+n for n in ('ogg_opus_audio_packets.h','ogg_page_input.h','ogg_opus_timeline.h','opus_pcm_trim.h','opus_family1_mapping.h','opus_multistream_framing.h','opus_tags_stream.h','decoder_pending_input.h','pcm_channel_layout.h','pcm_word_plane.h')]
+SOURCES+=['tests/native/ogg_family1_dispatch_host.c','tests/native/ogg_family1_word_allocator.h','tests/native/ogg_family1_word_controls.h','tests/native/opus_family1_playback_host.c','tests/native/opus_family1_public.h','tests/fixtures/opus_header_gain/generate.py','tests/run-ogg-family1-dispatch-host.py',PUBLIC+'/include/ogg/ogg.h',PUBLIC+'/include/ogg/os_types.h',PUBLIC+'/COPYING',CONFIG+'/ogg/config_types.h']
 LONG=ROOT/'tests/fixtures/opus_ogg_long_packets/stereo-510-120ms.ogg'
 LONG_SHA='b6237ae8df98d3fabbea252eec82b291a46dfdb537cb5b9f537bf5e00bcd7679'
 STRESS=ROOT/'.build/opus-family1-120ms-probe-20261101-01/results/channels8-120ms.packets'
@@ -61,14 +61,27 @@ def main():
         report['compiler_version']=command('compiler-version',['/usr/bin/gcc','--version']).decode().splitlines()[0];compiler=command('compiler-path',['readlink','-f','/usr/bin/gcc']).decode().strip();report['compiler_identity']=command('compiler-sha',['sha256sum',compiler]).decode().strip();libraries=[]
         for name in ('libopus.so.0','libogg.so.0'):
             library=command(name+'-link',['/usr/bin/gcc','-print-file-name='+name]).decode().strip();need(library.startswith('/usr/') and '\n' not in library,'installed creator library');library=command(name+'-path',['readlink','-f',library]).decode().strip();identity=command(name+'-sha',['sha256sum',library]).decode().strip();libraries.append((name,library,identity));report[name+'_identity']=identity
-        binary=out/'dispatch';command('build',['/usr/bin/gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Werror','-Wpedantic','-Wformat=2','-Wshadow','-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie','-MMD','-MF',host(out/'dispatch.d'),
-            *['-I'+host(out/'sources/vendor/include'/name) for name in ('','decoder','decoder/impl','simple_dec')],'-I'+host(out/'sources/idf/esp32-cyd2usb-native/main'),'-I'+host(out/'sources/idf/components/native_stream/include'),
-            '-I'+host(out/'sources'/PUBLIC/'include'),'-I'+host(out/'sources'/CONFIG),host(out/'sources/tests/native/ogg_family1_dispatch_host.c'),'-l:libopus.so.0','-l:libogg.so.0','-lm','-o',host(binary)])
-        report['executable']=dict(path=binary.name,local_only=True,**pin(binary));report['compiler_dependencies']=dict(path='dispatch.d',**pin(out/'dispatch.d'));save()
-        rows=[json.loads(line) for line in command('test',['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1',host(binary),*[host(p) for p in paths]]).decode().splitlines()];result=rows[-1]
-        need(all(r['passed'] for r in rows) and result['positive_schedules']==43 and result['host_controls']==12 and result['creator_pcm_samples_exact']==12983296 and
-            result['gain_layout_forwarded'] and result['close_retry_preserves_cfg_page_planes'] and not result['native_oom_qualified'] and not result['production_task_executed'],'complete creator-backed dispatch/ownership/control inventory')
-        report['test_records']=rows;report['measurements']=result
+        report['variants']={}
+        stress_logical=struct.unpack_from('<I',STRESS.read_bytes(),24)[0]
+        for variant,word_enabled in (('byte',False),('word',True)):
+            binary=out/('dispatch-'+variant);dependency=out/('dispatch-'+variant+'.d')
+            command('build-'+variant,['/usr/bin/gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Werror','-Wpedantic','-Wformat=2','-Wshadow','-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie','-MMD','-MF',host(dependency),
+                *(['-DDISPATCH_WORD_STORAGE=1'] if word_enabled else []),
+                *['-I'+host(out/'sources/vendor/include'/name) for name in ('','decoder','decoder/impl','simple_dec')],'-I'+host(out/'sources/idf/esp32-cyd2usb-native/main'),'-I'+host(out/'sources/idf/components/native_stream/include'),
+                '-I'+host(out/'sources'/PUBLIC/'include'),'-I'+host(out/'sources'/CONFIG),host(out/'sources/tests/native/ogg_family1_dispatch_host.c'),'-l:libopus.so.0','-l:libogg.so.0','-lm','-o',host(binary)])
+            item=dict(executable=dict(path=binary.name,local_only=True,**pin(binary)),compiler_dependencies=dict(path=dependency.name,**pin(dependency)))
+            report['variants'][variant]=item;save()
+            rows=[json.loads(line) for line in command('test-'+variant,['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1',host(binary),*[host(p) for p in paths]]).decode().splitlines()]
+            summaries=[row for row in rows if row.get('suite')=='ogg-family1-dispatch'];need(len(summaries)==1,'one complete baseline inventory');result=summaries[0]
+            need(all(r['passed'] for r in rows) and result['positive_schedules']==43 and result['host_controls']==12 and result['creator_pcm_samples_exact']==12983296 and
+                result['gain_layout_forwarded'] and result['close_retry_preserves_cfg_page_planes'] and not result['native_oom_qualified'] and not result['production_task_executed'],'unchanged complete creator-backed43/12 corpus in '+variant)
+            word=rows[-1];need(word['suite']=='ogg-family1-word-storage' and word['enabled']==int(word_enabled) and word['controls']==(19 if word_enabled else 0) and
+                word['creator_pcm_samples_exact']==((4*stress_logical-1)*8 if word_enabled else 0) and word['peak_live_planes']==(16 if word_enabled else 0) and
+                (word['allocation_attempts']>0)==word_enabled and not word['native_oom_qualified'] and not word['native_word_access_qualified'],'separate tracked HOST word-storage coverage')
+            need(len(rows)==(76 if word_enabled else 57),'every baseline and extra control record retained')
+            item.update(test_records=rows,measurements=result,word_storage_measurements=word);save()
+        report['executable']=report['variants']['byte']['executable'];report['compiler_dependencies']=report['variants']['byte']['compiler_dependencies']
+        report['test_records']=report['variants']['byte']['test_records'];report['measurements']=report['variants']['byte']['measurements'];report['word_measurements']=report['variants']['word']['word_storage_measurements'];result=report['measurements']
         for name,library,identity in libraries:need(command(name+'-post-sha',['sha256sum',library]).decode().strip()==identity,'unchanged creator library')
         need(command('compiler-post-sha',['sha256sum',compiler]).decode().strip()==report['compiler_identity'],'unchanged compiler')
         for row in report['sources']:need(pin(row['path'])==pin(out/row['snapshot'])=={k:row[k] for k in ('bytes','sha256')},'all initial/final actual source bytes unchanged')

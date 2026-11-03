@@ -1,7 +1,7 @@
 #ifndef YORADIO_OPUS_FAMILY1_PLAYBACK_H
 #define YORADIO_OPUS_FAMILY1_PLAYBACK_H
 
-/* UNSELECTED adapter for a caller's SAME CRC-verified ogg_page_input owner.
+/* Adapter for a caller's SAME CRC-verified ogg_page_input owner.
  * Only family1 is handled here; this does not feed a second page observer.
  * Initialize at a stable address with {0}; do not move a live owner. The caller
  * routes the verified HEAD and every following page through ofp_page, including
@@ -18,8 +18,8 @@
  * failed close retains handles/config addresses, held page and packet storage.
  * Retry ofp_page on the SAME held EOS page, or call ofp_abandon until successful.
  * Any other error is terminal for this owner until successful ofp_abandon.
- * Never call the old void ogp_reset/opi_reset, publish a released generation or
- * acknowledge decoder maintenance while ofp_abandon reports cleanup_pending.
+ * Never reset its page owner, publish a released generation or acknowledge
+ * decoder maintenance while ofp_abandon reports cleanup_pending.
  * After successful abandon the caller must separately reset its page owner;
  * abandon does NOT fake an ACK or claim an incomplete link drained.
  *
@@ -30,6 +30,9 @@
  * gates: verified page + optional packet prefix + real public handles + scratch
  * <=23040B + <=92160B unique mapped-channel planes. Output gathers <=2048B in
  * the already-owned raw scratch AFTER every needed stream's PCM was staged.
+ * Classic ESP32 splits large plane sets into word-only allocations, allowing
+ * its public32-bit heap to use IRAM where available. Small/C1/C2 workspaces
+ * retain their byte-DRAM path. This does not change public packet cadence.
  * All-silent maps use immutable zero storage, not a per-owner stack/heap chunk.
  */
 #include "ogg_opus_audio_packets.h"
@@ -43,7 +46,23 @@
 #define OFP_FREE free
 #endif
 
-enum { OFP_CHUNK_FRAMES=128, OFP_RATE=48000 };
+#if defined(ESP_PLATFORM)
+#include "sdkconfig.h"
+#if defined(CONFIG_IDF_TARGET_ESP32) && CONFIG_IDF_TARGET_ESP32 && \
+    !defined(OFP_WORD_ALLOC) && !defined(OFP_WORD_FREE)
+#include "esp_heap_caps.h"
+#define OFP_WORD_ALLOC(bytes) heap_caps_malloc((bytes),MALLOC_CAP_INTERNAL|MALLOC_CAP_32BIT)
+#define OFP_WORD_FREE(pointer) heap_caps_free(pointer)
+#endif
+#endif
+#if defined(OFP_WORD_ALLOC) != defined(OFP_WORD_FREE)
+#error OFP_WORD_ALLOC and OFP_WORD_FREE must be provided together
+#endif
+#ifdef OFP_WORD_ALLOC
+#include "pcm_word_plane.h"
+#endif
+
+enum { OFP_CHUNK_FRAMES=128, OFP_RATE=48000, OFP_BYTE_PLANE_LIMIT=23040 };
 static const uint8_t ofp_zero_chunk[OFP_CHUNK_FRAMES*8*2]={0};
 typedef enum {
     OFP_OK=0,OFP_ARGUMENT,OFP_MOVED,OFP_BUSY,OFP_CANCELLED,OFP_CONTAINER,
@@ -75,6 +94,11 @@ typedef struct opus_family1_playback {
     uint8_t plane_for_speaker[8],plane_slot[8],plane_channel[8],plane_count;
     uint8_t *planes;
     size_t capacity,produced[8];
+#ifdef OFP_WORD_ALLOC
+    volatile uint32_t *word_planes[8];
+    size_t word_capacity; /* Rounded bytes per unique plane. */
+    bool word_mode;
+#endif
     uint16_t samples;
     uint32_t generation,serial;
     uint64_t close_page_token;
@@ -94,8 +118,64 @@ static inline ofp_result ofp_block(opus_family1_playback *s,ofp_status code,int 
 }
 static inline bool ofp_has_input(const opus_family1_playback *s) {
     return s && (s->phase!=OFP_EMPTY || s->blocked || s->packets.active || s->packets.prefix ||
-        s->planes || ofd_has_handles(&s->decoder));
+        s->planes || ofd_has_handles(&s->decoder)
+#ifdef OFP_WORD_ALLOC
+        || s->word_mode
+#endif
+        );
 }
+
+static inline void ofp_free_planes(opus_family1_playback *s) {
+    OFP_FREE(s->planes);s->planes=NULL;s->capacity=0;
+#ifdef OFP_WORD_ALLOC
+    for(unsigned plane=0;plane<8;++plane) {
+        if(s->word_planes[plane])OFP_WORD_FREE((void *)s->word_planes[plane]);
+        s->word_planes[plane]=NULL;
+    }
+    s->word_capacity=0;s->word_mode=false;
+#endif
+}
+
+#ifdef OFP_WORD_ALLOC
+static inline bool ofp_reserve_word_planes(opus_family1_playback *s,uint16_t samples) {
+    size_t bytes=((size_t)samples*2u+3u)&~(size_t)3u;
+    if(s->word_mode && bytes<=s->word_capacity)return true;
+    volatile uint32_t *candidate[8]={0};
+    for(unsigned plane=0;plane<s->plane_count;++plane) {
+        candidate[plane]=OFP_WORD_ALLOC(bytes);
+        if(!candidate[plane] || ((uintptr_t)candidate[plane]&3u)) {
+            for(unsigned owned=0;owned<=plane;++owned)
+                if(candidate[owned])OFP_WORD_FREE((void *)candidate[owned]);
+            return false;
+        }
+        pcm_word_plane_clear(candidate[plane],bytes/4u);
+    }
+    /* Previous-packet samples have already been published. Keep their storage
+     * unchanged until every replacement succeeds; never realloc/copy bytes
+     * through a pointer which may address32-bit-only IRAM.
+     */
+    ofp_free_planes(s);
+    for(unsigned plane=0;plane<s->plane_count;++plane)s->word_planes[plane]=candidate[plane];
+    s->word_capacity=bytes;s->capacity=bytes*s->plane_count;s->word_mode=true;
+    return true;
+}
+
+static inline bool ofp_gather_word_planes(const opus_family1_playback *s,size_t first,
+    size_t frames,uint8_t *output,size_t capacity,size_t *written) {
+    size_t bytes=frames*s->plan.channels*2u;
+    if(!output || !written || first>s->samples || frames>s->samples-first || bytes>capacity)return false;
+    size_t at=0;
+    for(size_t frame=0;frame<frames;++frame)for(unsigned speaker=0;speaker<s->plan.channels;++speaker) {
+        unsigned plane=s->plane_for_speaker[speaker];uint16_t bits=0;
+        if(plane!=OF1_SILENCE) {
+            if(plane>=s->plane_count || !s->word_planes[plane])return false;
+            bits=pcm_word_plane_load(s->word_planes[plane],first+frame);
+        }
+        output[at++]=(uint8_t)bits;output[at++]=(uint8_t)(bits>>8);
+    }
+    *written=at;return true;
+}
+#endif
 
 /* Real public close is retryable. Preserve ALL page/packet/plane ownership if
  * even one handle remains. The caller's ogg_page_input is never reset here.
@@ -108,7 +188,7 @@ static inline ofp_result ofp_abandon(opus_family1_playback *s) {
         s->blocked=true;
         ofp_result r=ofp_code(OFP_CLEANUP);r.decoder=closed;r.cleanup_pending=closed.cleanup_pending;return r;
     }
-    opk_reset(&s->packets);opt_reset(&s->trim);ots_reset(&s->tags);OFP_FREE(s->planes);s->planes=NULL;s->capacity=0;
+    opk_reset(&s->packets);opt_reset(&s->trim);ots_reset(&s->tags);ofp_free_planes(s);
     s->source=NULL;s->head_bytes=0;s->plane_count=0;s->samples=0;s->generation=s->serial=0;
     s->close_page_token=0;s->blocked=s->stage_active=false;s->phase=OFP_EMPTY;
     memset(s->produced,0,sizeof(s->produced));return ofp_code(OFP_OK);
@@ -126,6 +206,11 @@ static inline bool ofp_sink_begin(void *opaque,const opus_family1_plan *plan,uin
         c->error=OFP_DECODER;c->detail=OFD_CONTRACT;return false;
     }
     size_t bytes=(size_t)samples*s->plane_count*2u;
+#ifdef OFP_WORD_ALLOC
+    if(s->word_mode || bytes>OFP_BYTE_PLANE_LIMIT) {
+        if(!ofp_reserve_word_planes(s,samples)){c->error=OFP_MEMORY;c->detail=(int)bytes;return false;}
+    } else
+#endif
     if(bytes>s->capacity) {
         uint8_t *larger=OFP_REALLOC(s->planes,bytes);
         if(!larger){c->error=OFP_MEMORY;c->detail=(int)bytes;return false;}
@@ -143,6 +228,17 @@ static inline bool ofp_sink_write(void *opaque,uint8_t slot,uint8_t stream,uint8
     /* Only referenced decoded channels are staged. A coupled stream's unused
      * companion does not double persistent plane memory; duplicate maps alias.
      */
+#ifdef OFP_WORD_ALLOC
+    if(s->word_mode) {
+        for(unsigned plane=0;plane<s->plane_count;++plane)if(s->plane_slot[plane]==slot) {
+            for(size_t frame=0;frame<frames;++frame) {
+                const uint8_t *from=pcm+(frame*width+s->plane_channel[plane])*2u;
+                uint16_t bits=(uint16_t)((uint16_t)from[0]|((uint16_t)from[1]<<8));
+                pcm_word_plane_store(s->word_planes[plane],offset+frame,bits);
+            }
+        }
+    } else
+#endif
     for(unsigned plane=0;plane<s->plane_count;++plane)if(s->plane_slot[plane]==slot) {
         uint8_t *to=s->planes+((size_t)plane*s->samples+offset)*2u;
         for(size_t frame=0;frame<frames;++frame) {
@@ -160,6 +256,9 @@ static inline bool ofp_sink_finish(void *opaque) {
         c->error=OFP_DECODER;c->detail=OFD_CONTRACT;return false;
     }
     of1_channel_view views[8]={{0}};
+#ifdef OFP_WORD_ALLOC
+    if(!s->word_mode)
+#endif
     for(unsigned speaker=0;speaker<s->plan.channels;++speaker) {
         unsigned plane=s->plane_for_speaker[speaker];views[speaker].frames=s->samples;
         if(plane==OF1_SILENCE)views[speaker].silence=true;
@@ -178,7 +277,15 @@ static inline bool ofp_sink_finish(void *opaque) {
              * in independent planes. No next decode/close occurs until this
              * synchronous output callback returns, so scratch is reusable.
              */
-            if(!s->decoder.scratch || of1_gather_s16(views,s->plan.channels,first,frames,s->decoder.scratch,s->decoder.capacity,&written)!=OF1_OK) {
+            bool gathered=false;
+            if(s->decoder.scratch) {
+#ifdef OFP_WORD_ALLOC
+                if(s->word_mode)gathered=ofp_gather_word_planes(s,first,frames,s->decoder.scratch,s->decoder.capacity,&written);
+                else
+#endif
+                gathered=of1_gather_s16(views,s->plan.channels,first,frames,s->decoder.scratch,s->decoder.capacity,&written)==OF1_OK;
+            }
+            if(!gathered) {
                 c->error=OFP_DECODER;c->detail=OFD_CONTRACT;return false;
             }
             chunk=s->decoder.scratch;
@@ -212,7 +319,7 @@ static inline ofp_result ofp_close_eos(opus_family1_playback *s,ogg_page_input *
     if(audio && !opk_finish_link(&s->packets))return ofp_block(s,OFP_PACKET,OPK_INVALID);
     /* Empty links end on TAGS, before an AUDIO page lease exists. */
     if(!audio)opk_reset(&s->packets);
-    opt_reset(&s->trim);ots_reset(&s->tags);OFP_FREE(s->planes);s->planes=NULL;s->capacity=0;s->head_bytes=s->plane_count=0;
+    opt_reset(&s->trim);ots_reset(&s->tags);ofp_free_planes(s);s->head_bytes=s->plane_count=0;
     s->phase=OFP_EMPTY;s->source=NULL;s->close_page_token=0;return ofp_code(OFP_OK);
 }
 

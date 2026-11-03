@@ -2,10 +2,18 @@
  * real creator-backed raw handles and exact independent multistream references.
  * Its main is not executed and no byte of that canonical source is changed.
  */
+#ifdef DISPATCH_WORD_STORAGE
+#include <stddef.h>
+static void *dispatch_word_alloc(size_t);
+static void dispatch_word_free(void *);
+#define OFP_WORD_ALLOC dispatch_word_alloc
+#define OFP_WORD_FREE dispatch_word_free
+#endif
 #define main frozen_family1_component_main
 #include "opus_family1_playback_host.c"
 #undef main
 #include "ogg_playback.h"
+#include "ogg_family1_word_allocator.h"
 
 typedef struct {
     ogg_sync_state sync;ogg_stream_state stream;bool stream_ready;
@@ -14,6 +22,7 @@ typedef struct {
     esp_audio_simple_dec_info_t info;
 } dispatch_simple;
 static unsigned simple_opens,simple_closes,simple_calls,simple_live,dispatch_cases,dispatch_controls,layout_chunks,legacy_chunks;
+static unsigned word_storage_controls;
 static ogg_playback *current_wrapper;
 esp_audio_err_t esp_audio_simple_dec_open(esp_audio_simple_dec_cfg_t *cfg,esp_audio_simple_dec_handle_t *out) {
     assert(cfg && out && !*out && cfg->dec_type==ESP_AUDIO_SIMPLE_DEC_TYPE_OGG && !cfg->dec_cfg && !cfg->cfg_size && !cfg->use_frame_dec && !stats.live);
@@ -68,7 +77,7 @@ static void dispatch_yield(void *opaque) {
     opus_family1_playback *f=&c->wrapper->family1;
     if(f->phase==OFP_EOS_CLOSE && ofd_has_handles(&f->decoder)) {
         assert(c->wrapper->input.ready && c->wrapper->input.event.flags&OOPT_LINK_END && !c->wrapper->input.timeline.seen_eos &&
-            f->planes && f->packets.prefix && opk_page_exhausted(&f->packets) && f->trim.raw_position==f->trim.total && stats.live==1);
+            dispatch_planes_present(f) && f->packets.prefix && opk_page_exhausted(&f->packets) && f->trim.raw_position==f->trim.total && stats.live==1);
         bool found=false;for(unsigned i=0;i<8;++i)if(f->decoder.handle[i]) {cfg_stable(f->decoder.handle[i]);found=true;}assert(found);c->close_witness=true;
         if(c->cancel_at_close)c->cancelled=true;
     }
@@ -100,7 +109,7 @@ static physical dispatch_family0(const corpus *source,unsigned serial,int16_t ga
 }
 typedef struct {ogg_playback wrapper;esp_audio_simple_dec_handle_t decoder;uint8_t *pcm;size_t capacity;decoder_pending_input_t pending;} dispatch_player;
 static void dispatch_init(dispatch_player *p) {
-    assert(!simple_live);assert(ogp_reset(&p->wrapper,42));reset_backend(&p->wrapper.family1);current_wrapper=&p->wrapper;simple_opens=simple_closes=simple_calls=0;
+    assert(!simple_live);assert(ogp_reset(&p->wrapper,42));dispatch_word_reset();reset_backend(&p->wrapper.family1);current_wrapper=&p->wrapper;simple_opens=simple_closes=simple_calls=0;
 }
 static ogg_playback_status dispatch_feed(dispatch_player *p,dispatch_context *c,const physical *bytes,size_t chunk,int32_t *cause) {
     ogg_playback_callbacks cb=dispatch_callbacks(c);ogg_playback_status status=OGP_OK;
@@ -111,7 +120,7 @@ static ogg_playback_status dispatch_feed(dispatch_player *p,dispatch_context *c,
 static void dispatch_clean(dispatch_player *p) {
     if(p->decoder)esp_audio_simple_dec_close(p->decoder);
     p->decoder=NULL;free(p->pcm);p->pcm=NULL;p->capacity=0;decoder_pending_input_clear(&p->pending);assert(ogp_reset(&p->wrapper,43) && !ogp_has_input(&p->wrapper) && !simple_live && !stats.live && stats.created==stats.destroyed &&
-        !plane_alloc.pointer && !scratch_alloc.pointer && !packet_alloc.pointer);
+        !plane_alloc.pointer && !scratch_alloc.pointer && !packet_alloc.pointer && dispatch_word_empty());
 }
 static void dispatch_positive(const corpus *source,const reference *ref,unsigned style,size_t chunk,bool cached,int16_t gain,bool prepared) {
     physical bytes=make(source,style,source->channels+200u,false,false);put16(bytes.head+16,gain);
@@ -137,7 +146,7 @@ static void dispatch_chain(const corpus *sources,const reference *refs,size_t ch
     assert(simple_opens==simple_closes && simple_opens==(legacy_first?2u:1u));dispatch_clean(&p);++dispatch_cases;
     printf("{\"kind\":\"chain\",\"case\":%u,\"chunk\":%zu,\"legacy_first\":%u,\"links\":3,\"simple_opens\":%u,\"simple_closes\":%u,\"passed\":true}\n",dispatch_cases,chunk,(unsigned)legacy_first,simple_opens,simple_closes);
 }
-static void dispatch_close_control(const corpus *source,const reference *ref,unsigned mode) {
+static void dispatch_close_control(const corpus *source,const reference *ref,unsigned mode,bool word_control) {
     physical bytes=make(source,1,401,false,false);creator_walk(&bytes,source);dispatch_player p={0};dispatch_init(&p);stats.close_refuse=2;
     dispatch_context c={.wrapper=&p.wrapper,.reference=ref,.generation=42,.gain=1536,.expect_layout=true,.cancel_at_close=mode==1};ogg_playback_callbacks cb=dispatch_callbacks(&c);if(mode==2)cb.yield=NULL;
     int32_t cause=0;ogg_playback_status status=ogp_feed(&p.wrapper,bytes.data,bytes.size,true,&p.decoder,&p.pcm,&p.capacity,&p.pending,&cb,&cause);
@@ -145,16 +154,18 @@ static void dispatch_close_control(const corpus *source,const reference *ref,uns
         assert(status==OGP_OK && c.close_witness && c.emitted==ref->logical_frames && stats.closes==source->streams+1u && !stats.live && !p.wrapper.input.ready && p.wrapper.input.timeline.seen_eos);
     } else {
         assert(status==(mode==1?OGP_CANCELLED:OGP_DECODER) && c.emitted==ref->logical_frames && p.wrapper.input.ready && p.wrapper.input.event.flags&OOPT_LINK_END &&
-            !p.wrapper.input.timeline.seen_eos && stats.live==1 && p.wrapper.family1.planes && p.wrapper.family1.packets.prefix && p.wrapper.generation==42);
-        uint8_t *page=p.wrapper.input.page,*planes=p.wrapper.family1.planes,*prefix=p.wrapper.family1.packets.prefix;size_t held=p.wrapper.input.size;uint64_t token=p.wrapper.input.event.token;unsigned published=c.outputs;
+            !p.wrapper.input.timeline.seen_eos && stats.live==1 && dispatch_planes_present(&p.wrapper.family1) && p.wrapper.family1.packets.prefix && p.wrapper.generation==42);
+        dispatch_plane_snapshot planes=dispatch_snapshot(&p.wrapper.family1);
+        uint8_t *page=p.wrapper.input.page,*prefix=p.wrapper.family1.packets.prefix;size_t held=p.wrapper.input.size;uint64_t token=p.wrapper.input.event.token;unsigned published=c.outputs;
         uint8_t *saved=malloc(held);assert(saved);memcpy(saved,page,held);stats.close_refuse=stats.closes+1u;
         assert(!ogp_reset(&p.wrapper,77) && p.wrapper.generation==42 && p.wrapper.input.page==page && p.wrapper.input.size==held && p.wrapper.input.ready && p.wrapper.input.event.token==token &&
-            p.wrapper.family1.planes==planes && p.wrapper.family1.packets.prefix==prefix && !memcmp(page,saved,held) && stats.live==1 && c.outputs==published);
+            p.wrapper.family1.packets.prefix==prefix && !memcmp(page,saved,held) && stats.live==1 && c.outputs==published);
+        dispatch_snapshot_equal(&p.wrapper.family1,&planes);
         for(unsigned i=0;i<8;++i)if(p.wrapper.family1.decoder.handle[i])cfg_stable(p.wrapper.family1.decoder.handle[i]);
-        stats.close_refuse=0;assert(ogp_reset(&p.wrapper,43) && !stats.live && !p.wrapper.input.page && !p.wrapper.family1.planes && !p.wrapper.family1.packets.prefix && p.wrapper.generation==43 && c.outputs==published);free(saved);
+        stats.close_refuse=0;assert(ogp_reset(&p.wrapper,43) && !stats.live && !p.wrapper.input.page && !dispatch_planes_present(&p.wrapper.family1) && !p.wrapper.family1.packets.prefix && p.wrapper.generation==43 && c.outputs==published);free(saved);
     }
-    dispatch_clean(&p);physical_free(&bytes);++dispatch_controls;
-    printf("{\"kind\":\"close-control\",\"mode\":%u,\"status\":%d,\"close_witness\":%u,\"raw_created\":%u,\"raw_destroyed\":%u,\"close_calls\":%u,\"published_frames\":%zu,\"passed\":true}\n",mode,(int)status,(unsigned)c.close_witness,stats.created,stats.destroyed,stats.closes,c.emitted);
+    dispatch_clean(&p);physical_free(&bytes);if(word_control)++word_storage_controls;else ++dispatch_controls;
+    printf("{\"kind\":\"%sclose-control\",\"mode\":%u,\"status\":%d,\"close_witness\":%u,\"raw_created\":%u,\"raw_destroyed\":%u,\"close_calls\":%u,\"published_frames\":%zu,\"passed\":true}\n",word_control?"word-":"",mode,(int)status,(unsigned)c.close_witness,stats.created,stats.destroyed,stats.closes,c.emitted);
 }
 static void dispatch_failure(const corpus *source,const reference *ref,unsigned mode) {
     physical bytes=make(source,1,411,false,false);dispatch_player p={0};dispatch_init(&p);dispatch_context c={.wrapper=&p.wrapper,.reference=ref,.generation=42,.gain=1536,.expect_layout=true};ogg_playback_callbacks cb=dispatch_callbacks(&c);ogg_playback_status expected=OGP_OK;
@@ -187,6 +198,7 @@ static void dispatch_bad_tags(const corpus *source,const reference *ref) {
     dispatch_clean(&p);physical_free(&bytes);++dispatch_controls;
     printf("{\"kind\":\"tag-control\",\"public_raw_opens\":%u,\"public_simple_opens\":%u,\"cause\":%" PRId32 ",\"passed\":true}\n",stats.opens,simple_opens,cause);
 }
+#include "ogg_family1_word_controls.h"
 int main(int argc,char **argv) {
     assert(argc==6);corpus sources[5];reference refs[5];for(unsigned i=0;i<5;++i){sources[i]=load(argv[i+1]);refs[i]=creator_reference(sources+i);}
     for(unsigned fixture=0;fixture<3;++fixture)for(unsigned style=0;style<3;++style)for(unsigned feed=0;feed<2;++feed)dispatch_positive(sources+fixture,refs+fixture,style,feed?257:0,false,1536,false);
@@ -196,12 +208,17 @@ int main(int argc,char **argv) {
     const int16_t gains[4]={-1536,0,-32768,32767};for(unsigned i=0;i<4;++i)dispatch_positive(sources,refs,1,257,false,gains[i],false);
     dispatch_positive(sources+2,refs+2,1,257,false,1536,true);
     for(unsigned feed=0;feed<2;++feed)for(unsigned order=0;order<2;++order)dispatch_chain(sources,refs,feed?257:0,order!=0);
-    for(unsigned mode=0;mode<3;++mode)dispatch_close_control(sources+2,refs+2,mode);
+    for(unsigned mode=0;mode<3;++mode)dispatch_close_control(sources+2,refs+2,mode,false);
     for(unsigned mode=0;mode<8;++mode)dispatch_failure(sources+2,refs+2,mode);
     dispatch_bad_tags(sources+2,refs+2);
+    assert(dispatch_cases==43 && dispatch_controls==12 && compared_samples==UINT64_C(12983296));
+    uint64_t base_samples=compared_samples;
+    unsigned base_layout_chunks=layout_chunks,base_legacy_chunks=legacy_chunks;
+    dispatch_word_controls(sources+4,refs+4);
     for(unsigned i=0;i<5;++i){free(refs[i].pcm);corpus_free(sources+i);}
     assert(!stats.live && !simple_live && !plane_alloc.pointer && !scratch_alloc.pointer && !packet_alloc.pointer);
     printf("{\"suite\":\"ogg-family1-dispatch\",\"passed\":true,\"positive_schedules\":%u,\"host_controls\":%u,\"creator_pcm_samples_exact\":%" PRIu64
         ",\"family1_output_chunks\":%u,\"legacy_output_chunks\":%u,\"gain_layout_forwarded\":true,\"close_retry_preserves_cfg_page_planes\":true,\"native_oom_qualified\":false,\"production_task_executed\":false}\n",
-        dispatch_cases,dispatch_controls,compared_samples,layout_chunks,legacy_chunks);return 0;
+        dispatch_cases,dispatch_controls,base_samples,base_layout_chunks,base_legacy_chunks);
+    printf("{\"suite\":\"ogg-family1-word-storage\",\"passed\":true,\"enabled\":%u,\"controls\":%u,\"creator_pcm_samples_exact\":%" PRIu64 ",\"peak_live_planes\":%u,\"allocation_attempts\":%u,\"native_oom_qualified\":false,\"native_word_access_qualified\":false}\n",dispatch_word_enabled(),word_storage_controls,compared_samples-base_samples,dispatch_word_peak(),dispatch_word_attempts());return 0;
 }
