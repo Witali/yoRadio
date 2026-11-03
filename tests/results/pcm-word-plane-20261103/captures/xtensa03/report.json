@@ -1,0 +1,434 @@
+{
+  "passed": true,
+  "SDK_started": false,
+  "QEMU_started": false,
+  "object_executed": false,
+  "linked": false,
+  "sources": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_stream\\include\\pcm_word_plane.h",
+      "snapshot": "sources/pcm_word_plane.h",
+      "bytes": 1588,
+      "sha256": "8b3c80edffd3298e2ccd1816fe20aa1cf6cbf30c367aad7035448f35ce868b6b"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\native\\pcm_word_plane_xtensa_probe.c",
+      "snapshot": "sources/pcm_word_plane_xtensa_probe.c",
+      "bytes": 669,
+      "sha256": "8837ea7c0f4413aacf11e937f4f4437bc4e3ba352563c0d5531ad688a54e99b6"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\pcm_word_plane\\inspect_xtensa.py",
+      "snapshot": "sources/inspect_xtensa.py",
+      "bytes": 2894,
+      "sha256": "307011f6f02ecf2244ce1d7a55e2bc38316f17c6907f78af17b08afdf37a813a"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\check-pcm-word-plane-xtensa.py",
+      "snapshot": "sources/check-pcm-word-plane-xtensa.py",
+      "bytes": 7292,
+      "sha256": "5b9b074d2f67f762fd7ad0cc9728a574b1c8dc4fe414524638100c96c87a2449"
+    }
+  ],
+  "commands": [
+    {
+      "name": "compiler-version",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+        "--version"
+      ],
+      "pid": 30592,
+      "state": "complete",
+      "stdout": {
+        "path": "compiler-version.stdout.log",
+        "bytes": 272,
+        "sha256": "2bc27a9674734ab4e4a07514743a150bc75331b49299574b9218e21a51e62c0e"
+      },
+      "stderr": {
+        "path": "compiler-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.030999999988125637
+    },
+    {
+      "name": "objdump-version",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "--version"
+      ],
+      "pid": 12212,
+      "state": "complete",
+      "stdout": {
+        "path": "objdump-version.stdout.log",
+        "bytes": 302,
+        "sha256": "ef6bfa561d421f034aeff6bdfb7910f45866ce01fac008fa99b316758b33ed57"
+      },
+      "stderr": {
+        "path": "objdump-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.0470000000204891
+    },
+    {
+      "name": "O2-compile",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-ffreestanding",
+        "-fno-builtin",
+        "-fno-stack-protector",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fno-lto",
+        "-fstrict-volatile-bitfields",
+        "-IC:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\sources",
+        "-O2",
+        "-c",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\sources\\pcm_word_plane_xtensa_probe.c",
+        "-o",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\O2.o"
+      ],
+      "pid": 29112,
+      "state": "complete",
+      "stdout": {
+        "path": "O2-compile.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "O2-compile.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.09299999999348074
+    },
+    {
+      "name": "O2-disassemble",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dr",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\O2.o"
+      ],
+      "pid": 13632,
+      "state": "complete",
+      "stdout": {
+        "path": "O2-disassemble.stdout.log",
+        "bytes": 1928,
+        "sha256": "6d07769e7d5adcbe4a181a52c946ba0953cac930165474f82ee681bbe5c0ec38"
+      },
+      "stderr": {
+        "path": "O2-disassemble.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.046999999991385266
+    },
+    {
+      "name": "O3-compile",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-ffreestanding",
+        "-fno-builtin",
+        "-fno-stack-protector",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fno-lto",
+        "-fstrict-volatile-bitfields",
+        "-IC:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\sources",
+        "-O3",
+        "-c",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\sources\\pcm_word_plane_xtensa_probe.c",
+        "-o",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\O3.o"
+      ],
+      "pid": 27440,
+      "state": "complete",
+      "stdout": {
+        "path": "O3-compile.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "O3-compile.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.09400000001187436
+    },
+    {
+      "name": "O3-disassemble",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dr",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\O3.o"
+      ],
+      "pid": 1508,
+      "state": "complete",
+      "stdout": {
+        "path": "O3-disassemble.stdout.log",
+        "bytes": 1928,
+        "sha256": "9a8aa3c47eb5cb04b79ca230242df1fa59efee96984412c3535b72719350b8ff"
+      },
+      "stderr": {
+        "path": "O3-disassemble.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.046999999991385266
+    },
+    {
+      "name": "forbidden-compile",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-ffreestanding",
+        "-fno-builtin",
+        "-fno-stack-protector",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-fno-lto",
+        "-fstrict-volatile-bitfields",
+        "-IC:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\sources",
+        "-O2",
+        "-c",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\sources\\forbidden_width_probe.c",
+        "-o",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\forbidden.o"
+      ],
+      "pid": 16296,
+      "state": "complete",
+      "stdout": {
+        "path": "forbidden-compile.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "forbidden-compile.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.09400000001187436
+    },
+    {
+      "name": "forbidden-disassemble",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dr",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-03\\forbidden.o"
+      ],
+      "pid": 29524,
+      "state": "complete",
+      "stdout": {
+        "path": "forbidden-disassemble.stdout.log",
+        "bytes": 925,
+        "sha256": "01269d9930bd6fd8f6f43b85935cf0743360ad238050e4b2e1658165e6042a06"
+      },
+      "stderr": {
+        "path": "forbidden-disassemble.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.046999999991385266
+    },
+    {
+      "name": "historical01-disassemble",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dr",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-01\\O2.o"
+      ],
+      "pid": 31868,
+      "state": "complete",
+      "stdout": {
+        "path": "historical01-disassemble.stdout.log",
+        "bytes": 2213,
+        "sha256": "238ed0edadbee887f55c30abd3c24383a7baa7db9a73152f4397ef3fe53762c9"
+      },
+      "stderr": {
+        "path": "historical01-disassemble.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.046000000002095476
+    }
+  ],
+  "probes": {
+    "O2": {
+      "object": {
+        "path": "O2.o",
+        "bytes": 1728,
+        "sha256": "709320d78df7a5eff7f28b11befbb84ab49aea91ca61b1d76eba4859bdbde96a"
+      },
+      "inspection": {
+        "pcm_word_probe_clear": {
+          "instructions": 12,
+          "word_memory_operands": [
+            "s32i.n"
+          ],
+          "ordinary_stack_word_operands": [],
+          "authenticated_literal_operands": [],
+          "additionally_storage_only_operands": true
+        },
+        "pcm_word_probe_store": {
+          "instructions": 17,
+          "word_memory_operands": [
+            "l32i.n",
+            "s32i.n"
+          ],
+          "ordinary_stack_word_operands": [],
+          "authenticated_literal_operands": [],
+          "additionally_storage_only_operands": true
+        },
+        "pcm_word_probe_load": {
+          "instructions": 11,
+          "word_memory_operands": [
+            "l32i.n"
+          ],
+          "ordinary_stack_word_operands": [],
+          "authenticated_literal_operands": [],
+          "additionally_storage_only_operands": true
+        }
+      }
+    },
+    "O3": {
+      "object": {
+        "path": "O3.o",
+        "bytes": 1728,
+        "sha256": "709320d78df7a5eff7f28b11befbb84ab49aea91ca61b1d76eba4859bdbde96a"
+      },
+      "inspection": {
+        "pcm_word_probe_clear": {
+          "instructions": 12,
+          "word_memory_operands": [
+            "s32i.n"
+          ],
+          "ordinary_stack_word_operands": [],
+          "authenticated_literal_operands": [],
+          "additionally_storage_only_operands": true
+        },
+        "pcm_word_probe_store": {
+          "instructions": 17,
+          "word_memory_operands": [
+            "l32i.n",
+            "s32i.n"
+          ],
+          "ordinary_stack_word_operands": [],
+          "authenticated_literal_operands": [],
+          "additionally_storage_only_operands": true
+        },
+        "pcm_word_probe_load": {
+          "instructions": 11,
+          "word_memory_operands": [
+            "l32i.n"
+          ],
+          "ordinary_stack_word_operands": [],
+          "authenticated_literal_operands": [],
+          "additionally_storage_only_operands": true
+        }
+      }
+    }
+  },
+  "tools": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    },
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    }
+  },
+  "historical01_readonly_literal_reinspection": {
+    "original_status": "NONPASS",
+    "original_report_sha256": "edf0319d29a42f9f4e5b320e6a5de21f48551e8d255628f577302c25d9995530",
+    "object": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\pcm-word-plane-xtensa-20261101-01\\O2.o",
+      "bytes": 2036,
+      "sha256": "05f931d710bb65f43b6fb3a3085e78dcbcf0293ddd89616879628e823bd8e675"
+    },
+    "inspection": {
+      "pcm_word_probe_clear": {
+        "instructions": 12,
+        "word_memory_operands": [
+          "s32i.n"
+        ],
+        "ordinary_stack_word_operands": [],
+        "authenticated_literal_operands": [],
+        "additionally_storage_only_operands": true
+      },
+      "pcm_word_probe_store": {
+        "instructions": 19,
+        "word_memory_operands": [
+          "l32i.n",
+          "s32i.n"
+        ],
+        "ordinary_stack_word_operands": [],
+        "authenticated_literal_operands": [
+          {
+            "mnemonic": "l32r",
+            "target": ".literal.pcm_word_probe_store",
+            "metadata": {
+              "readonly": true,
+              "bytes": 4,
+              "alignment": 4,
+              "value_u32": 65535,
+              "contents_sha256": "08efea1c0957a5a1fe019e6edb21fdc9fbe5de2213487eab7a05e06eca1c9784",
+              "ELF_section_flags": 6
+            }
+          }
+        ],
+        "additionally_storage_only_operands": false
+      },
+      "pcm_word_probe_load": {
+        "instructions": 11,
+        "word_memory_operands": [
+          "l32i.n"
+        ],
+        "ordinary_stack_word_operands": [],
+        "authenticated_literal_operands": [],
+        "additionally_storage_only_operands": true
+      }
+    },
+    "original_capture_mutated": false,
+    "object_executed": false
+  },
+  "all_source_tool_bindings_unchanged": true,
+  "forbidden_width_controls": [
+    {
+      "probe": "forbidden_byte",
+      "rejected": true,
+      "reason": "no narrow/FP/literal/unknown load: l8ui"
+    },
+    {
+      "probe": "forbidden_half",
+      "rejected": true,
+      "reason": "no narrow/FP/unknown store: s16i"
+    },
+    {
+      "probe": "forbidden_float",
+      "rejected": true,
+      "reason": "no narrow/FP/literal/unknown load: lsi"
+    }
+  ]
+}

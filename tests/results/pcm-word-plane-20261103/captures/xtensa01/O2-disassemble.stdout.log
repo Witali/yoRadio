@@ -1,0 +1,65 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\pcm-word-plane-xtensa-20261101-01\O2.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.pcm_word_probe_store:
+
+00000000 <.literal.pcm_word_probe_store>:
+   0:	0000ffff 	
+
+Disassembly of section .text.pcm_word_probe_clear:
+
+00000000 <pcm_word_probe_clear>:
+   0:	004136        	entry	a1, 32
+   3:	539c      	beqz.n	a3, 1c <pcm_word_probe_clear+0x1c>
+			3: R_XTENSA_SLOT0_OP	.text.pcm_word_probe_clear+0x1c
+   5:	1183e0        	slli	a8, a3, 2
+   8:	fcc882        	addi	a8, a8, -4
+   b:	418280        	srli	a8, a8, 2
+   e:	090c      	movi.n	a9, 0
+  10:	881b      	addi.n	a8, a8, 1
+  12:	068876        	loop	a8, 1c <pcm_word_probe_clear+0x1c>
+			12: R_XTENSA_SLOT0_OP	.text.pcm_word_probe_clear+0x1c
+  15:	0020c0        	memw
+  18:	0299      	s32i.n	a9, a2, 0
+  1a:	224b      	addi.n	a2, a2, 4
+  1c:	f01d      	retw.n
+
+Disassembly of section .text.pcm_word_probe_store:
+
+00000000 <pcm_word_probe_store>:
+   0:	004136        	entry	a1, 32
+   3:	418130        	srli	a8, a3, 1
+   6:	a02820        	addx4	a2, a8, a2
+   9:	043030        	extui	a3, a3, 0, 1
+   c:	000081        	l32r	a8, fffc000c <pcm_word_probe_store+0xfffc000c>
+			c: R_XTENSA_SLOT0_OP	.literal.pcm_word_probe_store
+   f:	0020c0        	memw
+  12:	0298      	l32i.n	a9, a2, 0
+  14:	1133c0        	slli	a3, a3, 4
+  17:	401300        	ssl	a3
+  1a:	a18800        	sll	a8, a8
+  1d:	f44040        	extui	a4, a4, 0, 16
+  20:	108890        	and	a8, a8, a9
+  23:	308890        	xor	a8, a8, a9
+  26:	401300        	ssl	a3
+  29:	a14400        	sll	a4, a4
+  2c:	208840        	or	a8, a8, a4
+  2f:	0020c0        	memw
+  32:	0289      	s32i.n	a8, a2, 0
+  34:	f01d      	retw.n
+
+Disassembly of section .text.pcm_word_probe_load:
+
+00000000 <pcm_word_probe_load>:
+   0:	004136        	entry	a1, 32
+   3:	418130        	srli	a8, a3, 1
+   6:	a08820        	addx4	a8, a8, a2
+   9:	0020c0        	memw
+   c:	0828      	l32i.n	a2, a8, 0
+   e:	043030        	extui	a3, a3, 0, 1
+  11:	1133c0        	slli	a3, a3, 4
+  14:	400300        	ssr	a3
+  17:	912020        	srl	a2, a2
+  1a:	f42020        	extui	a2, a2, 0, 16
+  1d:	f01d      	retw.n

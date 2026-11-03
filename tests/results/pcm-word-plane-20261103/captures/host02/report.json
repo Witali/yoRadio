@@ -1,0 +1,177 @@
+{
+  "passed": true,
+  "HOST_only": true,
+  "SDK_started": false,
+  "QEMU_started": false,
+  "native_memory_access_qualified": false,
+  "sources": [
+    {
+      "path": "idf/components/native_stream/include/pcm_word_plane.h",
+      "snapshot": "sources/idf/components/native_stream/include/pcm_word_plane.h",
+      "sha256": "8b3c80edffd3298e2ccd1816fe20aa1cf6cbf30c367aad7035448f35ce868b6b",
+      "bytes": 1588
+    },
+    {
+      "path": "tests/native/pcm_word_plane_host.c",
+      "snapshot": "sources/tests/native/pcm_word_plane_host.c",
+      "sha256": "bdf85df21a33b9c2bea70932f280a1e81c443fb8019f72f46215a55ad7efa91e",
+      "bytes": 6137
+    },
+    {
+      "path": "tests/run-pcm-word-plane-host.py",
+      "snapshot": "sources/tests/run-pcm-word-plane-host.py",
+      "sha256": "5f55cf2fb9c83ddc605be25c79a45c9827aa50b50926b981e084ed1c1a8b779b",
+      "bytes": 4050
+    }
+  ],
+  "commands": [
+    {
+      "name": "compiler-version",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "--version"
+      ],
+      "pid": 20756,
+      "state": "complete",
+      "stdout": {
+        "path": "compiler-version.stdout.log",
+        "bytes": 246,
+        "sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048"
+      },
+      "stderr": {
+        "path": "compiler-version.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 2.2660000000032596
+    },
+    {
+      "name": "compiler-path",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "which",
+        "gcc"
+      ],
+      "pid": 22024,
+      "state": "complete",
+      "stdout": {
+        "path": "compiler-path.stdout.log",
+        "bytes": 13,
+        "sha256": "03bead4187cf1c5ae2900e2aaeafb256b351af8e3c8b980892a16c6cea81e4f3"
+      },
+      "stderr": {
+        "path": "compiler-path.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.10899999999674037
+    },
+    {
+      "name": "compiler-sha",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "sha256sum",
+        "/usr/bin/gcc"
+      ],
+      "pid": 18084,
+      "state": "complete",
+      "stdout": {
+        "path": "compiler-sha.stdout.log",
+        "bytes": 79,
+        "sha256": "db0fc73917e80882e866bb733900c53f7aa07ba2785dd9ed41a7ca5c7a362da5"
+      },
+      "stderr": {
+        "path": "compiler-sha.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.09399999998277053
+    },
+    {
+      "name": "build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O2",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fsanitize=address,undefined",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-word-plane-host-20261101-02/sources/idf/components/native_stream/include",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-word-plane-host-20261101-02/sources/tests/native/pcm_word_plane_host.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-word-plane-host-20261101-02/word-plane-host"
+      ],
+      "pid": 18936,
+      "state": "complete",
+      "stdout": {
+        "path": "build.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "build.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.8440000000118744
+    },
+    {
+      "name": "test",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1",
+        "timeout",
+        "60",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/pcm-word-plane-host-20261101-02/word-plane-host"
+      ],
+      "pid": 25832,
+      "state": "complete",
+      "stdout": {
+        "path": "test.stdout.log",
+        "bytes": 193,
+        "sha256": "947ab8f8fcd090afc86761726d2046bbc5574027883fc180e369cbc964247f46"
+      },
+      "stderr": {
+        "path": "test.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_status": 0,
+      "seconds": 0.15599999998812564
+    }
+  ],
+  "all_source_bindings_unchanged": true,
+  "measurements": {
+    "passed": true,
+    "groups": 127,
+    "exhaustive_bit_patterns": 65536,
+    "checked_samples": 468228,
+    "immutable_DRAM": true,
+    "word_canaries": true,
+    "timer_dependency": false,
+    "native_memory_access_qualified": false
+  },
+  "binary": {
+    "path": "word-plane-host",
+    "bytes": 92368,
+    "sha256": "d890e69c03e75ed3d0c3dfdfcd37c6792fd4f2f9603cad6bf5a4f4128ea43388"
+  }
+}

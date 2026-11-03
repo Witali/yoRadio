@@ -1,0 +1,32 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\pcm-word-plane-xtensa-20261103-01\forbidden.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .text.forbidden_byte:
+
+00000000 <forbidden_byte>:
+   0:	004136        	entry	a1, 32
+   3:	0020c0        	memw
+   6:	000222        	l8ui	a2, a2, 0
+   9:	742020        	extui	a2, a2, 0, 8
+   c:	f01d      	retw.n
+
+Disassembly of section .text.forbidden_half:
+
+00000000 <forbidden_half>:
+   0:	004136        	entry	a1, 32
+   3:	0020c0        	memw
+   6:	005232        	s16i	a3, a2, 0
+   9:	f01d      	retw.n
+
+Disassembly of section .text.forbidden_float:
+
+00000000 <forbidden_float>:
+   0:	006136        	entry	a1, 48
+   3:	0020c0        	memw
+   6:	000203        	lsi	f0, a2, 0
+   9:	fa1350        	wfr	f1, a3
+   c:	0a0010        	add.s	f0, f0, f1
+   f:	0139      	s32i.n	a3, a1, 0
+  11:	fa2040        	rfr	a2, f0
+  14:	f01d      	retw.n

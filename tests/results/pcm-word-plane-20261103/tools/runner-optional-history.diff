@@ -1,0 +1,67 @@
+--- frozen03/check-pcm-word-plane-xtensa.py
++++ current/tests/check-pcm-word-plane-xtensa.py
+@@ -10,9 +10,10 @@
+ def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+ def main():
+     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',required=True,type=Path);parser.add_argument('--tool-directory',type=Path,default=TOOLS)
++    parser.add_argument('--historical-capture',type=Path,help='Optional retained O2.o/report.json directory for readonly L32R reinspection')
+     args=parser.parse_args();out=args.output.resolve();assert out.is_relative_to(ROOT/'.build') and not out.exists();out.mkdir(parents=True);(out/'tmp').mkdir();(out/'sources').mkdir()
+     compiler=args.tool_directory/'xtensa-esp32-elf-gcc.exe';objdump=args.tool_directory/'xtensa-esp32-elf-objdump.exe';assert compiler.is_file() and objdump.is_file()
+-    report=dict(passed=False,SDK_started=False,QEMU_started=False,object_executed=False,linked=False,sources=[],commands=[],probes={})
++    report=dict(passed=False,SDK_started=False,QEMU_started=False,object_executed=False,linked=False,sources=[],commands=[],probes={},historical_reinspection_requested=args.historical_capture is not None)
+     def save():(out/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+     def execute(name,argv):
+         start=time.monotonic();process=subprocess.Popen(list(map(str,argv)),stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+@@ -47,28 +48,30 @@
+             try:inspector.inspect(text,(name,))
+             except ValueError as error:controls.append(dict(probe=name,rejected=True,reason=str(error)))
+             else:raise AssertionError('Forbidden-width object was accepted: '+name)
+-        # Reinspect the ORIGINAL01 object as data under the corrected width
+-        # requirement. Preserve its original overstrict NONPASS result/header.
+-        original=ROOT/'.build/pcm-word-plane-xtensa-20261101-01'
+-        historical=original/'O2.o';body=historical.read_bytes();assert body[:4]==b'\x7fELF' and body[4:6]==b'\x01\x01' and struct.unpack_from('<H',body,18)[0]==94
+-        offset=struct.unpack_from('<I',body,32)[0];size,count,names=struct.unpack_from('<HHH',body,46)
+-        sections=[struct.unpack_from('<10I',body,offset+index*size) for index in range(count)]
+-        names_row=sections[names];strings=body[names_row[4]:names_row[4]+names_row[5]]
+-        literals={}
+-        for section in sections:
+-            name=strings[section[0]:].split(b'\0',1)[0].decode()
+-            if name=='.literal.pcm_word_probe_store':
+-                contents=body[section[4]:section[4]+section[5]]
+-                assert section[1]==1 and section[2]&2 and not section[2]&1 and section[8]>=4 and contents==b'\xff\xff\0\0'
+-                literals[name]=dict(readonly=True,bytes=len(contents),alignment=section[8],value_u32=65535,
+-                    contents_sha256=hashlib.sha256(contents).hexdigest(),ELF_section_flags=section[2])
+-        assert len(literals)==1
+-        text=execute('historical01-disassemble',[objdump,'-dr',historical])
+-        report['historical01_readonly_literal_reinspection']=dict(original_status='NONPASS',original_report_sha256=sha(original/'report.json'),
+-            object=dict(path=str(historical),bytes=len(body),sha256=hashlib.sha256(body).hexdigest()),
+-            inspection=inspector.inspect(text,('pcm_word_probe_clear','pcm_word_probe_store','pcm_word_probe_load'),literals),
+-            original_capture_mutated=False,object_executed=False)
+-        assert historical.read_bytes()==body
++        if args.historical_capture is not None:
++            # Optional evidence is independent of the current helper gates.
++            # Its original overstrict NONPASS result/header stay unchanged.
++            original=args.historical_capture.resolve()
++            assert original.is_relative_to(ROOT/'.build') and not original.is_relative_to(out) and not out.is_relative_to(original)
++            historical=original/'O2.o';body=historical.read_bytes();assert body[:4]==b'\x7fELF' and body[4:6]==b'\x01\x01' and struct.unpack_from('<H',body,18)[0]==94
++            offset=struct.unpack_from('<I',body,32)[0];size,count,names=struct.unpack_from('<HHH',body,46)
++            sections=[struct.unpack_from('<10I',body,offset+index*size) for index in range(count)]
++            names_row=sections[names];strings=body[names_row[4]:names_row[4]+names_row[5]]
++            literals={}
++            for section in sections:
++                name=strings[section[0]:].split(b'\0',1)[0].decode()
++                if name=='.literal.pcm_word_probe_store':
++                    contents=body[section[4]:section[4]+section[5]]
++                    assert section[1]==1 and section[2]&2 and not section[2]&1 and section[8]>=4 and contents==b'\xff\xff\0\0'
++                    literals[name]=dict(readonly=True,bytes=len(contents),alignment=section[8],value_u32=65535,
++                        contents_sha256=hashlib.sha256(contents).hexdigest(),ELF_section_flags=section[2])
++            assert len(literals)==1
++            text=execute('historical01-disassemble',[objdump,'-dr',historical])
++            report['historical01_readonly_literal_reinspection']=dict(original_status='NONPASS',original_report_sha256=sha(original/'report.json'),
++                object=dict(path=str(historical),bytes=len(body),sha256=hashlib.sha256(body).hexdigest()),
++                inspection=inspector.inspect(text,('pcm_word_probe_clear','pcm_word_probe_store','pcm_word_probe_load'),literals),
++                original_capture_mutated=False,object_executed=False)
++            assert historical.read_bytes()==body
+         assert all(sha(row['path'])==row['sha256'] and sha(out/row['snapshot'])==row['sha256'] for row in report['sources'])
+         assert all(sha(path)==pin['sha256'] for path,pin in report['tools'].items())
+         report.update(passed=True,all_source_tool_bindings_unchanged=True,forbidden_width_controls=controls)

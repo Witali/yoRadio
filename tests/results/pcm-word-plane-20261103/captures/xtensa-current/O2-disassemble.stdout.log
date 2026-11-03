@@ -1,0 +1,57 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\pcm-word-plane-xtensa-20261103-01\O2.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .text.pcm_word_probe_clear:
+
+00000000 <pcm_word_probe_clear>:
+   0:	004136        	entry	a1, 32
+   3:	539c      	beqz.n	a3, 1c <pcm_word_probe_clear+0x1c>
+			3: R_XTENSA_SLOT0_OP	.text.pcm_word_probe_clear+0x1c
+   5:	1183e0        	slli	a8, a3, 2
+   8:	fcc882        	addi	a8, a8, -4
+   b:	418280        	srli	a8, a8, 2
+   e:	090c      	movi.n	a9, 0
+  10:	881b      	addi.n	a8, a8, 1
+  12:	068876        	loop	a8, 1c <pcm_word_probe_clear+0x1c>
+			12: R_XTENSA_SLOT0_OP	.text.pcm_word_probe_clear+0x1c
+  15:	0020c0        	memw
+  18:	0299      	s32i.n	a9, a2, 0
+  1a:	224b      	addi.n	a2, a2, 4
+  1c:	f01d      	retw.n
+
+Disassembly of section .text.pcm_word_probe_store:
+
+00000000 <pcm_word_probe_store>:
+   0:	004136        	entry	a1, 32
+   3:	418130        	srli	a8, a3, 1
+   6:	a02820        	addx4	a2, a8, a2
+   9:	0020c0        	memw
+   c:	0298      	l32i.n	a9, a2, 0
+   e:	043030        	extui	a3, a3, 0, 1
+  11:	1133c0        	slli	a3, a3, 4
+  14:	400300        	ssr	a3
+  17:	918090        	srl	a8, a9
+  1a:	308840        	xor	a8, a8, a4
+  1d:	f48080        	extui	a8, a8, 0, 16
+  20:	401300        	ssl	a3
+  23:	a18800        	sll	a8, a8
+  26:	308890        	xor	a8, a8, a9
+  29:	0020c0        	memw
+  2c:	0289      	s32i.n	a8, a2, 0
+  2e:	f01d      	retw.n
+
+Disassembly of section .text.pcm_word_probe_load:
+
+00000000 <pcm_word_probe_load>:
+   0:	004136        	entry	a1, 32
+   3:	418130        	srli	a8, a3, 1
+   6:	a08820        	addx4	a8, a8, a2
+   9:	0020c0        	memw
+   c:	0828      	l32i.n	a2, a8, 0
+   e:	043030        	extui	a3, a3, 0, 1
+  11:	1133c0        	slli	a3, a3, 4
+  14:	400300        	ssr	a3
+  17:	912020        	srl	a2, a2
+  1a:	f42020        	extui	a2, a2, 0, 16
+  1d:	f01d      	retw.n
