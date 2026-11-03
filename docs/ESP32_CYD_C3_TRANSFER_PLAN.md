@@ -100,6 +100,16 @@ NONPASS, аппаратные временные и ресурсные гара�
 cleanup; она не доказывает вместимость полного приложения. Новый полный
 actual-task gate остаётся открытым; исходные native05/06 сохраняют NONPASS.
 
+Первый полный прогон 3 ноября прошёл 13 references и 47/48 outputs, включая
+все 64 word allocations/frees, затем последняя цепочка получила отказ small
+byte workspace15360. Decoder handles закрылись; диагностический EOF guard
+остановился до завершения асинхронного HTTP cleanup. Для этого случая добавлен
+атомарный fallback byte→word без изменения обычного успешного byte пути.
+[Новый HOST checkpoint](../tests/results/cyd-ogg-family1-word-fallback-host-20261103/README.md)
+сохраняет прежние 43/12 и 19 contracts, добавляя четыре fallback проверки
+(всего23). Исходный полный прогон остаётся NONPASS; повторная полная матрица
+и отдельные native OOM/recovery/backpressure/normalizer gates ещё нужны.
+
 ## Что осталось по переносу
 
 После уточнения пользователя 28 октября, состояние на 3 ноября 2026 года:

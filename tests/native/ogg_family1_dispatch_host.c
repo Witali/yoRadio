@@ -69,6 +69,10 @@ typedef struct {
     ogg_playback *wrapper;const reference *reference;uint32_t generation;int16_t gain;size_t emitted;
     bool expect_layout,cancelled,close_witness,cancel_at_close;
     unsigned outputs,yields,output_fail,cancel_output,cancel_yield;
+#ifdef DISPATCH_WORD_STORAGE
+    unsigned fallback_word_planes,fallback_word_witnesses;
+    size_t fallback_word_capacity;
+#endif
 } dispatch_context;
 static bool dispatch_cancelled(void *opaque){return ((dispatch_context *)opaque)->cancelled;}
 static void dispatch_yield(void *opaque) {
@@ -90,6 +94,13 @@ static bool dispatch_pcm(dispatch_context *c,const esp_audio_simple_dec_info_t *
     if(layout) {
         opus_family1_playback *f=&c->wrapper->family1;assert(bytes<=128u*r->channels*2u && f->plan.header_gain_q8==gain && !simple_live);
         if(f->plan.needed)assert(pcm==f->decoder.scratch && f->decoder.capacity>=bytes && stats.live);else assert(pcm==ofp_zero_chunk && !stats.live);
+#ifdef DISPATCH_WORD_STORAGE
+        if(c->fallback_word_planes) {
+            assert(f->word_mode && !f->planes && f->plane_count==c->fallback_word_planes && f->word_capacity==c->fallback_word_capacity &&
+                dispatch_words.live==c->fallback_word_planes && plane_alloc.calls==1 && plane_alloc.refuse==1 && !plane_alloc.pointer);
+            ++c->fallback_word_witnesses;
+        }
+#endif
     } else assert(simple_live && !stats.live);
     ++c->outputs;
     if(c->outputs==c->cancel_output){c->cancelled=true;return false;}
@@ -173,7 +184,13 @@ static void dispatch_failure(const corpus *source,const reference *ref,unsigned 
     if(mode==1){c.cancel_output=3;expected=OGP_CANCELLED;}
     if(mode==2){c.cancel_yield=1;expected=OGP_CANCELLED;}
     if(mode==3){stats.open_refuse=2;expected=OGP_MEMORY;}
-    if(mode==4){plane_alloc.refuse=1;expected=OGP_MEMORY;}
+    if(mode==4){plane_alloc.refuse=1;expected=OGP_MEMORY;
+#ifdef DISPATCH_WORD_STORAGE
+        /* With a word fallback, a fatal allocation control must exhaust both
+         * independent HOST allocators. The byte-only baseline is unchanged. */
+        dispatch_words.refuse=1;
+#endif
+    }
     if(mode==5){scratch_alloc.refuse=1;expected=OGP_MEMORY;}
     if(mode==6){cb.output_layout=NULL;expected=OGP_INFO;}
     if(mode==7) {
@@ -186,6 +203,9 @@ static void dispatch_failure(const corpus *source,const reference *ref,unsigned 
     if(mode==2)assert(!c.outputs && !stats.live && p.wrapper.input.ready);
     if(mode==3)assert(stats.opens==2 && stats.created==1 && stats.destroyed==1 && !stats.live && !c.outputs && p.wrapper.input.ready);
     if(mode==4 || mode==5)assert(!stats.syntheses && !stats.live && !c.outputs && p.wrapper.input.ready && cause==(mode==4?15360:11520));
+#ifdef DISPATCH_WORD_STORAGE
+    if(mode==4)assert(dispatch_words.calls==1 && dispatch_word_empty());
+#endif
     if(mode==6)assert(!stats.opens && !c.outputs && p.wrapper.input.ready && p.wrapper.input.event.flags&OOPT_HEAD);
     if(mode==7)assert(!stats.decodes && !c.outputs && !p.wrapper.input.ready && p.wrapper.family1.packets.prefix_size==255 && stats.live==source->streams);
     dispatch_clean(&p);physical_free(&bytes);++dispatch_controls;
@@ -214,7 +234,7 @@ int main(int argc,char **argv) {
     assert(dispatch_cases==43 && dispatch_controls==12 && compared_samples==UINT64_C(12983296));
     uint64_t base_samples=compared_samples;
     unsigned base_layout_chunks=layout_chunks,base_legacy_chunks=legacy_chunks;
-    dispatch_word_controls(sources+4,refs+4);
+    dispatch_word_controls(sources+4,refs+4,sources+2,refs+2);
     for(unsigned i=0;i<5;++i){free(refs[i].pcm);corpus_free(sources+i);}
     assert(!stats.live && !simple_live && !plane_alloc.pointer && !scratch_alloc.pointer && !packet_alloc.pointer);
     printf("{\"suite\":\"ogg-family1-dispatch\",\"passed\":true,\"positive_schedules\":%u,\"host_controls\":%u,\"creator_pcm_samples_exact\":%" PRIu64

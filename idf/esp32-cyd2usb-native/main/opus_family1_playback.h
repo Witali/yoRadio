@@ -213,8 +213,16 @@ static inline bool ofp_sink_begin(void *opaque,const opus_family1_plan *plan,uin
 #endif
     if(bytes>s->capacity) {
         uint8_t *larger=OFP_REALLOC(s->planes,bytes);
-        if(!larger){c->error=OFP_MEMORY;c->detail=(int)bytes;return false;}
-        s->planes=larger;s->capacity=bytes;
+        if(!larger) {
+#ifdef OFP_WORD_ALLOC
+            /* A small byte workspace can still be refused after decoder/link
+             * transitions. Try the same atomic word-plane storage before
+             * reporting exhaustion; ordinary successful byte paths stay hot.
+             */
+            if(!ofp_reserve_word_planes(s,samples))
+#endif
+            {c->error=OFP_MEMORY;c->detail=(int)bytes;return false;}
+        } else {s->planes=larger;s->capacity=bytes;}
     }
     memset(s->produced,0,sizeof(s->produced));s->samples=samples;s->stage_active=true;return true;
 }

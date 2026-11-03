@@ -30,7 +30,10 @@ DRAM или D/IRAM. D/IRAM имеет два адресных представл
 это хранение используется для рабочих наборов больше 23040 B.
 Каждый уникальный используемый канал получает отдельную plane до 11520 B;
 дублирующие speaker mappings используют ту же plane, silence не требует plane.
-Малые наборы, включая C1/C2, сохраняют прежний byte-DRAM путь. Подключение через
+Малые наборы, включая C1/C2, сначала используют прежний byte-DRAM путь. При
+отказе его realloc classic ESP32 пробует тот же word allocator, сохраняя старый
+byte buffer до успешного выделения всех кандидатов. Ошибка памяти возвращается
+только при отказе обоих путей. Успешный обычный byte путь не меняется. Подключение через
 public heap capabilities ограничено classic ESP32; профиль ESP32-C3 не меняется.
 
 Замена storage должна происходить только после успешного выделения всех новых
@@ -41,11 +44,13 @@ packet и все нужные streams по-прежнему декодируют
 не меняются. Полный actual-task и ресурсный gate этого подключения остаётся
 открытым до отдельного завершённого SDK/QEMU прогона.
 
-[Интеграционный HOST-корпус](../tests/results/cyd-ogg-family1-word-storage-host-20261103/README.md)
+[Интеграционный HOST-корпус](../tests/results/cyd-ogg-family1-word-fallback-host-20261103/README.md)
 проходит с обоими видами хранения: по 43 schedules/12 controls и 12983296
-точных creator PCM samples. Ещё 19 проверок покрывают отказ первого/среднего/
+точных creator PCM samples. Ещё 23 проверки покрывают отказ первого/среднего/
 последнего кандидата, сохранение byte/word storage при отказе роста, нечётный
-trim, duplicate/silence maps и удержание planes при close refusal. Это
+trim, duplicate/silence maps и удержание planes при close refusal. Полный C8/20ms
+поток после отказа byte allocation проходит через восемь word planes по 1920 B;
+при отказе small-growth fallback старые pointer/capacity/bytes сохраняются. Это
 ASan/UBSan HOST evidence, отдельно от настоящих ESP32 allocations.
 
 Проверки helper воспроизводятся отдельно:

@@ -108,15 +108,35 @@ static void word_wrapper_allocation_refusal(const corpus *source,const reference
     assert(p.wrapper.input.ready && !p.wrapper.input.timeline.seen_eos && p.wrapper.generation==42);
     dispatch_clean(&p);physical_free(&bytes);word_storage_record("wrapper-allocation-error-and-real-handle-cleanup",ordinal);
 }
-static void dispatch_word_controls(const corpus *source,const reference *ref) {
+static void word_small_fallback(const corpus *source,const reference *ref) {
+    assert(source->channels==8);physical bytes=make(source,1,461,false,false);creator_walk(&bytes,source);dispatch_player p={0};dispatch_init(&p);plane_alloc.refuse=1;
+    dispatch_context c={.wrapper=&p.wrapper,.reference=ref,.generation=42,.gain=1536,.expect_layout=true,.fallback_word_planes=8,.fallback_word_capacity=1920};int32_t cause=0;
+    assert(dispatch_feed(&p,&c,&bytes,257,&cause)==OGP_OK && c.emitted==ref->logical_frames && c.outputs && c.fallback_word_witnesses==c.outputs);
+    assert(plane_alloc.calls==1 && !plane_alloc.pointer && dispatch_words.calls==8 && dispatch_words.frees==8 && dispatch_word_empty() && !stats.live &&
+        stats.created==source->streams && stats.destroyed==stats.created && stats.syntheses);
+    dispatch_clean(&p);physical_free(&bytes);word_storage_record("complete-creator-small-byte-refusal-fallback",960);
+}
+static void word_small_fallback_growth_refusal(unsigned ordinal) {
+    opus_family1_playback s={0};word_owner_init(&s);assert(word_stage(&s,480) && !s.word_mode && s.planes && s.capacity==7680);
+    for(size_t byte=0;byte<s.capacity;++byte)s.planes[byte]=(uint8_t)(byte*59u+17u);
+    word_abort(&s);dispatch_plane_snapshot previous=dispatch_snapshot(&s);unsigned byte_calls=plane_alloc.calls;
+    plane_alloc.refuse=byte_calls+1u;dispatch_words.refuse=ordinal;
+    assert(!word_stage(&s,960) && plane_alloc.calls==byte_calls+1u && dispatch_words.calls==ordinal && dispatch_words.frees==ordinal-1u && dispatch_word_empty());
+    dispatch_snapshot_equal(&s,&previous);
+    for(size_t byte=0;byte<s.capacity;++byte)assert(s.planes[byte]==(uint8_t)(byte*59u+17u));
+    word_owner_clean(&s);word_storage_record("small-byte-and-word-growth-refusal",ordinal);
+}
+static void dispatch_word_controls(const corpus *source,const reference *ref,const corpus *small,const reference *small_ref) {
     const unsigned ordinals[3]={1,4,8};
     for(unsigned mode=0;mode<3;++mode)for(unsigned index=0;index<3;++index)word_reserve_refusal(mode,ordinals[index]);
     word_alignment_refusal();word_successful_replacement();word_gather_contract();word_creator_odd_trim(source);
     for(unsigned mode=0;mode<3;++mode)dispatch_close_control(source,ref,mode,true);
     for(unsigned index=0;index<3;++index)word_wrapper_allocation_refusal(source,ref,ordinals[index]);
-    assert(word_storage_controls==19 && word_peak_live==16 && dispatch_word_empty());
+    word_small_fallback(small,small_ref);
+    for(unsigned index=0;index<3;++index)word_small_fallback_growth_refusal(ordinals[index]);
+    assert(word_storage_controls==23 && word_peak_live==16 && dispatch_word_empty());
 }
 #else
-static void dispatch_word_controls(const corpus *source,const reference *ref) {(void)source;(void)ref;}
+static void dispatch_word_controls(const corpus *source,const reference *ref,const corpus *small,const reference *small_ref) {(void)source;(void)ref;(void)small;(void)small_ref;}
 #endif
 #endif
