@@ -1,5 +1,11 @@
 # Small_TV stock firmware hardware analysis
 
+The [complete factory-code export](FULL_DECOMPILATION.md) now covers 5,201
+recognized application functions and 106 bootloader functions. All 291,904
+exported instructions are checked against the original ELF bytes; remaining
+gaps and decompiler warnings are recorded explicitly. Raw pseudocode stays
+local; scripts and the measured checkpoint are preserved here.
+
 Analyzed on 2026-10-12 from this device's `../full-flash.bin`:
 
 ```text

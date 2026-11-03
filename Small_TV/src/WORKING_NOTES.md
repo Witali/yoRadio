@@ -24,6 +24,20 @@ The first full export and expanded SDK-gap analysis are local under
 `.build/factory-full-20261103/`; raw pseudocode is not approved for publication.
 The original feature-parity and bug-fixing objective remains in scope.
 
+Full export checkpoint: 5,201 application + 106 bootloader functions, 291,904
+literal instructions independently checked. Application decoded-byte coverage
+99.6931%; bootloader 99.6693%. All recognized functions produced pseudocode,
+but 872 + 51 have warnings. Application still has 2,498 undecoded bytes and
+8,562 decoded bytes without function owners; bootloader has 46 undecoded bytes.
+53 complete SDK body candidates, ten qualified runtime boundaries and 32
+hardware-vector slots were recovered in a read-only copy; initialized bytes
+are unchanged. Four invalid-export controls were rejected. See
+[FULL_DECOMPILATION.md](../analysis/FULL_DECOMPILATION.md) and its JSON checkpoint.
+Current raw C: `.build/factory-full-20261103/expanded/all-functions.c` and
+`.build/factory-bootloader-20261103/export/all-functions.c`. These are local
+analysis artifacts, excluded from publication. Next: remaining function owners,
+callback/jump-table control flow and types, then extend parity/fault evidence.
+
 ## Общая ветка smart-tv — 28 October 2026
 
 Current development is `.worktree/smart-tv-integration`, branch `smart-tv`.
