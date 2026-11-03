@@ -218,9 +218,23 @@ claim or default change.
    five actual decoder and HTTP-client instances are cleaned up. Transport and
    output hardware are explicit seams, and request-TX release is disabled because
    that transport does not enter SDK response state. No private phase/ACK writes
-   simulate cleanup. Backpressure/errors, scoped OOM and deliberate target
-   semantic controls remain open, as do production watchdog/resource margins.
-7. **Physical qualification open:** CYD A/B with matched
+   simulate cleanup. Target OOM, backpressure and semantic controls are
+   [explicitly deferred](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md).
+7. **Current ordinary watchdog checkpoint complete:**
+   [SDK/QEMU evidence](../tests/results/cyd-flac-ordinary-task-20261103/README.md)
+   freezes production source `de94a304a`, compiles 14 actual translation units
+   and binds 438 compiler dependencies/506 source inputs. It prepares all 130
+   original fixture/oracle entries, executes the original three lifecycle cases,
+   then repeats the complete 8192-block stream 382 times over 15033371 us.
+   Every repeat preserves exact PCM, releases decoder/HTTP/workspace ownership
+   and observes both idle watchdogs without allocation or pipeline faults.
+   TWDT5s/no-panic and INT300ms match the selected production policy; the
+   positive phase keeps its fixed 90s deadline and adds no sleeps or yields.
+   These are actual RTOS owners with immediate public output seams, without
+   the DMA renderer, radio/TLS/TFT load or physical hardware. The observed heap
+   and stack snapshots do not establish full-application resource margins.
+   This does not execute all 130 fixtures natively or reopen deferred faults.
+8. **Physical qualification open:** CYD A/B with matched
    configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.
    No custom default switch or speedup claim before this gate passes.
