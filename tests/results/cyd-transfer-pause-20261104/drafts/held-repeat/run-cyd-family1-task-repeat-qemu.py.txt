@@ -1,0 +1,231 @@
+"""Repeat the unchanged native04 compiled image, with passive owned-process data.
+
+No SDK, compiler, image preparation tool or archived controller is executed.
+Native action is held until root reviews and pins this exact repeat release.
+"""
+import argparse
+import importlib.util
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+import cyd_family1_repeat_support as support
+
+ROOT=support.ROOT
+REPEAT_RELEASE_ID='cyd-family1-prebuilt-repeat-20261103-01'
+QEMU_TIMEOUT_SECONDS=600
+SAMPLE_INTERVAL_SECONDS=1.0
+
+
+def write_json(path,value):
+    path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8',newline='\n')
+
+
+def current_module(name,relative):
+    # Use reviewed current code, authenticated against both parent and this
+    # repeat's fresh snapshots before and after use. Never import old captures.
+    spec=importlib.util.spec_from_file_location(name,ROOT/relative)
+    result=importlib.util.module_from_spec(spec);spec.loader.exec_module(result)
+    return result
+
+
+def fresh_output(path):
+    output=path.resolve();build=(ROOT/'.build').resolve()
+    support.need(output!=build and output.is_relative_to(build) and not output.exists(),'fresh contained repeat output')
+    support.need(not output.is_relative_to(support.PARENT) and not support.PARENT.is_relative_to(output),'repeat cannot overlap immutable parent')
+    return output
+
+
+class Repeat:
+    def __init__(self,args):
+        self.args,self.out=args,args.output
+        self.manifest={}
+        self.release_pin=support.identity(args.release)
+        self.report=dict(passed=False,completed=False,commands=[],target_executed=False,
+            parent_capture=support.PARENT.relative_to(ROOT).as_posix(),parent_result='NONPASS; preserved',
+            inherited_build_executed_here=False,SDK_build_started_here=False,production_firmware=False,
+            same_vendor_family1_integration_oracle=True,independent_codec_conformance=False,
+            performance_or_radio_resource_claim=False,physical_device=False,external_network=False,
+            workload_or_driver_changed=False,timer_or_process_policy_changed=False,
+            new_numeric_tolerance=False,normalization_enabled=False,oom_injection=False,
+            output_backpressure=False,repeat_release_id=REPEAT_RELEASE_ID,
+            repeat_release_sha256=self.release_pin['sha256'],production_source_release_sha256=support.SOURCE_RELEASE_SHA,
+            diagnostic_scope='Inherited20s TWDT/PANIC, INT1000ms; no production5s/no-panic/INT300ms equivalence')
+
+    def save(self):write_json(self.out/'report.json',self.report)
+
+    def freeze(self):
+        for relative in support.NEW_CODE+support.VALIDATORS+support.HELPERS:
+            original=support.contained(ROOT,relative);destination=self.out/'sources/current'/relative
+            destination.parent.mkdir(parents=True,exist_ok=True);destination.write_bytes(original.read_bytes())
+            pin=support.identity(destination);support.check_pin(support.identity(original),pin,'immutable current code while freezing')
+            self.manifest[relative]=dict(snapshot=destination.relative_to(self.out).as_posix(),**pin)
+        release_path=self.out/'repeat-release.json';release_path.write_bytes(self.args.release.read_bytes())
+        support.check_pin(support.identity(release_path),self.release_pin,'immutable reviewed repeat release while freezing')
+        write_json(self.out/'current-source-manifest.json',self.manifest)
+        self.report['current_source_manifest_sha256']=support.sha(self.out/'current-source-manifest.json')
+        self.report['current_validator_execution']='current reviewed live code equals fresh repeat snapshots'
+
+    def currentness(self):
+        context=support.audit_parent()
+        support.check_pin(support.identity(self.args.release),self.release_pin,'repeat release remains immutable')
+        support.check_pin(support.identity(self.out/'repeat-release.json'),self.release_pin,'repeat release snapshot remains immutable')
+        release=json.loads(self.args.release.read_bytes());support.validate_release(release,REPEAT_RELEASE_ID)
+        for relative,pin in self.manifest.items():
+            support.check_pin(support.identity(ROOT/relative),pin,'current repeat code: '+relative)
+            support.check_pin(support.identity(support.contained(self.out,pin['snapshot'])),pin,'fresh repeat code snapshot: '+relative)
+        support.need(support.sha(self.out/'current-source-manifest.json')==self.report['current_source_manifest_sha256'],'immutable repeat source manifest')
+        support.need(support.sha(self.out/'qemu-flash.bin')==support.PARENT_PINS['qemu-flash.bin'],'immutable copied prebuilt image')
+        for row in self.report['commands']:
+            for stream in ('stdout','stderr'):
+                if stream+'_sha256' in row:
+                    support.need(support.sha(self.out/(row['name']+'.'+stream+'.log'))==row[stream+'_sha256'],'new actual process log remains immutable')
+        if 'passive_sample_artifact' in self.report:
+            support.check_pin(support.identity(self.out/'owned-process-samples.jsonl'),self.report['passive_sample_artifact'],'actual passive sample file remains immutable')
+        if 'inherited_build_proof_sha256' in self.report:
+            support.need(support.sha(self.out/'inherited-build-proof.json')==self.report['inherited_build_proof_sha256'],'inherited build proof remains immutable')
+        for relative,pin in self.report.get('post_output_artifacts',{}).items():
+            support.check_pin(support.identity(support.contained(self.out,relative)),pin,'new independent output artifact remains immutable')
+        return context
+
+    def run_guest(self,context):
+        argv=support.expected_argv(context['qemu'],context['rom'],self.out/'qemu-flash.bin')
+        support.validate_argv(argv,context['qemu'],context['rom'],self.out/'qemu-flash.bin')
+        row=dict(name='qemu',argv=[support.safe_path(value) for value in argv],timeout_seconds=QEMU_TIMEOUT_SECONDS,
+            state='starting',SDK_or_build_command=False)
+        self.report['commands'].append(row);self.save()
+        child=None;started=time.monotonic();samples=0;sampler=None
+        environment=os.environ.copy()
+        environment.update(GIT_OPTIONAL_LOCKS='0',PYTHONNOUSERSITE='1',PYTHONUTF8='1',PYTHONIOENCODING='utf-8')
+        try:
+            with (self.out/'qemu.stdout.log').open('xb') as stdout,(self.out/'qemu.stderr.log').open('xb') as stderr,\
+                 (self.out/'owned-process-samples.jsonl').open('x',encoding='utf-8',newline='\n') as metrics:
+                child=subprocess.Popen(argv,cwd=self.out,env=environment,stdin=subprocess.DEVNULL,
+                    stdout=stdout,stderr=stderr,creationflags=subprocess.CREATE_NO_WINDOW)
+                row.update(state='running',pid=child.pid);self.report['target_executed']=True;self.save()
+                sampler_result=support.query_result(lambda:support.PassiveWindowsSampler(child.pid,child._handle))
+                if sampler_result['state']=='observed':sampler=sampler_result.pop('value')
+                self.report['passive_sampling']=dict(interval_seconds=SAMPLE_INTERVAL_SECONDS,
+                    initialization=sampler_result,only_owned_process=True,thread_census_exhaustive=False,
+                    guest_delay_or_instrumentation_added=False,thread_names_unavailable=True,
+                    effective_timer_resolution_observed=False,timeBeginPeriod_return_observed=False)
+                while True:
+                    # Queries are host-side and never change guest or OS policy.
+                    sample=support.query_result(sampler.sample) if sampler else dict(state='unknown',reason='sampler initialization unavailable')
+                    metrics.write(json.dumps(dict(index=samples,**sample))+'\n');metrics.flush();samples+=1
+                    remaining=QEMU_TIMEOUT_SECONDS-(time.monotonic()-started)
+                    if child.poll() is not None:break
+                    if remaining<=0:raise subprocess.TimeoutExpired('owned QEMU',QEMU_TIMEOUT_SECONDS)
+                    try:child.wait(timeout=min(SAMPLE_INTERVAL_SECONDS,remaining))
+                    except subprocess.TimeoutExpired:continue
+                row.update(state='complete',exit_status=child.returncode)
+        except BaseException as error:
+            row.update(state='failed',error_type=type(error).__name__,winerror=getattr(error,'winerror',None))
+            raise
+        finally:
+            if child is not None and child.poll() is None:
+                # Popen's still-owned handle avoids a stale/recycled PID kill.
+                child.kill();child.wait(timeout=15);row.update(state='forced_stop_nonpass',exit_status=child.returncode)
+            row['elapsed_seconds']=time.monotonic()-started
+            if child is not None:row['exit_status']=child.poll()
+            for stream in ('stdout','stderr'):
+                path=self.out/('qemu.'+stream+'.log')
+                if path.is_file():row[stream+'_sha256']=support.sha(path)
+            path=self.out/'owned-process-samples.jsonl'
+            if path.is_file():self.report['passive_sample_artifact']=dict(count=samples,**support.identity(path))
+            self.save()
+        support.need(row['state']=='complete' and row['exit_status']==0,'actual owned QEMU terminates zero within unchanged600s limit')
+        return support.decode_captured_bytes((self.out/'qemu.stdout.log').read_bytes(),row['stdout_sha256'])+'\n'+\
+            support.decode_captured_bytes((self.out/'qemu.stderr.log').read_bytes(),row['stderr_sha256'])
+
+    def execute(self,context):
+        self.out.mkdir(parents=True);self.save()
+        try:
+            self.freeze()
+            image=(support.PARENT/'qemu-flash.bin').read_bytes();support.validate_image(image)
+            (self.out/'qemu-flash.bin').write_bytes(image)
+            self.report['preconditions']=context['summary']
+            self.report['pcm_reference']=context['contract']
+            self.report['prebuilt_image']=dict(inherited=True,new_build_executed=False,**support.identity(self.out/'qemu-flash.bin'))
+            write_json(self.out/'inherited-build-proof.json',context['summary'])
+            self.report['inherited_build_proof_sha256']=support.sha(self.out/'inherited-build-proof.json')
+            context=self.currentness();self.save()
+            log=self.run_guest(context)
+            self.currentness()
+            word=current_module('current_repeat_word_reader',support.VALIDATORS[1])
+            try:self.report['word_allocation_prefix']=word.parse_word_allocation_log(log,require_terminal=False)
+            except ValueError as error:self.report['word_allocation_prefix_error']=str(error)
+            reader=current_module('current_repeat_task_reader',support.VALIDATORS[0])
+            measured,pcm=reader.validate(log,context['contract'])
+            self.report['measurements']=measured
+            self.report['word_allocations']=word.parse_word_allocation_log(log,require_terminal=True)
+            # The mandatory passive fault reader is imported by this current
+            # primary reader; its complete census is part of measured output.
+            support.need('allocation_faults' in measured,'mandatory current fault accounting')
+            oracle=current_module('current_repeat_Decimal_oracle',support.VALIDATORS[3])
+            self.report['post_output_oracle']=oracle.qualify(context['contract'],measured,pcm,self.out)
+            write_json(self.out/'post-output-oracle.json',self.report['post_output_oracle'])
+            paths=[self.out/'post-output-oracle.json',*(self.out/('reference-'+str(index)+'.pcm') for index in range(13))]
+            self.report['post_output_artifacts']={path.relative_to(self.out).as_posix():support.identity(path) for path in paths}
+            self.currentness()
+            self.report.update(passed=True,completed=True,full_pcm_independent_oracle=True)
+        except BaseException as error:
+            self.report.update(passed=False,completed=False,failure_type=type(error).__name__,winerror=getattr(error,'winerror',None))
+            if isinstance(error,ValueError):self.report['failure']=str(error)
+        finally:
+            try:
+                self.currentness();self.report['all_inputs_current_after']=True
+            except BaseException as error:
+                self.report.update(passed=False,completed=False,all_inputs_current_after=False,
+                    currentness_error_type=type(error).__name__)
+                if isinstance(error,ValueError):self.report['currentness_failure']=str(error)
+            self.save()
+        print(json.dumps(dict(passed=self.report['passed'],completed=self.report['completed'],
+            target_executed=self.report['target_executed'],inherited_build=True,parent_preserved_NONPASS=True)))
+        return 0 if self.report['passed'] else 1
+
+
+def arguments(argv=None):
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--preflight-only',action='store_true')
+    parser.add_argument('--release',type=Path)
+    parser.add_argument('--release-sha256')
+    args=parser.parse_args(argv);args.output=fresh_output(args.output)
+    return args
+
+
+def main(argv=None):
+    args=arguments(argv)
+    context=support.audit_parent()
+    release_checked=False
+    if args.release is not None or args.release_sha256 is not None:
+        support.need(args.release is not None and args.release_sha256 is not None,'explicit repeat release and SHA must be paired')
+        args.release=args.release.resolve()
+        support.need(args.release.is_file() and support.sha(args.release)==args.release_sha256,'exact repeat release bytes')
+        support.validate_release(json.loads(args.release.read_bytes()),REPEAT_RELEASE_ID)
+        release_checked=True
+    if args.preflight_only:
+        print(json.dumps(dict(passed=True,preflight_only=True,output_created=False,target_executed=False,
+            source_snapshots=context['summary']['source_snapshots'],production_inputs=35,
+            inherited_artifacts=context['summary']['inherited_artifacts'],repeat_release_id=REPEAT_RELEASE_ID,
+            native_action_released=release_checked,SDK_build_started_here=False)))
+        return 0
+    support.need(sys.platform=='win32','same inherited Windows QEMU runtime')
+    support.need(REPEAT_RELEASE_ID!='UNRELEASED','native repeat held until root reviews this exact helper release')
+    support.need(release_checked,'explicit repeat release and SHA required')
+    # The invoking Python was consumed by the successful parent controller too.
+    python=ROOT.parents[1]/'.idf/tools-v6.0.2/python_env/idf6.0_py3.12_env/Scripts/python.exe'
+    support.need(Path(sys.executable).resolve()==python.resolve() and
+        support.sha(sys.executable)==context['bundle']['runtime'][str(python)],'same invoking parent controller Python')
+    return Repeat(args).execute(context)
+
+
+if __name__=='__main__':
+    try:raise SystemExit(main())
+    except ValueError as error:
+        print(json.dumps(dict(passed=False,target_executed=False,failure=str(error))),file=sys.stderr)
+        raise SystemExit(1)

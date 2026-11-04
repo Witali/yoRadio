@@ -2,6 +2,11 @@
 
 Обновлено: 2026-11-04. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
+Работа приостановлена пользователем 2026-11-04. [Точка остановки](../tests/results/cyd-transfer-pause-20261104/README.md)
+сохраняет готовые production CYD vendor/PDM и vendor/continuous-DAC images,
+первый полный Clang-профиль и незавершённую матрицу. Дополнительная полная
+сборка C3 остановилась на отсутствующем include `stream_fairness.h`; причины
+ещё не исследованы, успешный C3 image этим прогоном не получен.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
 Arduino CYD и `esp32-cyd2usb-minimal` остаются отдельными профилями.

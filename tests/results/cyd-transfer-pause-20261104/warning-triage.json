@@ -1,0 +1,1249 @@
+{
+  "items": [
+    {
+      "check": "bugprone-branch-clone",
+      "column": 5,
+      "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+      "id": 1,
+      "line": 276,
+      "message": "if with identical then and else branches",
+      "occurrences": 1,
+      "rationale": "Current vendor configuration compiles both custom-decoder branches to empty conditional blocks. Supported custom decoder flags supply the respective operations in other configurations. No allocation/free omission in the selected supported path was substantiated.",
+      "review_state": "configuration-dependent duplicate stubs inspected",
+      "severity": "warning",
+      "translation_units": [
+        "custom_legacy_adapter.cpp"
+      ]
+    },
+    {
+      "check": "bugprone-branch-clone",
+      "column": 5,
+      "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+      "id": 2,
+      "line": 305,
+      "message": "if with identical then and else branches",
+      "occurrences": 1,
+      "rationale": "Current vendor configuration compiles both custom-decoder branches to empty conditional blocks. Supported custom decoder flags supply the respective operations in other configurations. No allocation/free omission in the selected supported path was substantiated.",
+      "review_state": "configuration-dependent duplicate stubs inspected",
+      "severity": "warning",
+      "translation_units": [
+        "custom_legacy_adapter.cpp"
+      ]
+    },
+    {
+      "check": "performance-enum-size",
+      "column": 9,
+      "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.h",
+      "id": 3,
+      "line": 11,
+      "message": "enum 'custom_legacy_kind_t' uses a larger base type ('unsigned int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size",
+      "occurrences": 1,
+      "rationale": "Smaller enum storage is an optional representation/ABI choice. This warning does not establish unsafe access or a useful memory saving warranting a public ABI change.",
+      "review_state": "ABI/style observation",
+      "severity": "warning",
+      "translation_units": [
+        "custom_legacy_adapter.cpp"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 17,
+      "file": "idf/components/native_ota/native_ota_form.c",
+      "id": 4,
+      "line": 20,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 17,
+      "file": "idf/components/native_ota/native_ota_form.c",
+      "id": 5,
+      "line": 23,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 17,
+      "file": "idf/components/native_storage/include/web_file_form.h",
+      "id": 6,
+      "line": 79,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 21,
+      "file": "idf/components/native_storage/include/web_file_form.h",
+      "id": 7,
+      "line": 87,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 55,
+      "file": "idf/components/native_storage/include/web_file_form.h",
+      "id": 8,
+      "line": 87,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 17,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 9,
+      "line": 48,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 3,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 20,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 10,
+      "line": 55,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 3,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 26,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 11,
+      "line": 86,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 3,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-inc-dec-in-conditions",
+      "column": 23,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 12,
+      "line": 170,
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "occurrences": 3,
+      "rationale": "Current expressions use sequenced &&/|| tests and a preceding cursor/end check; an incremented cursor is used again only in a sequenced operand or following statement. Multipart p==end checks prevent dereference after the terminator; numeric-host scan checks at<end before consuming the byte.",
+      "review_state": "sequencing/bounds inspected; preliminary",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-inc-dec-in-conditions",
+      "column": 23,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 13,
+      "line": 271,
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "occurrences": 3,
+      "rationale": "Current expressions use sequenced &&/|| tests and a preceding cursor/end check; an incremented cursor is used again only in a sequenced operand or following statement. Multipart p==end checks prevent dereference after the terminator; numeric-host scan checks at<end before consuming the byte.",
+      "review_state": "sequencing/bounds inspected; preliminary",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-inc-dec-in-conditions",
+      "column": 38,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 14,
+      "line": 300,
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "occurrences": 3,
+      "rationale": "Current expressions use sequenced &&/|| tests and a preceding cursor/end check; an incremented cursor is used again only in a sequenced operand or following statement. Multipart p==end checks prevent dereference after the terminator; numeric-host scan checks at<end before consuming the byte.",
+      "review_state": "sequencing/bounds inspected; preliminary",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-inc-dec-in-conditions",
+      "column": 19,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 15,
+      "line": 308,
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "occurrences": 3,
+      "rationale": "Current expressions use sequenced &&/|| tests and a preceding cursor/end check; an incremented cursor is used again only in a sequenced operand or following statement. Multipart p==end checks prevent dereference after the terminator; numeric-host scan checks at<end before consuming the byte.",
+      "review_state": "sequencing/bounds inspected; preliminary",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-inc-dec-in-conditions",
+      "column": 47,
+      "file": "idf/components/native_storage/include/web_multipart.h",
+      "id": 16,
+      "line": 308,
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "occurrences": 3,
+      "rationale": "Current expressions use sequenced &&/|| tests and a preceding cursor/end check; an incremented cursor is used again only in a sequenced operand or following statement. Multipart p==end checks prevent dereference after the terminator; numeric-host scan checks at<end before consuming the byte.",
+      "review_state": "sequencing/bounds inspected; preliminary",
+      "severity": "warning",
+      "translation_units": [
+        "native_ota_form.c",
+        "native_ota_http.c",
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 89,
+      "file": "idf/components/native_stream/include/ogg_opus_audio_packets.h",
+      "id": 17,
+      "line": 56,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/components/native_stream/include/ogg_opus_timeline.h",
+      "id": 18,
+      "line": 199,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 13,
+      "file": "idf/components/native_stream/include/ogg_opus_timeline.h",
+      "id": 19,
+      "line": 288,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-core.UndefinedBinaryOperatorResult",
+      "column": 29,
+      "file": "idf/components/native_stream/include/ogg_page_input.h",
+      "id": 20,
+      "line": 72,
+      "message": "The left operand of '&' is a garbage value",
+      "occurrences": 1,
+      "rationale": "Trace treats nonzero timeline.fault as positive OOPT_EVENT without initializing event. Initial/reset storage is zeroed; fault assignments are negative errors. Every actual EVENT path writes the event (pending copy, oopt_emit/page_end or provisional path). No real positive-fault producer found.",
+      "review_state": "reviewed source invariant; no reachable defect substantiated",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-unix.Malloc",
+      "column": 9,
+      "file": "idf/components/native_stream/include/ogg_page_input.h",
+      "id": 21,
+      "line": 131,
+      "message": "Potential leak of memory pointed to by 'larger'",
+      "occurrences": 1,
+      "rationale": "Successful realloc is immediately stored in s->page/capacity and intentionally retained by the page owner. opi_reset frees it; ogp_reset invokes that after actual family1 cleanup, and audio_service generation/error/EOF cleanup calls the yield/retry wrapper. Retaining a ready/partial page is intentional ownership, not local ownership loss.",
+      "review_state": "reviewed owner lifetime; no leak substantiated",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 37,
+      "file": "idf/components/native_stream/include/opus_family1_mapping.h",
+      "id": 22,
+      "line": 31,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 80,
+      "file": "idf/components/native_stream/include/opus_tags_stream.h",
+      "id": 23,
+      "line": 117,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-core.UndefinedBinaryOperatorResult",
+      "column": 44,
+      "file": "idf/components/native_stream/include/pcm_speaker_mix.h",
+      "id": 24,
+      "line": 82,
+      "message": "The left operand of '*' is a garbage value",
+      "occurrences": 1,
+      "rationale": "Trace assumes reader.channels zero but mono.channels positive. Actual Vorbis setter validates1..8 and psm_begin fixes mix.channels; pcm_reader_begin rejects layout/channel mismatch, psm_scale copies the same count. All sample entries consumed by psm_value are initialized. Updates are output-owner ordered.",
+      "review_state": "reviewed source invariant; no reachable defect substantiated",
+      "severity": "warning",
+      "translation_units": [
+        "native_audio_output.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-optin.core.EnumCastOutOfRange",
+      "column": 33,
+      "file": "idf/components/native_stream/include/stream_frames.h",
+      "id": 25,
+      "line": 47,
+      "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+      "occurrences": 1,
+      "rationale": "C source uses a display previous-state sentinel or a zeroed temporary frame-info enum before success paths assign a real codec. No dangerous use of the placeholder as an array index or decoder choice was found. An int sentinel could make intent clearer in later cleanup.",
+      "review_state": "sentinel/zero-initialization inspected; optional clarity cleanup",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 48,
+      "file": "idf/components/native_web_transport/native_web_transport.c",
+      "id": 26,
+      "line": 59,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_web_transport.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 12,
+      "file": "idf/components/native_wifi_store/native_wifi_file.c",
+      "id": 27,
+      "line": 12,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_wifi_file.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 12,
+      "file": "idf/components/native_wifi_store/native_wifi_file.c",
+      "id": 28,
+      "line": 13,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_wifi_file.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 12,
+      "file": "idf/components/native_wifi_store/native_wifi_file.c",
+      "id": 29,
+      "line": 14,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_wifi_file.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/components/native_wifi_store/native_wifi_http.c",
+      "id": 30,
+      "line": 42,
+      "message": "function 'strcasecmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_wifi_http.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/components/native_wifi_store/native_wifi_store.c",
+      "id": 31,
+      "line": 199,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "native_wifi_store.c"
+      ]
+    },
+    {
+      "check": "bugprone-assignment-in-if-condition",
+      "column": 26,
+      "file": "idf/components/native_wifi_store/native_wifi_store.c",
+      "id": 32,
+      "line": 200,
+      "message": "an assignment within an 'if' condition is bug-prone",
+      "occurrences": 1,
+      "rationale": "The assignment result is intentionally tested: checked allocation failure or negative SDK parser/read result. The assigned variable is used after the expression; no missing equality operator was substantiated.",
+      "review_state": "assignment/control-flow semantics inspected",
+      "severity": "warning",
+      "translation_units": [
+        "native_wifi_store.c"
+      ]
+    },
+    {
+      "check": "bugprone-assignment-in-if-condition",
+      "column": 35,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 33,
+      "line": 137,
+      "message": "an assignment within an 'if' condition is bug-prone",
+      "occurrences": 1,
+      "rationale": "The assignment result is intentionally tested: checked allocation failure or negative SDK parser/read result. The assigned variable is used after the expression; no missing equality operator was substantiated.",
+      "review_state": "assignment/control-flow semantics inspected",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 24,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 34,
+      "line": 155,
+      "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Exact site preserved at user pause; complete per-site review not finalized.",
+      "review_state": "preliminary; no root acceptance/waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 36,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 35,
+      "line": 328,
+      "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Exact site preserved at user pause; complete per-site review not finalized.",
+      "review_state": "preliminary; no root acceptance/waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 20,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 36,
+      "line": 598,
+      "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Exact site preserved at user pause; complete per-site review not finalized.",
+      "review_state": "preliminary; no root acceptance/waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 12,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 37,
+      "line": 632,
+      "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Exact site preserved at user pause; complete per-site review not finalized.",
+      "review_state": "preliminary; no root acceptance/waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-assignment-in-if-condition",
+      "column": 22,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 38,
+      "line": 673,
+      "message": "an assignment within an 'if' condition is bug-prone",
+      "occurrences": 1,
+      "rationale": "The assignment result is intentionally tested: checked allocation failure or negative SDK parser/read result. The assigned variable is used after the expression; no missing equality operator was substantiated.",
+      "review_state": "assignment/control-flow semantics inspected",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-assignment-in-if-condition",
+      "column": 21,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 39,
+      "line": 692,
+      "message": "an assignment within an 'if' condition is bug-prone",
+      "occurrences": 1,
+      "rationale": "The assignment result is intentionally tested: checked allocation failure or negative SDK parser/read result. The assigned variable is used after the expression; no missing equality operator was substantiated.",
+      "review_state": "assignment/control-flow semantics inspected",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-core.NullDereference",
+      "column": 51,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 40,
+      "line": 742,
+      "message": "Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')",
+      "occurrences": 1,
+      "rationale": "Analyzer permits ra->sd NULL at req_delete. Actual SDK httpd_sess_process rejects a null session and calls delete only after req_new succeeds; new associates ra->sd before parsing. Cleanup clears aux/sd and failed new returns failure. No valid double-cleanup path found in inspected owner flow.",
+      "review_state": "reviewed caller lifecycle; no valid-session trigger substantiated",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-core.NullDereference",
+      "column": 17,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 41,
+      "line": 750,
+      "message": "Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')",
+      "occurrences": 1,
+      "rationale": "Analyzer permits ra->sd NULL at req_delete. Actual SDK httpd_sess_process rejects a null session and calls delete only after req_new succeeds; new associates ra->sd before parsing. Cleanup clears aux/sd and failed new returns failure. No valid double-cleanup path found in inspected owner flow.",
+      "review_state": "reviewed caller lifecycle; no valid-session trigger substantiated",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 14,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 42,
+      "line": 927,
+      "message": "function 'strncasecmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 14,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 43,
+      "line": 1056,
+      "message": "function 'strncasecmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 14,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+      "id": 44,
+      "line": 1111,
+      "message": "function 'strncasecmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 37,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_ws.c",
+      "id": 45,
+      "line": 86,
+      "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Exact site preserved at user pause; complete per-site review not finalized.",
+      "review_state": "preliminary; no root acceptance/waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_ws.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-security.insecureAPI.strcpy",
+      "column": 5,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_ws.c",
+      "id": 46,
+      "line": 129,
+      "message": "Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119",
+      "occurrences": 1,
+      "rationale": "Validated Sec-WebSocket-Key copies at most24 characters plus NUL into25 B; fixed GUID is36 characters plus NUL. Destination sizeof(key)+sizeof(GUID)+1 is63 B; concatenated payload requires61 B including NUL. native_httpd_header checks every append and appends NUL.",
+      "review_state": "reviewed concrete buffer bound",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_ws.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-security.insecureAPI.strcpy",
+      "column": 5,
+      "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_ws.c",
+      "id": 47,
+      "line": 130,
+      "message": "Call to function 'strcat' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcat'. CWE-119",
+      "occurrences": 1,
+      "rationale": "Validated Sec-WebSocket-Key copies at most24 characters plus NUL into25 B; fixed GUID is36 characters plus NUL. Destination sizeof(key)+sizeof(GUID)+1 is63 B; concatenated payload requires61 B including NUL. native_httpd_header checks every append and appends NUL.",
+      "review_state": "reviewed concrete buffer bound",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_ws.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-optin.core.EnumCastOutOfRange",
+      "column": 38,
+      "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+      "id": 48,
+      "line": 58,
+      "message": "The value '-1' provided to the cast expression is not in the valid range of values for the enum",
+      "occurrences": 1,
+      "rationale": "C source uses a display previous-state sentinel or a zeroed temporary frame-info enum before success paths assign a real codec. No dangerous use of the placeholder as an array index or decoder choice was found. An int sentinel could make intent clearer in later cleanup.",
+      "review_state": "sentinel/zero-initialization inspected; optional clarity cleanup",
+      "severity": "warning",
+      "translation_units": [
+        "app_main.c"
+      ]
+    },
+    {
+      "check": "clang-analyzer-deadcode.DeadStores",
+      "column": 13,
+      "file": "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+      "id": 49,
+      "line": 163,
+      "message": "Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'",
+      "occurrences": 2,
+      "rationale": "Loop expression tests the returned header status directly, but the local variable is not needed afterward on this function path. Header token validation still returns failure appropriately; this is a readability/dead-store issue.",
+      "review_state": "redundant temporary assignment inspected",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c",
+        "httpd_ws.c"
+      ]
+    },
+    {
+      "check": "bugprone-inc-dec-in-conditions",
+      "column": 56,
+      "file": "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+      "id": 50,
+      "line": 219,
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "occurrences": 2,
+      "rationale": "Current expressions use sequenced &&/|| tests and a preceding cursor/end check; an incremented cursor is used again only in a sequenced operand or following statement. Multipart p==end checks prevent dereference after the terminator; numeric-host scan checks at<end before consuming the byte.",
+      "review_state": "sequencing/bounds inspected; preliminary",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c",
+        "httpd_ws.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+      "id": 51,
+      "line": 274,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 2,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "httpd_parse.c",
+        "httpd_ws.c"
+      ]
+    },
+    {
+      "check": "bugprone-incorrect-roundings",
+      "column": 27,
+      "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+      "id": 52,
+      "line": 272,
+      "message": "casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead",
+      "occurrences": 1,
+      "rationale": "pcm_round_s16 saturates at INT16 bounds and selects value+0.5 only for nonnegative values; negative values use the mirrored magnitude/sign operation. Finite validated factors and bounded samples reach this path. This is intentional nearest/away-from-zero rounding.",
+      "review_state": "reviewed sign/range guards",
+      "severity": "warning",
+      "translation_units": [
+        "native_audio_output.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 27,
+      "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+      "id": 53,
+      "line": 272,
+      "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Warned conditionals promote an existing int16 sample/ramp sample and zero to int before returning/storing int16. pcm_round_s16 conversions follow explicit saturation/sign handling, keeping the converted range within[-32768,32767].",
+      "review_state": "reviewed bounded sample or rounding conversion",
+      "severity": "warning",
+      "translation_units": [
+        "native_audio_output.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 27,
+      "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+      "id": 54,
+      "line": 273,
+      "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Warned conditionals promote an existing int16 sample/ramp sample and zero to int before returning/storing int16. pcm_round_s16 conversions follow explicit saturation/sign handling, keeping the converted range within[-32768,32767].",
+      "review_state": "reviewed bounded sample or rounding conversion",
+      "severity": "warning",
+      "translation_units": [
+        "native_audio_output.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 15,
+      "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+      "id": 55,
+      "line": 303,
+      "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Warned conditionals promote an existing int16 sample/ramp sample and zero to int before returning/storing int16. pcm_round_s16 conversions follow explicit saturation/sign handling, keeping the converted range within[-32768,32767].",
+      "review_state": "reviewed bounded sample or rounding conversion",
+      "severity": "warning",
+      "translation_units": [
+        "native_audio_output.c"
+      ]
+    },
+    {
+      "check": "bugprone-implicit-widening-of-multiplication-result",
+      "column": 14,
+      "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+      "id": 56,
+      "line": 457,
+      "message": "performing an implicit widening conversion to type 'unsigned long long' of a multiplication performed in type 'unsigned int'",
+      "occurrences": 1,
+      "rationale": "The pre-widening unsigned product is(8+1)*512=4608, so it cannot overflow32 bits; the next product uses1000ULL. No runtime-controlled multiplicand in that warned intermediate.",
+      "review_state": "reviewed constant bound",
+      "severity": "warning",
+      "translation_units": [
+        "native_audio_output.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 45,
+      "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+      "id": 57,
+      "line": 530,
+      "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Warned conditionals promote an existing int16 sample/ramp sample and zero to int before returning/storing int16. pcm_round_s16 conversions follow explicit saturation/sign handling, keeping the converted range within[-32768,32767].",
+      "review_state": "reviewed bounded sample or rounding conversion",
+      "severity": "warning",
+      "translation_units": [
+        "native_audio_output.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 37,
+      "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+      "id": 58,
+      "line": 46,
+      "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "RSSI value is already int8_t; the alternate invalid/freshness value is zero. Conditional int promotion preserves the signed8 value range.",
+      "review_state": "reviewed conditional promotion",
+      "severity": "warning",
+      "translation_units": [
+        "native_state.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 50,
+      "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+      "id": 59,
+      "line": 427,
+      "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "RSSI value is already int8_t; the alternate invalid/freshness value is zero. Conditional int promotion preserves the signed8 value range.",
+      "review_state": "reviewed conditional promotion",
+      "severity": "warning",
+      "translation_units": [
+        "network_runtime.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+      "id": 60,
+      "line": 478,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "network_runtime.c"
+      ]
+    },
+    {
+      "check": "bugprone-not-null-terminated-result",
+      "column": 5,
+      "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+      "id": 61,
+      "line": 45,
+      "message": "the result from calling 'memcpy' is not null-terminated",
+      "occurrences": 1,
+      "rationale": "The warned memcpy writes a four-byte binary magic into an already zeroed fixed-size record. It is compared as fixed bytes, not used as a C string. Hostname/server fields have separate bounded NUL validation before string-length/canonical encoding.",
+      "review_state": "reviewed binary record semantics",
+      "severity": "warning",
+      "translation_units": [
+        "network_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+      "id": 62,
+      "line": 54,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "network_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+      "id": 63,
+      "line": 63,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "network_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 34,
+      "file": "idf/esp32-cyd2usb-native/main/ogg_playback.h",
+      "id": 64,
+      "line": 248,
+      "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "Header gain is an int16 field; the alternative is zero. Ternary promotion to int does not expand the possible value set outside int16.",
+      "review_state": "reviewed conditional promotion",
+      "severity": "warning",
+      "translation_units": [
+        "audio_service.c"
+      ]
+    },
+    {
+      "check": "bugprone-inc-dec-in-conditions",
+      "column": 33,
+      "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+      "id": 65,
+      "line": 48,
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "occurrences": 1,
+      "rationale": "Current expressions use sequenced &&/|| tests and a preceding cursor/end check; an incremented cursor is used again only in a sequenced operand or following statement. Multipart p==end checks prevent dereference after the terminator; numeric-host scan checks at<end before consuming the byte.",
+      "review_state": "sequencing/bounds inspected; preliminary",
+      "severity": "warning",
+      "translation_units": [
+        "time_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-not-null-terminated-result",
+      "column": 5,
+      "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+      "id": 66,
+      "line": 85,
+      "message": "the result from calling 'memcpy' is not null-terminated",
+      "occurrences": 1,
+      "rationale": "The warned memcpy writes a four-byte binary magic into an already zeroed fixed-size record. It is compared as fixed bytes, not used as a C string. Hostname/server fields have separate bounded NUL validation before string-length/canonical encoding.",
+      "review_state": "reviewed binary record semantics",
+      "severity": "warning",
+      "translation_units": [
+        "time_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+      "id": 67,
+      "line": 101,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "time_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+      "id": 68,
+      "line": 117,
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "time_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 30,
+      "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+      "id": 69,
+      "line": 85,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "web_network_settings.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 30,
+      "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+      "id": 70,
+      "line": 89,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "web_time.c"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-string-compare",
+      "column": 9,
+      "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+      "id": 71,
+      "line": 176,
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "occurrences": 1,
+      "rationale": "The inspected use treats zero/nonzero strcmp/memcmp/strcasecmp result as equality/inequality in a Boolean condition. Explicit ==0/!=0 is optional readability. This check alone is not a memory-bounds diagnosis; any broader bounds claim remains outside this disposition.",
+      "review_state": "Boolean comparison semantics reviewed; no blanket bounds waiver",
+      "severity": "warning",
+      "translation_units": [
+        "web_upload.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 39,
+      "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+      "id": 72,
+      "line": 266,
+      "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "RSSI value is already int8_t; the alternate invalid/freshness value is zero. Conditional int promotion preserves the signed8 value range.",
+      "review_state": "reviewed conditional promotion",
+      "severity": "warning",
+      "translation_units": [
+        "websocket_service.c"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 21,
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "id": 73,
+      "line": 673,
+      "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "readUint is masked to the requested width. Sites673/688/693/705/712 request4/2/4/4-or5/5 bits. At708, readRiceSignedInt limits the folded uint32 code, rejects UINT32_MAX and reconstructs a value within signed32 before the int64-to-int32 assignment.",
+      "review_state": "reviewed bit-width/range bound",
+      "severity": "warning",
+      "translation_units": [
+        "flac_decoder.cpp"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 18,
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "id": 74,
+      "line": 688,
+      "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "readUint is masked to the requested width. Sites673/688/693/705/712 request4/2/4/4-or5/5 bits. At708, readRiceSignedInt limits the folded uint32 code, rejects UINT32_MAX and reconstructs a value within signed32 before the int64-to-int32 assignment.",
+      "review_state": "reviewed bit-width/range bound",
+      "severity": "warning",
+      "translation_units": [
+        "flac_decoder.cpp"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 26,
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "id": 75,
+      "line": 693,
+      "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "readUint is masked to the requested width. Sites673/688/693/705/712 request4/2/4/4-or5/5 bits. At708, readRiceSignedInt limits the folded uint32 code, rejects UINT32_MAX and reconstructs a value within signed32 before the int64-to-int32 assignment.",
+      "review_state": "reviewed bit-width/range bound",
+      "severity": "warning",
+      "translation_units": [
+        "flac_decoder.cpp"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 21,
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "id": 76,
+      "line": 705,
+      "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "readUint is masked to the requested width. Sites673/688/693/705/712 request4/2/4/4-or5/5 bits. At708, readRiceSignedInt limits the folded uint32 code, rejects UINT32_MAX and reconstructs a value within signed32 before the int64-to-int32 assignment.",
+      "review_state": "reviewed bit-width/range bound",
+      "severity": "warning",
+      "translation_units": [
+        "flac_decoder.cpp"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 40,
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "id": 77,
+      "line": 708,
+      "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'int32_t' (aka 'int') is implementation-defined",
+      "occurrences": 1,
+      "rationale": "readUint is masked to the requested width. Sites673/688/693/705/712 request4/2/4/4-or5/5 bits. At708, readRiceSignedInt limits the folded uint32 code, rejects UINT32_MAX and reconstructs a value within signed32 before the int64-to-int32 assignment.",
+      "review_state": "reviewed bit-width/range bound",
+      "severity": "warning",
+      "translation_units": [
+        "flac_decoder.cpp"
+      ]
+    },
+    {
+      "check": "bugprone-narrowing-conversions",
+      "column": 27,
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "id": 78,
+      "line": 712,
+      "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+      "occurrences": 1,
+      "rationale": "readUint is masked to the requested width. Sites673/688/693/705/712 request4/2/4/4-or5/5 bits. At708, readRiceSignedInt limits the folded uint32 code, rejects UINT32_MAX and reconstructs a value within signed32 before the int64-to-int32 assignment.",
+      "review_state": "reviewed bit-width/range bound",
+      "severity": "warning",
+      "translation_units": [
+        "flac_decoder.cpp"
+      ]
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "added_occurrences": 12,
+      "compiler_tool_description_equal": true,
+      "normalization": "TU+logical diagnostic path+severity+check+full message+multiplicity; line shifts ignored",
+      "removed_occurrences": 1,
+      "removed_site": "websocket status raw struct comparison; current same_status compares fields explicitly",
+      "report": "tests/results/cyd-input-reclaim-20261020/lint/raw/analysis/report.json",
+      "shared_occurrences": 85,
+      "units": 54,
+      "warnings": 86
+    },
+    "compiler_build_Git_or_external_upload": false,
+    "confirmed_dangerous_defects": [],
+    "errors": 0,
+    "report_sha256": "043e0ad61b6cfe72be19960ff364d169d28618554c78500af21b2522a7e4d497",
+    "root_warning_waiver_created": false,
+    "source_commit": "aa3103d0361c5f57afb021e124851bc5a09666c8",
+    "source_or_SDK_or_helper_edits": false,
+    "status": "PAUSED by explicit user request; review not finalized",
+    "unconfirmed_high_priority_sites": [
+      {
+        "check": "clang-analyzer-core.UndefinedBinaryOperatorResult",
+        "disposition": "reviewed source invariant; no reachable defect substantiated",
+        "file": "idf/components/native_stream/include/ogg_page_input.h",
+        "line": 72
+      },
+      {
+        "check": "clang-analyzer-unix.Malloc",
+        "disposition": "reviewed owner lifetime; no leak substantiated",
+        "file": "idf/components/native_stream/include/ogg_page_input.h",
+        "line": 131
+      },
+      {
+        "check": "clang-analyzer-core.UndefinedBinaryOperatorResult",
+        "disposition": "reviewed source invariant; no reachable defect substantiated",
+        "file": "idf/components/native_stream/include/pcm_speaker_mix.h",
+        "line": 82
+      },
+      {
+        "check": "clang-analyzer-core.NullDereference",
+        "disposition": "reviewed caller lifecycle; no valid-session trigger substantiated",
+        "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+        "line": 742
+      },
+      {
+        "check": "clang-analyzer-core.NullDereference",
+        "disposition": "reviewed caller lifecycle; no valid-session trigger substantiated",
+        "file": "idf/esp32-cyd2usb-native/build-ogg-final-clang-vendor-pdm/native-httpd-rfc6455/httpd_parse.c",
+        "line": 750
+      }
+    ],
+    "unique_sites": 78,
+    "units": 53,
+    "warning_occurrences": 97
+  }
+}

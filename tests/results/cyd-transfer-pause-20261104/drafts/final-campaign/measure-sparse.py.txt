@@ -1,0 +1,50 @@
+"""Read-only Git tree/rule size measurement. Never changes sparse configuration."""
+from pathlib import Path
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+env = os.environ.copy()
+env.update(GIT_OPTIONAL_LOCKS='0', GIT_LFS_SKIP_SMUDGE='1')
+def git(*args, data=None):
+    return subprocess.check_output(['git', '-C', str(ROOT), *args], input=data, env=env)
+
+commit = git('rev-parse', 'HEAD').decode().strip()
+raw = git('ls-tree', '-r', '-l', '-z', commit)
+rows = []
+for record in raw.split(b'\0'):
+    if not record:
+        continue
+    meta, name = record.split(b'\t', 1)
+    mode, kind, oid, size = meta.split()
+    if kind != b'blob':
+        raise RuntimeError('Explicit submodule policy required; no implicit checkout/download')
+    rows.append(dict(path=os.fsdecode(name), bytes=int(size)))
+patterns = HERE / 'sparse-patterns.preview.txt'
+selected = set(os.fsdecode(name) for name in git('sparse-checkout', 'check-rules', '--no-cone',
+             '--rules-file', str(patterns), '-z', data=b'\0'.join(os.fsencode(r['path']) for r in rows)+b'\0').split(b'\0') if name)
+evidence = {'cyd-surround-output-20261101', 'cyd-tls-traffic-20261101'}
+expected = {r['path'] for r in rows if not r['path'].startswith(('firmware/', 'tests/results/'))
+            or r['path'].startswith('tests/results/') and r['path'].split('/')[2] in evidence}
+assert selected == expected, 'Actual Git sparse rules differ from intended selection'
+kept = [r for r in rows if r['path'] in selected]
+def metrics(items):
+    return dict(files=len(items), logical_git_blob_bytes=sum(r['bytes'] for r in items),
+                estimated_4096_cluster_bytes=sum((r['bytes']+4095)//4096*4096 for r in items))
+report = dict(read_only=True, checkout_or_configure_invocations=0, commit_observed=commit,
+              final_commit_not_selected=True, full=metrics(rows), sparse=metrics(kept),
+              excluded_firmware=metrics([r for r in rows if r['path'].startswith('firmware/')]),
+              excluded_results_except_released_examples=metrics([r for r in rows if r['path'].startswith('tests/results/') and r['path'] not in selected]),
+              patterns_sha256=hashlib.sha256(patterns.read_bytes()).hexdigest(),
+              actual_git_check_rules_matches=True, existing_index_or_sparse_config_modified=False,
+              free_bytes=shutil.disk_usage(ROOT).free,
+              limitations=['Final release must add its actual full-task evidence package and donor baseline dependencies.',
+                           'Git blob sizes are measured; directory/NTFS metadata and future generated artifacts are additional.',
+                           'LFS skip-smudge is mandatory; required build inputs cannot remain LFS pointers.'])
+(HERE/'sparse-size.json').write_text(json.dumps(report, indent=2)+'\n')
+(HERE/'retained-git-paths.json').write_text(json.dumps(kept, indent=2)+'\n')
+print(json.dumps(report))

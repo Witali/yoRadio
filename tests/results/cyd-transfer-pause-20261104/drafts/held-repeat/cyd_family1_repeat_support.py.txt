@@ -1,0 +1,257 @@
+"""Read-only prerequisites and passive sampling for one inherited-image run."""
+import ctypes
+from ctypes import wintypes
+import hashlib
+import json
+from pathlib import Path
+import re
+import shutil
+import time
+
+ROOT=Path(__file__).resolve().parents[1]
+PARENT=ROOT/'.build/cyd-family1-playback-task-20261103-04'
+SOURCE_RELEASE_SHA='745e7482cd90517c4e5778717dd7e1016d4e8c692d125f4a3cf15302e7dc9381'
+QEMU_SHA='4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d'
+PARENT_PINS={
+ 'report.json':'af7a5fa7ecd6f5c9251298965582a829a24f03a1f25d4a442d6b77a4f828f4cf',
+ 'source-manifest.json':'82598b4c7d73bdf2363332ebbbe9d6c98fb03b590623efd24ed75064cbe0ed12',
+ 'execution-bundle.json':'fcc169a535db0f9adc35bb2201b5222b495a8b5ed8b65b6fd7dbfc3a15d04488',
+ 'actual-compiler-closure.json':'ced10dd90caeb0991d5375ae9e09ba5665dfb3debc519cc85d5da4699d1dfaa9',
+ 'qemu-flash.bin':'0588e76c5e4b23296045d6d159b02d2fa25f249dbad034231b77e6d32e4363a2',
+ 'reference-contract.json':'7984abc8717cf93090340d5658fff856289b13ea52b541df84e3d489c207d1fa',
+ 'sdk-child.json':'a660fb16de2f014633c1618963079b8de9e306e2d6cb93475f00b838568323da',
+ 'build/config/sdkconfig.json':'8f841adbaff60bf3280a2549b27fe686d9402ac8264f2b20a73d4fa8b4565bf9'}
+VALIDATORS=('tests/read-cyd-family1-task-log.py','tests/read-cyd-family1-word-alloc.py',
+ 'tests/read-cyd-family1-allocation-faults.py','tests/prepare-cyd-family1-task-output.py')
+HELPERS=('tests/prepare-cyd-family1-task-contract.py','tests/prepare-cyd-family1-task-assets.py',
+ 'tests/fixtures/opus_family1_playback_native/prepare.py','tests/fixtures/opus_multistream_public/framing.py',
+ 'tests/fixtures/opus_header_gain/generate.py','tests/fixtures/opus_family1_120ms/prepare.py')
+NEW_CODE=('tests/run-cyd-family1-task-repeat-qemu.py','tests/cyd_family1_repeat_support.py',
+ 'tests/check-cyd-family1-task-repeat.py')
+
+
+def need(value,reason):
+    if not value:raise ValueError(reason)
+
+
+def identity(path):
+    body=Path(path).read_bytes();return dict(bytes=len(body),sha256=hashlib.sha256(body).hexdigest())
+
+
+def sha(path):return identity(path)['sha256']
+
+
+def safe_path(path):
+    value=str(path)
+    return 'runtime-path-redacted:'+Path(value).name if re.search(r'(?i)[/\\]Users[/\\]',value) else value
+
+
+def contained(base,relative):
+    path=Path(relative)
+    need(not path.is_absolute() and '..' not in path.parts,'contained relative evidence path')
+    result=(base/path).resolve();need(result.is_relative_to(base.resolve()),'no evidence symlink escape')
+    return result
+
+
+def check_pin(actual,expected,label):
+    need(actual['sha256']==expected['sha256'] and ('bytes' not in expected or actual['bytes']==expected['bytes']),label)
+
+
+def decode_captured_bytes(body,digest):
+    need(hashlib.sha256(body).hexdigest()==digest,'only actual immutable new process bytes reach validators')
+    return body.decode('utf-8',errors='replace')
+
+
+def validate_config(config):
+    expected=dict(FREERTOS_HZ=1000,ESP_TASK_WDT_TIMEOUT_S=20,ESP_TASK_WDT_PANIC=True,
+        ESP_INT_WDT_TIMEOUT_MS=1000,ESP_TASK_WDT_EN=True,ESP_TASK_WDT_INIT=True,
+        ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0=True,ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=True,
+        HEAP_POISONING_LIGHT=True,FREERTOS_CHECK_STACKOVERFLOW_CANARY=True,
+        COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE=True,YORADIO_NATIVE_AUDIO_OUTPUT_PDM=True,
+        YORADIO_OGG_TIMELINE=True,FREERTOS_UNICORE=False,SPIRAM=False,HEAP_ABORT_WHEN_ALLOCATION_FAILS=False)
+    need(all(config.get(k,False)==v for k,v in expected.items()),'exact inherited diagnostic scheduler/watchdog/heap profile')
+    return expected
+
+
+def validate_contract(contract):
+    need(len(contract['cases'])==48 and len(contract['entries'])==13,'unchanged 48-case/13-reference contract')
+    need(contract['task_bindings']=={'stream':dict(core=0,priority=3,stack=6144),
+        'decode':dict(core=1,priority=5,stack=16384),'output':dict(core=1,priority=6,stack=4096)},'original task profiles')
+    need(all(contract[key]==value for key,value in dict(complete_output_cases=48,
+        application_http_sessions=58,application_decoder_handles=195,ordinary_deadline_ms=30000,
+        reference_capture_deadline_ms=90000,whole_qemu_deadline_ms=600000,
+        deadlines_selected_once_at_entry=True,normalization_enabled=False).items()),'whole unchanged corpus and deadlines')
+
+
+def expected_argv(qemu,rom,flash):
+    return [str(qemu),'-audiodev','none,id=quiet','-M','esp32,audiodev=quiet','-smp','2','-L',str(rom),
+        '-display','none','-monitor','none','-serial','stdio','-no-reboot','-snapshot','-nic','none',
+        '-drive','file='+str(flash).replace(',',',,')+',if=mtd,format=raw']
+
+
+def validate_argv(argv,qemu,rom,flash):
+    need(argv==expected_argv(qemu,rom,flash),'exact parent QEMU arguments, SMP/default MTTCG and snapshot policy')
+
+
+def validate_image(body):
+    need(len(body)==4194304,'exact inherited 4 MiB flash')
+    need(body[0x9000:0x10000]==b'\xff'*0x7000,'fresh erased NVS and PHY partitions')
+
+
+def resolve_tools(runtime,overrides=None):
+    overrides=overrides or {};need(set(overrides)<=set(runtime),'only inherited runtime overrides')
+    paths={}
+    for label,digest in runtime.items():
+        raw=overrides.get(label)
+        if raw is None:raw=shutil.which(label.split(':',1)[1]) if label.startswith('runtime-path-redacted:') else label
+        need(raw and Path(raw).is_file(),'inherited runtime resolves: '+Path(label).name)
+        path=Path(raw).resolve();need(sha(path)==digest,'inherited runtime identity: '+Path(label).name);paths[label]=path
+    return paths
+
+
+def validate_inherited_execution(report,child):
+    need(not report['passed'] and not report['completed'] and report['target_executed'],'native04 remains an executed NONPASS')
+    build=[c for c in report['commands'] if c['name']=='build'];guest=[c for c in report['commands'] if c['name']=='qemu']
+    need(len(build)==len(guest)==1 and build[0]['state']=='complete' and build[0]['exit_status']==0 and build[0]['pid']>0 and
+        build[0]['timeout_seconds']==1200 and guest[0]['state']=='complete' and guest[0]['exit_status']==0 and
+        guest[0]['pid']>0 and guest[0]['timeout_seconds']==600,'actual inherited build and terminal parent process')
+    need(child['pid']>0 and child['exit_status']==0,'real successful inherited SDK child')
+    return build[0],guest[0]
+
+
+def validate_release(release,release_id):
+    need(release_id!='UNRELEASED' and release['release_id']==release_id,'root-reviewed native repeat release required')
+    need(release['parent_pins']==PARENT_PINS and release['production_source_release_sha256']==SOURCE_RELEASE_SHA,
+         'repeat release joins immutable parent and production')
+    need(set(release['files'])==set(NEW_CODE+VALIDATORS+HELPERS),'exact current runner/validator/helper inventory')
+    for relative,pin in release['files'].items():
+        check_pin(identity(contained(ROOT,relative)),pin,'current repeat release input: '+relative)
+
+
+def audit_parent(overrides=None):
+    """Authenticate originals; execute no archived Python, tool or guest."""
+    for name,digest in PARENT_PINS.items():need(sha(PARENT/name)==digest,'immutable native04 prerequisite: '+name)
+    report=json.loads((PARENT/'report.json').read_bytes());bundle=json.loads((PARENT/'execution-bundle.json').read_bytes())
+    sources=json.loads((PARENT/'source-manifest.json').read_bytes());closure=json.loads((PARENT/'actual-compiler-closure.json').read_bytes())
+    need(bundle['sources']==sources and report['production_source_release_sha256']==SOURCE_RELEASE_SHA,'same inherited source graph and production release')
+    child=json.loads((PARENT/'sdk-child.json').read_text('utf-8-sig'));build,guest=validate_inherited_execution(report,child)
+    for command in report['commands']:
+        need(re.fullmatch('[A-Za-z0-9_-]+',command['name']),'bounded parent command label')
+        for stream in ('stdout','stderr'):
+            need(sha(contained(PARENT,command['name']+'.'+stream+'.log'))==command[stream+'_sha256'],'inherited actual command logs')
+    for original,pin in sources.items():
+        check_pin(identity(Path(original)),pin,'current inherited input: '+pin['snapshot'])
+        check_pin(identity(contained(PARENT,pin['snapshot'])),pin,'authentic parent snapshot: '+pin['snapshot'])
+    for name,digest in bundle['artifacts'].items():need(sha(contained(PARENT,name))==digest,'authentic inherited artifact: '+name)
+    for path,pin in closure['dependencies'].items():
+        need(pin['manifest_original'] in sources and sha(path)==pin['sha256']==sources[pin['manifest_original']]['sha256'],'all actual compiler dependencies bound and current')
+    names={Path(row['file']).name for row in closure['translation_units']}
+    need({'main.cpp','direct_reference.c','reference_control.c','audio_service.c','native_state.c','native_health.c',
+        'decoder_registration.c','native_audio_output.c','native_output_metrics.c'}<=names,'whole target/reference/production compiler closure inherited')
+    for relative in VALIDATORS+HELPERS:
+        need(str(ROOT/relative) in sources and sha(ROOT/relative)==sources[str(ROOT/relative)]['sha256'],'current actually consumed validator/helper: '+relative)
+    release=ROOT/'.build/cyd-family1-source-release-20261103-02.json';need(sha(release)==SOURCE_RELEASE_SHA,'exact 35-input production release')
+    production=json.loads(release.read_bytes());need(len(production['files'])==35,'all 35 production inputs')
+    for relative,pin in production['files'].items():
+        check_pin(identity(ROOT/relative),pin,'current production source: '+relative)
+        need(sources[str(ROOT/relative)]['sha256']==pin['sha256'],'production release joined to inherited compiler inputs')
+    config=json.loads((PARENT/'build/config/sdkconfig.json').read_bytes());profile=validate_config(config)
+    contract=json.loads((PARENT/'reference-contract.json').read_bytes());validate_contract(contract)
+    need(contract==report['pcm_reference']==bundle['pcm_reference']==bundle['expected_cases'],'unchanged exact parent fixture/reference contract')
+    recipe=json.loads((PARENT/'build/flasher_args.json').read_bytes());files={int(k,0):contained(PARENT/'build',v) for k,v in recipe['flash_files'].items()}
+    need(set(files)=={0x1000,0x8000,0x10000} and recipe['extra_esptool_args']['chip']=='esp32','inherited boot/partition/app layout')
+    image=(PARENT/'qemu-flash.bin').read_bytes();validate_image(image)
+    need(all(image[at:at+path.stat().st_size]==path.read_bytes() for at,path in files.items()),'same successfully built embedded images')
+    tools=resolve_tools(bundle['runtime'],overrides);qemu=ROOT/'.build/cyd-qemu-idf6-build-05/qemu-system-xtensa.exe'
+    need(sha(qemu)==QEMU_SHA and str(qemu) in tools,'same pinned prebuilt QEMU')
+    rom=Path('C:/Work/QEMU-ESP32/pc-bios')
+    validate_argv(guest['argv'],qemu,rom,PARENT/'qemu-flash.bin')
+    return dict(report=report,bundle=bundle,sources=sources,tools=tools,contract=contract,qemu=qemu,rom=rom,
+        summary=dict(parent_status='NONPASS; preserved',parent_pins=PARENT_PINS,source_snapshots=len(sources),
+            all_parent_live_bindings_current=True,actual_compiler_dependencies=len(closure['dependencies']),
+            inherited_artifacts=len(bundle['artifacts']),production_inputs=35,diagnostic_profile=profile,
+            inherited_build=dict(executed_here=False,parent_command=build,sdk_child=dict(pid=child['pid'],exit_status=0)),
+            runtime={safe_path(path):identity(path) for path in tools.values()},SDK_build_started_here=False))
+
+
+def query_result(operation):
+    try:return dict(state='observed',value=operation())
+    except Exception as error:return dict(state='unknown',error_type=type(error).__name__,winerror=getattr(error,'winerror',None))
+
+
+class PassiveWindowsSampler:
+    """Queries only an owned process handle and its threads. Never sets policy."""
+    def __init__(self,pid,handle):
+        self.pid,self.handle=pid,wintypes.HANDLE(int(handle))
+        self.kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+        self.kernel.GetProcessTimes.argtypes=[wintypes.HANDLE,*([ctypes.c_void_p]*4)]
+        self.kernel.GetThreadTimes.argtypes=self.kernel.GetProcessTimes.argtypes
+        self.kernel.GetPriorityClass.argtypes=[wintypes.HANDLE];self.kernel.GetPriorityClass.restype=wintypes.DWORD
+        self.kernel.GetProcessAffinityMask.argtypes=[wintypes.HANDLE,ctypes.c_void_p,ctypes.c_void_p]
+        self.kernel.GetProcessInformation.argtypes=[wintypes.HANDLE,ctypes.c_int,ctypes.c_void_p,wintypes.DWORD]
+        self.kernel.CreateToolhelp32Snapshot.argtypes=[wintypes.DWORD,wintypes.DWORD];self.kernel.CreateToolhelp32Snapshot.restype=wintypes.HANDLE
+        self.kernel.Thread32First.argtypes=[wintypes.HANDLE,ctypes.c_void_p];self.kernel.Thread32Next.argtypes=self.kernel.Thread32First.argtypes
+        self.kernel.OpenThread.argtypes=[wintypes.DWORD,wintypes.BOOL,wintypes.DWORD];self.kernel.OpenThread.restype=wintypes.HANDLE
+        self.kernel.GetProcessIdOfThread.argtypes=[wintypes.HANDLE];self.kernel.GetProcessIdOfThread.restype=wintypes.DWORD
+        self.kernel.CloseHandle.argtypes=[wintypes.HANDLE]
+        self.kernel.QueryPerformanceCounter.argtypes=[ctypes.POINTER(ctypes.c_longlong)]
+        self.kernel.QueryPerformanceFrequency.argtypes=[ctypes.POINTER(ctypes.c_longlong)]
+
+    def checked(self,ok):
+        if not ok:raise ctypes.WinError(ctypes.get_last_error())
+
+    def cpu(self,handle,thread=False):
+        values=[ctypes.c_ulonglong() for _ in range(4)]
+        self.checked((self.kernel.GetThreadTimes if thread else self.kernel.GetProcessTimes)(handle,*[ctypes.byref(v) for v in values]))
+        return dict(created_100ns=values[0].value,kernel_100ns=values[2].value,user_100ns=values[3].value)
+
+    def power(self):
+        class State(ctypes.Structure):_fields_=[('Version',wintypes.ULONG),('ControlMask',wintypes.ULONG),('StateMask',wintypes.ULONG)]
+        state=State(1,0,0);self.checked(self.kernel.GetProcessInformation(self.handle,4,ctypes.byref(state),ctypes.sizeof(state)))
+        return dict(version=state.Version,control_mask=state.ControlMask,state_mask=state.StateMask)
+
+    def affinity(self):
+        process,system=ctypes.c_size_t(),ctypes.c_size_t()
+        self.checked(self.kernel.GetProcessAffinityMask(self.handle,ctypes.byref(process),ctypes.byref(system)))
+        return dict(process_mask=process.value,system_mask=system.value)
+
+    def priority(self):
+        value=self.kernel.GetPriorityClass(self.handle);self.checked(value);return int(value)
+
+    def threads(self):
+        class Entry(ctypes.Structure):
+            _fields_=[('dwSize',wintypes.DWORD),('cntUsage',wintypes.DWORD),('thread',wintypes.DWORD),
+                ('owner',wintypes.DWORD),('base_priority',wintypes.LONG),('delta_priority',wintypes.LONG),('flags',wintypes.DWORD)]
+        snapshot=self.kernel.CreateToolhelp32Snapshot(4,0);self.checked(snapshot not in (None,ctypes.c_void_p(-1).value))
+        result=[]
+        try:
+            entry=Entry();entry.dwSize=ctypes.sizeof(entry);more=self.kernel.Thread32First(snapshot,ctypes.byref(entry))
+            self.checked(more)
+            while more:
+                if entry.owner==self.pid:
+                    handle=self.kernel.OpenThread(0x0800,False,entry.thread)
+                    if handle:
+                        try:
+                            def owned_cpu():
+                                owner=self.kernel.GetProcessIdOfThread(handle);self.checked(owner)
+                                need(owner==self.pid,'thread handle still belongs to owned child')
+                                return self.cpu(handle,True)
+                            result.append(dict(thread_id=entry.thread,base_priority=entry.base_priority,cpu=query_result(owned_cpu)))
+                        finally:self.kernel.CloseHandle(handle)
+                    else:result.append(dict(thread_id=entry.thread,cpu=dict(state='unknown',winerror=ctypes.get_last_error())))
+                more=self.kernel.Thread32Next(snapshot,ctypes.byref(entry))
+            need(ctypes.get_last_error()==18,'thread snapshot ended normally')
+            return result
+        finally:self.kernel.CloseHandle(snapshot)
+
+    def qpc(self):
+        counter,frequency=ctypes.c_longlong(),ctypes.c_longlong()
+        self.checked(self.kernel.QueryPerformanceCounter(ctypes.byref(counter)))
+        self.checked(self.kernel.QueryPerformanceFrequency(ctypes.byref(frequency)))
+        return dict(counter=counter.value,frequency=frequency.value)
+
+    def sample(self):
+        return dict(pid=self.pid,wall_time_ns=time.time_ns(),monotonic_ns=time.monotonic_ns(),
+            qpc=query_result(self.qpc),cpu=query_result(lambda:self.cpu(self.handle)),threads=query_result(self.threads),
+            priority=query_result(self.priority),affinity=query_result(self.affinity),power_throttling=query_result(self.power),
+            effective_timer_resolution_ms=None,timeBeginPeriod_return_unobserved=True,policy_changes=False)

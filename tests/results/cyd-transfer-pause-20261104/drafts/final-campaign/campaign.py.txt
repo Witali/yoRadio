@@ -1,0 +1,854 @@
+"""Prepared offline final matrix. NO phase is authorized by this file's existence.
+
+Every phase requires a root-reviewed explicit released FINAL_COMMIT. Source,
+SDK, tool and actual-input checks fail closed. Failed/live attempts are never
+overwritten or restarted. No downloads, device operations or publication.
+"""
+from pathlib import Path
+import argparse
+import ctypes
+from ctypes import wintypes
+import hashlib
+import importlib.util
+import json
+import math
+import os
+import re
+import shutil
+import struct
+import subprocess
+import sys
+import time
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+REPO = Path('C:/Work/yoRadio')
+CYD = Path('idf/esp32-cyd2usb-native')
+C3 = Path('idf/esp32c3-oled-native')
+SDK_PINS = {'v6.0.2': '7101770dc6db2667b3c477cc31365dd1acd6db4e',
+            'v5.5.4': '735507283d5b2f9fb363a1901172dbd9e847945d',
+            'v6.1-9a97f6c54ec6': '9a97f6c54ec638111ce55cd36581b3c192f15207'}
+ARCHIVE_PINS = {
+    'lib/esp32/libesp_audio_codec.a': '92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58',
+    'lib/esp32/libesp_audio_simple_dec.a': 'ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6',
+    'lib/esp32c3/libesp_audio_codec.a': '311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909',
+    'lib/esp32c3/libesp_audio_simple_dec.a': '232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f'}
+BACKEND = {'pdm': 'YORADIO_NATIVE_AUDIO_OUTPUT_PDM', 'continuous': 'YORADIO_NATIVE_AUDIO_OUTPUT_DAC',
+           'legacy': 'YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC'}
+OFF = ['YORADIO_TLS_INPUT_RECLAIM', 'YORADIO_TLS_STATIC_RX_RESERVE',
+       'YORADIO_TLS_EARLY_MPI_LOCK', 'YORADIO_NATIVE_DIAGNOSTICS']
+ROWS = [(f'{flac}-{backend}', backend, flac == 'custom-flac')
+        for flac in ('vendor', 'custom-flac') for backend in BACKEND]
+
+
+def require(value, message):
+    if not value:
+        raise RuntimeError(message)
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding='utf-8-sig'))
+
+
+def write(path, value):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, ensure_ascii=True)+'\n', encoding='utf-8')
+
+
+def ident(path):
+    path = Path(path).resolve(strict=True)
+    before = path.stat()
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    after = path.stat()
+    require((before.st_size, before.st_mtime_ns, before.st_ino) ==
+            (after.st_size, after.st_mtime_ns, after.st_ino), 'Input changed while hashed')
+    return dict(path=str(path), bytes=after.st_size, sha256=digest)
+
+
+def same(binding):
+    require(ident(binding['path']) == binding, 'Frozen input changed: '+binding['path'])
+
+
+def env():
+    result = os.environ.copy()
+    result.update(PYTHONDONTWRITEBYTECODE='1', PYTHONNOUSERSITE='1', PYTHONUTF8='1',
+                  PYTHONIOENCODING='utf-8', IDF_COMPONENT_MANAGER='0', GIT_OPTIONAL_LOCKS='0',
+                  GIT_LFS_SKIP_SMUDGE='1', GIT_TERMINAL_PROMPT='0')
+    return result
+
+
+def git(cwd, *args, data=None):
+    return subprocess.check_output(['git', '-c', 'core.longpaths=true', '-C', str(cwd), *args],
+                                   input=data, env=env())
+
+
+def module(path):
+    spec = importlib.util.spec_from_file_location('final_exporter', path)
+    result = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(result)
+    return result
+
+
+def release(path):
+    result = read(path)
+    require(result.get('schema') == 'cyd-final-production-release-v1' and result.get('released') is True,
+            'Root has not explicitly released FINAL_COMMIT')
+    for key in ('final_commit', 'task_profile_reference_commit'):
+        require(re.fullmatch('[0-9a-f]{40}', str(result.get(key))), 'Explicit full commit required: '+key)
+    for key in ('source_release_id', 'campaign_id'):
+        require(re.fullmatch('[a-zA-Z0-9_-]{3,80}', str(result.get(key))), 'Explicit release/campaign identity required')
+    task_worktree = Path(result['worktree']).resolve()
+    require(task_worktree.parent == REPO/'.worktree' and
+            re.fullmatch(r'cyd-ogg-production-[0-9]{8}(?:-[A-Za-z0-9_-]+)?', task_worktree.name),
+            'Production task must be a bounded repository-local worktree with a fresh date/suffix')
+    require(result['branch'] == 'codex/'+task_worktree.name, 'Own matching codex task branch required')
+    require(result.get('sparse_checkout_approved') is True, 'Explicit standard sparse-checkout review required')
+    require(result['evidence_files'] and result.get('c3_host_baseline_report'), 'Final task evidence and donor baseline are required')
+    for name in ('campaign.py', 'invoke-build.ps1', 'README.md'):
+        require(result['reviewed_campaign_files_sha256'].get(name) == ident(HERE/name)['sha256'],
+                'Root review does not bind exact prepared recipe: '+name)
+    require(git(REPO, 'rev-parse', '--verify', result['final_commit']+'^{commit}').decode().strip() == result['final_commit'],
+            'FINAL_COMMIT is not already local; no fetch is permitted')
+    return result
+
+
+def context(a):
+    r = release(a.release)
+    w = Path(r['worktree']).resolve()
+    run = HERE/'execution'/r['campaign_id']
+    return r, w, Path(r['dependencies']).resolve(), run
+
+
+def evidence_files(r):
+    # Future ordinary-FLAC production-watchdog successor is an explicit,
+    # optional released input. It is never inferred from a NONPASS predecessor.
+    return r['evidence_files'] + r.get('ordinary_flac_watchdog_evidence_files', [])
+
+
+def sparse_patterns(r):
+    captures = set()
+    for name in evidence_files(r):
+        p = Path(name)
+        require(not p.is_absolute() and '..' not in p.parts, 'Evidence paths must be committed repository-relative paths')
+        if p.parts[:2] == ('tests', 'results'):
+            require(len(p.parts) >= 4, 'Evidence must identify actual files in a bounded capture')
+            captures.add(p.parts[2])
+        require(not p.parts[0] == 'firmware', 'Old firmware is not an implicit final evidence input')
+    return '/*\n!/tests/results/*\n!/firmware/*\n'+''.join('/tests/results/'+x+'/\n' for x in sorted(captures))
+
+
+def disk_plan(r, patterns, directory):
+    rows = []
+    for record in git(REPO, 'ls-tree', '-r', '-l', '-z', r['final_commit']).split(b'\0'):
+        if not record:
+            continue
+        meta, name = record.split(b'\t', 1)
+        mode, kind, oid, size = meta.split()
+        require(kind == b'blob', 'Submodules require a separate offline review')
+        rows.append((os.fsdecode(name), int(size)))
+    rules = directory/'sparse-patterns.txt'
+    rules.write_text(patterns)
+    chosen = set(os.fsdecode(x) for x in git(REPO, 'sparse-checkout', 'check-rules', '--no-cone',
+                 '--rules-file', str(rules), '-z', data=b'\0'.join(os.fsencode(p) for p, s in rows)+b'\0').split(b'\0') if x)
+    material = [(p, s) for p, s in rows if p in chosen]
+    checkout = sum((s+4095)//4096*4096 for p, s in material)
+    # Measured full GCC reference was 176,250,044 B. Budgets deliberately exceed
+    # that reference; all six trees/configurations and original logs are retained.
+    mib = 1024**2
+    components = dict(sparse_checkout_rounded_4k=checkout, six_gcc_trees=6*256*mib,
+                      six_clang_configurations=6*96*mib, two_c3_configurations_and_objects=2*256*mib,
+                      donor_host_and_fixtures=128*mib, deduplicated_dependency_snapshots=512*mib,
+                      original_logs_and_reports=256*mib, six_firmware_handoffs=64*mib,
+                      operational_reserve=1024*mib)
+    required = math.ceil(sum(components.values())/1024**3)*1024**3
+    result = dict(components=components, minimum_free_before_launch=required,
+                  selected_tracked_files=len(material), selected_git_blob_bytes=sum(s for p, s in material),
+                  free_now=shutil.disk_usage(REPO).free, estimate_not_guarantee=True,
+                  required_evidence_packages_included=sorted(chosen & set(evidence_files(r))))
+    require(set(evidence_files(r)) <= chosen, 'Sparse plan omits required released evidence')
+    write(directory/'disk-plan.json', result)
+    require(result['free_now'] >= required, 'Insufficient measured free space for retained campaign; no automatic cleanup')
+    return result
+
+
+def process(argv, directory, label, record, cwd, environment=None, expected_exit=0):
+    require(expected_exit == 0 or record['phase'] == 'wrapper-test' and label == 'shim-host-throw' and expected_exit == 1,
+            'Nonzero outcomes are allowed only by the explicit host error-propagation control')
+    stdout, stderr = directory/(label+'.stdout.log'), directory/(label+'.stderr.log')
+    with stdout.open('xb') as out, stderr.open('xb') as err:
+        child = subprocess.Popen(list(map(str, argv)), cwd=cwd, env=environment or env(), stdout=out, stderr=err)
+        item = dict(argv=list(map(str, argv)), pid=child.pid, state='RUNNING', started_epoch=time.time(), expected_exit=expected_exit)
+        record['children'].append(item)
+        write(directory/'record.json', record)
+        print(json.dumps(dict(phase=record['phase'], child_pid=child.pid, state='RUNNING', record=str(directory/'record.json'))), flush=True)
+        code = child.wait()  # No observation timeout, restart, process kill or deadline extension.
+    item.update(state='TERMINAL', exit_status=code, ended_epoch=time.time(), logs=[ident(stdout), ident(stderr)])
+    write(directory/'record.json', record)
+    require(code == expected_exit, 'Unexpected terminal result preserved; never restart or overwrite this phase')
+    return stdout.read_text(encoding='utf-8', errors='replace')
+
+
+def source_check(r, w):
+    require(git(w, 'rev-parse', 'HEAD').decode().strip() == r['final_commit'], 'Final source commit changed')
+    require(git(w, 'branch', '--show-current').decode().strip() == r['branch'], 'Wrong task branch')
+    require(not git(w, 'diff', '--name-only', 'HEAD').strip(), 'Tracked source/index is dirty')
+    api = module(w/'tools/export_cyd_production.py')
+    state = api.source_snapshot(w)
+    require(not state['source_dirty'] and not state['untracked'], 'Clean committed source required; AllowDirty is forbidden')
+    allowed = [w/'firmware/development'/('esp32-cyd2usb-native-ogg-final-'+name) for name, b, c in ROWS]
+    for name in git(w, 'ls-files', '--others', '--exclude-standard', '-z').split(b'\0'):
+        if name:
+            require(any((w/os.fsdecode(name)).is_relative_to(p) for p in allowed), 'Unrelated untracked material in isolated checkout')
+    return state
+
+
+def board_tasks(r, w):
+    result = {}
+    baseline = r['task_profile_reference_commit']
+    for name in ('app_main.c', 'network_runtime.c', 'audio_service.c'):
+        rel = (CYD/'main'/name).as_posix()
+        before = git(w, 'show', baseline+':'+rel).decode().replace('\r\n', '\n')
+        after = (w/rel).read_text()
+        calls = lambda x: re.findall(r'\bxTaskCreatePinnedToCore\([^;]+;', x, re.S)
+        require(calls(before) == calls(after) and calls(after), 'Original core/priority/stack task calls changed: '+name)
+        result[name] = dict(calls=calls(after), source=ident(w/rel))
+        if name == 'audio_service.c':
+            pattern = r'static const pipeline_task_t task_config\[3\] = \{(.*?)\n    \};'
+            require(re.search(pattern, before, re.S)[1] == re.search(pattern, after, re.S)[1], 'Audio task binding table changed')
+            result[name]['pipeline_table'] = re.search(pattern, after, re.S)[1]
+    rel = (CYD/'main/board_config.h').as_posix()
+    require(git(w, 'show', baseline+':'+rel).replace(b'\r\n', b'\n') == (w/rel).read_bytes().replace(b'\r\n', b'\n'), 'CYD hardware/stack header changed')
+    result['board_config'] = ident(w/rel)
+    rel = (CYD/'partitions.csv').as_posix()
+    require(git(w, 'show', baseline+':'+rel).replace(b'\r\n', b'\n') == (w/rel).read_bytes().replace(b'\r\n', b'\n'), 'CYD OTA/partition source layout changed')
+    result['partition_source'] = ident(w/rel)
+    return result
+
+
+def tools_and_sdks(r, w, dep):
+    bindings = []
+    for folder, commit in SDK_PINS.items():
+        root = dep/folder
+        require(git(root, 'rev-parse', 'HEAD').decode().strip() == commit, 'Wrong installed SDK: '+folder)
+        require(not git(root, 'status', '--porcelain', '--untracked-files=no').strip(), 'Installed SDK tracked files changed')
+        bindings.extend(ident(root/name) for name in ('export.ps1', 'tools/idf.py', 'tools/idf_tools.py'))
+    require((w/C3/'idf-revision.txt').read_text().strip() == SDK_PINS['v6.1-9a97f6c54ec6'], 'Donor SDK pin changed')
+    for name, sha in ARCHIVE_PINS.items():
+        binding = ident(dep/'esp-adf-libs/esp_audio_codec'/name)
+        require(binding['sha256'] == sha, 'Wrong public vendor archive ABI/bytes')
+        bindings.append(binding)
+    paths = [Path(r['powershell']), Path(shutil.which('git')), dep/'python-3.12.10/tools/python.exe']
+    for version, clang in [('v6.0.2', 'esp-20.1.1_20250829'), ('v6.1', 'esp-21.1.3_20260408')]:
+        base = dep/('tools-'+version)
+        paths.extend([base/'idf-env.json', base/'tools/cmake/4.0.3/bin/cmake.exe', base/'tools/ninja/1.12.1/ninja.exe'])
+        paths.extend(base/'tools/esp-clang'/clang/'esp-clang/bin'/name for name in ('clang.exe', 'clang++.exe', 'clang-tidy.exe', 'llvm-ar.exe', 'llvm-ranlib.exe', 'ld.lld.exe'))
+        compiler = ('xtensa-esp-elf' if version == 'v6.0.2' else 'riscv32-esp-elf')
+        ccroot = base/'tools'/compiler/'esp-15.2.0_20251204'/compiler
+        paths.extend(ccroot.rglob('*.exe'))
+        paths.extend(ccroot.rglob('*.dll'))
+        paths.append(base/'python_env'/('idf6.0_py3.12_env' if version == 'v6.0.2' else 'idf6.1_py3.12_env')/'Scripts/python.exe')
+    bindings.extend(ident(p) for p in sorted(set(paths)))
+    return bindings
+
+
+def row_paths(w, name, clang=False, donor=False):
+    project = w/(C3 if donor else CYD)
+    suffix = 'c3-normalizer' if donor else name
+    build = project/('build-ogg-final-'+('clang-' if clang else 'gcc-')+suffix)
+    return project, build, build/'sdkconfig'
+
+
+def configure_seed(config, custom=None, gcc_config=None):
+    config.parent.mkdir(parents=True, exist_ok=False)
+    if gcc_config:
+        text = gcc_config.read_text()
+        keys = r'(?:IDF_TOOLCHAIN(?:_CLANG|_GCC)?|LIBC_(?:PICOLIBC(?:_NEWLIB_COMPATIBILITY)?|NEWLIB(?:_NANO_FORMAT)?))'
+        text = re.sub(r'(?m)^(?:CONFIG_'+keys+r'=.*|# CONFIG_'+keys+r' is not set)\r?\n?', '', text)
+        text += '\nCONFIG_IDF_TOOLCHAIN="clang"\nCONFIG_LIBC_NEWLIB=y\nCONFIG_LIBC_NEWLIB_NANO_FORMAT=y\n'
+    else:
+        text = 'CONFIG_IDF_TOOLCHAIN="gcc"\n'
+        if custom is not None:
+            text += '\n'.join('CONFIG_'+key+'='+('y' if (key.endswith('CUSTOM') == custom) else 'n') for key in ('YORADIO_FLAC_DECODER_ESPRESSIF', 'YORADIO_FLAC_DECODER_CUSTOM'))+'\n'
+            text += '\n'.join('# CONFIG_'+key+' is not set' for key in OFF)+'\n'
+    config.write_text(text, encoding='utf-8')
+
+
+def invoke(r, w, dep, directory, record, backend, build, config, clang=False, donor=False, ninja_targets=None, production=False, variant=None):
+    project = w/(C3 if donor else CYD)
+    parameters = dict(DependencyRoot=str(dep), BuildDirectory=str(build), Sdkconfig=str(config))
+    if not donor:
+        parameters['AudioBackend'] = backend
+    if clang or donor:
+        parameters['IdfArguments'] = ['-D', 'IDF_TOOLCHAIN='+('clang' if clang else 'gcc'), 'reconfigure']
+    if production:
+        parameters['Variant'] = variant
+        parameters['Evidence'] = [str(w/path) for path in evidence_files(r)]
+    spec = dict(schema='cyd-final-production-invocation-v1', script=str(project/('build-production.ps1' if production else 'build.ps1')),
+                parameters=parameters, witness_directory=str(directory), ninja_only=bool(ninja_targets),
+                ninja_targets=ninja_targets, project=str(project), build=str(build),
+                idf_tools=str(dep/('tools-v6.1' if donor else 'tools-v6.0.2')),
+                idf_export=str(dep/('v6.1-9a97f6c54ec6' if donor else 'v6.0.2')/'export.ps1'),
+                audio_codec_component=str(dep/'esp-adf-libs/esp_audio_codec'),
+                bootstrap_directory=str(dep/'python-3.12.10/tools'),
+                ninja=str(dep/('tools-v6.1' if donor else 'tools-v6.0.2')/'tools/ninja/1.12.1/ninja.exe'))
+    invocation = directory/'invocation.json'
+    write(invocation, spec)
+    e = env()
+    e['IDF_TOOLCHAIN'] = 'clang' if clang else 'gcc'
+    process([r['powershell'], '-NoProfile', '-NonInteractive', '-File', HERE/'invoke-build.ps1', '-Invocation', invocation],
+            directory, 'ninja' if ninja_targets else 'sdk', record, w, e)
+    if ninja_targets:
+        witness = read(directory/'ninja-handle.json')
+        require(witness['state'] == 'TERMINAL' and witness['exit_status'] == 0, 'Donor Ninja handle is not terminal zero')
+        record.setdefault('actual_ninja_handles', []).append(ident(directory/'ninja-handle.json'))
+    record['descendant_observation'] = dict(attempted=False, available=False,
+        limitation='Nested SDK PIDs/exit events not independently observed; no statuses invented. Canonical waited-child/error propagation, owned root terminal, actual logs/database/dependencies/artifacts are primary.')
+
+
+def config_check(r, build, backend=None, custom=False, clang=False, donor=False):
+    cfg = read(build/'config/sdkconfig.json')
+    require(cfg['IDF_TARGET'] == ('esp32c3' if donor else 'esp32'), 'Wrong hardware target')
+    require(cfg['IDF_TARGET_ARCH'] == ('riscv' if donor else 'xtensa'), 'Wrong compiler ABI')
+    require(cfg.get('FREERTOS_UNICORE') is donor, 'Core count changed')
+    require(cfg.get('ESP_DEFAULT_CPU_FREQ_MHZ') == (160 if donor else 240), 'CPU clock profile changed')
+    require(cfg['IDF_TOOLCHAIN'] == ('clang' if clang else 'gcc'), 'Cached toolchain did not transition')
+    require(cfg.get('LIBC_NEWLIB' if clang else 'LIBC_PICOLIBC') is True, 'Wrong compiler/libc profile')
+    if clang:
+        require(cfg.get('LIBC_NEWLIB_NANO_FORMAT') is True, 'Clang nano formatting changed')
+    if donor:
+        require(cfg.get('YORADIO_DIRECT_DMA_PCM') is not True, 'Do not activate unsupported donor direct-DMA target')
+    else:
+        require(cfg.get('ESPTOOLPY_FLASHMODE_QIO') is True and cfg.get('ESPTOOLPY_FLASHFREQ_80M') is True
+                and cfg.get('ESPTOOLPY_FLASHSIZE_4MB') is True, 'CYD QIO/80MHz/4MiB hardware profile changed')
+        require(all(cfg.get(key) is True for key in ('MBEDTLS_HARDWARE_MPI', 'MBEDTLS_HARDWARE_AES', 'MBEDTLS_HARDWARE_SHA')), 'Hardware crypto profile changed')
+        require(cfg.get(BACKEND[backend]) is True and all(cfg.get(key) is not True for name, key in BACKEND.items() if name != backend), 'Audio backend changed')
+        require(cfg.get('YORADIO_FLAC_DECODER_CUSTOM') is custom and cfg.get('YORADIO_FLAC_DECODER_ESPRESSIF') is not custom, 'FLAC matrix dimension changed')
+        require(all(cfg.get(key) is not True for key in OFF), 'Default-OFF memory/diagnostic option became enabled')
+        require(cfg.get('MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE') is not True, 'Diagnostic/custom trust bundle in production')
+        require(cfg.get('MBEDTLS_SSL_IN_CONTENT_LEN') == 16384 and cfg.get('MBEDTLS_SSL_OUT_CONTENT_LEN') == 4096, 'Production record capacities changed')
+        for key, value in r['expected_cyd_options'].items():
+            require(type(cfg.get(key)) is type(value) and cfg.get(key) == value, 'Released option changed: '+key)
+    return cfg
+
+
+def tokens(command):
+    argc = ctypes.c_int()
+    parse = ctypes.windll.shell32.CommandLineToArgvW
+    parse.argtypes = [wintypes.LPCWSTR, ctypes.POINTER(ctypes.c_int)]
+    parse.restype = ctypes.POINTER(wintypes.LPWSTR)
+    values = parse(command, ctypes.byref(argc))
+    require(bool(values), 'Windows argv parsing failed')
+    try:
+        return [values[i] for i in range(argc.value)]
+    finally:
+        free = ctypes.windll.kernel32.LocalFree
+        free.argtypes = [ctypes.c_void_p]
+        free(ctypes.cast(values, ctypes.c_void_p))
+
+
+def entry_tokens(entry, response_bindings=None):
+    argv = list(entry['arguments']) if 'arguments' in entry else tokens(entry['command'])
+    def expand(items, depth=0):
+        require(depth < 12, 'Response-file recursion')
+        result = []
+        for item in items:
+            if item.startswith('@'):
+                path = Path(item[1:]); path = path if path.is_absolute() else Path(entry['directory'])/path
+                if response_bindings is not None:
+                    response_bindings[str(path.resolve())] = ident(path)
+                result.extend(expand(tokens('response '+path.read_text())[1:], depth+1))
+            else:
+                require(item not in ('&&', '|', '>', '<'), 'Shell command wrappers are unsupported')
+                result.append(item)
+        return result
+    argv = expand(argv)
+    require('clang' in Path(argv[0]).name or 'gcc' in Path(argv[0]).name or 'g++' in Path(argv[0]).name, 'Actual compiler driver required')
+    require(tokens(subprocess.list2cmdline(argv)) == argv, 'Windows compile argument roundtrip failed')
+    return argv
+
+
+def input_path(entry):
+    p = Path(entry['file'])
+    return (p if p.is_absolute() else Path(entry['directory'])/p).resolve()
+
+
+def object_path(entry):
+    argv = entry_tokens(entry)
+    require('-o' in argv, 'Actual compiler output path is required')
+    p = Path(argv[argv.index('-o')+1])
+    return (p if p.is_absolute() else Path(entry['directory'])/p).resolve()
+
+
+def store_inputs(paths, run):
+    result = []
+    store = run/'dependency-bytes'
+    store.mkdir(exist_ok=True)
+    for path in sorted(set(Path(p).resolve() for p in paths)):
+        binding = ident(path)
+        target = store/binding['sha256']
+        if not target.exists():
+            with target.open('xb') as out, path.open('rb') as stream:
+                shutil.copyfileobj(stream, out)
+        require(ident(target)['sha256'] == binding['sha256'], 'Dependency byte-store corruption')
+        same(binding)
+        result.append(dict(**binding, snapshot=str(target)))
+    return result
+
+
+def gcc_closure(build, entries, dep, donor, directory, record, run, w):
+    ninja = dep/('tools-v6.1' if donor else 'tools-v6.0.2')/'tools/ninja/1.12.1/ninja.exe'
+    text = process([ninja, '-C', build, '-t', 'deps'], directory, 'ninja-deps', record, w)
+    dependencies, current = {}, None
+    for line in text.splitlines():
+        if line and not line.startswith(' '):
+            match = re.match(r'(.+): #deps .*\((VALID|STALE)\)', line)
+            current = match[1] if match else None
+            if current:
+                require(match[2] == 'VALID', 'Stale Ninja consumed dependency record')
+                dependencies[current.replace('\\', '/')] = []
+        elif current and line.startswith('    '):
+            p = Path(line[4:]); dependencies[current.replace('\\', '/')].append(p if p.is_absolute() else build/p)
+    all_inputs, outputs, response = set(), [], {}
+    for entry in entries:
+        argv = entry_tokens(entry, response)
+        obj = object_path(entry)
+        key = obj.relative_to(build).as_posix()
+        require(key in dependencies and obj.is_file(), 'Actual compiled object/dependency record missing: '+key)
+        raw = obj.read_bytes()
+        require(len(raw) >= 52 and raw[:6] == b'\x7fELF\x01\x01' and struct.unpack_from('<H', raw, 18)[0] == (243 if donor else 94), 'Actual object architecture differs')
+        all_inputs.update(dependencies[key]); all_inputs.add(input_path(entry))
+        outputs.append(dict(command=entry, actual_argv=argv, object=ident(obj), dependencies_key=key))
+    all_inputs.update(Path(p) for p in response)
+    return dict(actual_objects=outputs, inputs=store_inputs(all_inputs, run), responses=list(response.values()),
+                ninja_dependencies=ident(directory/'ninja-deps.stdout.log'))
+
+
+def frontend_args(entry):
+    clean, argv, i = [], entry_tokens(entry), 0
+    while i < len(argv):
+        if argv[i] in ('-o', '-MF', '-MT', '-MQ'):
+            i += 2
+        elif argv[i] in ('-c', '-MD', '-MMD', '-MP'):
+            i += 1
+        else:
+            clean.append(argv[i]); i += 1
+    return clean
+
+
+def make_dependencies(path, cwd):
+    text = path.read_text().replace('\\\r\n', '').replace('\\\n', '')
+    require(text.startswith('final_dependency:'), 'Unexpected actual dependency target')
+    result = []
+    for token in re.findall(r'(?:\\[ #:\\]|[^\s])+', text.split(':', 1)[1]):
+        p = Path(re.sub(r'\\([ #:\\])', r'\1', token))
+        result.append((p if p.is_absolute() else Path(cwd)/p).resolve(strict=True))
+    return result
+
+
+def lint_selection(entries, w, build):
+    result = []
+    for entry in entries:
+        p = input_path(entry)
+        if p.suffix.lower() not in ('.c', '.cc', '.cpp', '.cxx') or not p.is_relative_to(w):
+            continue
+        rel = p.relative_to(w)
+        overlay = p.parent == build/'native-httpd-rfc6455' and p.name in ('httpd_ws.c', 'httpd_parse.c')
+        if not overlay and any(x.startswith('build') or x.startswith('.') for x in rel.parts[:-1]):
+            continue
+        result.append(entry)
+    require(result, 'No actual project lint units')
+    return result
+
+
+def sdk_frontends(entries, build, dep, backend, donor):
+    result = []
+    for name in ('esp_http_client.c', 'esp_tls_mbedtls.c', 'ssl_tls.c'):
+        selected = [e for e in entries if input_path(e).name == name]
+        require(len(selected) == 1, 'Unique actual SDK/frontend input required: '+name)
+        result.extend(selected)
+    if not donor:
+        require(input_path(result[0]).parent == build/'native-http-request-buffer', 'Actual patched HTTP-client source missing')
+        require(input_path(result[1]) == (dep/'v6.0.2/components/esp-tls/esp_tls_mbedtls.c').resolve(), 'TLS EOF compile-definition source identity changed')
+        require('-Dmbedtls_ssl_read=yoradio_mbedtls_ssl_read' in entry_tokens(result[1]), 'Actual TLS EOF source redirection missing')
+        require(input_path(result[2]) == (dep/'v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c').resolve(), 'Default-OFF RX must use unmodified SDK SSL source')
+        if backend == 'legacy':
+            legacy = [e for e in entries if input_path(e).name == 'i2s_legacy.c']
+            require(len(legacy) == 1 and input_path(legacy[0]) == (dep/'v5.5.4/components/driver/deprecated/i2s_legacy.c').resolve(), 'Wrong borrowed legacy driver')
+            result.extend(legacy)
+    return result
+
+
+def delta(before, after):
+    return {k: dict(before_present=k in before, before=before.get(k), after_present=k in after, after=after.get(k))
+            for k in sorted(before.keys() | after.keys()) if k not in before or k not in after or
+            type(before[k]) is not type(after[k]) or before[k] != after[k]}
+
+
+def checked_marker(r, w, dep, run):
+    m = read(run/'marker.json')
+    require(m['release'] == ident(ARGS.release), 'Released request changed')
+    require(source_check(r, w) == m['source_snapshot'], 'Source identity changed')
+    require(board_tasks(r, w) == m['task_profiles'], 'Original CYD task profile changed')
+    for binding in m['tools_and_sdks'] + m['inputs'] + m['recipe']:
+        same(binding)
+    return m
+
+
+def create(r, w, dep, run, directory, record):
+    require(not w.exists(), 'Do not reuse or overwrite a task worktree')
+    require(not git(REPO, 'branch', '--list', r['branch']).strip(), 'Do not reuse an existing task branch')
+    require('/.worktree/' in (REPO/'.gitignore').read_text().splitlines(), 'Repository worktree ignore must already be committed')
+    patterns = sparse_patterns(r)
+    record['disk_plan'] = disk_plan(r, patterns, directory)
+    process(['git', '-c', 'core.longpaths=true', '-C', REPO, 'worktree', 'add', '--no-checkout', '-b', r['branch'], w, r['final_commit']], directory, 'worktree-add', record, REPO)
+    rules = directory/'sparse-patterns.txt'
+    # Input through a file-backed stdin, no shell interpolation or wildcard.
+    with rules.open('rb') as stream, (directory/'sparse.stdout.log').open('xb') as out, (directory/'sparse.stderr.log').open('xb') as err:
+        child = subprocess.Popen(['git', '-C', str(w), 'sparse-checkout', 'set', '--no-cone', '--stdin'], stdin=stream, stdout=out, stderr=err, env=env())
+        item = dict(argv=['git', '-C', str(w), 'sparse-checkout', 'set', '--no-cone', '--stdin'], stdin=ident(rules), pid=child.pid, state='RUNNING')
+        record['children'].append(item); write(directory/'record.json', record)
+        code = child.wait(); item.update(state='TERMINAL', exit_status=code, logs=[ident(directory/'sparse.stdout.log'), ident(directory/'sparse.stderr.log')])
+        require(code == 0, 'Sparse setup failed; preserve partial worktree, do not remove/retry')
+    process(['git', '-C', w, 'checkout', r['branch']], directory, 'checkout', record, w)
+    source_check(r, w)
+    record['patterns'] = ident(rules)
+
+
+def freeze(r, w, dep, run, directory, record):
+    require(not (run/'marker.json').exists(), 'Never overwrite a freeze')
+    budget = read(run/'create/disk-plan.json')
+    remaining = budget['minimum_free_before_launch'] - budget['components']['sparse_checkout_rounded_4k']
+    require(shutil.disk_usage(w).free >= remaining, 'Insufficient retained-campaign free space after checkout')
+    source = source_check(r, w)
+    require(not git(w, 'ls-files', '--others', '--exclude-standard').strip(), 'Initial isolated worktree must have no untracked files')
+    require(git(w, 'sparse-checkout', 'list').decode().replace('\r\n', '\n') == sparse_patterns(r), 'Sparse patterns differ from released inputs')
+    api = module(w/'tools/export_cyd_production.py')
+    for backend in BACKEND:
+        api.preflight(dep, backend)
+    for project in (CYD, C3):
+        require(not any((w/project/name).exists() for name in ('sdkconfig', 'sdkconfig.dac', 'sdkconfig.legacy-dac')), 'Ignored historical full sdkconfig seed in fresh checkout')
+    inputs = [ident(w/name) for name in evidence_files(r)]
+    baseline = ident(r['c3_host_baseline_report'])
+    inputs.append(baseline)
+    for project in (CYD, C3):
+        inputs.extend(ident(p) for p in sorted((w/project).glob('sdkconfig*')) if p.is_file())
+    inputs.extend(ident(w/name) for name in ('.clang-tidy', 'tools/export_cyd_production.py', 'tools/run_native_lint.py',
+                  'tests/run-cyd-production-wrapper.py', 'tools/codec_benchmark/run_output_dma_host.py',
+                  'yoRadio/src/audioI2S/AudioNormalizer.cpp', 'yoRadio/src/audioI2S/AudioNormalizer.h',
+                  str(CYD/'build.ps1'), str(CYD/'build-production.ps1'), str(C3/'build.ps1')))
+    for name, backend, custom in ROWS:
+        require(not row_paths(w, name)[1].exists() and not row_paths(w, name, True)[1].exists(), 'Build/config directory not fresh')
+        require(not (w/'firmware/development'/('esp32-cyd2usb-native-ogg-final-'+name)).exists(), 'New production destination already exists')
+    marker = dict(release=ident(ARGS.release), source_snapshot=source, task_profiles=board_tasks(r, w),
+                  tools_and_sdks=tools_and_sdks(r, w, dep), inputs=inputs,
+                  recipe=[ident(HERE/name) for name in ('campaign.py', 'invoke-build.ps1', 'README.md')],
+                  disk=read(run/'create/disk-plan.json'), source_release_id=r['source_release_id'])
+    require(source_check(r, w) == source, 'Source changed during freeze')
+    write(run/'marker.json', marker)
+    record['marker'] = ident(run/'marker.json')
+
+
+def shim_host(r, w, dep, directory, record):
+    fixture = directory/'shim-host-receiver.ps1'
+    fixture.write_text('''param([string[]]$Evidence, [string[]]$IdfArguments, [string]$Literal, [string]$Mode)
+$ErrorActionPreference = 'Stop'
+if ($Mode -eq 'throw') { throw 'Intentional host propagation control; no SDK invoked' }
+[ordered]@{ Evidence=@($Evidence); IdfArguments=@($IdfArguments); Literal=$Literal; Mode=$Mode } | ConvertTo-Json -Compress
+''')
+    parameters = dict(Evidence=['C:/fixture path/one.json', 'C:/fixture/two.json'],
+                      IdfArguments=['-D', 'IDF_TOOLCHAIN=clang', 'reconfigure'],
+                      Literal='literal "quotes" and trailing \\', Mode='ok')
+    fixture_invocation = directory/'shim-host-invocation.json'
+    write(fixture_invocation, dict(schema='cyd-final-production-invocation-v1', script=str(fixture), parameters=parameters))
+    argv = [r['powershell'], '-NoProfile', '-NonInteractive', '-File', HERE/'invoke-build.ps1', '-Invocation', fixture_invocation]
+    output = process(argv, directory, 'shim-host-ok', record, w)
+    require(json.loads(output) == parameters, 'Typed JSON array/quote parameter forwarding changed')
+    failure_invocation = directory/'shim-host-failure-invocation.json'
+    write(failure_invocation, dict(schema='cyd-final-production-invocation-v1', script=str(fixture), parameters=dict(parameters, Mode='throw')))
+    process(argv[:-1]+[failure_invocation], directory, 'shim-host-throw', record, w, expected_exit=1)
+    record['shim_host_controls'] = dict(passed=True, arrays_quotes_and_backslashes_exact=True,
+                                       actual_throw_exit=1, sdk_invocations=0, fixture=ident(fixture))
+
+
+def gcc(r, w, dep, run, directory, record, name, backend, custom):
+    require(read(run/'wrapper-test/record.json')['state'] == 'TERMINAL_SUCCESS', 'Production wrapper host gate required first')
+    project, build, config = row_paths(w, name)
+    configure_seed(config, custom)
+    api = module(w/'tools/export_cyd_production.py')
+    api.preflight(dep, backend)
+    record['config_seed'] = ident(config)
+    variant = 'esp32-cyd2usb-native-ogg-final-'+name
+    invoke(r, w, dep, directory, record, backend, build, config, production=True, variant=variant)
+    record['config'] = config_check(r, build, backend, custom)
+    # The unchanged canonical wrapper already built, qualified and saved the
+    # handoff, including its original logs and completion manifest.
+    output = w/'firmware/development'/variant
+    receipt = read(output/'manifest.json')
+    record['canonical_sdkconfig_seed'] = receipt['sdkconfig_seed']
+    source = source_check(r, w)
+    require(receipt['build_check'] == 'PASS' and receipt['source_commit'] == r['final_commit']
+            and receipt['source_content_sha256'] == source['content_sha256']
+            and not receipt['source_dirty'] and not receipt['source_untracked'], 'Canonical export identity failed')
+    qualified = api.qualify(w, build, dep, backend, source_check(r, w), config)
+    require(all(receipt.get(k) == v for k, v in qualified['details'].items()), 'Saved exporter receipt differs from actual build')
+    require(receipt['ota_slots'] == [dict(name='app0', offset=0x10000, bytes=0x1B0000), dict(name='app1', offset=0x1C0000, bytes=0x1B0000)], 'Original dual-OTA geometry changed')
+    actual_logs = []
+    for log in receipt['build_logs']:
+        original = ident(log['original_path']); saved = ident(output/log['file'])
+        require(original['sha256'] == saved['sha256'] == log['sha256'] and original['bytes'] == saved['bytes'], 'Canonical original/saved compiler log mismatch')
+        actual_logs.extend([original, saved])
+    record['native_build_logs'] = actual_logs
+    desc = read(build/'project_description.json')
+    elf = build/desc['app_elf']
+    nm = Path(desc['c_compiler']).parent/'xtensa-esp32-elf-nm.exe'
+    symbols = process([nm, '-S', '--defined-only', elf], directory, 'nm', record, w)
+    names = {line.split()[-1] for line in symbols.splitlines() if line.split()}
+    require(('custom_flac_decoder_feed' in names) is custom and ('esp_flac_dec_register' in names) is not custom, 'Actual linked FLAC implementation mismatch')
+    require(not {'native_tls_early_mpi_prepare', '__wrap_esp_mbedtls_mem_calloc', 'native_tls_rx_reserve_crt_bundle_attach'} & names, 'Default-OFF helper linked into production')
+    record['compiler_closure'] = gcc_closure(build, read(build/'compile_commands.json'), dep, False, directory, record, run, w)
+    process([Path(desc['c_compiler']).parent/'xtensa-esp32-elf-objdump.exe', '-dwC', '--disassemble=audio_service_start', elf],
+            directory, 'actual-task-start-disassembly', record, w)
+    commands = process([dep/'tools-v6.0.2/tools/ninja/1.12.1/ninja.exe', '-C', build, '-t', 'commands'], directory, 'actual-commands', record, w)
+    require(not any('--wrap='+name in commands for name in ('esp_mbedtls_mem_calloc', 'esp_mbedtls_mem_free', 'heap_caps_calloc', 'heap_caps_free', 'mbedtls_platform_zeroize')), 'Diagnostic/default-ON allocator routing in production')
+    raw = elf.read_bytes()
+    section_offset = struct.unpack_from('<I', raw, 32)[0]
+    section_size, section_count = struct.unpack_from('<HH', raw, 46)
+    sections = [struct.unpack_from('<10I', raw, section_offset+i*section_size) for i in range(section_count)]
+    allocated = [s for s in sections if s[2] & 2]
+    record['actual_resource_totals'] = dict(iram_bytes=sum(s[5] for s in allocated if 0x40080000 <= s[3] < 0x400a0000),
+                                            dram_bytes=sum(s[5] for s in allocated if 0x3ff80000 <= s[3] < 0x40000000),
+                                            app_bytes=receipt['app_bytes'], ota_slots=receipt['ota_slots'], attribution='none')
+    record['artifacts'] = [ident(p) for p in sorted(output.iterdir()) if p.is_file()] + [ident(elf), ident(build/(desc['project_name']+'.map')), ident(build/'compile_commands.json'), ident(config), ident(build/'config/sdkconfig.json')]
+    record['resource_scope'] = 'Actual ELF/map/image/OTA identities; no runtime heap, radio, TFT, RF or physical margin claim'
+
+
+def donor_gcc(r, w, dep, run, directory, record):
+    project, build, config = row_paths(w, '', donor=True)
+    configure_seed(config)
+    invoke(r, w, dep, directory, record, None, build, config, donor=True)
+    record['config'] = config_check(r, build, donor=True)
+    expected = {w/'yoRadio/src/audioI2S/AudioNormalizer.cpp', project/'main/native_audio_normalizer.cpp', project/'main/native_audio_output.c'}
+    entries = [e for e in read(build/'compile_commands.json') if input_path(e) in expected]
+    require({input_path(e) for e in entries} == expected and len(entries) == 3, 'Exact donor object sources not unique')
+    targets = [object_path(e).relative_to(build).as_posix() for e in entries]
+    objects = directory/'objects'; objects.mkdir()
+    invoke(r, w, dep, objects, record, None, build, config, donor=True, ninja_targets=targets)
+    record['compiler_closure'] = gcc_closure(build, entries, dep, True, directory, record, run, w)
+    record['actual_object_targets'] = targets
+    record['artifacts'] = [ident(config), ident(build/'config/sdkconfig.json'), ident(build/'compile_commands.json')]
+
+
+def clang_configure(r, w, dep, run, directory, record, name, backend, custom, donor=False):
+    prior = run/('c3-gcc' if donor else 'gcc-'+name)/'record.json'
+    require(read(prior)['state'] == 'TERMINAL_SUCCESS', 'Corresponding actual GCC result required')
+    project, build, config = row_paths(w, name, True, donor)
+    gcc_config = row_paths(w, name, False, donor)[2]
+    record['gcc_config_input'] = ident(gcc_config)
+    configure_seed(config, gcc_config=gcc_config)
+    record['clang_seed'] = ident(config)
+    invoke(r, w, dep, directory, record, backend, build, config, clang=True, donor=donor)
+    cfg = config_check(r, build, backend, custom, True, donor)
+    changes = delta(read(gcc_config.parent/'config/sdkconfig.json'), cfg)
+    write(directory/'typed-config-delta.json', changes)
+    record['config_delta'] = ident(directory/'typed-config-delta.json')
+    record['artifacts'] = [ident(p) for p in (config, build/'config/sdkconfig.json', build/'compile_commands.json', build/'CMakeCache.txt')]
+    record['review_required_before_lint'] = True
+
+
+def clang_check(r, w, dep, run, directory, record, name, backend, custom, donor=False):
+    configured = read(run/('c3-clang-configure' if donor else 'clang-configure-'+name)/'record.json')
+    require(configured['state'] == 'TERMINAL_SUCCESS', 'Actual Clang configuration required')
+    for binding in configured['artifacts']:
+        same(binding)
+    same(configured['config_delta'])
+    approval = read(ARGS.delta_approval)
+    require(approval.get('approved') is True and approval.get('delta_sha256') == configured['config_delta']['sha256']
+            and approval.get('source_commit') == r['final_commit'] and approval.get('reason'), 'Root must review the full actual typed delta, not a historical count')
+    record['delta_approval'] = ident(ARGS.delta_approval)
+    project, build, config = row_paths(w, name, True, donor)
+    actual_config = config_check(r, build, backend, custom, True, donor)
+    require(delta(read(row_paths(w, name, False, donor)[1]/'config/sdkconfig.json'), actual_config) == read(configured['config_delta']['path']), 'Approved compiler/libc delta no longer matches actual configs')
+    entries = read(build/'compile_commands.json')
+    lint = lint_selection(entries, w, build)
+    if not donor:
+        require({input_path(e).name for e in lint if input_path(e).parent == build/'native-httpd-rfc6455'} == {'httpd_ws.c', 'httpd_parse.c'}, 'Both actual HTTPD overlay units required')
+    sdk = sdk_frontends(entries, build, dep, backend, donor)
+    selected = {str(input_path(e)): e for e in lint+sdk}
+    inputs, responses, discoveries = set(), {}, []
+    for index, entry in enumerate(selected.values()):
+        entry_tokens(entry, responses)
+        require('clang' in Path(entry_tokens(entry)[0]).name, 'Actual Clang compile command required')
+        dependency = directory/f'input-{index}.d'
+        argv = frontend_args(entry)+['-M', '-MF', str(dependency), '-MT', 'final_dependency']
+        process(argv, directory, f'discover-{index}', record, entry['directory'])
+        consumed = make_dependencies(dependency, entry['directory'])
+        inputs.update(consumed); inputs.add(input_path(entry))
+        discoveries.append(dict(entry=entry, dependency=ident(dependency), inputs=[str(p) for p in consumed]))
+    inputs.update(Path(p) for p in responses)
+    frozen = store_inputs(inputs, run)
+    clang_series = 'esp-21.1.3_20260408' if donor else 'esp-20.1.1_20250829'
+    tidy = dep/('tools-v6.1' if donor else 'tools-v6.0.2')/'tools/esp-clang'/clang_series/'esp-clang/bin/clang-tidy.exe'
+    lint_out = directory/'full-lint'
+    process([dep/'python-3.12.10/tools/python.exe', '-B', '-X', 'utf8', w/'tools/run_native_lint.py', '--build-dir', build,
+             '--clang-tidy', tidy, '--output', lint_out, '--jobs', '2', '--include-httpd-overlay'], directory, 'full-lint', record, w)
+    report = read(lint_out/'report.json')
+    expected = {input_path(e).relative_to(w).as_posix() for e in lint}
+    require(report['complete'] and report['errors'] == 0 and report['source_commit'] == r['final_commit']
+            and {x['file'] for x in report['results']} == expected and report['units'] == len(expected), 'Incomplete actual full Clang coverage')
+    require(all(x['complete'] and x['returncode'] == 0 and ident(w/x['file'])['sha256'] == x['source_sha256'] for x in report['results']), 'Stale/error Clang unit')
+    for index, entry in enumerate(sdk):
+        dependency = directory/f'sdk-{index}.d'
+        process(frontend_args(entry)+['-fsyntax-only', '-MD', '-MF', str(dependency), '-MT', 'final_dependency'],
+                directory, f'sdk-frontend-{index}', record, entry['directory'])
+        require(set(make_dependencies(dependency, entry['directory'])) <= inputs, 'SDK frontend consumed an unfrozen input')
+    for binding in frozen:
+        same({k: binding[k] for k in ('path', 'bytes', 'sha256')})
+    record.update(compiler_closure=dict(inputs=frozen, response_files=list(responses.values()), discoveries=discoveries),
+                  actual_lint_units=sorted(expected), sdk_frontend_units=[str(input_path(e)) for e in sdk],
+                  lint_report=ident(lint_out/'report.json'), warnings=report['warnings'], frontend_errors=0)
+
+
+def host(r, w, dep, run, directory, record):
+    # Normal reviewed Windows/WSL execution is required by the operator.
+    process(['wsl.exe', '--exec', '/bin/sh', '-c', 'set -eu; command -v gcc; command -v g++; gcc --version; g++ --version; sha256sum /usr/bin/gcc /usr/bin/g++ "$(gcc -print-prog-name=cc1)" "$(g++ -print-prog-name=cc1plus)" "$(gcc -print-file-name=libasan.so)" "$(gcc -print-file-name=libubsan.so)"'], directory, 'host-tools', record, w)
+    output = directory/'actual-host'
+    process([dep/'python-3.12.10/tools/python.exe', '-B', w/'tools/codec_benchmark/run_output_dma_host.py', '--output', output, '--profile'], directory, 'donor-host', record, w)
+    report = read(output/'report.json')
+    keys = ('pcm_identical', 'case_metadata_identical', 'profile_pcm_identical', 'profile_metadata_identical', 'staged_profile_pcm_identical', 'staged_profile_metadata_identical')
+    require(all(report.get(k) is True for k in keys), 'ASan/UBSan staged/DMA/profile regression failed')
+    baseline = read(r['c3_host_baseline_report'])
+    require(report['variants'] == baseline['variants'] and report['normalizer'] == baseline['normalizer'], 'Donor legacy PCM/normalizer differs from explicit pre-change baseline')
+    for rel, sha in report['sources'].items():
+        require(ident(w/rel)['sha256'] == sha, 'Donor host consumed stale source')
+    record.update(host_report=ident(output/'report.json'), baseline=ident(r['c3_host_baseline_report']),
+                  scope='Actual immutable-input host seams/ASan/UBSan/leaks; not physical DMA or universal algorithm conformance')
+
+
+def catalog(run, directory):
+    result = {}
+    diagnostic = re.compile(r'^(.+?):(\d+)(?::(\d+))?: (warning|error|fatal error): (.+)$')
+    logs = set(run.rglob('*.log'))
+    for path in run.glob('gcc-*/record.json'):
+        for binding in read(path).get('native_build_logs', []):
+            same(binding); logs.add(Path(binding['path']))
+    for log in sorted(logs):
+        if directory in log.parents:
+            continue
+        for number, line in enumerate(log.read_text(encoding='utf-8', errors='replace').splitlines(), 1):
+            match = diagnostic.match(line)
+            if match:
+                require(match[4] == 'warning', 'Compiler/parser error remains in an actual phase log')
+            if match or re.search(r'\bwarning:\s', line):
+                key = hashlib.sha256(line.encode()).hexdigest()
+                result.setdefault(key, dict(id=key, diagnostic=line, observations=[]))['observations'].append(dict(log=ident(log), line=number))
+    value = dict(warning_free=not result, items=list(result.values()), acceptance_requires_exact_individual_root_triage=True)
+    write(directory/'warnings.json', value)
+    return value
+
+
+def finalize(r, w, dep, run, directory, record):
+    expected = ['wrapper-test', 'c3-gcc', 'c3-clang-configure', 'c3-clang-check', 'c3-host']
+    expected += [kind+'-'+name for name, b, c in ROWS for kind in ('gcc', 'clang-configure', 'clang-check')]
+    closed = []
+    for phase in expected:
+        path = run/phase/'record.json'; item = read(path)
+        require(item['state'] == 'TERMINAL_SUCCESS' and item['driver_pid'] and all(c['state'] == 'TERMINAL' and c['exit_status'] == c.get('expected_exit', 0) for c in item['children']), 'Missing/failed actual terminal phase: '+phase)
+        for child in item['children']:
+            for log in child['logs']:
+                same(log)
+        for binding in item.get('native_build_logs', []):
+            same(binding)
+        if 'compiler_closure' in item:
+            for binding in item['compiler_closure']['inputs']:
+                same({k: binding[k] for k in ('path', 'bytes', 'sha256')})
+        for artifact in item.get('artifacts', []):
+            same(artifact)
+        closed.append(ident(path))
+    warning_binding = ident(run/'warning-catalog/warnings.json')
+    warnings = read(warning_binding['path'])
+    require(catalog(run, directory) == warnings, 'Warning corpus changed after triage/catalog creation')
+    triage = read(ARGS.triage)
+    require(triage.get('warnings_sha256') == warning_binding['sha256'] and triage.get('source_commit') == r['final_commit'], 'Warning triage is not bound to actual final corpus')
+    require({x['id'] for x in triage['items']} == {x['id'] for x in warnings['items']}, 'Every warning needs its own explicit triage')
+    require(len(triage['items']) == len(warnings['items']), 'Duplicate warning dispositions')
+    require(all(x.get('disposition') in ('accepted-existing', 'accepted-scoped') and x.get('reason') and x.get('reference') for x in triage['items']), 'Unexplained warning disposition')
+    record.update(passed=True, source_release_id=r['source_release_id'], source_snapshot=source_check(r, w),
+                  reports=closed, six_gcc_exports=True, six_actual_full_clang_profiles=True,
+                  own_sdk_c3_object_lint_host_regression=True, warning_triage=ident(ARGS.triage),
+                  ordinary_flac_watchdog_successor_included=bool(r.get('ordinary_flac_watchdog_evidence_files')),
+                  physical_device_qualified=False, publication_authorized=False,
+                  raw_privacy_inspection_still_required_before_any_staging_or_publication=True)
+
+
+def main():
+    global ARGS
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('phase', choices=['create', 'freeze', 'wrapper-test', 'gcc', 'clang-configure', 'clang-check',
+                        'c3-gcc', 'c3-clang-configure', 'c3-clang-check', 'c3-host', 'warning-catalog', 'finalize'])
+    parser.add_argument('--release', required=True, type=Path)
+    parser.add_argument('--row', choices=[x[0] for x in ROWS])
+    parser.add_argument('--delta-approval', type=Path)
+    parser.add_argument('--triage', type=Path)
+    ARGS = parser.parse_args()
+    require(os.name == 'nt', 'Windows-native pinned orchestration required')
+    r, w, dep, run = context(ARGS)
+    name = ARGS.phase + ('-'+ARGS.row if ARGS.row else '')
+    directory = run/name
+    directory.mkdir(parents=True, exist_ok=False)
+    record = dict(schema='cyd-final-production-phase-v1', phase=name, state='STARTING',
+                  driver_pid=os.getpid(), started_epoch=time.time(), children=[], release=ident(ARGS.release),
+                  free_before=shutil.disk_usage(REPO).free)
+    write(directory/'record.json', record)
+    try:
+        if ARGS.phase not in ('create', 'freeze'):
+            record['marker'] = ident(run/'marker.json'); checked_marker(r, w, dep, run)
+        if ARGS.phase not in ('create', 'freeze', 'wrapper-test'):
+            require(read(run/'wrapper-test/record.json')['state'] == 'TERMINAL_SUCCESS', 'Host shim and canonical wrapper gates must pass before later phases')
+        require(shutil.disk_usage(REPO).free >= 1024**3, 'Operational disk reserve exhausted; no automatic cleanup')
+        if ARGS.phase == 'create':
+            create(r, w, dep, run, directory, record)
+        elif ARGS.phase == 'freeze':
+            freeze(r, w, dep, run, directory, record)
+        elif ARGS.phase == 'wrapper-test':
+            shim_host(r, w, dep, directory, record)
+            process([dep/'python-3.12.10/tools/python.exe', '-B', w/'tests/run-cyd-production-wrapper.py', '--output', directory/'actual-host'], directory, 'wrapper-tests', record, w)
+            require(read(directory/'actual-host/report.json')['status'] == 'PASS', 'Canonical wrapper host qualification failed')
+        elif ARGS.phase in ('gcc', 'clang-configure', 'clang-check'):
+            require(ARGS.row, 'Explicit one-row invocation required')
+            row, backend, custom = next(x for x in ROWS if x[0] == ARGS.row)
+            if ARGS.phase == 'gcc':
+                gcc(r, w, dep, run, directory, record, row, backend, custom)
+            elif ARGS.phase == 'clang-configure':
+                clang_configure(r, w, dep, run, directory, record, row, backend, custom)
+            else:
+                require(ARGS.delta_approval, 'Explicit full typed-delta approval file required')
+                clang_check(r, w, dep, run, directory, record, row, backend, custom)
+        elif ARGS.phase == 'c3-gcc':
+            donor_gcc(r, w, dep, run, directory, record)
+        elif ARGS.phase == 'c3-clang-configure':
+            clang_configure(r, w, dep, run, directory, record, '', None, False, True)
+        elif ARGS.phase == 'c3-clang-check':
+            require(ARGS.delta_approval, 'Own C3 typed-delta approval required')
+            clang_check(r, w, dep, run, directory, record, '', None, False, True)
+        elif ARGS.phase == 'c3-host':
+            host(r, w, dep, run, directory, record)
+        elif ARGS.phase == 'warning-catalog':
+            record['warnings'] = catalog(run, directory)
+        elif ARGS.phase == 'finalize':
+            require(ARGS.triage, 'Exact per-warning root triage file required')
+            finalize(r, w, dep, run, directory, record)
+        if ARGS.phase not in ('create', 'freeze'):
+            checked_marker(r, w, dep, run)
+        record.update(state='TERMINAL_SUCCESS', ended_epoch=time.time(), free_after=shutil.disk_usage(REPO).free)
+    except BaseException as error:
+        record.update(state='TERMINAL_FAILURE', error_type=type(error).__name__, error=str(error), ended_epoch=time.time())
+        raise
+    finally:
+        write(directory/'record.json', record)
+    print(json.dumps(dict(phase=name, state=record['state'], record=ident(directory/'record.json'))), flush=True)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,186 @@
+"""Pure/data controls for the held native04 prebuilt-image repeat helper.
+
+No compiler, SDK, guest, archived controller or synthetic COMPLETE is executed.
+"""
+import argparse
+import ast
+import copy
+import ctypes
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+from unittest.mock import patch
+
+import cyd_family1_repeat_support as support
+
+ROOT=support.ROOT
+
+
+def runner_module():
+    spec=importlib.util.spec_from_file_location('held_family1_repeat_runner',ROOT/support.NEW_CODE[0])
+    result=importlib.util.module_from_spec(spec);spec.loader.exec_module(result);return result
+
+
+def run(output):
+    runner=runner_module();support.need(not output.exists() and output.is_relative_to(ROOT/'.build'),'fresh contained data controls')
+    output.mkdir(parents=True)
+    results=[]
+
+    def positive(name,operation):
+        operation();results.append(dict(name=name,accepted=True))
+
+    def reject(name,operation):
+        try:operation()
+        except ValueError:results.append(dict(name=name,rejected=True));return
+        raise ValueError('contradiction was accepted: '+name)
+
+    context=support.audit_parent()
+    positive('actual immutable parent prerequisites',lambda:support.need(context['summary']['source_snapshots']==560 and
+        context['summary']['actual_compiler_dependencies']==471 and context['summary']['inherited_artifacts']==44,
+        'complete native04 graph'))
+    positive('unchanged contract',lambda:support.validate_contract(context['contract']))
+    config=json.loads((support.PARENT/'build/config/sdkconfig.json').read_bytes())
+    positive('exact inherited diagnostic profile',lambda:support.validate_config(config))
+    for key,value in [('FREERTOS_HZ',100),('FREERTOS_UNICORE',True),('ESP_TASK_WDT_TIMEOUT_S',5),
+        ('ESP_TASK_WDT_PANIC',False),('ESP_INT_WDT_TIMEOUT_MS',300),('HEAP_ABORT_WHEN_ALLOCATION_FAILS',True)]:
+        modified=dict(config,**{key:value});reject('config drift '+key,lambda modified=modified:support.validate_config(modified))
+    for key,value in [('ordinary_deadline_ms',31000),('reference_capture_deadline_ms',90001),
+        ('whole_qemu_deadline_ms',600001),('application_http_sessions',57),('application_decoder_handles',194),
+        ('normalization_enabled',True),('deadlines_selected_once_at_entry',False)]:
+        modified=dict(context['contract'],**{key:value});reject('contract drift '+key,lambda modified=modified:support.validate_contract(modified))
+    modified=copy.deepcopy(context['contract']);modified['task_bindings']['decode']['core']=0
+    reject('decoder affinity drift',lambda:support.validate_contract(modified))
+    modified=copy.deepcopy(context['contract']);modified['cases'].pop()
+    reject('missing output case',lambda:support.validate_contract(modified))
+    modified=copy.deepcopy(context['contract']);modified['entries'].pop()
+    reject('missing direct reference',lambda:support.validate_contract(modified))
+
+    image=(support.PARENT/'qemu-flash.bin').read_bytes()
+    positive('fresh exact image',lambda:support.validate_image(image))
+    reject('truncated image',lambda:support.validate_image(image[:-1]))
+    reject('oversize image',lambda:support.validate_image(image+b'\xff'))
+    for offset in (0x9000,0xefff,0xf000,0xffff):
+        modified=image[:offset]+b'\x00'+image[offset+1:]
+        reject('nonerased NVS or PHY '+hex(offset),lambda modified=modified:support.validate_image(modified))
+    positive('exact parent two-vCPU default QEMU argv',lambda:support.validate_argv(
+        support.expected_argv(context['qemu'],context['rom'],support.PARENT/'qemu-flash.bin'),
+        context['qemu'],context['rom'],support.PARENT/'qemu-flash.bin'))
+    argv=support.expected_argv(context['qemu'],context['rom'],support.PARENT/'qemu-flash.bin')
+    variants=[('one vCPU',argv[:6]+['1']+argv[7:]),('icount',argv+['-icount','auto']),
+        ('single TCG',argv+['-accel','tcg,thread=single']),('no snapshot',[v for v in argv if v!='-snapshot']),
+        ('extra timing option',argv+['-rtc','clock=host']),('different image',argv[:-1]+['file=other.bin,if=mtd,format=raw'])]
+    for name,modified in variants:
+        reject(name,lambda modified=modified:support.validate_argv(modified,context['qemu'],context['rom'],support.PARENT/'qemu-flash.bin'))
+    for path in ('../parent','sources/../../parent',str(ROOT/'outside')):
+        reject('snapshot path escape '+path.split('/')[-1],lambda path=path:support.contained(output,path))
+    pin=dict(bytes=3,sha256='a'*64)
+    reject('SHA drift',lambda:support.check_pin(dict(pin,sha256='b'*64),pin,'control SHA'))
+    reject('size drift',lambda:support.check_pin(dict(pin,bytes=4),pin,'control size'))
+    captured=b'partial local byte-control\n';digest=hashlib.sha256(captured).hexdigest()
+    positive('consume exactly recorded fresh bytes',lambda:support.need(
+        support.decode_captured_bytes(captured,digest)==captured.decode(),'same recorded bytes'))
+    reject('changed new transcript bytes',lambda:support.decode_captured_bytes(captured+b'changed',digest))
+    reject('transcript hash mismatch',lambda:support.decode_captured_bytes(captured,'0'*64))
+
+    report=context['report'];child=json.loads((support.PARENT/'sdk-child.json').read_text('utf-8-sig'))
+    positive('real inherited build is not new build evidence',lambda:support.need(
+        context['summary']['inherited_build']['executed_here'] is False and not context['summary']['SDK_build_started_here'],
+        'inherited successful build explicitly labelled'))
+    for field,value in [('passed',True),('completed',True),('target_executed',False)]:
+        modified=dict(report,**{field:value});reject('parent outcome drift '+field,
+            lambda modified=modified:support.validate_inherited_execution(modified,child))
+    for command in ('build','qemu'):
+        for field,value in [('exit_status',1),('pid',0),('state','running'),('timeout_seconds',601)]:
+            modified=copy.deepcopy(report)
+            next(row for row in modified['commands'] if row['name']==command)[field]=value
+            reject('inherited '+command+' '+field,lambda modified=modified:support.validate_inherited_execution(modified,child))
+    modified=copy.deepcopy(report);modified['commands']=[row for row in modified['commands'] if row['name']!='build']
+    reject('missing actual build',lambda:support.validate_inherited_execution(modified,child))
+    reject('failed SDK child',lambda:support.validate_inherited_execution(report,dict(child,exit_status=1)))
+
+    # This in-memory hypothetical release tests its data validator only. It is
+    # never written or passed to the native launcher; that stays UNRELEASED.
+    release=dict(release_id='data-control-only',parent_pins=support.PARENT_PINS,
+        production_source_release_sha256=support.SOURCE_RELEASE_SHA,
+        files={relative:support.identity(ROOT/relative) for relative in support.NEW_CODE+support.VALIDATORS+support.HELPERS})
+    positive('complete hypothetical reviewed inventory',lambda:support.validate_release(release,'data-control-only'))
+    for relative in (support.NEW_CODE[0],support.NEW_CODE[1],support.NEW_CODE[2],support.VALIDATORS[2],support.HELPERS[-1]):
+        modified=copy.deepcopy(release);del modified['files'][relative]
+        reject('missing release input '+relative,lambda modified=modified:support.validate_release(modified,'data-control-only'))
+    modified=copy.deepcopy(release);modified['files']['tests/unbound.py']=pin
+    reject('extra unbound release helper',lambda:support.validate_release(modified,'data-control-only'))
+    modified=copy.deepcopy(release);modified['files'][support.VALIDATORS[2]]['sha256']='0'*64
+    reject('changed mandatory fault reader',lambda:support.validate_release(modified,'data-control-only'))
+    modified=copy.deepcopy(release);modified['parent_pins']['report.json']='0'*64
+    reject('changed parent in repeat release',lambda:support.validate_release(modified,'data-control-only'))
+    modified=copy.deepcopy(release);modified['production_source_release_sha256']='0'*64
+    reject('different production release',lambda:support.validate_release(modified,'data-control-only'))
+    reject('unreleased native guard',lambda:support.validate_release(release,'UNRELEASED'))
+    with patch.object(support,'audit_parent',return_value=context),patch.object(runner,'REPEAT_RELEASE_ID','UNRELEASED'),\
+         patch.object(runner.subprocess,'Popen',side_effect=AssertionError('native launch forbidden')):
+        reject('held main cannot launch or create output',lambda:runner.main(['--output',str(output/'never-created')]))
+    support.need(not (output/'never-created').exists(),'native guard created no output')
+    with patch.object(support,'audit_parent',return_value=context),\
+         patch.object(runner.subprocess,'Popen',side_effect=AssertionError('preflight native launch forbidden')):
+        positive('data-only preflight creates no output',lambda:support.need(
+            runner.main(['--output',str(output/'never-created'),'--preflight-only'])==0 and
+            not (output/'never-created').exists(),'no preflight target or capture creation'))
+        reject('unpaired release input',lambda:runner.main(['--output',str(output/'never-created'),
+            '--preflight-only','--release',str(output/'missing.json')]))
+    reject('old capture output reuse',lambda:runner.fresh_output(support.PARENT))
+    reject('output nested inside parent',lambda:runner.fresh_output(support.PARENT/'repeat'))
+    reject('output outside ignored build root',lambda:runner.fresh_output(ROOT/'repeat'))
+
+    positive('successful process query stays observed',lambda:support.need(
+        support.query_result(lambda:123)==dict(state='observed',value=123),'observed query'))
+    def failed_query():raise OSError('data control; no sensitive value')
+    positive('query failure stays explicit unknown',lambda:support.need(
+        support.query_result(failed_query)['state']=='unknown','unknown is not fabricated observation'))
+    # Test handle ownership after a thread-ID reuse between snapshot and open.
+    sampler=object.__new__(support.PassiveWindowsSampler);sampler.pid=123
+    class Kernel:
+        def CreateToolhelp32Snapshot(self,*_):return 7
+        def Thread32First(self,_,entry):
+            row=entry._obj;row.owner=123;row.thread=456;return 1
+        def Thread32Next(self,*_):ctypes.set_last_error(18);return 0
+        def OpenThread(self,*_):return 8
+        def GetProcessIdOfThread(self,*_):return 999
+        def CloseHandle(self,*_):return 1
+    sampler.kernel=Kernel()
+    with patch.object(sampler,'cpu',side_effect=AssertionError('foreign thread CPU must never be queried')):
+        rows=sampler.threads()
+    positive('recycled foreign thread handle is never sampled',lambda:support.need(
+        rows[0]['cpu']['state']=='unknown' and rows[0]['thread_id']==456,'foreign thread remains explicit unknown'))
+    sampler.kernel.GetProcessIdOfThread=lambda *_:123
+    with patch.object(sampler,'cpu',return_value=dict(kernel_100ns=20,user_100ns=30)) as cpu:
+        rows=sampler.threads();support.need(cpu.call_count==1,'owned thread queried once')
+    positive('still-owned thread handle CPU is observed',lambda:support.need(rows[0]['cpu']['value']['user_100ns']==30,'owned CPU observation'))
+    sampler.kernel.Thread32Next=lambda *_:0;ctypes.set_last_error(5)
+    positive('thread snapshot error remains unknown',lambda:support.need(
+        support.query_result(sampler.threads)['state']=='unknown','snapshot failure not a complete empty census'))
+    # Supplement runtime/data controls with a narrow prohibition on policy APIs.
+    tree=ast.parse((ROOT/'tests/cyd_family1_repeat_support.py').read_text())
+    calls={node.func.attr for node in ast.walk(tree) if isinstance(node,ast.Call) and isinstance(node.func,ast.Attribute)}
+    positive('passive sampler has no timer or priority policy setters',lambda:support.need(not calls&{
+        'SetProcessInformation','SetPriorityClass','SetProcessAffinityMask','SetThreadPriority',
+        'timeBeginPeriod','timeEndPeriod','NtSetTimerResolution'},'read-only process sampling'))
+
+    # Re-audit originals after all controls; no original receipt is rewritten.
+    support.audit_parent()
+    report=dict(passed=True,pure_data_only=True,target_executed=False,SDK_build_started_here=False,
+        native_release_created=False,parent_preserved_NONPASS=True,accepted=sum(row.get('accepted',False) for row in results),
+        rejected=sum(row.get('rejected',False) for row in results),controls=results,
+        sources={relative:support.identity(ROOT/relative) for relative in support.NEW_CODE+support.VALIDATORS+support.HELPERS},
+        parent_prerequisites=context['summary'])
+    (output/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8',newline='\n')
+    print(json.dumps(dict(passed=True,pure_data_only=True,accepted=report['accepted'],rejected=report['rejected'],target_executed=False)))
+    return 0
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',required=True,type=Path)
+    args=parser.parse_args();return run(args.output.resolve())
+
+
+if __name__=='__main__':raise SystemExit(main())

@@ -1,0 +1,224 @@
+"""One authorized linked C3 build and local development handoff; no device I/O."""
+from pathlib import Path
+import hashlib
+import importlib.util
+import json
+import os
+import re
+import shutil
+import struct
+import subprocess
+import sys
+import time
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+REPO = Path('C:/Work/yoRadio')
+OUT = HERE / 'extra-c3-linked-20261104-01'
+HANDOFF = REPO / 'firmware/development/esp32c3-oled-native-ogg-final-20261104'
+FINAL = 'aa3103d0361c5f57afb021e124851bc5a09666c8'
+SDK_SHA = '9a97f6c54ec638111ce55cd36581b3c192f15207'
+RELEASE_SHA = '59436063ff5914ecbeec14333e744f6f1a26ddcca6d1b12167b658fbe72f4d10'
+
+
+def need(value, reason):
+    if not value: raise ValueError(reason)
+
+
+def pin(path):
+    path = Path(path).resolve(); body = path.read_bytes()
+    return dict(path=str(path), bytes=len(body), sha256=hashlib.sha256(body).hexdigest())
+
+
+def write(path, value):
+    Path(path).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8', newline='\n')
+
+
+def read(path): return json.loads(Path(path).read_bytes())
+
+
+def module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value); return value
+
+
+def git(directory, *args):
+    child = subprocess.run(['git', '-C', str(directory), *args], capture_output=True,
+        env=dict(os.environ, GIT_OPTIONAL_LOCKS='0'))
+    need(child.returncode == 0, 'read-only source/SDK Git query')
+    return child.stdout
+
+
+def files_under(base, suffixes=None):
+    for path in sorted(base.rglob('*')):
+        if path.is_file() and '.git' not in path.parts and '__pycache__' not in path.parts:
+            if suffixes is None or path.suffix in suffixes or path.name in ('CMakeLists.txt', 'Kconfig', 'Kconfig.projbuild'):
+                yield path
+
+
+def stable(bindings):
+    for path, value in bindings.items():
+        need(pin(path) == value, 'unchanged before-bound source/SDK/tool bytes')
+
+
+def main():
+    need(not OUT.exists() and not HANDOFF.exists(), 'fresh independent row and development variant')
+    OUT.mkdir()
+    record = dict(phase='extra-c3-linked', passed=False, completed=False, state='PREPARING', driver_pid=os.getpid(),
+        children=[], source_commit=FINAL, whole_linked_image=True, physical_tested=False,
+        device_operation=False, Setup=False, downloads=False, canonical_C3_phases_executed=False,
+        canonical_helpers_modified=False, firmware_variant=HANDOFF.name)
+    write(OUT / 'record.json', record)
+    child = None
+    try:
+        release = read(HERE / 'release.json')
+        need(pin(HERE / 'release.json')['sha256'] == RELEASE_SHA and release['released'] and release['final_commit'] == FINAL, 'exact root-released request')
+        worktree = Path(release['worktree']); dep = Path(release['dependencies'])
+        project = worktree / 'idf/esp32c3-oled-native'
+        build = project / 'build-ogg-final-c3-linked'
+        need(not build.exists(), 'fresh complete linked build/config directory')
+        sdk = dep / 'v6.1-9a97f6c54ec6'; tools = dep / 'tools-v6.1'
+        sdk_python = tools / 'python_env/idf6.1_py3.12_env/Scripts/python.exe'
+        ninja = tools / 'tools/ninja/1.12.1/ninja.exe'
+        gcc_root = tools / 'tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf'
+        vendor = dep / 'esp-adf-libs/esp_audio_codec'
+        invocation = read(HERE / 'c3-linked-invocation.json')
+        need(invocation == dict(schema='cyd-final-production-invocation-v1', script=str(project / 'build.ps1'),
+            parameters=dict(DependencyRoot=str(dep), BuildDirectory=str(build), Sdkconfig=str(build / 'sdkconfig'),
+                IdfArguments=['-D','IDF_TOOLCHAIN=gcc','build']), ninja_only=False), 'exact build-only typed plan')
+        required = [sdk / 'tools/idf.py', sdk / 'export.ps1', dep / 'python-3.12.10/tools/python.exe',
+            tools / 'idf-env.json', vendor / 'CMakeLists.txt', vendor / 'lib/esp32c3/libesp_audio_codec.a',
+            vendor / 'lib/esp32c3/libesp_audio_simple_dec.a', sdk_python, ninja,
+            tools / 'tools/cmake/4.0.3/bin/cmake.exe']
+        need(all(p.is_file() for p in required), 'complete offline dependencies; automatic Setup path must not be reached')
+        need(git(sdk, 'rev-parse', 'HEAD').decode().strip() == SDK_SHA and not git(sdk, 'status', '--porcelain', '--untracked-files=no').strip(), 'own pinned clean SDK6.1')
+        need((project / 'idf-revision.txt').read_text().strip() == SDK_SHA, 'own project SDK pin')
+        api = module('live_final_canonical_export', worktree / 'tools/export_cyd_production.py')
+        before_source = api.source_snapshot(worktree)
+        need(before_source['commit'] == FINAL and not before_source['source_dirty'] and not before_source['untracked'], 'fixed clean whole source tree')
+        before = {}
+        for row in read(HERE / 'retained-git-paths.json'):
+            path = worktree / row['path']; need(path.is_file(), 'all selected source/evidence objects materialized')
+            before[str(path)] = pin(path)
+        for path in files_under(sdk, {'.c','.cpp','.cc','.h','.hh','.hpp','.hxx','.tcc','.def','.inc','.S','.s','.ld','.lf','.cmake','.py','.ps1'}): before[str(path)] = pin(path)
+        for path in files_under(gcc_root): before[str(path)] = pin(path)
+        for path in files_under(sdk_python.parents[1], {'.py','.exe','.dll','.pyd','.cfg'}): before[str(path)] = pin(path)
+        for path in files_under(vendor, {'.c','.cpp','.h','.hpp','.inc','.cmake'}): before[str(path)] = pin(path)
+        for path in required + [Path(__file__).resolve()] + [HERE / n for n in ('campaign.py','invoke-build.ps1','README.md','measure-sparse.py','release.json','c3-linked-invocation.json')]: before[str(path)] = pin(path)
+        for name, digest in {'libesp_audio_codec.a':'311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909',
+            'libesp_audio_simple_dec.a':'232650ec81ae5e10ecbe1b2c86de2d1adf8f1b793f5ef343241c6e510db3e71f'}.items():
+            need(pin(vendor / 'lib/esp32c3' / name)['sha256'] == digest, 'unchanged RISC-V decoder archive ABI')
+        write(OUT / 'before-inputs.json', before)
+        write(OUT / 'before-source.json', before_source)
+        record.update(state='BUILD_RUNNING', before_bindings=len(before), own_SDK_commit=SDK_SHA,
+            exact_invocation=pin(HERE / 'c3-linked-invocation.json'))
+        argv = [release['powershell'],'-NoProfile','-NonInteractive','-File',str(HERE / 'invoke-build.ps1'),'-Invocation',str(HERE / 'c3-linked-invocation.json')]
+        environment = dict(os.environ, GIT_OPTIONAL_LOCKS='0', GIT_LFS_SKIP_SMUDGE='1', PYTHONNOUSERSITE='1',
+            PYTHONDONTWRITEBYTECODE='1', PYTHONUTF8='1', PYTHONIOENCODING='utf-8', IDF_TOOLCHAIN='gcc')
+        started = time.monotonic()
+        with (OUT / 'build.stdout.log').open('xb') as stdout, (OUT / 'build.stderr.log').open('xb') as stderr:
+            child = subprocess.Popen(argv, cwd=worktree, env=environment, stdout=stdout, stderr=stderr,
+                creationflags=subprocess.CREATE_NO_WINDOW)
+            process = dict(name='whole-c3-build', pid=child.pid, argv=argv, state='RUNNING', started_epoch=time.time())
+            record['children'].append(process); write(OUT / 'record.json', record)
+            print(json.dumps(dict(state='RUNNING', driver_pid=os.getpid(), child_pid=child.pid, row_directory=str(OUT))), flush=True)
+            status = child.wait()
+        process.update(state='TERMINAL', exit_status=status, elapsed_seconds=time.monotonic()-started,
+            stdout=pin(OUT / 'build.stdout.log'), stderr=pin(OUT / 'build.stderr.log'))
+        record.update(state='BUILD_TERMINAL'); write(OUT / 'record.json', record)
+        need(status == 0, 'whole C3 build terminal zero; no retries')
+        need(git(sdk, 'rev-parse', 'HEAD').decode().strip() == SDK_SHA and not git(sdk, 'status', '--porcelain', '--untracked-files=no').strip(), 'own SDK unchanged after build')
+        stable(before)
+        after_source = api.source_snapshot(worktree)
+        need({k:v for k,v in before_source.items() if k!='dirty'} == {k:v for k,v in after_source.items() if k!='dirty'}, 'source content unchanged across independent parallel builds')
+        desc = read(build / 'project_description.json'); config = read(build / 'config/sdkconfig.json')
+        need(desc['target']=='esp32c3' and desc['project_name']=='yoradio_esp32c3_oled_native' and Path(desc['idf_path']).resolve()==sdk.resolve(), 'actual whole own-SDK C3 project')
+        compiler = Path(desc['c_compiler']); need(compiler.name=='riscv32-esp-elf-gcc.exe' and compiler.resolve().is_relative_to(tools.resolve()), 'actual RISC-V GCC from own6.1 tools')
+        need(config['IDF_TARGET']=='esp32c3' and config['IDF_TARGET_ARCH']=='riscv' and config['ESP_DEFAULT_CPU_FREQ_MHZ']==160 and config['FREERTOS_UNICORE'] is True and not config.get('YORADIO_DIRECT_DMA_PCM',False), 'unchanged C3 hardware/profile and direct-DMA activation off')
+        parsed = api.parse_sdkconfig((build / 'sdkconfig').read_text().split('# Deprecated options for backward compatibility',1)[0])
+        need(set(parsed)==set(config) and all(type(parsed[k]) is type(v) and parsed[k]==v for k,v in config.items()), 'actual configuration text/JSON agree')
+        app = api.build_file(build, desc['app_bin']); elf = api.build_file(build, desc['app_elf'])
+        elf_body = elf.read_bytes(); need(elf_body[:6]==b'\x7fELF\x01\x01' and struct.unpack_from('<H',elf_body,18)[0]==243, 'actual 32-bit RISC-V ELF243')
+        qualify_source = '''from pathlib import Path
+import hashlib,json,struct,sys
+from esptool.bin_image import LoadFirmwareImage
+p=Path(sys.argv[1]);body=p.read_bytes();image=LoadFirmwareImage('esp32c3',body)
+assert image.chip_id==5 and image.checksum==image.calculate_checksum()
+assert image.append_digest and image.stored_digest==image.calc_digest and body.endswith(image.stored_digest)
+found=[s.data[:256] for s in image.segments if len(s.data)>=256 and struct.unpack_from('<I',s.data)[0]==0xABCD5432]
+assert len(found)==1
+d=found[0];text=lambda b:b.split(b'\\0',1)[0].decode()
+r=dict(image_chip_id=image.chip_id,checksum_valid=True,digest_valid=True,bytes=len(body),sha256=hashlib.sha256(body).hexdigest(),version=text(d[16:48]),project_name=text(d[48:80]),idf_version=text(d[112:144]),embedded_ELF_sha256=d[144:176].hex())
+Path(sys.argv[2]).write_text(json.dumps(r,indent=2)+'\\n',encoding='utf-8')
+'''
+        (OUT / 'qualify-image.py').write_text(qualify_source, encoding='utf-8', newline='\n')
+        with (OUT / 'image-check.stdout.log').open('xb') as stdout, (OUT / 'image-check.stderr.log').open('xb') as stderr:
+            image_child=subprocess.Popen([str(sdk_python),'-B',str(OUT/'qualify-image.py'),str(app),str(OUT/'image-check.json')],
+                cwd=worktree,env=environment,stdout=stdout,stderr=stderr,creationflags=subprocess.CREATE_NO_WINDOW)
+            image_process=dict(name='offline-image-check',pid=image_child.pid,state='RUNNING');record['children'].append(image_process);write(OUT/'record.json',record)
+            image_status=image_child.wait();image_process.update(state='TERMINAL',exit_status=image_status)
+        need(image_status==0, 'offline checksum/digest/chip checks; CLI exit alone is not trusted')
+        image=read(OUT/'image-check.json')
+        need(image['project_name']==desc['project_name'] and image['version']==desc['project_version'] and FINAL[:7] in image['version'] and
+             image['embedded_ELF_sha256']==hashlib.sha256(elf_body).hexdigest(), 'application descriptor matches source/CMake/actual ELF')
+        slots=api.partition_slots((build/'partition_table/partition-table.bin').read_bytes(),0x400000)
+        need(slots==[dict(name='app0',offset=0x10000,bytes=0x1d0000),dict(name='app1',offset=0x1e0000,bytes=0x1d0000)] and all(app.stat().st_size<=slot['bytes'] for slot in slots), 'C3 own generated MD5/overlap/4MiB/OTA geometry')
+        flash=read(build/'flasher_args.json')
+        need(flash['extra_esptool_args']['chip']=='esp32c3' and int(flash['app']['offset'],0)==0x10000 and api.build_file(build,flash['app']['file'])==app, 'own-chip flash recipe and exact app offset')
+        HANDOFF.mkdir(parents=True)
+        copies={'app.bin':app,'sdkconfig':build/'sdkconfig','sdkconfig.json':build/'config/sdkconfig.json',
+            'project_description.json':build/'project_description.json','flasher_args.json':build/'flasher_args.json',
+            'partition-table.bin':build/'partition_table/partition-table.bin','build.stdout.log':OUT/'build.stdout.log','build.stderr.log':OUT/'build.stderr.log'}
+        for name,path in copies.items(): shutil.copyfile(path,HANDOFF/name);need(pin(path)['sha256']==pin(HANDOFF/name)['sha256'],'immediate handoff exact copy')
+        record.update(state='IMAGE_RETAINED', image=image, OTA_slots=slots, handoff_app=pin(HANDOFF/'app.bin'),
+            handoff_completion_manifest_pending=True);write(OUT/'record.json',record)
+        deps=subprocess.run([str(ninja),'-C',str(build),'-t','deps'],cwd=worktree,env=environment,capture_output=True)
+        (OUT/'actual-ninja-deps.stdout.log').write_bytes(deps.stdout);(OUT/'actual-ninja-deps.stderr.log').write_bytes(deps.stderr)
+        need(deps.returncode==0,'actual whole-build Ninja dependencies')
+        targets={};current=None
+        for line in deps.stdout.decode('utf-8').splitlines():
+            if line and not line[0].isspace() and ': #deps ' in line:
+                name=line.split(': #deps ',1)[0];current=targets.setdefault(name,dict(valid='(VALID)' in line,dependencies=[]))
+            elif line.startswith('    ') and current is not None:
+                p=Path(line.strip());p=(p if p.is_absolute() else build/p).resolve();current['dependencies'].append(str(p))
+        database=read(build/'compile_commands.json');actual={};generated=[]
+        bound_paths={os.path.normcase(str(Path(p).resolve())) for p in before}
+        for entry in database:
+            if Path(entry['file']).suffix.lower() not in ('.c','.cc','.cpp','.cxx'):continue
+            obj=Path(entry['output']);obj=(obj if obj.is_absolute() else build/obj).resolve()
+            target=obj.relative_to(build).as_posix();need(target in targets and targets[target]['valid'],'all actual C/C++ targets have valid whole-build dependency records')
+            for path in targets[target]['dependencies']:
+                p=Path(path);value=pin(p);actual[path]=value
+                if os.path.normcase(str(p.resolve())) not in bound_paths:
+                    need(p.is_relative_to(build),'every external/compiler dependency was bound before; only this build generates new inputs')
+                    generated.append(path)
+            need(obj.is_file(),'whole-build actual object exists')
+        stable(before)
+        for path,value in actual.items():need(pin(path)==value,'actual consumed dependencies immutable after closure')
+        write(OUT/'actual-compiler-closure.json',dict(whole_compile_database=pin(build/'compile_commands.json'),
+            C_CPP_translation_units=sum(Path(e['file']).suffix.lower() in ('.c','.cc','.cpp','.cxx') for e in database),
+            actual_dependencies=actual,generated_in_this_build_only=sorted(set(generated)),dependency_tool_stdout=pin(OUT/'actual-ninja-deps.stdout.log')))
+        write(OUT/'after-source.json',after_source)
+        record.update(passed=True,completed=True,state='TERMINAL_SUCCESS',handoff_completion_manifest_pending=False,
+            source_unchanged=True,SDK_unchanged=True,before_bindings_current_after=True,
+            actual_compiler_closure=pin(OUT/'actual-compiler-closure.json'),whole_C3_compile_database_rows=len(database),
+            actual_dependency_count=len(actual),artifacts=[pin(p) for p in (app,elf,build/'yoradio_esp32c3_oled_native.map',build/'compile_commands.json')])
+        manifest=dict(source_commit=FINAL,target='esp32c3',whole_linked_firmware=True,SDK_commit=SDK_SHA,
+            app=pin(HANDOFF/'app.bin'),image_validation=image,OTA_slots=slots,physical_tested=False,
+            actual_owned_build_child=process,local_full_receipt=str(OUT/'record.json'),source_and_tool_binding_receipt=pin(OUT/'before-inputs.json'),
+            actual_compiler_closure=record['actual_compiler_closure'],files={p.name:pin(p) for p in HANDOFF.iterdir() if p.is_file()})
+        write(HANDOFF/'manifest.json',manifest)
+    except BaseException as error:
+        if child is not None and child.poll() is None:
+            subprocess.run(['taskkill.exe','/PID',str(child.pid),'/T','/F'],capture_output=True,creationflags=subprocess.CREATE_NO_WINDOW)
+            stopped=child.wait();record['owned_tree_stopped_after_interruption']=True
+            if 'process' in locals():process.update(state='FORCED_STOP_NONPASS',exit_status=stopped)
+        record.update(passed=False,completed=False,state='TERMINAL_FAILURE',failure_type=type(error).__name__)
+        if isinstance(error,ValueError): record['failure']=str(error)
+    finally:
+        write(OUT/'record.json',record)
+    print(json.dumps({k:record.get(k) for k in ('state','passed','completed','failure_type','failure','handoff_app')}),flush=True)
+    return 0 if record['passed'] else 1
+
+
+if __name__=='__main__': raise SystemExit(main())

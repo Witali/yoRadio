@@ -1,0 +1,41 @@
+[CmdletBinding(PositionalBinding = $false)]
+param([Parameter(Mandatory)][string]$Invocation)
+$ErrorActionPreference = 'Stop'
+if ($PSVersionTable.PSVersion.Major -lt 7) { throw 'PowerShell 7 required' }
+$inv = Get-Content -LiteralPath $Invocation -Raw | ConvertFrom-Json -AsHashtable
+if ($inv.schema -ne 'cyd-final-production-invocation-v1') { throw 'Wrong invocation schema' }
+
+# Typed JSON splatting preserves array parameters (Evidence/IdfArguments) and
+# literal quotes. Canonical scripts and child/error handling run unchanged.
+# There is no Start-Process proxy, monkeypatch or telemetry prerequisite.
+if (-not $inv.ninja_only) {
+    $bound = @{}
+    foreach ($key in $inv.parameters.Keys) { $bound[$key] = $inv.parameters[$key] }
+    & ([string]$inv.script) @bound
+    if (-not $?) { throw 'Canonical script failed' }
+}
+if ($inv.ninja_targets) {
+    $env:IDF_TOOLS_PATH = [string]$inv.idf_tools
+    $env:IDF_COMPONENT_MANAGER = '0'
+    $env:PYTHONNOUSERSITE = '1'
+    $env:YORADIO_AUDIO_CODEC_COMPONENT = [string]$inv.audio_codec_component
+    $env:Path = ([string]$inv.bootstrap_directory) + ';' + $env:Path
+    . ([string]$inv.idf_export)
+    $psi = [System.Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = [string]$inv.ninja
+    $psi.WorkingDirectory = [string]$inv.project
+    $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
+    foreach ($arg in (@('-C', [string]$inv.build, '-j2') + @($inv.ninja_targets))) { $psi.ArgumentList.Add([string]$arg) }
+    $child = [System.Diagnostics.Process]::new()
+    $child.StartInfo = $psi
+    if (-not $child.Start()) { throw 'Ninja child did not start' }
+    $record = [ordered]@{ actual_handle=$true; pid=$child.Id; state='RUNNING'; argv=@($psi.FileName)+@($psi.ArgumentList) }
+    $path = Join-Path ([string]$inv.witness_directory) 'ninja-handle.json'
+    if (Test-Path -LiteralPath $path) { throw 'Never overwrite a child handle' }
+    [IO.File]::WriteAllText($path, ($record|ConvertTo-Json -Depth 8), [Text.UTF8Encoding]::new($false))
+    $child.WaitForExit()
+    $record.state='TERMINAL'; $record.exit_status=$child.ExitCode
+    [IO.File]::WriteAllText($path, ($record|ConvertTo-Json -Depth 8), [Text.UTF8Encoding]::new($false))
+    if ($child.ExitCode -ne 0) { throw 'Actual donor object compilation failed' }
+}
