@@ -1,6 +1,6 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-11-03. Ветка: `codex/cyd-espressif-vorbis`.
+Обновлено: 2026-11-04. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
@@ -135,9 +135,22 @@ decoder/stream/output fault counters нулевые. Однако текущий
 не выполнен. Исправляется test-only наблюдение за настоящим владельцем и
 declared/creation priority без изменения SDK config или production tasks.
 
+4 ноября полный обновлённый стенд завершил все 48 cases и 13 references.
+Исходный controller report сохранён как **NONPASS**: анализатор ещё не знал
+два новых текстовых поля ownership. Исправлена только классификация этих
+полей; [отдельный data successor](../tests/results/cyd-family1-task-20261104/README.md)
+аутентифицирует исходные build/QEMU/SDK-child receipts, весь compiled graph
+и завершает полный независимый PCM oracle на 100/160 Decimal digits.
+Все 48 outputs совпали без нового допуска; 684 bindings неизменны.
+Сохранены 195 opens/closes, 58 HTTP cleanup, 72 word allocations/frees,
+нулевые live planes и единственное настоящее byte→word recovery.
+Полный reader отклоняет 64 противоречивых копии реального лога. Это finite
+diagnostic gate; deliberate OOM/backpressure, enabled normalizer, production
+exports и ресурсы полного radio/TLS/TFT приложения остаются отдельными.
+
 ## Что осталось по переносу
 
-После уточнения пользователя 28 октября, состояние на 3 ноября 2026 года:
+После уточнения пользователя 28 октября, состояние на 4 ноября 2026 года:
 
 Программная часть этапов 01–10 выполнена. Остаются четыре активных блока
 доводки и проверки; это не четыре небольшие правки. Пятый раздел, AAC
@@ -146,7 +159,7 @@ compact/private, сохранён в таблице как отложенный,
 
 | Блок | Оставшаяся программная работа |
 | --- | --- |
-| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates. Многоканальный family1 dispatch теперь выбран в production caller и проходит [43 HOST schedules/12 controls](../tests/results/cyd-ogg-family1-dispatch-host-20261101/README.md); все три output backend и FIFO layout/gain проверены отдельно. Остались полный actual-task gate нового dispatch, resource/error qualification и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
+| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates. Многоканальный family1 dispatch выбран в production caller и проходит [43 HOST schedules/12 controls](../tests/results/cyd-ogg-family1-dispatch-host-20261101/README.md) и [48 полных actual-task outputs с независимым PCM oracle](../tests/results/cyd-family1-task-20261104/README.md); все три output backend и FIFO layout/gain проверены отдельно. Остались deliberate OOM/backpressure, enabled normalizer и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
 | AAC compact owners — отложено | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) и [48 actual-task сценариев](../tests/results/cyd-aac-playback-task-20261101/README.md) завершены. Compact/private ABI/reset/owner-view scopes не возобновлять автоматически. Late SBR/PS отмечены как ограничения vendor, без заявления о полной поддержке этих переходов. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Обычная current-source регрессия и конечный production-policy watchdog gate пройдены в SDK/QEMU. Остаются ресурсы полного приложения, финальные vendor/custom exports и физический A/B. Target OOM/backpressure/semantic controls [явно отложены](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md). [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | [Actual TLS traffic](../tests/results/cyd-tls-traffic-20261101/README.md) в изолированном SDK/QEMU пройден: full records, два клиента, реальные reserve/reclaim/MPI и pressure/recovery. Остались полный radio boot и heap/IRAM/stack с radio/TFT до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |

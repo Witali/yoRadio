@@ -1,0 +1,204 @@
+"""Data-only successor for one immutable native capture; default is preflight.
+
+No compiler, SDK command, decoder, QEMU, Git, archived Python or native image
+is executed. Only reviewed current live validators run after all bindings pass.
+"""
+import argparse
+import decimal
+import _decimal
+import difflib
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import shutil
+import sys
+
+sys.dont_write_bytecode = True
+ROOT = Path(__file__).resolve().parents[1]
+CAPTURE = ROOT / '.build/cyd-family1-playback-task-20261104-01'
+SELF = Path(__file__).resolve()
+PINS = {
+    'report.json': 'cc895b695b4af4646cfecfc647e3aeffcea6e58f87e48629542e24d40f72226f',
+    'execution-bundle.json': '942a57630a281498ea2f0d9f78231010bf89b27c89600a2ea09e47f73de71fae',
+    'source-manifest.json': 'fb8bd2ac7ec5a310a94e787d21ef4020ba6823f188d722b6d46c4c37a36d1296',
+    'actual-compiler-closure.json': '162c4e79c86eee763ad537291be336bfbfa1d8be6cbd69b2992812ef47f0623a',
+    'sdk-child.json': '005b2ad01ea5b6c397abcc6ef1e19030f73c6ac34c9965381b6a062427ddfc08',
+    'reference-contract.json': '7984abc8717cf93090340d5658fff856289b13ea52b541df84e3d489c207d1fa',
+}
+SOURCE_RELEASE = ROOT / '.build/cyd-family1-source-release-20261103-02.json'
+SOURCE_SHA = '745e7482cd90517c4e5778717dd7e1016d4e8c692d125f4a3cf15302e7dc9381'
+VALIDATORS = ('tests/read-cyd-family1-task-log.py', 'tests/read-cyd-family1-word-alloc.py',
+              'tests/read-cyd-family1-allocation-faults.py', 'tests/prepare-cyd-family1-task-output.py')
+OLD_READER_SHA = '9dad2bb62b597887d44475e61728658b6b8c9e5cdc10dc775f3130e6baa3f3f0'
+NEW_READER_SHA = '60b69804fd9e07125b5f74a2e6317f36c9feae279d5595f7bf64600b7653b3ee'
+OLD_WORDS = b"    words={'fixture','id','kind','sha256','stage','hex','role','sdk','operation','phase','function'};row={}\n"
+NEW_WORDS = b"    words={'fixture','id','kind','sha256','stage','hex','role','sdk','operation','phase','function',\n           'owner_role','priority_provenance'};row={}\n"
+
+
+def need(ok, reason):
+    if not ok:
+        raise ValueError(reason)
+
+
+def ident(path):
+    body = Path(path).read_bytes()
+    return dict(bytes=len(body), sha256=hashlib.sha256(body).hexdigest())
+
+
+def sha(path): return ident(path)['sha256']
+def load(path): return json.loads(Path(path).read_bytes())
+def write(path, value): Path(path).write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8', newline='\n')
+
+
+def contained(base, name):
+    relative = Path(name)
+    need(not relative.is_absolute() and '..' not in relative.parts, 'contained relative capture path')
+    result = (base / relative).resolve()
+    need(result.is_relative_to(base.resolve()), 'capture path cannot escape through symlink')
+    return result
+
+
+def equal_pin(path, pin, reason):
+    actual = ident(path)
+    need(actual['sha256'] == pin['sha256'] and actual['bytes'] == pin['bytes'], reason)
+    return actual
+
+
+def audit():
+    bindings = {}
+    for name, digest in PINS.items():
+        need(sha(CAPTURE / name) == digest, 'immutable original ' + name)
+        bindings['original:' + name] = ident(CAPTURE / name)
+    report, bundle, sources, closure, child, contract = [load(CAPTURE / name) for name in PINS]
+    need(not report['passed'] and not report['completed'] and report['target_executed'] and
+         report['failure_type'] == 'ValueError' and report['failure'] == 'strict actual integer observation' and
+         report['all_bound_inputs_current'] and report['bound_input_failures'] == [], 'original NONPASS remains exact')
+    need(bundle['sdk_commit'] == '7101770dc6db2667b3c477cc31365dd1acd6db4e' and
+         bundle['vendor_commit'] == '67b8d0e98f58c774b8652480893037273190e8dc', 'recorded SDK/vendor identities')
+    need(bundle['sources'] == sources and contract == bundle['pcm_reference'] == bundle['expected_cases'] == report['pcm_reference'], 'original graph and complete contract agree')
+    need(len(contract['cases']) == 48 and len(contract['entries']) == 13 and
+         contract['task_bindings'] == dict(stream=dict(core=0, priority=3, stack=6144), decode=dict(core=1, priority=5, stack=16384), output=dict(core=1, priority=6, stack=4096)), 'whole corpus and original core/task profiles')
+    for command in report['commands']:
+        need(re.fullmatch('[A-Za-z0-9_-]+', command['name']) and command['state'] == 'complete' and
+             command['pid'] > 0 and command['exit_status'] == 0, 'every inherited actual process is terminal zero')
+        for stream in ('stdout', 'stderr'):
+            name = command['name'] + '.' + stream + '.log'; path = contained(CAPTURE, name)
+            need(sha(path) == command[stream + '_sha256'], 'immutable original command log')
+            bindings['command:' + name] = ident(path)
+    build, guest = [next(c for c in report['commands'] if c['name'] == name) for name in ('build', 'qemu')]
+    need(build['timeout_seconds'] == 1200 and guest['timeout_seconds'] == 600 and child['pid'] > 0 and child['exit_status'] == 0, 'inherited real SDK child/build/guest receipts')
+    need(len(sources) == 560 and len(closure['dependencies']) == 471 and len(closure['translation_units']) == 18, 'complete original compiler/source closure')
+    reader = ROOT / VALIDATORS[0]; old_pin = sources[str(reader)]; old = contained(CAPTURE, old_pin['snapshot']).read_bytes(); new = reader.read_bytes()
+    need(old_pin['sha256'] == OLD_READER_SHA and hashlib.sha256(new).hexdigest() == NEW_READER_SHA and old.count(OLD_WORDS) == 1 and
+         old.replace(OLD_WORDS, NEW_WORDS, 1) == new, 'only exact reviewed two textual field keys differ')
+    compiled = {row['manifest_original'] for row in closure['dependencies'].values()}
+    need(str(reader) not in compiled, 'reader metadata exception is absent from every actual compiled dependency')
+    for index, (original, pin) in enumerate(sources.items()):
+        equal_pin(contained(CAPTURE, pin['snapshot']), pin, 'authentic immutable original source snapshot')
+        actual = ident(original)
+        if original != str(reader):
+            equal_pin(original, pin, 'all current original source/config/dependency bytes remain exact')
+        bindings['source:' + str(index)] = actual
+    for original, pin in closure['dependencies'].items():
+        need(pin['manifest_original'] in sources and sha(original) == pin['sha256'] == sources[pin['manifest_original']]['sha256'], 'every actual compiled dependency is current; no compiled exception')
+    for unit in closure['translation_units']:
+        object_path = Path(unit['output'])
+        if not object_path.is_absolute(): object_path = Path(unit['directory']) / object_path
+        object_path = object_path.resolve(); need(object_path.is_relative_to(CAPTURE), 'actual object belongs to inherited capture')
+        relative = object_path.relative_to(CAPTURE).as_posix()
+        need(relative in bundle['artifacts'] and sha(object_path) == bundle['artifacts'][relative], 'all actual translation-unit objects remain authenticated')
+        need(all(path in closure['dependencies'] for path in unit['actual_dependency_paths']), 'whole TU dependency path list bound')
+    for name, digest in bundle['artifacts'].items():
+        path = contained(CAPTURE, name); need(sha(path) == digest, 'all inherited build/image/ELF/map/config artifacts')
+        bindings['artifact:' + name] = ident(path)
+    need(sha(SOURCE_RELEASE) == SOURCE_SHA and report['production_source_release_sha256'] == SOURCE_SHA, 'exact production35 release')
+    production = load(SOURCE_RELEASE); need(len(production['files']) == 35, 'all35 production inputs')
+    for name, pin in production['files'].items():
+        equal_pin(ROOT / name, pin, 'current production35 bytes')
+        need(sources[str(ROOT / name)]['sha256'] == pin['sha256'], 'production35 joins actual compiled snapshot graph')
+    for index, (label, digest) in enumerate(bundle['runtime'].items()):
+        raw = shutil.which(label.split(':', 1)[1]) if label.startswith('runtime-path-redacted:') else label
+        need(raw and sha(raw) == digest, 'all inherited runtime/tool/ROM identities remain exact')
+        bindings['inherited-tool:' + str(index)] = ident(raw)
+    python = ROOT.parents[1] / '.idf/tools-v6.0.2/python_env/idf6.0_py3.12_env/Scripts/python.exe'
+    need(Path(sys.executable).resolve() == python.resolve() and sha(python) == bundle['runtime'][str(python)], 'same inherited controller Python, no SDK activation')
+    for label, path in [('script', SELF), ('python', sys.executable), ('decimal', decimal.__file__), ('decimal-binary', _decimal.__file__)]:
+        bindings['current-data-tool:' + label] = ident(path)
+    for name in VALIDATORS:
+        path = ROOT / name; bindings['validator:' + name] = ident(path)
+        need(str(path) in sources, 'all executed validators belong to original source graph')
+    return bindings, contract, dict(parent_status='NONPASS; unmodified', source_snapshots=560, actual_compiler_dependencies=471,
+        actual_translation_units=18, inherited_artifacts=len(bundle['artifacts']), inherited_tools=len(bundle['runtime']), production_inputs=35,
+        only_current_source_exception=VALIDATORS[0], compiled_source_exceptions=0, recorded_SDK_commit=bundle['sdk_commit'], recorded_vendor_commit=bundle['vendor_commit'],
+        build={k:build[k] for k in ('pid','exit_status','elapsed_seconds')}, SDK_child={k:child[k] for k in ('pid','exit_status')},
+        guest={k:guest[k] for k in ('pid','exit_status','elapsed_seconds')}, current_Git_refs_queried=False)
+
+
+def module(index):
+    path = ROOT / VALIDATORS[index]
+    spec = importlib.util.spec_from_file_location('current_successor_' + path.stem.replace('-', '_'), path)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value); return value
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--preliminary-parse', action='store_true')
+    parser.add_argument('--execute-oracle', action='store_true')
+    parser.add_argument('--reviewed-script-sha256')
+    args = parser.parse_args(); output = args.output.resolve()
+    need(output != ROOT / '.build' and output.is_relative_to(ROOT / '.build') and not output.exists() and
+         not output.is_relative_to(CAPTURE) and not CAPTURE.is_relative_to(output), 'fresh separate contained successor output')
+    if args.execute_oracle:
+        need(args.reviewed_script_sha256 == sha(SELF), 'root must review exact current script SHA before full oracle')
+    output.mkdir(parents=True)
+    result = dict(schema='cyd-family1-data-successor-v1', passed=False, completed=False, preflight_passed=False,
+        metadata_only_successor=True, original_capture=CAPTURE.relative_to(ROOT).as_posix(), original_status='NONPASS; unmodified',
+        original_metadata_pins=PINS, native_executed_here=False, SDK_build_started_here=False, inherited_native_execution=True,
+        archived_code_executed=False, current_live_validators_executed=False, new_numeric_tolerance=False,
+        full_pcm_independent_oracle=False, physical_hardware=False, performance_or_full_radio_resource_claim=False)
+    try:
+        before, contract, inherited = audit(); result['inherited_execution'] = inherited
+        write(output / 'bindings-before.json', before)
+        for name in VALIDATORS:
+            destination = output / 'current-validators' / Path(name).name; destination.parent.mkdir(exist_ok=True)
+            destination.write_bytes((ROOT / name).read_bytes())
+            equal_pin(destination, before['validator:' + name], 'frozen current validators equal live executed inputs')
+        parent_sources = load(CAPTURE / 'source-manifest.json'); old = contained(CAPTURE, parent_sources[str(ROOT / VALIDATORS[0])]['snapshot']).read_text(); new = (ROOT / VALIDATORS[0]).read_text()
+        (output / 'reviewed-reader-change.patch').write_text(''.join(difflib.unified_diff(old.splitlines(True), new.splitlines(True), fromfile='captured-reader', tofile='current-reader')), encoding='utf-8', newline='\n')
+        result['preflight_passed'] = True
+        if args.preliminary_parse or args.execute_oracle:
+            log = (CAPTURE / 'qemu.stdout.log').read_bytes().decode('utf-8', errors='replace') + '\n' + (CAPTURE / 'qemu.stderr.log').read_bytes().decode('utf-8', errors='replace')
+            measured, pcm = module(0).validate(log, contract); word = module(1).parse_word_allocation_log(log, require_terminal=True)
+            need(len(measured['cases']) == 48 and len(pcm) == 13 and 'allocation_faults' in measured, 'whole current strict reader accepts all48 with mandatory fault accounting')
+            write(output / 'measurements.json', measured); write(output / 'word-allocations.json', word)
+            result.update(current_live_validators_executed=True, reader_complete_cases=48, direct_reference_captures=13,
+                          full_reference_capture_pins=[ident_bytes(body) for body in pcm], owner_provenance_observed=True)
+            if args.execute_oracle:
+                oracle = module(3).qualify(contract, measured, pcm, output)
+                need(oracle['passed'] and oracle['complete_cases'] == 48, 'full independent current Decimal oracle')
+                write(output / 'post-output-oracle.json', oracle)
+                need(all((output / ('reference-' + str(i) + '.pcm')).read_bytes() == body for i, body in enumerate(pcm)), 'all13 complete actual reference PCM retained')
+                result.update(passed=True, completed=True, full_pcm_independent_oracle=True)
+        after, _, _ = audit(); need(before == after, 'all exact original/current bindings unchanged after validation')
+        write(output / 'bindings-after.json', after); result['all_bindings_current_after'] = True
+    except BaseException as error:
+        result.update(passed=False, completed=False, failure_type=type(error).__name__)
+        if isinstance(error, ValueError): result['failure'] = str(error)
+        try:
+            after, _, _ = audit(); write(output / 'bindings-after-failure.json', after)
+            result['all_bindings_current_after'] = 'before' in locals() and before == after
+        except BaseException as second:
+            result.update(all_bindings_current_after=False, after_failure_type=type(second).__name__)
+    result['post_artifacts'] = {p.relative_to(output).as_posix(): ident(p) for p in sorted(output.rglob('*')) if p.is_file()}
+    write(output / 'report.json', result)
+    print(json.dumps({k:result.get(k) for k in ('preflight_passed','reader_complete_cases','full_pcm_independent_oracle','passed','completed','all_bindings_current_after','failure_type','failure')}))
+    return 0 if result['preflight_passed'] and not result.get('failure_type') and result.get('all_bindings_current_after') and (not args.execute_oracle or result['passed']) else 1
+
+
+def ident_bytes(body): return dict(bytes=len(body), sha256=hashlib.sha256(body).hexdigest())
+
+
+if __name__ == '__main__': raise SystemExit(main())
