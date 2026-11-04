@@ -156,6 +156,15 @@ backpressure исходного8192-byte ring, Stop и maintenance/stale-token/r
 Все 12004 borrowed writes неизменны после renderer, включая INVALID_STATE.
 Исходный NONPASS с неверным test-only сравнением OGP status/detail сохранён.
 
+[Enabled normalizer gate](../tests/results/cyd-normalizer-enabled-20261104/README.md)
+проходит два полных C8/48kHz потока с независимой integer/Decimal моделью:
+по 9600 frames, 19200 mono bytes и 256 zero-padding bytes. Проверены обработка
+всех восьми каналов, два coalesced reset requests после 5448 frames, отдельный
+EOF reset в FLUSH и неизменность всех 152 borrowed source writes. Все 10 codec
+и 2 HTTP owners закрыты; source PCM нового независимого reference decode
+полностью совпадает с заранее выбранным эталоном. Это конечный профиль
+max boost 20 dB / target -20 dBFS / 100 ms, без physical DMA или production timing claim.
+
 ## Что осталось по переносу
 
 После уточнения пользователя 28 октября, состояние на 4 ноября 2026 года:
@@ -167,7 +176,7 @@ compact/private, сохранён в таблице как отложенный,
 
 | Блок | Оставшаяся программная работа |
 | --- | --- |
-| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates. Многоканальный family1 dispatch выбран в production caller и проходит [43 HOST schedules/12 controls](../tests/results/cyd-ogg-family1-dispatch-host-20261101/README.md), [48 полных actual-task outputs с независимым PCM oracle](../tests/results/cyd-family1-task-20261104/README.md) и [6 реальных OOM/backpressure controls](../tests/results/cyd-ogg-runtime-controls-20261104/README.md); все три output backend и FIFO layout/gain проверены отдельно. Остались enabled normalizer и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
+| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates. Многоканальный family1 dispatch выбран в production caller и проходит [43 HOST schedules/12 controls](../tests/results/cyd-ogg-family1-dispatch-host-20261101/README.md), [48 полных actual-task outputs с независимым PCM oracle](../tests/results/cyd-family1-task-20261104/README.md), [6 реальных OOM/backpressure controls](../tests/results/cyd-ogg-runtime-controls-20261104/README.md) и [enabled C8 normalizer](../tests/results/cyd-normalizer-enabled-20261104/README.md); все три output backend и FIFO layout/gain проверены отдельно. Остались финальные production exports и ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
 | AAC compact owners — отложено | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) и [48 actual-task сценариев](../tests/results/cyd-aac-playback-task-20261101/README.md) завершены. Compact/private ABI/reset/owner-view scopes не возобновлять автоматически. Late SBR/PS отмечены как ограничения vendor, без заявления о полной поддержке этих переходов. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Обычная current-source регрессия и конечный production-policy watchdog gate пройдены в SDK/QEMU. Остаются ресурсы полного приложения, финальные vendor/custom exports и физический A/B. Target OOM/backpressure/semantic controls [явно отложены](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md). [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | [Actual TLS traffic](../tests/results/cyd-tls-traffic-20261101/README.md) в изолированном SDK/QEMU пройден: full records, два клиента, реальные reserve/reclaim/MPI и pressure/recovery. Остались полный radio boot и heap/IRAM/stack с radio/TFT до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
