@@ -22,7 +22,7 @@
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "stream_http_reader.h"
-#include "stream_fairness.h"
+#include "../../components/native_stream/include/stream_fairness.h"
 #include "stream_probe.h"
 #include "stream_bitrate.h"
 #ifdef CONFIG_YORADIO_HTTP_RELEASE_REQUEST_BUFFER
