@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>yoRadio recovery</title>
+<h1>yoRadio recovery</h1>
+<form id="upload">
+  <label>Application image <input type="file" accept=".bin" required></label>
+  <button>Install</button>
+</form>
+<p role="status" id="status"></p>
+<script>
+const form = document.querySelector('#upload');
+const message = document.querySelector('#status');
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = form.querySelector('button');
+  button.disabled = true;
+  message.textContent = 'Uploading and verifying firmware…';
+  try {
+    const response = await fetch('/firmware', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/octet-stream'},
+      body: form.querySelector('input').files[0]
+    });
+    message.textContent = await response.text();
+    if (response.ok) return;
+  } catch {
+    message.textContent = 'Connection lost. Reconnect to the recovery network to retry.';
+  }
+  button.disabled = false;
+});
+</script>
+</html>
