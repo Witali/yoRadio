@@ -36,4 +36,4 @@ The raw flash images, test certificates and build intermediates stay local.
 
 The [RX backoff follow-up](../cyd-openeth-rx-backoff-20261111/README.md) corrects
 the playback status check to match the production `OGG` label and records a
-health sample after the first PCM write.
+health sample after the first PDM driver write.

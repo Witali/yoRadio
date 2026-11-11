@@ -17,6 +17,10 @@ FATAL = re.compile(r'Guru Meditation|assert failed:|abort\(\) was called|watchdo
                    r'SPIFFS mount failed|Audio service failed|Radio control failed|Web server failed|'
                    r'opencores\.emac: no mem for receive buffer', re.I)
 RX_WAIT = re.compile(r'CYD_OPENETH_RX_WAIT request=(\d+) heap=(\d+) largest=(\d+) dma=(\d+)')
+# The pinned Opus fixture's EOS granule 528312 minus pre-skip 312 gives
+# 528000 mono output samples. PDM pads to 512-sample writes and counts the
+# 704 bias samples written after DMA preload, at two bytes per sample.
+PDM_OPUS_EOF_BYTES = 1058176
 
 
 def digest(data):
@@ -111,7 +115,40 @@ def guest_log(log_path):
     return log_path.read_text(encoding='utf-8', errors='replace')
 
 
-def observe_playback(port, server, guest, log_path, report):
+def observe_eof(port, server, event, guest, log_path, generation, report):
+    # The emulated PDM writes averaged 58 ms per block in the load test.
+    until = time.monotonic() + 90
+    while time.monotonic() < until:
+        if FATAL.search(guest_log(log_path)) or guest.poll() is not None:
+            raise RuntimeError('Guest stopped or logged a failure before EOF')
+        status = json.loads(request(port, '/api/native/status'))
+        if status['generation'] != generation:
+            raise RuntimeError('Playback changed generation before EOF')
+        if not status['audio'] and not status['connecting']:
+            report['eof_status'] = {key: status[key] for key in ('audio', 'connecting', 'format', 'generation')}
+            if status['format'] != 'stream ended':
+                raise RuntimeError(f"Playback ended as {status['format']!r}")
+            if event['complete']:
+                break
+        time.sleep(0.75)
+    else:
+        raise RuntimeError('Guest EOF and full TLS response were not both observed')
+
+    final = sample(port)
+    report['eof_health'] = final
+    driver = final['output_driver']
+    if event['sent'] != len(server.fixtures['station']['data']):
+        raise RuntimeError('TLS peer did not write the exact fixture length')
+    if not driver['requested_bytes'] == driver['written_bytes'] == PDM_OPUS_EOF_BYTES:
+        raise RuntimeError('Unexpected PDM byte count after EOF')
+    if any(driver[key] for key in ('errors', 'timeouts', 'short_writes', 'saturated')):
+        raise RuntimeError('Unexpected PDM driver fault after EOF')
+    require_clean_health(final)
+    report['web_asset_after_eof'] = check_asset(port)
+    report['observed'] += ['complete TLS response', 'ordered EOF with exact PDM driver byte count', 'WebUI after EOF']
+
+
+def observe_playback(port, server, guest, log_path, report, through_eof):
     radio = json.loads(request(port, '/api/native/radio'))
     if radio['count'] != 1 or radio['station'] != 'OpenETH fixture':
         raise RuntimeError('The expected SPIFFS station was not loaded')
@@ -153,10 +190,15 @@ def observe_playback(port, server, guest, log_path, report):
     report['playing_health'].append(second)
     report['tls_peer'] = {key: events[0][key] for key in ('tls_version', 'tls_cipher', 'sent')}
     report['playback'] = {key: status[key] for key in ('codec', 'format', 'pcm_sample_rate_hz', 'pcm_channels')}
-    request(port, '/api/native/radio?action=stop', 'POST')
     report['observed'] += ['Opus audio over verified TLS', 'audio progress across WebUI asset read']
+    if not through_eof:
+        request(port, '/api/native/radio?action=stop', 'POST')
     require_clean_health(first)
     require_clean_health(second)
+    if through_eof:
+        if report['health'][-1]['output_driver']['writes'] != 0:
+            raise RuntimeError('PDM EOF check requires an idle driver before Play')
+        observe_eof(port, server, events[0], guest, log_path, status['generation'], report)
 
 
 def main():
@@ -166,6 +208,8 @@ def main():
     parser.add_argument('--rom', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--tls-material', type=Path, help='Local disposable CA and server certificate/key directory')
+    parser.add_argument('--through-eof', action='store_true',
+                        help='Require the full TLS Opus response, exact PDM write length, and WebUI after EOF')
     args = parser.parse_args()
     build, qemu, rom = (path.resolve(strict=True) for path in (args.build, args.qemu, args.rom))
     output = args.output.resolve()
@@ -178,6 +222,9 @@ def main():
     if material is not None and (not material.is_relative_to(ROOT / '.build') or
                                  not config.get('MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE')):
         raise ValueError('TLS workload requires local test credentials and a diagnostic CA bundle')
+    if args.through_eof and not (material and config.get('YORADIO_NATIVE_AUDIO_OUTPUT_PDM') and
+                                 config.get('YORADIO_OGG_TIMELINE')):
+        parser.error('--through-eof requires the TLS fixture, PDM output and Ogg timeline')
     flash, parts = flash_parts(build)
     output.mkdir(parents=True)
     flash_path = output / 'qemu-flash.bin'
@@ -213,6 +260,8 @@ def main():
             net = command.index('-nic') + 1
             command[net] += f',guestfwd=tcp:10.0.2.100:18080-tcp:127.0.0.1:{host_port}'
             report['scope'] = 'OpenETH full-application boot and TLS audio with concurrent WebUI'
+            if args.through_eof:
+                report['scope'] += ' through EOF'
         with log_path.open('xb') as log:
             guest = subprocess.Popen(command, cwd=output, stdin=subprocess.DEVNULL, stdout=log,
                                      stderr=subprocess.STDOUT,
@@ -249,7 +298,7 @@ def main():
             require_clean_health(second)
             if server:
                 try:
-                    observe_playback(web_port, server, guest, log_path, report)
+                    observe_playback(web_port, server, guest, log_path, report, args.through_eof)
                 except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):
                     if guest.poll() is None:
                         try:

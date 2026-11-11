@@ -21,6 +21,10 @@ reported one complete 1024-byte driver write. At that sample, the heap had
 13,312 bytes. Allocation, decoder, stream and output failure counters were
 zero at that point.
 
+This first driver write can be part of the 1408-byte PDM bias ramp counted
+after DMA preload. The [TLS buffer comparison](../cyd-openeth-tls-dynamic-20261111/README.md)
+observes writes well past that ramp in both profiles.
+
 Later the OpenETH task logged four allocation pressure episodes and recovered
 from three before the test ended. The lowest recorded free heap during these
 episodes was 1796 bytes. The largest DMA block fell to 864 bytes. The HTTP

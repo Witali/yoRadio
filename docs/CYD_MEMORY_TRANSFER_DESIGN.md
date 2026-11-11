@@ -229,12 +229,23 @@ Wi-Fi PHY, five-second watchdog and combined resource limits remain open.
 
 The [RX backoff experiment](../tests/results/cyd-openeth-rx-backoff-20261111/README.md)
 keeps the 1522-byte receive allocation and delays retries by one tick. Under
-the same TLS load the guest reported its first PDM write, with 16,936 bytes
+the same TLS load the guest reported its first PDM driver write, with 16,936 bytes
 free and a largest DMA block of 13,312 bytes. Later, OpenETH recovered from
 three of four allocation pressure episodes. The lowest pressure sample had
 1796 bytes free and a largest DMA block of 864 bytes. WebUI could not complete
 a request during playback. This experiment uses a build-local OpenETH driver
 overlay and supplies a control for testing CYD memory options under load.
+
+The [dynamic TLS comparison](../tests/results/cyd-openeth-tls-dynamic-20261111/README.md)
+enabled the SDK buffer policy used by the C3 profile on a second CYD build.
+Both static controls served the asset during audio output and recorded
+allocation failures. Both dynamic runs completed the overlap with zero failures.
+The dynamic profile also completed the Opus file with the exact PDM driver
+byte count, successful WebUI during playback and after EOF, and a minimum of
+16,164 free heap bytes. The RX/TX record limits stay at 16384/4096 bytes.
+This is an OpenETH experiment. The remaining comparison includes the CYD
+static RX reservation, maximum-size TLS records, physical Wi-Fi and all three
+output backends.
 
 ## Actual TLS traffic in isolated SDK/QEMU
 

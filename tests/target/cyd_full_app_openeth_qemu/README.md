@@ -45,6 +45,20 @@ allocating and waits one tick before retrying a failed allocation. The report
 records the UART pressure markers and any health samples returned during
 playback, including samples with nonzero failure counters.
 
+For the [TLS buffer comparison](../../results/cyd-openeth-tls-dynamic-20261111/README.md),
+make a second copy of the TLS diagnostic `sdkconfig` in a fresh build directory.
+Replace `# CONFIG_MBEDTLS_DYNAMIC_BUFFER is not set` with
+`CONFIG_MBEDTLS_DYNAMIC_BUFFER=y` and reuse the first profile's CA and TLS
+station. Build both configurations with the RX overlay. Keep the TLS record
+limits at 16384/4096 bytes and leave dynamic certificate/configuration cleanup
+disabled. Compare both generated `config/sdkconfig.json` files before running.
+
+Add `--through-eof` to the TLS run to check the complete Opus file on PDM with
+the Ogg timeline enabled. The runner requires the full TLS response, the
+original generation's EOF, the exact PDM byte count, and another exact WebUI
+asset read after EOF. Its 90-second host deadline accommodates the measured
+QEMU I2S rate.
+
 The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
 and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)
 cover the diagnostic profiles. Production Wi-Fi, the five-second watchdog and

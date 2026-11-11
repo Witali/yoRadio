@@ -1,0 +1,562 @@
+{
+  "source_commit": "d471868f1cd534fe46e14424455db4c6fbd60dce",
+  "idf_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "project_version": "v0.9.693-2101-gd471868f1-dirty",
+  "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+  "openeth_overlay_sha256": "77827f4605a712e9057484fe5999c8a3405e3e617f3f45e52ca8933d96be6cca",
+  "spiffs_sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44",
+  "opus": {
+    "encoded_bytes": 706319,
+    "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+    "pcm_frames": 528000,
+    "expected_pdm_driver_bytes": 1058176
+  },
+  "web_asset": {
+    "bytes": 13588,
+    "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+  },
+  "typed_config_changes_static_to_dynamic": {
+    "MBEDTLS_DYNAMIC_BUFFER": [
+      false,
+      true
+    ],
+    "MBEDTLS_DYNAMIC_FREE_CONFIG_DATA": [
+      null,
+      false
+    ],
+    "YORADIO_TLS_STATIC_RX_RESERVE": [
+      false,
+      null
+    ]
+  },
+  "images": {
+    "static": {
+      "app_bytes": 1264528,
+      "app_sha256": "7b61b843cc75ea619e03979032390dc40e295327e615bfdb6f39826f9d9ab284",
+      "config_sha256": "1b8a303061242903157be696586b811a81654c2e5315f548d22bbe578c905838"
+    },
+    "dynamic": {
+      "app_bytes": 1267504,
+      "app_sha256": "95e0b20fb88359621e24a0ce761c7fdc492a2d007e24af142c8fc0c4aff8ce5a",
+      "config_sha256": "59e84c90613ade29bc2909367dfd2af130905d408c57f28b8b6be4f46dfdc7a0"
+    }
+  },
+  "runs": [
+    {
+      "gate": "ab",
+      "run": "static-01",
+      "state": "TERMINAL_NONPASS",
+      "runner_sha256": "55826c98c9c387c6165c74b1632f746f8370d0fa6473484cac48994f24c3d956",
+      "flash_sha256": "6ade1f8843a684dcfa8ad11085520276d69e2d58eb329e646693ed0a7211e0b2",
+      "report_sha256": "385e2a11b11d62da803e347807c0e705d5df9036418eef122a995cd7700e112c",
+      "uart_sha256": "1b8ef29d8aad5587d048fed361ae476f5691389db5e5c0d74a7567fcf5c9b262",
+      "rx_waits": 2,
+      "rx_recoveries": 2,
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 246784,
+        "complete": false
+      },
+      "reason": "Unexpected allocation failure",
+      "web_asset_during_playback": true,
+      "first_active_health": {
+        "uptime_ms": 16138,
+        "heap": 18488,
+        "minimum_heap": 9588,
+        "allocation_failures": 0,
+        "largest_dma": 15360,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 1,
+          "requested_bytes": 1024,
+          "written_bytes": 1024,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 3354,
+          "max_write_us": 3354
+        }
+      },
+      "health_during_webui": {
+        "uptime_ms": 21925,
+        "heap": 12544,
+        "minimum_heap": 348,
+        "allocation_failures": 8,
+        "largest_dma": 5376,
+        "last_allocation_size": 1522,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 80,
+          "requested_bytes": 81280,
+          "written_bytes": 81280,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 5,
+          "write_us": 2267586,
+          "max_write_us": 88660
+        }
+      },
+      "last_reachable_health": {
+        "uptime_ms": 22043,
+        "heap": 108456,
+        "minimum_heap": 348,
+        "allocation_failures": 8,
+        "largest_dma": 94208,
+        "last_allocation_size": 1522,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 80,
+          "requested_bytes": 81280,
+          "written_bytes": 81280,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 7,
+          "write_us": 2267586,
+          "max_write_us": 88660
+        }
+      }
+    },
+    {
+      "gate": "ab",
+      "run": "dynamic-01",
+      "state": "TERMINAL_PASS",
+      "runner_sha256": "55826c98c9c387c6165c74b1632f746f8370d0fa6473484cac48994f24c3d956",
+      "flash_sha256": "69e40d53f808e4979f13db609742f7699d187eedcc0d47f4432a798989933ddc",
+      "report_sha256": "622e055ce1c19c44064252105c09e94c1a4bafb214441522c79b7f5a75ade401",
+      "uart_sha256": "f041971763ce743b420d206d9e3bc4c6f32322e280440dd98fac8176d3192348",
+      "rx_waits": 0,
+      "rx_recoveries": 0,
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 219136,
+        "complete": false
+      },
+      "web_asset_during_playback": true,
+      "first_active_health": {
+        "uptime_ms": 15787,
+        "heap": 40268,
+        "minimum_heap": 31096,
+        "allocation_failures": 0,
+        "largest_dma": 18432,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 5,
+          "requested_bytes": 4480,
+          "written_bytes": 4480,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 242051,
+          "max_write_us": 62666
+        }
+      },
+      "health_during_webui": {
+        "uptime_ms": 20493,
+        "heap": 24388,
+        "minimum_heap": 18416,
+        "allocation_failures": 0,
+        "largest_dma": 18432,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 72,
+          "requested_bytes": 73088,
+          "written_bytes": 73088,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 6,
+          "write_us": 1443491,
+          "max_write_us": 83920
+        }
+      }
+    },
+    {
+      "gate": "ab",
+      "run": "static-02",
+      "state": "TERMINAL_NONPASS",
+      "runner_sha256": "55826c98c9c387c6165c74b1632f746f8370d0fa6473484cac48994f24c3d956",
+      "flash_sha256": "6ade1f8843a684dcfa8ad11085520276d69e2d58eb329e646693ed0a7211e0b2",
+      "report_sha256": "1c70ccc7f6733d74a7246b572c844573e31521990afff239f5b0935a05dfaf19",
+      "uart_sha256": "1c046a1cb732dd90936e68abf100a195b2a3c311ff8d06ca9d01dac01d3c701c",
+      "rx_waits": 2,
+      "rx_recoveries": 2,
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 242688,
+        "complete": false
+      },
+      "reason": "Unexpected allocation failure",
+      "web_asset_during_playback": true,
+      "first_active_health": {
+        "uptime_ms": 15493,
+        "heap": 16960,
+        "minimum_heap": 12376,
+        "allocation_failures": 0,
+        "largest_dma": 13312,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 4,
+          "requested_bytes": 3456,
+          "written_bytes": 3456,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 172648,
+          "max_write_us": 61535
+        }
+      },
+      "health_during_webui": {
+        "uptime_ms": 20905,
+        "heap": 14168,
+        "minimum_heap": 304,
+        "allocation_failures": 56,
+        "largest_dma": 10240,
+        "last_allocation_size": 1522,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 80,
+          "requested_bytes": 81280,
+          "written_bytes": 81280,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 2,
+          "write_us": 2574728,
+          "max_write_us": 77407
+        }
+      },
+      "last_reachable_health": {
+        "uptime_ms": 21038,
+        "heap": 110076,
+        "minimum_heap": 304,
+        "allocation_failures": 56,
+        "largest_dma": 94208,
+        "last_allocation_size": 1522,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 80,
+          "requested_bytes": 81280,
+          "written_bytes": 81280,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 4,
+          "write_us": 2574728,
+          "max_write_us": 77407
+        }
+      }
+    },
+    {
+      "gate": "ab",
+      "run": "dynamic-02",
+      "state": "TERMINAL_PASS",
+      "runner_sha256": "55826c98c9c387c6165c74b1632f746f8370d0fa6473484cac48994f24c3d956",
+      "flash_sha256": "69e40d53f808e4979f13db609742f7699d187eedcc0d47f4432a798989933ddc",
+      "report_sha256": "0493bf603b28dd898ef23e069e45a6650fb2f51e1652be0c8312a6ce10dd6cd5",
+      "uart_sha256": "55d2de204e49d4b3bf45667c404f334f2b71dd235fcb41805064bff78c993310",
+      "rx_waits": 0,
+      "rx_recoveries": 0,
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 221184,
+        "complete": false
+      },
+      "web_asset_during_playback": true,
+      "first_active_health": {
+        "uptime_ms": 15763,
+        "heap": 38608,
+        "minimum_heap": 33908,
+        "allocation_failures": 0,
+        "largest_dma": 30720,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 5,
+          "requested_bytes": 4480,
+          "written_bytes": 4480,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 235763,
+          "max_write_us": 63302
+        }
+      },
+      "health_during_webui": {
+        "uptime_ms": 20569,
+        "heap": 23484,
+        "minimum_heap": 18540,
+        "allocation_failures": 0,
+        "largest_dma": 21504,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 76,
+          "requested_bytes": 77184,
+          "written_bytes": 77184,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 3,
+          "write_us": 1747884,
+          "max_write_us": 86742
+        }
+      }
+    },
+    {
+      "gate": "eof",
+      "run": "dynamic-01",
+      "state": "TERMINAL_NONPASS",
+      "runner_sha256": "7f3056608d6189fded69b69db99a9208bdb22419f797834b4ec36aa2398d71e0",
+      "flash_sha256": "69e40d53f808e4979f13db609742f7699d187eedcc0d47f4432a798989933ddc",
+      "report_sha256": "0e528e1d0cf1a21f137ef359c0053fa8b4ab13a536b960e55625ad78fdfa6b07",
+      "uart_sha256": "8f5389b15972f56a6fb053f7eb00eafb27c586f67759eb74a96d86f14c4aa091",
+      "rx_waits": 0,
+      "rx_recoveries": 0,
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 706319,
+        "complete": true
+      },
+      "reason": "Guest EOF and full TLS response were not both observed",
+      "web_asset_during_playback": true,
+      "first_active_health": {
+        "uptime_ms": 15159,
+        "heap": 38880,
+        "minimum_heap": 33896,
+        "allocation_failures": 0,
+        "largest_dma": 30720,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 4,
+          "requested_bytes": 3456,
+          "written_bytes": 3456,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 170617,
+          "max_write_us": 62047
+        }
+      },
+      "health_during_webui": {
+        "uptime_ms": 21398,
+        "heap": 25024,
+        "minimum_heap": 17168,
+        "allocation_failures": 0,
+        "largest_dma": 16384,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 80,
+          "requested_bytes": 81280,
+          "written_bytes": 81280,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 15,
+          "write_us": 1036307,
+          "max_write_us": 87042
+        }
+      },
+      "last_reachable_health": {
+        "uptime_ms": 71735,
+        "heap": 24632,
+        "minimum_heap": 16140,
+        "allocation_failures": 0,
+        "largest_dma": 21504,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 872,
+          "requested_bytes": 892288,
+          "written_bytes": 892288,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 16,
+          "write_us": 50970003,
+          "max_write_us": 92353
+        }
+      }
+    },
+    {
+      "gate": "eof",
+      "run": "static-01",
+      "state": "TERMINAL_NONPASS",
+      "runner_sha256": "7f3056608d6189fded69b69db99a9208bdb22419f797834b4ec36aa2398d71e0",
+      "flash_sha256": "6ade1f8843a684dcfa8ad11085520276d69e2d58eb329e646693ed0a7211e0b2",
+      "report_sha256": "ee84e826f778547a2ba684d9ab80e4e490660978ec4cc03a416c5309002d0b85",
+      "uart_sha256": "67a8c4f729fe0912b5bcd6c580c659a5851f0f326afe1e9659d6bda34f58a427",
+      "rx_waits": 5,
+      "rx_recoveries": 4,
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 322560,
+        "complete": false
+      },
+      "reason": "Remote end closed connection without response",
+      "first_active_health": {
+        "uptime_ms": 15369,
+        "heap": 18104,
+        "minimum_heap": 10672,
+        "allocation_failures": 0,
+        "largest_dma": 13312,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 5,
+          "requested_bytes": 4480,
+          "written_bytes": 4480,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 247647,
+          "max_write_us": 77291
+        }
+      }
+    },
+    {
+      "gate": "eof",
+      "run": "dynamic-02",
+      "state": "TERMINAL_PASS",
+      "runner_sha256": "1e89627abccad8c6dadfb8f36bff4c34a98d84eb1ae94b3ae707e6c2f99f8777",
+      "flash_sha256": "69e40d53f808e4979f13db609742f7699d187eedcc0d47f4432a798989933ddc",
+      "report_sha256": "4a9f4f84f7eac34a69c75bf9afd0271d8e9148304e158bd5db8adf9213c8ebdc",
+      "uart_sha256": "6f293b6aae64cd8afb20a230b1362b5f4ee811d6e6af0516d3fbac3926a6cfed",
+      "rx_waits": 0,
+      "rx_recoveries": 0,
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 706319,
+        "complete": true
+      },
+      "web_asset_during_playback": true,
+      "first_active_health": {
+        "uptime_ms": 15292,
+        "heap": 38880,
+        "minimum_heap": 31344,
+        "allocation_failures": 0,
+        "largest_dma": 18432,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 1,
+          "requested_bytes": 1024,
+          "written_bytes": 1024,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 1804,
+          "max_write_us": 1804
+        }
+      },
+      "health_during_webui": {
+        "uptime_ms": 20021,
+        "heap": 24588,
+        "minimum_heap": 18564,
+        "allocation_failures": 0,
+        "largest_dma": 18432,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 75,
+          "requested_bytes": 76160,
+          "written_bytes": 76160,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 2193981,
+          "max_write_us": 89839
+        }
+      },
+      "eof_health": {
+        "uptime_ms": 81635,
+        "heap": 142648,
+        "minimum_heap": 16164,
+        "allocation_failures": 0,
+        "largest_dma": 110592,
+        "last_allocation_size": 0,
+        "decoder_failures": 0,
+        "stream_failures": 0,
+        "output_failures": 0,
+        "driver": {
+          "writes": 1034,
+          "requested_bytes": 1058176,
+          "written_bytes": 1058176,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "completion_queue_drops": 0,
+          "write_us": 63274724,
+          "max_write_us": 92669
+        }
+      },
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "web_asset_after_eof": true,
+      "stack_free_min": {
+        "stream": 1604,
+        "decode": 2700,
+        "output": 2868,
+        "http": 1228
+      }
+    }
+  ]
+}
