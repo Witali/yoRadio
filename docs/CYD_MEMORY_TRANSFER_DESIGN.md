@@ -227,6 +227,15 @@ and stack samples. Both TLS load runs verify the local peer and configure PDM,
 then fail in the SDK OpenETH receive-buffer allocation loop. The production
 Wi-Fi PHY, five-second watchdog and combined resource limits remain open.
 
+The [RX backoff experiment](../tests/results/cyd-openeth-rx-backoff-20261111/README.md)
+keeps the 1522-byte receive allocation and delays retries by one tick. Under
+the same TLS load the guest reported its first PDM write, with 16,936 bytes
+free and a largest DMA block of 13,312 bytes. Later, OpenETH recovered from
+three of four allocation pressure episodes. The lowest pressure sample had
+1796 bytes free and a largest DMA block of 864 bytes. WebUI could not complete
+a request during playback. This experiment uses a build-local OpenETH driver
+overlay and supplies a control for testing CYD memory options under load.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)

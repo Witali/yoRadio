@@ -37,6 +37,15 @@ control serves the exact gzip JavaScript asset and reports the actual guest's
 heap and stack samples. The load case selects station 1 through the WebUI API
 and requires progress in the audio driver's byte counter across a WebUI read.
 
-The [observed results](../../results/cyd-full-app-openeth-20261111/README.md)
-cover this diagnostic configuration. Production Wi-Fi, the five-second
-watchdog and physical audio require their own evidence.
+For the OpenETH receive-memory experiment, add `'-D','CYD_OPENETH_RX_BACKOFF=ON'`
+to `-IdfArguments` before `'build'`. Use a new build directory with the same
+TLS profile and station fixture. The hook replaces the pinned SDK's OpenETH
+MAC source inside that build. It checks for a ready descriptor before
+allocating and waits one tick before retrying a failed allocation. The report
+records the UART pressure markers and any health samples returned during
+playback, including samples with nonzero failure counters.
+
+The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
+and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)
+cover the diagnostic profiles. Production Wi-Fi, the five-second watchdog and
+physical audio require their own evidence.

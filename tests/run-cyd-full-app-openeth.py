@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FATAL = re.compile(r'Guru Meditation|assert failed:|abort\(\) was called|watchdog got triggered|'
                    r'SPIFFS mount failed|Audio service failed|Radio control failed|Web server failed|'
                    r'opencores\.emac: no mem for receive buffer', re.I)
+RX_WAIT = re.compile(r'CYD_OPENETH_RX_WAIT request=(\d+) heap=(\d+) largest=(\d+) dma=(\d+)')
 
 
 def digest(data):
@@ -68,14 +69,19 @@ def sample(port):
     report = json.loads(request(port, '/api/native/health'))
     if report['schema'] != 1 or report['cores'] != 2:
         raise RuntimeError('Unexpected production health endpoint schema or core count')
+    if not 0 < report['minimum_heap'] <= report['heap'] or not 0 < report['largest'] <= report['heap']:
+        raise RuntimeError('Invalid production heap sample')
+    return {key: report[key] for key in ('uptime_ms', 'heap', 'largest', 'minimum_heap', 'tasks', 'memory', 'cpu',
+                                         'allocation_failures', 'last_allocation_failure', 'decoder_failure',
+                                         'stream_failure', 'output', 'output_driver')}
+
+
+def require_clean_health(report):
     for group, key in (('decoder_failure', 'sequence'), ('stream_failure', 'sequence'), ('output', 'failures')):
         if report[group][key] != 0:
             raise RuntimeError(f'Unexpected {group} counter')
     if report['allocation_failures'] != 0:
         raise RuntimeError('Unexpected allocation failure')
-    if not 0 < report['minimum_heap'] <= report['heap'] or not 0 < report['largest'] <= report['heap']:
-        raise RuntimeError('Invalid production heap sample')
-    return {key: report[key] for key in ('uptime_ms', 'heap', 'largest', 'minimum_heap', 'tasks', 'memory', 'cpu', 'output_driver')}
 
 
 def tls_station(material):
@@ -116,8 +122,10 @@ def observe_playback(port, server, guest, log_path, report):
         if FATAL.search(uart) or guest.poll() is not None:
             raise RuntimeError('Guest stopped or logged a failure during playback')
         status = json.loads(request(port, '/api/native/status'))
-        if status['audio'] and status['codec'].lower() == 'opus':
+        if (status['audio'] and status['codec'] == 'OGG' and
+                status['pcm_sample_rate_hz'] == 48000 and status['pcm_channels'] == 2):
             first = sample(port)
+            report['first_active_health'] = first
             if first['output_driver']['written_bytes'] > 0:
                 break
         time.sleep(0.2)
@@ -130,6 +138,7 @@ def observe_playback(port, server, guest, log_path, report):
         if FATAL.search(guest_log(log_path)) or guest.poll() is not None:
             raise RuntimeError('Guest stopped or logged a failure during WebUI sampling')
         second = sample(port)
+        report['health_during_webui'] = second
         status_after = json.loads(request(port, '/api/native/status'))
         if not status_after['audio'] or status_after['generation'] != status['generation']:
             raise RuntimeError('Playback stopped or changed generation during WebUI sampling')
@@ -146,6 +155,8 @@ def observe_playback(port, server, guest, log_path, report):
     report['playback'] = {key: status[key] for key in ('codec', 'format', 'pcm_sample_rate_hz', 'pcm_channels')}
     request(port, '/api/native/radio?action=stop', 'POST')
     report['observed'] += ['Opus audio over verified TLS', 'audio progress across WebUI asset read']
+    require_clean_health(first)
+    require_clean_health(second)
 
 
 def main():
@@ -227,6 +238,7 @@ def main():
                 raise RuntimeError('Expected the production TFT and audio tasks')
             report['health'] = [first]
             save()
+            require_clean_health(first)
             asset = check_asset(web_port)
             second = sample(web_port)
             if second['uptime_ms'] < first['uptime_ms']:
@@ -234,8 +246,17 @@ def main():
             report.update(health=[first, second], web_asset=asset,
                           observed=['ST7789', 'OpenETH IPv4', 'audio tasks', 'HTTP health', 'SPIFFS WebUI asset'])
             save()
+            require_clean_health(second)
             if server:
-                observe_playback(web_port, server, guest, log_path, report)
+                try:
+                    observe_playback(web_port, server, guest, log_path, report)
+                except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):
+                    if guest.poll() is None:
+                        try:
+                            report['last_reachable_health'] = sample(web_port)
+                        except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):
+                            pass
+                    raise
             report['passed'] = True
     except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException) as error:
         report['reason'] = str(error)
@@ -254,7 +275,12 @@ def main():
         if log_path.is_file():
             uart = log_path.read_bytes()
             report['uart_sha256'] = digest(uart)
-            report['guest_fault_observed'] = bool(FATAL.search(uart.decode('utf-8', errors='replace')))
+            uart_text = uart.decode('utf-8', errors='replace')
+            report['guest_fault_observed'] = bool(FATAL.search(uart_text))
+            pressure = RX_WAIT.findall(uart_text)
+            report['openeth_rx_pressure'] = dict(wait_episodes=len(pressure),
+                recovered=uart_text.count('CYD_OPENETH_RX_RECOVERED'),
+                samples=[dict(zip(('request', 'heap', 'largest', 'dma_largest'), map(int, fields))) for fields in pressure[:32]])
         report['passed'] = bool(report['passed'] and report['flash_unchanged'] and not report.get('guest_fault_observed'))
         report['state'] = 'TERMINAL_PASS' if report['passed'] else 'TERMINAL_NONPASS'
         save()
