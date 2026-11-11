@@ -121,7 +121,7 @@ class Server:
     def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False,
                  delivery_stats=False, initial_failures=0, pacing_ratio=1.02,
                  delivery_pauses=(), send_buffer_bytes=None, icy_interval=0,
-                 icy_metadata=DEFAULT_METADATA, tcp_nodelay=None):
+                 icy_metadata=DEFAULT_METADATA, tcp_nodelay=None, chunk_bytes=1024):
         if tcp_nodelay is not None and type(tcp_nodelay) is not bool:
             raise ValueError('tcp_nodelay must be None or a boolean')
         if type(icy_interval) is not int or icy_interval < 0:
@@ -133,6 +133,8 @@ class Server:
         if (type(pacing_ratio) not in (int, float) or
                 not math.isfinite(pacing_ratio) or pacing_ratio <= 0):
             raise ValueError('pacing_ratio must be finite and positive')
+        if type(chunk_bytes) is not int or not 1 <= chunk_bytes <= 16384:
+            raise ValueError('Audio write size must be an integer within [1, 16384]')
         delivery_pauses = DeliveryPauses.validate(delivery_pauses)
         if send_buffer_bytes is not None and (type(send_buffer_bytes) is not int or
                                              not 1024 <= send_buffer_bytes <= 1048576):
@@ -259,7 +261,7 @@ class Server:
                                     if mode == 'stall':
                                         outer.closed.wait(15)
                                     return
-                                size = min(1024, len(payload)-offset)
+                                size = min(chunk_bytes, len(payload)-offset)
                                 if pauses:
                                     size = pauses.next_size(event['sent'], size)
                                     if not size:

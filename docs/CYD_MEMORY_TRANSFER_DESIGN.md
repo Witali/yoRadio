@@ -247,6 +247,14 @@ This is an OpenETH experiment. The remaining comparison includes the CYD
 static RX reservation, maximum-size TLS records, physical Wi-Fi and all three
 output backends.
 
+The [maximum TLS record comparison](../tests/results/cyd-openeth-full-records-20261111/README.md)
+records the failure modes under 16,384-byte application records. With the
+static RX reserve the peer wrote the complete file and WebUI responded during
+playback, followed by a decoder failure and substantial OpenETH allocation
+pressure. The dynamic profile encountered a PDM configuration timeout while
+its heap allocation counter remained clean. The ordinary static profile
+closed the WebUI response partway through. The full-file gate remains open.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)

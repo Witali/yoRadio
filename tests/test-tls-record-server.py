@@ -1,6 +1,8 @@
 """Actual TLS/HTTP roundtrip; assert encrypted record lengths and exact audio."""
 import hashlib
 import copy
+import http.client
+import importlib.util
 from pathlib import Path
 import socket
 import ssl
@@ -11,6 +13,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
 from audio_test_server.record_test_ca import generate
+from audio_test_server.server import Server
 from audio_test_server.tls_records import RecordServer
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
 from tls_records import capture_record_observation, record_evidence
@@ -81,6 +84,37 @@ class RecordTests(unittest.TestCase):
             with socket.create_connection(('127.0.0.1', server.server.server_address[1]), timeout=5) as plain:
                 with self.assertRaises(ssl.SSLCertVerificationError):
                     context.wrap_socket(plain, server_hostname='127.0.0.1')
+
+    def test_finite_audio_server_proves_full_records_and_tail(self):
+        path = Path(__file__).with_name('run-cyd-full-app-openeth.py')
+        spec = importlib.util.spec_from_file_location('cyd_openeth', path)
+        probe = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(probe)
+        data = self.data * 2 + b'tail'
+        fixtures = {'opus': dict(codec='opus', data=data, mime='audio/ogg', seconds=1)}
+        trust = ssl.create_default_context(cafile=str(self.keys['ca']))
+        trust.maximum_version = ssl.TLSVersion.TLSv1_2
+        trust.set_ciphers('ECDHE-RSA-AES256-GCM-SHA384')
+        for size in (1024, 16384):
+            with self.subTest(size=size), Server('127.0.0.1', 0, fixtures,
+                    self.keys['cert'], self.keys['key'], unpaced_files=True, chunk_bytes=size) as server:
+                lengths = []
+                probe.observe_tls_record_headers(server.http.socket.context, lengths)
+                connection = http.client.HTTPSConnection('127.0.0.1', server.http.server_port, context=trust, timeout=5)
+                try:
+                    connection.request('GET', '/file/opus')
+                    response = connection.getresponse()
+                    self.assertEqual(response.status, 200)
+                    self.assertEqual(response.read(), data)
+                finally:
+                    connection.close()
+                event, = server.events
+                if size == 16384:
+                    self.assertEqual(lengths[1:], [16408, 16408, 28])
+                    probe.require_full_tls_records(event, len(data), lengths)
+                else:
+                    with self.assertRaises(RuntimeError):
+                        probe.require_full_tls_records(event, len(data), lengths)
 
     def test_explicit_pacing_controls_real_tls_delivery(self):
         duration = .8

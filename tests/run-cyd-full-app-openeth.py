@@ -21,6 +21,8 @@ RX_WAIT = re.compile(r'CYD_OPENETH_RX_WAIT request=(\d+) heap=(\d+) largest=(\d+
 # 528000 mono output samples. PDM pads to 512-sample writes and counts the
 # 704 bias samples written after DMA preload, at two bytes per sample.
 PDM_OPUS_EOF_BYTES = 1058176
+FULL_TLS_PLAINTEXT_BYTES = 16384
+TLS12_AES_GCM_OVERHEAD = 24
 
 
 def digest(data):
@@ -88,7 +90,18 @@ def require_clean_health(report):
         raise RuntimeError('Unexpected allocation failure')
 
 
-def tls_station(material):
+def observe_tls_record_headers(context, lengths):
+    def record(_connection, direction, _version, content_type, _message_type, header):
+        # CPython passes OpenSSL's record-header messages as type 0x100.
+        # Retain only outgoing TLS 1.2 application ciphertext lengths.
+        if (direction == 'write' and content_type == 0x100 and len(header) == 5 and
+                header[:3] == b'\x17\x03\x03' and len(lengths) < 128):
+            lengths.append(int.from_bytes(header[3:], 'big'))
+
+    context._msg_callback = record
+
+
+def tls_station(material, wire_lengths=None):
     sys.path.insert(0, str(ROOT / 'tools'))
     from audio_test_server.server import Server
 
@@ -97,8 +110,24 @@ def tls_station(material):
     data = (folder / fixture['file']).read_bytes()
     if digest(data) != fixture['sha256']:
         raise ValueError('Calibration Opus file differs from its fixture manifest')
-    return Server('127.0.0.1', 0, {'station': dict(data=data, seconds=11, codec='opus', mime='audio/ogg')},
-                  material / 'server.pem', material / 'server-key.pem', pacing_ratio=0.5)
+    chunk_bytes = 1024 if wire_lengths is None else FULL_TLS_PLAINTEXT_BYTES
+    server = Server('127.0.0.1', 0, {'station': dict(data=data, seconds=11, codec='opus', mime='audio/ogg')},
+                    material / 'server.pem', material / 'server-key.pem', pacing_ratio=0.5, chunk_bytes=chunk_bytes)
+    if wire_lengths is not None:
+        observe_tls_record_headers(server.http.socket.context, wire_lengths)
+    return server
+
+
+def require_full_tls_records(event, body_bytes, wire_lengths):
+    full, tail = divmod(body_bytes, FULL_TLS_PLAINTEXT_BYTES)
+    expected = [FULL_TLS_PLAINTEXT_BYTES + TLS12_AES_GCM_OVERHEAD] * full
+    if tail:
+        expected.append(tail + TLS12_AES_GCM_OVERHEAD)
+    gcm_ciphers = ('ECDHE-RSA-AES128-GCM-SHA256', 'ECDHE-RSA-AES256-GCM-SHA384')
+    if (not full or event['tls_version'] != 'TLSv1.2' or event['tls_cipher'] not in gcm_ciphers or
+            not wire_lengths or not TLS12_AES_GCM_OVERHEAD < wire_lengths[0] < expected[0] or
+            wire_lengths[1:] != expected):
+        raise RuntimeError('Missing exact TLS 1.2 AES-GCM file record evidence')
 
 
 def check_asset(port):
@@ -137,8 +166,14 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
     final = sample(port)
     report['eof_health'] = final
     driver = final['output_driver']
-    if event['sent'] != len(server.fixtures['station']['data']):
+    body_bytes = len(server.fixtures['station']['data'])
+    if event['sent'] != body_bytes:
         raise RuntimeError('TLS peer did not write the exact fixture length')
+    if 'tls_application_payload_lengths' in report:
+        if len(server.events) != 1:
+            raise RuntimeError('Expected a single full-record TLS connection')
+        require_full_tls_records(event, body_bytes, report['tls_application_payload_lengths'])
+        report['observed'].append('full-sized TLS 1.2 records')
     if not driver['requested_bytes'] == driver['written_bytes'] == PDM_OPUS_EOF_BYTES:
         raise RuntimeError('Unexpected PDM byte count after EOF')
     if any(driver[key] for key in ('errors', 'timeouts', 'short_writes', 'saturated')):
@@ -210,6 +245,8 @@ def main():
     parser.add_argument('--tls-material', type=Path, help='Local disposable CA and server certificate/key directory')
     parser.add_argument('--through-eof', action='store_true',
                         help='Require the full TLS Opus response, exact PDM write length, and WebUI after EOF')
+    parser.add_argument('--full-tls-records', action='store_true',
+                        help='Serve and verify actual maximum-size TLS 1.2 application records')
     args = parser.parse_args()
     build, qemu, rom = (path.resolve(strict=True) for path in (args.build, args.qemu, args.rom))
     output = args.output.resolve()
@@ -225,6 +262,8 @@ def main():
     if args.through_eof and not (material and config.get('YORADIO_NATIVE_AUDIO_OUTPUT_PDM') and
                                  config.get('YORADIO_OGG_TIMELINE')):
         parser.error('--through-eof requires the TLS fixture, PDM output and Ogg timeline')
+    if args.full_tls_records and not args.through_eof:
+        parser.error('--full-tls-records requires --through-eof')
     flash, parts = flash_parts(build)
     output.mkdir(parents=True)
     flash_path = output / 'qemu-flash.bin'
@@ -245,6 +284,8 @@ def main():
                   runner_sha256=digest(Path(__file__).read_bytes()),
                   task_watchdog_seconds=config['ESP_TASK_WDT_TIMEOUT_S'],
                   native_diagnostics=config.get('YORADIO_NATIVE_DIAGNOSTICS', False))
+    if args.full_tls_records:
+        report['tls_application_payload_lengths'] = []
 
     def save():
         report_path.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
@@ -254,7 +295,7 @@ def main():
     server = None
     stack = ExitStack()
     try:
-        server = stack.enter_context(tls_station(material)) if material else None
+        server = stack.enter_context(tls_station(material, report.get('tls_application_payload_lengths'))) if material else None
         if server:
             host_port = server.http.server_port
             net = command.index('-nic') + 1
@@ -262,6 +303,8 @@ def main():
             report['scope'] = 'OpenETH full-application boot and TLS audio with concurrent WebUI'
             if args.through_eof:
                 report['scope'] += ' through EOF'
+            if args.full_tls_records:
+                report['scope'] += ' with full TLS records'
         with log_path.open('xb') as log:
             guest = subprocess.Popen(command, cwd=output, stdin=subprocess.DEVNULL, stdout=log,
                                      stderr=subprocess.STDOUT,

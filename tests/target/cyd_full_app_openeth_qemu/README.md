@@ -59,6 +59,15 @@ original generation's EOF, the exact PDM byte count, and another exact WebUI
 asset read after EOF. Its 90-second host deadline accommodates the measured
 QEMU I2S rate.
 
+Add `--full-tls-records` with `--through-eof` to verify TLS 1.2 AES-GCM record
+lengths on the local HTTPS server. The Opus fixture uses 43 full 16,384-byte
+body writes and an 1807-byte tail. The CPython/OpenSSL message callback records
+only outgoing encrypted record lengths. The runner checks each length.
+To compare the reserved RX buffer, enable `CONFIG_YORADIO_TLS_STATIC_RX_RESERVE`
+in a fresh copy of the static-buffer diagnostic config. Reuse the CA and
+station fixture and keep the same OpenETH RX overlay across the three builds.
+[Full-record results](../../results/cyd-openeth-full-records-20261111/README.md).
+
 The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
 and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)
 cover the diagnostic profiles. Production Wi-Fi, the five-second watchdog and

@@ -1,0 +1,401 @@
+{
+  "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+  "runner_sha256": "52d8ca8e670055004d4d3aa53d4f3b74820bb275ee27b52e80f9a67ea65766de",
+  "server_sha256": "1b0179aec16b1a7622e9d33b9781b82f45c19dc0493cdd5cb1ed299122a9bd38",
+  "spiffs_sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44",
+  "expected_webui": {
+    "bytes": 13588,
+    "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+  },
+  "tls_record_plaintext_bytes": 16384,
+  "expected_full_records": 43,
+  "expected_tail_bytes": 1807,
+  "images": {
+    "static": {
+      "app_sha256": "7b61b843cc75ea619e03979032390dc40e295327e615bfdb6f39826f9d9ab284",
+      "app_bytes": 1264528,
+      "config_sha256": "1b8a303061242903157be696586b811a81654c2e5315f548d22bbe578c905838",
+      "project_version": "v0.9.693-2101-gd471868f1-dirty"
+    },
+    "reserve": {
+      "app_sha256": "2861a5b3f8513c0adae6717e321142a2547304138c2fd1d2139681952001c2ee",
+      "app_bytes": 1265216,
+      "config_sha256": "9d59e256692d0094220aac0050bf860c754d599689aed3d35b3dd67ef202a376",
+      "project_version": "v0.9.693-2102-gabadf24e6-dirty"
+    },
+    "dynamic": {
+      "app_sha256": "95e0b20fb88359621e24a0ce761c7fdc492a2d007e24af142c8fc0c4aff8ce5a",
+      "app_bytes": 1267504,
+      "config_sha256": "59e84c90613ade29bc2909367dfd2af130905d408c57f28b8b6be4f46dfdc7a0",
+      "project_version": "v0.9.693-2101-gd471868f1-dirty"
+    }
+  },
+  "initial_memorybio_failure": {
+    "error": "TimeoutError",
+    "socket_bytes": 0,
+    "report_sha256": "50d2090f39dff3f4c3da882ee2a43740e030e42f9c8f6e9520d8a298ac6160cb"
+  },
+  "runs": [
+    {
+      "run": "dynamic-03",
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active Opus playback with output writes before the deadline",
+      "report_sha256": "f0d765e33542c46adf554a823cec40853a539c48d630a2fc589b8c14b087bde6",
+      "uart_sha256": "b45d3110eb253b913996e07f83bdbe80eeb11c661902341e7647d0990bb6d0fb",
+      "flash_sha256": "69e40d53f808e4979f13db609742f7699d187eedcc0d47f4432a798989933ddc",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 278528,
+        "complete": false
+      },
+      "application_ciphertext_payload_lengths": [
+        185,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408
+      ],
+      "rx_waits": 0,
+      "rx_recoveries": 0,
+      "qemu_rx_frame_drop_log_count": 5,
+      "last_reachable_health": {
+        "heap": 142968,
+        "minimum_heap": 13156,
+        "largest_dma": 94208,
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 1,
+          "write_errors": 0,
+          "configure_errors": 1,
+          "flush_errors": 0,
+          "generation": 1,
+          "stage": 1,
+          "result": 263
+        },
+        "driver_bytes": 0
+      }
+    },
+    {
+      "run": "reserve-03",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Playback ended as 'decode failed'",
+      "report_sha256": "52f6e1e8608398d76fecc0b52def90d11a2719689529443331b20d837ab920ab",
+      "uart_sha256": "afe36fe67c81a8b97adcf0d6d68f4dba2f0bb92a67a0b95e1f3cc4e1f8fa1e1d",
+      "flash_sha256": "778a66b59ed7fd588694134b13664d24bd2601cbb621c3fe0a3594cef835a3bd",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 706319,
+        "complete": true
+      },
+      "application_ciphertext_payload_lengths": [
+        185,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        1831
+      ],
+      "rx_waits": 9,
+      "rx_recoveries": 9,
+      "qemu_rx_frame_drop_log_count": 32,
+      "exact_webui_during_playback": true,
+      "health_during_webui": {
+        "heap": 6436,
+        "minimum_heap": 560,
+        "largest_dma": 4864,
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "driver_bytes": 63872
+      },
+      "last_reachable_health": {
+        "heap": 125896,
+        "minimum_heap": 560,
+        "largest_dma": 94208,
+        "allocation_failures": 18880,
+        "last_allocation_failure": {
+          "size": 1522,
+          "caps": 6144
+        },
+        "decoder_failure": {
+          "sequence": 1,
+          "generation": 1,
+          "codec": 4,
+          "stage": 2,
+          "result": -3,
+          "completion": 8,
+          "input_bytes": 1807,
+          "allocation_sequence": 18880
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "driver_bytes": 730496
+      },
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "decode failed",
+        "generation": 1
+      }
+    },
+    {
+      "run": "static-03",
+      "state": "TERMINAL_NONPASS",
+      "reason": "IncompleteRead(1024 bytes read)",
+      "report_sha256": "ce55a47e0eb446227b6f0cdf8216e0942ff320968826eb7c58736a1e82f83562",
+      "uart_sha256": "e2f07fba9a227cdbd6c41a9bba3ae0eb890271a1eb01a605a26e00c64d7d6184",
+      "flash_sha256": "6ade1f8843a684dcfa8ad11085520276d69e2d58eb329e646693ed0a7211e0b2",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 229376,
+        "complete": false
+      },
+      "application_ciphertext_payload_lengths": [
+        185,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408
+      ],
+      "rx_waits": 1,
+      "rx_recoveries": 1,
+      "qemu_rx_frame_drop_log_count": 6,
+      "last_reachable_health": {
+        "heap": 13996,
+        "minimum_heap": 348,
+        "largest_dma": 6144,
+        "allocation_failures": 764,
+        "last_allocation_failure": {
+          "size": 1522,
+          "caps": 6144
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "driver_bytes": 77184
+      }
+    },
+    {
+      "run": "dynamic-04",
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active Opus playback with output writes before the deadline",
+      "report_sha256": "c735bb4b913249f96ab43eab9246116771d60a6af82ea7ebf7b97076951270ed",
+      "uart_sha256": "dcd7d903211fc6a451be645ec776fe09b771fd0429db0d3a82264d169d071e21",
+      "flash_sha256": "69e40d53f808e4979f13db609742f7699d187eedcc0d47f4432a798989933ddc",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 278528,
+        "complete": false
+      },
+      "application_ciphertext_payload_lengths": [
+        185,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408,
+        16408
+      ],
+      "rx_waits": 0,
+      "rx_recoveries": 0,
+      "qemu_rx_frame_drop_log_count": 5,
+      "last_reachable_health": {
+        "heap": 142988,
+        "minimum_heap": 13208,
+        "largest_dma": 110592,
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 1,
+          "write_errors": 0,
+          "configure_errors": 1,
+          "flush_errors": 0,
+          "generation": 1,
+          "stage": 1,
+          "result": 263
+        },
+        "driver_bytes": 0
+      }
+    }
+  ]
+}
