@@ -7,6 +7,9 @@ Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 `stream_fairness.h` на C3, собран полный образ и пройдены Clang и хостовая
 ASan/UBSan-регрессия. Текущий PDM-образ CYD в QEMU доходит до ST7789 и
 останавливается в Wi-Fi PHY. [Матрица, образы и пределы проверок](../tests/results/cyd-production-matrix-20261111/README.md).
+Отдельный [стенд OpenETH](../tests/results/cyd-full-app-openeth-20261111/README.md)
+запускает аудиозадачи, радио, TFT и WebUI и даёт измерения в простое.
+Под нагрузкой TLS/Opus диагностический OpenETH упирается в выделение RX-буфера.
 Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
 для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
 Arduino CYD и `esp32-cyd2usb-minimal` остаются отдельными профилями.

@@ -1,0 +1,913 @@
+{
+  "schema": 1,
+  "source_commit": "34595e1d5578c562d03ebd1fce4335b8c5ccdfb0",
+  "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "test_sources": {
+    "tests/run-cyd-full-app-openeth.py": {
+      "bytes": 13411,
+      "sha256": "ac3293f22fba2dfba029f7ad2d1e0480adfa709fba5f01411f4c29daa41f7290"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/prepare-profile.py": {
+      "bytes": 3548,
+      "sha256": "4bba653f4c0bf095c1f34b0aad6aa64ea4e0a00ee0ea09665e5e286e2f795490"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/prepare.py": {
+      "bytes": 2927,
+      "sha256": "947de37ad224ea7c5d2ae43f03b741e369ee60ddd94fe3e55808b27d3113ff97"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/network.c": {
+      "bytes": 2614,
+      "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/attach.cmake": {
+      "bytes": 630,
+      "sha256": "25d72151bfb3146d0996b36b07df0e8d2dd33527c1115a8191b9486b1d61edca"
+    }
+  },
+  "profiles": {
+    "production_policy": {
+      "task_watchdog_seconds": 5,
+      "interrupt_watchdog_ms": 300,
+      "native_diagnostics": false,
+      "application": {
+        "bytes": 1260208,
+        "sha256": "4d085679f8670fc952bdd5d9321a12b0cb6da1e4dc317fd2ed63802b8ed61a8a"
+      },
+      "elf": {
+        "bytes": 10572828,
+        "sha256": "12120a2f2a11f342bf35e4c1fa6b451c466f1cd87a2088d6c674ea1d0295802a"
+      },
+      "typed_config": {
+        "bytes": 48975,
+        "sha256": "18b057ec6425b2a2dfb0bd6f71421cfb02c8a83a0e00c277f35c9afd685d2a58"
+      },
+      "selected_compiled_sources": {
+        "idf/esp32-cyd2usb-native/main/app_main.c": {
+          "bytes": 4854,
+          "sha256": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80"
+        },
+        "idf/esp32-cyd2usb-native/main/audio_service.c": {
+          "bytes": 75982,
+          "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b"
+        },
+        "idf/esp32-cyd2usb-native/main/cyd_display.c": {
+          "bytes": 8728,
+          "sha256": "ec0e84b798d88ac3a7d8995956a2687ee29d0e8ec70173615c84b698d43210bb"
+        },
+        "idf/esp32-cyd2usb-native/main/radio_control.c": {
+          "bytes": 147,
+          "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+        },
+        "idf/esp32-cyd2usb-native/main/web_service.c": {
+          "bytes": 28023,
+          "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+        },
+        "tests/target/cyd_full_app_openeth_qemu/network.c": {
+          "bytes": 2614,
+          "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+        }
+      }
+    },
+    "telemetry_tls": {
+      "task_watchdog_seconds": 30,
+      "interrupt_watchdog_ms": 300,
+      "native_diagnostics": true,
+      "application": {
+        "bytes": 1264256,
+        "sha256": "a70d092900dbea671925722759845dd54aa8b843b5dcc0739081eb6e8dae6369"
+      },
+      "elf": {
+        "bytes": 10629168,
+        "sha256": "dfb0af4ebdc92c88922ea8ad162e8e6484167aebedb3caf9efdf4aaeb99a93ce"
+      },
+      "typed_config": {
+        "bytes": 49428,
+        "sha256": "1b8a303061242903157be696586b811a81654c2e5315f548d22bbe578c905838"
+      },
+      "selected_compiled_sources": {
+        "idf/esp32-cyd2usb-native/main/app_main.c": {
+          "bytes": 4854,
+          "sha256": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80"
+        },
+        "idf/esp32-cyd2usb-native/main/audio_service.c": {
+          "bytes": 75982,
+          "sha256": "445ed8812f91c5b8d8bcb7e244657cce534c45b726d4c5c9f8f8d3b6685c140b"
+        },
+        "idf/esp32-cyd2usb-native/main/cyd_display.c": {
+          "bytes": 8728,
+          "sha256": "ec0e84b798d88ac3a7d8995956a2687ee29d0e8ec70173615c84b698d43210bb"
+        },
+        "idf/esp32-cyd2usb-native/main/radio_control.c": {
+          "bytes": 147,
+          "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+        },
+        "idf/esp32-cyd2usb-native/main/web_service.c": {
+          "bytes": 28023,
+          "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+        },
+        "tests/target/cyd_full_app_openeth_qemu/network.c": {
+          "bytes": 2614,
+          "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+        }
+      }
+    }
+  },
+  "runs": {
+    "cyd-openeth-boot-20261111-01": {
+      "state": "TERMINAL_NONPASS",
+      "qemu_exit_status": 1,
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "flash_sha256": "18598ad369bf983270b9b4596889e35949e4250ca9a943536926e87362b52027",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "499e05ed266aa491c19cc9c2951340b85a7b35b2eca05360b20ad1ef32582bbd"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1260208,
+          "sha256": "4d085679f8670fc952bdd5d9321a12b0cb6da1e4dc317fd2ed63802b8ed61a8a"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "e92e0bab990144ad683306fc59b60cb510656f96dff6f13952332cc7ca8ed027"
+        }
+      ],
+      "flash_unchanged": true,
+      "reason": "Guest stopped or logged a startup failure",
+      "receipt": {
+        "bytes": 2403,
+        "sha256": "bb2a630598f4ecf885a9b9afaefe298f755473967ac99971a6ac8dcdb0713970"
+      },
+      "uart": {
+        "bytes": 3230,
+        "sha256": "5e4865fc3d3c4bcf6d26e72fdbd444a7b653354d620803549fe37e2d06e8a3ab"
+      },
+      "markers": {
+        "ipv4": true,
+        "display": true,
+        "audio_tasks": true,
+        "radio_one_station": false,
+        "web_http": false,
+        "certificate_validated": false,
+        "pdm_configured": false,
+        "openeth_receive_allocation_failed": false
+      },
+      "watchdog_stack_functions": [
+        "task_wdt_timeout_handling",
+        "_xt_lowint1",
+        "??",
+        "vPortClearInterruptMaskFromISR",
+        "xQueueGenericSend",
+        "xQueueGiveMutexRecursive",
+        "spi_flash_op_unlock",
+        "spi_flash_enable_interrupts_caches_and_other_cpu",
+        "cache_enable",
+        "spi1_end",
+        "spiflash_end_default",
+        "esp_flash_read",
+        "esp_partition_read",
+        "spiffs_api_read",
+        "spiffs_phys_rd",
+        "spiffs_obj_lu_find_entry_visitor",
+        "spiffs_object_find_object_index_header_by_name",
+        "SPIFFS_open",
+        "vfs_spiffs_open",
+        "esp_vfs_open",
+        "open",
+        "fopen",
+        "load_playlist_index_locked",
+        "radio_control_init",
+        "network_task"
+      ]
+    },
+    "cyd-openeth-seeded-boot-20261111-01": {
+      "state": "TERMINAL_NONPASS",
+      "qemu_exit_status": 1,
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "flash_sha256": "9a420b1a584d1a05151749735c9593eb2d8e42c041a13d9e44fdb99d7e7526de",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "499e05ed266aa491c19cc9c2951340b85a7b35b2eca05360b20ad1ef32582bbd"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1260208,
+          "sha256": "4d085679f8670fc952bdd5d9321a12b0cb6da1e4dc317fd2ed63802b8ed61a8a"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "a14e4910552df657f91e197a9ea45ff63645051fdbbae0d8ca62990da26fe359"
+        }
+      ],
+      "flash_unchanged": true,
+      "reason": "Guest stopped or logged a startup failure",
+      "receipt": {
+        "bytes": 2410,
+        "sha256": "7b0e1b300cefc16b6233edc0164dce3678fb71480468e2c4072a232c77b42c7f"
+      },
+      "uart": {
+        "bytes": 2435,
+        "sha256": "0fd87ded28b10bd501b73eb296e66229bc78cdfa4b072469e37f3b8681c1c85a"
+      },
+      "markers": {
+        "ipv4": false,
+        "display": false,
+        "audio_tasks": false,
+        "radio_one_station": false,
+        "web_http": false,
+        "certificate_validated": false,
+        "pdm_configured": false,
+        "openeth_receive_allocation_failed": false
+      },
+      "watchdog_stack_functions": [
+        "task_wdt_timeout_handling",
+        "_xt_lowint1",
+        "??",
+        "vPortClearInterruptMaskFromISR",
+        "vPortExitCriticalSafe",
+        "spi_flash_enable_interrupts_caches_and_other_cpu",
+        "cache_enable",
+        "spi1_end",
+        "spiflash_end_default",
+        "esp_flash_read",
+        "esp_partition_read",
+        "spiffs_api_read",
+        "spiffs_phys_rd",
+        "spiffs_obj_lu_scan",
+        "SPIFFS_mount",
+        "esp_spiffs_init",
+        "esp_vfs_spiffs_register",
+        "mount_spiffs",
+        "main_task"
+      ]
+    },
+    "cyd-openeth-tls-load-20261111-01": {
+      "state": "TERMINAL_NONPASS",
+      "qemu_exit_status": 1,
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "flash_sha256": "1d0c4e045b33f8887e607c0d78bb790fbb39a91c993daeb29bee163de91b12a4",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "5609b3ea0fe3257c97b7dcdf414b676c6f850be7424e52e87ccf76e042f313cd"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1264256,
+          "sha256": "a70d092900dbea671925722759845dd54aa8b843b5dcc0739081eb6e8dae6369"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "35bc9213e02c18561a14d629073d4819349d23f273b72fd687c9bba05183a57f"
+        }
+      ],
+      "flash_unchanged": true,
+      "reason": "Guest stopped or logged a startup failure",
+      "receipt": {
+        "bytes": 2551,
+        "sha256": "7b3311143acd6826475e8e301adfb91f24e1f9083e9b8922c4afa0b44f9072f1"
+      },
+      "uart": {
+        "bytes": 3453,
+        "sha256": "95c83c092fc98241f0f479a1c5d59dbe43377e8e9d4111001480adabdfa1e4ea"
+      },
+      "markers": {
+        "ipv4": true,
+        "display": true,
+        "audio_tasks": true,
+        "radio_one_station": false,
+        "web_http": true,
+        "certificate_validated": false,
+        "pdm_configured": false,
+        "openeth_receive_allocation_failed": false
+      },
+      "watchdog_stack_functions": [
+        "task_wdt_timeout_handling",
+        "_xt_lowint1",
+        "xQueueGiveMutexRecursive",
+        "spi_flash_op_unlock",
+        "spi_flash_enable_interrupts_caches_and_other_cpu",
+        "cache_enable",
+        "spi1_end",
+        "spiflash_end_default",
+        "flash_end_flush_cache",
+        "esp_flash_write",
+        "esp_partition_write",
+        "spiffs_api_write",
+        "spiffs_phys_wr",
+        "spiffs_page_delete",
+        "spiffs_object_truncate",
+        "SPIFFS_remove",
+        "vfs_spiffs_unlink",
+        "esp_vfs_unlink",
+        "unlink",
+        "remove",
+        "native_file_replace",
+        "build_playlist_index_locked",
+        "radio_control_init",
+        "network_task"
+      ]
+    },
+    "cyd-openeth-tls-load-20261111-02": {
+      "state": "TERMINAL_NONPASS",
+      "qemu_exit_status": 1,
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "flash_sha256": "095ef0fdbbad1c0605286226bac7c4febfd46c8d66675f9ce5acd590b7b5e80d",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "5609b3ea0fe3257c97b7dcdf414b676c6f850be7424e52e87ccf76e042f313cd"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1264256,
+          "sha256": "a70d092900dbea671925722759845dd54aa8b843b5dcc0739081eb6e8dae6369"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44"
+        }
+      ],
+      "flash_unchanged": true,
+      "reason": "timed out",
+      "health": [
+        {
+          "uptime_ms": 17391,
+          "heap": 153820,
+          "largest": 110592,
+          "minimum_heap": 147744,
+          "tasks": 20,
+          "memory": {
+            "internal_free": 153820,
+            "internal_largest": 110592,
+            "dma_free": 153820,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": true,
+            "available": true,
+            "sample_uptime_ms": 17227,
+            "snapshot_failures": 0,
+            "overall_percent": 74.4,
+            "core_percent": [
+              81.2,
+              67.6
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": 4596
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": 14252
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": 3460
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "output_driver": {
+            "writes": 0,
+            "requested_bytes": 0,
+            "written_bytes": 0,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": true,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          }
+        },
+        {
+          "uptime_ms": 23215,
+          "heap": 153692,
+          "largest": 110592,
+          "minimum_heap": 145996,
+          "tasks": 20,
+          "memory": {
+            "internal_free": 153692,
+            "internal_largest": 110592,
+            "dma_free": 153692,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": true,
+            "available": true,
+            "sample_uptime_ms": 22326,
+            "snapshot_failures": 0,
+            "overall_percent": 92.9,
+            "core_percent": [
+              95.8,
+              89.9
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": 1.0,
+                "stack_free_min": 4596
+              },
+              "decode": {
+                "percent_of_one_core": 3.0,
+                "stack_free_min": 14252
+              },
+              "output": {
+                "percent_of_one_core": 4.5,
+                "stack_free_min": 3460
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": 1908
+              }
+            }
+          },
+          "output_driver": {
+            "writes": 0,
+            "requested_bytes": 0,
+            "written_bytes": 0,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": true,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          }
+        }
+      ],
+      "web_asset": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "receipt": {
+        "bytes": 5715,
+        "sha256": "31e6ac45fb003935b5e4732e774041b886380e001125787ecb48c9fac6d2c760"
+      },
+      "uart": {
+        "bytes": 1549083,
+        "sha256": "e45d0b916f0069f49465b06f8fb7bae6ae601284d78c9a603a1baac13c997027"
+      },
+      "markers": {
+        "ipv4": true,
+        "display": true,
+        "audio_tasks": true,
+        "radio_one_station": true,
+        "web_http": true,
+        "certificate_validated": true,
+        "pdm_configured": true,
+        "openeth_receive_allocation_failed": true
+      }
+    },
+    "cyd-openeth-idle-control-20261111-01": {
+      "state": "TERMINAL_PASS",
+      "qemu_exit_status": 1,
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "flash_sha256": "095ef0fdbbad1c0605286226bac7c4febfd46c8d66675f9ce5acd590b7b5e80d",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "5609b3ea0fe3257c97b7dcdf414b676c6f850be7424e52e87ccf76e042f313cd"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1264256,
+          "sha256": "a70d092900dbea671925722759845dd54aa8b843b5dcc0739081eb6e8dae6369"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44"
+        }
+      ],
+      "flash_unchanged": true,
+      "health": [
+        {
+          "uptime_ms": 10930,
+          "heap": 153812,
+          "largest": 110592,
+          "minimum_heap": 147756,
+          "tasks": 20,
+          "memory": {
+            "internal_free": 153812,
+            "internal_largest": 110592,
+            "dma_free": 153812,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": true,
+            "available": true,
+            "sample_uptime_ms": 10889,
+            "snapshot_failures": 0,
+            "overall_percent": 71.9,
+            "core_percent": [
+              77.7,
+              66.0
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": 4596
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": 14252
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": 3460
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "output_driver": {
+            "writes": 0,
+            "requested_bytes": 0,
+            "written_bytes": 0,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": true,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          }
+        },
+        {
+          "uptime_ms": 17996,
+          "heap": 153496,
+          "largest": 110592,
+          "minimum_heap": 143348,
+          "tasks": 20,
+          "memory": {
+            "internal_free": 153496,
+            "internal_largest": 110592,
+            "dma_free": 153496,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": true,
+            "available": true,
+            "sample_uptime_ms": 16155,
+            "snapshot_failures": 0,
+            "overall_percent": 95.7,
+            "core_percent": [
+              97.9,
+              93.5
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": 1.1,
+                "stack_free_min": 4596
+              },
+              "decode": {
+                "percent_of_one_core": 3.8,
+                "stack_free_min": 14252
+              },
+              "output": {
+                "percent_of_one_core": 5.1,
+                "stack_free_min": 3460
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": 1916
+              }
+            }
+          },
+          "output_driver": {
+            "writes": 0,
+            "requested_bytes": 0,
+            "written_bytes": 0,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": true,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          }
+        }
+      ],
+      "web_asset": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "receipt": {
+        "bytes": 5608,
+        "sha256": "94727c9781b39aa43bc9292b696d222d13eaa3c274b8fba0d52ec4759741bf24"
+      },
+      "uart": {
+        "bytes": 2555,
+        "sha256": "4e16edcf60d15d49be242c1993bfb208d71941b94fa3995a8136cd466a24adfe"
+      },
+      "markers": {
+        "ipv4": true,
+        "display": true,
+        "audio_tasks": true,
+        "radio_one_station": true,
+        "web_http": true,
+        "certificate_validated": false,
+        "pdm_configured": false,
+        "openeth_receive_allocation_failed": false
+      }
+    },
+    "cyd-openeth-tls-load-20261111-03": {
+      "state": "TERMINAL_NONPASS",
+      "qemu_exit_status": 1,
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "flash_sha256": "095ef0fdbbad1c0605286226bac7c4febfd46c8d66675f9ce5acd590b7b5e80d",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "5609b3ea0fe3257c97b7dcdf414b676c6f850be7424e52e87ccf76e042f313cd"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1264256,
+          "sha256": "a70d092900dbea671925722759845dd54aa8b843b5dcc0739081eb6e8dae6369"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44"
+        }
+      ],
+      "flash_unchanged": true,
+      "reason": "timed out",
+      "health": [
+        {
+          "uptime_ms": 9009,
+          "heap": 153812,
+          "largest": 110592,
+          "minimum_heap": 147736,
+          "tasks": 20,
+          "memory": {
+            "internal_free": 153812,
+            "internal_largest": 110592,
+            "dma_free": 153812,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": true,
+            "available": false,
+            "sample_uptime_ms": 5082,
+            "snapshot_failures": 0,
+            "overall_percent": null,
+            "core_percent": [
+              null,
+              null
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "output_driver": {
+            "writes": 0,
+            "requested_bytes": 0,
+            "written_bytes": 0,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": true,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          }
+        },
+        {
+          "uptime_ms": 14157,
+          "heap": 153672,
+          "largest": 110592,
+          "minimum_heap": 145980,
+          "tasks": 20,
+          "memory": {
+            "internal_free": 153672,
+            "internal_largest": 110592,
+            "dma_free": 153672,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": true,
+            "available": true,
+            "sample_uptime_ms": 10168,
+            "snapshot_failures": 0,
+            "overall_percent": 71.7,
+            "core_percent": [
+              76.8,
+              66.6
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": 4596
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": 14252
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": 3460
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": 1916
+              }
+            }
+          },
+          "output_driver": {
+            "writes": 0,
+            "requested_bytes": 0,
+            "written_bytes": 0,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": true,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          }
+        }
+      ],
+      "web_asset": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 322560,
+          "complete": false
+        }
+      ],
+      "runner_sha256": "ac3293f22fba2dfba029f7ad2d1e0480adfa709fba5f01411f4c29daa41f7290",
+      "receipt": {
+        "bytes": 5982,
+        "sha256": "b8cebfd23b89b0e10a1ea93a2ee9b81a127d24b64b089c427f9eb19c19802ce1"
+      },
+      "uart": {
+        "bytes": 1516643,
+        "sha256": "b1bb857b1e24ec51783380f9c147a95fb601159402b5b2102eb1bf6e3adb1b02"
+      },
+      "markers": {
+        "ipv4": true,
+        "display": true,
+        "audio_tasks": true,
+        "radio_one_station": true,
+        "web_http": true,
+        "certificate_validated": true,
+        "pdm_configured": true,
+        "openeth_receive_allocation_failed": true
+      }
+    }
+  },
+  "openeth_sdk_rx_source": {
+    "bytes": 15913,
+    "sha256": "63a02370163adc81ee66fb22b7ae2bfecb831c79f150ec0bceb9ee1e48c25920"
+  },
+  "production_wifi_tested": false,
+  "combined_resource_gate_passed": false
+}

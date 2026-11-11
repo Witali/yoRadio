@@ -217,6 +217,16 @@ observed emulator boundary; complete radio boot, static RX loans, TLS traffic
 and production resource margins remain unqualified. The original failed
 attempts and local-only image identities are preserved separately.
 
+## Full application with diagnostic OpenETH
+
+The [OpenETH application runs](../tests/results/cyd-full-app-openeth-20261111/README.md)
+start the normal CYD audio, radio, TFT and WebUI paths over a diagnostic
+Ethernet transport. With a seeded SPIFFS playlist and the 30-second diagnostic
+watchdog, the idle control serves an exact WebUI asset and exposes heap, DMA
+and stack samples. Both TLS load runs verify the local peer and configure PDM,
+then fail in the SDK OpenETH receive-buffer allocation loop. The production
+Wi-Fi PHY, five-second watchdog and combined resource limits remain open.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)
