@@ -37,6 +37,9 @@ static void syntax_cases(void) {
     wrapped("{\"ssid\":\" new \",\"password_action\":\"set\",\"password\":\"\"}", true);
     wrapped("{\"id\":\"r2\",\"ssid\":\"renamed\",\"password_action\":\"keep\"}", true);
     wrapped("{\"id\":\"r5\",\"password_action\":\"set\",\"password\":\"********\"}", true);
+    wrapped("{\"id\":\"r1\",\"password_action\":\"ke\\u0065p\"}", true);
+    wrapped("{\"id\":\"r1\",\"password_action\":\"\\ud83d\\ude00\"}", false);
+    wrapped("{\"id\":\"r1\",\"password_action\":\"k\\ud83d\\ude00\"}", false);
     const char *bad[] = {
         "{}", "[]", "null", "", "{\"revision\":1,\"profiles\":[]}",
         "{\"revision\":\"0123456789abcdef-0000000000000001\",\"profiles\":null}",
