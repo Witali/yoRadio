@@ -122,3 +122,7 @@ tables, types and global lifetimes against original bytes and SDK evidence.
 Then expand the firmware correspondence and regression tests. Complete feature
 parity, remaining bug fixes, long-run acceptance and physical-board checks
 are still open; no device was flashed or reset during this work.
+
+The [November 13 behavior audit](../src/reference/BEHAVIOR_GAPS.md) resolves
+the factory HTTP handler table and two station timer callback registrations.
+It also records a reproducible difference in partial `/advancedset` updates.
