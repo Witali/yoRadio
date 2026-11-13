@@ -43,3 +43,11 @@ image, configuration, receipt and log digests. The full application gate is
 **NONPASS** in this diagnostic PDM profile. Separating TLS receive behavior
 from PDM startup and tracing the reserve profile's decode failure are the next
 software checks.
+
+The follow-up reproduced a startup state bug in the host driver seam. A PDM
+bias write timeout left the channel enabled and the next configure call
+could treat it as ready. The CYD driver now releases that channel on startup
+failure, retains its handle if release fails, and retries cleanup before
+another startup. The output ownership suite passed under ASan/UBSan with 17
+PDM, 17 continuous DAC and 10 legacy DAC cases. A control that restored the
+old readiness check failed at the expected retry assertion.

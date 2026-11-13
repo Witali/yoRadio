@@ -368,6 +368,7 @@ static int16_t pcm_reader_next(pcm_reader_t *reader) {
 
 static i2s_chan_handle_t s_pdm;
 static bool s_pdm_running;
+static bool s_pdm_ready;
 static uint32_t s_input_sample_rate;
 static size_t s_buffered_samples;
 static int16_t s_sample_buffer[PDM_DMA_SAMPLES];
@@ -436,6 +437,7 @@ static esp_err_t pdm_queue_sample(int16_t sample) {
 }
 
 static esp_err_t pdm_release(bool ramp_down) {
+    s_pdm_ready = false;
     esp_err_t first_error = ESP_OK;
     if (s_pdm && s_pdm_running && ramp_down) {
         esp_err_t result = pdm_flush();
@@ -480,7 +482,7 @@ static esp_err_t pdm_release(bool ramp_down) {
 
 static esp_err_t pdm_begin(void) {
     if (s_pdm) {
-        if (s_pdm_running) return ESP_OK;
+        if (s_pdm_ready) return ESP_OK;
         ESP_RETURN_ON_ERROR(pdm_release(false), TAG, "release old PDM channel");
     }
     i2s_chan_config_t channel_config =
@@ -552,15 +554,24 @@ static esp_err_t pdm_begin(void) {
         for (size_t sample = 0; sample < chunk; ++sample) {
             s_sample_buffer[sample] = ramp_sample(index + sample, count, true);
         }
-        ESP_RETURN_ON_ERROR(pdm_write_block(s_sample_buffer, chunk), TAG,
-                            "write PDM bias ramp");
+        result = pdm_write_block(s_sample_buffer, chunk);
+        if (result != ESP_OK) break;
         index += chunk;
     }
-    vTaskDelay(pdMS_TO_TICKS(PDM_BIAS_SETTLE_MS));
 
     i2s_chan_info_t channel_info = {0};
-    ESP_RETURN_ON_ERROR(i2s_channel_get_info(s_pdm, &channel_info), TAG,
-                        "read PDM clock");
+    if (result == ESP_OK) {
+        vTaskDelay(pdMS_TO_TICKS(PDM_BIAS_SETTLE_MS));
+        result = i2s_channel_get_info(s_pdm, &channel_info);
+    }
+    if (result != ESP_OK) {
+        esp_err_t cleanup = pdm_release(false);
+        if (cleanup != ESP_OK) {
+            ESP_LOGW(TAG, "PDM startup cleanup failed: %s", esp_err_to_name(cleanup));
+        }
+        return result;
+    }
+    s_pdm_ready = true;
     ESP_LOGI(TAG, "PDM fixed at 48000 Hz, carrier %lu Hz on GPIO%d",
              (unsigned long)channel_info.bclk_hz, BOARD_AUDIO_DATA);
     return ESP_OK;

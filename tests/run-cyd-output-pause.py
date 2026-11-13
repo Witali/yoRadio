@@ -80,6 +80,23 @@ def main():
             else:
                 raise AssertionError('negative control survived: '+name)
             (work/'production.inc').write_text(source)
+        if name == 'pdm':
+            old = 'if (s_pdm_ready) return ESP_OK;'
+            assert source.count(old) == 1
+            (work/'production.inc').write_text(source.replace(old, 'if (s_pdm_running) return ESP_OK;'))
+            retry_control = command[:-1]+[host(work/'negative-startup')]
+            (work/'negative-startup-build.log').write_bytes(run(retry_control))
+            try:
+                run(['env', 'ASAN_OPTIONS=detect_leaks=0:halt_on_error=1', host(work/'negative-startup')])
+            except subprocess.CalledProcessError as e:
+                (work/'negative-startup.log').write_bytes(e.output)
+                expected = b"Assertion `native_audio_output_configure(48000)==ESP_FAIL' failed."
+                if expected not in e.output or b'ERROR: AddressSanitizer' in e.output or b'runtime error:' in e.output:
+                    raise AssertionError('unexpected startup control failure: '+e.output.decode(errors='replace')) from e
+                negative['pdm-startup'] = 'rejected falsely successful retry on a partially initialized channel'
+            else:
+                raise AssertionError('PDM startup control survived')
+            (work/'production.inc').write_text(source)
     (out/'report.json').write_text(json.dumps(dict(
         passed=True, variants=results, negative_controls=negative,
         source_sha256={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in files},

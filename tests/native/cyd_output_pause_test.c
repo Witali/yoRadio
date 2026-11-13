@@ -46,6 +46,7 @@ typedef struct { atomic_bool allocated,running; } driver_t;
 static driver_t driver;
 static atomic_uint allocations,disables,deletes,writes;
 static atomic_bool fail_disable,fail_delete,fail_enable,fail_prime;
+static bool timeout_pdm_write, fail_pdm_info;
 static int allocate(void **out) {assert(!driver.allocated);driver=(driver_t){true,false};*out=&driver;++allocations;return ESP_OK;}
 static int enable(void *h) {assert(h==&driver && driver.allocated);if(fail_enable)return ESP_FAIL;driver.running=true;return ESP_OK;}
 static int disable(void *h) {assert(h==&driver && driver.allocated && driver.running);MAINTENANCE_DRIVER_HOOK("disable");++disables;if(fail_disable)return ESP_FAIL;driver.running=false;return ESP_OK;}
@@ -75,8 +76,14 @@ static int i2s_channel_preload_data(void *h,const void *p,size_t n,size_t *done)
 static int i2s_channel_enable(void *h) {return enable(h);}
 static int i2s_channel_disable(void *h) {return disable(h);}
 static int i2s_del_channel(void *h) {return release(h);}
-static int i2s_channel_get_info(void *h,i2s_chan_info_t *i) {assert(h==&driver);i->bclk_hz=6144000;return ESP_OK;}
-static int i2s_channel_write(void *h,const void *p,size_t n,size_t *done,unsigned t) {return write_driver(h,p,n,done,t);}
+static int i2s_channel_get_info(void *h,i2s_chan_info_t *i) {assert(h==&driver);i->bclk_hz=6144000;return fail_pdm_info ? ESP_FAIL : ESP_OK;}
+static int i2s_channel_write(void *h,const void *p,size_t n,size_t *done,unsigned t) {
+    if (!timeout_pdm_write) return write_driver(h,p,n,done,t);
+    assert(h==&driver && driver.allocated && driver.running && p && t);
+    ++writes;
+    *done=0;
+    return ESP_ERR_TIMEOUT;
+}
 typedef void *dac_continuous_handle_t;
 typedef struct {unsigned chan_mask,desc_num,buf_size,freq_hz;int offset,clk_src,chan_mode;} dac_continuous_config_t;
 enum {DAC_CHANNEL_MASK_CH1=1,DAC_DIGI_CLK_SRC_APLL,DAC_CHANNEL_MODE_SIMUL};
@@ -145,7 +152,35 @@ int main(void) {
     const uint8_t data[64]={0};
     assert(native_audio_output_write_pcm(data,sizeof(data),16,1)==ESP_OK);++cases;
     assert(native_audio_output_pause()==ESP_OK);assert(!driver.allocated);++cases;
-#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_DAC
+#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_PDM
+    timeout_pdm_write=true;
+    assert(native_audio_output_configure(48000)==ESP_ERR_TIMEOUT);
+    assert(!driver.allocated && !driver.running && !s_pdm_ready);++cases;
+    timeout_pdm_write=false;
+    unsigned before_retry=writes;
+    assert(native_audio_output_configure(48000)==ESP_OK);
+    assert(driver.running && s_pdm_ready && writes==before_retry+2);++cases;
+    assert(native_audio_output_pause()==ESP_OK);
+
+    fail_pdm_info=true;
+    assert(native_audio_output_configure(48000)==ESP_FAIL);
+    assert(!driver.allocated && !s_pdm_ready);++cases;
+    fail_pdm_info=false;
+
+    timeout_pdm_write=true;
+    fail_disable=true;
+    assert(native_audio_output_configure(48000)==ESP_ERR_TIMEOUT);
+    assert(driver.allocated && driver.running && !s_pdm_ready);++cases;
+    timeout_pdm_write=false;
+    before_retry=writes;
+    old_allocations=allocations;
+    assert(native_audio_output_configure(48000)==ESP_FAIL);
+    assert(driver.running && !s_pdm_ready && allocations==old_allocations && writes==before_retry);++cases;
+    fail_disable=false;
+    assert(native_audio_output_configure(48000)==ESP_OK);
+    assert(driver.running && s_pdm_ready && allocations==old_allocations+1 && writes==before_retry+2);++cases;
+    assert(native_audio_output_pause()==ESP_OK);
+#elif CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_DAC
     fail_enable=true;
     assert(native_audio_output_configure(16000)!=ESP_OK);
     assert(driver.allocated && !driver.running && !s_dac_enabled);++cases;
