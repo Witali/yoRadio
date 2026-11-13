@@ -92,6 +92,7 @@ def main():
         report['compiler_identity'] = command('compiler-sha256',['/usr/bin/sha256sum',compiler]).decode().strip()
         binary = out / 'ogg-playback-gain-host'
         command('build',['/usr/bin/gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-Wpedantic','-Wshadow',
+                         '-DCONFIG_YORADIO_TLS_STATIC_RX_RESERVE=1',
                          '-Wformat=2','-Wstrict-prototypes','-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
                          *['-I'+host(out/'sources/vendor/include'/name) for name in ('','decoder','decoder/impl','simple_dec')],
                          '-I'+host(out/'sources'/MAIN),'-I'+host(out/'sources'/SHARED),

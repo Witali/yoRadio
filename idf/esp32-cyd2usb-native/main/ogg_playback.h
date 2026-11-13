@@ -13,7 +13,12 @@
 #include "opus_family1_playback.h"
 #include "pcm_channel_layout.h"
 
-enum { OGP_INITIAL_PCM_BYTES = 12288 };
+enum {
+    OGP_INITIAL_PCM_BYTES = 12288,
+    /* Opus family 0 has at most two channels. Start with 20 ms of stereo
+     * S16 PCM at 48 kHz and use the public resize path for longer packets. */
+    OGP_OPUS_INITIAL_PCM_BYTES = 960 * 2 * sizeof(int16_t),
+};
 
 typedef struct {
     ogg_page_input input;
@@ -177,10 +182,15 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
     }
     if (!*decoder) {
         if (!*capacity) {
-            uint8_t *prepared = realloc(*output, OGP_INITIAL_PCM_BYTES);
+            size_t initial = OGP_INITIAL_PCM_BYTES;
+#if CONFIG_YORADIO_TLS_STATIC_RX_RESERVE
+            if (page->opus && page->mapping == 0)
+                initial = OGP_OPUS_INITIAL_PCM_BYTES;
+#endif
+            uint8_t *prepared = realloc(*output, initial);
             if (!prepared) { *cause = ESP_AUDIO_ERR_MEM_LACK; return OGP_MEMORY; }
             *output = prepared;
-            *capacity = OGP_INITIAL_PCM_BYTES;
+            *capacity = initial;
         }
         esp_audio_simple_dec_cfg_t config = {
             .dec_type = ESP_AUDIO_SIMPLE_DEC_TYPE_OGG,
@@ -231,7 +241,10 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
              */
             continue;
         }
-        if (result != ESP_AUDIO_ERR_OK) { *cause = result; return OGP_DECODER; }
+        if (result != ESP_AUDIO_ERR_OK) {
+            *cause = result;
+            return result == ESP_AUDIO_ERR_MEM_LACK ? OGP_MEMORY : OGP_DECODER;
+        }
         if (frame.decoded_size) {
             esp_audio_simple_dec_info_t info = {0};
             result = esp_audio_simple_dec_get_info(*decoder, &info);

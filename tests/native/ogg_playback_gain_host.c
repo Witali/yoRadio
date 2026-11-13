@@ -31,13 +31,15 @@ static void tracked_free(void *p)
 
 enum mode {
     NORMAL, RESIZE_ZERO, RESIZE_PARTIAL, RESIZE_ALL, STALL_HEAD,
-    CANCEL_BEFORE, CANCEL_AFTER, YIELD_CANCEL, OPEN_MEMORY, PROCESS_FAIL,
+    CANCEL_BEFORE, CANCEL_AFTER, YIELD_CANCEL, OPEN_MEMORY, PROCESS_FAIL, PROCESS_MEMORY,
+    ALLOCATE_PCM,
     INFO_FAIL, BAD_RATE, BAD_CHANNEL, BAD_BITS, BAD_PCM_SIZE, BAD_CONSUMED,
     BAD_DECODED, BAD_NEEDED, BAD_RESIZE_OUTPUT, OUTPUT_FAIL, MODES
 };
 static const char *names[] = {
     "normal","resize_zero","resize_partial","resize_all_nonterminal","retained_head",
-    "cancel_before","cancel_after","yield_cancel","open_memory","process_fail",
+    "cancel_before","cancel_after","yield_cancel","open_memory","process_fail","process_memory",
+    "allocate_pcm",
     "info_fail","bad_rate","bad_channel","bad_bits","bad_pcm_size","bad_consumed",
     "bad_decoded","bad_needed","bad_resize_output","output_failure"
 };
@@ -91,6 +93,7 @@ esp_audio_err_t esp_audio_simple_dec_process(esp_audio_simple_dec_handle_t handl
     assert(state.owner->input.ready && state.owner->input.event.crc_verified);
     if (state.mode == CANCEL_AFTER) state.cancelled = true;
     if (state.mode == PROCESS_FAIL) return ESP_AUDIO_ERR_FAIL;
+    if (state.mode == PROCESS_MEMORY) return ESP_AUDIO_ERR_MEM_LACK;
     if (state.mode == BAD_CONSUMED) { raw->consumed = raw->len + 1; return ESP_AUDIO_ERR_OK; }
     if (state.mode == BAD_DECODED) { frame->decoded_size = frame->len + 1; return ESP_AUDIO_ERR_OK; }
     if (state.stage < 2) {
@@ -259,7 +262,8 @@ static unsigned run_case(enum mode mode, size_t chunk, unsigned fail_at, bool cr
     esp_audio_simple_dec_handle_t decoder = NULL;
     size_t capacity = mode == RESIZE_ZERO || mode == RESIZE_PARTIAL || mode == RESIZE_ALL ||
                       mode == BAD_NEEDED || mode == BAD_RESIZE_OUTPUT ? 512 : 4096;
-    uint8_t *pcm = tracked_realloc(NULL, capacity);
+    if (mode == ALLOCATE_PCM) capacity = 0;
+    uint8_t *pcm = capacity ? tracked_realloc(NULL, capacity) : NULL;
     fail_allocation = fail_at;
     encoded bytes = {{0}, 0};
     size_t final = 0;
@@ -280,7 +284,7 @@ static unsigned run_case(enum mode mode, size_t chunk, unsigned fail_at, bool cr
     if (fail_at) expected = OGP_MEMORY;
     else if (crc_bad) expected = OGP_CONTAINER;
     else if (mode == CANCEL_BEFORE || mode == CANCEL_AFTER || mode == YIELD_CANCEL) expected = OGP_CANCELLED;
-    else if (mode == OPEN_MEMORY) expected = OGP_MEMORY;
+    else if (mode == OPEN_MEMORY || mode == PROCESS_MEMORY) expected = OGP_MEMORY;
     else if (mode == PROCESS_FAIL || mode == BAD_CONSUMED || mode == BAD_DECODED || mode == BAD_NEEDED || mode == BAD_RESIZE_OUTPUT) expected = OGP_DECODER;
     else if (mode == INFO_FAIL || mode == BAD_RATE || mode == BAD_CHANNEL || mode == BAD_BITS || mode == BAD_PCM_SIZE) expected = OGP_INFO;
     else if (mode == OUTPUT_FAIL) expected = OGP_OUTPUT;
@@ -297,6 +301,7 @@ static unsigned run_case(enum mode mode, size_t chunk, unsigned fail_at, bool cr
         assert(state.last_sample == (mode == RESIZE_ALL ? 1499 : 699));
         assert(state.bytes == (mode == RESIZE_ALL ? 4752u : 1552u) * links);
         if (mode == RESIZE_ZERO || mode == RESIZE_PARTIAL || mode == RESIZE_ALL) assert(state.retries == 1 && capacity == 3840);
+        if (mode == ALLOCATE_PCM) assert(capacity == 3840);
     }
     if (crc_bad) assert(!state.outputs && state.calls == 2);
     if (mode == YIELD_CANCEL && !fail_at) assert(state.yields == 1 && s.calls == 32);
