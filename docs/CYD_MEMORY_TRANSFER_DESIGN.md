@@ -255,6 +255,13 @@ pressure. The dynamic profile encountered a PDM configuration timeout while
 its heap allocation counter remained clean. The ordinary static profile
 closed the WebUI response partway through. The full-file gate remains open.
 
+The [TLS isolation follow-up](../tests/results/cyd-openeth-tls-isolation-20261113/README.md)
+verified 28 exact full records in each policy with two concurrent clients
+and recovery from deliberate allocator pressure. The full dynamic CYD image
+with PDM startup recovery then reached the exact output byte count at EOF.
+The OpenETH diagnostic still recorded allocation failures and PDM completion
+queue drops under that full-file workload.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)

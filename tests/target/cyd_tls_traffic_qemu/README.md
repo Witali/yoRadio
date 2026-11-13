@@ -21,6 +21,13 @@ diagnostic pressure blocks. This explicit allocator pressure probe is separate
 from a claim that a particular TLS handshake allocation itself exhausted heap.
 Panics, unknown refusals, timeouts and partial transfers remain NONPASS.
 
+Use `--dynamic-buffers` on a fresh controller output directory to compare the
+same traffic with the SDK's dynamic RX/TX policy. This profile retains
+certificate configuration, input reclaim, early MPI and full record limits.
+The controller verifies the actual SDK RX allocation and release calls in ELF
+and the simultaneous ownership of two public TLS connections. The default
+profile continues to prove ownership of the static reservation separately.
+
 `create-test-material.ps1` writes only a fresh ignored campaign; the CA private
 key stays in memory, and the generated server key remains local-only. Never
 publish generated keys, unreviewed certificate bundles, or images containing

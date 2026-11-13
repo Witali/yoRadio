@@ -52,6 +52,8 @@ def main():
     parser.add_argument('--preflight-only', action='store_true')
     parser.add_argument('--freeze-only', action='store_true')
     parser.add_argument('--compile-only', action='store_true')
+    parser.add_argument('--dynamic-buffers', action='store_true',
+                        help='Select SDK dynamic TLS buffers instead of the CYD static RX reserve')
     args = parser.parse_args()
     out, sdk, tools, qemu, rom, ps, material = [getattr(args, key).resolve() for key in ('output', 'sdk', 'tools', 'qemu', 'rom', 'powershell', 'material')]
     need(not out.exists() and out.is_relative_to(ROOT/'.build') and material.is_relative_to(ROOT/'.build'), 'fresh ignored output and ignored local test material')
@@ -85,6 +87,7 @@ def main():
                   production_sources_changed=False, rf_or_full_radio_qualified=False, physical_headroom_qualified=False,
                   certificate_store_modified=False, insecure_verification=False, external_endpoints=False,
                   user_network_restrict=False, commands=[], sources={}, tools={}, material_identities={})
+    report['dynamic_buffers'] = args.dynamic_buffers
     for path in source_paths:
         relative = path.relative_to(TARGET) if path.is_relative_to(TARGET) else Path('repository')/path.relative_to(ROOT)
         target = out/'sources'/relative
@@ -109,6 +112,15 @@ def main():
             destination.write_bytes(path.read_bytes())
     (project/'ca.pem').write_bytes((material/'ca.pem').read_bytes())
     (project/'main/test_clock.h').write_text('#define TLS_TEST_EPOCH '+str(test_material['guest_epoch_seconds'])+'\n')
+    if args.dynamic_buffers:
+        defaults_path = project/'sdkconfig.defaults'
+        defaults = defaults_path.read_text()
+        for name, original, value in (('MBEDTLS_DYNAMIC_BUFFER', 'n', 'y'),
+                                      ('YORADIO_TLS_STATIC_RX_RESERVE', 'y', 'n')):
+            before = f'CONFIG_{name}={original}\n'
+            need(defaults.count(before) == 1, 'unambiguous TLS profile default: '+name)
+            defaults = defaults.replace(before, f'CONFIG_{name}={value}\n')
+        defaults_path.write_text(defaults, encoding='utf-8', newline='\n')
     report['generated_project_inputs'] = {p.relative_to(out).as_posix(): dict(sha256=sha(p), bytes=p.stat().st_size,
                                          local_only=p.name == 'ca.pem') for p in project.rglob('*') if p.is_file()}
     write_json(out/'source-manifest.json', dict(sources=report['sources'], generated_project_inputs=report['generated_project_inputs']))
@@ -158,24 +170,39 @@ def main():
         need(image[:6] == b'\x7fELF\x01\x01' and struct.unpack_from('<H', image, 18)[0] == 94, 'actual Xtensa ELF94')
         config = json.loads((build/'config/sdkconfig.json').read_text())
         for key in ('MBEDTLS_HARDWARE_MPI', 'MBEDTLS_HARDWARE_AES', 'MBEDTLS_HARDWARE_SHA', 'ETH_USE_OPENETH',
-                    'YORADIO_TLS_INPUT_RECLAIM', 'YORADIO_TLS_STATIC_RX_RESERVE', 'YORADIO_TLS_EARLY_MPI_LOCK'):
+                    'YORADIO_TLS_INPUT_RECLAIM', 'YORADIO_TLS_EARLY_MPI_LOCK'):
             need(config[key], 'actual enabled profile: '+key)
+        need(bool(config.get('MBEDTLS_DYNAMIC_BUFFER')) == args.dynamic_buffers and
+             bool(config.get('YORADIO_TLS_STATIC_RX_RESERVE')) != args.dynamic_buffers, 'actual selected TLS buffer policy')
+        need(not config.get('MBEDTLS_DYNAMIC_FREE_CONFIG_DATA'), 'certificate configuration retained')
         need(config['MBEDTLS_SSL_IN_CONTENT_LEN'] == 16384 and config['MBEDTLS_SSL_OUT_CONTENT_LEN'] == 4096 and not config['FREERTOS_UNICORE'], 'actual original dual-core full-record profile')
         symbols_text = execute('symbols', [nm, '-n', '-S', elf])
         symbols = {m[4]: dict(address=int(m[1], 16), bytes=int(m[2], 16), kind=m[3]) for m in re.finditer(r'^([0-9a-f]+)\s+([0-9a-f]+)\s+([A-Za-z])\s+(.+)$', symbols_text, re.M)}
-        need('s_rx' in symbols and symbols['s_rx']['bytes'] >= 16384, 'actual production static RX symbol identity')
-        for name, callee in (('mbedtls_ssl_setup', '__wrap_yoradio_tls_static_rx_calloc'), ('mbedtls_ssl_free', '__wrap_yoradio_tls_static_rx_zeroize_free'),
-                             ('app_main', '__wrap_native_tls_early_mpi_prepare')):
+        references = {'app_main': ('__wrap_native_tls_early_mpi_prepare',)}
+        if args.dynamic_buffers:
+            need('s_rx' not in symbols and '__wrap_esp_crt_bundle_attach' in symbols, 'dynamic TLS owns its RX buffers')
+            references['__wrap_mbedtls_ssl_read'] = ('esp_mbedtls_add_rx_buffer', 'esp_mbedtls_free_rx_buffer')
+        else:
+            need('s_rx' in symbols and symbols['s_rx']['bytes'] >= 16384, 'actual production static RX symbol identity')
+            references.update(mbedtls_ssl_setup=('__wrap_yoradio_tls_static_rx_calloc',),
+                              mbedtls_ssl_free=('__wrap_yoradio_tls_static_rx_zeroize_free',))
+        for name, callees in references.items():
             asm = execute('asm-'+name, [objdump, '-dwC', '--disassemble='+name, elf])
-            need(callee in asm, 'actual forwarding helper reference: '+name)
+            need(all(callee in asm for callee in callees), 'actual forwarding helper reference: '+name)
         rows = json.loads((build/'compile_commands.json').read_text())
-        for name in ('main.c', 'native_tls_rx_reserve.c', 'native_input_reclaim.c', 'native_tls_early_mpi.c', 'adaptive_input.c'):
+        for name in ('main.c', 'native_input_reclaim.c', 'native_tls_early_mpi.c', 'adaptive_input.c'):
             need(sum(Path(row['file']).name == name for row in rows) == 1, 'one actual selected translation unit: '+name)
         overlay = build/'native-tls-static-rx/ssl_tls.c'
-        need(sum(Path(row['file']).resolve() == overlay.resolve() for row in rows) == 1 and
-             not any(Path(row['file']).resolve() == (sdk/'components/mbedtls/mbedtls/library/ssl_tls.c').resolve() for row in rows), 'guarded build-local SDK overlay only')
-        patcher = load('frozen_traffic_overlay', out/'sources/repository/tools/patch_cyd_tls_static_rx.py')
-        need(overlay.read_bytes() == patcher.patch((sdk/'components/mbedtls/mbedtls/library/ssl_tls.c').read_bytes()), 'actual compiled canonical overlay bytes')
+        original = sdk/'components/mbedtls/mbedtls/library/ssl_tls.c'
+        compiled = [Path(row['file']).resolve() for row in rows]
+        need(sum(path.name == 'native_tls_rx_reserve.c' for path in compiled) == (not args.dynamic_buffers),
+             'static RX helper selected only with its configuration')
+        if args.dynamic_buffers:
+            need(compiled.count(original.resolve()) == 1 and overlay.resolve() not in compiled, 'unmodified SDK TLS source for dynamic buffers')
+        else:
+            need(compiled.count(overlay.resolve()) == 1 and original.resolve() not in compiled, 'guarded build-local SDK overlay only')
+            patcher = load('frozen_traffic_overlay', out/'sources/repository/tools/patch_cyd_tls_static_rx.py')
+            need(overlay.read_bytes() == patcher.patch(original.read_bytes()), 'actual compiled canonical overlay bytes')
         cache = (build/'CMakeCache.txt').read_text()
         ninja = Path(re.search(r'^CMAKE_MAKE_PROGRAM:FILEPATH=(.+)$', cache, re.M)[1].strip())
         deps = execute('dependencies', [ninja, '-C', build, '-t', 'deps'])
@@ -188,7 +215,7 @@ def main():
                     closure[str(path)] = sha(path)
         write_json(out/'actual-compiler-closure.json', dict(captured_before_execution=True, dependencies=closure, translation_units=rows))
         report['compiled_profile'] = config
-        report['static_rx'] = symbols['s_rx']
+        report['static_rx'] = symbols.get('s_rx')
         report['actual_compiler_dependencies'] = len(closure)
         if args.compile_only:
             report.update(state='compiled_unrun', compiled=True); save(); return 0
@@ -269,7 +296,9 @@ def main():
              all(row[1:4] == ('65536', '4', '4') and row[5] == peer.PAYLOAD_SHA256 for row in normal.values()), 'seven full actual plaintext/digest observations')
         need(any(row[0] == 'truncated_record' and row[1:4] == ('0', '0', '0') and int(row[4]) <= 0 for row in data_rows), 'actual truncated-record failure')
         live = re.search(r'TLS_PARALLEL ptr0=(0x[0-9a-f]+) ptr1=(0x[0-9a-f]+) live=2', log)
-        need(live and len({int(live[1], 16), int(live[2], 16)}) == 2 and symbols['s_rx']['address'] in (int(live[1], 16), int(live[2], 16)), 'actual static RX owner and distinct heap fallback while both TLS clients live')
+        need(live and live[1] != live[2], 'two distinct live TLS owners')
+        if not args.dynamic_buffers:
+            need(symbols['s_rx']['address'] in (int(live[1], 16), int(live[2], 16)), 'static RX owner and distinct heap fallback')
         events = [json.loads(line) for line in (out/'server.jsonl').read_text().splitlines()]
         complete = [row for row in events if row['event'] == 'response_complete']
         need(len(complete) == 7 and all(row['bytes'] == 65536 and row['sha256'] == peer.PAYLOAD_SHA256 for row in complete), 'all seven server/client exact response bindings')
@@ -281,7 +310,9 @@ def main():
         need(not subprocess.check_output(['git', '-c', 'core.longpaths=true', '-C', str(sdk), 'status', '--porcelain', '--untracked-files=no']).strip(), 'installed SDK remains unchanged')
         report.update(passed=True, state='complete', full_responses=7, full_plaintext_records=28, parallel_live_clients=2,
                       genuine_parallel_traffic_rounds=4, real_pressure_recovery=True, all_source_bindings_current=True)
-        save(); print(json.dumps(dict(passed=True, full_responses=7, full_plaintext_records=28, actual_live_clients=2, actual_static_rx=symbols['s_rx']['address']))); return 0
+        save(); print(json.dumps(dict(passed=True, full_responses=7, full_plaintext_records=28, actual_live_clients=2,
+                                      dynamic_buffers=args.dynamic_buffers,
+                                      actual_static_rx=None if args.dynamic_buffers else symbols['s_rx']['address']))); return 0
     except BaseException as error:
         report.update(passed=False, state='nonpass', error_type=type(error).__name__, error=str(error)); save(); raise
 
