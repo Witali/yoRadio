@@ -316,6 +316,40 @@ esp_err_t settings_update_city(const char *city, const char *country)
     return ESP_OK;
 }
 
+esp_err_t settings_update_advanced(const char *ntp, const char *weather_key,
+                                   const int *click_count)
+{
+    /* NULL leaves the corresponding field untouched. Validate the whole update
+     * before taking the mutex so an invalid field cannot publish a partial change. */
+    if ((!ntp && !weather_key && !click_count) ||
+        (ntp && strlen(ntp) >= sizeof(current_settings.ntp)) ||
+        (weather_key && strlen(weather_key) >= sizeof(current_settings.weather_key)) ||
+        (click_count && (*click_count < 0 || *click_count > 10)))
+        return ESP_ERR_INVALID_ARG;
+
+    xSemaphoreTake(settings_mutex, portMAX_DELAY);
+    bool changed = false;
+    if (ntp && strcmp(current_settings.ntp, ntp))
+    {
+        strcpy(current_settings.ntp, ntp);
+        changed = true;
+    }
+    if (weather_key && strcmp(current_settings.weather_key, weather_key))
+    {
+        strcpy(current_settings.weather_key, weather_key);
+        changed = true;
+    }
+    if (click_count && current_settings.click_count != *click_count)
+    {
+        current_settings.click_count = (uint8_t)*click_count;
+        changed = true;
+    }
+    if (changed)
+        mark_settings_changed_locked();
+    xSemaphoreGive(settings_mutex);
+    return ESP_OK;
+}
+
 esp_err_t settings_replace(const tv_settings_t *s)
 {
     /* Validate and publish changed settings, recording their generation and deadline. */

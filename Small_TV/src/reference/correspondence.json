@@ -1128,7 +1128,7 @@
       "native": [
         "app/web/settings_api.c#web_settings_post"
       ],
-      "note": "All registered settings contracts/defaults/ranges reviewed. Strict complete JSON and atomic snapshots replace substring parsing; proven unsafe factory behavior is not reproduced."
+      "note": "Each supplied NTP or weather field updates independently. Optional clickCount is validated when present. The settings helper applies the validated fields atomically."
     },
     {
       "address": "0x4200ec12",
@@ -1948,6 +1948,10 @@
     "app/settings/settings.c#settings_snapshot_with_revisions": {
       "kind": "reconstruction_support",
       "note": "Reviewed implementation support in app/settings/settings.c; factoring/validation/synchronization/formatting for the mapped module behavior, without a separate factory entry point. This classification does not prove every branch."
+    },
+    "app/settings/settings.c#settings_update_advanced": {
+      "kind": "reconstruction_support",
+      "note": "Applies the validated fields from 0x4200e9ea under the settings mutex, preserving omitted fields and unrelated concurrent settings."
     },
     "app/settings/settings.c#settings_replace": {
       "kind": "reconstruction_support",
@@ -3596,7 +3600,7 @@
     "src/app/include/network.h": "fc88fdbbb10f4dec709f480cbd260371c7816923f5a0b9c757652e5aed5d708f",
     "src/app/include/photo_codec.h": "6d6347a3b01fd4978abb481a9a087b3c75863acb30d8bfaa166c448ded553081",
     "src/app/include/services.h": "6490660af9c5cd11519c173a17982def5a33e0c7a5c9de32c3e7218f5faab193",
-    "src/app/include/settings.h": "862df47c95be90b99c764e776d47cff1baf616ad0d976c7850cf01c66efb973f",
+    "src/app/include/settings.h": "cb612a63279ddcae72fe50a634b34531f908e18b331a5ee8dc619916d16d47c2",
     "src/app/include/text.h": "150044cb34ad45edbd4d3d267d7c066aafaf3b6e2635e6e2a93ec88775b3a3ef",
     "src/app/include/timezones.h": "b0f6bc81cea6a32a60a48a9746ff999922b0c7af1f137d2cbe34d2e436e859f8",
     "src/app/include/web.h": "ef1f410ad00755e4b9475daeb288b72ee9ab04478a2b4d63a1a697da5453f01a",
@@ -3622,13 +3626,13 @@
     "src/app/services/weather.c": "5f8cf49943d713bffc886707b64b15634dcb4749d483e222b34dd89d7f7b57e7",
     "src/app/services/weather_parser.c": "af09595b9843d4d559526d39db7afd84cd45b6497408b3a7d23c2f61e8ced6e5",
     "src/app/settings/factory_settings.c": "81ad9a3cef18df97d9c345abe1106c5c62ecd4e3c60ebba677200f612d7faa9b",
-    "src/app/settings/settings.c": "ca22375f42e088cf97c3215622e7cf2a8e6b48bffd7e7924571a0e7e9d7820fd",
+    "src/app/settings/settings.c": "0930fab0487580c179408de9ec67a87a689a4918d5a2172b3c4b2e13700e3f03",
     "src/app/text/text.c": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa",
     "src/app/web/photo_api.c": "86d732dc59558717737099821899300769e6f93dd7e41173f45f048f0408e1e2",
     "src/app/web/photo_async.c": "c3112349fbf69d693a69783de94eb736cb285a899a32e9a97615be6cc04621cd",
     "src/app/web/request_body.c": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
     "src/app/web/server.c": "b936b84396482b72beee190a12d76fdbb1ad17437de93526fd9b40a4ec31a0cc",
-    "src/app/web/settings_api.c": "80247849a96e7324488fd9c944de364828016e3e6ebbbc81db67aaf4c6167773",
+    "src/app/web/settings_api.c": "9e146b9a48ba97d06d28fd3a2d64a744416a03fe27b104769e22615015a384a4",
     "src/build.ps1": "47284d56ceadc6717925f11ea133d37870f64ae5b33549124619a2575b229212",
     "src/cmake/debug_logging.cmake": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c",
     "src/cmake/nvs_recovery.cmake": "bf90a7dc648892d7b6e1643696ca3ce02884362701b638e98d4be8016c15ba9a",

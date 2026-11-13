@@ -25,6 +25,8 @@ void settings_snapshot_with_revisions(tv_settings_t *out, uint32_t *configuratio
 esp_err_t settings_replace(const tv_settings_t *settings);
 esp_err_t settings_select_theme(unsigned theme);
 esp_err_t settings_update_city(const char *city, const char *country);
+esp_err_t settings_update_advanced(const char *ntp, const char *weather_key,
+                                   const int *click_count);
 esp_err_t settings_photo_size(unsigned slot, uint32_t bytes);
 esp_err_t settings_flush(void);
 uint32_t settings_generation(void);

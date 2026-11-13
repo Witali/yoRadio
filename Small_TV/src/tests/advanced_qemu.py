@@ -5,6 +5,7 @@ from html.parser import HTMLParser
 import json
 from pathlib import Path
 import sys
+import time
 from types import SimpleNamespace
 from qemu_storage import direct_flash_backing
 
@@ -42,6 +43,48 @@ def validate_advanced(data):
             raise ValueError('Advanced editor: saved attribute differs or changes document markup')
 
 
+def wait_saved_fields(state, expected):
+    """Compare only the two synthetic fields in the owned flash copy."""
+    deadline = time.monotonic() + 20
+    while time.monotonic() < deadline:
+        with (state / 'flash.bin').open('rb') as flash:
+            values = []
+            for address in (0x3e7086, 0x3e711c):
+                flash.seek(address)
+                values.append(flash.read(65).split(b'\0', 1)[0])
+        if tuple(values) == tuple(value.encode() for value in expected):
+            return True
+        time.sleep(0.15)
+    return False
+
+
+def check_partial_updates(url, state, key, http):
+    """Exercise independent saves, strict validation and persistence in a guest."""
+    rows = {}
+    cases = (
+        ('ntp_only', {'ntp': 'partial-ntp.invalid'}, 200, ('partial-ntp.invalid', key)),
+        ('weather_only', {'openweathermapKey': 'partial-weather-fixture'}, 200,
+         ('partial-ntp.invalid', 'partial-weather-fixture')),
+        ('both_without_click_count', {'ntp': 'final-ntp.invalid', 'openweathermapKey': ''}, 200,
+         ('final-ntp.invalid', '')),
+        ('invalid_key_type', {'ntp': 'discard.invalid', 'openweathermapKey': None}, 400,
+         ('final-ntp.invalid', '')),
+        ('invalid_click_count', {'ntp': 'discard.invalid', 'clickCount': 11}, 400,
+         ('final-ntp.invalid', '')),
+        ('empty_update', {}, 400, ('final-ntp.invalid', '')),
+    )
+    for name, payload, expected_status, expected in cases:
+        status, body = http(url, '/advancedset', payload, origin=url)
+        # Let a wrong partial update reach the normal debounced flash write.
+        if expected_status == 400:
+            time.sleep(3)
+        persisted = wait_saved_fields(state, expected)
+        rows[name] = {'status': status, 'fields_persisted': persisted,
+                      'passed': status == expected_status and persisted and
+                      (status != 200 or body == b'Settings saved')}
+    return rows
+
+
 def main():
     """Use an owned snapshot flash and close the VM after the exact same before/after probe."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -49,6 +92,7 @@ def main():
     parser.add_argument('--artifact-root', type=Path, default=ROOT)
     parser.add_argument('--native-elf', type=Path)
     parser.add_argument('--qemu-root', type=Path, default=Path('C:/Work/QEMU-ESP32'))
+    parser.add_argument('--qemu', type=Path, help='Override the QEMU executable')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     sys.path[:0] = [str(args.qemu_root/'tools'), str(ROOT/'Small_TV/qemu/parity')]
@@ -66,7 +110,7 @@ def main():
     helpers = {name: digest(args.qemu_root/'tools'/name) for name in
         ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py', 'small_tv_display.py')}
     args.output.mkdir(parents=True, exist_ok=False)
-    options = SimpleNamespace(yoradio=str(args.artifact_root), qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),
+    options = SimpleNamespace(yoradio=str(args.artifact_root), qemu=str(args.qemu or args.qemu_root/'bin/qemu-system-riscv32.exe'),
         rom_elf=str(args.dependency_root/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
         firmware='reconstructed', hardware_profile=str(profile), network='clock',
         persistent=True, display='none', paused=False, gdb_port=0)
@@ -83,6 +127,8 @@ def main():
     ranges = ((0, 0x9000), (0x10000, 0x3e7000))
     key = 'fixture-key-never-render'
     try:
+        if (archive/'app.bin').read_bytes()[176:208].hex() != result['native_elf_sha256']:
+            raise ValueError('Advanced editor app and ELF do not match')
         session, prepared = vm.launch(options, state)
         result['sources'] = prepared['sources']
         result['source_sha256'] = prepared['sources']['source_sha256']
@@ -112,7 +158,26 @@ def main():
             no_key_disclosure=all(not row['key_disclosed'] for row in result['cases']),
             no_markup_injection=all(not row['injected_node'] for row in result['cases']),
             complete_html=all(row['complete_html'] for row in result['cases']))
-        result['passed'] = all(result['checks'].values())
+        if not wait_saved_fields(state, (VALUES[-1], key)):
+            raise AssertionError('Full update did not reach flash')
+        partial = check_partial_updates(url, state, key, http)
+        result['partial_updates'] = partial
+        if all(row['passed'] for row in partial.values()):
+            uart = state/'uart.log'
+            previous_boots = uart.read_bytes().count(b'ESP-ROM:')
+            vm.control(state, 'reset')
+            from small_tv_http_test import wait_for
+            wait_for(lambda: uart.read_bytes().count(b'ESP-ROM:') > previous_boots,
+                     'No reboot after saving advanced settings', seconds=40)
+            body = wait_http(url, '/advanced', b'Advanced settings', seconds=55)
+            document = Inputs()
+            document.feed(body.decode('utf-8'))
+            result['partial_update_reboot'] = (
+                document.fields.get('ntp') == 'final-ntp.invalid' and
+                wait_saved_fields(state, ('final-ntp.invalid', '')))
+        result['passed'] = (all(result['checks'].values()) and
+                            all(row['passed'] for row in partial.values()) and
+                            result.get('partial_update_reboot', False))
     except Exception as error:
         result['error'] = str(error)
     finally:

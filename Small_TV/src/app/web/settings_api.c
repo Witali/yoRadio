@@ -280,16 +280,25 @@ esp_err_t web_settings_post(httpd_req_t *req)
         }
         else if (!strcmp(uri, "/advancedset"))
         {
+            /* The two factory settings can be submitted independently (0x4200e9ea).
+             * Merge the supplied fields into live settings under one mutex. */
+            const cJSON *ntp = cJSON_GetObjectItemCaseSensitive(object, "ntp");
+            const cJSON *key = cJSON_GetObjectItemCaseSensitive(object, "openweathermapKey");
+            bool has_clicks = cJSON_HasObjectItem(object, "clickCount");
             int clicks;
-            valid =
-                copy_string(object, "ntp", s.ntp, sizeof(s.ntp)) &&
-                copy_string(object, "openweathermapKey", s.weather_key, sizeof(s.weather_key)) &&
-                web_integer(object, "clickCount", 0, 10, &clicks);
+            valid = (!ntp || cJSON_IsString(ntp)) && (!key || cJSON_IsString(key)) &&
+                    (!has_clicks || web_integer(object, "clickCount", 0, 10, &clicks));
             if (valid)
-            {
-                s.click_count = clicks;
-                weather = true;
-            }
+                valid = settings_update_advanced(ntp ? ntp->valuestring : NULL,
+                                                 key ? key->valuestring : NULL,
+                                                 has_clicks ? &clicks : NULL) == ESP_OK;
+            bool update_weather = key != NULL;
+            cJSON_Delete(object);
+            if (!valid)
+                return web_error(req, "Invalid setting or value");
+            if (update_weather)
+                weather_request_update();
+            return httpd_resp_send(req, "Settings saved", HTTPD_RESP_USE_STRLEN);
         }
         else if (!strcmp(uri, "/updateCity"))
         {
@@ -346,8 +355,6 @@ esp_err_t web_settings_post(httpd_req_t *req)
         weather_request_update();
     if (restart)
         network_restart_later();
-    if (!strcmp(uri, "/advancedset"))
-        return httpd_resp_send(req, "Settings saved", HTTPD_RESP_USE_STRLEN);
     return web_ok(req);
 }
 

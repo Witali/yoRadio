@@ -31,7 +31,7 @@ class CorrespondenceTest(unittest.TestCase):
         self.assertFalse(result['semantic_equivalence_proved'])
         self.assertEqual(result['factory_export_functions'], 176)
         # Includes the separately reviewed keep-alive and BSS length corrections.
-        self.assertEqual(result['native_app_functions'], 225)
+        self.assertEqual(result['native_app_functions'], 226)
         self.assertEqual(len(result['assembly_only']), 11)
 
     def test_missing_factory(self):

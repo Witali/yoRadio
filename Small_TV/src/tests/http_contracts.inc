@@ -241,8 +241,22 @@ static void test_http_transport(void)
     post("/advancedset",
          "{\"ntp\":\"fixture.invalid\",\"openweathermapKey\":\"synthetic-key\",\"clickCount\":10}",
          200);
+    post("/advancedset", "{\"ntp\":\"other.invalid\"}", 200);
+    settings_snapshot(&after);
+    CHECK(!strcmp(after.ntp, "other.invalid") && !strcmp(after.weather_key, "synthetic-key") &&
+          after.click_count == 10);
+    post("/advancedset", "{\"openweathermapKey\":\"another-fixture\"}", 200);
+    settings_snapshot(&after);
+    CHECK(!strcmp(after.ntp, "other.invalid") && !strcmp(after.weather_key, "another-fixture") &&
+          after.click_count == 10);
+    post("/advancedset", "{\"ntp\":\"fixture.invalid\",\"openweathermapKey\":\"\"}", 200);
+    settings_snapshot(&after);
+    CHECK(!strcmp(after.ntp, "fixture.invalid") && !after.weather_key[0] && after.click_count == 10);
+    rejected_setting("/advancedset", "{}");
+    rejected_setting("/advancedset", "{\"ntp\":\"x\",\"openweathermapKey\":null}");
     rejected_setting("/advancedset",
                      "{\"ntp\":\"x\",\"openweathermapKey\":\"\",\"clickCount\":11}");
+    post("/advancedset", "{\"openweathermapKey\":\"synthetic-key\"}", 200);
     CHECK(strstr(get("/getsettings"), "synthetic-key") == NULL);
     after.theme = 2;
     CHECK(settings_replace(&after) == ESP_OK);
