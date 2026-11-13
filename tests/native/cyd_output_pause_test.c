@@ -94,8 +94,19 @@ static int dac_continuous_del_channels(void *h) {return release(h);}
 static int dac_continuous_write(void *h,const void *p,size_t n,size_t *done,unsigned t) {return write_driver(h,p,n,done,t);}
 typedef struct {unsigned mode,sample_rate,bits_per_sample,channel_format,communication_format,intr_alloc_flags,dma_buf_count,dma_buf_len;bool use_apll,tx_desc_auto_clear;int fixed_mclk;} i2s_config_t;
 enum {I2S_MODE_MASTER=1,I2S_MODE_TX=2,I2S_MODE_DAC_BUILT_IN=4,I2S_BITS_PER_SAMPLE_16BIT=16,I2S_CHANNEL_FMT_RIGHT_LEFT,I2S_COMM_FORMAT_STAND_MSB,ESP_INTR_FLAG_LEVEL1,I2S_PIN_NO_CHANGE,I2S_DAC_CHANNEL_LEFT_EN};
-static int idf6_dac_output_configure(const i2s_config_t *c,int mode) {assert(c && mode==I2S_DAC_CHANNEL_LEFT_EN);return ESP_OK;}
-static int idf6_dac_output_begin(void) {void *h;int e=allocate(&h);return e ? e:enable(h);}
+static size_t legacy_dma_payload;
+static int idf6_dac_output_configure(const i2s_config_t *c,int mode) {
+    assert(c && mode == I2S_DAC_CHANNEL_LEFT_EN);
+    assert(c->dma_buf_len == 512 && c->bits_per_sample == 16);
+    legacy_dma_payload = c->dma_buf_count * c->dma_buf_len * sizeof(uint32_t);
+    return ESP_OK;
+}
+static int idf6_dac_output_begin(void) {
+    if (legacy_dma_payload > 8 * 1024) return ESP_ERR_NO_MEM;
+    void *h;
+    int result = allocate(&h);
+    return result == ESP_OK ? enable(h) : result;
+}
 static int idf6_dac_output_end(void) {if(fail_disable)return ESP_FAIL;int e=disable(&driver);return e ? e:release(&driver);}
 static int idf6_dac_output_set_sample_rate(unsigned r) {assert(r);return ESP_OK;}
 static int idf6_dac_output_write(const void *p,size_t n,size_t *done,unsigned t) {return write_driver(&driver,p,n,done,t);}
@@ -192,6 +203,13 @@ int main(void) {
     assert(native_audio_output_configure(16000)==ESP_OK);++cases;
     assert(native_audio_output_pause()==ESP_OK);free(s_dac_data);
 #elif CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC
+    assert(native_audio_output_configure(48000) == ESP_OK);
+    assert(legacy_dma_payload == 8 * 1024);
+    unsigned before_reprime = writes;
+    assert(native_audio_output_configure(44100) == ESP_OK);
+    assert(writes - before_reprime == 4);
+    assert(native_audio_output_pause() == ESP_OK);
+    ++cases;
     free(s_legacy_frames);
 #endif
     printf("PASS %u cases; real production pause/ownership; driver DMA barrier seam\n",cases);

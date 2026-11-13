@@ -39,7 +39,7 @@ esp_err_t native_audio_output_pause(void);
 static uint32_t s_dac_sample_rate;
 static bool s_legacy_installed;
 static uint32_t s_legacy_sample_rate, s_legacy_output_sample_rate;
-static uint32_t legacy_storage[1536];
+static uint32_t legacy_storage[512];
 static uint32_t *s_legacy_frames = legacy_storage;
 static uint16_t s_legacy_fractional_error;
 static uint32_t s_input_sample_rate;

@@ -43,7 +43,7 @@ def main():
     constants = ''
     for name in ('OUTPUT_PACKET_BYTES', 'SAMPLE_GAIN_SCALE', 'VOLUME_DENOMINATOR',
                  'BALANCE_DENOMINATOR', 'NORMALIZER_CHUNK_FRAMES',
-                 'LEGACY_OUTPUT_BYTES', 'LEGACY_OVERSAMPLE_FACTOR',
+                 'LEGACY_OVERSAMPLE_FACTOR',
                  'LEGACY_DMA_DESCRIPTORS', 'LEGACY_DMA_FRAMES',
                  'LEGACY_MIN_INPUT_SAMPLE_RATE', 'LEGACY_MAX_INPUT_SAMPLE_RATE'):
         constants += re.search(r'^#define ' + name + r'[^\n]+', source, re.M).group(0) + '\n'

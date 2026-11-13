@@ -26,7 +26,7 @@ static uint8_t dac_storage[3072];
 static uint8_t *s_dac_data = dac_storage;
 static int s_dac;
 static bool s_legacy_installed = true;
-static uint32_t legacy_storage[1536];
+static uint32_t legacy_storage[512];
 static uint32_t *s_legacy_frames = legacy_storage;
 static uint16_t s_legacy_fractional_error;
 static uint8_t native_audio_settings_get_volume(void) { ++volume_reads; return volume; }

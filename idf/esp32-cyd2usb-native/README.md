@@ -92,8 +92,8 @@ The legacy DAC profile applies x16 oversampling with continuous fractional
 error diffusion. A 48 kHz PCM stream therefore drives the 8-bit DAC at
 768 kHz; 44.1 kHz becomes 705.6 kHz, and other supported 8-48 kHz streams use
 the same `Fs x 16` rule. Each input sample is expanded on the fly into adjacent
-8-bit DAC codes, so the existing 6 KiB conversion buffer is reused and no
-full oversampled stream is stored in RAM. The error accumulator is preserved
+8-bit DAC codes in a 2 KiB conversion buffer. Four 512-frame I2S DMA
+descriptors use another 8 KiB for payloads. The error accumulator is preserved
 between PCM samples and reset only when the input sample rate changes.
 
 The default pipeline uses an eight-slot compressed-input pool (a 16 KiB

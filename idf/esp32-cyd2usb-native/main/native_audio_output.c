@@ -809,9 +809,10 @@ esp_err_t native_audio_output_pause(void) {
 
 #include "idf6_i2s_compat.h"
 
-#define LEGACY_DMA_DESCRIPTORS 8
+// The driver allocates one 2 KiB internal DMA block per descriptor at Play.
+// Keep the interrupt interval and bound the DMA payload to 8 KiB.
+#define LEGACY_DMA_DESCRIPTORS 4
 #define LEGACY_DMA_FRAMES 512
-#define LEGACY_OUTPUT_BYTES (OUTPUT_PACKET_BYTES * 2)
 #define LEGACY_OVERSAMPLE_FACTOR 16U
 #define LEGACY_MIN_INPUT_SAMPLE_RATE 8000U
 #define LEGACY_MAX_INPUT_SAMPLE_RATE 48000U
@@ -862,12 +863,11 @@ static esp_err_t legacy_write_frames(size_t frames) {
 }
 
 static esp_err_t legacy_write_silence(size_t frames) {
-    size_t capacity = LEGACY_OUTPUT_BYTES / sizeof(uint32_t);
-    for (size_t index = 0; index < capacity; ++index) {
+    for (size_t index = 0; index < LEGACY_DMA_FRAMES; ++index) {
         s_legacy_frames[index] = 0x80008000UL;
     }
     while (frames) {
-        size_t chunk = frames > capacity ? capacity : frames;
+        size_t chunk = frames > LEGACY_DMA_FRAMES ? LEGACY_DMA_FRAMES : frames;
         ESP_RETURN_ON_ERROR(legacy_write_frames(chunk), TAG,
                             "write legacy DAC silence");
         frames -= chunk;
@@ -876,7 +876,7 @@ static esp_err_t legacy_write_silence(size_t frames) {
 }
 
 esp_err_t native_audio_output_init(void) {
-    s_legacy_frames = malloc(LEGACY_OUTPUT_BYTES);
+    s_legacy_frames = malloc(LEGACY_DMA_FRAMES * sizeof(*s_legacy_frames));
     return s_legacy_frames ? ESP_OK : ESP_ERR_NO_MEM;
 }
 
@@ -950,7 +950,6 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     }
     size_t frame_bytes = (size_t)channels * (bits_per_sample / 8U);
     size_t frames = size / frame_bytes;
-    size_t capacity = LEGACY_OUTPUT_BYTES / sizeof(uint32_t);
     size_t buffered = 0;
     pcm_reader_t reader = pcm_reader_begin(data, frames, bits_per_sample, channels);
     if (!reader.valid) return ESP_ERR_NOT_SUPPORTED;
@@ -959,7 +958,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         for (uint32_t phase = 0; phase < LEGACY_OVERSAMPLE_FACTOR; ++phase) {
             uint8_t code = legacy_fractional_dac_step(pcm);
             s_legacy_frames[buffered++] = legacy_pack_dac_code(code);
-            if (buffered == capacity) {
+            if (buffered == LEGACY_DMA_FRAMES) {
                 ESP_RETURN_ON_ERROR(legacy_write_frames(buffered), TAG,
                                     "write oversampled legacy DAC");
                 buffered = 0;
