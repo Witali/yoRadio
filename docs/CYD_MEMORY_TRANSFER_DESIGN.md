@@ -270,6 +270,12 @@ triggered the watchdog in that profile and in the ordinary-record control.
 Legacy DAC stopped after a TLS read error with six recovered OpenETH RX
 waits. The full DAC output and physical timing gates remain open.
 
+The [continuous DAC DMA experiment](../tests/results/cyd-openeth-dac-wait-20261113/README.md)
+publishes the running state before DMA start and bounds the synchronous wait
+for the previous transfer. The combined diagnostic build with the C3 TCP
+settings reached exact Opus EOF and served WebUI in both TLS record modes.
+The selected build and full application receipts are in the report.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)

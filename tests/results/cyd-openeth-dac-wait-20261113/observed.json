@@ -1,0 +1,197 @@
+{
+  "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+  "runner_sha256": "adba72546c3076e9d6ee946004fcc71b2ebe5f2e87f3541e13e64b0f3c91cf4d",
+  "images": {
+    "start-order": "92222add7e05e39a98a19cfdf5acf6c6d1579631d9eaad08ab5a100cc9516993",
+    "bounded": "c0441cfce4675398b9e50f3e571640a4de1e9e605c034afda20799666e4c9da3"
+  },
+  "original_dac_source_lf": "663e602b1f4c7a79d089a3c6eec85035a4987f3afe3d91d49f7efb892e40e616",
+  "start_order_source_sha256": "a3a4a7de173efe0ee83c36c837ec0b0b636f7e53acc32c326c5bf4b74567af24",
+  "bounded_source_sha256": "2e4655813500a3d3b5cbb8ac655c65a6534076c8e972335fa1863d83ae39a27d",
+  "bounded_elf_sha256": "4bd423c6a7bc04399fcc9173bd452d3af1ca04409ff798e8479e942bac878c5e",
+  "baseline_app_sha256": "3bccaa9723803b8074187e2da5128ccc9fb1d1fa3dfe0f7bb8bf5fa1cadd8850",
+  "identical_components": {
+    "spiffs.bin": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44",
+    "config/sdkconfig.json": "e4fc14b9a4b61f9691644549feb4bd5a5c0f960aa9243f8e369138762cb73115",
+    "bootloader/bootloader.bin": "9c17c7944f4a8412a191db333da4c52731b4a8ce0c15efab9e147e9476e6f6ff",
+    "partition_table/partition-table.bin": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2",
+    "ota_data_initial.bin": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+  },
+  "runs": [
+    {
+      "overlay": "start-order",
+      "tls_workload": "full",
+      "run": 1,
+      "result": "TERMINAL_NONPASS",
+      "reason": "timed out",
+      "report_sha256": "fbfc301589491a6375530802e9b1ae49894934e307da0ea4864f046473ccde68",
+      "uart_sha256": "65f1046d402cd49feb6dbb2f8b6ed90fecb06066df83dfe86f8156ded82b60b0",
+      "flash_sha256": "fad7efb41913ea83ecfcef28863ef366d1c57bb3d524dea5bf8829e40d14a8b9",
+      "peer": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 344064,
+          "complete": false
+        }
+      ],
+      "full_record_headers": 22,
+      "tls_tail_payload_bytes": null,
+      "pcm_progress": null,
+      "last_pcm_progress": 24648,
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "rx_waits": 0,
+      "minimum_heap": null,
+      "allocation_failures": null
+    },
+    {
+      "overlay": "start-order",
+      "tls_workload": "ordinary",
+      "run": 1,
+      "result": "TERMINAL_NONPASS",
+      "reason": "timed out",
+      "report_sha256": "e0000c2b945b419db3ece7274e9604298081b77dd7a67e02de9fad2e5e75f789",
+      "uart_sha256": "5dd4d6378bb01ef2b38d2518c4cfceda78de5c0b946ccb511847c7d4c002d716",
+      "flash_sha256": "fad7efb41913ea83ecfcef28863ef366d1c57bb3d524dea5bf8829e40d14a8b9",
+      "peer": [],
+      "full_record_headers": 0,
+      "tls_tail_payload_bytes": null,
+      "pcm_progress": null,
+      "last_pcm_progress": 0,
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "rx_waits": 0,
+      "minimum_heap": null,
+      "allocation_failures": null
+    },
+    {
+      "overlay": "bounded",
+      "tls_workload": "ordinary",
+      "run": 1,
+      "result": "TERMINAL_PASS",
+      "reason": null,
+      "report_sha256": "939daa86209a07de85202c83130eff8ee477398b0db1774502f01b3d38823450",
+      "uart_sha256": "91090a2610ffcb5faa6839696ed6f7d5c5dbed0a7bd71658a9d7a0b5775f6f39",
+      "flash_sha256": "e61d722f881be3e0482e1cdaa66fde50709ff193c799707f4c87903bcf5fa2bf",
+      "peer": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 706319,
+          "complete": true
+        }
+      ],
+      "full_record_headers": 0,
+      "tls_tail_payload_bytes": null,
+      "pcm_progress": [
+        648,
+        39048
+      ],
+      "last_pcm_progress": 523848,
+      "pcm_flushes": [
+        {
+          "frames": 528000,
+          "status": 0
+        }
+      ],
+      "webui_during": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "rx_waits": 0,
+      "minimum_heap": 20968,
+      "allocation_failures": 0
+    },
+    {
+      "overlay": "bounded",
+      "tls_workload": "full",
+      "run": 1,
+      "result": "TERMINAL_PASS",
+      "reason": null,
+      "report_sha256": "3dd56a9f04b543d07640e5cb6e7454ad74fd2c7f35fb1f4849cf9eb81bb0763d",
+      "uart_sha256": "2266905abdf489a42f0369475b6ce34bedda648deca2da517c717ee91eb5286e",
+      "flash_sha256": "e61d722f881be3e0482e1cdaa66fde50709ff193c799707f4c87903bcf5fa2bf",
+      "peer": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 706319,
+          "complete": true
+        }
+      ],
+      "full_record_headers": 43,
+      "tls_tail_payload_bytes": 1831,
+      "pcm_progress": [
+        648,
+        34248
+      ],
+      "last_pcm_progress": 523848,
+      "pcm_flushes": [
+        {
+          "frames": 528000,
+          "status": 0
+        }
+      ],
+      "webui_during": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "rx_waits": 0,
+      "minimum_heap": 5836,
+      "allocation_failures": 0
+    },
+    {
+      "overlay": "bounded",
+      "tls_workload": "full",
+      "run": 2,
+      "result": "TERMINAL_PASS",
+      "reason": null,
+      "report_sha256": "262e9b0c63858949b90a4ea606de2b2a4ce851791e5cb215f3a7ed82f834822f",
+      "uart_sha256": "98cbefc6a9eb230fced4c550c9252df3421a8be56ece0f2de3aee3dddceca04f",
+      "flash_sha256": "e61d722f881be3e0482e1cdaa66fde50709ff193c799707f4c87903bcf5fa2bf",
+      "peer": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 706319,
+          "complete": true
+        }
+      ],
+      "full_record_headers": 43,
+      "tls_tail_payload_bytes": 1831,
+      "pcm_progress": [
+        5448,
+        39048
+      ],
+      "last_pcm_progress": 523848,
+      "pcm_flushes": [
+        {
+          "frames": 528000,
+          "status": 0
+        }
+      ],
+      "webui_during": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "rx_waits": 0,
+      "minimum_heap": 4800,
+      "allocation_failures": 0
+    }
+  ]
+}
