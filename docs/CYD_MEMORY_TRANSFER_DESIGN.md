@@ -262,6 +262,14 @@ with PDM startup recovery then reached the exact output byte count at EOF.
 The OpenETH diagnostic still recorded allocation failures and PDM completion
 queue drops under that full-file workload.
 
+The [DAC runtime comparison](../tests/results/cyd-openeth-dac-20261113/README.md)
+measured actual PCM acceptance on both DAC drivers. The C3 receive window and
+mailbox let the continuous DAC full-record run serve WebUI with PCM progress
+and zero observed allocation failures. The same `dac_continuous_write` wait
+triggered the watchdog in that profile and in the ordinary-record control.
+Legacy DAC stopped after a TLS read error with six recovered OpenETH RX
+waits. The full DAC output and physical timing gates remain open.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)

@@ -1,0 +1,265 @@
+{
+  "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+  "spiffs_sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44",
+  "images": {
+    "continuous": {
+      "app_bytes": 1261568,
+      "app_sha256": "2f54aa0375334bea87d1cbc54732b9593e0a585dd1c46659116e20f0f0274062",
+      "elf_sha256": "091b68f09e810bd50b0eaaa4e0057b8e349309ff48bbd507c0f1fd701b243a75",
+      "config_sha256": "20df92a7738b946128daa3c8c94c8bf816b517b26738a1ec9fd2f397d7674ac6"
+    },
+    "legacy": {
+      "app_bytes": 1267712,
+      "app_sha256": "fd3b1fecf8264ac8f2c6641a9f33c0ff23499408ced6cf9ecf2a33afddef928f",
+      "elf_sha256": "0e54f0f8071848c2df5832efce6adcb44c29204eb64b2348bdcbd30e07f608f5",
+      "config_sha256": "3fa2d231a7ee6fc8719cc6fda3f72519f7aa147ff67146843d09b5d46e34c7c6"
+    },
+    "tcp-c3": {
+      "app_bytes": 1261552,
+      "app_sha256": "3bccaa9723803b8074187e2da5128ccc9fb1d1fa3dfe0f7bb8bf5fa1cadd8850",
+      "elf_sha256": "7dedb2b02d1ec7aeac5064464b2ff7bbe00c74b7dd1476ba30551c3f380939d5",
+      "config_sha256": "e4fc14b9a4b61f9691644549feb4bd5a5c0f960aa9243f8e369138762cb73115"
+    }
+  },
+  "tcp_receive_changes": {
+    "LWIP_TCP_RECVMBOX_SIZE": [
+      10,
+      8
+    ],
+    "LWIP_TCP_WND_DEFAULT": [
+      11520,
+      8640
+    ]
+  },
+  "runs": [
+    {
+      "case": "continuous-load",
+      "profile": "continuous",
+      "state": "TERMINAL_NONPASS",
+      "reason": "timed out",
+      "receipt_sha256": "9f5e05e3261264f726e69a054a75a120119188b930232f9c1f2d054621cde2f6",
+      "runner_sha256": "bb77bedfeb2ca7a139d2d77289ab011a0b24b2f3ffaec33791d84a095b454fb7",
+      "uart_sha256": "3fdf8e9c54062b48d0678b8a2829cb1d1b8bc7772bf5877e2591e06e90c7ae7f",
+      "flash_sha256": "0d6d164e05055bf09d0dc696fe8475550d7ccc4810123194da1a6eba0c1d985e",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 344064,
+        "complete": false
+      },
+      "full_tls_record_headers": 22,
+      "webui_bytes_during_playback": 13588,
+      "last_progress_frames": 648,
+      "progress_frames_during_webui": null,
+      "flushes": [],
+      "openeth_pressure": {
+        "wait_episodes": 1,
+        "recovered": 0,
+        "samples": [
+          {
+            "request": 1522,
+            "heap": 4552,
+            "largest": 992,
+            "dma_largest": 992
+          }
+        ]
+      }
+    },
+    {
+      "case": "legacy-load",
+      "profile": "legacy",
+      "state": "TERMINAL_NONPASS",
+      "reason": "timed out",
+      "receipt_sha256": "9e06625776fcd897748703560bff80988de932e9775181a5d506989cac379153",
+      "runner_sha256": "bb77bedfeb2ca7a139d2d77289ab011a0b24b2f3ffaec33791d84a095b454fb7",
+      "uart_sha256": "050fea3087f21ee1fb504a946c34249a2977779fbe9298edc3838cb3c77756e7",
+      "flash_sha256": "ba968e66e5af4e79ab379c8caca2b64e711062b0990a0e3d820f955ec8b3dc6f",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 360448,
+        "complete": false
+      },
+      "full_tls_record_headers": 23,
+      "webui_bytes_during_playback": null,
+      "last_progress_frames": 39048,
+      "progress_frames_during_webui": null,
+      "flushes": [
+        {
+          "frames": 40008,
+          "status": 0
+        }
+      ],
+      "openeth_pressure": {
+        "wait_episodes": 6,
+        "recovered": 6,
+        "samples": [
+          {
+            "request": 1522,
+            "heap": 2144,
+            "largest": 1088,
+            "dma_largest": 1088
+          },
+          {
+            "request": 1522,
+            "heap": 1984,
+            "largest": 1024,
+            "dma_largest": 1088
+          },
+          {
+            "request": 1522,
+            "heap": 888,
+            "largest": 768,
+            "dma_largest": 768
+          },
+          {
+            "request": 1522,
+            "heap": 928,
+            "largest": 768,
+            "dma_largest": 768
+          },
+          {
+            "request": 1522,
+            "heap": 232,
+            "largest": 184,
+            "dma_largest": 184
+          },
+          {
+            "request": 1522,
+            "heap": 232,
+            "largest": 184,
+            "dma_largest": 184
+          }
+        ]
+      },
+      "last_minimum_heap": 40,
+      "allocation_failures": 8500,
+      "stream_failure": {
+        "sequence": 1,
+        "generation": 1,
+        "completion": 2,
+        "result": -1
+      },
+      "decoder_failure": {
+        "sequence": 1,
+        "generation": 1,
+        "codec": 4,
+        "stage": 2,
+        "result": -4,
+        "completion": 8,
+        "input_bytes": 0,
+        "allocation_sequence": 8500
+      }
+    },
+    {
+      "case": "continuous-small-load",
+      "profile": "continuous",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Guest stopped or logged a failure before EOF",
+      "receipt_sha256": "f03836f530a37b1345c2792e62f2abc9aa7cee6dcfd20452d69096a3c9e92562",
+      "runner_sha256": "adba72546c3076e9d6ee946004fcc71b2ebe5f2e87f3541e13e64b0f3c91cf4d",
+      "uart_sha256": "69fea333526a1b796a483b0aa41e300fac3498b500c1bf425ea64812f154f6f9",
+      "flash_sha256": "0d6d164e05055bf09d0dc696fe8475550d7ccc4810123194da1a6eba0c1d985e",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 366592,
+        "complete": false
+      },
+      "full_tls_record_headers": 0,
+      "webui_bytes_during_playback": 13588,
+      "last_progress_frames": 19848,
+      "progress_frames_during_webui": [
+        648,
+        19848
+      ],
+      "flushes": [],
+      "openeth_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0,
+        "samples": []
+      },
+      "watchdog_stack": [
+        "esp_crosscore_isr",
+        "_xt_lowint1",
+        "dac_continuous_write",
+        "dac_write_block",
+        "output_task",
+        "gated_pipeline_task"
+      ],
+      "last_minimum_heap": 15828,
+      "allocation_failures": 0,
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      }
+    },
+    {
+      "case": "tcp-c3-load",
+      "profile": "tcp-c3",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Guest stopped or logged a failure before EOF",
+      "receipt_sha256": "31a1a176c9c04d7c6ea4d32c905afaf6bf619426b36e5ca3f940d5226c6c05f8",
+      "runner_sha256": "adba72546c3076e9d6ee946004fcc71b2ebe5f2e87f3541e13e64b0f3c91cf4d",
+      "uart_sha256": "92089a1cbbf8622a95707c7041218946c3317997e1b2ac6634d99cc0c8548900",
+      "flash_sha256": "c4ca64a856297e4361784dd8f55899572697041c90beb615d93492005acccd17",
+      "peer": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 344064,
+        "complete": false
+      },
+      "full_tls_record_headers": 22,
+      "webui_bytes_during_playback": 13588,
+      "last_progress_frames": 15048,
+      "progress_frames_during_webui": [
+        648,
+        15048
+      ],
+      "flushes": [],
+      "openeth_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0,
+        "samples": []
+      },
+      "watchdog_stack": [
+        "esp_crosscore_isr",
+        "_xt_lowint1",
+        "dac_continuous_write",
+        "dac_write_block",
+        "output_task",
+        "gated_pipeline_task"
+      ],
+      "last_minimum_heap": 7260,
+      "allocation_failures": 0,
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      }
+    }
+  ]
+}

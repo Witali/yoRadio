@@ -53,11 +53,18 @@ station. Build both configurations with the RX overlay. Keep the TLS record
 limits at 16384/4096 bytes and leave dynamic certificate/configuration cleanup
 disabled. Compare both generated `config/sdkconfig.json` files before running.
 
-Add `--through-eof` to the TLS run to check the complete Opus file on PDM with
-the Ogg timeline enabled. The runner requires the full TLS response, the
-original generation's EOF, the exact PDM byte count, and another exact WebUI
-asset read after EOF. Its 90-second host deadline accommodates the measured
-QEMU I2S rate.
+Add `--through-eof` to the TLS run to check the complete Opus file with the
+Ogg timeline enabled. The runner requires the full TLS response, the original
+generation's EOF, the exact output count, and another exact WebUI asset read
+after EOF. PDM uses the driver byte count.
+
+For continuous and legacy DAC, select the corresponding CYD audio backend in
+the isolated `sdkconfig` and add `'-D','CYD_OPENETH_PCM_PROBE=ON'` to the build
+arguments. The probe counts only decoded PCM accepted by the actual output
+function and requires 528,000 stereo frames at the ordered flush. Priming and
+idle writes are outside the probe. QEMU runs the continuous DAC model at
+48 kHz and the legacy model at its supported ceiling of 96 kHz. The legacy
+driver still requests its normal x16 rate, so its host deadline is 360 seconds.
 
 Add `--full-tls-records` with `--through-eof` to verify TLS 1.2 AES-GCM record
 lengths on the local HTTPS server. The Opus fixture uses 43 full 16,384-byte

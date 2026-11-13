@@ -21,6 +21,7 @@ RX_WAIT = re.compile(r'CYD_OPENETH_RX_WAIT request=(\d+) heap=(\d+) largest=(\d+
 # 528000 mono output samples. PDM pads to 512-sample writes and counts the
 # 704 bias samples written after DMA preload, at two bytes per sample.
 PDM_OPUS_EOF_BYTES = 1058176
+OPUS_EOF_PCM_FRAMES = 528000
 FULL_TLS_PLAINTEXT_BYTES = 16384
 TLS12_AES_GCM_OVERHEAD = 24
 
@@ -144,9 +145,27 @@ def guest_log(log_path):
     return log_path.read_text(encoding='utf-8', errors='replace')
 
 
+def pcm_probe_progress(uart):
+    progress = re.findall(r'^CYD_OPENETH_PCM_PROGRESS frames=(\d+)\s*$', uart, re.M)
+    return int(progress[-1]) if progress else 0
+
+
+def pcm_probe_flushes(uart):
+    return [dict(frames=int(frames), status=int(status)) for frames, status in
+            re.findall(r'^CYD_OPENETH_PCM_FLUSH frames=(\d+) status=(-?\d+)\s*$', uart, re.M)]
+
+
+def output_progress(health, uart, backend):
+    if backend == 'pdm':
+        return health['output_driver']['written_bytes']
+    return pcm_probe_progress(uart)
+
+
 def observe_eof(port, server, event, guest, log_path, generation, report):
-    # The emulated PDM writes averaged 58 ms per block in the load test.
-    until = time.monotonic() + 90
+    backend = report['audio_backend']
+    # The legacy driver emits x16 stereo words. The model caps the DAC clock
+    # at 96 kHz and consumes one 16-bit slot per tick.
+    until = time.monotonic() + (360 if backend == 'legacy_dac' else 90)
     while time.monotonic() < until:
         if FATAL.search(guest_log(log_path)) or guest.poll() is not None:
             raise RuntimeError('Guest stopped or logged a failure before EOF')
@@ -174,16 +193,24 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
             raise RuntimeError('Expected a single full-record TLS connection')
         require_full_tls_records(event, body_bytes, report['tls_application_payload_lengths'])
         report['observed'].append('full-sized TLS 1.2 records')
-    if not driver['requested_bytes'] == driver['written_bytes'] == PDM_OPUS_EOF_BYTES:
-        raise RuntimeError('Unexpected PDM byte count after EOF')
+    if backend == 'pdm':
+        if not driver['requested_bytes'] == driver['written_bytes'] == PDM_OPUS_EOF_BYTES:
+            raise RuntimeError('Unexpected PDM byte count after EOF')
+    else:
+        if pcm_probe_flushes(guest_log(log_path)) != [dict(frames=OPUS_EOF_PCM_FRAMES, status=0)]:
+            raise RuntimeError('Unexpected decoded PCM frame count or flush result after EOF')
+        if not 0 < driver['requested_bytes'] == driver['written_bytes']:
+            raise RuntimeError('Incomplete DAC driver writes after EOF')
+    report['observed'] += ['complete TLS response', 'ordered EOF with exact output count']
     if any(driver[key] for key in ('errors', 'timeouts', 'short_writes', 'saturated')):
-        raise RuntimeError('Unexpected PDM driver fault after EOF')
-    require_clean_health(final)
+        raise RuntimeError('Unexpected audio driver fault after EOF')
     report['web_asset_after_eof'] = check_asset(port)
-    report['observed'] += ['complete TLS response', 'ordered EOF with exact PDM driver byte count', 'WebUI after EOF']
+    report['observed'].append('WebUI after EOF')
+    require_clean_health(final)
 
 
 def observe_playback(port, server, guest, log_path, report, through_eof):
+    backend = report['audio_backend']
     radio = json.loads(request(port, '/api/native/radio'))
     if radio['count'] != 1 or radio['station'] != 'OpenETH fixture':
         raise RuntimeError('The expected SPIFFS station was not loaded')
@@ -198,7 +225,8 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
                 status['pcm_sample_rate_hz'] == 48000 and status['pcm_channels'] == 2):
             first = sample(port)
             report['first_active_health'] = first
-            if first['output_driver']['written_bytes'] > 0:
+            initial = output_progress(first, uart, backend)
+            if initial > 0:
                 break
         time.sleep(0.2)
     else:
@@ -214,7 +242,8 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
         status_after = json.loads(request(port, '/api/native/status'))
         if not status_after['audio'] or status_after['generation'] != status['generation']:
             raise RuntimeError('Playback stopped or changed generation during WebUI sampling')
-        if second['output_driver']['written_bytes'] > first['output_driver']['written_bytes']:
+        after = output_progress(second, guest_log(log_path), backend)
+        if after > initial:
             break
         time.sleep(0.2)
     else:
@@ -225,15 +254,17 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
     report['playing_health'].append(second)
     report['tls_peer'] = {key: events[0][key] for key in ('tls_version', 'tls_cipher', 'sent')}
     report['playback'] = {key: status[key] for key in ('codec', 'format', 'pcm_sample_rate_hz', 'pcm_channels')}
+    if backend != 'pdm':
+        report['pcm_progress_during_webui'] = [initial, after]
     report['observed'] += ['Opus audio over verified TLS', 'audio progress across WebUI asset read']
     if not through_eof:
         request(port, '/api/native/radio?action=stop', 'POST')
-    require_clean_health(first)
-    require_clean_health(second)
     if through_eof:
         if report['health'][-1]['output_driver']['writes'] != 0:
-            raise RuntimeError('PDM EOF check requires an idle driver before Play')
+            raise RuntimeError('EOF check requires an idle driver before Play')
         observe_eof(port, server, events[0], guest, log_path, status['generation'], report)
+    require_clean_health(first)
+    require_clean_health(second)
 
 
 def main():
@@ -244,7 +275,7 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--tls-material', type=Path, help='Local disposable CA and server certificate/key directory')
     parser.add_argument('--through-eof', action='store_true',
-                        help='Require the full TLS Opus response, exact PDM write length, and WebUI after EOF')
+                        help='Require the full TLS Opus response, exact audio output count, and WebUI after EOF')
     parser.add_argument('--full-tls-records', action='store_true',
                         help='Serve and verify actual maximum-size TLS 1.2 application records')
     args = parser.parse_args()
@@ -255,13 +286,16 @@ def main():
     config = json.loads((build / 'config/sdkconfig.json').read_bytes())
     if not (config['IDF_TARGET'] == 'esp32' and config['ETH_USE_OPENETH'] and not config['FREERTOS_UNICORE']):
         raise ValueError('Expected a dual-core CYD OpenETH diagnostic build')
+    backends = [name for name in ('PDM', 'DAC', 'LEGACY_DAC') if config.get('YORADIO_NATIVE_AUDIO_OUTPUT_' + name)]
+    if len(backends) != 1:
+        raise ValueError('Expected exactly one CYD audio backend')
+    backend = backends[0].lower()
     material = args.tls_material.resolve(strict=True) if args.tls_material else None
     if material is not None and (not material.is_relative_to(ROOT / '.build') or
                                  not config.get('MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE')):
         raise ValueError('TLS workload requires local test credentials and a diagnostic CA bundle')
-    if args.through_eof and not (material and config.get('YORADIO_NATIVE_AUDIO_OUTPUT_PDM') and
-                                 config.get('YORADIO_OGG_TIMELINE')):
-        parser.error('--through-eof requires the TLS fixture, PDM output and Ogg timeline')
+    if args.through_eof and not (material and config.get('YORADIO_OGG_TIMELINE')):
+        parser.error('--through-eof requires the TLS fixture and Ogg timeline')
     if args.full_tls_records and not args.through_eof:
         parser.error('--full-tls-records requires --through-eof')
     flash, parts = flash_parts(build)
@@ -270,8 +304,13 @@ def main():
     flash_path.write_bytes(flash)
     flash_sha = digest(flash)
     web_port = local_port()
+    machine = 'esp32,st7789=on,audiodev=quiet'
+    if backend == 'dac':
+        machine += ',dac-rate=48000'
+    elif backend == 'legacy_dac':
+        machine += ',dac-rate=96000'
     command = [str(qemu), '-global', 'driver=ssi.esp32.spi,property=input-delay-ns,value=25',
-               '-audiodev', 'none,id=quiet', '-M', 'esp32,st7789=on,audiodev=quiet', '-smp', '2',
+               '-audiodev', 'none,id=quiet', '-M', machine, '-smp', '2',
                '-L', str(rom), '-display', 'none', '-monitor', 'none', '-serial', 'stdio',
                '-no-reboot', '-snapshot', '-nic', f'user,model=open_eth,restrict=on,hostfwd=tcp:127.0.0.1:{web_port}-:80',
                '-drive', f'file={str(flash_path).replace(",", ",,")},if=mtd,format=raw']
@@ -280,7 +319,7 @@ def main():
     report = dict(state='STARTING', scope='OpenETH full-application idle boot', passed=False,
                   flash_parts=parts, flash_sha256=flash_sha, qemu_sha256=digest(qemu.read_bytes()),
                   config_sha256=digest((build / 'config/sdkconfig.json').read_bytes()),
-                  openeth=True, physical_tested=False, command=command,
+                  openeth=True, audio_backend=backend, physical_tested=False, command=command,
                   runner_sha256=digest(Path(__file__).read_bytes()),
                   task_watchdog_seconds=config['ESP_TASK_WDT_TIMEOUT_S'],
                   native_diagnostics=config.get('YORADIO_NATIVE_DIAGNOSTICS', False))
@@ -369,6 +408,9 @@ def main():
             report['uart_sha256'] = digest(uart)
             uart_text = uart.decode('utf-8', errors='replace')
             report['guest_fault_observed'] = bool(FATAL.search(uart_text))
+            if backend != 'pdm':
+                report['pcm_probe_last_progress'] = pcm_probe_progress(uart_text)
+                report['pcm_probe_flushes'] = pcm_probe_flushes(uart_text)
             pressure = RX_WAIT.findall(uart_text)
             report['openeth_rx_pressure'] = dict(wait_episodes=len(pressure),
                 recovered=uart_text.count('CYD_OPENETH_RX_RECOVERED'),
