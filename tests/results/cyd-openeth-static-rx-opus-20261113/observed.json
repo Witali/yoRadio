@@ -1,0 +1,763 @@
+{
+  "fixture": {
+    "bytes": 706319,
+    "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+    "crc32": "58c30e90",
+    "opus_packets": 551,
+    "opus_samples": 528960,
+    "opus_crc32": "2a4a64cf"
+  },
+  "runs": {
+    "historical_pdm": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "Playback ended as 'decode failed'",
+      "report_sha256": "52f6e1e8608398d76fecc0b52def90d11a2719689529443331b20d837ab920ab",
+      "uart_sha256": "afe36fe67c81a8b97adcf0d6d68f4dba2f0bb92a67a0b95e1f3cc4e1f8fa1e1d",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "2861a5b3f8513c0adae6717e321142a2547304138c2fd1d2139681952001c2ee",
+      "sdkconfig_sha256": "9d59e256692d0094220aac0050bf860c754d599689aed3d35b3dd67ef202a376",
+      "audio_backend": "pdm",
+      "tcp_window": 11520,
+      "receive_mailbox": 10,
+      "configured_initial_pcm_capacity": 12288,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset",
+        "Opus audio over verified TLS",
+        "audio progress across WebUI asset read"
+      ],
+      "full_tls_records": 43,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 706319,
+          "complete": true
+        }
+      ],
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "decode failed",
+        "generation": 1
+      },
+      "trace": {},
+      "pcm_flushes": [],
+      "webui_during": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after": null,
+      "allocation_failures": 18880,
+      "minimum_heap": 560,
+      "decoder_failure": {
+        "sequence": 1,
+        "generation": 1,
+        "codec": 4,
+        "stage": 2,
+        "result": -3,
+        "completion": 8,
+        "input_bytes": 1807,
+        "allocation_sequence": 18880
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 714,
+        "requested_bytes": 730496,
+        "written_bytes": 730496,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": 190,
+        "timing_enabled": true,
+        "timing_samples": 714,
+        "invalid_time_samples": 0,
+        "write_us": 41267285,
+        "max_write_us": 67600
+      },
+      "openeth_allocation_waits": 9,
+      "guest_fault": false
+    },
+    "current_pdm_standard_tcp": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active Opus playback with output writes before the deadline",
+      "report_sha256": "e2318fe19aade6d6239e005ff930f898c8d66e55ffa0779f17d4f2e5862d67f3",
+      "uart_sha256": "da8cdae1a41a81f1aebd904edd491e71ab7324f874fc0fac66193e018c7c3820",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "23afe8507673349932375bc17c9e7ae70e15bfbd9431cfccdacdc9f7df8bae85",
+      "sdkconfig_sha256": "b120de4691d15fb961f83d96aadfb616df13fd63a0176eb60e3e7d9d4141e30c",
+      "audio_backend": "pdm",
+      "tcp_window": 11520,
+      "receive_mailbox": 10,
+      "configured_initial_pcm_capacity": 12288,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset"
+      ],
+      "full_tls_records": 18,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 278528,
+          "complete": false
+        }
+      ],
+      "eof_status": null,
+      "trace": {},
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "allocation_failures": 3,
+      "minimum_heap": 2096,
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "output": {
+        "failures": 1,
+        "write_errors": 0,
+        "configure_errors": 1,
+        "flush_errors": 0,
+        "generation": 1,
+        "stage": 1,
+        "result": 263
+      },
+      "output_driver": {
+        "writes": 1,
+        "requested_bytes": 1024,
+        "written_bytes": 0,
+        "errors": 1,
+        "timeouts": 1,
+        "short_writes": 1,
+        "saturated": false,
+        "completion_queue_drops": 0,
+        "timing_enabled": true,
+        "timing_samples": 1,
+        "invalid_time_samples": 0,
+        "write_us": 1000384,
+        "max_write_us": 1000384
+      },
+      "openeth_allocation_waits": 1,
+      "guest_fault": false
+    },
+    "traced_pdm_standard_tcp": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "IncompleteRead(0 bytes read)",
+      "report_sha256": "c79c5ce28b7da6e118103223cd16934c7158deca6444c4cba8dec4c0b2f623c2",
+      "uart_sha256": "3970520e74e890b4dee0a6b29bdf63c69f8c1137e748f6b176a7511d16eb1942",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "f5956f0d76f52d5821a21614e1d1414559abc119f3351dc8ae7510c8faff21a1",
+      "sdkconfig_sha256": "b120de4691d15fb961f83d96aadfb616df13fd63a0176eb60e3e7d9d4141e30c",
+      "audio_backend": "pdm",
+      "tcp_window": 11520,
+      "receive_mailbox": 10,
+      "configured_initial_pcm_capacity": 12288,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset"
+      ],
+      "full_tls_records": 23,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 376832,
+          "complete": false
+        }
+      ],
+      "eof_status": null,
+      "trace": {
+        "sampled_packets": 75,
+        "matching_sampled_packets": 75
+      },
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "allocation_failures": null,
+      "minimum_heap": null,
+      "decoder_failure": null,
+      "output": null,
+      "output_driver": null,
+      "openeth_allocation_waits": 10,
+      "guest_fault": false
+    },
+    "traced_pdm_smaller_tcp": {
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "report_sha256": "d4fa65f1bbcbdba02289de220baed37302ceea9345c06fc7e2665fb39f643b94",
+      "uart_sha256": "42f8e373495dcafdacf6d180a4fc558f45e7e543647bbe1677d1a51fb35a203b",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "4b102f821fc92a25daf6598d69fb820da6018089902b1f47a3e373f8902cd2e9",
+      "sdkconfig_sha256": "040b0b5e086d5a1bee2dc0c3f38c1ce535ea174c703e7f82c54911feee8e47fd",
+      "audio_backend": "pdm",
+      "tcp_window": 8640,
+      "receive_mailbox": 8,
+      "configured_initial_pcm_capacity": 12288,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset",
+        "Opus audio over verified TLS",
+        "audio progress across WebUI asset read",
+        "full-sized TLS 1.2 records",
+        "complete TLS response",
+        "ordered EOF with exact output count",
+        "WebUI after EOF"
+      ],
+      "full_tls_records": 43,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 706319,
+          "complete": true
+        }
+      ],
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "trace": {
+        "sampled_packets": 12,
+        "matching_sampled_packets": 12,
+        "http_bytes": 706319,
+        "http_crc32": "58c30e90"
+      },
+      "pcm_flushes": [],
+      "webui_during": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "allocation_failures": 0,
+      "minimum_heap": 2536,
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 1034,
+        "requested_bytes": 1058176,
+        "written_bytes": 1058176,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": 0,
+        "timing_enabled": true,
+        "timing_samples": 1034,
+        "invalid_time_samples": 0,
+        "write_us": 62758705,
+        "max_write_us": 67336
+      },
+      "openeth_allocation_waits": 0,
+      "guest_fault": false
+    },
+    "smaller_pcm_pdm_standard_tcp_attempt_1": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active Opus playback with output writes before the deadline",
+      "report_sha256": "8dddca02302ee2d43f213d6b37155ac35386a96ce43a9aaf70914355c74a33a7",
+      "uart_sha256": "bffc266f5d7776d989f7147151ad7ea15c4598a910a82f0caf6c5790fd8b4b00",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "b2ce5c92d9f7d3f65c5ed17a577c9c0e3979bdceb3282af554a190690e70d587",
+      "sdkconfig_sha256": "b120de4691d15fb961f83d96aadfb616df13fd63a0176eb60e3e7d9d4141e30c",
+      "audio_backend": "pdm",
+      "tcp_window": 11520,
+      "receive_mailbox": 10,
+      "configured_initial_pcm_capacity": 3840,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset"
+      ],
+      "full_tls_records": 18,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 278528,
+          "complete": false
+        }
+      ],
+      "eof_status": null,
+      "trace": {
+        "sampled_packets": 1,
+        "matching_sampled_packets": 1
+      },
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "allocation_failures": 0,
+      "minimum_heap": 16144,
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "output": {
+        "failures": 1,
+        "write_errors": 0,
+        "configure_errors": 1,
+        "flush_errors": 0,
+        "generation": 1,
+        "stage": 1,
+        "result": 263
+      },
+      "output_driver": {
+        "writes": 1,
+        "requested_bytes": 1024,
+        "written_bytes": 0,
+        "errors": 1,
+        "timeouts": 1,
+        "short_writes": 1,
+        "saturated": false,
+        "completion_queue_drops": 0,
+        "timing_enabled": true,
+        "timing_samples": 1,
+        "invalid_time_samples": 0,
+        "write_us": 1000350,
+        "max_write_us": 1000350
+      },
+      "openeth_allocation_waits": 0,
+      "guest_fault": false
+    },
+    "smaller_pcm_pdm_standard_tcp_attempt_2": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "timed out",
+      "report_sha256": "e65392ba0eb01c35babe00cab47d92570676991caaad3fdafc8d8b5e8055ecae",
+      "uart_sha256": "c3d0a0f52eeba02be8a26a7c81e828e8b0bcd0c5d99d62ae2272302a88ff9ea6",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "b2ce5c92d9f7d3f65c5ed17a577c9c0e3979bdceb3282af554a190690e70d587",
+      "sdkconfig_sha256": "b120de4691d15fb961f83d96aadfb616df13fd63a0176eb60e3e7d9d4141e30c",
+      "audio_backend": "pdm",
+      "tcp_window": 11520,
+      "receive_mailbox": 10,
+      "configured_initial_pcm_capacity": 3840,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset",
+        "Opus audio over verified TLS",
+        "audio progress across WebUI asset read",
+        "full-sized TLS 1.2 records",
+        "complete TLS response",
+        "ordered EOF with exact output count"
+      ],
+      "full_tls_records": 43,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 706319,
+          "complete": true
+        }
+      ],
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "trace": {
+        "sampled_packets": 12,
+        "matching_sampled_packets": 12,
+        "http_bytes": 706319,
+        "http_crc32": "58c30e90"
+      },
+      "pcm_flushes": [],
+      "webui_during": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after": null,
+      "allocation_failures": 0,
+      "minimum_heap": 5568,
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 1034,
+        "requested_bytes": 1058176,
+        "written_bytes": 1058176,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": 12,
+        "timing_enabled": true,
+        "timing_samples": 1034,
+        "invalid_time_samples": 0,
+        "write_us": 61293546,
+        "max_write_us": 95849
+      },
+      "openeth_allocation_waits": 0,
+      "guest_fault": false
+    },
+    "smaller_pcm_pdm_standard_tcp_attempt_3": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "timed out",
+      "report_sha256": "e05c3cfb96bacc4d58927239477fc221968feac4aa6768afacf3d02e82568c72",
+      "uart_sha256": "67bc4b579bbceb84c2946b93a35bc47a12292d15a241dc6963ba474f211d693e",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "b2ce5c92d9f7d3f65c5ed17a577c9c0e3979bdceb3282af554a190690e70d587",
+      "sdkconfig_sha256": "b120de4691d15fb961f83d96aadfb616df13fd63a0176eb60e3e7d9d4141e30c",
+      "audio_backend": "pdm",
+      "tcp_window": 11520,
+      "receive_mailbox": 10,
+      "configured_initial_pcm_capacity": 3840,
+      "observed": null,
+      "full_tls_records": 0,
+      "peer_observations": [],
+      "eof_status": null,
+      "trace": {},
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "allocation_failures": null,
+      "minimum_heap": null,
+      "decoder_failure": null,
+      "output": null,
+      "output_driver": null,
+      "openeth_allocation_waits": 0,
+      "guest_fault": false
+    },
+    "smaller_pcm_pdm_smaller_tcp_attempt_1": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active Opus playback with output writes before the deadline",
+      "report_sha256": "5b0016c6e68e17438fc0432fd7eb311fc554770a5959144dd9b71d308f4c9423",
+      "uart_sha256": "773940c24ee85a315c041cb87fde5f32160a56c5570fa750cc7e1786f42d4c8a",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "0547a86a98e6d98039be4a6881113e7b0bf80ec70f5987842c78ee8a85f4d4d1",
+      "sdkconfig_sha256": "040b0b5e086d5a1bee2dc0c3f38c1ce535ea174c703e7f82c54911feee8e47fd",
+      "audio_backend": "pdm",
+      "tcp_window": 8640,
+      "receive_mailbox": 8,
+      "configured_initial_pcm_capacity": 3840,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset"
+      ],
+      "full_tls_records": 20,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 311296,
+          "complete": false
+        }
+      ],
+      "eof_status": null,
+      "trace": {
+        "sampled_packets": 1,
+        "matching_sampled_packets": 1,
+        "pcm_capacity": 3840
+      },
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "allocation_failures": 0,
+      "minimum_heap": 13076,
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "output": {
+        "failures": 1,
+        "write_errors": 0,
+        "configure_errors": 1,
+        "flush_errors": 0,
+        "generation": 1,
+        "stage": 1,
+        "result": 263
+      },
+      "output_driver": {
+        "writes": 1,
+        "requested_bytes": 1024,
+        "written_bytes": 0,
+        "errors": 1,
+        "timeouts": 1,
+        "short_writes": 1,
+        "saturated": false,
+        "completion_queue_drops": 0,
+        "timing_enabled": true,
+        "timing_samples": 1,
+        "invalid_time_samples": 0,
+        "write_us": 1000186,
+        "max_write_us": 1000186
+      },
+      "openeth_allocation_waits": 0,
+      "guest_fault": false
+    },
+    "smaller_pcm_pdm_smaller_tcp_attempt_2": {
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active Opus playback with output writes before the deadline",
+      "report_sha256": "528a1f2a7eceaf533a8ca49a65b65b93626dbf0ac28544a3a9443cf8653f12b3",
+      "uart_sha256": "8d1814df051c6cfcee8a4a8ddce7948d4fdd305652c65ef9c08e9f666e52c0aa",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "0547a86a98e6d98039be4a6881113e7b0bf80ec70f5987842c78ee8a85f4d4d1",
+      "sdkconfig_sha256": "040b0b5e086d5a1bee2dc0c3f38c1ce535ea174c703e7f82c54911feee8e47fd",
+      "audio_backend": "pdm",
+      "tcp_window": 8640,
+      "receive_mailbox": 8,
+      "configured_initial_pcm_capacity": 3840,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset"
+      ],
+      "full_tls_records": 20,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 311296,
+          "complete": false
+        }
+      ],
+      "eof_status": null,
+      "trace": {
+        "sampled_packets": 1,
+        "matching_sampled_packets": 1,
+        "pcm_capacity": 3840
+      },
+      "pcm_flushes": [],
+      "webui_during": null,
+      "webui_after": null,
+      "allocation_failures": 0,
+      "minimum_heap": 12344,
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "output": {
+        "failures": 1,
+        "write_errors": 0,
+        "configure_errors": 1,
+        "flush_errors": 0,
+        "generation": 1,
+        "stage": 1,
+        "result": 263
+      },
+      "output_driver": {
+        "writes": 1,
+        "requested_bytes": 1024,
+        "written_bytes": 0,
+        "errors": 1,
+        "timeouts": 1,
+        "short_writes": 1,
+        "saturated": false,
+        "completion_queue_drops": 0,
+        "timing_enabled": true,
+        "timing_samples": 1,
+        "invalid_time_samples": 0,
+        "write_us": 1002142,
+        "max_write_us": 1002142
+      },
+      "openeth_allocation_waits": 0,
+      "guest_fault": false
+    },
+    "smaller_pcm_continuous_dac_smaller_tcp": {
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "report_sha256": "781031713dfc4ede073f1b2f13dbd61845ffc66eb46689a159a80d0716594eb5",
+      "uart_sha256": "5ead25d9a92fe437ea07dc40a0841fce5de76f010d5875dd7fc0264f43a173c5",
+      "qemu_sha256": "4fcdc2bef259bdf5c8ea21251e76a0f9d9255996d8c8d2f28d1af3de99f6e45d",
+      "app_sha256": "389b461d10aedbc0501645eace2db3612325c58dbb5c78f52069766c2904c13d",
+      "sdkconfig_sha256": "dec888a77de10575bd3cd6e6e2325953ccbf0364734093675d3075edeae6825a",
+      "audio_backend": "dac",
+      "tcp_window": 8640,
+      "receive_mailbox": 8,
+      "configured_initial_pcm_capacity": 3840,
+      "observed": [
+        "ST7789",
+        "OpenETH IPv4",
+        "audio tasks",
+        "HTTP health",
+        "SPIFFS WebUI asset",
+        "Opus audio over verified TLS",
+        "audio progress across WebUI asset read",
+        "full-sized TLS 1.2 records",
+        "complete TLS response",
+        "ordered EOF with exact output count",
+        "WebUI after EOF"
+      ],
+      "full_tls_records": 43,
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 706319,
+          "complete": true
+        }
+      ],
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "trace": {
+        "sampled_packets": 12,
+        "matching_sampled_packets": 12,
+        "http_bytes": 706319,
+        "http_crc32": "58c30e90",
+        "opus_packets": 551,
+        "opus_samples": 528960,
+        "opus_crc32": "2a4a64cf",
+        "pcm_capacity": 3840
+      },
+      "pcm_flushes": [
+        {
+          "frames": 528000,
+          "status": 0
+        }
+      ],
+      "webui_during": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "allocation_failures": 0,
+      "minimum_heap": 11300,
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 2214,
+        "requested_bytes": 813952,
+        "written_bytes": 813952,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": null,
+        "timing_enabled": true,
+        "timing_samples": 2214,
+        "invalid_time_samples": 0,
+        "write_us": 11241758,
+        "max_write_us": 18127
+      },
+      "openeth_allocation_waits": 0,
+      "guest_fault": false
+    }
+  },
+  "trace_source_sha256": {
+    "attach.cmake.txt": "836434f520c1155c252e766da038b8d35eb6718f6df333a5f1c9a919b2be5c29",
+    "trace.c.txt": "f4be171e8e6851ca2b2d1f6851023b9e592137a8f36eef1742663a588316972c"
+  },
+  "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "codec_commit": "67b8d0e98f58c774b8652480893037273190e8dc",
+  "production_change": "28bb884d1d310750ec3adf129680fc002c1a791f",
+  "trace_snapshot_sha256": {
+    "attach.cmake.txt": "bee8abaef8b814383ee2f454c851ff6d73053181093a5164771297c376228ac5",
+    "trace.c.txt": "860606fd0b2dd1a05e98dc504a56eb325df000579e727a3e3e02abc4b7c7bea1"
+  }
+}

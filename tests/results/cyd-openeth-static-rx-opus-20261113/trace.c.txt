@@ -1,0 +1,68 @@
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include "esp_http_client.h"
+#include "esp_rom_crc.h"
+#include "esp_heap_caps.h"
+#include "esp_audio_simple_dec.h"
+
+static uint32_t opus_packets, packet_crc, samples;
+
+int __real_esp_http_client_read(esp_http_client_handle_t, char *, int);
+int __wrap_esp_http_client_read(esp_http_client_handle_t client, char *buffer, int size)
+{
+    static uint32_t total, crc;
+    int got = __real_esp_http_client_read(client, buffer, size);
+    if (got > 0) {
+        total += got;
+        crc = esp_rom_crc32_le(crc, (const uint8_t *)buffer, got);
+        if (total >= 706319)
+            printf("CYD_TLS_BODY bytes=%"PRIu32" crc=%08"PRIx32"\n", total, crc);
+    }
+    return got;
+}
+
+int __real_opus_decode_native(void *, const uint8_t *, int32_t, int16_t *, int,
+                             int, int, int32_t *, int);
+int __wrap_opus_decode_native(void *state, const uint8_t *data, int32_t len, int16_t *pcm,
+                             int frames, int fec, int delimited, int32_t *offset, int clip)
+{
+    uint32_t crc = data && len > 0 ? esp_rom_crc32_le(0, data, len) : 0;
+    int result = __real_opus_decode_native(state, data, len, pcm, frames, fec, delimited, offset, clip);
+    if (data && len > 0) packet_crc = esp_rom_crc32_le(packet_crc, data, len);
+    if (result > 0) samples += result;
+    ++opus_packets;
+    if (result < 0 || opus_packets % 50 == 1) printf("CYD_OPUS_PACKET n=%"PRIu32" bytes=%"PRId32" crc=%08"PRIx32" result=%d delimited=%d\n",
+           opus_packets, len, crc, result, delimited);
+    return result;
+}
+
+esp_audio_err_t __real_esp_audio_simple_dec_process(esp_audio_simple_dec_handle_t,
+    esp_audio_simple_dec_raw_t *, esp_audio_simple_dec_out_t *);
+esp_audio_err_t __wrap_esp_audio_simple_dec_process(esp_audio_simple_dec_handle_t handle,
+    esp_audio_simple_dec_raw_t *raw, esp_audio_simple_dec_out_t *out)
+{
+    uint32_t length = raw->len;
+    unsigned before = opus_packets;
+    uint32_t capacity = out->len;
+    esp_audio_err_t result = __real_esp_audio_simple_dec_process(handle, raw, out);
+    if (opus_packets == 1 && before == 0) printf("CYD_OPUS_PCM_CAPACITY bytes=%"PRIu32"\n", capacity);
+    if (raw->eos && !raw->consumed && !out->decoded_size)
+        printf("CYD_OPUS_TOTAL packets=%"PRIu32" samples=%"PRIu32" crc=%08"PRIx32"\n", opus_packets, samples, packet_crc);
+    if (result != ESP_AUDIO_ERR_OK || (raw->eos && !raw->consumed && !out->decoded_size))
+        printf("CYD_OPUS_SIMPLE bytes=%"PRIu32" used=%"PRIu32" pcm=%"PRIu32
+               " eos=%u result=%d calls=%u heap=%zu\n",
+               length, raw->consumed, out->decoded_size, (unsigned)raw->eos,
+               result, (unsigned)(opus_packets-before), heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    return result;
+}
+
+
+void *__real_media_lib_module_realloc(const char *, void *, size_t);
+void *__wrap_media_lib_module_realloc(const char *module, void *pointer, size_t bytes)
+{
+    void *result = __real_media_lib_module_realloc(module, pointer, bytes);
+    if (!result && bytes)
+        printf("CYD_CODEC_ALLOC_FAIL bytes=%zu packets=%"PRIu32"\n", bytes, opus_packets);
+    return result;
+}

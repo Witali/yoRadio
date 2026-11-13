@@ -1,0 +1,8 @@
+include("${CMAKE_CURRENT_LIST_DIR}/../../tests/target/cyd_full_app_openeth_qemu/attach.cmake")
+function(cyd_static_rx_trace)
+  idf_component_get_property(app main COMPONENT_LIB)
+  target_sources(${app} PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/trace.c")
+  target_link_options(${app} INTERFACE "-Wl,--wrap=esp_http_client_read"
+    "-Wl,--wrap=opus_decode_native" "-Wl,--wrap=esp_audio_simple_dec_process" "-Wl,--wrap=media_lib_module_realloc")
+endfunction()
+cmake_language(DEFER CALL cyd_static_rx_trace)

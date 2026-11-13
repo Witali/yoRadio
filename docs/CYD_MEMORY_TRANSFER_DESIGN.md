@@ -262,6 +262,13 @@ with PDM startup recovery then reached the exact output byte count at EOF.
 The OpenETH diagnostic still recorded allocation failures and PDM completion
 queue drops under that full-file workload.
 
+The [static RX follow-up](../tests/results/cyd-openeth-static-rx-opus-20261113/README.md)
+completed the full TLS/Opus gate with continuous DAC, a smaller TCP receive
+window and the smaller initial Opus PCM buffer. The guest's body and Opus
+packet checksums matched the source, and the allocation failure count was
+zero. The original Espressif error occurred under much higher memory
+pressure. Its exact cause remains open.
+
 The [DAC runtime comparison](../tests/results/cyd-openeth-dac-20261113/README.md)
 measured actual PCM acceptance on both DAC drivers. The C3 receive window and
 mailbox let the continuous DAC full-record run serve WebUI with PCM progress
