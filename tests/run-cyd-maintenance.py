@@ -35,7 +35,7 @@ def main():
     main=ROOT/'idf/esp32-cyd2usb-native/main';shared=ROOT/'idf/components/native_stream'
     harness=ROOT/'tests/native/cyd_maintenance_test.c'
     files=[Path(__file__).resolve(),harness,ROOT/'tests/native/cyd_maintenance_platform.h',ROOT/'tests/native/cyd_output_pause_test.c',ROOT/'tests/native/cyd_output_metrics_noop.h',ROOT/'tests/native/audio_power_seam.h',
-           *[main/n for n in ('audio_service.c','audio_service.h','native_audio_output.c','native_audio_output.h','native_state.c','native_state.h','native_health.h','input_prefill.h')],
+           *[main/n for n in ('audio_service.c','audio_service.h','native_audio_output.c','native_audio_output.h','native_state.c','native_state.h','native_health.h','input_prefill.h','native_tls_rx_reserve.h')],
            shared/'adaptive_input.c',shared/'icy_title.c',*sorted((shared/'include').glob('*.h'))]
     power=ROOT/'idf/components/native_network_power'
     if a.network_power:files += [power/'native_network_power.c',power/'include/native_network_power.h']
@@ -45,9 +45,13 @@ def main():
     for name in ('FreeRTOS.h','semphr.h','task.h'):
         (out/'freertos'/name).write_text('#include "'+host(ROOT/'tests/native/cyd_maintenance_platform.h')+'"\n')
     (out/'esp_err.h').write_text('#pragma once\n')
-    source=stripped(main/'audio_service.c',('stream_encoded_router.h','stream_start.h','input_prefill.h'))
+    (out/'esp_crt_bundle.h').write_text('#pragma once\n')
+    (out/'sdkconfig.h').write_text('#pragma once\n')
+    source=stripped(main/'audio_service.c',('stream_encoded_router.h','stream_start.h','input_prefill.h',
+        'decoder_pending_input.h','decoder_eof_input.h','stream_fairness.h','native_tls_rx_reserve.h'))
     (out/'audio.inc').write_text(source)
-    (out/'production.inc').write_text(stripped(main/'native_audio_output.c'))
+    (out/'production.inc').write_text(stripped(main/'native_audio_output.c',
+        ('native_audio_output.h','pcm_header_gain.h','pcm_speaker_mix.h')))
     (out/'adaptive.inc').write_text(stripped(shared/'adaptive_input.c'))
     (out/'state.inc').write_text(stripped(main/'native_state.c'))
     defines=['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1','-DCONFIG_YORADIO_FRAME_ROUTER=1',
@@ -63,7 +67,7 @@ def main():
                  '-pthread','-fno-omit-frame-pointer','-fno-pie','-no-pie','-fsanitize='+sanitizer,
                  '-DCONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_'+backend+'=1',*defines,
                  '-I'+host(out),'-I'+host(ROOT/'tests/native'),'-I'+host(main),'-I'+host(shared/'include'),
-                 host(harness),host(shared/'icy_title.c'),'-o',host(binary)]
+                 host(harness),host(shared/'icy_title.c'),'-lm','-o',host(binary)]
         if sanitizer=='thread':command.insert(1,'-DTEST_TSAN=1')
         if a.network_power:command[1:1]=['-DAUDIO_POWER_INTEGRATION=1','-I'+host(power/'include'),'-I'+host(power)]
         code,log=execute(command,60);(out/(binary.name+'-build.log')).write_bytes(log)
@@ -82,7 +86,11 @@ def main():
         # Cleanup in the ACK branch now independently protects stale epochs.
         # Remove both protections to reproduce the original premature ACK;
         # deleting the epoch check alone is no longer a semantic failure.
-        'decoder_stale_epoch_without_cleanup':('generation == atomic_load(&s_generation)) {\n                decoder_release(&decoder, &output, &output_size);','true) {\n                /* negative: omit redundant same-block cleanup */','empty_receive_epoch','!begin_done && !maintenance_acked(MAINTENANCE_DECODER)'),
+        'decoder_stale_epoch_without_cleanup':(
+            'generation == atomic_load(&s_generation)) {\n'
+            '                decoder_release(&decoder, &output, &output_size, &pending, &eof_input);',
+            'true) {\n                /* negative: omit redundant same-block cleanup */',
+            'empty_receive_epoch','!begin_done && !maintenance_acked(MAINTENANCE_DECODER)'),
         'output_early_ack':('if (maintenance_acked(MAINTENANCE_DECODER) &&','if (true &&','late_pcm','!maintenance_acked(MAINTENANCE_OUTPUT)'),
         'ignored_dma_pause':('esp_err_t result = native_audio_output_pause();','esp_err_t result = ESP_OK;','output_write','!http_clients&&!decoder_handles&&!driver.allocated'),
         'lost_resume':('maintenance_finish_locked(phase != MAINTENANCE_END_STOP)','maintenance_finish_locked(false)','resume','esp_timer_get_time()<end'),

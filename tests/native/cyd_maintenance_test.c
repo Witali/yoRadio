@@ -46,7 +46,10 @@ typedef struct {unsigned dec_type;void *dec_cfg;unsigned cfg_size;bool use_frame
 typedef struct {uint8_t *buffer;size_t len,consumed;unsigned eos;} esp_audio_simple_dec_raw_t;
 typedef struct {uint8_t *buffer;size_t len,needed_size,decoded_size;} esp_audio_simple_dec_out_t;
 typedef struct {uint32_t sample_rate,bitrate;uint8_t bits_per_sample,channel;} esp_audio_simple_dec_info_t;
-enum {ESP_AUDIO_ERR_OK=0,ESP_AUDIO_ERR_BUFF_NOT_ENOUGH=-8,ESP_AUDIO_ERR_MEM_LACK=-9,ESP_AUDIO_SIMPLE_DEC_TYPE_MP3=1,ESP_AUDIO_SIMPLE_DEC_TYPE_AAC,ESP_AUDIO_SIMPLE_DEC_TYPE_FLAC,ESP_AUDIO_SIMPLE_DEC_TYPE_OGG};
+enum {ESP_AUDIO_ERR_OK=0,ESP_AUDIO_ERR_DATA_LACK=-3,ESP_AUDIO_ERR_INVALID_PARAMETER=-5,
+      ESP_AUDIO_ERR_BUFF_NOT_ENOUGH=-8,ESP_AUDIO_ERR_MEM_LACK=-9,
+      ESP_AUDIO_SIMPLE_DEC_TYPE_MP3=1,ESP_AUDIO_SIMPLE_DEC_TYPE_AAC,
+      ESP_AUDIO_SIMPLE_DEC_TYPE_FLAC,ESP_AUDIO_SIMPLE_DEC_TYPE_OGG};
 static atomic_uint decoder_handles,codec_type;
 static atomic_bool hold_codec_close,codec_close_entered;
 static int decoder_register_codecs(void) {return ESP_OK;}
