@@ -66,12 +66,11 @@ idle writes are outside the probe. QEMU runs the continuous DAC model at
 48 kHz and the legacy model at its supported ceiling of 96 kHz. The legacy
 driver still requests its normal x16 rate, so its host deadline is 360 seconds.
 
-For the continuous DAC DMA experiment, use the C3 TCP window of 8640 bytes
-and receive mailbox of 8 entries. Add `'-D','CYD_OPENETH_DAC_START_ORDER=ON'`
-for the start-order control and `'-D','CYD_OPENETH_DAC_BOUND_STOP_WAIT=ON'`
-for the combined candidate. Both switches select a build-local copy of the
-pinned SDK's synchronous DAC driver. The candidate publishes DMA state before
-start and waits at most the caller's timeout for a previous transfer to stop.
+The continuous DAC build automatically applies the DMA start and wait fix.
+To reproduce the full-record comparison, use the C3 TCP window of 8640 bytes
+and receive mailbox of 8 entries with the dynamic TLS and OpenETH settings
+above. The historical start-order and combined diagnostics are reproducible
+at `eb3b096ec`.
 Run `tests/run-cyd-dac-write-test.py --sdk <pinned-sdk> --output <fresh-directory>`
 for the early completion, timeout, and recovery cases under ASan/UBSan.
 [DAC DMA results](../../results/cyd-openeth-dac-wait-20261113/README.md).

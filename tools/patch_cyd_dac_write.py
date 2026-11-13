@@ -1,4 +1,4 @@
-"""Generate a diagnostic DAC driver with DMA state published before start."""
+"""Generate the CYD synchronous DAC fix from the pinned SDK source."""
 import argparse
 import hashlib
 from pathlib import Path
@@ -21,17 +21,16 @@ WAIT = b'''        TimeOut_t stop_timeout;
         }'''
 
 
-def overlay(raw, bound_stop_wait=False):
+def overlay(raw):
     source = raw.replace(b'\r\n', b'\n')
     if hashlib.sha256(source).hexdigest() != SOURCE_SHA or source.count(WRITE) != 1:
         raise ValueError('DAC overlay requires the pinned ESP-IDF 6.0.2 source')
     prefix, write = source.split(WRITE, 1)
-    if bound_stop_wait:
-        if write.count(SPIN) != 1:
-            raise ValueError('Expected one synchronous DAC stop wait')
-        write = write.replace(SPIN, WAIT, 1)
-        prefix = prefix.replace(b'#include "freertos/semphr.h"\n',
-                                b'#include "freertos/semphr.h"\n#include "freertos/task.h"\n', 1)
+    if write.count(SPIN) != 1:
+        raise ValueError('Expected one synchronous DAC stop wait')
+    write = write.replace(SPIN, WAIT, 1)
+    prefix = prefix.replace(b'#include "freertos/semphr.h"\n',
+                            b'#include "freertos/semphr.h"\n#include "freertos/task.h"\n', 1)
     for indent in (b'        ', b'            '):
         before = indent + START + b'\n' + indent + RUNNING
         after = indent + RUNNING + b'\n' + indent + START
@@ -45,9 +44,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--bound-stop-wait', action='store_true')
     args = parser.parse_args()
-    generated = overlay(args.input.read_bytes(), args.bound_stop_wait)
+    generated = overlay(args.input.read_bytes())
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(generated)
 

@@ -97,6 +97,12 @@ native_enable_tls_static_rx_reserve()
 include("${CMAKE_CURRENT_LIST_DIR}/compat/early_mpi/enable.cmake")
 native_enable_tls_early_mpi()
 
+if(NOT CMAKE_BUILD_EARLY_EXPANSION AND CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_DAC)
+  include("${CMAKE_CURRENT_LIST_DIR}/compat/sdk_source_overlay.cmake")
+  cyd_overlay_sdk_source(esp_driver_dac dac_continuous.c
+    "${CMAKE_CURRENT_LIST_DIR}/../../../tools/patch_cyd_dac_write.py" native-dac-write)
+endif()
+
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
 
 if(CONFIG_ESP_TLS_USING_MBEDTLS)

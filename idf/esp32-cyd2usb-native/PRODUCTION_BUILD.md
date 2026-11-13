@@ -15,6 +15,12 @@ Use `continuous` for the native DAC continuous driver, or `legacy` for the
 ESP-IDF 5.5 legacy I2S/DAC driver embedded in the pinned CYD project. Each
 backend defaults to its own `build-production-<backend>/sdkconfig` and preserves
 the corresponding CYD defaults selected by the existing `build.ps1`.
+
+Continuous DAC builds compile a build-local copy of the pinned SDK driver.
+It publishes the running flag before starting DMA and applies the caller's
+timeout while waiting for the previous transfer to stop. The generator checks
+the SDK source digest before applying the fix.
+[Host and QEMU results](../../tests/results/cyd-openeth-dac-wait-20261113/README.md).
 An existing isolated config is never replaced by another profile. The wrapper
 raises `CONFIG_LWIP_SNTP_MAX_SERVERS` to at least two so the new default time
 settings can actually be applied, and records this change in the manifest.
