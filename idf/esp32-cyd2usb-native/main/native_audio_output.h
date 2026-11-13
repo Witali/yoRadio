@@ -7,6 +7,9 @@
 #include "esp_err.h"
 #include "pcm_channel_layout.h"
 
+// Four legacy DMA buffers hold 2.67 ms at the maximum x16 output rate.
+#define NATIVE_AUDIO_LEGACY_IDLE_MS 2U
+
 esp_err_t native_audio_output_init(void);
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate);
 // Signed packed little-endian PCM, with a sample width of 8, 16, 24 or 32 bits.

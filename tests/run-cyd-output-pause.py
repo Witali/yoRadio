@@ -38,12 +38,13 @@ def main():
     for name, define in variants.items():
         work = out/name
         work.mkdir()
+        (work/'esp_err.h').write_text('#pragma once\n')
         (work/'production.inc').write_text(source)
         command = ['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                    '-Wno-unused-function', '-Wno-unused-variable',
                    '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
                    '-fno-pie', '-no-pie', '-DCONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_'+define+'=1',
-                   '-I'+host(work), '-I'+host(ROOT/'tests/native'), '-I'+host(shared),
+                   '-I'+host(work), '-I'+host(ROOT/'tests/native'), '-I'+host(main), '-I'+host(shared),
                    host(files[2]), '-lm', '-o', host(work/'test')]
         try:
             build = run(command)

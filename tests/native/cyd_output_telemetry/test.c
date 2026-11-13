@@ -38,6 +38,9 @@ void native_audio_normalizer_reset(void) {}
 void native_audio_normalizer_process_block(int16_t *pcm,size_t frames,uint8_t channels) {
     (void)pcm;(void)frames;(void)channels;CHECK(false,"normalizer_not_exercised");
 }
+void native_audio_normalizer_process_multichannel_block(int16_t *pcm,size_t frames,uint8_t channels) {
+    native_audio_normalizer_process_block(pcm, frames, channels);
+}
 static esp_err_t allocate(void **handle) {
     CHECK(!driver.allocated,"single_driver");
     driver.allocated=true;*handle=&driver;++allocations;return ESP_OK;
@@ -115,7 +118,7 @@ esp_err_t idf6_dac_output_configure(const i2s_config_t *config,int channel) {
     CHECK(channel==I2S_DAC_CHANNEL_LEFT_EN && config->mode==(I2S_MODE_MASTER|I2S_MODE_TX|I2S_MODE_DAC_BUILT_IN) &&
         config->sample_rate==48000*16 && config->bits_per_sample==I2S_BITS_PER_SAMPLE_16BIT &&
         config->channel_format==I2S_CHANNEL_FMT_RIGHT_LEFT && config->communication_format==I2S_COMM_FORMAT_STAND_MSB &&
-        config->intr_alloc_flags==ESP_INTR_FLAG_LEVEL1 && config->dma_buf_count==8 && config->dma_buf_len==512 &&
+        config->intr_alloc_flags==ESP_INTR_FLAG_LEVEL1 && config->dma_buf_count==4 && config->dma_buf_len==512 &&
         !config->use_apll && !config->tx_desc_auto_clear && config->fixed_mclk==I2S_PIN_NO_CHANGE,"legacy_hardware_defaults");
     configured_rate=config->sample_rate;return ESP_OK;
 }
@@ -151,7 +154,7 @@ static void configure(void) {
     CHECK(ledger_calls==1 && ledger_requested==1024,"dac_prime_driver_units");
     CHECK(!native_output_metrics_snapshot().queue_drops_available,"dac_no_queue_claim");
 #else
-    CHECK(ledger_calls==3 && ledger_requested==16384,"legacy_prime_driver_units");
+    CHECK(ledger_calls==4 && ledger_requested==8192,"legacy_prime_driver_units");
     CHECK(!native_output_metrics_snapshot().queue_drops_available,"legacy_no_queue_claim");
 #endif
     verify_metrics("prime_writes_accounted");
@@ -216,12 +219,16 @@ static void full_tail_idle(void) {
 #else
     unsigned before=ledger_calls;uint64_t bytes=ledger_requested;
     CHECK(write_pcm(100)==ESP_OK,"legacy_full_and_tail");
-    CHECK(ledger_calls==before+2 && ledger_requested==bytes+6400,"legacy_full_tail_units");
+    CHECK(ledger_calls==before+4 && ledger_requested==bytes+6400,"legacy_full_tail_units");
     verify_metrics("legacy_full_tail_telemetry");
     before=ledger_calls;bytes=ledger_requested;next_result=ESP_ERR_TIMEOUT;next_report=12;
     native_audio_output_idle();
-    CHECK(ledger_calls==before+1 && ledger_requested==bytes+6144,"legacy_idle_stops_after_error");
+    CHECK(ledger_calls==before+1 && ledger_requested==bytes+2048,"legacy_idle_stops_after_error");
     verify_metrics("legacy_idle_telemetry");
+    before=ledger_calls;bytes=ledger_requested;
+    native_audio_output_idle();
+    CHECK(ledger_calls==before+3 && ledger_requested==bytes+6144,"legacy_idle_two_ms");
+    verify_metrics("legacy_idle_two_ms_telemetry");
 #endif
     finish();
 }

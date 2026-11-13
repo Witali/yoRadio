@@ -1357,8 +1357,13 @@ static void output_task(void *argument) {
             sample_rate = 0;
         }
         size_t item_size = 0;
+#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC
+        const TickType_t pcm_wait = pdMS_TO_TICKS(NATIVE_AUDIO_LEGACY_IDLE_MS);
+#else
+        const TickType_t pcm_wait = pdMS_TO_TICKS(5);
+#endif
         pcm_packet_t *packet = xRingbufferReceive(s_pcm, &item_size,
-                                                  pdMS_TO_TICKS(5));
+                                                  pcm_wait);
         if (!packet) {
             audio_level_led_update_peak(0);
             if (maintenance_active()) {

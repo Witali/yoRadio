@@ -78,6 +78,7 @@ esp_err_t native_audio_settings_set_balance(int8_t value);
 void native_audio_normalizer_configure(bool, uint8_t, int8_t, uint16_t, uint32_t);
 void native_audio_normalizer_reset(void);
 void native_audio_normalizer_process_block(int16_t *, size_t, uint8_t);
+void native_audio_normalizer_process_multichannel_block(int16_t *, size_t, uint8_t);
 
 typedef void *i2s_chan_handle_t;
 typedef struct { unsigned size; } i2s_event_data_t;

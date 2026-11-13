@@ -970,9 +970,8 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
 
 void native_audio_output_idle(void) {
     if (!s_legacy_installed || atomic_load(&s_pause_requested)) return;
-    // output_task wakes after 5 ms without PCM. Supply the corresponding
-    // amount of midpoint data at the oversampled DAC clock.
-    size_t frames = (s_legacy_output_sample_rate + 199U) / 200U;
+    size_t frames =
+        (s_legacy_output_sample_rate * NATIVE_AUDIO_LEGACY_IDLE_MS + 999U) / 1000U;
     legacy_write_silence(frames);
 }
 

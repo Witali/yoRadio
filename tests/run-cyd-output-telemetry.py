@@ -13,6 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 MAIN = Path('idf/esp32-cyd2usb-native/main')
 TEST = Path('tests/native/cyd_output_telemetry')
+SHARED = Path('idf/components/native_stream/include')
 
 
 def host(path):
@@ -36,6 +37,7 @@ def main():
     inputs = [Path(__file__).resolve().relative_to(ROOT),
               *[MAIN / name for name in ('native_audio_output.c', 'native_audio_output.h',
                                         'native_output_metrics.c', 'native_output_metrics.h', 'board_config.h')],
+              *[SHARED / name for name in ('pcm_header_gain.h', 'pcm_channel_layout.h', 'pcm_speaker_mix.h')],
               *[TEST / name for name in ('test.c', 'platform.h', 'README.md')]]
     frozen = out / 'sources'
     report = dict(passed=False, scope=__doc__, source_sha256={}, cases={}, negative_controls={},
@@ -74,7 +76,8 @@ def main():
                    '-DCONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_' + backend + '=1',
                    *(['-DCONFIG_YORADIO_NATIVE_DIAGNOSTICS=1'] if diagnostic else []),
                    '-I' + host(stubs), '-I' + host(frozen / TEST), '-I' + host(frozen / MAIN),
-                   host(unit), host(metrics), host(frozen / TEST / 'test.c'), '-o', host(binary)]
+                   '-I' + host(frozen / SHARED), host(unit), host(metrics),
+                   host(frozen / TEST / 'test.c'), '-lm', '-o', host(binary)]
         (directory / 'command.json').write_text(json.dumps(command, indent=2) + '\n')
         code, output = execute(command)
         (directory / 'build.log').write_bytes(output)

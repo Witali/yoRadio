@@ -111,6 +111,9 @@ static int idf6_dac_output_end(void) {if(fail_disable)return ESP_FAIL;int e=disa
 static int idf6_dac_output_set_sample_rate(unsigned r) {assert(r);return ESP_OK;}
 static int idf6_dac_output_write(const void *p,size_t n,size_t *done,unsigned t) {return write_driver(&driver,p,n,done,t);}
 esp_err_t native_audio_output_pause(void);
+#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC
+#include "native_audio_output.h"
+#endif
 #include "production.inc"
 
 #ifndef CYD_MAINTENANCE_HOST
