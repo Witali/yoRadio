@@ -83,6 +83,8 @@ To compare the reserved RX buffer, enable `CONFIG_YORADIO_TLS_STATIC_RX_RESERVE`
 in a fresh copy of the static-buffer diagnostic config. Reuse the CA and
 station fixture and keep the same OpenETH RX overlay across the three builds.
 [Full-record results](../../results/cyd-openeth-full-records-20261111/README.md).
+For PDM with static RX, use the [QEMU I2S DMA fix and tested profile](../../results/cyd-pdm-static-rx-20261113/README.md)
+for the complete run, including the WebUI request after EOF.
 
 The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
 and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)

@@ -1,0 +1,189 @@
+{
+  "physical_tested": false,
+  "qemu": {
+    "integrated_build_commit": "cb9deafd83a6f88275004717875503e52f167ab2",
+    "patch_base": "9135fc89ce3eba7bbb1c2dbed103cd2854436940",
+    "local_fix": "82c3e11c1ce258adf0076ae92f1eb2404e480371",
+    "patch_sha256": "f678b0aa6985e3f827561b1a724e8699d4057c05c00c9fdd8f8819d6eeeb80e3"
+  },
+  "configuration": {
+    "static_tls_rx_reserve": true,
+    "mbedtls_dynamic_buffer": false,
+    "tls_rx_content_bytes": 16384,
+    "tls_tx_content_bytes": 4096,
+    "tcp_receive_window_bytes": 8640,
+    "tcp_receive_mailbox_entries": 8,
+    "task_watchdog_seconds": 30,
+    "audio_backend": "pdm",
+    "sample_rate_hz": 48000,
+    "initial_opus_pcm_capacity_bytes": 3840,
+    "openeth_rx_backoff": true,
+    "ogg_timeline": true
+  },
+  "fixture": {
+    "bytes": 706319,
+    "sha256": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+    "crc32": "58c30e90",
+    "opus_packets": 551,
+    "opus_samples": 528960,
+    "opus_crc32": "2a4a64cf"
+  },
+  "qtest": {
+    "integrated_qemu_control": {
+      "no_completion_before_tx": true,
+      "sdk_order_completes": false,
+      "reverse_order_completes": true,
+      "link_stop_clears_pending": true,
+      "dma_reset_clears_pending": true,
+      "tx_reset_clears_pending": true
+    },
+    "fixed_qemu": {
+      "no_completion_before_tx": true,
+      "sdk_order_completes": true,
+      "reverse_order_completes": true,
+      "link_stop_clears_pending": true,
+      "dma_reset_clears_pending": true,
+      "tx_reset_clears_pending": true
+    }
+  },
+  "runs": {
+    "integrated_qemu_control": {
+      "state": "TERMINAL_PASS",
+      "qemu_sha256": "6e673939124187d0e863f89cc3d11552c024f8c288fa01708eeb6c9aeeef4329",
+      "app_sha256": "0547a86a98e6d98039be4a6881113e7b0bf80ec70f5987842c78ee8a85f4d4d1",
+      "flash_sha256": "ddcce7c03ecf8a89499c21142c4a8900bcb350c4b6a3bbc55328a36ba46b986e",
+      "sdkconfig_sha256": "040b0b5e086d5a1bee2dc0c3f38c1ce535ea174c703e7f82c54911feee8e47fd",
+      "runner_sha256": "adba72546c3076e9d6ee946004fcc71b2ebe5f2e87f3541e13e64b0f3c91cf4d",
+      "report_sha256": "be9d4147c6f1161e4c6009e398691ef24eddcb8e013d0d398f6aa669ad03b6cc",
+      "uart_sha256": "6ba197079a8557e401a774fc0751d7b67c79797c29eb462f9a24362dcddc0917",
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "full_tls_records": 43,
+      "tls_plaintext_tail_bytes": 1807,
+      "matching_body_and_opus_crc": true,
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "webui_during_playback": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "allocation_failures": 0,
+      "decoder_failures": 0,
+      "stream_failures": 0,
+      "output_failures": 0,
+      "minimum_heap_bytes": 7612,
+      "pdm_driver": {
+        "writes": 1034,
+        "requested_bytes": 1058176,
+        "written_bytes": 1058176,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "completion_queue_drops": 29
+      },
+      "openeth_allocation_waits": 0,
+      "openeth_rx_frame_drop_log_count": 21,
+      "guest_fault": false
+    },
+    "fixed_qemu_attempt_1": {
+      "state": "TERMINAL_PASS",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "app_sha256": "0547a86a98e6d98039be4a6881113e7b0bf80ec70f5987842c78ee8a85f4d4d1",
+      "flash_sha256": "ddcce7c03ecf8a89499c21142c4a8900bcb350c4b6a3bbc55328a36ba46b986e",
+      "sdkconfig_sha256": "040b0b5e086d5a1bee2dc0c3f38c1ce535ea174c703e7f82c54911feee8e47fd",
+      "runner_sha256": "adba72546c3076e9d6ee946004fcc71b2ebe5f2e87f3541e13e64b0f3c91cf4d",
+      "report_sha256": "a3c813665acfb2bffe113c65baa518e94c568421e9c344f085fece7d4335e509",
+      "uart_sha256": "8555a8d362c3a7fc3e9264e1e7c71dd00e322b0822111433769726706774c2fb",
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "full_tls_records": 43,
+      "tls_plaintext_tail_bytes": 1807,
+      "matching_body_and_opus_crc": true,
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "webui_during_playback": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "allocation_failures": 0,
+      "decoder_failures": 0,
+      "stream_failures": 0,
+      "output_failures": 0,
+      "minimum_heap_bytes": 10164,
+      "pdm_driver": {
+        "writes": 1034,
+        "requested_bytes": 1058176,
+        "written_bytes": 1058176,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "completion_queue_drops": 14
+      },
+      "openeth_allocation_waits": 0,
+      "openeth_rx_frame_drop_log_count": 20,
+      "guest_fault": false
+    },
+    "fixed_qemu_attempt_2": {
+      "state": "TERMINAL_PASS",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "app_sha256": "0547a86a98e6d98039be4a6881113e7b0bf80ec70f5987842c78ee8a85f4d4d1",
+      "flash_sha256": "ddcce7c03ecf8a89499c21142c4a8900bcb350c4b6a3bbc55328a36ba46b986e",
+      "sdkconfig_sha256": "040b0b5e086d5a1bee2dc0c3f38c1ce535ea174c703e7f82c54911feee8e47fd",
+      "runner_sha256": "adba72546c3076e9d6ee946004fcc71b2ebe5f2e87f3541e13e64b0f3c91cf4d",
+      "report_sha256": "9d8b178563863822d419edf2a63da17adb5ba26e5e0ee64cf51580ae5db80a60",
+      "uart_sha256": "7dd528fefe4bd78a38d96fe40af43397be03f6eb3d1303e7e718990072710484",
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "full_tls_records": 43,
+      "tls_plaintext_tail_bytes": 1807,
+      "matching_body_and_opus_crc": true,
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "webui_during_playback": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "webui_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "allocation_failures": 0,
+      "decoder_failures": 0,
+      "stream_failures": 0,
+      "output_failures": 0,
+      "minimum_heap_bytes": 10168,
+      "pdm_driver": {
+        "writes": 1034,
+        "requested_bytes": 1058176,
+        "written_bytes": 1058176,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "completion_queue_drops": 13
+      },
+      "openeth_allocation_waits": 0,
+      "openeth_rx_frame_drop_log_count": 20,
+      "guest_fault": false
+    }
+  }
+}

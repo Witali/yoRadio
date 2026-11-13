@@ -253,7 +253,8 @@ static RX reserve the peer wrote the complete file and WebUI responded during
 playback, followed by a decoder failure and substantial OpenETH allocation
 pressure. The dynamic profile encountered a PDM configuration timeout while
 its heap allocation counter remained clean. The ordinary static profile
-closed the WebUI response partway through. The full-file gate remains open.
+closed the WebUI response partway through. Later tests use the TCP and Opus
+buffer sizes described below.
 
 The [TLS isolation follow-up](../tests/results/cyd-openeth-tls-isolation-20261113/README.md)
 verified 28 exact full records in each policy with two concurrent clients
@@ -268,6 +269,13 @@ window and the smaller initial Opus PCM buffer. The guest's body and Opus
 packet checksums matched the source, and the allocation failure count was
 zero. The original Espressif error occurred under much higher memory
 pressure. Its exact cause remains open.
+
+The [static RX PDM follow-up](../tests/results/cyd-pdm-static-rx-20261113/README.md)
+reproduced an I2S DMA start-order race with QTest. The fixed QEMU model waits
+for both the DMA link and TX start. Two runs of the same CYD fixture completed
+43 full TLS records and the tail, accepted all 1,058,176 expected PDM driver
+bytes and verified the exact WebUI asset after EOF. Physical Wi-Fi and PDM
+remain open.
 
 The [DAC runtime comparison](../tests/results/cyd-openeth-dac-20261113/README.md)
 measured actual PCM acceptance on both DAC drivers. The C3 receive window and
