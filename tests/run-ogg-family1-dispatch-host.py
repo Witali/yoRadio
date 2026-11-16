@@ -13,8 +13,9 @@ REPO=ROOT.parent.parent if ROOT.parent.name=='.worktree' else ROOT
 VENDOR=REPO/'.idf/esp-adf-libs/esp_audio_codec'
 PUBLIC='idf/components/native_vorbis_xiph/upstream/libogg'
 CONFIG='idf/components/native_vorbis_xiph/platform'
-SOURCES=['idf/esp32-cyd2usb-native/main/'+n for n in ('ogg_playback.h','opus_family1_playback.h','opus_family1_decoder.h')]
+SOURCES=['idf/esp32-cyd2usb-native/main/'+n for n in ('ogg_playback.h','opus_family1_playback.h','opus_family1_decoder.h','audio_channel_policy.h')]
 SOURCES+=['idf/components/native_stream/include/'+n for n in ('ogg_opus_audio_packets.h','ogg_page_input.h','ogg_opus_timeline.h','opus_pcm_trim.h','opus_family1_mapping.h','opus_multistream_framing.h','opus_tags_stream.h','decoder_pending_input.h','pcm_channel_layout.h','pcm_word_plane.h')]
+SOURCES+=['idf/components/native_stream/include/'+n for n in ('stream_frames.h','stream_tags.h')]
 SOURCES+=['tests/native/ogg_family1_dispatch_host.c','tests/native/ogg_family1_word_allocator.h','tests/native/ogg_family1_word_controls.h','tests/native/opus_family1_playback_host.c','tests/native/opus_family1_public.h','tests/fixtures/opus_header_gain/generate.py','tests/run-ogg-family1-dispatch-host.py',PUBLIC+'/include/ogg/ogg.h',PUBLIC+'/include/ogg/os_types.h',PUBLIC+'/COPYING',CONFIG+'/ogg/config_types.h']
 LONG=ROOT/'tests/fixtures/opus_ogg_long_packets/stereo-510-120ms.ogg'
 LONG_SHA='b6237ae8df98d3fabbea252eec82b291a46dfdb537cb5b9f537bf5e00bcd7679'
@@ -64,15 +65,22 @@ def main():
         report['variants']={}
         stress_logical=struct.unpack_from('<I',STRESS.read_bytes(),24)[0]
         small_logical=struct.unpack_from('<I',paths[2].read_bytes(),24)[0]
-        for variant,word_enabled in (('byte',False),('word',True)):
+        for variant,word_enabled in (('byte',False),('word',True),('limited',False)):
             binary=out/('dispatch-'+variant);dependency=out/('dispatch-'+variant+'.d')
             command('build-'+variant,['/usr/bin/gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Werror','-Wpedantic','-Wformat=2','-Wshadow','-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie','-MMD','-MF',host(dependency),
                 *(['-DDISPATCH_WORD_STORAGE=1'] if word_enabled else []),
+                *(['-DCONFIG_YORADIO_AUDIO_STEREO_ONLY=1'] if variant=='limited' else []),
                 *['-I'+host(out/'sources/vendor/include'/name) for name in ('','decoder','decoder/impl','simple_dec')],'-I'+host(out/'sources/idf/esp32-cyd2usb-native/main'),'-I'+host(out/'sources/idf/components/native_stream/include'),
                 '-I'+host(out/'sources'/PUBLIC/'include'),'-I'+host(out/'sources'/CONFIG),host(out/'sources/tests/native/ogg_family1_dispatch_host.c'),'-l:libopus.so.0','-l:libogg.so.0','-lm','-o',host(binary)])
             item=dict(executable=dict(path=binary.name,local_only=True,**pin(binary)),compiler_dependencies=dict(path=dependency.name,**pin(dependency)))
             report['variants'][variant]=item;save()
             rows=[json.loads(line) for line in command('test-'+variant,['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1',host(binary),*[host(p) for p in paths]]).decode().splitlines()]
+            if variant=='limited':
+                expected=dict(suite='cyd-audio-channel-limit',rejected_headers=7,invalid_crc_controls=3,
+                              mono_stereo_schedules=2,flac_counts=8,adts_configurations=8,passed=True)
+                need(len(rows)==3 and rows[-1]==expected and all(r['passed'] for r in rows),
+                     'encoded headers rejected before decoder open and mono/stereo PCM preserved')
+                item.update(test_records=rows,measurements=rows[-1]);save();continue
             summaries=[row for row in rows if row.get('suite')=='ogg-family1-dispatch'];need(len(summaries)==1,'one complete baseline inventory');result=summaries[0]
             need(all(r['passed'] for r in rows) and result['positive_schedules']==43 and result['host_controls']==12 and result['creator_pcm_samples_exact']==12983296 and
                 result['gain_layout_forwarded'] and result['close_retry_preserves_cfg_page_planes'] and not result['native_oom_qualified'] and not result['production_task_executed'],'unchanged complete creator-backed43/12 corpus in '+variant)

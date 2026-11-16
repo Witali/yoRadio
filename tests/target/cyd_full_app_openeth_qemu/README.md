@@ -105,6 +105,7 @@ build, including PDM. The runner checks the exact `/script.js` with a
 25-second socket I/O timeout, independent of the guest watchdog.
 
 For [Opus Family 1](../../results/cyd-opus-family1-openeth-20261116/README.md),
+disable `CONFIG_YORADIO_AUDIO_STEREO_ONLY` for multichannel playback and
 add `'-D','CYD_OPENETH_PCM_PROBE=ON'` and
 `'-D','CYD_OPENETH_PCM_CHANNEL_METRICS=ON'` to the diagnostic build. Use
 `'-D','CYD_OPENETH_OPUS_HEAP_PROBE=ON'` to record available internal memory
@@ -122,6 +123,12 @@ Use `--packet-ms 20`, `--channels 4` or `--channels 6`, and
 the exact post-trim frame count, then compares energy and zero crossings in
 each Vorbis-order channel against the libopus decode. It also requires
 progress during a WebUI read and an exact asset read after EOF.
+
+With the default stereo-only build, run the same `--opus-family1` fixture
+with `--expect-channel-limit` in place of the EOF and full-record options.
+The runner checks the channel-limit status, absence of decoder opens and PCM
+writes, and the exact WebUI asset after rejection. Enable the Opus heap probe
+to observe every raw decoder open.
 
 To compare two builds of the ST7789 status display, use `check-tft.py`
 with the same OpenETH boot profile. It waits for the full network-client

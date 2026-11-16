@@ -78,6 +78,13 @@ reuse mechanism for those default layouts, not completed production support.
 
 ### Current multichannel integration
 
+CYD builds enable `CONFIG_YORADIO_AUDIO_STEREO_ONLY=y` by default. Playback
+accepts one or two input channels and mixes to the board's mono output.
+The verified Ogg identification page supplies the Opus or Vorbis channel count
+before the decoder is opened. For the experimental multichannel profile, set
+`# CONFIG_YORADIO_AUDIO_STEREO_ONLY is not set` in the CYD sdkconfig.
+The multichannel results below describe that profile.
+
 The [production dispatcher](../idf/esp32-cyd2usb-native/main/ogg_playback.h)
 selects the [public raw-stream adapter](../idf/esp32-cyd2usb-native/main/opus_family1_playback.h)
 after the verified OpusHead identifies family1. The same page owner reconstructs

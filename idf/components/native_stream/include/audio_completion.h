@@ -17,6 +17,7 @@ enum {
     AUDIO_END_ALLOCATION_FAILED,
     AUDIO_END_OUTPUT_FAILED,
     AUDIO_END_METADATA_TRUNCATED,
+    AUDIO_END_CHANNEL_LIMIT,
 };
 
 static inline int audio_completion_is_terminal(unsigned reason) {
@@ -34,6 +35,7 @@ static inline const char *audio_completion_status(unsigned reason) {
         case AUDIO_END_ALLOCATION_FAILED: return "decoder allocation failed";
         case AUDIO_END_OUTPUT_FAILED: return "audio output failed";
         case AUDIO_END_METADATA_TRUNCATED: return "truncated stream metadata";
+        case AUDIO_END_CHANNEL_LIMIT: return "audio supports up to two channels";
         default: return "stream ended";
     }
 }

@@ -294,16 +294,51 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
     require_clean_health(final)
 
 
+def start_station(port):
+    radio = json.loads(request(port, '/api/native/radio'))
+    if radio['count'] != 1 or radio['station'] != 'OpenETH fixture':
+        raise RuntimeError('The expected SPIFFS station was not loaded')
+    request(port, '/api/native/radio?action=play&station=1', 'POST')
+
+
+def observe_channel_rejection(port, server, guest, log_path, report):
+    start_station(port)
+    until = time.monotonic() + 30
+    status = None
+    while time.monotonic() < until:
+        uart = guest_log(log_path)
+        if FATAL.search(uart) or guest.poll() is not None:
+            raise RuntimeError('Guest stopped or logged a failure during channel rejection')
+        status = json.loads(request(port, '/api/native/status'))
+        if not status['audio'] and status['format'] == 'audio supports up to two channels':
+            break
+        time.sleep(0.2)
+    else:
+        raise RuntimeError(f'Channel limit status missing before the deadline: {status["format"]}')
+    rejected = sample(port)
+    fault = rejected['decoder_failure']
+    channels = server.fixtures['station']['pcm_channels']
+    if (fault['sequence'] != 1 or fault['completion'] != 12 or fault['result'] != channels
+            or fault['generation'] != status['generation'] or rejected['allocation_failures']
+            or rejected['stream_failure']['sequence'] or rejected['output']['failures']
+            or rejected['output_driver']['written_bytes'] != report['health'][-1]['output_driver']['written_bytes']
+            or OPUS_OPEN.search(uart)):
+        raise RuntimeError('Expected channel rejection before decoder allocation or PCM output')
+    peers = [event for event in server.events if event.get('tls_version') and event['sent'] > 0]
+    if len(peers) != 1:
+        raise RuntimeError('Expected one actual TLS audio response before channel rejection')
+    report['channel_rejection'] = fault
+    report['web_asset_after_rejection'] = check_asset(port)
+    report['observed'] += ['encoded channel limit over verified TLS', 'WebUI after channel rejection']
+
+
 def observe_playback(port, server, guest, log_path, report, through_eof):
     backend = report['audio_backend']
     fixture = server.fixtures['station']
     codec = fixture['codec']
     pcm_probe = uses_pcm_probe(backend, fixture)
     status_codec = {'opus': 'OGG', 'flac': 'FLAC'}[codec]
-    radio = json.loads(request(port, '/api/native/radio'))
-    if radio['count'] != 1 or radio['station'] != 'OpenETH fixture':
-        raise RuntimeError('The expected SPIFFS station was not loaded')
-    request(port, '/api/native/radio?action=play&station=1', 'POST')
+    start_station(port)
     until = time.monotonic() + 40
     while time.monotonic() < until:
         uart = guest_log(log_path)
@@ -368,6 +403,8 @@ def main():
                         help='Select the TLS audio fixture (default: opus)')
     parser.add_argument('--opus-family1', type=Path,
                         help='Use a manifest from prepare-opus-family1.py instead of stereo Opus')
+    parser.add_argument('--expect-channel-limit', action='store_true',
+                        help='Require rejection of the Family 1 fixture and WebUI after the error')
     parser.add_argument('--through-eof', action='store_true',
                         help='Require the full TLS response, exact audio output, and WebUI after EOF')
     parser.add_argument('--full-tls-records', action='store_true',
@@ -394,8 +431,14 @@ def main():
         parser.error('Opus --through-eof requires the Ogg timeline')
     if args.codec == 'flac' and not args.through_eof:
         parser.error('--codec flac requires --through-eof and the PCM MD5 probe')
-    if args.opus_family1 and (args.codec != 'opus' or not args.through_eof):
-        parser.error('--opus-family1 requires Opus, --through-eof and the PCM channel probe')
+    if args.opus_family1 and (args.codec != 'opus' or not (args.through_eof or args.expect_channel_limit)):
+        parser.error('--opus-family1 requires Opus and an EOF or channel limit check')
+    stereo_only = config.get('YORADIO_AUDIO_STEREO_ONLY', False)
+    if args.expect_channel_limit:
+        if not (args.opus_family1 and material and stereo_only) or args.through_eof:
+            parser.error('--expect-channel-limit requires a stereo-only build, TLS and --opus-family1')
+    elif args.opus_family1 and stereo_only:
+        parser.error('Family 1 playback requires CONFIG_YORADIO_AUDIO_STEREO_ONLY disabled')
     if args.full_tls_records and not args.through_eof:
         parser.error('--full-tls-records requires --through-eof')
     flac_decoder = None
@@ -496,7 +539,10 @@ def main():
             require_clean_health(second)
             if server:
                 try:
-                    observe_playback(web_port, server, guest, log_path, report, args.through_eof)
+                    if args.expect_channel_limit:
+                        observe_channel_rejection(web_port, server, guest, log_path, report)
+                    else:
+                        observe_playback(web_port, server, guest, log_path, report, args.through_eof)
                 except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):
                     if guest.poll() is None:
                         try:

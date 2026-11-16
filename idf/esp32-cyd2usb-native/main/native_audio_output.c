@@ -121,6 +121,9 @@ static int16_t pcm_mono_sample(const uint8_t *frame, uint8_t channels,
 
 bool native_audio_output_supports_pcm(uint8_t bits_per_sample,
                                       uint8_t channels) {
+#if CONFIG_YORADIO_AUDIO_STEREO_ONLY
+    if (channels > 2) return false;
+#endif
     return channels && (bits_per_sample == 8 || bits_per_sample == 16 ||
                         bits_per_sample == 24 || bits_per_sample == 32);
 }

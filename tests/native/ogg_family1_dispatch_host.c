@@ -231,8 +231,82 @@ static void dispatch_bad_tags(const corpus *source,const reference *ref) {
     printf("{\"kind\":\"tag-control\",\"public_raw_opens\":%u,\"public_simple_opens\":%u,\"cause\":%" PRId32 ",\"passed\":true}\n",stats.opens,simple_opens,cause);
 }
 #include "ogg_family1_word_controls.h"
+#if CONFIG_YORADIO_AUDIO_STEREO_ONLY
+static void reject_channel_count(const physical *bytes, size_t chunk,
+                                 ogg_playback_status expected, unsigned channels) {
+    dispatch_player player = {0};
+    dispatch_init(&player);
+    dispatch_context context = {.wrapper = &player.wrapper, .generation = 42};
+    int32_t cause = 0;
+    assert(dispatch_feed(&player, &context, bytes, chunk, &cause) == expected);
+    if (expected == OGP_CHANNEL_LIMIT) assert(cause == (int32_t)channels);
+    assert(!stats.opens && !simple_opens && !player.pcm &&
+           !context.prepared && !context.outputs);
+    dispatch_clean(&player);
+}
+
+static void check_channel_limit(const corpus sources[5]) {
+    unsigned rejected = 0;
+    for (unsigned i = 0; i < 3; ++i) {
+        physical bytes = make(sources + i, 1, 500 + i, false, false);
+        reject_channel_count(&bytes, 0, OGP_CHANNEL_LIMIT, sources[i].channels);
+        reject_channel_count(&bytes, 1, OGP_CHANNEL_LIMIT, sources[i].channels);
+        rejected += 2;
+        bytes.data[22] ^= 1;
+        reject_channel_count(&bytes, 0, OGP_CONTAINER, 0);
+        physical_free(&bytes);
+    }
+    physical vorbis = {.serial = 510};
+    uint8_t head[30] = {1, 'v', 'o', 'r', 'b', 'i', 's', 0, 0, 0, 0, 6};
+    put32(head + 12, 48000);
+    head[28] = 0xb8;
+    head[29] = 1;
+    uint8_t lace = sizeof(head);
+    page(&vorbis, 2, 0, &lace, 1, head, sizeof(head));
+    reject_channel_count(&vorbis, 3, OGP_CHANNEL_LIMIT, 6);
+    physical_free(&vorbis);
+    ++rejected;
+
+    const uint8_t maps[2][2] = {{7}, {6, 0}};
+    for (unsigned channels = 1; channels <= 2; ++channels) {
+        corpus stream = variant(sources + 2, channels, maps[channels - 1]);
+        reference output = creator_reference(&stream);
+        dispatch_positive(&stream, &output, 1, 257, false, 1536, false);
+        free(output.pcm);
+    }
+
+    uint8_t flac[21] = {'f', 'L', 'a', 'C', 0x80, 0, 0, 34};
+    uint8_t adts[7] = {0xff, 0xf1, 0x4d, 0xc0, 1, 0x1f, 0xfc};
+    for (unsigned channels = 1; channels <= 8; ++channels) {
+        audio_channel_probe_t probe = {0};
+        flac[20] = (uint8_t)(((channels - 1) << 1) | 0x41);
+        assert(audio_flac_channel_probe(&probe, flac, 8) == 0);
+        assert(audio_flac_channel_probe(&probe, flac + 8, 13) == channels);
+        assert(audio_flac_channel_probe(&probe, flac, sizeof(flac)) == 0);
+        assert(audio_channel_limit_exceeded(channels) == (channels > 2));
+    }
+    for (unsigned config = 0; config <= 7; ++config) {
+        audio_channel_probe_t probe = {0};
+        adts[2] = (uint8_t)(0x4c | (config >> 2));
+        adts[3] = (uint8_t)((config & 3u) << 6);
+        assert(audio_adts_channel_probe(&probe, adts, 4) == 0);
+        assert(audio_adts_channel_probe(&probe, adts + 4, 3) ==
+               (config == 7 ? 8 : config));
+    }
+    printf("{\"suite\":\"cyd-audio-channel-limit\",\"rejected_headers\":%u,"
+           "\"invalid_crc_controls\":3,\"mono_stereo_schedules\":%u,"
+           "\"flac_counts\":8,\"adts_configurations\":8,\"passed\":true}\n",
+           rejected, dispatch_cases);
+}
+#endif
+
 int main(int argc,char **argv) {
     assert(argc==6);corpus sources[5];reference refs[5];for(unsigned i=0;i<5;++i){sources[i]=load(argv[i+1]);refs[i]=creator_reference(sources+i);}
+#if CONFIG_YORADIO_AUDIO_STEREO_ONLY
+    check_channel_limit(sources);
+    for (unsigned i = 0; i < 5; ++i) {free(refs[i].pcm);corpus_free(sources+i);}
+    return 0;
+#endif
     for(unsigned fixture=0;fixture<3;++fixture)for(unsigned style=0;style<3;++style)for(unsigned feed=0;feed<2;++feed)dispatch_positive(sources+fixture,refs+fixture,style,feed?257:0,false,1536,false);
     const uint8_t maps[8][8]={{7},{6,0},{5,5,255},{7,0,6,1},{255,255,255,255,255},{0,1,2,3,4,5},{7,7,6,5,0,255,1},{0,7,0,7,255,5,6,255}};
     for(unsigned channels=1;channels<=8;++channels){corpus v=variant(sources+2,channels,maps[channels-1]);reference r=creator_reference(&v);dispatch_positive(&v,&r,channels%3u,257,false,1536,false);free(r.pcm);}

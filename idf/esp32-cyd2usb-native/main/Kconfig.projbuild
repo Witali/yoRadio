@@ -22,6 +22,15 @@ menu "yoRadio native firmware"
             Disabling this option selects the raw vendor playback path, which
             can emit Opus priming samples and end padding.
 
+    config YORADIO_AUDIO_STEREO_ONLY
+        bool "Limit CYD audio playback to mono and stereo"
+        default y
+        select YORADIO_OGG_TIMELINE
+        help
+            Reject sources with more than two channels when their metadata
+            exposes the channel count. Reject wider PCM at the output of all
+            codecs. Disable this option for experimental multichannel playback.
+
     config YORADIO_NATIVE_WEB
         bool
         default y

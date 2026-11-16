@@ -6,6 +6,7 @@
 #include <strings.h>
 
 #include "audio_level_led.h"
+#include "audio_channel_policy.h"
 #include "audio_completion.h"
 #include "board_config.h"
 #include "decoder_registration.h"
@@ -795,6 +796,7 @@ static bool send_pcm_end(uint32_t generation, uint8_t reason) {
 typedef struct {
     uint32_t generation;
     native_codec_t codec;
+    unsigned rejected_channels;
     esp_audio_simple_dec_info_t stream_info;
 } custom_legacy_output_context_t;
 
@@ -802,6 +804,12 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
                                  const uint8_t *pcm, size_t pcm_size) {
     custom_legacy_output_context_t *context = user;
     if (context->generation != atomic_load(&s_generation)) return false;
+    if (audio_channel_limit_exceeded(info->stream_channels) ||
+        audio_channel_limit_exceeded(info->channels)) {
+        context->rejected_channels = info->stream_channels > info->channels
+            ? info->stream_channels : info->channels;
+        return false;
+    }
     context->stream_info = (esp_audio_simple_dec_info_t){
             .sample_rate = info->sample_rate,
             .bits_per_sample = info->bits_per_sample,
@@ -935,6 +943,9 @@ static void decoder_task(void *argument) {
     native_codec_t codec = NATIVE_CODEC_AUTO;
     uint32_t failed_generation = 0;
     uint32_t process_calls = 0;
+#if CONFIG_YORADIO_AUDIO_STEREO_ONLY
+    audio_channel_probe_t channel_probe = {0};
+#endif
 #if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
     bool input_prefilled = false;
 #endif
@@ -1021,7 +1032,8 @@ static void decoder_task(void *argument) {
             && !legacy_decoder
 #endif
         ) goto packet_done;
-        if (packet->generation != generation || packet->codec != codec) {
+        bool switching_codec = packet->generation != generation || packet->codec != codec;
+        if (switching_codec) {
             decoder_pending_input_clear(&pending);
             decoder_eof_input_clear(&eof_input);
             if (decoder) esp_audio_simple_dec_close(decoder);
@@ -1045,6 +1057,22 @@ static void decoder_task(void *argument) {
                 .codec = codec,
             };
 #endif
+        }
+#if CONFIG_YORADIO_AUDIO_STEREO_ONLY
+        if (switching_codec) channel_probe.used = 0;
+        unsigned source_channels = 0;
+        if (codec == NATIVE_CODEC_FLAC)
+            source_channels = audio_flac_channel_probe(&channel_probe, packet->data, packet->data_size);
+        else if (codec == NATIVE_CODEC_AAC)
+            source_channels = audio_adts_channel_probe(&channel_probe, packet->data, packet->data_size);
+        if (audio_channel_limit_exceeded(source_channels)) {
+            failure_stage = NATIVE_HEALTH_INFO;
+            failure_result = (int32_t)source_channels;
+            end_reason = AUDIO_END_CHANNEL_LIMIT;
+            goto packet_done;
+        }
+#endif
+        if (switching_codec) {
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
             if (codec == NATIVE_CODEC_FLAC) {
                 free(output);
@@ -1161,7 +1189,13 @@ static void decoder_task(void *argument) {
                     failure_result = result;
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
                              codec_name(codec), result);
-                    end_reason = AUDIO_END_DECODE_FAILED;
+                    if (legacy_context.rejected_channels) {
+                        failure_stage = NATIVE_HEALTH_INFO;
+                        failure_result = (int32_t)legacy_context.rejected_channels;
+                        end_reason = AUDIO_END_CHANNEL_LIMIT;
+                    } else {
+                        end_reason = AUDIO_END_DECODE_FAILED;
+                    }
                 }
             }
             goto packet_done;
@@ -1184,11 +1218,12 @@ static void decoder_task(void *argument) {
                 &decoder, &output, &output_size, &pending, &callbacks, &cause);
             if (status != OGP_OK && status != OGP_CANCELLED &&
                 generation == atomic_load(&s_generation)) {
-                failure_stage = status == OGP_INFO || context.info_failed
+                failure_stage = status == OGP_INFO || status == OGP_CHANNEL_LIMIT || context.info_failed
                     ? NATIVE_HEALTH_INFO : status == OGP_OUTPUT
                     ? NATIVE_HEALTH_PCM : NATIVE_HEALTH_PROCESS;
                 failure_result = cause;
                 end_reason = status == OGP_MEMORY ? AUDIO_END_ALLOCATION_FAILED
+                    : status == OGP_CHANNEL_LIMIT ? AUDIO_END_CHANNEL_LIMIT
                     : status == OGP_OUTPUT && !context.info_failed
                     ? AUDIO_END_BUFFER_STALLED : AUDIO_END_DECODE_FAILED;
                 ESP_LOGW(TAG, "Ogg playback error: %d (%ld)",
@@ -1280,6 +1315,12 @@ static void decoder_task(void *argument) {
                 if (frame.decoded_size) {
                     esp_audio_simple_dec_info_t info = {0};
                     esp_audio_err_t info_result = esp_audio_simple_dec_get_info(decoder, &info);
+                    if (info_result == ESP_AUDIO_ERR_OK && audio_channel_limit_exceeded(info.channel)) {
+                        failure_stage = NATIVE_HEALTH_INFO;
+                        failure_result = info.channel;
+                        end_reason = AUDIO_END_CHANNEL_LIMIT;
+                        break;
+                    }
                     if (info_result != ESP_AUDIO_ERR_OK || !publish_stream_info(generation,codec,&info)) {
                         failure_stage = NATIVE_HEALTH_INFO;
                         failure_result = info_result == ESP_AUDIO_ERR_OK ? ESP_FAIL : (int32_t)info_result;

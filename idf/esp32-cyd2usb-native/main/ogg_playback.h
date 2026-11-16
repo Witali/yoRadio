@@ -7,6 +7,7 @@
  * generation, public handle/output/pending owners and synchronous callbacks.
  */
 #include "esp_audio_simple_dec.h"
+#include "audio_channel_policy.h"
 #include "decoder_pending_input.h"
 #include "ogg_page_input.h"
 #include "opus_pcm_trim.h"
@@ -47,7 +48,7 @@ typedef struct {
 
 typedef enum {
     OGP_OK = 0, OGP_CANCELLED, OGP_MEMORY, OGP_CONTAINER, OGP_DECODER,
-    OGP_INFO, OGP_OUTPUT
+    OGP_INFO, OGP_OUTPUT, OGP_CHANNEL_LIMIT
 } ogg_playback_status;
 
 typedef struct {
@@ -168,6 +169,14 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
     int32_t *cause)
 {
     const oopt_event *page = &s->input.event;
+#if CONFIG_YORADIO_AUDIO_STEREO_ONLY
+    unsigned channels = page->opus ? ((page->flags & OOPT_HEAD) ? page->channels : 0)
+        : audio_vorbis_header_channels(s->input.page, s->input.size);
+    if (audio_channel_limit_exceeded(channels)) {
+        *cause = (int32_t)channels;
+        return OGP_CHANNEL_LIMIT;
+    }
+#endif
     bool eos = (page->flags & OOPT_LINK_END) != 0;
     if (page->opus && page->mapping == 1) {
         if (page->flags & OOPT_HEAD) {
@@ -280,6 +289,10 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
             esp_audio_simple_dec_info_t info = {0};
             result = esp_audio_simple_dec_get_info(*decoder, &info);
             if (result != ESP_AUDIO_ERR_OK) { *cause = result; return OGP_INFO; }
+            if (audio_channel_limit_exceeded(info.channel)) {
+                *cause = info.channel;
+                return OGP_CHANNEL_LIMIT;
+            }
             opus_pcm_span span = {0, frame.decoded_size};
             if (page->opus && opt_clip(&s->trim, s->generation,
                     info.sample_rate, info.channel, info.bits_per_sample,
