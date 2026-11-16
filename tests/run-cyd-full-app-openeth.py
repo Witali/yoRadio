@@ -24,6 +24,9 @@ PDM_OPUS_EOF_BYTES = 1058176
 OPUS_EOF_PCM_FRAMES = 528000
 FULL_TLS_PLAINTEXT_BYTES = 16384
 TLS12_AES_GCM_OVERHEAD = 24
+# An exact SPIFFS asset read can spend several host seconds scanning flash
+# on the emulated ESP32 before the HTTP response starts.
+WEB_ASSET_TIMEOUT_SECONDS = 25
 
 
 def digest(data):
@@ -59,8 +62,8 @@ def flash_parts(build):
     return flash, parts
 
 
-def request(port, uri, method='GET'):
-    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=8)
+def request(port, uri, method='GET', *, timeout=8):
+    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=timeout)
     try:
         connection.request(method, uri)
         response = connection.getresponse()
@@ -158,7 +161,7 @@ def require_full_tls_records(event, body_bytes, wire_lengths):
 
 def check_asset(port):
     expected = (ROOT / 'yoRadio/data/www/script.js.gz').read_bytes()
-    data = request(port, '/script.js')
+    data = request(port, '/script.js', timeout=WEB_ASSET_TIMEOUT_SECONDS)
     if data != expected:
         raise RuntimeError('WebUI did not serve the exact packaged SPIFFS asset')
     return dict(bytes=len(data), sha256=digest(data))
@@ -369,6 +372,7 @@ def main():
                   openeth=True, audio_backend=backend, physical_tested=False, command=command,
                   runner_sha256=digest(Path(__file__).read_bytes()),
                   task_watchdog_seconds=config['ESP_TASK_WDT_TIMEOUT_S'],
+                  web_asset_io_timeout_seconds=WEB_ASSET_TIMEOUT_SECONDS,
                   native_diagnostics=config.get('YORADIO_NATIVE_DIAGNOSTICS', False))
     if args.full_tls_records:
         report['tls_application_payload_lengths'] = []

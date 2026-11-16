@@ -19,7 +19,17 @@ class PcmObserverTests(unittest.TestCase):
             connection.return_value.getresponse.side_effect = TimeoutError
             with self.assertRaisesRegex(TimeoutError, 'GET /script.js timed out'):
                 probe.request(1234, '/script.js')
+            connection.assert_called_once_with('127.0.0.1', 1234, timeout=8)
             connection.return_value.close.assert_called_once()
+
+    def test_static_asset_has_its_own_timeout_and_exact_body_check(self):
+        asset = (probe.ROOT / 'yoRadio/data/www/script.js.gz').read_bytes()
+        with patch.object(probe, 'request', return_value=asset) as request:
+            self.assertEqual(probe.check_asset(1234)['bytes'], len(asset))
+            request.assert_called_once_with(1234, '/script.js', timeout=probe.WEB_ASSET_TIMEOUT_SECONDS)
+        with patch.object(probe, 'request', return_value=asset[:-1]):
+            with self.assertRaisesRegex(RuntimeError, 'exact packaged SPIFFS asset'):
+                probe.check_asset(1234)
 
     def test_dac_progress_excludes_driver_bytes(self):
         health = {'output_driver': {'written_bytes': 1024}}
