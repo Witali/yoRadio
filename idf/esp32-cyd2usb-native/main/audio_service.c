@@ -1185,8 +1185,10 @@ static void decoder_task(void *argument) {
         }
         uint8_t previous_byte;
         decoder_eof_segment_t segments[2];
+        // The FLAC parser needs EOS on input to release its final frame.
         unsigned segment_count = decoder_eof_input_prepare(&eof_input,
-            codec == NATIVE_CODEC_OGG, packet->data, packet->data_size,
+            codec == NATIVE_CODEC_OGG || codec == NATIVE_CODEC_FLAC,
+            packet->data, packet->data_size,
             packet->end_of_stream != AUDIO_CONTINUE, &previous_byte, segments);
         for (unsigned segment = 0; segment < segment_count; ++segment) {
             uint8_t *input_buffer;

@@ -26,6 +26,32 @@ activated DAC playback. These measurements describe the two observed
 workloads. The [observations](observed.json) include config and image hashes,
 output counters, PCM checks and stack watermarks.
 
+## Espressif block and EOF controls
+
+Xiph FLAC re-encoded the identical PCM with two smaller block sizes. With
+4,096 samples per block, the original Espressif image recorded a failed
+16,384-byte request and produced zero PCM. With 2,048 samples it made
+every allocation and reported normal EOF, but emitted only the first
+526,336 frames. Their MD5 matched the corresponding Xiph PCM prefix. The
+omitted 1,664 frames form the last encoded block.
+
+The [decoder task](../../../idf/esp32-cyd2usb-native/main/audio_service.c)
+now retains one final byte for the vendor FLAC path so the parser receives
+actual input with the EOS flag. On the same 2,048-block stream it accepted all
+528,000 PCM frames with the exact full MD5, zero allocation failures, and
+working WebUI after EOF. Six ASan/UBSan lifecycle profiles passed, including
+a FLAC regression that requires non-empty EOS after one-byte inputs. The
+larger block allocation failures remain open.
+
+To reproduce the controls, decode the tracked fixture to signed
+little-endian raw PCM with Xiph FLAC 1.5.0. Encode it with
+`--verify -8 --blocksize=2048 --force-raw-format --endian=little --sign=signed --channels=2 --bps=16 --sample-rate=48000`.
+Use `--blocksize=4096` for the other control. Keep the new FLAC under
+`.build` and run [run-block-control.py](run-block-control.py) from the
+repository root with the FLAC path as the first argument, followed by the
+full application runner arguments. It requires the original PCM length
+and MD5 from the replacement fixture.
+
 Use the [matched FLAC profile](../../target/cyd_full_app_openeth_qemu/README.md)
 with the [validated QEMU build profile](../cyd-pdm-static-rx-20261113/README.md).
 The vendor decoder remains the default. Physical Wi-Fi, DAC timing and the

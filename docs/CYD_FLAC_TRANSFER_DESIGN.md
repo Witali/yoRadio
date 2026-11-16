@@ -241,8 +241,11 @@ claim or default change.
    use TLS, TFT, continuous DAC and WebUI. The custom decoder plays all 528,000
    frames with the exact Xiph PCM checksum and no allocation failures. The
    Espressif profile records a failed 18,432-byte request while processing
-   the same level-8 file. The full application uses the 30-second diagnostic
-   watchdog. Qualification at the production watchdog setting remains open.
+   the same level-8 file. The 2,048-block control exposed a separate lost
+   final frame. The vendor path now sends EOS with the last encoded byte,
+   and the control passes with exact PCM. The full application uses the
+   30-second diagnostic watchdog. Qualification at the production watchdog
+   setting remains open.
 9. **Physical qualification open:** CYD A/B with matched
    configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.

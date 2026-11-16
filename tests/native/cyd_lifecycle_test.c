@@ -60,7 +60,7 @@ static bool oversized_frame;
 static bool header_only;
 static unsigned process_calls, delay_calls, emit_on_call;
 static bool fragmented_input, stalled_eof;
-static bool require_nonempty_eos, ogg_eos_started;
+static bool require_nonempty_eos, decoder_eos_started;
 static bool verify_ogg_bytes;
 static unsigned mock_codec, ogg_credits, ogg_eos_nonempty, ogg_eos_empty;
 static unsigned ogg_pcm_frames;
@@ -159,7 +159,7 @@ static void esp_opus_dec_register(void) {}
 static void esp_audio_simple_dec_register_default(void) {}
 static int esp_audio_simple_dec_open(const esp_audio_simple_dec_cfg_t *cfg, void **handle) {
     if (fail_open) return open_error;
-    mock_codec=cfg->dec_type;ogg_credits=ogg_pcm_frames=0;ogg_eos_started=false;
+    mock_codec=cfg->dec_type;ogg_credits=ogg_pcm_frames=0;decoder_eos_started=false;
     *handle = malloc(8); assert(*handle); ++opens; ++open_handles; eos_frames=2; return ESP_OK;
 }
 static void esp_audio_simple_dec_close(void *handle) { assert(open_handles); --open_handles; ++closes; free(handle); }
@@ -168,9 +168,11 @@ static int esp_audio_simple_dec_process(void *handle, esp_audio_simple_dec_raw_t
     assert(handle && out->len >= 16);
     ++process_calls;
     if (fail_process) return ESP_FAIL;
+    if (raw->eos && require_nonempty_eos && !decoder_eos_started) {
+        assert(raw->len);
+        decoder_eos_started=true;
+    }
     if(mock_codec==ESP_AUDIO_SIMPLE_DEC_TYPE_OGG && !header_only && raw->eos) {
-        if(!ogg_eos_started && require_nonempty_eos) assert(raw->len);
-        ogg_eos_started=true;
         if(raw->len) ++ogg_eos_nonempty;else ++ogg_eos_empty;
     }
     if (fragmented_input) {
@@ -334,7 +336,7 @@ static void begin(unsigned gen) {
     oversized_frame=false;info_result=ESP_OK;info_rate=expected_rate=48000;test_now_us=0;
     header_only=false;process_calls=delay_calls=emit_on_call=0;open_error=ESP_FAIL;
     fragmented_input=stalled_eof=false;minimum_input=4;verified_input=verified_pcm=0;
-    require_nonempty_eos=ogg_eos_started=false;ogg_eos_nonempty=ogg_eos_empty=0;
+    require_nonempty_eos=decoder_eos_started=false;ogg_eos_nonempty=ogg_eos_empty=0;
     verify_ogg_bytes=false;expected_ogg_bytes=0;
     pending_allocations=fail_pending_at=0;
     cancel_prefill=false;prefill_queries=0;
@@ -696,6 +698,16 @@ int main(void) {
     fragment(108,NATIVE_CODEC_FLAC,AUDIO_END_EOF,6,0);run_task(decoder_task);
     assert(verified_input==6 && opens==2 && closes==2 && !open_handles && !health_decoder_faults);
     run_task(output_task);assert(verified_pcm==24 && flushes==1);
+
+    // A separate FLAC EOF control must mark the genuine final encoded byte.
+    begin(109);
+    fragmented_input=require_nonempty_eos=true;
+    for (unsigned i=0;i<9;++i) fragment(109,NATIVE_CODEC_FLAC,AUDIO_CONTINUE,i,1);
+    fragment(109,NATIVE_CODEC_FLAC,AUDIO_END_EOF,9,0);
+    run_task(decoder_task);
+    assert(decoder_eos_started && verified_input==9 && opens==1 && closes==1 && !health_decoder_faults);
+    run_task(output_task);
+    assert(verified_pcm==36 && flushes==1);
 
     // The Ogg mock credits three encoded bytes per PCM frame, independent of
     // call boundaries. Its first EOS must contain the genuine final byte;
