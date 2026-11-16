@@ -114,21 +114,23 @@ static void time_service_notify_network_ready(void){++time_notices;}
 static unsigned startup_step, display_step, time_step, pinned_step[2], pinned_count;
 static unsigned nvs_step, network_settings_step;
 static int time_start_error, nvs_error, spiffs_error, network_settings_error;
+static int radio_start_error;
+static unsigned radio_starts, web_starts, network_task_deletes;
 static bool health_ok;
 typedef unsigned UBaseType_t;
-enum { tskIDLE_PRIORITY = 0, TEST_MAIN_PRIORITY = 1 };
-static UBaseType_t main_priority;
+enum { tskIDLE_PRIORITY = 0, TEST_MAIN_PRIORITY = 1, TEST_NETWORK_PRIORITY = 3 };
+static UBaseType_t current_priority;
 static UBaseType_t uxTaskPriorityGet(void *task) {
     assert(!task);
-    return main_priority;
+    return current_priority;
 }
 static void vTaskPrioritySet(void *task, UBaseType_t priority) {
     assert(!task);
-    main_priority = priority;
+    current_priority = priority;
 }
 typedef struct {const char *base_path, *partition_label; int max_files; bool format_if_mount_failed;} esp_vfs_spiffs_conf_t;
 static int esp_vfs_spiffs_register(const esp_vfs_spiffs_conf_t *config) {
-    assert(main_priority == tskIDLE_PRIORITY);
+    assert(current_priority == tskIDLE_PRIORITY);
     assert(!strcmp(config->base_path, "/spiffs") && !strcmp(config->partition_label, "spiffs"));
     assert(config->max_files == 8 && !config->format_if_mount_failed);
     return spiffs_error;
@@ -139,13 +141,31 @@ static int network_settings_init(void) {network_settings_step=++startup_step; re
 static bool native_health_start(void) {++startup_step; return health_ok;}
 static int cyd_display_init(int *display) {
     assert(display == &s_display);
-    assert(main_priority == TEST_MAIN_PRIORITY);
+    assert(current_priority == TEST_MAIN_PRIORITY);
     display_step = ++startup_step;
     return ESP_OK;
 }
 static int time_service_start(void) {time_step = ++startup_step; return time_start_error;}
 static void display_task(void *context) {(void)context;}
-static void network_task(void *context) {(void)context;}
+static int audio_service_start(native_state_t *state) {
+    assert(state == &s_app_state && current_priority == TEST_NETWORK_PRIORITY);
+    return ESP_OK;
+}
+static int radio_control_init(native_state_t *state) {
+    assert(state == &s_app_state && current_priority == tskIDLE_PRIORITY);
+    ++radio_starts;
+    return radio_start_error;
+}
+static int web_service_start(native_state_t *state) {
+    assert(state == &s_app_state && current_priority == TEST_NETWORK_PRIORITY);
+    ++web_starts;
+    return ESP_OK;
+}
+static void vTaskDelete(void *task) {
+    assert(!task && current_priority == TEST_NETWORK_PRIORITY);
+    ++network_task_deletes;
+}
+static void network_task(void *context);
 static int xTaskCreatePinnedToCore(void (*task)(void *), const char *name,
                                   unsigned stack, void *context, unsigned priority, void *handle, int core) {
     assert(!context && !handle && pinned_count < 2U);
@@ -171,7 +191,9 @@ static void reset(void){
     s_wifi_events=1;event_bits=connect_calls=time_notices=0;s_have_credentials=false;
     atomic_store(&s_stopping_for_sleep,false);s_credential_count=s_credential_index=s_retries=0;
     startup_step=display_step=time_step=pinned_count=0;
-    main_priority=TEST_MAIN_PRIORITY;
+    current_priority=TEST_MAIN_PRIORITY;
+    radio_start_error=0;
+    radio_starts=web_starts=network_task_deletes=0;
     nvs_step=network_settings_step=0;network_settings_error=0;
     time_start_error=nvs_error=spiffs_error=0;health_ok=true;
 }
@@ -217,6 +239,14 @@ int main(void){
         app_main();assert(pinned_count==2U&&time_step>display_step&&time_step<pinned_step[0]);
         assert(network_settings_step>nvs_step&&network_settings_step<display_step);
         assert(pinned_step[0]<pinned_step[1]&&!time_notices);++groups;
+    }
+    for (unsigned failure = 0; failure < 2; ++failure) {
+        reset();
+        current_priority = TEST_NETWORK_PRIORITY;
+        radio_start_error = failure ? ESP_FAIL : ESP_OK;
+        network_task(NULL);
+        assert(radio_starts == 1 && web_starts == 1 && network_task_deletes == 1);
+        ++groups;
     }
     printf("PASS CYD startup facade: %u groups; actual app/time ordering, task affinity, SDK bootstrap failure rollback, retained resources, default-loop ownership, atomic active-profile handoff; C3 guarded STA_START; platform seams only\n",groups);
     return 0;

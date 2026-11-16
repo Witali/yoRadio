@@ -92,7 +92,11 @@ static void network_task(void *argument) {
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Audio service failed: %s", esp_err_to_name(result));
     } else {
+        // Playlist lookup and index recovery can scan SPIFFS synchronously.
+        UBaseType_t priority = uxTaskPriorityGet(NULL);
+        vTaskPrioritySet(NULL, tskIDLE_PRIORITY);
         result = radio_control_init(&s_state);
+        vTaskPrioritySet(NULL, priority);
         if (result != ESP_OK) ESP_LOGE(TAG, "Radio control failed: %s", esp_err_to_name(result));
     }
     result = web_service_start(&s_state);

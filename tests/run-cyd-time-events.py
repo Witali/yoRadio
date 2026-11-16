@@ -63,7 +63,7 @@ def main():
     globals_end=network.index('static SemaphoreHandle_t',globals_start)
     network_unit=network[globals_start:globals_end]+helpers.function(network,'network_service_start')
     startup_unit = '#include "native_tls_early_mpi.h"\n' + ''.join(
-        helpers.function(startup, name) for name in ['mount_spiffs', 'app_main'])
+        helpers.function(startup, name) for name in ['mount_spiffs', 'network_task', 'app_main'])
     c3_unit = helpers.function((frozen/'idf/esp32c3-oled-native/main/network_service.c').read_text(), 'event_handler')
     assert 'CONFIG_LWIP_SNTP_MAX_SERVERS=2' in (frozen / 'idf/esp32-cyd2usb-native/sdkconfig.defaults').read_text()
     (out / 'driver').mkdir()
@@ -99,10 +99,16 @@ def main():
 
     run_case('positive', network_unit, startup_unit)
     mutations = [
-        ('busy_spiffs_mount', 'startup', 'vTaskPrioritySet(NULL, tskIDLE_PRIORITY);',
-         '(void)0;', 'main_priority == tskIDLE_PRIORITY'),
-        ('leaked_spiffs_priority', 'startup', 'vTaskPrioritySet(NULL, priority);',
-         '(void)priority;', 'main_priority == TEST_MAIN_PRIORITY'),
+        ('busy_spiffs_mount', 'startup', '    vTaskPrioritySet(NULL, tskIDLE_PRIORITY);\n    esp_err_t result',
+         '    (void)0;\n    esp_err_t result', 'current_priority == tskIDLE_PRIORITY'),
+        ('leaked_spiffs_priority', 'startup', '    vTaskPrioritySet(NULL, priority);\n    return result;',
+         '    (void)priority;\n    return result;', 'current_priority == TEST_MAIN_PRIORITY'),
+        ('busy_playlist_load', 'startup', 'vTaskPrioritySet(NULL, tskIDLE_PRIORITY);\n        result = radio_control_init',
+         '(void)0;\n        result = radio_control_init', 'current_priority == tskIDLE_PRIORITY'),
+        ('leaked_playlist_priority', 'startup',
+         'result = radio_control_init(&s_state);\n        vTaskPrioritySet(NULL, priority);',
+         'result = radio_control_init(&s_state);\n        (void)priority;',
+         'current_priority == TEST_NETWORK_PRIORITY'),
         ('missing_time_start', 'startup', 'result = time_service_start();',
          'result = ESP_OK;', 'time_step>display_step'),
         ('missing_network_settings_start', 'startup', 'result = network_settings_init();',
