@@ -12,6 +12,7 @@
 #include "native_wifi_public.h"
 
 typedef int esp_err_t;
+typedef unsigned UBaseType_t;
 typedef void *QueueHandle_t, *TaskHandle_t;
 typedef struct { char uri[600]; int fd, status, method; bool async, closed; } httpd_req_t;
 enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_INVALID_STATE=-2, ESP_ERR_NO_MEM=-3,
@@ -19,6 +20,7 @@ enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_INVALID_STATE=-2, ESP_ERR_NO_MEM=-3,
 #define CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES 1024
 #define CONFIG_YORADIO_WEB_STATIC_WORKERS 2
 #define portMAX_DELAY UINT32_MAX
+#define tskIDLE_PRIORITY 0U
 #define ESP_LOGW(...) ((void)0)
 static httpd_req_t *pending[2];
 static unsigned queued, tasks, deleted_tasks, queue_live, complete_count, shutdown_count;
@@ -29,6 +31,15 @@ static size_t body_size;
 static unsigned read_calls, invalid_reads, open_calls, async_begins;
 static jmp_buf worker_exit;
 static unsigned notifications;
+static UBaseType_t worker_priority = 2;
+static UBaseType_t uxTaskPriorityGet(TaskHandle_t task) {
+    assert(!task);
+    return worker_priority;
+}
+static void vTaskPrioritySet(TaskHandle_t task, UBaseType_t priority) {
+    assert(!task);
+    worker_priority = priority;
+}
 static unsigned ulTaskNotifyTake(int clear, unsigned wait) {
     assert(clear==pdTRUE && wait==portMAX_DELAY && notifications==2);return 1;
 }
@@ -83,12 +94,14 @@ static int httpd_resp_set_type(httpd_req_t *r, const char *value) {
 static int httpd_resp_set_status(httpd_req_t *r, const char *value) { r->status=atoi(value);return 0; }
 static int httpd_resp_send_chunk(httpd_req_t *r, const char *data, ssize_t size) {
     (void)r;assert(size>=0 && size<=CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES);
+    assert(worker_priority == 2);
     if (++send_count==fail_send) return ESP_FAIL;
     if (!size) terminal_chunks++;
     else { assert(body_size+(size_t)size<sizeof(body));memcpy(body+body_size,data,(size_t)size);body_size+=(size_t)size;body[body_size]=0; }
     return ESP_OK;
 }
 static int httpd_resp_sendstr(httpd_req_t *r, const char *text) {
+    assert(worker_priority == 2);
     (void)r;snprintf(body,sizeof(body),"%s",text);body_size=strlen(body);return ESP_OK;
 }
 static int httpd_resp_send_err(httpd_req_t *r, int status, const char *text) {
@@ -101,7 +114,10 @@ static FILE *test_fopen(const char *path, const char *mode) {
     snprintf(actual,sizeof(actual),"%s/%s",fixture_root,path+8);return fopen(actual,mode);
 }
 // The storage publication/open mutex is exercised in the upload suite.
-static FILE *web_upload_open_file(const char *path) { return test_fopen(path,"rb"); }
+static FILE *web_upload_open_file(const char *path) {
+    assert(worker_priority == tskIDLE_PRIORITY);
+    return test_fopen(path, "rb");
+}
 static int test_ferror(FILE *file) { return fail_read || ferror(file); }
 static size_t test_fread(void *data, size_t size, size_t count, FILE *file) {
     if (ferror(file) || feof(file) || (fail_read && read_calls)) ++invalid_reads;

@@ -33,11 +33,16 @@ static const char *content_type(const char *path) {
 }
 
 static FILE *open_nonempty(const char *path) {
+    // Each SPIFFS name lookup can scan the partition synchronously. Let this
+    // core's idle task run during the lookup, even when the name is absent.
+    UBaseType_t priority = uxTaskPriorityGet(NULL);
+    vTaskPrioritySet(NULL, tskIDLE_PRIORITY);
     FILE *file = web_upload_open_file(path);
     if (file && (fgetc(file) == EOF || fseek(file, 0, SEEK_SET))) {
         fclose(file);
         file = NULL;
     }
+    vTaskPrioritySet(NULL, priority);
     return file;
 }
 

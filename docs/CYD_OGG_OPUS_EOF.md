@@ -112,7 +112,9 @@ with TLS, TFT and the WebUI reached separate memory limits. Eight-channel
 streams failed on an Espressif decoder allocation under both TLS policies.
 Six-channel streams opened their decoders and failed to allocate the first
 audio page with both tested page sizes. Full-application qualification remains
-open.
+open for six and eight channels. Four-channel PDM passed full TLS through
+EOF, with the exact PCM frame count and a WebUI read after EOF, after fixing
+SPIFFS lookup starvation.
 
 ## Additional legal packet-mode observations
 

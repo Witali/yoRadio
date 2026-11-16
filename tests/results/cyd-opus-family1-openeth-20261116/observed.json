@@ -658,5 +658,84 @@
     "state": "TERMINAL_NONPASS",
     "reason": "QEMU guestfwd loopback unavailable",
     "uart_sha256": "9e7c8063983f102887c00098ee4981b4e8e444593d5c6681d1ddd6acff991fc8"
+  },
+  "web_static_lookup_fix": {
+    "state": "TERMINAL_PASS",
+    "encoded_sha256": "cb36ff458d93e73463d7a88aa2a6df21d35024fbe7ffdfd4fa4ff3b1fa51c347",
+    "app_sha256": "09c158c2248e5473088533b5d44261b89b5d5d1d05cf7342a2d4a7a50da022c6",
+    "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+    "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+    "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+    "report_sha256": "16eed17458ad20734a150bbd146be59c48ebfb40152bfa94268daa9331b2c7ca",
+    "uart_sha256": "ddd198d2dca119792b6903d8e62b6377490bf8be0b354244f21677e1b7cf8fce",
+    "baseline_stack": [
+      "static_worker",
+      "serve_static",
+      "open_nonempty",
+      "web_upload_open_file",
+      "fopen",
+      "SPIFFS_open",
+      "spiffs_object_find_object_index_header_by_name",
+      "spiffs_obj_lu_find_entry_visitor",
+      "esp_flash_read"
+    ],
+    "baseline_executable_segments_match_rebuild": true,
+    "min_free_heap": 14288,
+    "pcm_progress_during_webui": [
+      128,
+      33800
+    ],
+    "pcm_flushes": [
+      {
+        "frames": 672000,
+        "status": 0
+      }
+    ],
+    "pcm_metrics": [
+      {
+        "energy": 443745605009,
+        "crossings": 5908
+      },
+      {
+        "energy": 606271555166,
+        "crossings": 12963
+      },
+      {
+        "energy": 520753839007,
+        "crossings": 9436
+      },
+      {
+        "energy": 1130906326246,
+        "crossings": 2045
+      }
+    ],
+    "tls_peer": {
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "sent": 903530,
+      "complete": true
+    },
+    "full_records": 55,
+    "body_tail_bytes": 2410,
+    "web_asset_all_three_reads": {
+      "bytes": 13588,
+      "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+    },
+    "eof": {
+      "audio": false,
+      "connecting": false,
+      "format": "stream ended",
+      "generation": 1
+    },
+    "output_driver_bytes": 1345920,
+    "faults": 0,
+    "host_static_report_sha256": "61037039a5663e0c09f19bf592658a19d65716f5dbc89819eca7ebb3b43e5ffa",
+    "host_negative_controls": [
+      "missing_admission_guard",
+      "missing_worker_guard",
+      "wrong_wifi_edit_route",
+      "wrong_network_settings_edit_route",
+      "missing_wifi_activation"
+    ]
   }
 }
