@@ -243,9 +243,12 @@ claim or default change.
    Espressif profile records a failed 18,432-byte request while processing
    the same level-8 file. The 2,048-block control exposed a separate lost
    final frame. The vendor path now sends EOS with the last encoded byte,
-   and the control passes with exact PCM. The full application uses the
-   30-second diagnostic watchdog. Qualification at the production watchdog
-   setting remains open.
+   and the control passes with exact PCM. Two more custom FLAC runs passed
+   with the five-second production watchdog under the same TLS/TFT/continuous
+   DAC workload. The matched SDK configurations differ only in the task
+   watchdog timeout. An allocation traceback attributes the vendor large-block
+   failure to the library's frame workspace. Reducing the application's
+   initial PCM buffer to 1 KiB still hits a vendor allocation failure.
 9. **Physical qualification open:** CYD A/B with matched
    configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.

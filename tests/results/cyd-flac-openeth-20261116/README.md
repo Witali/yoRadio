@@ -52,7 +52,32 @@ repository root with the FLAC path as the first argument, followed by the
 full application runner arguments. It requires the original PCM length
 and MD5 from the replacement fixture.
 
-Use the [matched FLAC profile](../../target/cyd_full_app_openeth_qemu/README.md)
-with the [validated QEMU build profile](../cyd-pdm-static-rx-20261113/README.md).
-The vendor decoder remains the default. Physical Wi-Fi, DAC timing and the
-production watchdog under simultaneous network and display load remain open.
+## Production watchdog and allocation traceback
+
+The custom decoder passed the same complete TLS workload twice with the
+production five-second task watchdog, both idle tasks subscribed, and
+the 300 ms interrupt watchdog. Compared with the 30-second custom fixture,
+the generated SDK configuration changed only the task watchdog timeout.
+Both runs reached the full PCM MD5 and served WebUI after EOF, with zero
+watchdog events, allocation failures or output faults. Minimum free heap
+was 47,268 and 47,276 bytes. The smallest observed stack watermarks were
+1,620 bytes for the stream task, 11,708 for decode, 2,932 for output and
+1,228 for HTTP. [Watchdog configuration](https://docs.espressif.com/projects/esp-idf/en/v6.0.2/esp32/api-reference/system/wdts.html).
+
+A separate Espressif build used a temporary allocation-failure probe.
+The traceback and matching link map locate the failed 18,448-byte request
+in `stream_decoder.c.obj` inside `read_frame_`, which called
+`media_lib_module_malloc`. That size is consistent with 4,608 32-bit
+samples plus four padding words in the reference decoder. A trial with a
+1 KiB initial application PCM buffer still failed a separate 18,432-byte
+request from `FLAC__memory_alloc_aligned_int32_array`. The trial was
+discarded. [Xiph reference allocation layout](https://github.com/xiph/flac/blob/1.5.0/src/libFLAC/stream_decoder.c#L1459).
+
+See [watchdog and heap evidence](watchdog-and-heap.json) for the two passes
+and the allocation call sites. Use the
+[matched FLAC profile](../../target/cyd_full_app_openeth_qemu/README.md)
+with the [validated QEMU build profile](../cyd-pdm-static-rx-20261113/README.md)
+and `CONFIG_ESP_TASK_WDT_TIMEOUT_S=5` to repeat the production watchdog runs.
+The vendor decoder remains the default. The five-second watchdog result
+covers custom FLAC over OpenETH and continuous DAC. Physical Wi-Fi and all
+physical audio output tests remain open.
