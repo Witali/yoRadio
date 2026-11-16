@@ -247,7 +247,7 @@ DMA-памяти завершилось ошибкой.
 
 ## Что осталось по переносу
 
-После уточнения пользователя 28 октября, состояние на 11 ноября 2026 года:
+Состояние программных проверок на 16 ноября 2026 года.
 
 Программная часть этапов 01–10 выполнена. Остаются четыре активных блока
 доводки и проверки; это не четыре небольшие правки. Пятый раздел, AAC
@@ -256,11 +256,11 @@ compact/private, сохранён в таблице как отложенный,
 
 | Блок | Оставшаяся программная работа |
 | --- | --- |
-| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates. Многоканальный family1 dispatch выбран в production caller и проходит [43 HOST schedules/12 controls](../tests/results/cyd-ogg-family1-dispatch-host-20261101/README.md), [48 полных actual-task outputs с независимым PCM oracle](../tests/results/cyd-family1-task-20261104/README.md), [6 реальных OOM/backpressure controls](../tests/results/cyd-ogg-runtime-controls-20261104/README.md) и [enabled C8 normalizer](../tests/results/cyd-normalizer-enabled-20261104/README.md); все три output backend и FIFO layout/gain проверены отдельно. Финальные production exports пройдены. Остаются ресурсы полного приложения. [Входы и gates](CYD_OGG_OPUS_EOF.md). |
+| Ogg/Opus и Espressif reuse | CRC-verified pages, sample-accurate pre-skip/end trim, chaining и ordered header gain подключены и проходят actual task gates. Лимит входных каналов по умолчанию равен двум. Стерео прошло полный TLS с WebUI до и после EOF на всех трёх выходах [в QEMU OpenETH](../tests/results/cyd-static-rx-output-matrix-20261116/README.md). Для экспериментального многоканального профиля сохранены [проверки PCM, ошибок и ресурсов](CYD_OGG_OPUS_EOF.md). |
 | AAC compact owners — отложено | [Public AAC-Plus preference](../tests/results/cyd-aac-public-config-20261101/README.md) и [48 actual-task сценариев](../tests/results/cyd-aac-playback-task-20261101/README.md) завершены. Compact/private ABI/reset/owner-view scopes не возобновлять автоматически. Late SBR/PS отмечены как ограничения vendor, без заявления о полной поддержке этих переходов. [Выбор decoder и ограничения](CYD_ESPRESSIF_VORBIS_REUSE.md). |
 | FLAC | Обычная current-source регрессия и конечный production-policy watchdog gate пройдены в SDK/QEMU. Финальные vendor/custom exports пройдены. [A/B полного приложения в QEMU](../tests/results/cyd-flac-openeth-20261116/README.md) показал точный PCM custom FLAC и отказ выделения памяти Espressif на том же потоке. Custom FLAC прошёл этот сценарий со штатным watchdog на всех трёх выходах. Физический A/B остаётся. Target OOM/backpressure/semantic controls [явно отложены](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md). [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
-| Память и TLS | [Actual TLS traffic](../tests/results/cyd-tls-traffic-20261101/README.md) в изолированном SDK/QEMU пройден: full records, два клиента, реальные reserve/reclaim/MPI и pressure/recovery. Остались полный radio boot и heap/IRAM/stack с radio/TFT до выбора default-off опций. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
-| Финальные сборки и регрессия | [Шесть production exports и Clang-профилей](../tests/results/cyd-production-matrix-20261111/README.md) пройдены для vendor/custom FLAC на PDM, continuous DAC и legacy DAC. Полная C3 сборка, Clang и хостовая регрессия пройдены. Совместный запуск радио, TLS, TFT и аудио требует рабочей Wi-Fi PHY в эмуляторе или платы. |
+| Память и TLS | [Изолированный SDK/QEMU](../tests/results/cyd-tls-traffic-20261101/README.md) проверил full records, два клиента, reserve/reclaim/MPI и pressure/recovery. [Полное приложение в QEMU OpenETH](../tests/results/cyd-static-rx-output-matrix-20261116/README.md) прошло статический TLS RX, TFT и WebUI одновременно с Opus на всех трёх выходах. Остаются повторное подключение, OTA под нагрузкой, совместная проверка опций памяти в полном приложении и измерения на Wi-Fi. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
+| Финальные сборки и регрессия | [Шесть production exports и Clang-профилей](../tests/results/cyd-production-matrix-20261111/README.md) пройдены для vendor/custom FLAC на PDM, continuous DAC и legacy DAC. Полная C3 сборка, Clang и хостовая регрессия пройдены. Тесты полного приложения используют OpenETH вместо Wi-Fi. Приёмка Wi-Fi и аудиовыходов ждёт платы. |
 
 Физическая приёмка выделена отдельно и ждёт подключения платы. Собственный
 расширенный Vorbis отложен и не включён в четыре активных блока; перенос

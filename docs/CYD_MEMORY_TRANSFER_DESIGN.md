@@ -291,6 +291,14 @@ for the previous transfer. The combined diagnostic build with the C3 TCP
 settings reached exact Opus EOF and served WebUI in both TLS record modes.
 The selected build and full application receipts are in the report.
 
+The [matched static RX matrix](../tests/results/cyd-static-rx-output-matrix-20261116/README.md)
+used the same complete stereo Opus fixture, ESP-IDF 6.0.2 and five-second
+task watchdog for PDM, continuous DAC and legacy DAC. All three reached
+EOF with the expected output count, zero allocation failures and the exact
+WebUI asset during playback and after EOF. Legacy DAC recorded the lowest
+heap watermark at 9,908 bytes. The matrix uses the diagnostic OpenETH
+transport. Combined option testing and physical Wi-Fi remain open.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)
