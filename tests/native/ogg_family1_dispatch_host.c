@@ -68,7 +68,7 @@ esp_audio_err_t esp_audio_simple_dec_process(esp_audio_simple_dec_handle_t handl
 typedef struct {
     ogg_playback *wrapper;const reference *reference;uint32_t generation;int16_t gain;size_t emitted;
     bool expect_layout,cancelled,close_witness,cancel_at_close;
-    unsigned outputs,yields,output_fail,cancel_output,cancel_yield;
+    unsigned outputs,yields,output_fail,cancel_output,cancel_yield,prepared;
 #ifdef DISPATCH_WORD_STORAGE
     unsigned fallback_word_planes,fallback_word_witnesses;
     size_t fallback_word_capacity;
@@ -111,7 +111,17 @@ static bool dispatch_legacy_output(void *opaque,const esp_audio_simple_dec_info_
 static bool dispatch_layout_output(void *opaque,const esp_audio_simple_dec_info_t *info,const uint8_t *pcm,size_t bytes,int16_t gain,pcm_channel_layout layout) {
     assert(layout==PCM_CHANNEL_LAYOUT_VORBIS);return dispatch_pcm(opaque,info,pcm,bytes,gain,true);
 }
-static ogg_playback_callbacks dispatch_callbacks(dispatch_context *c){return (ogg_playback_callbacks){dispatch_cancelled,dispatch_legacy_output,dispatch_yield,c,dispatch_layout_output};}
+static void dispatch_prepare_family1(void *opaque,const opus_family1_plan *plan) {
+    dispatch_context *c=opaque;
+    opus_family1_playback *family1=&c->wrapper->family1;
+    assert(c->expect_layout && plan==&family1->plan && family1->phase==OFP_TAGS &&
+           !c->wrapper->input.ready && !simple_live && !ofd_has_handles(&family1->decoder));
+    ++c->prepared;
+}
+static ogg_playback_callbacks dispatch_callbacks(dispatch_context *c) {
+    return (ogg_playback_callbacks){.cancelled=dispatch_cancelled,.output=dispatch_legacy_output,
+        .yield=dispatch_yield,.context=c,.output_layout=dispatch_layout_output,.prepare_family1=dispatch_prepare_family1};
+}
 static physical dispatch_family0(const corpus *source,unsigned serial,int16_t gain) {
     assert(source->channels==2 && source->streams==1 && source->coupled==1);physical p={.serial=serial,.head_bytes=19,.tags_bytes=16};p.head=calloc(19,1);p.tags=calloc(16,1);assert(p.head && p.tags);
     memcpy(p.head,source->head,19);p.head[18]=0;put16(p.head+16,gain);memcpy(p.tags,"OpusTags",8);uint8_t table[255];unsigned n=laces(table,19);page(&p,2,0,table,n,p.head,19);n=laces(table,16);page(&p,0,0,table,n,p.tags,16);uint64_t raw=0;
@@ -139,7 +149,7 @@ static void dispatch_positive(const corpus *source,const reference *ref,unsigned
     dispatch_player p={0};dispatch_init(&p);stats.cache_full=cached;
     if(prepared) {esp_audio_simple_dec_cfg_t cfg={.dec_type=ESP_AUDIO_SIMPLE_DEC_TYPE_OGG};assert(esp_audio_simple_dec_open(&cfg,&p.decoder)==ESP_AUDIO_ERR_OK);p.capacity=12288;p.pcm=malloc(p.capacity);assert(p.pcm);}
     dispatch_context c={.wrapper=&p.wrapper,.reference=ref,.generation=42,.gain=gain,.expect_layout=true};int32_t cause=0;assert(dispatch_feed(&p,&c,&bytes,chunk,&cause)==OGP_OK &&
-        c.emitted==ref->logical_frames && !ogp_has_input(&p.wrapper) && !p.decoder && !p.pcm && !p.capacity && simple_opens==simple_closes && simple_opens==(unsigned)prepared && !stats.live);
+        c.emitted==ref->logical_frames && c.prepared==1 && !ogp_has_input(&p.wrapper) && !p.decoder && !p.pcm && !p.capacity && simple_opens==simple_closes && simple_opens==(unsigned)prepared && !stats.live);
     dispatch_clean(&p);physical_free(&bytes);++dispatch_cases;
     printf("{\"kind\":\"family1\",\"case\":%u,\"channels\":%u,\"style\":%u,\"chunk\":%zu,\"cached\":%u,\"gain\":%d,\"prepared_simple\":%u,\"frames\":%zu,\"raw_created\":%u,\"raw_destroyed\":%u,\"simple_opens\":%u,\"simple_closes\":%u,\"passed\":true}\n",
         dispatch_cases,source->channels,style,chunk,(unsigned)cached,(int)gain,(unsigned)prepared,c.emitted,stats.created,stats.destroyed,simple_opens,simple_closes);
@@ -151,7 +161,8 @@ static void dispatch_chain(const corpus *sources,const reference *refs,size_t ch
         physical bytes=legacy?dispatch_family0(source,300u+link,gain):make(source,1,300u+link,false,false);
         if(!legacy){put16(bytes.head+16,gain);size_t head=27u+bytes.data[26];memcpy(bytes.data+head,bytes.head,bytes.head_bytes);ogg_page fixed={bytes.data,(long)head,bytes.data+head,(long)bytes.head_bytes};ogg_page_checksum_set(&fixed);}
         creator_walk(&bytes,source);dispatch_context c={.wrapper=&p.wrapper,.reference=ref,.generation=42,.gain=gain,.expect_layout=!legacy};int32_t cause=0;
-        assert(dispatch_feed(&p,&c,&bytes,chunk,&cause)==OGP_OK && c.emitted==ref->logical_frames && !p.decoder && !ogp_has_input(&p.wrapper) && !stats.live && !simple_live);
+        assert(dispatch_feed(&p,&c,&bytes,chunk,&cause)==OGP_OK && c.emitted==ref->logical_frames && c.prepared==(unsigned)!legacy &&
+            !p.decoder && !ogp_has_input(&p.wrapper) && !stats.live && !simple_live);
         physical_free(&bytes);
     }
     assert(simple_opens==simple_closes && simple_opens==(legacy_first?2u:1u));dispatch_clean(&p);++dispatch_cases;
@@ -199,6 +210,7 @@ static void dispatch_failure(const corpus *source,const reference *ref,unsigned 
         bytes.data[at+22]^=1;expected=OGP_CONTAINER;
     }
     int32_t cause=0;ogg_playback_status status=ogp_feed(&p.wrapper,bytes.data,bytes.size,true,&p.decoder,&p.pcm,&p.capacity,&p.pending,&cb,&cause);assert(status==expected && !simple_opens);
+    assert(c.prepared==(unsigned)(mode!=6));
     if(mode<=1)assert(c.outputs==3 && c.emitted==256 && !stats.live && p.wrapper.input.ready && p.wrapper.family1.trim.raw_position==960);
     if(mode==2)assert(!c.outputs && !stats.live && p.wrapper.input.ready);
     if(mode==3)assert(stats.opens==2 && stats.created==1 && stats.destroyed==1 && !stats.live && !c.outputs && p.wrapper.input.ready);

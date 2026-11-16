@@ -120,6 +120,12 @@ the exact PCM frame count and a WebUI read after EOF for both 20 ms and
 120 ms packets. The 120 ms replay with word-backed Ogg pages retained
 more free byte-addressable heap.
 
+The [next static-RX PDM runs](../tests/results/cyd-opus-family1-dma-20261116/README.md)
+passed the six-channel 20 ms streams with both Ogg page targets. They used
+smaller TFT DMA strips and reduced the compressed input pool after the
+verified Family 1 header. The first 120 ms packet still exceeds the available
+PCM plane memory in the six-channel profile.
+
 ## Additional legal packet-mode observations
 
 The [49-stream creator corpus](../tests/results/opus-packet-modes-20261101/README.md)

@@ -62,6 +62,8 @@ typedef struct {
     bool (*output_layout)(void *context, const esp_audio_simple_dec_info_t *info,
                           const uint8_t *pcm, size_t bytes,
                           int16_t header_gain_q8, pcm_channel_layout layout);
+    /* After a verified Family 1 identification page, before opening decoders. */
+    void (*prepare_family1)(void *context, const opus_family1_plan *plan);
 } ogg_playback_callbacks;
 
 /* A real raw close refusal retains its cfg/handle, page and packet ownership.
@@ -127,9 +129,12 @@ static inline ogg_playback_status ogp_family1_page(ogg_playback *s,
         .cancelled = ogp_family1_cancelled, .output48_s16le = ogp_family1_output,
         .yield = ogp_family1_yield, .context = &context,
     };
+    bool opening = s->family1.phase == OFP_EMPTY;
     for (;;) {
         ofp_result result = ofp_page(&s->family1, &s->input, &selected, NULL);
         if (result.code == OFP_OK) {
+            if (opening && s->family1.phase == OFP_TAGS && callbacks->prepare_family1)
+                callbacks->prepare_family1(callbacks->context, &s->family1.plan);
 #if defined(ESP_PLATFORM) && CONFIG_IDF_TARGET_ESP32
             const ogg_page_word_allocator *allocator = s->family1.phase == OFP_AUDIO
                 ? &ogp_word_payload_allocator : NULL;

@@ -85,9 +85,12 @@ def sample(port):
         raise RuntimeError('Unexpected production health endpoint schema or core count')
     if not 0 < report['minimum_heap'] <= report['heap'] or not 0 < report['largest'] <= report['heap']:
         raise RuntimeError('Invalid production heap sample')
-    return {key: report[key] for key in ('uptime_ms', 'heap', 'largest', 'minimum_heap', 'tasks', 'memory', 'cpu',
-                                         'allocation_failures', 'last_allocation_failure', 'decoder_failure',
-                                         'stream_failure', 'output', 'output_driver')}
+    sample = {key: report[key] for key in ('uptime_ms', 'heap', 'largest', 'minimum_heap', 'tasks', 'memory', 'cpu',
+                                          'allocation_failures', 'last_allocation_failure', 'decoder_failure',
+                                          'stream_failure', 'output', 'output_driver')}
+    if 'input' in report:
+        sample['input'] = report['input']
+    return sample
 
 
 def require_clean_health(report):

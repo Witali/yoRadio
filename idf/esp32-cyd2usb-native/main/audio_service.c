@@ -612,7 +612,10 @@ static void stream_task(void *argument) {
         network_service_audio_receive(command.generation);
         stream_transport_reset();
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
-        // Between connections only; never alter published/leased storage.
+        // The previous decoder has released its generation. Restore the
+        // target in case its multistream Opus decoder reduced the pool.
+        adaptive_input_stats_t pool = adaptive_input_stats(s_encoded);
+        if (pool.limit != pool.target) adaptive_input_set_limit(s_encoded, pool.target);
         adaptive_input_restore(s_encoded);
 #endif
         if (command.restore)
@@ -851,6 +854,17 @@ static bool ogg_output_cancelled(void *user) {
     return context->generation != atomic_load(&s_generation) ||
            context->generation == atomic_load(&s_failed_generation);
 }
+
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+static void ogg_prepare_family1(void *user, const opus_family1_plan *plan) {
+    // Four or more active Opus decoders put sustained pressure on byte RAM.
+    // Keep the established four-slot floor. Excess busy slots retire on
+    // return, without dropping queued packets or invalidating leases.
+    if (plan->needed >= 4 && !ogg_output_cancelled(user)) {
+        adaptive_input_set_limit(s_encoded, adaptive_input_stats(s_encoded).minimum);
+    }
+}
+#endif
 
 static bool ogg_output_layout(void *user, const esp_audio_simple_dec_info_t *info,
                               const uint8_t *pcm, size_t bytes,
@@ -1160,6 +1174,9 @@ static void decoder_task(void *argument) {
                 .cancelled = ogg_output_cancelled, .output = ogg_output_pcm,
                 .yield = ogg_output_yield, .context = &context,
                 .output_layout = ogg_output_layout,
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+                .prepare_family1 = ogg_prepare_family1,
+#endif
             };
             int32_t cause = 0;
             ogg_playback_status status = ogp_feed(&ogg, packet->data,
