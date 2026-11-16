@@ -6,6 +6,7 @@
 #include "native_tls_early_mpi.h"
 static unsigned phase,acquires,releases,tasks;
 static bool held;
+static UBaseType_t main_priority=1;
 static void fail(const char *s) { fprintf(stderr,"EARLY_MPI_HOST_FAILURE %s\n",s); exit(2); }
 void event(unsigned id) {
     if (CONFIG_YORADIO_TLS_EARLY_MPI_LOCK && phase != 2) fail("startup_before_warm");
@@ -27,7 +28,12 @@ void native_state_set_network(native_state_t *s,int m,int v) { (void)v;s->networ
 int nvs_flash_init(void) { event(3);return 0; }
 int native_audio_settings_init(void) { event(3);return 0; }
 int network_settings_init(void) { event(3);return 0; }
-int esp_vfs_spiffs_register(const esp_vfs_spiffs_conf_t *c) { event(3);if(c->format_if_mount_failed)fail("format_policy");return 0; }
+int esp_vfs_spiffs_register(const esp_vfs_spiffs_conf_t *c) {
+    event(3);
+    if(c->format_if_mount_failed)fail("format_policy");
+    if(main_priority!=tskIDLE_PRIORITY)fail("mount_priority");
+    return 0;
+}
 int cyd_display_init(cyd_display_t *d) { (void)d;event(3);return 0; }
 int time_service_start(void) { event(3);return 0; }
 int audio_service_start(native_state_t *s) { (void)s;return 0; }
@@ -40,6 +46,14 @@ int cyd_display_draw_bitmap(cyd_display_t *d,int a,int b,int c,int e,uint16_t *p
 void cyd_display_flush(cyd_display_t *d) { (void)d; }
 void vTaskDelete(void *p) { (void)p; }
 void vTaskDelay(unsigned t) { (void)t; }
+UBaseType_t uxTaskPriorityGet(void *task) {
+    if(task)fail("get_main_priority");
+    return main_priority;
+}
+void vTaskPrioritySet(void *task,UBaseType_t priority) {
+    if(task)fail("set_main_priority");
+    main_priority=priority;
+}
 int xTaskCreatePinnedToCore(void (*fn)(void *),const char *name,unsigned stack,void *arg,unsigned priority,void *handle,int core) {
     (void)fn;(void)arg;(void)handle;event(3);
     if(core!=0)fail("existing_core_affinity");
@@ -51,6 +65,7 @@ const char *esp_err_to_name(int r) { (void)r;return "stub"; }
 void app_main(void);
 int main(void) {
     app_main();
+    if(main_priority!=1)fail("restore_main_priority");
     if(held || tasks!=2 || acquires!=(unsigned)CONFIG_YORADIO_TLS_EARLY_MPI_LOCK || releases!=acquires)fail("final_order");
     puts("EARLY_MPI_HOST_COMPLETE actual_module=1 actual_app_main_copy=1");
     return 0;

@@ -31,7 +31,13 @@ static esp_err_t mount_spiffs(void) {
         // Never format automatically: this preserves Wi-Fi, playlist and UI.
         .format_if_mount_failed = false,
     };
-    return esp_vfs_spiffs_register(&config);
+    // The synchronous flash scan can outlast the idle task watchdog.
+    // Run at idle priority so CPU0 can time-slice between the two tasks.
+    UBaseType_t priority = uxTaskPriorityGet(NULL);
+    vTaskPrioritySet(NULL, tskIDLE_PRIORITY);
+    esp_err_t result = esp_vfs_spiffs_register(&config);
+    vTaskPrioritySet(NULL, priority);
+    return result;
 }
 
 static void paint_status(uint16_t top, uint16_t center, uint16_t bottom) {

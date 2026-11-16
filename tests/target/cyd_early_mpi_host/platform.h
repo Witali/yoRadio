@@ -37,5 +37,9 @@ int cyd_display_draw_bitmap(cyd_display_t *d,int x0,int y0,int x1,int y1,uint16_
 void cyd_display_flush(cyd_display_t *d);
 void vTaskDelete(void *task);
 void vTaskDelay(unsigned ticks);
+typedef unsigned UBaseType_t;
+enum { tskIDLE_PRIORITY = 0 };
+UBaseType_t uxTaskPriorityGet(void *task);
+void vTaskPrioritySet(void *task, UBaseType_t priority);
 int xTaskCreatePinnedToCore(void (*fn)(void *),const char *name,unsigned stack,void *arg,unsigned priority,void *handle,int core);
 const char *esp_err_to_name(int result);

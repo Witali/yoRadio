@@ -36,6 +36,7 @@ def main():
     test = ROOT / 'tests/native/cyd_time_events_test.c'
     helper = ROOT / 'tests/run-web-warning-regressions.py'
     files = [Path(__file__).resolve(), test, helper, main_dir / 'app_main.c',
+             main_dir / 'native_tls_early_mpi.h',
              main_dir / 'network_service.c', main_dir / 'board_config.h',
              main_dir / 'network_profiles.h', main_dir / 'network_netif.h',
              main_dir / 'network_runtime.h',
@@ -61,12 +62,14 @@ def main():
     globals_start=network.index('static network_netif_t s_station_netif;')
     globals_end=network.index('static SemaphoreHandle_t',globals_start)
     network_unit=network[globals_start:globals_end]+helpers.function(network,'network_service_start')
-    startup_unit = ''.join(helpers.function(startup, name) for name in ['mount_spiffs', 'app_main'])
+    startup_unit = '#include "native_tls_early_mpi.h"\n' + ''.join(
+        helpers.function(startup, name) for name in ['mount_spiffs', 'app_main'])
     c3_unit = helpers.function((frozen/'idf/esp32c3-oled-native/main/network_service.c').read_text(), 'event_handler')
     assert 'CONFIG_LWIP_SNTP_MAX_SERVERS=2' in (frozen / 'idf/esp32-cyd2usb-native/sdkconfig.defaults').read_text()
     (out / 'driver').mkdir()
     (out / 'driver/gpio.h').write_text('/* GPIO declarations unused by this startup fixture. */\n')
     (out / 'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
+    (out / 'sdkconfig.h').write_text('#pragma once\n')
     (out / 'esp_netif.h').write_text('#pragma once\ntypedef struct esp_netif esp_netif_t;\n')
     command = ['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                '-Wno-unused-function', '-Wno-unused-variable',
@@ -96,6 +99,10 @@ def main():
 
     run_case('positive', network_unit, startup_unit)
     mutations = [
+        ('busy_spiffs_mount', 'startup', 'vTaskPrioritySet(NULL, tskIDLE_PRIORITY);',
+         '(void)0;', 'main_priority == tskIDLE_PRIORITY'),
+        ('leaked_spiffs_priority', 'startup', 'vTaskPrioritySet(NULL, priority);',
+         '(void)priority;', 'main_priority == TEST_MAIN_PRIORITY'),
         ('missing_time_start', 'startup', 'result = time_service_start();',
          'result = ESP_OK;', 'time_step>display_step'),
         ('missing_network_settings_start', 'startup', 'result = network_settings_init();',
