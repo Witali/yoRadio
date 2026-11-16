@@ -104,6 +104,25 @@ one build per output selection and enable both PCM probe options for each
 build, including PDM. The runner checks the exact `/script.js` with a
 25-second socket I/O timeout, independent of the guest watchdog.
 
+For [Opus Family 1](../../results/cyd-opus-family1-openeth-20261116/README.md),
+add `'-D','CYD_OPENETH_PCM_PROBE=ON'` and
+`'-D','CYD_OPENETH_PCM_CHANNEL_METRICS=ON'` to the diagnostic build. Use
+`'-D','CYD_OPENETH_OPUS_HEAP_PROBE=ON'` to record available internal memory
+and the largest matching block before and after each Espressif decoder open.
+Generate a local fixture with FFmpeg and ffprobe available on PATH.
+
+```powershell
+& $py -B "$target/prepare-opus-family1.py" --output .build/family1-120 --packet-ms 120
+& $py -B tests/run-cyd-full-app-openeth.py --build .build/openeth-fixture --qemu $qemu --rom $rom --tls-material $profile --output .build/openeth-family1-120 --opus-family1 .build/family1-120/fixture.json --through-eof --full-tls-records
+```
+
+The fixture defaults to eight channels and a 1,000 ms Ogg muxer page target.
+Use `--packet-ms 20`, `--channels 4` or `--channels 6`, and
+`--ogg-page-ms 200` to vary one property per comparison. The runner checks
+the exact post-trim frame count, then compares energy and zero crossings in
+each Vorbis-order channel against the libopus decode. It also requires
+progress during a WebUI read and an exact asset read after EOF.
+
 The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
 and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)
 cover the earlier diagnostic profiles. Production Wi-Fi and physical audio

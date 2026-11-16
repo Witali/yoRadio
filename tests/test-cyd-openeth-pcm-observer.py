@@ -33,12 +33,31 @@ class PcmObserverTests(unittest.TestCase):
 
     def test_dac_progress_excludes_driver_bytes(self):
         health = {'output_driver': {'written_bytes': 1024}}
-        self.assertEqual(probe.output_progress(health, '', 'dac'), 0)
-        self.assertEqual(probe.output_progress(health, '', 'pdm'), 1024)
-        self.assertEqual(probe.output_progress(health, 'bad CYD_OPENETH_PCM_PROGRESS frames=960\n', 'dac'), 0)
+        self.assertEqual(probe.output_progress(health, '', True), 0)
+        self.assertEqual(probe.output_progress(health, '', False), 1024)
+        self.assertEqual(probe.output_progress(health, 'bad CYD_OPENETH_PCM_PROGRESS frames=960\n', True), 0)
         log = 'CYD_OPENETH_PCM_PROGRESS frames=648\r\nCYD_OPENETH_PCM_PROGRESS frames=5448\r\n'
-        self.assertEqual(probe.output_progress(health, log, 'legacy_dac'), 5448)
-        self.assertEqual(probe.output_progress(health, log, 'pdm', 'flac'), 5448)
+        self.assertEqual(probe.output_progress(health, log, True), 5448)
+
+    def test_pdm_counts_pcm_for_flac_and_family1(self):
+        self.assertFalse(probe.uses_pcm_probe('pdm', {'codec': 'opus'}))
+        self.assertTrue(probe.uses_pcm_probe('pdm', {'codec': 'flac'}))
+        self.assertTrue(probe.uses_pcm_probe('pdm', {'codec': 'opus', 'family1': {}}))
+        self.assertTrue(probe.uses_pcm_probe('dac', {'codec': 'opus'}))
+
+    def test_family1_checks_order_and_both_channel_metrics(self):
+        reference = [dict(energy=1000 + 500 * channel, crossings=100 + 20 * channel)
+                     for channel in range(8)]
+        rows = [f'CYD_OPENETH_PCM_CHANNEL index={channel} energy={row["energy"]} crossings={row["crossings"]}\n'
+                for channel, row in enumerate(reference)]
+        self.assertEqual(probe.require_family1_metrics(''.join(rows), reference), reference)
+        for changed in (rows[::-1], rows[:-1], rows + rows[:1]):
+            with self.subTest(changed=changed), self.assertRaisesRegex(RuntimeError, 'ordered PCM metrics'):
+                probe.require_family1_metrics(''.join(changed), reference)
+        for replacement in ('index=0 energy=1051 crossings=100', 'index=0 energy=1000 crossings=103'):
+            with self.subTest(replacement=replacement), self.assertRaisesRegex(RuntimeError, 'channel 0 disagrees'):
+                probe.require_family1_metrics('CYD_OPENETH_PCM_CHANNEL ' + replacement + '\n' + ''.join(rows[1:]),
+                                              reference)
 
     def observe_eof(self, uart, *, allocations=0, backend='dac', codec='opus',
                     pcm_md5=None, pcm_frames=528000):

@@ -105,13 +105,14 @@ all-channel normalization with the existing512-byte scratch. Ordinary LEGACY
 layout retains its established first-two-channel behavior. These output HOST
 gates do not replace the complete family1 task gate.
 
-The new full-task diagnostic has not passed yet. Original nonpassing attempts
-are retained; completed independent references or individual EOF/Stop cases
-are partial evidence. Corrections to a new observer must preserve production
-sources, fixtures, exact source/mono comparisons and original task profiles.
-Application OOM, watchdog/resource margins and full radio/TLS/TFT behavior must
-be established from their own observations rather than inferred from a failed
-diagnostic assertion or from the standalone adapter.
+The [actual-task diagnostic](../tests/results/cyd-family1-task-20261104/README.md)
+passed 48 outputs against an independent PCM oracle. The
+[full CYD application runs](../tests/results/cyd-opus-family1-openeth-20261116/README.md)
+with TLS, TFT and the WebUI reached separate memory limits. Eight-channel
+streams failed on an Espressif decoder allocation under both TLS policies.
+Six-channel streams opened their decoders and failed to allocate the first
+audio page with both tested page sizes. Full-application qualification remains
+open.
 
 ## Additional legal packet-mode observations
 
