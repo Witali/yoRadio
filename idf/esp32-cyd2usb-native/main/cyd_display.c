@@ -40,8 +40,8 @@ esp_err_t cyd_display_init(cyd_display_t *display) {
         xSemaphoreCreateCounting(CYD_DISPLAY_DMA_BUFFER_COUNT, 0);
     ESP_RETURN_ON_FALSE(display->transfer_done, ESP_ERR_NO_MEM, TAG,
                         "LCD completion semaphore allocation failed");
-    // This status-oriented native UI does not redraw full frames at video
-    // rate. A single split DMA buffer saves 10 KiB for TLS and audio codecs.
+    // The status UI refreshes only on network state changes. Split the
+    // primary buffer into two four-row transfers and keep both DMA slots.
     ESP_RETURN_ON_ERROR(cyd_display_set_double_buffered(display, false), TAG,
                         "LCD DMA buffer setup failed");
 
@@ -99,9 +99,9 @@ esp_err_t cyd_display_init(cyd_display_t *display) {
     ESP_RETURN_ON_ERROR(gpio_set_level(BOARD_TFT_BACKLIGHT, 1), TAG,
                         "Backlight enable failed");
 
-    ESP_LOGI(TAG, "ST7789: SPI2 DMA, %d Hz, double %dx%d-row buffers",
-             BOARD_DISPLAY_CLOCK_HZ, CYD_DISPLAY_WIDTH,
-             CYD_DISPLAY_ROWS_PER_TRANSFER);
+    ESP_LOGI(TAG, "ST7789: SPI2 DMA, %d Hz, two %dx%d strips (%u bytes)",
+             BOARD_DISPLAY_CLOCK_HZ, CYD_DISPLAY_WIDTH, display->rows_per_transfer,
+             (unsigned)sizeof(display->primary_dma_buffer));
     return cyd_display_clear(display, 0x0000);
 }
 

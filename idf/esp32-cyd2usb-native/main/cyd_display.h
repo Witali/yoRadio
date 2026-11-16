@@ -11,7 +11,7 @@
 
 #define CYD_DISPLAY_WIDTH 320
 #define CYD_DISPLAY_HEIGHT 240
-#define CYD_DISPLAY_ROWS_PER_TRANSFER 16
+#define CYD_DISPLAY_ROWS_PER_TRANSFER 8
 
 typedef struct {
     esp_lcd_panel_io_handle_t io;

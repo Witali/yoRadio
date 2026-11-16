@@ -123,6 +123,15 @@ the exact post-trim frame count, then compares energy and zero crossings in
 each Vorbis-order channel against the libopus decode. It also requires
 progress during a WebUI read and an exact asset read after EOF.
 
+To compare two builds of the ST7789 status display, use `check-tft.py`
+with the same OpenETH boot profile. It waits for the full network-client
+frame in QEMU and compares the dimensions and every RGB pixel. The PPM
+frames are saved under the supplied ignored output directory.
+
+```powershell
+& $py -B "$target/check-tft.py" --baseline .build/openeth-before --build .build/openeth-after --qemu $qemu --rom $rom --output .build/tft-comparison
+```
+
 The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
 and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)
 cover the earlier diagnostic profiles. Production Wi-Fi and physical audio
