@@ -14,7 +14,7 @@ static void packet_free(void *);
 #include <stdlib.h>
 typedef struct {uint8_t *body;size_t size,capacity;unsigned pages;} physical;
 typedef struct {uint8_t head[40];uint8_t *packets[11];size_t bytes[11];unsigned count,channels,streams,coupled,pre_skip,logical;} corpus;
-typedef struct {unsigned packets,borrowed,copied,pages,realloc_calls,failures;size_t capacity;opk_status status;bool abandoned;} observation;
+typedef struct {unsigned packets,borrowed,copied,pages,realloc_calls,failures,word_pages;size_t capacity;opk_status status;bool abandoned;} observation;
 static unsigned cases;
 static unsigned fail_on,realloc_calls,failures;
 static bool retry_failure;
@@ -25,6 +25,31 @@ static uint8_t saved_prefix[61440];
 static size_t saved_size,saved_capacity,saved_cursor;
 static unsigned saved_segment;
 static uint64_t saved_token;
+static bool use_word_pages, deny_word_allocation;
+static unsigned word_allocations, word_releases, word_refusals;
+static void *live_word_payload;
+
+static void *word_allocate(size_t bytes) {
+    assert(!live_word_payload && bytes >= 4096 && bytes % 4 == 0);
+    if (deny_word_allocation) {
+        ++word_refusals;
+        return NULL;
+    }
+    live_word_payload = malloc(bytes);
+    assert(live_word_payload);
+    memset(live_word_payload, 0xa5, bytes);
+    ++word_allocations;
+    return live_word_payload;
+}
+
+static void word_release(void *payload) {
+    assert(payload && payload == live_word_payload);
+    free(payload);
+    live_word_payload = NULL;
+    ++word_releases;
+}
+
+static const ogg_page_word_allocator word_allocator = {word_allocate, word_release};
 static void *packet_realloc(void *pointer,size_t bytes) {
     assert(pointer==live_prefix && bytes<=61440);++realloc_calls;
     if(fail_on==realloc_calls) {
@@ -105,6 +130,10 @@ static observation observe(const physical *physical_bytes,const corpus *expected
             else if(e.flags&OOPT_TAGS){assert(opk_start_link(&owner,&input));}
             else if(owner.active) {
                 audio=true;assert(opk_begin_page(&owner,&input)==OPK_NEED_PAGE);++r.pages;
+                if(input.word_page) {
+                    assert(use_word_pages && input.word_payload && input.capacity < input.size);
+                    ++r.word_pages;
+                }
                 for(;;) {
                     opus_audio_packet_view view;opk_status next=opk_next(&owner,&view);r.status=next;
                     if(next==OPK_MEMORY) {
@@ -130,16 +159,30 @@ static observation observe(const physical *physical_bytes,const corpus *expected
                 assert(opk_page_exhausted(&owner) && !opk_page_released(&owner,&input));
                 if(owner.capacity>r.capacity)r.capacity=owner.capacity;
             }
+            if(use_word_pages)assert(!opi_set_word_allocator(&input,&word_allocator));
             assert(opi_ack(&input,e.generation,e.token));
-            if(audio){assert(opk_page_released(&owner,&input));if(e.flags&OOPT_LINK_END)assert(opk_finish_link(&owner) && !owner.capacity);}
+            if(use_word_pages && (e.flags&OOPT_TAGS))assert(opi_set_word_allocator(&input,&word_allocator));
+            if(audio) {
+                assert(opk_page_released(&owner,&input));
+                if(e.flags&OOPT_LINK_END) {
+                    assert(opk_finish_link(&owner) && !owner.capacity);
+                    if(use_word_pages)assert(opi_set_word_allocator(&input,NULL) && !live_word_payload);
+                }
+            }
             if(input.capacity)memset(input.page,0xa5,input.capacity); /* The prefix must survive genuine page retirement. */
         } else {assert(status==OPI_MORE);if(at==physical_bytes->size)break;assert(used);}
     }
     if(!policy && !crc_error && !r.abandoned)assert(at==physical_bytes->size && r.packets==expected->count && !owner.active && opi_finish(&input)==OPI_FINISHED);
     if(policy)assert(r.status==OPK_PACKET_POLICY && r.packets==0 && owner.prefix_size<=255 && owner.capacity<=OMF_FAMILY01_MAX_PACKET);
-    if(crc_error)assert(r.packets==0 && !input.ready && owner.prefix_size==0);
+    if(crc_error) {
+        assert(r.packets==0 && !input.ready);
+        if(owner.prefix_size) {
+            assert(owner.partial && owner.prefix_size==255 && owner.capacity>=255 &&
+                   !memcmp(owner.prefix,expected->packets[0],255));
+        }
+    }
     if(r.abandoned)assert(input.ready && r.packets==0 && failures==1);
-    r.realloc_calls=realloc_calls;r.failures=failures;opk_reset(&owner);opi_reset(&input,10);assert(!owner.prefix && !owner.ready && !owner.source && !live_prefix && !live_capacity);fault_owner=NULL;++cases;return r;
+    r.realloc_calls=realloc_calls;r.failures=failures;opk_reset(&owner);opi_reset(&input,10);assert(!owner.prefix && !owner.ready && !owner.source && !live_prefix && !live_capacity && !live_word_payload);fault_owner=NULL;++cases;return r;
 }
 static corpus load(const char *path) {
     FILE *f=fopen(path,"rb");assert(f);corpus out={0};assert(fread(out.head,1,40,f)==40 && !memcmp(out.head,"OFAM101\0",8));
@@ -152,6 +195,52 @@ static corpus padded(size_t bytes) {
     uint8_t *p=out.packets[0];p[0]=0xfb;p[1]=0x41;memset(p+2,255,240);p[242]=(uint8_t)(bytes-243-240*254);return out;
 }
 static void release(corpus *source){for(unsigned i=0;i<source->count;++i)free(source->packets[i]);}
+
+static unsigned test_word_pages(void) {
+    corpus source = padded(61440);
+    // Opus padding may contain any bit pattern. Exercise every byte position
+    // in a packed word without changing the packet's declared duration.
+    for (size_t i = 253; i < source.bytes[0]; ++i) source.packets[0][i] = (uint8_t)(13 * i);
+    const size_t chunks[] = {0, 1, 257};
+    unsigned before = cases;
+    use_word_pages = true;
+    for (unsigned style = 0; style <= 1; ++style) {
+        physical bytes = make(&source, style);
+        creator_walk(&bytes, &source);
+        for (unsigned feed = 0; feed < sizeof(chunks) / sizeof(chunks[0]); ++feed) {
+            observation result = observe(&bytes, &source, chunks[feed], false, false);
+            assert(result.word_pages == 1 && result.copied == 1 && !result.borrowed);
+        }
+        bytes.body[bytes.size - 1] ^= 0x40;
+        observe(&bytes, &source, 257, false, true);
+        free(bytes.body);
+    }
+    physical bytes = make(&source, 0);
+    deny_word_allocation = true;
+    observation fallback = observe(&bytes, &source, 257, false, false);
+    assert(!fallback.word_pages && fallback.borrowed == 1 && !fallback.copied);
+    free(bytes.body);
+    deny_word_allocation = false;
+
+    corpus growth = padded(61429);
+    growth.packets[1] = source.packets[0];
+    growth.bytes[1] = source.bytes[0];
+    growth.bytes[2] = growth.bytes[0];
+    growth.packets[2] = malloc(growth.bytes[2]);
+    assert(growth.packets[2]);
+    memcpy(growth.packets[2], growth.packets[0], growth.bytes[2]);
+    growth.count = 3;
+    growth.logical = 2880;
+    bytes = make(&growth, 0);
+    observation larger = observe(&bytes, &growth, 257, false, false);
+    assert(larger.word_pages == 3 && larger.copied == 3 && !larger.borrowed);
+    assert(word_allocations == 10 && word_releases == 10 && word_refusals == 1);
+    use_word_pages = false;
+    free(bytes.body);
+    release(&growth);
+    return cases - before;
+}
+
 int main(int argc,char **argv) {
     assert(argc==3);unsigned creator_walks=0,borrowed=0,copied=0;const size_t chunks[3]={0,1,257};
     for(unsigned fixture=0;fixture<2;++fixture) {
@@ -188,6 +277,8 @@ int main(int argc,char **argv) {
         printf("{\"suite\":\"packet-realloc-control\",\"ordinal\":%u,\"retry\":%s,\"packets\":%u,\"held_page_preserved\":true,\"cursor_prefix_token_preserved\":true,\"cleanup_live_bytes\":0}\n",ordinal,retry?"true":"false",r.packets);
     }
     fail_on=0;retry_failure=false;free(ladder.body);release(&growth);
-    printf("{\"suite\":\"ogg-opus-audio-packets\",\"passed\":true,\"owner_schedules\":%u,\"creator_libogg_walks\":%u,\"borrowed_packets\":%u,\"copied_packets\":%u,\"maximum_packet\":61440,\"over_limit_policy\":61441,\"allocation_failure_injected\":true,\"realloc_ordinals\":%u,\"retry_cases\":%u,\"abandon_cases\":%u,\"decoder_drain_claimed\":false,\"production_selected\":false}\n",
-        cases,creator_walks,borrowed,copied,baseline.realloc_calls,retry_cases,abandon_cases);return 0;
+    unsigned word_cases = test_word_pages();
+    printf("{\"suite\":\"ogg-opus-audio-packets\",\"passed\":true,\"owner_schedules\":%u,\"creator_libogg_walks\":%u,\"borrowed_packets\":%u,\"copied_packets\":%u,\"maximum_packet\":61440,\"over_limit_policy\":61441,\"allocation_failure_injected\":true,\"realloc_ordinals\":%u,\"retry_cases\":%u,\"abandon_cases\":%u,\"decoder_drain_claimed\":false,\"production_selected\":false,\"word_page_schedules\":%u,\"word_allocations\":%u,\"word_releases\":%u,\"word_refusals\":%u}\n",
+        cases-word_cases,creator_walks,borrowed,copied,baseline.realloc_calls,retry_cases,abandon_cases,
+        word_cases,word_allocations,word_releases,word_refusals);return 0;
 }

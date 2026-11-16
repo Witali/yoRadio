@@ -72,6 +72,57 @@ The existing WebUI host suite passed under ASan/UBSan, including the added
 priority assertions, five negative controls and 48 page tests. The
 six- and eight-channel resource limits remain open.
 
+## Moving encoded audio pages out of byte-addressable memory
+
+After verified OpusTags, CYD can hold Family 1 audio payloads of at least
+4,096 bytes in memory with aligned 32-bit access. The page header and lacing
+table stay byte-addressable. The reader delivers complete packets from the
+verified page, copying only the requested packet or continuation into its
+existing assembly buffer. Short pages keep the borrowed-packet path. If a
+word-capable block cannot be reserved, the byte-page path can still accept it.
+The word payload is reclaimed when the link closes or playback is reset.
+[Ogg page structure and CRC](https://www.rfc-editor.org/rfc/rfc3533.html#section-6).
+[ESP32 heap capabilities](https://docs.espressif.com/projects/esp-idf/en/v6.0.2/esp32/api-reference/system/mem_alloc.html).
+
+The intermediate image with word pages passed the first six-channel audio
+page for both muxing profiles. The next allocation that failed in each case
+was the initial 11,520-byte PCM scratch buffer. The current scratch policy
+uses the validated first packet duration and the largest active stream width.
+For 20 ms stereo substreams, the first request is 3,840 bytes. The same public
+resize protocol handles legal packets up to 120 ms. The PCM plane path can
+use aligned word storage while the encoded page is held.
+
+The host comparison against libogg passes 65 existing packet schedules and
+10 new word-page schedules under ASan/UBSan. The new cases cover byte-wise
+input, continued packets, a 61,440-byte packet, CRC error, reuse and growth,
+EOS retirement, and fallback after word memory refusal. The unchanged
+page/trim suite passes 276 page and 204 trim cases, including the maximum
+65,307-byte Ogg page. Independently, the libopus decoder-owner test passes 13
+positive cases and 22 controls with 2,679,360 exact PCM samples.
+
+In the matched four-channel, 120 ms replays with dynamic TLS buffers and
+200 ms Ogg pages, both firmware images produced exactly 672,000 frames
+and served the exact WebUI asset after EOF. The minimum free byte heap
+rose from 7,804 to 14,204 bytes. An intermediate attempt timed out during
+the WebUI read before playback and is included separately.
+
+The six-channel replay with regular Ogg pages and dynamic TLS reached
+120,200 frames in the last progress sample. No decoder failure was reported.
+The minimum free byte heap fell to 520 bytes. OpenETH reported six receive
+allocation wait and recovery episodes and the WebUI connection closed
+before EOF. With 200 ms Ogg pages, a request for 11,520 bytes still failed
+before any PCM was accepted.
+
+With static TLS RX, the six-channel stream with regular pages reached
+105,800 frames. OpenETH reported 13 RX allocation waits and WebUI closed
+before EOF. With 200 ms pages, the decoder advanced to output setup.
+PDM configuration failed on a 1,024-byte DMA allocation. The native error
+was `ESP_ERR_NO_MEM` and no PCM reached the output task. Both TLS policies
+still have a six-channel full-application resource limit.
+
+The [word-page observations](word-page-observed.json) bind these measurements
+to the fixture, firmware, SDK configuration and host test reports.
+
 The [observations](observed.json) record the image, runner and UART hashes,
 the fixture bounds, and the numeric results. For the commands, see
 [the OpenETH harness](../../target/cyd_full_app_openeth_qemu/README.md).

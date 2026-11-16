@@ -27,11 +27,13 @@ static backend stats;
 static opus_family1_decoder *current_owner;
 static unsigned scratch_calls,scratch_refuse;
 static void *live_scratch;
-static size_t scratch_bytes;
+static size_t scratch_bytes, first_scratch_bytes;
 static unsigned controls,positive_cases;
 static uint64_t compared_samples;
 static void *scratch_realloc(void *p,size_t n) {
-    assert(p==live_scratch && n<=23040);++scratch_calls;if(scratch_calls==scratch_refuse)return NULL;
+    assert(p==live_scratch && n<=23040);
+    if(!scratch_calls)first_scratch_bytes=n;
+    ++scratch_calls;if(scratch_calls==scratch_refuse)return NULL;
     void *next=realloc(p,n);assert(next);live_scratch=next;scratch_bytes=n;return next;
 }
 static void scratch_free(void *p) {
@@ -85,7 +87,8 @@ esp_audio_err_t esp_opus_dec_close(void *opaque) {
     opus_decoder_destroy(h->decoder);free(h->pending);free(h);++stats.destroyed;assert(stats.live);--stats.live;return ESP_AUDIO_ERR_OK;
 }
 static void reset_backend(opus_family1_decoder *owner) {
-    assert(!stats.live && !live_scratch && !scratch_bytes);memset(&stats,0,sizeof(stats));scratch_calls=scratch_refuse=0;current_owner=owner;
+    assert(!stats.live && !live_scratch && !scratch_bytes);memset(&stats,0,sizeof(stats));
+    scratch_calls=scratch_refuse=0;first_scratch_bytes=0;current_owner=owner;
 }
 typedef struct {
     opus_family1_plan plan;
@@ -130,6 +133,7 @@ static void positive(const corpus *source,unsigned channels,const uint8_t *map,b
     for(unsigned p=0;p<source->count;++p) {
         int frames=opus_multistream_decode_float(reference,source->packet[p],(int32_t)source->bytes[p],reference_pcm,5760,0);assert(frames>0);staged.reference=reference_pcm;
         assert(ofd_decode_packet(&owner,source->packet[p],source->bytes[p],&output).code==OFD_OK && owner.active && !staged.aborts && staged.published==p+1);
+        if(!p && channels==8 && needed==5 && frames==960)assert(first_scratch_bytes==3840);
     }
     assert(ofd_close(&owner).code==OFD_OK && !owner.active && !ofd_has_handles(&owner) && stats.created==needed && stats.created==stats.destroyed && !stats.live && !live_scratch);
     assert(ofd_close(&owner).code==OFD_OK);opus_multistream_decoder_destroy(reference);free(reference_pcm);release_stage(&staged);++positive_cases;

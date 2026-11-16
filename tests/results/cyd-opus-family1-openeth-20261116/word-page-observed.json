@@ -1,0 +1,645 @@
+{
+  "base_commit": "8462667198bfafffb984bf5d69e36446aa6010e7",
+  "sdk": "6.0.2",
+  "physical_tested": false,
+  "watchdog_seconds": 5,
+  "cases": [
+    {
+      "case": "run-pdm-4ch-120-web-idle-01",
+      "revision": "baseline",
+      "tls_rx": "dynamic",
+      "app_sha256": "09c158c2248e5473088533b5d44261b89b5d5d1d05cf7342a2d4a7a50da022c6",
+      "report_sha256": "541f7f1ba2ed0b82e35856d1c276b683c2205652db8a4f5e9a51fc94beec8900",
+      "channels": 4,
+      "packet_ms": 120,
+      "ogg_page_ms": 200,
+      "max_page_bytes": 15449,
+      "reference_pcm_sha256": "d6166d1ce39eae2eac997d830db20f67bbd01a65dc02811e8fc36742ca281c14",
+      "encoded_sha256": "30145422f0df5b68ed2f872278e2f2a1ce639cf701a2d38806ab99670513702a",
+      "state": "TERMINAL_PASS",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "uart_sha256": "22028a82db427679a747be79f3eb352b84b883232cb1ab2e8f38d566209e4b7d",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 671304,
+      "pcm_probe_flushes": [
+        {
+          "frames": 672000,
+          "status": 0
+        }
+      ],
+      "pcm_progress_during_webui": [
+        128,
+        48712
+      ],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 903907,
+          "complete": true
+        }
+      ],
+      "minimum_heap": 7804,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "written_bytes": 1345920,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0
+      },
+      "openeth_rx_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0
+      },
+      "full_tls_records": 55,
+      "tail_bytes": 2787,
+      "family1_pcm_metrics": [
+        {
+          "energy": 443299596691,
+          "crossings": 5910
+        },
+        {
+          "energy": 606251529032,
+          "crossings": 12963
+        },
+        {
+          "energy": 520858446949,
+          "crossings": 9436
+        },
+        {
+          "energy": 1129513082816,
+          "crossings": 2051
+        }
+      ],
+      "web_asset_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      }
+    },
+    {
+      "case": "run-pdm-6ch-20-word-01",
+      "revision": "word_pages",
+      "tls_rx": "dynamic",
+      "app_sha256": "d8c68aa6f92fd33a150801ae1f78a4a1aff98324988bd7ca7d3d4c5a76223642",
+      "report_sha256": "4cd671c624deaa731aa3b8b37c20c1f9a6c6cc5a8804e4375f7bb4f658594ac7",
+      "channels": 6,
+      "packet_ms": 20,
+      "reference_pcm_sha256": "19f707283b78cc89321920057c11a2d5e4e371e089b5aefab2d059e483fa3d2e",
+      "encoded_sha256": "50982b1a9c0e8fe23fe727dc5237bcadf31ca74d3efe5d5ff3eb6d0f092a1ac2",
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active opus playback with output writes before the deadline",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "uart_sha256": "f02322c3f62178410eea6cb3e62388e98d51bfbb73c3181cd3cb5ceeff6bc0f5",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 0,
+      "pcm_probe_flushes": [
+        {
+          "frames": 0,
+          "status": 0
+        }
+      ],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 278528,
+          "complete": false
+        }
+      ],
+      "minimum_heap": 17336,
+      "allocation_failures": 1,
+      "last_allocation_failure": {
+        "size": 11520,
+        "caps": 6144
+      },
+      "decoder_failure": {
+        "sequence": 1,
+        "generation": 1,
+        "codec": 4,
+        "stage": 2,
+        "result": 11520,
+        "completion": 9,
+        "input_bytes": 2048,
+        "allocation_sequence": 1
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "written_bytes": 0,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0
+      },
+      "openeth_rx_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0
+      }
+    },
+    {
+      "case": "run-pdm-6ch-20-word-short-01",
+      "revision": "word_pages",
+      "tls_rx": "dynamic",
+      "app_sha256": "d8c68aa6f92fd33a150801ae1f78a4a1aff98324988bd7ca7d3d4c5a76223642",
+      "report_sha256": "b96013a1e76b5bd848a01e2bc9821c4afa607c27452b31ab5ad5b117aee8d088",
+      "channels": 6,
+      "packet_ms": 20,
+      "ogg_page_ms": 200,
+      "max_page_bytes": 12887,
+      "reference_pcm_sha256": "19f707283b78cc89321920057c11a2d5e4e371e089b5aefab2d059e483fa3d2e",
+      "encoded_sha256": "cee85272c466f276ab2091eec6659ecbdf110a07129dfa18304387db89aec854",
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active opus playback with output writes before the deadline",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "uart_sha256": "9e728159261d9bbb167d6dc47922652c602d36056f8b5dc69d84b0ebc1ed17c3",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 0,
+      "pcm_probe_flushes": [
+        {
+          "frames": 0,
+          "status": 0
+        }
+      ],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 212992,
+          "complete": false
+        }
+      ],
+      "minimum_heap": 15784,
+      "allocation_failures": 1,
+      "last_allocation_failure": {
+        "size": 11520,
+        "caps": 6144
+      },
+      "decoder_failure": {
+        "sequence": 1,
+        "generation": 1,
+        "codec": 4,
+        "stage": 2,
+        "result": 11520,
+        "completion": 9,
+        "input_bytes": 2048,
+        "allocation_sequence": 1
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "written_bytes": 0,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0
+      },
+      "openeth_rx_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0
+      }
+    },
+    {
+      "case": "run-pdm-4ch-120-word-01",
+      "revision": "word_pages",
+      "tls_rx": "dynamic",
+      "app_sha256": "d8c68aa6f92fd33a150801ae1f78a4a1aff98324988bd7ca7d3d4c5a76223642",
+      "report_sha256": "3417df1a1dd7c38cb4dee76bbdabf00de7d92b59d7bc3cd63aa7f9f04e008267",
+      "channels": 4,
+      "packet_ms": 120,
+      "ogg_page_ms": 200,
+      "max_page_bytes": 15449,
+      "reference_pcm_sha256": "d6166d1ce39eae2eac997d830db20f67bbd01a65dc02811e8fc36742ca281c14",
+      "encoded_sha256": "30145422f0df5b68ed2f872278e2f2a1ce639cf701a2d38806ab99670513702a",
+      "state": "TERMINAL_NONPASS",
+      "reason": "GET /script.js timed out",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "uart_sha256": "436a09c96101e0e7477319e74e97a123b89bb334d8c4a1aeaa037ce5cf72f255",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 0,
+      "pcm_probe_flushes": [],
+      "peer_observations": [],
+      "openeth_rx_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0
+      }
+    },
+    {
+      "case": "run-pdm-6ch-20-sized-01",
+      "revision": "word_pages_sized_scratch",
+      "tls_rx": "dynamic",
+      "app_sha256": "c17e1d3919429482308599377b61d933f7cdb04411825127a0922030351d7e83",
+      "report_sha256": "77998a65f2fff11f54278bdcf4aa3fbd58c781a3b6da4e45a649be107523dd40",
+      "channels": 6,
+      "packet_ms": 20,
+      "reference_pcm_sha256": "19f707283b78cc89321920057c11a2d5e4e371e089b5aefab2d059e483fa3d2e",
+      "encoded_sha256": "50982b1a9c0e8fe23fe727dc5237bcadf31ca74d3efe5d5ff3eb6d0f092a1ac2",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Remote end closed connection without response",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "uart_sha256": "669951b592807ee6bd4f9e3c68d2215b4541ca025703b7c0c7c53a7b3d12f0bb",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 120200,
+      "pcm_probe_flushes": [],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 507904,
+          "complete": false
+        }
+      ],
+      "minimum_heap": 520,
+      "allocation_failures": 4592,
+      "last_allocation_failure": {
+        "size": 1522,
+        "caps": 6144
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "written_bytes": 243072,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0
+      },
+      "openeth_rx_pressure": {
+        "wait_episodes": 6,
+        "recovered": 6
+      }
+    },
+    {
+      "case": "run-pdm-6ch-20-sized-short-01",
+      "revision": "word_pages_sized_scratch",
+      "tls_rx": "dynamic",
+      "app_sha256": "c17e1d3919429482308599377b61d933f7cdb04411825127a0922030351d7e83",
+      "report_sha256": "b93e468b2801bcd5b64941a5f4457e487a6f3e1c0bd08d5dc5c0273ec7481b16",
+      "channels": 6,
+      "packet_ms": 20,
+      "ogg_page_ms": 200,
+      "max_page_bytes": 12887,
+      "reference_pcm_sha256": "19f707283b78cc89321920057c11a2d5e4e371e089b5aefab2d059e483fa3d2e",
+      "encoded_sha256": "cee85272c466f276ab2091eec6659ecbdf110a07129dfa18304387db89aec854",
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active opus playback with output writes before the deadline",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "uart_sha256": "0461fb9d06e7df86cd31615f45a962fca7837a64137a7c0d9574470dd49433e4",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 0,
+      "pcm_probe_flushes": [
+        {
+          "frames": 0,
+          "status": 0
+        }
+      ],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 212992,
+          "complete": false
+        }
+      ],
+      "minimum_heap": 17472,
+      "allocation_failures": 1,
+      "last_allocation_failure": {
+        "size": 11520,
+        "caps": 6144
+      },
+      "decoder_failure": {
+        "sequence": 1,
+        "generation": 1,
+        "codec": 4,
+        "stage": 2,
+        "result": 11520,
+        "completion": 9,
+        "input_bytes": 2048,
+        "allocation_sequence": 1
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "written_bytes": 0,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0
+      },
+      "openeth_rx_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0
+      }
+    },
+    {
+      "case": "run-pdm-4ch-120-sized-01",
+      "revision": "word_pages_sized_scratch",
+      "tls_rx": "dynamic",
+      "app_sha256": "c17e1d3919429482308599377b61d933f7cdb04411825127a0922030351d7e83",
+      "report_sha256": "810c284b01efd7e6f07a80cdaa5ab97a56dc7fb49c6299d2211d21e837c1b4b7",
+      "channels": 4,
+      "packet_ms": 120,
+      "ogg_page_ms": 200,
+      "max_page_bytes": 15449,
+      "reference_pcm_sha256": "d6166d1ce39eae2eac997d830db20f67bbd01a65dc02811e8fc36742ca281c14",
+      "encoded_sha256": "30145422f0df5b68ed2f872278e2f2a1ce639cf701a2d38806ab99670513702a",
+      "state": "TERMINAL_PASS",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "uart_sha256": "fc2dbcd14e25cc9ec39cf8cdcc1a2d5e5cffa5d70781e815dfd20f83a8c21ed3",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 671304,
+      "pcm_probe_flushes": [
+        {
+          "frames": 672000,
+          "status": 0
+        }
+      ],
+      "pcm_progress_during_webui": [
+        128,
+        58440
+      ],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 903907,
+          "complete": true
+        }
+      ],
+      "minimum_heap": 14204,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "written_bytes": 1345920,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0
+      },
+      "openeth_rx_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0
+      },
+      "full_tls_records": 55,
+      "tail_bytes": 2787,
+      "family1_pcm_metrics": [
+        {
+          "energy": 443299596691,
+          "crossings": 5910
+        },
+        {
+          "energy": 606251529032,
+          "crossings": 12963
+        },
+        {
+          "energy": 520858446949,
+          "crossings": 9436
+        },
+        {
+          "energy": 1129513082816,
+          "crossings": 2051
+        }
+      ],
+      "web_asset_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      }
+    },
+    {
+      "case": "run-pdm-6ch-20-static-sized-01",
+      "revision": "word_pages_sized_scratch",
+      "tls_rx": "static_reserve",
+      "app_sha256": "c5717aafb58c900b2db8d486f251e2bd7f6b82f1b33ec4fd67ce243ba33a8d78",
+      "report_sha256": "a263dd8a77f7a9a9faa40669eacad443ef181d77702c29633330ce05a5016fb7",
+      "channels": 6,
+      "packet_ms": 20,
+      "reference_pcm_sha256": "19f707283b78cc89321920057c11a2d5e4e371e089b5aefab2d059e483fa3d2e",
+      "encoded_sha256": "50982b1a9c0e8fe23fe727dc5237bcadf31ca74d3efe5d5ff3eb6d0f092a1ac2",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Remote end closed connection without response",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "d956429c223cde70b378d35b9d9f14c03f3ce859e00c4dd9b3d1ccc91c71dc91",
+      "uart_sha256": "3058d7478c768048c9f53cb1cb75ac7f5e08ad239a22440bc6019ebc44595430",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 105800,
+      "pcm_probe_flushes": [],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 491520,
+          "complete": false
+        }
+      ],
+      "openeth_rx_pressure": {
+        "wait_episodes": 13,
+        "recovered": 12
+      }
+    },
+    {
+      "case": "run-pdm-6ch-20-static-sized-short-01",
+      "revision": "word_pages_sized_scratch",
+      "tls_rx": "static_reserve",
+      "app_sha256": "c5717aafb58c900b2db8d486f251e2bd7f6b82f1b33ec4fd67ce243ba33a8d78",
+      "report_sha256": "7c63a83ad7b89092c130a58795d11ce9d162d4ac145754e65257bf1572c9977c",
+      "channels": 6,
+      "packet_ms": 20,
+      "ogg_page_ms": 200,
+      "max_page_bytes": 12887,
+      "reference_pcm_sha256": "19f707283b78cc89321920057c11a2d5e4e371e089b5aefab2d059e483fa3d2e",
+      "encoded_sha256": "cee85272c466f276ab2091eec6659ecbdf110a07129dfa18304387db89aec854",
+      "state": "TERMINAL_NONPASS",
+      "reason": "No active opus playback with output writes before the deadline",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "config_sha256": "d956429c223cde70b378d35b9d9f14c03f3ce859e00c4dd9b3d1ccc91c71dc91",
+      "uart_sha256": "54de15e9dc8c766af031a01675231abfc39bb1dd9d2d35edfda01e1ebf9ff790",
+      "runner_sha256": "460f2801f151102d8dd7c5d073d32651b59b539a891d736e1427cfe5f3384e09",
+      "guest_fault_observed": false,
+      "pcm_probe_last_progress": 0,
+      "pcm_probe_flushes": [],
+      "peer_observations": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 212992,
+          "complete": false
+        }
+      ],
+      "minimum_heap": 568,
+      "allocation_failures": 1,
+      "last_allocation_failure": {
+        "size": 1024,
+        "caps": 2060
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 1,
+        "write_errors": 0,
+        "configure_errors": 1,
+        "flush_errors": 0,
+        "generation": 1,
+        "stage": 1,
+        "result": 257
+      },
+      "output_driver": {
+        "written_bytes": 0,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0
+      },
+      "openeth_rx_pressure": {
+        "wait_episodes": 0,
+        "recovered": 0
+      }
+    }
+  ],
+  "host_report_sha256": {
+    "host-page-input-regression": "9bab95b788eb3c2f1166593b738bc9707c3f714f8e411f50f6c75590acc7fbfa",
+    "host-word-packets-verified": "64b5fec059a9d2e1864f107afa3e63912ced489200e56156bd379c16f8d1c76d",
+    "host-sized-decoder": "6247bcf762c14cb63960be6cae6e25bdfaa77c22611a085ac153c83d09e84dda",
+    "host-word-sized-dispatch-final": "6719ba5f6deb7db6c0961d6f9dbbc2194184677339528b57ed1866bba5deec2e"
+  }
+}

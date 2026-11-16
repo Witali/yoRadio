@@ -4,7 +4,8 @@
 /* Audio packets only, after the committed OpusTags completion event. Header /
  * comment syntax and their different size policies remain separate. Sources
  * must be real CRC-verified ogg_page_input leases. Complete contiguous packets
- * borrow the held page; only cross-page prefixes allocate. A page ACK is still
+ * borrow a byte-addressable page. Word payloads are copied one packet at a
+ * time into the same buffer that assembles cross-page prefixes. A page ACK is
  * the caller's action after real synthesis/output/EOStream cleanup. This owner
  * never claims that a decoder drained or closes a codec on the caller's behalf.
  * Initialize with {0}, never copy a live owner, reset to cancel/release storage.
@@ -78,7 +79,7 @@ static inline opk_status opk_next(ogg_opus_audio_packets *s,opus_audio_packet_vi
     if(s->prefix_size>OMF_FAMILY01_MAX_PACKET || span>OMF_FAMILY01_MAX_PACKET-s->prefix_size)return OPK_PACKET_POLICY;
     size_t bytes=s->prefix_size+span;
     if(complete && (!bytes || s->token_sequence==UINT64_MAX))return bytes?OPK_LIMIT:OPK_INVALID;
-    bool borrowed=!s->partial && complete;
+    bool borrowed=!s->partial && complete && !s->source->word_page;
     if(!borrowed) {
         if(bytes>s->capacity) {
             size_t capacity=s->capacity?s->capacity:256;
@@ -86,7 +87,7 @@ static inline opk_status opk_next(ogg_opus_audio_packets *s,opus_audio_packet_vi
             uint8_t *larger=OPK_REALLOC(s->prefix,capacity);if(!larger)return OPK_MEMORY;
             s->prefix=larger;s->capacity=capacity;
         }
-        if(span)memcpy(s->prefix+s->prefix_size,page+s->payload_at,span);
+        if(span)opi_copy_payload(s->source,s->payload_at,s->prefix+s->prefix_size,span);
         s->prefix_size=bytes;
     }
     const uint8_t *data=borrowed?page+s->payload_at:s->prefix;s->segment=next;s->payload_at+=span;s->partial=!complete;
@@ -105,7 +106,9 @@ static inline bool opk_consume(ogg_opus_audio_packets *s,uint32_t generation,uin
  */
 static inline bool opk_page_released(ogg_opus_audio_packets *s,const ogg_page_input *input) {
     if(!s || !input || s->source!=input || !opk_page_exhausted(s) || input->ready || input->size ||
-        input->page!=s->page_data || input->capacity<s->page_bytes)return false;
+        input->page!=s->page_data)return false;
+    size_t storage=input->word_page?27u+input->page[26]+input->word_capacity:input->capacity;
+    if(storage<s->page_bytes)return false;
     s->eos_released=s->page_eos;s->source=NULL;s->page_data=NULL;s->payload_at=s->page_bytes=0;
     s->segment=s->page_segments=0;s->page_active=s->page_eos=false;return true;
 }

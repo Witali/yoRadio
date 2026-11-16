@@ -25,12 +25,29 @@ typedef enum {
 } ogg_page_input_status;
 
 typedef struct {
+    void *(*allocate)(size_t);
+    void (*release)(void *);
+} ogg_page_word_allocator;
+
+typedef struct {
     ogg_opus_timeline timeline;
     uint8_t *page;
     size_t size, capacity;
     bool ready;
     oopt_event event;
+    const ogg_page_word_allocator *word_allocator;
+    volatile uint32_t *word_payload;
+    size_t word_capacity;
+    bool word_page;
 } ogg_page_input;
+
+static inline void opi_release_word_payload(ogg_page_input *s)
+{
+    if (s->word_payload) s->word_allocator->release((void *)s->word_payload);
+    s->word_payload = NULL;
+    s->word_capacity = 0;
+    s->word_page = false;
+}
 
 /* Storage must initially be {0}. Reset releases the page, including after OOM
  * or incomplete input, and preserves the observer's monotonically unique ACK
@@ -42,8 +59,85 @@ static inline void opi_reset(ogg_page_input *s, uint32_t generation)
     s->page = NULL;
     s->size = s->capacity = 0;
     s->ready = false;
+    opi_release_word_payload(s);
+    s->word_allocator = NULL;
     memset(&s->event, 0, sizeof(s->event));
     oopt_reset(&s->timeline, generation);
+}
+
+/* Select the optional word-capable payload store between pages. Keep the Ogg
+ * header and lacing table byte-addressable. Its caller must read payload via
+ * opi_copy_payload() when word_page is set. The allocator outlives the link.
+ */
+static inline bool opi_set_word_allocator(ogg_page_input *s,
+                                         const ogg_page_word_allocator *allocator)
+{
+    if (s->ready || s->size || (allocator && (!allocator->allocate || !allocator->release)))
+        return false;
+    if (s->word_allocator == allocator) return true;
+    opi_release_word_payload(s);
+    s->word_allocator = allocator;
+    if (allocator && s->capacity > 27u + 255u) {
+        OGG_PAGE_INPUT_FREE(s->page);
+        s->page = NULL;
+        s->capacity = 0;
+    }
+    return true;
+}
+
+static inline bool opi_reserve_word_payload(ogg_page_input *s, size_t bytes)
+{
+    if (bytes <= s->word_capacity) return true;
+    /* A new page owns no payload yet. Release the old capacity before growing
+     * rather than copying it or holding two full pages at the same time. */
+    opi_release_word_payload(s);
+    size_t capacity = (bytes + 3u) & ~(size_t)3u;
+    void *payload = s->word_allocator->allocate(capacity);
+    if (!payload) return false;
+    if ((uintptr_t)payload & 3u) {
+        s->word_allocator->release(payload);
+        return false;
+    }
+    s->word_payload = payload;
+    s->word_capacity = capacity;
+    return true;
+}
+
+static inline void opi_store_word_payload(volatile uint32_t *payload, size_t at,
+                                         const uint8_t *source, size_t bytes)
+{
+    while (bytes) {
+        unsigned byte = at & 3u;
+        size_t word_index = at / 4u;
+        uint32_t value = byte ? payload[word_index] : 0;
+        do {
+            value |= (uint32_t)*source++ << (8u * byte++);
+            ++at;
+            --bytes;
+        } while (byte < 4u && bytes);
+        payload[word_index] = value;
+    }
+}
+
+static inline void opi_copy_payload(const ogg_page_input *s, size_t at,
+                                    uint8_t *output, size_t bytes)
+{
+    if (!s->word_page) {
+        memcpy(output, s->page + at, bytes);
+        return;
+    }
+    at -= 27u + s->page[26];
+    while (bytes) {
+        unsigned byte = at & 3u;
+        uint32_t value = s->word_payload[at / 4u] >> (8u * byte);
+        do {
+            *output++ = (uint8_t)value;
+            value >>= 8;
+            ++byte;
+            ++at;
+            --bytes;
+        } while (byte < 4u && bytes);
+    }
 }
 
 static inline bool opi_ack(ogg_page_input *s, uint32_t generation,
@@ -87,7 +181,8 @@ static inline ogg_page_input_status opi_observe(ogg_page_input *s,
     }
 }
 
-/* The returned page is s->page[0..s->size), valid until ACK or reset.
+/* The returned page is valid until ACK or reset. When word_page is set only
+ * its header and lacing table are contiguous at s->page.
  * Allocation refusal leaves already consumed bytes intact and can be retried
  * with precisely the unconsumed suffix. Invalid pages never become ready.
  */
@@ -99,11 +194,14 @@ static inline ogg_page_input_status opi_feed(ogg_page_input *s,
     if (s->ready) return OPI_PAGE;
     if (size && !data) return OPI_INVALID;
     if (s->timeline.fault) return (ogg_page_input_status)s->timeline.fault;
+    if (!s->size) s->word_page = false;
     for (;;) {
         size_t target = 27;
+        size_t payload_at = 0;
         if (s->size >= 27) {
             target += s->page[26];
             if (s->size >= target) {
+                payload_at = target;
                 for (size_t i = 27; i < 27u + s->page[26]; ++i)
                     target += s->page[i];
             }
@@ -116,7 +214,13 @@ static inline ogg_page_input_status opi_feed(ogg_page_input *s,
             return status == OPI_MORE ? OPI_INVALID : status;
         }
         if (*used == size) return OPI_MORE;
-        if (target > s->capacity) {
+        /* Small pages keep their inexpensive borrowed-packet path. Allocate
+         * large payloads in word RAM before attempting a contiguous byte page. */
+        if (payload_at && s->size == payload_at && target - payload_at >= 4096 &&
+            s->word_allocator) {
+            s->word_page = opi_reserve_word_payload(s, target - payload_at);
+        }
+        if (!s->word_page && target > s->capacity) {
             uint8_t *larger = OGG_PAGE_INPUT_REALLOC(s->page, target);
             if (!larger) return OPI_NO_MEMORY;
             s->page = larger;
@@ -124,8 +228,13 @@ static inline ogg_page_input_status opi_feed(ogg_page_input *s,
         }
         size_t take = target - s->size;
         if (take > size - *used) take = size - *used;
-        memcpy(s->page + s->size, data + *used, take);
-        const uint8_t *fresh = s->page + s->size;
+        const uint8_t *fresh = data + *used;
+        if (s->word_page) {
+            opi_store_word_payload(s->word_payload, s->size - payload_at, fresh, take);
+        } else {
+            memcpy(s->page + s->size, fresh, take);
+            fresh = s->page + s->size;
+        }
         s->size += take;
         *used += take;
         ogg_page_input_status status = opi_observe(s, fresh, take);

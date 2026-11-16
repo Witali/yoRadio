@@ -19,6 +19,7 @@
 #ifndef OFD_FREE
 #define OFD_FREE free
 #endif
+enum { OFD_GATHER_BYTES = 2048, OFD_INITIAL_PCM_LIMIT = 11520, OFD_MAX_PCM_BYTES = 23040 };
 typedef enum {
     OFD_OK=0,OFD_ARGUMENT,OFD_MOVED,OFD_BUSY,OFD_HEADER,OFD_FRAMING,OFD_PACKET_POLICY,
     OFD_MEMORY,OFD_PUBLIC_OPEN,OFD_PUBLIC_DECODE,OFD_PUBLIC_CLOSE,OFD_CONTRACT,OFD_PROGRESS,OFD_SINK
@@ -103,12 +104,16 @@ static inline ofd_result ofd_decode_packet(opus_family1_decoder *s,const uint8_t
     omf_status framing=omf_family01_packet(packet,bytes,s->plan.streams,s->plan.stream_id,s->plan.needed,views,&samples);
     if(framing!=OMF_OK){ofd_result r=ofd_code(framing==OMF_PACKET_POLICY?OFD_PACKET_POLICY:OFD_FRAMING);r.detail=framing;return ofd_fail(s,r);}
     if(s->plan.needed && !s->capacity) {
-        /* INVALID duration's documented estimate is60ms. The public resize
-         * protocol handles longer legal packets, never a private cache view.
-         */
-        uint8_t *buffer=OFD_REALLOC(NULL,11520);
-        if(!buffer){ofd_result r=ofd_code(OFD_MEMORY);r.detail=11520;return ofd_fail(s,r);}
-        s->scratch=buffer;s->capacity=11520;
+        /* Framing gives the real sample count even with INVALID duration.
+         * Keep room for one gathered output chunk. The public resize
+         * protocol still handles requests larger than this first buffer. */
+        unsigned width=memchr(s->plan.stream_channels,2,s->plan.needed)?2u:1u;
+        size_t capacity=(size_t)samples*width*2u;
+        if(capacity<OFD_GATHER_BYTES)capacity=OFD_GATHER_BYTES;
+        if(capacity>OFD_INITIAL_PCM_LIMIT)capacity=OFD_INITIAL_PCM_LIMIT;
+        uint8_t *buffer=OFD_REALLOC(NULL,capacity);
+        if(!buffer){ofd_result r=ofd_code(OFD_MEMORY);r.detail=(int)capacity;return ofd_fail(s,r);}
+        s->scratch=buffer;s->capacity=capacity;
     }
     ofd_result result=ofd_code(OFD_OK);bool began=true;
     if(!sink->begin(sink->context,&s->plan,s->generation,samples)){result=ofd_code(OFD_SINK);goto fail;}
@@ -121,7 +126,7 @@ static inline ofd_result ofd_decode_packet(opus_family1_decoder *s,const uint8_t
             if(raw.len!=before || raw.consumed>before || frame.decoded_size>s->capacity){result=ofd_code(OFD_CONTRACT);goto fail;}
             raw.buffer+=raw.consumed;raw.len-=raw.consumed;
             if(actual==ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
-                if(frame.decoded_size || frame.needed_size<=s->capacity || frame.needed_size>23040){result=ofd_code(OFD_CONTRACT);goto fail;}
+                if(frame.decoded_size || frame.needed_size<=s->capacity || frame.needed_size>OFD_MAX_PCM_BYTES){result=ofd_code(OFD_CONTRACT);goto fail;}
                 uint8_t *larger=OFD_REALLOC(s->scratch,frame.needed_size);
                 if(!larger){result=ofd_code(OFD_MEMORY);result.detail=(int)frame.needed_size;goto fail;}
                 s->scratch=larger;s->capacity=frame.needed_size;continue;

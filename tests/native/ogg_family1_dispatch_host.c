@@ -202,7 +202,7 @@ static void dispatch_failure(const corpus *source,const reference *ref,unsigned 
     if(mode<=1)assert(c.outputs==3 && c.emitted==256 && !stats.live && p.wrapper.input.ready && p.wrapper.family1.trim.raw_position==960);
     if(mode==2)assert(!c.outputs && !stats.live && p.wrapper.input.ready);
     if(mode==3)assert(stats.opens==2 && stats.created==1 && stats.destroyed==1 && !stats.live && !c.outputs && p.wrapper.input.ready);
-    if(mode==4 || mode==5)assert(!stats.syntheses && !stats.live && !c.outputs && p.wrapper.input.ready && cause==(mode==4?15360:11520));
+    if(mode==4 || mode==5)assert(!stats.syntheses && !stats.live && !c.outputs && p.wrapper.input.ready && cause==(mode==4?15360:3840));
 #ifdef DISPATCH_WORD_STORAGE
     if(mode==4)assert(dispatch_words.calls==1 && dispatch_word_empty());
 #endif

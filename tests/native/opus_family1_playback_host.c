@@ -284,7 +284,7 @@ static void failure(const corpus *source,const reference *ref,failure_kind kind,
     if(kind==FAIL_DECODE)assert(result.decoder.public_error_known && result.decoder.public_error==ESP_AUDIO_ERR_FAIL && stats.syntheses==ordinal-1 && !out.published);
     if(kind==FAIL_PLANES)assert(result.detail>0 && !result.decoder.public_error_known &&
         (ordinal==1?(!stats.syntheses && !out.published):(stats.syntheses==s.plan.needed && out.emitted==960)));
-    if(kind==FAIL_SCRATCH)assert(result.decoder.code==OFD_MEMORY && !result.decoder.public_error_known && result.detail==(ordinal==1?11520:23040));
+    if(kind==FAIL_SCRATCH)assert(result.decoder.code==OFD_MEMORY && !result.decoder.public_error_known && result.detail==(ordinal==1?3840:23040));
     if(kind==FAIL_OUTPUT || kind==CANCEL_OUTPUT)assert(out.published==ordinal-1 && out.emitted==(ordinal-1)*128u);
     if(kind==CANCEL_OPEN)assert(stats.created==s.plan.needed && !stats.decodes && stats.live==s.plan.needed);
     uint8_t *saved=malloc(input.size);assert(saved);memcpy(saved,input.page,input.size);size_t held=input.size;uint64_t token=input.event.token;unsigned calls=stats.decodes,published=out.published;

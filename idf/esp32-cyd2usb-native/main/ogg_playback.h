@@ -13,6 +13,22 @@
 #include "opus_family1_playback.h"
 #include "pcm_channel_layout.h"
 
+#if defined(ESP_PLATFORM) && CONFIG_IDF_TARGET_ESP32
+#include "esp_heap_caps.h"
+
+static inline void *ogp_allocate_word_payload(size_t bytes)
+{
+    const uint32_t caps = MALLOC_CAP_INTERNAL | MALLOC_CAP_32BIT;
+    if (heap_caps_get_largest_free_block(caps) < bytes) return NULL;
+    return heap_caps_malloc(bytes, caps);
+}
+
+static const ogg_page_word_allocator ogp_word_payload_allocator = {
+    .allocate = ogp_allocate_word_payload,
+    .release = heap_caps_free,
+};
+#endif
+
 enum {
     OGP_INITIAL_PCM_BYTES = 12288,
     /* Opus family 0 has at most two channels. Start with 20 ms of stereo
@@ -113,7 +129,17 @@ static inline ogg_playback_status ogp_family1_page(ogg_playback *s,
     };
     for (;;) {
         ofp_result result = ofp_page(&s->family1, &s->input, &selected, NULL);
-        if (result.code == OFP_OK) return OGP_OK;
+        if (result.code == OFP_OK) {
+#if defined(ESP_PLATFORM) && CONFIG_IDF_TARGET_ESP32
+            const ogg_page_word_allocator *allocator = s->family1.phase == OFP_AUDIO
+                ? &ogp_word_payload_allocator : NULL;
+            if (!opi_set_word_allocator(&s->input, allocator)) {
+                *cause = OPI_INVALID;
+                return OGP_CONTAINER;
+            }
+#endif
+            return OGP_OK;
+        }
         if (result.code == OFP_CLEANUP && result.cleanup_pending && callbacks->yield) {
             callbacks->yield(callbacks->context);
             if (callbacks->cancelled(callbacks->context)) return OGP_CANCELLED;

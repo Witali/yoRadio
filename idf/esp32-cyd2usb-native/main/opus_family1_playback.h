@@ -62,7 +62,7 @@
 #include "pcm_word_plane.h"
 #endif
 
-enum { OFP_CHUNK_FRAMES=128, OFP_RATE=48000, OFP_BYTE_PLANE_LIMIT=23040 };
+enum { OFP_CHUNK_FRAMES=OFD_GATHER_BYTES/(OF1_MAX_CHANNELS*2), OFP_RATE=48000, OFP_BYTE_PLANE_LIMIT=23040 };
 static const uint8_t ofp_zero_chunk[OFP_CHUNK_FRAMES*8*2]={0};
 typedef enum {
     OFP_OK=0,OFP_ARGUMENT,OFP_MOVED,OFP_BUSY,OFP_CANCELLED,OFP_CONTAINER,
@@ -212,6 +212,11 @@ static inline bool ofp_sink_begin(void *opaque,const opus_family1_plan *plan,uin
     } else
 #endif
     if(bytes>s->capacity) {
+#ifdef OFP_WORD_ALLOC
+        /* A large encoded page already competes for the same scarce byte
+         * heap as the vendor decoder. Prefer word planes while it is held. */
+        if(s->source && s->source->word_page && ofp_reserve_word_planes(s,samples))goto reserved;
+#endif
         uint8_t *larger=OFP_REALLOC(s->planes,bytes);
         if(!larger) {
 #ifdef OFP_WORD_ALLOC
@@ -224,6 +229,9 @@ static inline bool ofp_sink_begin(void *opaque,const opus_family1_plan *plan,uin
             {c->error=OFP_MEMORY;c->detail=(int)bytes;return false;}
         } else {s->planes=larger;s->capacity=bytes;}
     }
+#ifdef OFP_WORD_ALLOC
+reserved:
+#endif
     memset(s->produced,0,sizeof(s->produced));s->samples=samples;s->stage_active=true;return true;
 }
 static inline bool ofp_sink_write(void *opaque,uint8_t slot,uint8_t stream,uint8_t width,size_t offset,const uint8_t *pcm,size_t frames) {
