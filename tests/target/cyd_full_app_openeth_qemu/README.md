@@ -98,7 +98,13 @@ task's ordered flush. The probe hashes the decoded samples accepted by the
 backend, before volume processing and conversion to DAC samples.
 [FLAC STREAMINFO specification](https://www.rfc-editor.org/rfc/rfc9639.html#section-8.2).
 
+To reproduce the [custom FLAC production watchdog matrix](../../results/cyd-flac-openeth-20261116/README.md#matched-full-application-results-on-all-three-outputs),
+set `CONFIG_ESP_TASK_WDT_TIMEOUT_S=5` in the TLS diagnostic profile. Use
+one build per output selection and enable both PCM probe options for each
+build, including PDM. The runner checks the exact `/script.js` with a
+25-second socket I/O timeout, independent of the guest watchdog.
+
 The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
 and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)
-cover the diagnostic profiles. Production Wi-Fi, the five-second watchdog and
-physical audio require their own evidence.
+cover the earlier diagnostic profiles. Production Wi-Fi and physical audio
+require hardware evidence.

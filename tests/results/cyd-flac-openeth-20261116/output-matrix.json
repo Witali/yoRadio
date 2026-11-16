@@ -1,0 +1,291 @@
+{
+  "physical_tested": false,
+  "application_source_commit": "d7f853a1b62f1c08d22ef6b891a9691ecd24c55b",
+  "test_runner_commit": "bff1f06d31e633993d7a20d33d1dbeedd6b37f8d",
+  "web_asset_io_timeout_seconds": 25,
+  "sdk_policy": {
+    "ESP_TASK_WDT_EN": true,
+    "ESP_TASK_WDT_INIT": true,
+    "ESP_TASK_WDT_PANIC": false,
+    "ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0": true,
+    "ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1": true,
+    "ESP_TASK_WDT_TIMEOUT_S": 5,
+    "ESP_INT_WDT": true,
+    "ESP_INT_WDT_CHECK_CPU1": true,
+    "ESP_INT_WDT_TIMEOUT_MS": 300
+  },
+  "workload": {
+    "audio": "custom FLAC",
+    "flac_fixture": "flac-level8.flac",
+    "tcp_receive_window": 8640,
+    "tcp_receive_mailbox": 8,
+    "tls_buffer": "dynamic",
+    "openeth_rx_backoff": true
+  },
+  "runs": {
+    "pdm": {
+      "state": "TERMINAL_PASS",
+      "sdk_delta_from_continuous_dac": [
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC",
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM"
+      ],
+      "sdkconfig_sha256": "6b3f8e707d39d5bc83c925dccb013790cc671ab257324782b912cc25e68f416b",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "runner_sha256": "edc9fbe191395a00b6f3aea1e6bb2bedeb55539ae685f75bfafe1fea843cad24",
+      "report_sha256": "4cc5caea79c70d176c711f8d6907228d883f3e93853c5b9cfdaa9f03883a7f12",
+      "uart_sha256": "489a0d7b9d48dffc95f3c6e0c68af9db466c230e92defa9cd7eab906484f0c36",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "4ba42de7e33632d384890daf4c75776f146d7a71cb910bc6e2894c2ff6f3002e"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1241936,
+          "sha256": "c76d76213015fe656e097103536ff31124fcae40a36a9929154d352925869377"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44"
+        }
+      ],
+      "tls": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 1771852,
+        "complete": true
+      },
+      "full_tls_records": 108,
+      "tail_record_plaintext_bytes": 2380,
+      "pcm_frames": 528000,
+      "pcm_md5": "7e7636f603770391913d2d7521b969ea",
+      "pcm_progress_during_webui": [
+        512,
+        31232
+      ],
+      "webui_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "uptime_at_eof_ms": 83257,
+      "minimum_heap_bytes": 47116,
+      "minimum_task_stack_free_bytes": {
+        "stream": 1588,
+        "decode": 11788,
+        "output": 2804,
+        "http": 1216
+      },
+      "allocation_failures": 0,
+      "watchdog_events": 0,
+      "openeth_allocation_waits": 0,
+      "openeth_rx_frame_drop_log_count": 103,
+      "output_driver": {
+        "writes": 1034,
+        "requested_bytes": 1058176,
+        "written_bytes": 1058176,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "completion_queue_drops": 11
+      }
+    },
+    "dac": {
+      "state": "TERMINAL_PASS",
+      "sdk_delta_from_continuous_dac": [],
+      "sdkconfig_sha256": "d7236d978adb5dd63c7bd1632cead6d4c712100cef44cfd2680ca83e1689d6f7",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "runner_sha256": "edc9fbe191395a00b6f3aea1e6bb2bedeb55539ae685f75bfafe1fea843cad24",
+      "report_sha256": "6da9d7989f2634465622a575525eb2fd36e79c0ac659ad0bf110e45c6fe0af79",
+      "uart_sha256": "a9053000ddd84c88d975642721efc01fafe2ee96d6cc3c30e2b04b2312a2d057",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "0d45de982f160fbdd38067bfa766ffbf3b883632196393f5cb357797134698fb"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1236064,
+          "sha256": "5f2edde0159accac044f376296d36f73c465db7e42160efe419f595b54059120"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44"
+        }
+      ],
+      "tls": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 1771852,
+        "complete": true
+      },
+      "full_tls_records": 108,
+      "tail_record_plaintext_bytes": 2380,
+      "pcm_frames": 528000,
+      "pcm_md5": "7e7636f603770391913d2d7521b969ea",
+      "pcm_progress_during_webui": [
+        5632,
+        51712
+      ],
+      "webui_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "uptime_at_eof_ms": 40853,
+      "minimum_heap_bytes": 47304,
+      "minimum_task_stack_free_bytes": {
+        "stream": 1620,
+        "decode": 11708,
+        "output": 2948,
+        "http": 1228
+      },
+      "allocation_failures": 0,
+      "watchdog_events": 0,
+      "openeth_allocation_waits": 0,
+      "openeth_rx_frame_drop_log_count": 90,
+      "output_driver": {
+        "writes": 2559,
+        "requested_bytes": 919680,
+        "written_bytes": 919680,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "completion_queue_drops": null
+      }
+    },
+    "legacy_dac": {
+      "state": "TERMINAL_PASS",
+      "sdk_delta_from_continuous_dac": [
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC",
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC"
+      ],
+      "sdkconfig_sha256": "ed9e2952e82e3364a989bbff61f2905ecdac178772bc8d121fb4ffedde7a2ca3",
+      "qemu_sha256": "91b14c158892d70095b7e9706fe3dd3a3baf8dd1330973ff42372eaa74579d07",
+      "runner_sha256": "edc9fbe191395a00b6f3aea1e6bb2bedeb55539ae685f75bfafe1fea843cad24",
+      "report_sha256": "91498cf3832bdbe445c7d0c295553be80efd960296713e9abad023d5b29ed12f",
+      "uart_sha256": "d971390fd76beeca1a1538b045231340a889604c937dbd3a9c84def24792bfc1",
+      "flash_parts": [
+        {
+          "file": "bootloader/bootloader.bin",
+          "offset": 4096,
+          "bytes": 25488,
+          "sha256": "3944501d1e7a5b10ae972e9135abf21463db7fd86c64eef15d73bd1d43568855"
+        },
+        {
+          "file": "partition_table/partition-table.bin",
+          "offset": 32768,
+          "bytes": 3072,
+          "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+        },
+        {
+          "file": "ota_data_initial.bin",
+          "offset": 57344,
+          "bytes": 8192,
+          "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+        },
+        {
+          "file": "yoradio_cyd2usb_native.bin",
+          "offset": 65536,
+          "bytes": 1242048,
+          "sha256": "10737078d9c9909ceaa6ba288a9de2c120749f26fa7bdd92fdbc98decb4b6ae9"
+        },
+        {
+          "file": "spiffs.bin",
+          "offset": 3604480,
+          "bytes": 589824,
+          "sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44"
+        }
+      ],
+      "tls": {
+        "tls_version": "TLSv1.2",
+        "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 1771852,
+        "complete": true
+      },
+      "full_tls_records": 108,
+      "tail_record_plaintext_bytes": 2380,
+      "pcm_frames": 528000,
+      "pcm_md5": "7e7636f603770391913d2d7521b969ea",
+      "pcm_progress_during_webui": [
+        512,
+        20992
+      ],
+      "webui_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "eof_status": {
+        "audio": false,
+        "connecting": false,
+        "format": "stream ended",
+        "generation": 1
+      },
+      "uptime_at_eof_ms": 193738,
+      "minimum_heap_bytes": 46464,
+      "minimum_task_stack_free_bytes": {
+        "stream": 1620,
+        "decode": 11788,
+        "output": 2868,
+        "http": 1228
+      },
+      "allocation_failures": 0,
+      "watchdog_events": 0,
+      "openeth_allocation_waits": 0,
+      "openeth_rx_frame_drop_log_count": 102,
+      "output_driver": {
+        "writes": 16544,
+        "requested_bytes": 33882112,
+        "written_bytes": 33882112,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "completion_queue_drops": null
+      }
+    }
+  }
+}

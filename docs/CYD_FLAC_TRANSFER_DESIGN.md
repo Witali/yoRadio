@@ -249,6 +249,10 @@ claim or default change.
    watchdog timeout. An allocation traceback attributes the vendor large-block
    failure to the library's frame workspace. Reducing the application's
    initial PCM buffer to 1 KiB still hits a vendor allocation failure.
+   The [three-output follow-up](../tests/results/cyd-flac-openeth-20261116/README.md#matched-full-application-results-on-all-three-outputs)
+   passes the same workload with PDM, continuous DAC and legacy DAC at the
+   production watchdog settings. It also verifies the startup scheduling
+   fixes for synchronous SPIFFS mount and playlist-index lookup.
 9. **Physical qualification open:** CYD A/B with matched
    configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.

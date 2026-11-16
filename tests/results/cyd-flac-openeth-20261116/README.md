@@ -79,5 +79,51 @@ and the allocation call sites. Use the
 with the [validated QEMU build profile](../cyd-pdm-static-rx-20261113/README.md)
 and `CONFIG_ESP_TASK_WDT_TIMEOUT_S=5` to repeat the production watchdog runs.
 The vendor decoder remains the default. The five-second watchdog result
-covers custom FLAC over OpenETH and continuous DAC. Physical Wi-Fi and all
-physical audio output tests remain open.
+covers custom FLAC over OpenETH. Physical Wi-Fi and physical audio output
+tests remain open.
+
+## Startup watchdog with the other output profiles
+
+PDM and legacy DAC first hit the five-second watchdog before Play. The ELF
+stacks located CPU0 in the synchronous SPIFFS mount scan while its idle
+task waited. At idle priority the main task completed startup in 8.706 and
+8.722 seconds of guest time respectively, without a watchdog event. A
+continuous DAC control then exposed the same scheduling problem during
+the playlist-index load in the network task.
+
+The [CYD startup code](../../../idf/esp32-cyd2usb-native/main/app_main.c)
+now uses idle priority around the SPIFFS mount and radio initialization,
+then restores the caller's priority on success and failure. The 31-group
+host suite passed under ASan/UBSan and detected all 13 semantic controls,
+including omitting either priority change or its restoration. The
+separate early-MPI startup suite passed. [ESP-IDF time slicing](https://docs.espressif.com/projects/esp-idf/en/v6.0.2/esp32/api-reference/system/freertos_idf.html#time-slicing).
+
+A local OpenETH capture contained a TCP acknowledgment for a timed-out
+`/script.js` request. The preceding asset response started 7.88 seconds
+after the connection began, measured on QEMU's virtual clock. The runner
+now allows 25 seconds per socket I/O operation on that SPIFFS read and
+requires the exact body, same-generation playback progress and a separate
+post-EOF read. JSON API requests have an eight-second timeout.
+
+## Matched full-application results on all three outputs
+
+Three builds from the corrected source passed with the production
+five-second task watchdog and 300 ms interrupt watchdog. The generated
+SDK configurations differ only in their audio-output selection.
+
+| Output | Minimum free heap | Lowest sampled stream/decode/output/HTTP stack watermarks |
+| --- | ---: | --- |
+| PDM | 47,116 B | 1,588 / 11,788 / 2,804 / 1,216 B |
+| Continuous DAC | 47,304 B | 1,620 / 11,708 / 2,948 / 1,228 B |
+| Legacy DAC | 46,464 B | 1,620 / 11,788 / 2,868 / 1,228 B |
+
+Each run received all 108 full TLS records and the final record, accepted
+528,000 stereo PCM16 frames with the exact Xiph MD5, and read the byte-exact
+13,588-byte WebUI asset during playback and after EOF. All three reported
+zero allocation failures, driver errors, short writes and watchdog events.
+PDM reported 11 completion-queue drops in the driver telemetry and accepted
+all 1,058,176 expected driver bytes. The legacy test used the emulator's
+96 kHz DAC clock ceiling.
+
+[Startup and packet evidence](startup-matrix.json).
+[Full playback matrix](output-matrix.json).
