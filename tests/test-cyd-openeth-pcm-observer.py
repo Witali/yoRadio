@@ -14,6 +14,13 @@ spec.loader.exec_module(probe)
 
 
 class PcmObserverTests(unittest.TestCase):
+    def test_http_timeout_names_the_request(self):
+        with patch.object(probe.http.client, 'HTTPConnection') as connection:
+            connection.return_value.getresponse.side_effect = TimeoutError
+            with self.assertRaisesRegex(TimeoutError, 'GET /script.js timed out'):
+                probe.request(1234, '/script.js')
+            connection.return_value.close.assert_called_once()
+
     def test_dac_progress_excludes_driver_bytes(self):
         health = {'output_driver': {'written_bytes': 1024}}
         self.assertEqual(probe.output_progress(health, '', 'dac'), 0)
@@ -21,15 +28,18 @@ class PcmObserverTests(unittest.TestCase):
         self.assertEqual(probe.output_progress(health, 'bad CYD_OPENETH_PCM_PROGRESS frames=960\n', 'dac'), 0)
         log = 'CYD_OPENETH_PCM_PROGRESS frames=648\r\nCYD_OPENETH_PCM_PROGRESS frames=5448\r\n'
         self.assertEqual(probe.output_progress(health, log, 'legacy_dac'), 5448)
+        self.assertEqual(probe.output_progress(health, log, 'pdm', 'flac'), 5448)
 
-    def observe_eof(self, uart, *, allocations=0):
-        report = {'audio_backend': 'dac', 'observed': []}
+    def observe_eof(self, uart, *, allocations=0, backend='dac', codec='opus',
+                    pcm_md5=None, pcm_frames=528000):
+        report = {'audio_backend': backend, 'observed': []}
         health = dict(output_driver=dict(requested_bytes=528000, written_bytes=528000, errors=0,
                                          timeouts=0, short_writes=0, saturated=False),
                       decoder_failure={'sequence': 0}, stream_failure={'sequence': 0},
                       output={'failures': 0}, allocation_failures=allocations)
         status = json.dumps(dict(generation=1, audio=False, connecting=False, format='stream ended'))
-        server = SimpleNamespace(fixtures={'station': {'data': b'123'}})
+        server = SimpleNamespace(fixtures={'station': dict(data=b'123', codec=codec,
+                                                           pcm_frames=pcm_frames, pcm_md5=pcm_md5)})
         guest = SimpleNamespace(poll=lambda: None)
         with patch.object(probe, 'request', return_value=status), patch.object(probe, 'sample', return_value=health), \
              patch.object(probe, 'guest_log', return_value=uart), patch.object(probe, 'check_asset', return_value={'bytes': 13588}):
@@ -39,6 +49,7 @@ class PcmObserverTests(unittest.TestCase):
             else:
                 probe.observe_eof(0, server, dict(complete=True, sent=3), guest, runner, 1, report)
         self.assertEqual(report['web_asset_after_eof']['bytes'], 13588)
+        return report
 
     def test_exact_ordered_flush(self):
         self.observe_eof('CYD_OPENETH_PCM_FLUSH frames=528000 status=0\n')
@@ -52,6 +63,23 @@ class PcmObserverTests(unittest.TestCase):
                      'CYD_OPENETH_PCM_FLUSH frames=528000 status=-1\n', good + good):
             with self.subTest(uart=uart), self.assertRaisesRegex(RuntimeError, 'Unexpected decoded PCM frame count'):
                 self.observe_eof(uart)
+
+    def test_flac_streaminfo_contains_independently_verified_pcm(self):
+        fixture = probe.station_fixture('flac')
+        self.assertEqual(fixture['pcm_frames'], 528000)
+        self.assertEqual(fixture['pcm_md5'], '7e7636f603770391913d2d7521b969ea')
+        with self.assertRaisesRegex(ValueError, 'Missing FLAC STREAMINFO'):
+            probe.flac_streaminfo(fixture['data'][:41])
+
+    def test_exact_flac_pcm_on_pdm_uses_the_probe(self):
+        md5 = '7e7636f603770391913d2d7521b969ea'
+        flush = 'CYD_OPENETH_PCM_FLUSH frames=5448 status=0\n'
+        checksum = f'CYD_OPENETH_PCM_MD5 {md5}\n'
+        args = dict(backend='pdm', codec='flac', pcm_md5=md5, pcm_frames=5448)
+        self.assertEqual(self.observe_eof(flush + checksum, **args)['pcm_md5'], md5)
+        for log in (flush, flush + checksum.replace('7e76', '8e76'), flush + checksum * 2):
+            with self.subTest(log=log), self.assertRaisesRegex(RuntimeError, 'FLAC STREAMINFO MD5'):
+                self.observe_eof(log, **args)
 
 
 if __name__ == '__main__':

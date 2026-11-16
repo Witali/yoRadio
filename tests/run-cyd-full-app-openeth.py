@@ -68,6 +68,8 @@ def request(port, uri, method='GET'):
         if response.status != 200 or len(data) > 64 * 1024:
             raise RuntimeError(f'{uri}: HTTP {response.status}, {len(data)} bytes')
         return data
+    except TimeoutError as error:
+        raise TimeoutError(f'{method} {uri} timed out') from error
     finally:
         connection.close()
 
@@ -102,17 +104,40 @@ def observe_tls_record_headers(context, lengths):
     context._msg_callback = record
 
 
-def tls_station(material, wire_lengths=None):
+def flac_streaminfo(data):
+    # RFC 9639 section 8.2. The first metadata block is STREAMINFO.
+    if len(data) < 42 or data[:4] != b'fLaC' or data[4] & 0x7f or data[5:8] != b'\x00\x00\x22':
+        raise ValueError('Missing FLAC STREAMINFO')
+    fields = int.from_bytes(data[18:26], 'big')
+    rate = fields >> 44
+    channels = ((fields >> 41) & 7) + 1
+    bits = ((fields >> 36) & 31) + 1
+    frames = fields & ((1 << 36) - 1)
+    md5 = data[26:42]
+    if (rate, channels, bits) != (48000, 2, 16) or not frames or not any(md5):
+        raise ValueError('Expected 48 kHz stereo PCM16 FLAC with sample count and MD5')
+    return frames, md5.hex()
+
+
+def station_fixture(codec):
+    folder = ROOT / 'tests/fixtures/esp32c3_calibration'
+    filename, mime = {'opus': ('opus-510.ogg', 'audio/ogg'),
+                      'flac': ('flac-level8.flac', 'audio/flac')}[codec]
+    fixture, = [row for row in json.loads((folder / 'manifest.json').read_bytes())['fixtures'] if row['file'] == filename]
+    data = (folder / fixture['file']).read_bytes()
+    if digest(data) != fixture['sha256']:
+        raise ValueError(f'{filename} differs from its fixture manifest')
+    frames, md5 = flac_streaminfo(data) if codec == 'flac' else (OPUS_EOF_PCM_FRAMES, None)
+    return dict(data=data, seconds=frames / 48000, codec=codec, mime=mime,
+                pcm_frames=frames, pcm_md5=md5)
+
+
+def tls_station(material, codec, wire_lengths=None):
     sys.path.insert(0, str(ROOT / 'tools'))
     from audio_test_server.server import Server
 
-    folder = ROOT / 'tests/fixtures/esp32c3_calibration'
-    fixture, = [row for row in json.loads((folder / 'manifest.json').read_bytes())['fixtures'] if row['file'] == 'opus-510.ogg']
-    data = (folder / fixture['file']).read_bytes()
-    if digest(data) != fixture['sha256']:
-        raise ValueError('Calibration Opus file differs from its fixture manifest')
     chunk_bytes = 1024 if wire_lengths is None else FULL_TLS_PLAINTEXT_BYTES
-    server = Server('127.0.0.1', 0, {'station': dict(data=data, seconds=11, codec='opus', mime='audio/ogg')},
+    server = Server('127.0.0.1', 0, {'station': station_fixture(codec)},
                     material / 'server.pem', material / 'server-key.pem', pacing_ratio=0.5, chunk_bytes=chunk_bytes)
     if wire_lengths is not None:
         observe_tls_record_headers(server.http.socket.context, wire_lengths)
@@ -155,14 +180,15 @@ def pcm_probe_flushes(uart):
             re.findall(r'^CYD_OPENETH_PCM_FLUSH frames=(\d+) status=(-?\d+)\s*$', uart, re.M)]
 
 
-def output_progress(health, uart, backend):
-    if backend == 'pdm':
+def output_progress(health, uart, backend, codec='opus'):
+    if backend == 'pdm' and codec == 'opus':
         return health['output_driver']['written_bytes']
     return pcm_probe_progress(uart)
 
 
 def observe_eof(port, server, event, guest, log_path, generation, report):
     backend = report['audio_backend']
+    fixture = server.fixtures['station']
     # The legacy driver emits x16 stereo words. The model caps the DAC clock
     # at 96 kHz and consumes one 16-bit slot per tick.
     until = time.monotonic() + (360 if backend == 'legacy_dac' else 90)
@@ -185,7 +211,7 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
     final = sample(port)
     report['eof_health'] = final
     driver = final['output_driver']
-    body_bytes = len(server.fixtures['station']['data'])
+    body_bytes = len(fixture['data'])
     if event['sent'] != body_bytes:
         raise RuntimeError('TLS peer did not write the exact fixture length')
     if 'tls_application_payload_lengths' in report:
@@ -193,14 +219,20 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
             raise RuntimeError('Expected a single full-record TLS connection')
         require_full_tls_records(event, body_bytes, report['tls_application_payload_lengths'])
         report['observed'].append('full-sized TLS 1.2 records')
-    if backend == 'pdm':
+    if backend == 'pdm' and fixture['codec'] == 'opus':
         if not driver['requested_bytes'] == driver['written_bytes'] == PDM_OPUS_EOF_BYTES:
             raise RuntimeError('Unexpected PDM byte count after EOF')
     else:
-        if pcm_probe_flushes(guest_log(log_path)) != [dict(frames=OPUS_EOF_PCM_FRAMES, status=0)]:
+        uart = guest_log(log_path)
+        if pcm_probe_flushes(uart) != [dict(frames=fixture['pcm_frames'], status=0)]:
             raise RuntimeError('Unexpected decoded PCM frame count or flush result after EOF')
         if not 0 < driver['requested_bytes'] == driver['written_bytes']:
-            raise RuntimeError('Incomplete DAC driver writes after EOF')
+            raise RuntimeError('Incomplete driver writes after EOF')
+        if fixture['pcm_md5'] is not None:
+            pcm_digests = re.findall(r'^CYD_OPENETH_PCM_MD5 ([0-9a-f]{32})\s*$', uart, re.M)
+            if pcm_digests != [fixture['pcm_md5']]:
+                raise RuntimeError('Decoded PCM differs from FLAC STREAMINFO MD5')
+            report['pcm_md5'] = pcm_digests[0]
     report['observed'] += ['complete TLS response', 'ordered EOF with exact output count']
     if any(driver[key] for key in ('errors', 'timeouts', 'short_writes', 'saturated')):
         raise RuntimeError('Unexpected audio driver fault after EOF')
@@ -211,6 +243,8 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
 
 def observe_playback(port, server, guest, log_path, report, through_eof):
     backend = report['audio_backend']
+    codec = server.fixtures['station']['codec']
+    status_codec = {'opus': 'OGG', 'flac': 'FLAC'}[codec]
     radio = json.loads(request(port, '/api/native/radio'))
     if radio['count'] != 1 or radio['station'] != 'OpenETH fixture':
         raise RuntimeError('The expected SPIFFS station was not loaded')
@@ -221,16 +255,16 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
         if FATAL.search(uart) or guest.poll() is not None:
             raise RuntimeError('Guest stopped or logged a failure during playback')
         status = json.loads(request(port, '/api/native/status'))
-        if (status['audio'] and status['codec'] == 'OGG' and
+        if (status['audio'] and status['codec'] == status_codec and
                 status['pcm_sample_rate_hz'] == 48000 and status['pcm_channels'] == 2):
             first = sample(port)
             report['first_active_health'] = first
-            initial = output_progress(first, uart, backend)
+            initial = output_progress(first, uart, backend, codec)
             if initial > 0:
                 break
         time.sleep(0.2)
     else:
-        raise RuntimeError('No active Opus playback with output writes before the deadline')
+        raise RuntimeError(f'No active {codec} playback with output writes before the deadline')
     report['playing_health'] = [first]
     report['web_asset_during_playback'] = check_asset(port)
     end = time.monotonic() + 5
@@ -242,7 +276,7 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
         status_after = json.loads(request(port, '/api/native/status'))
         if not status_after['audio'] or status_after['generation'] != status['generation']:
             raise RuntimeError('Playback stopped or changed generation during WebUI sampling')
-        after = output_progress(second, guest_log(log_path), backend)
+        after = output_progress(second, guest_log(log_path), backend, codec)
         if after > initial:
             break
         time.sleep(0.2)
@@ -254,9 +288,10 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
     report['playing_health'].append(second)
     report['tls_peer'] = {key: events[0][key] for key in ('tls_version', 'tls_cipher', 'sent')}
     report['playback'] = {key: status[key] for key in ('codec', 'format', 'pcm_sample_rate_hz', 'pcm_channels')}
-    if backend != 'pdm':
+    if backend != 'pdm' or codec == 'flac':
         report['pcm_progress_during_webui'] = [initial, after]
-    report['observed'] += ['Opus audio over verified TLS', 'audio progress across WebUI asset read']
+    report['observed'] += [f'{"Opus" if codec == "opus" else "FLAC"} audio over verified TLS',
+                           'audio progress across WebUI asset read']
     if not through_eof:
         request(port, '/api/native/radio?action=stop', 'POST')
     if through_eof:
@@ -274,8 +309,10 @@ def main():
     parser.add_argument('--rom', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--tls-material', type=Path, help='Local disposable CA and server certificate/key directory')
+    parser.add_argument('--codec', choices=('opus', 'flac'), default='opus',
+                        help='Select the TLS audio fixture (default: opus)')
     parser.add_argument('--through-eof', action='store_true',
-                        help='Require the full TLS Opus response, exact audio output count, and WebUI after EOF')
+                        help='Require the full TLS response, exact audio output, and WebUI after EOF')
     parser.add_argument('--full-tls-records', action='store_true',
                         help='Serve and verify actual maximum-size TLS 1.2 application records')
     args = parser.parse_args()
@@ -294,10 +331,20 @@ def main():
     if material is not None and (not material.is_relative_to(ROOT / '.build') or
                                  not config.get('MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE')):
         raise ValueError('TLS workload requires local test credentials and a diagnostic CA bundle')
-    if args.through_eof and not (material and config.get('YORADIO_OGG_TIMELINE')):
-        parser.error('--through-eof requires the TLS fixture and Ogg timeline')
+    if args.through_eof and not material:
+        parser.error('--through-eof requires the TLS fixture')
+    if args.through_eof and args.codec == 'opus' and not config.get('YORADIO_OGG_TIMELINE'):
+        parser.error('Opus --through-eof requires the Ogg timeline')
+    if args.codec == 'flac' and not args.through_eof:
+        parser.error('--codec flac requires --through-eof and the PCM MD5 probe')
     if args.full_tls_records and not args.through_eof:
         parser.error('--full-tls-records requires --through-eof')
+    flac_decoder = None
+    if args.codec == 'flac':
+        decoders = [name for name in ('ESPRESSIF', 'CUSTOM') if config.get('YORADIO_FLAC_DECODER_' + name)]
+        if len(decoders) != 1:
+            raise ValueError('Expected exactly one CYD FLAC decoder')
+        flac_decoder = decoders[0].lower()
     flash, parts = flash_parts(build)
     output.mkdir(parents=True)
     flash_path = output / 'qemu-flash.bin'
@@ -325,6 +372,8 @@ def main():
                   native_diagnostics=config.get('YORADIO_NATIVE_DIAGNOSTICS', False))
     if args.full_tls_records:
         report['tls_application_payload_lengths'] = []
+    if flac_decoder is not None:
+        report['flac_decoder'] = flac_decoder
 
     def save():
         report_path.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
@@ -334,7 +383,9 @@ def main():
     server = None
     stack = ExitStack()
     try:
-        server = stack.enter_context(tls_station(material, report.get('tls_application_payload_lengths'))) if material else None
+        if material:
+            server = stack.enter_context(tls_station(material, args.codec,
+                                                     report.get('tls_application_payload_lengths')))
         if server:
             host_port = server.http.server_port
             net = command.index('-nic') + 1
@@ -408,7 +459,7 @@ def main():
             report['uart_sha256'] = digest(uart)
             uart_text = uart.decode('utf-8', errors='replace')
             report['guest_fault_observed'] = bool(FATAL.search(uart_text))
-            if backend != 'pdm':
+            if backend != 'pdm' or args.codec == 'flac':
                 report['pcm_probe_last_progress'] = pcm_probe_progress(uart_text)
                 report['pcm_probe_flushes'] = pcm_probe_flushes(uart_text)
             pressure = RX_WAIT.findall(uart_text)

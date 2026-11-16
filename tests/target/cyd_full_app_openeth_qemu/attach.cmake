@@ -14,6 +14,12 @@ function(cyd_attach_openeth_probe)
     target_link_options(${app} INTERFACE "-Wl,--wrap=native_audio_output_write_pcm"
                         "-Wl,--wrap=native_audio_output_flush_pcm")
   endif()
+  if(CYD_OPENETH_PCM_MD5)
+    if(NOT CYD_OPENETH_PCM_PROBE)
+      message(FATAL_ERROR "PCM MD5 requires CYD_OPENETH_PCM_PROBE")
+    endif()
+    target_compile_definitions(${app} PRIVATE CYD_OPENETH_PCM_MD5=1)
+  endif()
   if(CYD_OPENETH_RX_BACKOFF)
     cyd_overlay_sdk_source(esp_eth src/openeth/esp_eth_mac_openeth.c
       "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/prepare-rx-source.py" openeth-rx-overlay)

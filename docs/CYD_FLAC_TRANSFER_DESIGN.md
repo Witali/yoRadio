@@ -1,9 +1,11 @@
 # Portable custom FLAC transfer to native CYD
 
 Status: **CYD runtime integration is implemented behind an explicit Kconfig
-choice; Espressif remains the default**. Actual CYD decoder-task host tests and
-the pinned Xtensa integration/component compilation pass. Custom-path target
-execution, complete application exports and physical CYD A/B remain open gates.
+choice; Espressif remains the default**. Actual CYD decoder-task host tests,
+Xtensa SDK/QEMU and all three custom application exports pass. The
+[full OpenETH application](../tests/results/cyd-flac-openeth-20261116/README.md)
+also delivers exact custom FLAC PCM and WebUI after EOF under TLS load with
+continuous DAC. Physical CYD A/B remains open.
 This is stage CYD-C3-12 of the [transfer plan](ESP32_CYD_C3_TRANSFER_PLAN.md).
 Default CYD configurations continue using the Espressif FLAC backend. This port
 preserves display/board pins, audio backend, decoder/output task cores, priorities
@@ -234,7 +236,14 @@ claim or default change.
    the DMA renderer, radio/TLS/TFT load or physical hardware. The observed heap
    and stack snapshots do not establish full-application resource margins.
    This does not execute all 130 fixtures natively or reopen deferred faults.
-8. **Physical qualification open:** CYD A/B with matched
+8. **Full OpenETH application checkpoint complete for custom FLAC:**
+   [matched SDK/QEMU profiles](../tests/results/cyd-flac-openeth-20261116/README.md)
+   use TLS, TFT, continuous DAC and WebUI. The custom decoder plays all 528,000
+   frames with the exact Xiph PCM checksum and no allocation failures. The
+   Espressif profile records a failed 18,432-byte request while processing
+   the same level-8 file. The full application uses the 30-second diagnostic
+   watchdog. Qualification at the production watchdog setting remains open.
+9. **Physical qualification open:** CYD A/B with matched
    configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.
    No custom default switch or speedup claim before this gate passes.

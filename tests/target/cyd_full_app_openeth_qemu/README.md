@@ -86,6 +86,18 @@ station fixture and keep the same OpenETH RX overlay across the three builds.
 For PDM with static RX, use the [QEMU I2S DMA fix and tested profile](../../results/cyd-pdm-static-rx-20261113/README.md)
 for the complete run, including the WebUI request after EOF.
 
+For a matched FLAC comparison, use two copies of the same TLS diagnostic
+configuration and local CA. Select `CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF`
+in the first and `CONFIG_YORADIO_FLAC_DECODER_CUSTOM` in the second. Use
+continuous DAC, the DMA fix, dynamic TLS buffers, TCP 8640/8 and OpenETH RX
+backoff in both builds. Add `'-D','CYD_OPENETH_PCM_PROBE=ON'` and
+`'-D','CYD_OPENETH_PCM_MD5=ON'` to each build. Run each fixture with
+`--codec flac --through-eof --full-tls-records`. The runner verifies the
+lossless PCM16 frame count and MD5 against FLAC STREAMINFO at the output
+task's ordered flush. The probe hashes the decoded samples accepted by the
+backend, before volume processing and conversion to DAC samples.
+[FLAC STREAMINFO specification](https://www.rfc-editor.org/rfc/rfc9639.html#section-8.2).
+
 The [startup results](../../results/cyd-full-app-openeth-20261111/README.md)
 and [RX backoff results](../../results/cyd-openeth-rx-backoff-20261111/README.md)
 cover the diagnostic profiles. Production Wi-Fi, the five-second watchdog and
