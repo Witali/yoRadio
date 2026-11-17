@@ -1,0 +1,42 @@
+--- a/subprojects/slirp-win32/src/misc.c
++++ b/subprojects/slirp-win32/src/misc.c
+@@ -212,5 +212,39 @@
++/* Connect a new local socket for this guest TCP connection. The Windows
++ * spawn helper cannot use a Winsock SOCKET directly as a CRT descriptor.
++ */
++static int open_tcp_loopback(struct socket *so, const char *port_text)
++{
++    char *end;
++    guint64 port = g_ascii_strtoull(port_text, &end, 10);
++    if (*end || port == 0 || port > UINT16_MAX) {
++        return 0;
++    }
++    struct sockaddr_in peer = {
++        .sin_family = AF_INET,
++        .sin_port = htons(port),
++        .sin_addr.s_addr = htonl(INADDR_LOOPBACK),
++    };
++    slirp_os_socket fd = slirp_socket(AF_INET, SOCK_STREAM, 0);
++    if (!have_valid_socket(fd)) {
++        return 0;
++    }
++    if (connect(fd, (struct sockaddr *)&peer, sizeof(peer)) < 0) {
++        closesocket(fd);
++        return 0;
++    }
++    so->s = fd;
++    slirp_set_nonblock(fd);
++    slirp_register_poll_socket(so);
++    return 1;
++}
++
+ int fork_exec(struct socket *so, const char *ex)
+ {
++    static const char loopback[] = "tcp-loopback:";
++    if (g_str_has_prefix(ex, loopback)) {
++        return open_tcp_loopback(so, ex + sizeof(loopback) - 1);
++    }
++
+     GError *err = NULL;
+     gint argc = 0;
+     gchar **argv = NULL;

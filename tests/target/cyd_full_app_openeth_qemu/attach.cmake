@@ -31,6 +31,17 @@ function(cyd_attach_openeth_probe)
     target_sources(${app} PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/opus_heap.c")
     target_link_options(${app} INTERFACE "-Wl,--wrap=esp_opus_dec_open")
   endif()
+  if(CYD_OPENETH_TLS_RX_PROBE)
+    if(NOT CONFIG_YORADIO_TLS_STATIC_RX_RESERVE)
+      message(FATAL_ERROR "The TLS RX probe requires the static RX reserve")
+    endif()
+    target_sources(${app} PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/tls_rx.c")
+    # Mbed TLS can follow libmain in the link order. Pull in the probe first.
+    target_link_options(${app} INTERFACE "-Wl,-u,__wrap_yoradio_tls_static_rx_calloc"
+                        "-Wl,--wrap=yoradio_tls_static_rx_calloc"
+                        "-Wl,--wrap=yoradio_tls_static_rx_free"
+                        "-Wl,--wrap=yoradio_tls_static_rx_zeroize_free")
+  endif()
   if(CYD_OPENETH_RX_BACKOFF)
     cyd_overlay_sdk_source(esp_eth src/openeth/esp_eth_mac_openeth.c
       "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/prepare-rx-source.py" openeth-rx-overlay)

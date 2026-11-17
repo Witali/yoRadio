@@ -299,6 +299,13 @@ WebUI asset during playback and after EOF. Legacy DAC recorded the lowest
 heap watermark at 9,908 bytes. The matrix uses the diagnostic OpenETH
 transport. Combined option testing and physical Wi-Fi remain open.
 
+The [PDM Stop/Play and OTA test](../tests/results/cyd-openeth-ota-lifecycle-20261116/README.md)
+observed four loans and returns of the static RX buffer across independent
+TLS connections. The full application resumed audio after verification
+rejected a partial upload, then booted the same application from the
+alternate slot after a successful upload. WebUI and TLS audio worked
+after the software reset.
+
 ## Actual TLS traffic in isolated SDK/QEMU
 
 The [1 November traffic checkpoint](../tests/results/cyd-tls-traffic-20261101/README.md)

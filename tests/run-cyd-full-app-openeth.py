@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import socket
 import subprocess
 import sys
@@ -19,6 +20,7 @@ FATAL = re.compile(r'Guru Meditation|assert failed:|abort\(\) was called|watchdo
 RX_WAIT = re.compile(r'CYD_OPENETH_RX_WAIT request=(\d+) heap=(\d+) largest=(\d+) dma=(\d+)')
 OPUS_OPEN = re.compile(r'^CYD_OPENETH_OPUS_OPEN channels=(\d+) result=(-?\d+) free=(\d+) largest=(\d+) '
                        r'remaining=(\d+) remaining_largest=(\d+)$', re.M)
+TLS_RX_EVENT = re.compile(r'^CYD_OPENETH_TLS_RX (loan|return)$', re.M)
 # The pinned Opus fixture's EOS granule 528312 minus pre-skip 312 gives
 # 528000 mono output samples. PDM pads to 512-sample writes and counts the
 # 704 bias samples written after DMA preload, at two bytes per sample.
@@ -85,7 +87,8 @@ def sample(port):
         raise RuntimeError('Unexpected production health endpoint schema or core count')
     if not 0 < report['minimum_heap'] <= report['heap'] or not 0 < report['largest'] <= report['heap']:
         raise RuntimeError('Invalid production heap sample')
-    sample = {key: report[key] for key in ('uptime_ms', 'heap', 'largest', 'minimum_heap', 'tasks', 'memory', 'cpu',
+    sample = {key: report[key] for key in ('boot_id', 'reset_reason', 'uptime_ms', 'heap', 'largest',
+                                          'minimum_heap', 'tasks', 'memory', 'cpu',
                                           'allocation_failures', 'last_allocation_failure', 'decoder_failure',
                                           'stream_failure', 'output', 'output_driver')}
     if 'input' in report:
@@ -301,6 +304,127 @@ def start_station(port):
     request(port, '/api/native/radio?action=play&station=1', 'POST')
 
 
+def wait_for_observation(guest, log_path, observe, description, timeout=40):
+    until = time.monotonic() + timeout
+    while time.monotonic() < until:
+        uart = guest_log(log_path)
+        if FATAL.search(uart) or guest.poll() is not None:
+            raise RuntimeError(f'Guest stopped or logged a failure while waiting for {description}')
+        result = observe(uart)
+        if result is not None:
+            return result
+        time.sleep(0.2)
+    raise RuntimeError(f'Did not observe {description}')
+
+
+def observe_radio_ota_lifecycle(port, server, guest, log_path, report, image):
+    sys.path.insert(0, str(ROOT))
+    from tools.cyd_tests.ota import ESP_RST_SW, multipart, upload
+
+    origin = f'http://127.0.0.1:{port}'
+    boot = report['health'][-1]['boot_id']
+    original = json.loads(request(port, '/api/native/ota'))
+    if original['partition'] != 'app0' or len(image) > original['max_size']:
+        raise RuntimeError('Expected the staged OTA image in slot app0 with a spare slot')
+    phases = report['ota_lifecycle'] = {}
+
+    def active(previous_generation, session):
+        def observe(uart):
+            status = json.loads(request(port, '/api/native/status'))
+            if (not status['audio'] or status['generation'] == previous_generation
+                    or status['codec'] != 'OGG' or status['pcm_channels'] != 2):
+                return None
+            if TLS_RX_EVENT.findall(uart) != ['loan', 'return'] * (session - 1) + ['loan']:
+                return None
+            if not pcm_probe_progress(uart.rsplit('CYD_OPENETH_TLS_RX loan', 1)[-1]):
+                return None
+            if len(server.events) != session:
+                return None
+            event = server.events[-1]
+            if event.get('tls_version') != 'TLSv1.2' or not event['sent'] or event['complete']:
+                return None
+            health = sample(port)
+            require_clean_health(health)
+            return status['generation'], health
+        return wait_for_observation(guest, log_path, observe, f'PCM and reserved RX in TLS session {session}')
+
+    def stop(session):
+        request(port, '/api/native/radio?action=stop', 'POST')
+
+        def stopped(uart):
+            status = json.loads(request(port, '/api/native/status'))
+            if (not status['audio'] and not status['connecting'] and status['format'] == 'stopped'
+                    and TLS_RX_EVENT.findall(uart) == ['loan', 'return'] * session):
+                health = sample(port)
+                require_clean_health(health)
+                return health
+            return None
+        return wait_for_observation(guest, log_path, stopped, f'Stop and return of RX from TLS session {session}')
+
+    request(port, '/api/native/radio?action=smartstart&enabled=0', 'POST')
+    start_station(port)
+    first, _ = active(None, 1)
+    stopped = stop(1)
+    if stopped['boot_id'] != boot:
+        raise RuntimeError('Unexpected reboot during Stop')
+    start_station(port)
+    second, _ = active(first, 2)
+    phases['stop_and_reconnect'] = dict(first_generation=first, next_generation=second,
+                                        released_heap=stopped['heap'])
+    report['observed'].append('Stop returns TLS RX and a new Play borrows it again')
+
+    rejected = upload(origin, multipart(image[:8192]))
+    phases['truncated_upload'] = dict(status=rejected.status, sent_bytes=rejected.sent_bytes)
+    if (rejected.status, rejected.body) != (400, b'Firmware image verification failed'):
+        raise RuntimeError('Expected the incomplete application to reach OTA image verification and fail')
+    resumed, playing = active(second, 3)
+    if playing['boot_id'] != boot or json.loads(request(port, '/api/native/ota')) != original:
+        raise RuntimeError('Truncated OTA changed the boot or running application')
+    if check_asset(port) != report['web_asset']:
+        raise RuntimeError('Unexpected WebUI asset after aborted OTA')
+    phases['truncated_upload']['resumed_generation'] = resumed
+    report['observed'].append('OTA verification failure resumes radio in the same boot')
+
+    status = json.loads(request(port, '/api/native/status'))
+    if not status['audio'] or status['generation'] != resumed or server.events[-1]['complete']:
+        raise RuntimeError('The resumed TLS station must be active when starting the complete OTA')
+    accepted = upload(origin, multipart(image))
+    phases['complete_upload'] = dict(status=accepted.status, sent_bytes=accepted.sent_bytes)
+    if (accepted.status, accepted.body) != (200, b'OK'):
+        raise RuntimeError(f'Complete OTA returned HTTP {accepted.status}')
+
+    def rebooted(uart):
+        try:
+            health = sample(port)
+        except (OSError, http.client.HTTPException):
+            return None
+        if health['boot_id'] == boot:
+            return None
+        installed = json.loads(request(port, '/api/native/ota'))
+        if health['reset_reason'] != ESP_RST_SW or installed['partition'] != 'app1':
+            raise RuntimeError('Expected a software restart into the alternate OTA slot')
+        if installed['app_elf_sha256'] != original['app_elf_sha256']:
+            raise RuntimeError('OTA image ELF hash differs from the uploaded application')
+        if TLS_RX_EVENT.findall(uart) != ['loan', 'return'] * 3:
+            raise RuntimeError('Radio did not release reserved RX before OTA restart')
+        require_clean_health(health)
+        return health
+
+    booted = wait_for_observation(guest, log_path, rebooted, 'WebUI in alternate OTA slot', timeout=100)
+    if check_asset(port) != report['web_asset']:
+        raise RuntimeError('Unexpected WebUI asset after the OTA restart')
+    start_station(port)
+    fourth, reloaded = active(None, 4)
+    if booted['boot_id'] != reloaded['boot_id']:
+        raise RuntimeError('Unexpected second reboot after OTA')
+    stop(4)
+    phases['complete_upload'].update(partition='app1', reset_reason=booted['reset_reason'],
+                                      playback_generation=fourth)
+    phases['reserved_rx_events'] = TLS_RX_EVENT.findall(guest_log(log_path))
+    report['observed'] += ['same-image OTA activates the alternate slot and restarts',
+                           'post-OTA WebUI and fresh TLS audio']
+
+
 def observe_channel_rejection(port, server, guest, log_path, report):
     start_station(port)
     until = time.monotonic() + 30
@@ -409,6 +533,8 @@ def main():
                         help='Require the full TLS response, exact audio output, and WebUI after EOF')
     parser.add_argument('--full-tls-records', action='store_true',
                         help='Serve and verify actual maximum-size TLS 1.2 application records')
+    parser.add_argument('--radio-ota-lifecycle', action='store_true',
+                        help='Check TLS RX reuse and failed/successful OTA during playback in disposable QEMU')
     args = parser.parse_args()
     build, qemu, rom = (path.resolve(strict=True) for path in (args.build, args.qemu, args.rom))
     output = args.output.resolve()
@@ -441,6 +567,10 @@ def main():
         parser.error('Family 1 playback requires CONFIG_YORADIO_AUDIO_STEREO_ONLY disabled')
     if args.full_tls_records and not args.through_eof:
         parser.error('--full-tls-records requires --through-eof')
+    if args.radio_ota_lifecycle and (not material or args.through_eof or args.opus_family1
+                                    or not config.get('YORADIO_TLS_STATIC_RX_RESERVE')
+                                    or args.codec != 'opus'):
+        parser.error('--radio-ota-lifecycle requires stereo TLS/Opus, the static RX and PCM probes')
     flac_decoder = None
     if args.codec == 'flac':
         decoders = [name for name in ('ESPRESSIF', 'CUSTOM') if config.get('YORADIO_FLAC_DECODER_' + name)]
@@ -466,6 +596,8 @@ def main():
                '-L', str(rom), '-display', 'none', '-monitor', 'none', '-serial', 'stdio',
                '-no-reboot', '-snapshot', '-nic', f'user,model=open_eth,restrict=on,hostfwd=tcp:127.0.0.1:{web_port}-:80',
                '-drive', f'file={str(flash_path).replace(",", ",,")},if=mtd,format=raw']
+    if args.radio_ota_lifecycle:
+        command.remove('-no-reboot')
     log_path = output / 'qemu.log'
     report_path = output / 'report.json'
     report = dict(state='STARTING', scope='OpenETH full-application idle boot', passed=False,
@@ -497,8 +629,18 @@ def main():
         if server:
             host_port = server.http.server_port
             net = command.index('-nic') + 1
-            command[net] += f',guestfwd=tcp:10.0.2.100:18080-tcp:127.0.0.1:{host_port}'
+            if args.radio_ota_lifecycle:
+                if os.name == 'nt':
+                    forward = f'cmd:tcp-loopback:{host_port}'
+                else:
+                    relay = ROOT / 'tests/target/cyd_full_app_openeth_qemu/tcp_relay.py'
+                    forward = 'cmd:' + shlex.join([Path(sys.executable).as_posix(), relay.as_posix(), str(host_port)])
+            else:
+                forward = f'tcp:127.0.0.1:{host_port}'
+            command[net] += ',guestfwd=tcp:10.0.2.100:18080-' + forward.replace(',', ',,')
             report['scope'] = 'OpenETH full-application boot and TLS audio with concurrent WebUI'
+            if args.radio_ota_lifecycle:
+                report['scope'] += ', Stop/Play and OTA'
             if args.through_eof:
                 report['scope'] += ' through EOF'
             if args.full_tls_records:
@@ -541,6 +683,11 @@ def main():
                 try:
                     if args.expect_channel_limit:
                         observe_channel_rejection(web_port, server, guest, log_path, report)
+                    elif args.radio_ota_lifecycle:
+                        application, = [part for part in parts if part['offset'] == 0x10000]
+                        start = application['offset']
+                        image = bytes(flash[start:start + application['bytes']])
+                        observe_radio_ota_lifecycle(web_port, server, guest, log_path, report, image)
                     else:
                         observe_playback(web_port, server, guest, log_path, report, args.through_eof)
                 except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):

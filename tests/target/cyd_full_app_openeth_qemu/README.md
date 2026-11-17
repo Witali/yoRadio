@@ -86,6 +86,35 @@ station fixture and keep the same OpenETH RX overlay across the three builds.
 For PDM with static RX, use the [QEMU I2S DMA fix and tested profile](../../results/cyd-pdm-static-rx-20261113/README.md)
 for the complete run, including the WebUI request after EOF.
 
+## TLS reconnect and OTA during playback
+
+Build the static RX profile with `'-D','CYD_OPENETH_TLS_RX_PROBE=ON'` and
+`'-D','CYD_OPENETH_PCM_PROBE=ON'`. The RX probe reports each acquisition
+and return of the buffer in the application's BSS. The PCM probe confirms
+that real audio reaches the output in each TLS session.
+
+This test opens a fresh host TCP connection for every guest connection and
+keeps QEMU user networking restricted. With a Windows build that uses
+`subprojects/slirp-win32`, apply the
+[loopback forwarding patch](qemu-slirp-loopback.patch) to the QEMU source
+tree and rebuild with the same I2S DMA start fix. The Windows SLIRP command
+backend otherwise passes a Winsock handle to GLib as a file descriptor.
+The patch adds `cmd:tcp-loopback:<port>` for a fixed loopback destination.
+On POSIX hosts, the runner uses [QEMU's per-connection guestfwd command](https://www.qemu.org/docs/master/system/invocation.html)
+with the Python loopback relay.
+
+```powershell
+& $py -B tests/run-cyd-full-app-openeth.py --build .build/openeth-fixture --qemu $qemu --rom $rom --tls-material $profile --output .build/openeth-ota-lifecycle --radio-ota-lifecycle
+```
+
+The controller checks Stop/Play, a truncated image that fails verification
+and resumes playback, then a same-image update started during playback.
+After the software reset it checks the running `app1` slot, ELF hash,
+WebUI asset and fresh TLS playback. All writes are to the QEMU snapshot.
+The controller also checks the original flash file digest after QEMU exits.
+
+## Other playback fixtures
+
 For a matched FLAC comparison, use two copies of the same TLS diagnostic
 configuration and local CA. Select `CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF`
 in the first and `CONFIG_YORADIO_FLAC_DECODER_CUSTOM` in the second. Use
