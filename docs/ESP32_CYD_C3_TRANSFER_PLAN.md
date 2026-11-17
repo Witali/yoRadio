@@ -130,6 +130,14 @@ allocation и численные настройки C3 являются канд
 Оба прежних непрохождения сохранены отдельно. Синтез остаётся в неизменённой
 Espressif-библиотеке; физическая приёмка и собственный Vorbis отделены.
 
+После исправления сохранены [шесть обычных production-образов](../tests/results/cyd-ogg-word-production-20261117/README.md):
+vendor/custom FLAC × PDM/continuous/legacy. Конфигурации SDK побайтно
+совпадают с предыдущими, исходные привязки задач сохранены. Проверены
+контрольные суммы, соответствие ELF, оба OTA-слота и статические stack frames;
+полный Clang прошёл 320 project units и 20 SDK frontend checks без ошибок.
+Число warnings прежнее; изменение одного analyzer trace разобрано в отчёте.
+C3 сохраняет [предыдущую отдельную сборку и host-регрессию](../tests/results/cyd-production-refresh-20261117/README.md).
+
 Дополнительная [проверка status keys](../tests/results/ws-status-key-20261023/README.md)
 устранила зависимость публикации WebSocket от padding структуры в CYD и C3.
 CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang обеих целей проходят;
