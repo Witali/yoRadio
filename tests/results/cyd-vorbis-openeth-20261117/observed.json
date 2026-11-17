@@ -1,0 +1,127 @@
+{
+  "esp_idf": "6.0.2",
+  "openeth": true,
+  "physical_tested": false,
+  "source_commit": "2245311c51aed9cbc196f825df50ac26e4da95f6",
+  "production_sources_changed": false,
+  "diagnostic_sources": [
+    {
+      "path": "tests/run-cyd-full-app-openeth.py",
+      "sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490"
+    },
+    {
+      "path": "tests/test-cyd-openeth-pcm-observer.py",
+      "sha256": "070ae7f536c0c7383c7d430c729c9f2ba92271e61abeb25dbd4590f102200f67"
+    },
+    {
+      "path": "tests/target/cyd_full_app_openeth_qemu/attach.cmake",
+      "sha256": "28edb3f5822b08aff61b3271a9ba0fc61e0a4e8909f618d2a7e7935a5d8d1f41"
+    },
+    {
+      "path": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+      "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+    }
+  ],
+  "fixture": {
+    "path": "tests/fixtures/esp32c3_calibration/vorbis-q10.ogg",
+    "bytes": 703584,
+    "sha256": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f",
+    "expected_pcm_frames": 528000,
+    "expected_pcm_bytes": 2112000,
+    "expected_vendor_pcm_sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
+    "independent_full_numeric_oracle": false
+  },
+  "vendor": [
+    {
+      "file": "libesp_audio_codec.a",
+      "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+      "matches_direct_native_baseline": true
+    },
+    {
+      "file": "libesp_audio_simple_dec.a",
+      "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+      "matches_direct_native_baseline": true
+    }
+  ],
+  "host_observer_tests": 12,
+  "watchdog_seconds": 5,
+  "interrupt_watchdog_ms": 300,
+  "configuration_delta": {
+    "MBEDTLS_DYNAMIC_BUFFER": [
+      false,
+      true
+    ],
+    "MBEDTLS_DYNAMIC_FREE_CONFIG_DATA": [
+      null,
+      false
+    ],
+    "YORADIO_TLS_STATIC_RX_RESERVE": [
+      false,
+      null
+    ]
+  },
+  "runs": [
+    {
+      "profile": "pdm",
+      "result": "NONPASS",
+      "reason": "GET /api/native/health timed out",
+      "report_sha256": "65c36e0091140120b09882ccddd100b8ebb7478a9fbee6ea7ecb752a23efe4ae",
+      "uart_sha256": "9a0a9a0799271bbf7b3b5a86a48e73e4426c21fb515402cca4a14b193d17ea4b",
+      "config_sha256": "80326c82ed3a7e19ded3e6dff3f03d1b6e6057663ae78f8283b49d04f42f0e04",
+      "app_sha256": "ee783c5cc9a994e515891a63a761ce383bab55342b59622fdd6daafd930351ee",
+      "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+      "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
+      "pcm_last_progress_frames": 40640,
+      "pcm_flushes": [],
+      "peer": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 425984,
+          "complete": false
+        }
+      ],
+      "rx_wait_episodes": 9,
+      "rx_recovered": 8,
+      "minimum_rx_wait_largest_bytes": 464,
+      "allocation_failures": null,
+      "last_allocation_failure": null,
+      "minimum_heap": null
+    },
+    {
+      "profile": "dynamic-pdm",
+      "result": "NONPASS",
+      "reason": "Playback stopped or changed generation during WebUI sampling",
+      "report_sha256": "dd6995e2729e0183ab680ac264e7e9b7f1d83ce548b72e6f92702285fe1c7728",
+      "uart_sha256": "867b4247edd7c78ff5a88189b6f32ae23d7007f00ba4af9c5af7e0c828ba8900",
+      "config_sha256": "0b05388ec3f7b0d02a034deed5b32d61284dd3cacf06c9c4e96e8a21df8d8e9b",
+      "app_sha256": "09e60a54e2b68a3ac56721ef24c6a03346da58b7471694de97d574ebac1b1b25",
+      "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+      "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
+      "pcm_last_progress_frames": 40640,
+      "pcm_flushes": [
+        {
+          "frames": 41920,
+          "status": 0
+        }
+      ],
+      "peer": [
+        {
+          "tls_version": "TLSv1.2",
+          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+          "sent": 278528,
+          "complete": false
+        }
+      ],
+      "rx_wait_episodes": 3,
+      "rx_recovered": 3,
+      "minimum_rx_wait_largest_bytes": 1088,
+      "allocation_failures": 1219,
+      "last_allocation_failure": {
+        "size": 16749,
+        "caps": 2052
+      },
+      "minimum_heap": 1412
+    }
+  ]
+}

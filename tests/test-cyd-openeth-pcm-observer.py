@@ -60,7 +60,7 @@ class PcmObserverTests(unittest.TestCase):
                                               reference)
 
     def observe_eof(self, uart, *, allocations=0, backend='dac', codec='opus',
-                    pcm_md5=None, pcm_frames=528000):
+                    pcm_md5=None, pcm_frames=528000, pcm_sha256=None):
         report = {'audio_backend': backend, 'observed': []}
         health = dict(output_driver=dict(requested_bytes=528000, written_bytes=528000, errors=0,
                                          timeouts=0, short_writes=0, saturated=False),
@@ -68,7 +68,8 @@ class PcmObserverTests(unittest.TestCase):
                       output={'failures': 0}, allocation_failures=allocations)
         status = json.dumps(dict(generation=1, audio=False, connecting=False, format='stream ended'))
         server = SimpleNamespace(fixtures={'station': dict(data=b'123', codec=codec,
-                                                           pcm_frames=pcm_frames, pcm_md5=pcm_md5)})
+                                                           pcm_frames=pcm_frames, pcm_md5=pcm_md5,
+                                                           pcm_sha256=pcm_sha256)})
         guest = SimpleNamespace(poll=lambda: None)
         with patch.object(probe, 'request', return_value=status), patch.object(probe, 'sample', return_value=health), \
              patch.object(probe, 'guest_log', return_value=uart), patch.object(probe, 'check_asset', return_value={'bytes': 13588}):
@@ -109,6 +110,24 @@ class PcmObserverTests(unittest.TestCase):
         for log in (flush, flush + checksum.replace('7e76', '8e76'), flush + checksum * 2):
             with self.subTest(log=log), self.assertRaisesRegex(RuntimeError, 'FLAC STREAMINFO MD5'):
                 self.observe_eof(log, **args)
+
+    def test_vorbis_requires_the_entire_pcm_identity_on_all_outputs(self):
+        fixture = probe.station_fixture('vorbis')
+        self.assertEqual(len(fixture['data']), 703584)
+        self.assertEqual(fixture['pcm_frames'], 528000)
+        sha256 = fixture['pcm_sha256']
+        self.assertEqual(sha256, 'e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910')
+        flush = 'CYD_OPENETH_PCM_FLUSH frames=528000 status=0\n'
+        checksum = f'CYD_OPENETH_PCM_SHA256 {sha256}\n'
+        for backend in ('pdm', 'dac', 'legacy_dac'):
+            args = dict(backend=backend, codec='vorbis', pcm_sha256=sha256)
+            with self.subTest(backend=backend):
+                self.assertTrue(probe.uses_pcm_probe(backend, fixture))
+                self.assertEqual(self.observe_eof(flush + checksum, **args)['pcm_sha256'], sha256)
+                for log in (flush, flush + checksum * 2, flush + checksum.replace('e2c3', 'f2c3'),
+                            flush + 'CYD_OPENETH_PCM_MD5 ' + '0' * 32 + '\n'):
+                    with self.assertRaisesRegex(RuntimeError, 'complete public decoder SHA-256'):
+                        self.observe_eof(log, **args)
 
     def test_helix_mp3_checks_eof_for_mono_and_stereo_builds(self):
         mono = probe.helix_mp3_fixture(True)

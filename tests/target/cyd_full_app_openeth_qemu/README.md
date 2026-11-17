@@ -179,6 +179,18 @@ run uses QEMU's 96 kHz DAC model and its longer existing EOF deadline.
 
 ## Other playback fixtures
 
+For Espressif Vorbis, build with `'-D','CYD_OPENETH_PCM_PROBE=ON'` and
+`'-D','CYD_OPENETH_PCM_SHA256=ON'`, then run with
+`--codec vorbis --through-eof --full-tls-records`. The tracked stereo
+`vorbis-q10.ogg` fixture must deliver all 528,000 PCM frames at 48 kHz.
+The controller checks its complete PCM SHA-256 against the
+[direct public Espressif baseline](../../results/cyd-espressif-reuse-20261030/NATIVE.md),
+audio progress during WebUI access, ordered EOF and the exact WebUI asset
+after EOF. The hash includes the complete final tail. It establishes
+integration equality with that vendor baseline, rather than independent
+numeric Vorbis conformance. The SHA probe uses the public PSA hash API and
+adds diagnostic state and work on the output task.
+
 For Helix MP3, use `--codec mp3 --through-eof` with the PCM and PCM MD5
 probes and `CONFIG_YORADIO_MP3_DECODER_HELIX=y`. Compare builds with
 `CONFIG_YORADIO_AUDIO_MONO` enabled and disabled. The fixture repeats a

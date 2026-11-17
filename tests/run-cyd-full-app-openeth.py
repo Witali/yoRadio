@@ -144,14 +144,22 @@ def flac_streaminfo(data):
 def station_fixture(codec):
     folder = ROOT / 'tests/fixtures/esp32c3_calibration'
     filename, mime = {'opus': ('opus-510.ogg', 'audio/ogg'),
+                      'vorbis': ('vorbis-q10.ogg', 'audio/ogg'),
                       'flac': ('flac-level8.flac', 'audio/flac')}[codec]
     fixture, = [row for row in json.loads((folder / 'manifest.json').read_bytes())['fixtures'] if row['file'] == filename]
     data = (folder / fixture['file']).read_bytes()
     if digest(data) != fixture['sha256']:
         raise ValueError(f'{filename} differs from its fixture manifest')
-    frames, md5 = flac_streaminfo(data) if codec == 'flac' else (OPUS_EOF_PCM_FRAMES, None)
-    return dict(data=data, seconds=frames / 48000, codec=codec, mime=mime,
-                pcm_frames=frames, pcm_channels=2, pcm_md5=md5)
+    frames, md5 = flac_streaminfo(data) if codec == 'flac' else (528000, None)
+    result = dict(data=data, seconds=frames / 48000, codec=codec, mime=mime,
+                  pcm_frames=frames, pcm_channels=2, pcm_md5=md5)
+    if codec == 'vorbis':
+        # Complete direct-public Espressif PCM, qualified on LX6 and RV32:
+        # results/cyd-espressif-reuse-20261030/NATIVE.md. This is an integration
+        # identity, not an independent numeric Vorbis-conformance oracle.
+        result['pcm_sha256'] = 'e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910'
+        result['source_channels'] = 2
+    return result
 
 
 def helix_mp3_fixture(mono):
@@ -411,6 +419,11 @@ def observe_eof(port, server, event, guest, log_path, generation, report, web_so
             raise RuntimeError('Incomplete driver writes after EOF')
         if 'family1' in fixture:
             report['family1_pcm_metrics'] = require_family1_metrics(uart, fixture['family1']['metrics'])
+        elif fixture.get('pcm_sha256') is not None:
+            pcm_digests = re.findall(r'^CYD_OPENETH_PCM_SHA256 ([0-9a-f]{64})\s*$', uart, re.M)
+            if pcm_digests != [fixture['pcm_sha256']]:
+                raise RuntimeError('Decoded PCM differs from the complete public decoder SHA-256')
+            report['pcm_sha256'] = pcm_digests[0]
         elif fixture['pcm_md5'] is not None or fixture['codec'] == 'mp3':
             pcm_digests = re.findall(r'^CYD_OPENETH_PCM_MD5 ([0-9a-f]{32})\s*$', uart, re.M)
             if fixture['pcm_md5'] is not None and pcm_digests != [fixture['pcm_md5']]:
@@ -637,8 +650,8 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
     pcm_probe = uses_pcm_probe(backend, fixture)
     reclaim = 'input_reclaim_pcm_reference' in report
     overlap = web_socket is not None
-    name = {'opus': 'Opus', 'flac': 'FLAC', 'mp3': 'MP3'}[codec]
-    status_codec = 'OGG' if codec == 'opus' else name
+    name = {'opus': 'Opus', 'vorbis': 'Vorbis', 'flac': 'FLAC', 'mp3': 'MP3'}[codec]
+    status_codec = 'OGG' if codec in ('opus', 'vorbis') else name
     start_station(port)
     until = time.monotonic() + 40
     while time.monotonic() < until:
@@ -722,7 +735,7 @@ def main():
     parser.add_argument('--rom', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--tls-material', type=Path, help='Local disposable CA and server certificate/key directory')
-    parser.add_argument('--codec', choices=('opus', 'flac', 'mp3'), default='opus',
+    parser.add_argument('--codec', choices=('opus', 'vorbis', 'flac', 'mp3'), default='opus',
                         help='Select the TLS audio fixture (default: opus)')
     parser.add_argument('--opus-family1', type=Path,
                         help='Use a manifest from prepare-opus-family1.py instead of stereo Opus')
@@ -765,6 +778,8 @@ def main():
         parser.error('Opus --through-eof requires the Ogg timeline')
     if args.codec == 'flac' and not args.through_eof:
         parser.error('--codec flac requires --through-eof and the PCM MD5 probe')
+    if args.codec == 'vorbis' and not args.through_eof:
+        parser.error('--codec vorbis requires --through-eof and the PCM SHA-256 probe')
     if args.codec == 'mp3' and not (args.through_eof and config.get('YORADIO_MP3_DECODER_HELIX')):
         parser.error('--codec mp3 requires Helix, --through-eof and the PCM MD5 probe')
     if args.opus_family1 and (args.codec != 'opus' or not (args.through_eof or args.expect_channel_limit)):

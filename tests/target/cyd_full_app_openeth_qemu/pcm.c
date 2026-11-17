@@ -3,6 +3,15 @@
 
 #include "native_audio_output.h"
 
+#ifdef CYD_OPENETH_PCM_SHA256
+#include <assert.h>
+#include "psa/crypto.h"
+#ifdef NDEBUG
+#error "The PCM SHA-256 diagnostic requires assertions"
+#endif
+static psa_hash_operation_t pcm_sha256 = PSA_HASH_OPERATION_INIT;
+#endif
+
 #ifdef CYD_OPENETH_PCM_MD5
 #include "esp_rom_md5.h"
 
@@ -89,6 +98,13 @@ esp_err_t __wrap_native_audio_output_write_pcm(const uint8_t *data, size_t size,
     }
     esp_rom_md5_update(&pcm_md5, data, size);
 #endif
+#ifdef CYD_OPENETH_PCM_SHA256
+    if (!pcm_frames) {
+        assert(psa_crypto_init() == PSA_SUCCESS);
+        assert(psa_hash_setup(&pcm_sha256, PSA_ALG_SHA_256) == PSA_SUCCESS);
+    }
+    assert(psa_hash_update(&pcm_sha256, data, size) == PSA_SUCCESS);
+#endif
     pcm_frames += size / frame_bytes;
 #ifdef CYD_OPENETH_RECLAIM_PROBE
     if (channels == 2) cyd_openeth_note_playback();
@@ -104,6 +120,23 @@ esp_err_t __real_native_audio_output_flush_pcm(void);
 esp_err_t __wrap_native_audio_output_flush_pcm(void) {
     esp_err_t result = __real_native_audio_output_flush_pcm();
     printf("CYD_OPENETH_PCM_FLUSH frames=%" PRIu64 " status=%d\n", pcm_frames, (int)result);
+#ifdef CYD_OPENETH_PCM_SHA256
+    if (result == ESP_OK && pcm_frames) {
+        static const char hex[] = "0123456789abcdef";
+        uint8_t digest[32];
+        char text[2 * sizeof(digest) + 1];
+        size_t size = 0;
+        assert(psa_hash_finish(&pcm_sha256, digest, sizeof(digest), &size) == PSA_SUCCESS);
+        assert(size == sizeof(digest));
+        assert(psa_hash_abort(&pcm_sha256) == PSA_SUCCESS);
+        for (size_t i = 0; i < sizeof(digest); ++i) {
+            text[2 * i] = hex[digest[i] >> 4];
+            text[2 * i + 1] = hex[digest[i] & 15];
+        }
+        text[sizeof(text) - 1] = '\0';
+        printf("CYD_OPENETH_PCM_SHA256 %s\n", text);
+    }
+#endif
 #ifdef CYD_OPENETH_PCM_CHANNEL_METRICS
     for (uint8_t channel = 0; channel < measured_channels; ++channel) {
         printf("CYD_OPENETH_PCM_CHANNEL index=%u energy=%" PRIu64 " crossings=%" PRIu32 "\n",
