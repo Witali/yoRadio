@@ -282,16 +282,34 @@ extern "C" void __wrap_esp_audio_simple_dec_close(esp_audio_simple_dec_handle_t 
 }
 
 // Only the hardware/backend boundary is synthetic; output_task and its ring are real.
+static bool packet_layout_ready, packet_gain_ready;
 extern "C" bool native_audio_output_supports_pcm(uint8_t bits, uint8_t channels) {
     return channels && (bits == 8 || bits == 16 || bits == 24 || bits == 32);
 }
 extern "C" esp_err_t native_audio_output_init(void) { return ESP_OK; }
 extern "C" const char *native_audio_output_name(void) { return "QEMU vendor PCM integration seam"; }
 extern "C" esp_err_t native_audio_output_configure(uint32_t rate) {
-    owner(1, 6); check(rate == 48000, "actual_output_rate"); return ESP_OK;
+    owner(1, 6); check(rate == 48000, "actual_output_rate");
+    packet_layout_ready = packet_gain_ready = false;
+    return ESP_OK;
+}
+extern "C" esp_err_t native_audio_output_set_channel_layout(pcm_channel_layout layout, uint8_t channels) {
+    owner(1, 6);
+    check(layout == PCM_CHANNEL_LAYOUT_LEGACY && channels == 2, "actual_packet_layout");
+    packet_layout_ready = true;
+    return ESP_OK;
+}
+extern "C" esp_err_t native_audio_output_set_header_gain(int16_t gain_q8) {
+    owner(1, 6);
+    // Every pinned stream in this fixture has zero header gain.
+    check(gain_q8 == 0, "actual_packet_header_gain");
+    packet_gain_ready = true;
+    return ESP_OK;
 }
 extern "C" esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size, uint8_t bits, uint8_t channels) {
     owner(1, 6);
+    check(packet_layout_ready && packet_gain_ready, "metadata_before_each_pcm_packet");
+    packet_layout_ready = packet_gain_ready = false;
     xSemaphoreTake(output_lock, portMAX_DELAY);
     check(!hash_finished && bits == 16 && channels == 2 && size && size % 4 == 0, "output_pcm_geometry");
     auto info = snapshot();
