@@ -32,6 +32,7 @@ static const ogg_page_word_allocator ogp_word_payload_allocator = {
 
 enum {
     OGP_INITIAL_PCM_BYTES = 12288,
+    OGP_ENCODED_FRAGMENT_BYTES = 2048,
     /* Opus family 0 has at most two channels. Start with 20 ms of stereo
      * S16 PCM at 48 kHz and use the public resize path for longer packets. */
     OGP_OPUS_INITIAL_PCM_BYTES = 960 * 2 * sizeof(int16_t),
@@ -262,6 +263,32 @@ static inline ogg_playback_status ogp_decode_fragment(ogg_playback *s,
     return OGP_OK;
 }
 
+/* Keep the 2 KiB staging frame off raw Opus/F1 call stacks. Their existing
+ * 16 KiB decode stack must not inherit a buffer used only by simple Ogg. */
+static __attribute__((noinline)) ogg_playback_status ogp_decode_word_page(ogg_playback *s,
+    bool eos, esp_audio_simple_dec_handle_t *decoder, uint8_t **output, size_t *capacity,
+    decoder_pending_input_t *pending, const ogg_playback_callbacks *callbacks,
+    int32_t *cause)
+{
+    const oopt_event *page = &s->input.event;
+    uint8_t encoded[OGP_ENCODED_FRAGMENT_BYTES];
+    for (size_t at = 0; at < s->input.size;) {
+        size_t bytes = s->input.size - at;
+        if (bytes > sizeof(encoded)) bytes = sizeof(encoded);
+        if (!opi_copy_page(&s->input, at, encoded, bytes)) {
+            *cause = OPI_INVALID;
+            return OGP_CONTAINER;
+        }
+        bool final = eos && bytes == s->input.size - at;
+        ogg_playback_status decoded = ogp_decode_fragment(s, page,
+            encoded, bytes, final, decoder, output, capacity,
+            pending, callbacks, cause);
+        if (decoded != OGP_OK) return decoded;
+        at += bytes;
+    }
+    return OGP_OK;
+}
+
 static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
     esp_audio_simple_dec_handle_t *decoder, uint8_t **output, size_t *capacity,
     decoder_pending_input_t *pending, const ogg_playback_callbacks *callbacks,
@@ -345,10 +372,16 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
             return result == ESP_AUDIO_ERR_MEM_LACK ? OGP_MEMORY : OGP_DECODER;
         }
     }
-    ogg_playback_status decoded = ogp_decode_fragment(s, page,
-        s->input.page, s->input.size, eos, decoder, output, capacity,
-        pending, callbacks, cause);
-    if (decoded != OGP_OK) return decoded;
+    if (s->input.word_page) {
+        ogg_playback_status decoded = ogp_decode_word_page(s, eos, decoder,
+            output, capacity, pending, callbacks, cause);
+        if (decoded != OGP_OK) return decoded;
+    } else {
+        ogg_playback_status decoded = ogp_decode_fragment(s, page,
+            s->input.page, s->input.size, eos, decoder, output, capacity,
+            pending, callbacks, cause);
+        if (decoded != OGP_OK) return decoded;
+    }
     if (eos) {
         if (page->opus && opt_finish(&s->trim, s->generation) != OPT_OK) {
             *cause = ESP_AUDIO_ERR_DATA_LACK;
@@ -360,7 +393,18 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
         opt_reset(&s->trim);
         s->header_gain_q8 = 0;
     }
-    return opi_ack(&s->input, page->generation, page->token) ? OGP_OK : OGP_CONTAINER;
+    if (!opi_ack(&s->input, page->generation, page->token)) return OGP_CONTAINER;
+#if defined(ESP_PLATFORM) && CONFIG_IDF_TARGET_ESP32
+    /* Keep BOS byte-addressable for source metadata. Subsequent large pages
+     * share the existing word-capable store with the raw Opus path, while
+     * the public simple decoder receives ordinary byte-addressable fragments.
+     * A new link starts with a byte-addressable BOS after EOS drain/close. */
+    if (!opi_set_word_allocator(&s->input, eos ? NULL : &ogp_word_payload_allocator)) {
+        *cause = OPI_INVALID;
+        return OGP_CONTAINER;
+    }
+#endif
+    return OGP_OK;
 }
 
 static inline ogg_playback_status ogp_feed(ogg_playback *s,

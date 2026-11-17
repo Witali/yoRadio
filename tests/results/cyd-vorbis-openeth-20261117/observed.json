@@ -2,26 +2,6 @@
   "esp_idf": "6.0.2",
   "openeth": true,
   "physical_tested": false,
-  "source_commit": "2245311c51aed9cbc196f825df50ac26e4da95f6",
-  "production_sources_changed": false,
-  "diagnostic_sources": [
-    {
-      "path": "tests/run-cyd-full-app-openeth.py",
-      "sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490"
-    },
-    {
-      "path": "tests/test-cyd-openeth-pcm-observer.py",
-      "sha256": "070ae7f536c0c7383c7d430c729c9f2ba92271e61abeb25dbd4590f102200f67"
-    },
-    {
-      "path": "tests/target/cyd_full_app_openeth_qemu/attach.cmake",
-      "sha256": "28edb3f5822b08aff61b3271a9ba0fc61e0a4e8909f618d2a7e7935a5d8d1f41"
-    },
-    {
-      "path": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
-      "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
-    }
-  ],
   "fixture": {
     "path": "tests/fixtures/esp32c3_calibration/vorbis-q10.ogg",
     "bytes": 703584,
@@ -29,7 +9,10 @@
     "expected_pcm_frames": 528000,
     "expected_pcm_bytes": 2112000,
     "expected_vendor_pcm_sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
-    "independent_full_numeric_oracle": false
+    "independent_full_numeric_oracle": false,
+    "pages": 15,
+    "largest_page_bytes": 58231,
+    "eos_granule": 528000
   },
   "vendor": [
     {
@@ -46,82 +29,1237 @@
   "host_observer_tests": 12,
   "watchdog_seconds": 5,
   "interrupt_watchdog_ms": 300,
-  "configuration_delta": {
-    "MBEDTLS_DYNAMIC_BUFFER": [
-      false,
-      true
+  "original_controls": {
+    "source_commit": "2245311c51aed9cbc196f825df50ac26e4da95f6",
+    "production_sources_changed": false,
+    "diagnostic_sources": [
+      {
+        "path": "tests/run-cyd-full-app-openeth.py",
+        "sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490"
+      },
+      {
+        "path": "tests/test-cyd-openeth-pcm-observer.py",
+        "sha256": "070ae7f536c0c7383c7d430c729c9f2ba92271e61abeb25dbd4590f102200f67"
+      },
+      {
+        "path": "tests/target/cyd_full_app_openeth_qemu/attach.cmake",
+        "sha256": "28edb3f5822b08aff61b3271a9ba0fc61e0a4e8909f618d2a7e7935a5d8d1f41"
+      },
+      {
+        "path": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+        "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+      }
     ],
-    "MBEDTLS_DYNAMIC_FREE_CONFIG_DATA": [
-      null,
-      false
-    ],
-    "YORADIO_TLS_STATIC_RX_RESERVE": [
-      false,
-      null
+    "configuration_delta": {
+      "MBEDTLS_DYNAMIC_BUFFER": [
+        false,
+        true
+      ],
+      "MBEDTLS_DYNAMIC_FREE_CONFIG_DATA": [
+        null,
+        false
+      ],
+      "YORADIO_TLS_STATIC_RX_RESERVE": [
+        false,
+        null
+      ]
+    },
+    "runs": [
+      {
+        "profile": "pdm",
+        "result": "NONPASS",
+        "reason": "GET /api/native/health timed out",
+        "report_sha256": "65c36e0091140120b09882ccddd100b8ebb7478a9fbee6ea7ecb752a23efe4ae",
+        "uart_sha256": "9a0a9a0799271bbf7b3b5a86a48e73e4426c21fb515402cca4a14b193d17ea4b",
+        "config_sha256": "80326c82ed3a7e19ded3e6dff3f03d1b6e6057663ae78f8283b49d04f42f0e04",
+        "app_sha256": "ee783c5cc9a994e515891a63a761ce383bab55342b59622fdd6daafd930351ee",
+        "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+        "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
+        "pcm_last_progress_frames": 40640,
+        "pcm_flushes": [],
+        "peer": [
+          {
+            "tls_version": "TLSv1.2",
+            "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+            "sent": 425984,
+            "complete": false
+          }
+        ],
+        "rx_wait_episodes": 9,
+        "rx_recovered": 8,
+        "minimum_rx_wait_largest_bytes": 464,
+        "allocation_failures": null,
+        "last_allocation_failure": null,
+        "minimum_heap": null
+      },
+      {
+        "profile": "dynamic-pdm",
+        "result": "NONPASS",
+        "reason": "Playback stopped or changed generation during WebUI sampling",
+        "report_sha256": "dd6995e2729e0183ab680ac264e7e9b7f1d83ce548b72e6f92702285fe1c7728",
+        "uart_sha256": "867b4247edd7c78ff5a88189b6f32ae23d7007f00ba4af9c5af7e0c828ba8900",
+        "config_sha256": "0b05388ec3f7b0d02a034deed5b32d61284dd3cacf06c9c4e96e8a21df8d8e9b",
+        "app_sha256": "09e60a54e2b68a3ac56721ef24c6a03346da58b7471694de97d574ebac1b1b25",
+        "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+        "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
+        "pcm_last_progress_frames": 40640,
+        "pcm_flushes": [
+          {
+            "frames": 41920,
+            "status": 0
+          }
+        ],
+        "peer": [
+          {
+            "tls_version": "TLSv1.2",
+            "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+            "sent": 278528,
+            "complete": false
+          }
+        ],
+        "rx_wait_episodes": 3,
+        "rx_recovered": 3,
+        "minimum_rx_wait_largest_bytes": 1088,
+        "allocation_failures": 1219,
+        "last_allocation_failure": {
+          "size": 16749,
+          "caps": 2052
+        },
+        "minimum_heap": 1412
+      }
     ]
   },
-  "runs": [
+  "repair_source_base_commit": "51b4f03b8",
+  "repair_sources": [
     {
-      "profile": "pdm",
-      "result": "NONPASS",
-      "reason": "GET /api/native/health timed out",
-      "report_sha256": "65c36e0091140120b09882ccddd100b8ebb7478a9fbee6ea7ecb752a23efe4ae",
-      "uart_sha256": "9a0a9a0799271bbf7b3b5a86a48e73e4426c21fb515402cca4a14b193d17ea4b",
-      "config_sha256": "80326c82ed3a7e19ded3e6dff3f03d1b6e6057663ae78f8283b49d04f42f0e04",
-      "app_sha256": "ee783c5cc9a994e515891a63a761ce383bab55342b59622fdd6daafd930351ee",
-      "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
-      "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
-      "pcm_last_progress_frames": 40640,
-      "pcm_flushes": [],
-      "peer": [
-        {
-          "tls_version": "TLSv1.2",
-          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
-          "sent": 425984,
-          "complete": false
-        }
-      ],
-      "rx_wait_episodes": 9,
-      "rx_recovered": 8,
-      "minimum_rx_wait_largest_bytes": 464,
-      "allocation_failures": null,
-      "last_allocation_failure": null,
-      "minimum_heap": null
+      "path": "idf/esp32-cyd2usb-native/main/ogg_playback.h",
+      "sha256": "077201fae015b77576cd6667d60c343d8ba3f483c8b82c918bc8fe0135d8d800"
     },
     {
-      "profile": "dynamic-pdm",
-      "result": "NONPASS",
-      "reason": "Playback stopped or changed generation during WebUI sampling",
-      "report_sha256": "dd6995e2729e0183ab680ac264e7e9b7f1d83ce548b72e6f92702285fe1c7728",
-      "uart_sha256": "867b4247edd7c78ff5a88189b6f32ae23d7007f00ba4af9c5af7e0c828ba8900",
-      "config_sha256": "0b05388ec3f7b0d02a034deed5b32d61284dd3cacf06c9c4e96e8a21df8d8e9b",
-      "app_sha256": "09e60a54e2b68a3ac56721ef24c6a03346da58b7471694de97d574ebac1b1b25",
+      "path": "idf/components/native_stream/include/ogg_page_input.h",
+      "sha256": "c080ceffa46540e242f7b30fab74b28f8fe2816c958edd36c208eb1ca63b50b2"
+    },
+    {
+      "path": "tests/native/ogg_playback_host.c",
+      "sha256": "d12de2f5a68cc23ed50e573d538c731bf84f26c9ae84d7dce9b32f4751348ae9"
+    },
+    {
+      "path": "tests/native/ogg_playback_fragments.h",
+      "sha256": "d5c361ae370ffc7bbd97afa733035fab792f7897d4ee83279672fa999afffbd5"
+    },
+    {
+      "path": "tests/run-ogg-playback-host.py",
+      "sha256": "33a5b282c79d15e99be8ec565db5cccfadd868626ec388ca22104ad95bfcee11"
+    },
+    {
+      "path": "tests/check-cyd-ogg-stack.py",
+      "sha256": "57a4f68e7d164072c2178196d91ea86b05ed142a95bab2e742dcc114f431832a"
+    }
+  ],
+  "repaired_runs": [
+    {
+      "variant": "pdm",
+      "result": "PASS",
+      "app_sha256": "5b76ded4a3416e9c071ef49416c830afa80221d249be1cbafa77cd918a9a96b5",
+      "config_sha256": "80326c82ed3a7e19ded3e6dff3f03d1b6e6057663ae78f8283b49d04f42f0e04",
+      "config_delta_from_original_pdm": {},
+      "report_sha256": "642a943f60d2a598200a1b461bd84f737e9142b20ef1de61bf985a439971a3f6",
+      "uart_sha256": "98945626246bdc4d6117b2de7c12d44dd9d80348822dfdd5edf5aed17f786d97",
       "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
       "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
-      "pcm_last_progress_frames": 40640,
-      "pcm_flushes": [
-        {
-          "frames": 41920,
-          "status": 0
-        }
-      ],
-      "peer": [
-        {
-          "tls_version": "TLSv1.2",
-          "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
-          "sent": 278528,
-          "complete": false
-        }
-      ],
-      "rx_wait_episodes": 3,
-      "rx_recovered": 3,
-      "minimum_rx_wait_largest_bytes": 1088,
-      "allocation_failures": 1219,
-      "last_allocation_failure": {
-        "size": 16749,
-        "caps": 2052
+      "pcm_frames": 528000,
+      "pcm_sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
+      "minimum_heap": 38640,
+      "allocation_failures": 0,
+      "rx_wait_episodes": 0,
+      "driver": {
+        "writes": 1034,
+        "requested_bytes": 1058176,
+        "written_bytes": 1058176,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": 0,
+        "timing_enabled": true,
+        "timing_samples": 1034,
+        "invalid_time_samples": 0,
+        "write_us": 63652654,
+        "max_write_us": 74540
       },
-      "minimum_heap": 1412
+      "minimum_stack_free": {
+        "stream": {
+          "percent_of_one_core": 1.1,
+          "stack_free_min": 1604
+        },
+        "decode": {
+          "percent_of_one_core": 1.7,
+          "stack_free_min": 10844
+        },
+        "output": {
+          "percent_of_one_core": 1.4,
+          "stack_free_min": 2724
+        },
+        "http": {
+          "percent_of_one_core": 0.8,
+          "stack_free_min": 1228
+        }
+      },
+      "response_bytes": 703584,
+      "full_tls_body_records": 42,
+      "tls_body_tail_bytes": 15456,
+      "web_asset_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "pcm_progress_during_webui": [
+        128,
+        61120
+      ]
+    },
+    {
+      "variant": "continuous",
+      "result": "PASS",
+      "app_sha256": "29855324049d09ef51c4dcf22bfb81d05ff12eb1cb47cbc15f12197d7513d950",
+      "config_sha256": "e3f02a70cc4ad1c8329514b64576dbf14817d489a107ff7c1c8c0bc38a9260c0",
+      "config_delta_from_original_pdm": {
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": [
+          false,
+          true
+        ],
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": [
+          true,
+          false
+        ]
+      },
+      "report_sha256": "b95d72a3bfa92206399b485d509dd225b7df81db7d400a8af2463e0f63fbef09",
+      "uart_sha256": "d34e3eecda1d5e406ceaafe64fe466b379fdd9c05ad8b19c3a0b7c79089c8eb1",
+      "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+      "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
+      "pcm_frames": 528000,
+      "pcm_sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
+      "minimum_heap": 40132,
+      "allocation_failures": 0,
+      "rx_wait_episodes": 0,
+      "driver": {
+        "writes": 2181,
+        "requested_bytes": 819840,
+        "written_bytes": 819840,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": null,
+        "timing_enabled": true,
+        "timing_samples": 2181,
+        "invalid_time_samples": 0,
+        "write_us": 9953327,
+        "max_write_us": 43849
+      },
+      "minimum_stack_free": {
+        "stream": {
+          "percent_of_one_core": 2.4,
+          "stack_free_min": 1572
+        },
+        "decode": {
+          "percent_of_one_core": 4.7,
+          "stack_free_min": 10844
+        },
+        "output": {
+          "percent_of_one_core": 6.0,
+          "stack_free_min": 2868
+        },
+        "http": {
+          "percent_of_one_core": 0.7,
+          "stack_free_min": 1224
+        }
+      },
+      "response_bytes": 703584,
+      "full_tls_body_records": 42,
+      "tls_body_tail_bytes": 15456,
+      "web_asset_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "pcm_progress_during_webui": [
+        128,
+        81600
+      ]
+    },
+    {
+      "variant": "legacy",
+      "result": "PASS",
+      "app_sha256": "e0815dd8e19fcd7763c3a13e5a14988e2376f8c085376dc93584151fd22a48c9",
+      "config_sha256": "0166a5eff23e401ac22e71fec6b752b2c8bf63066fe233c3939d7cd680daf3a1",
+      "config_delta_from_original_pdm": {
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": [
+          false,
+          true
+        ],
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": [
+          true,
+          false
+        ]
+      },
+      "report_sha256": "fe9fbf32895c3894079933184e2ec157b857168fa44550b01e1ead37adeed2fb",
+      "uart_sha256": "bb5114eb910d7a58bb8198f5d40ff4ea2d6e1bf29153df3e2a8451346fd5bf59",
+      "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+      "runner_sha256": "01f2f4d4f1efd82326002cec8ad09ed389e7c753e02740d3a31cf0e286906490",
+      "pcm_frames": 528000,
+      "pcm_sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
+      "minimum_heap": 36728,
+      "allocation_failures": 0,
+      "rx_wait_episodes": 0,
+      "driver": {
+        "writes": 16522,
+        "requested_bytes": 33837056,
+        "written_bytes": 33837056,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": null,
+        "timing_enabled": true,
+        "timing_samples": 16522,
+        "invalid_time_samples": 0,
+        "write_us": 174116358,
+        "max_write_us": 29824
+      },
+      "minimum_stack_free": {
+        "stream": {
+          "percent_of_one_core": 0.1,
+          "stack_free_min": 1540
+        },
+        "decode": {
+          "percent_of_one_core": 0.7,
+          "stack_free_min": 10844
+        },
+        "output": {
+          "percent_of_one_core": 1.5,
+          "stack_free_min": 2964
+        },
+        "http": {
+          "percent_of_one_core": 0.7,
+          "stack_free_min": 1224
+        }
+      },
+      "response_bytes": 703584,
+      "full_tls_body_records": 42,
+      "tls_body_tail_bytes": 15456,
+      "web_asset_after_eof": {
+        "bytes": 13588,
+        "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+      },
+      "pcm_progress_during_webui": [
+        128,
+        20160
+      ]
     }
-  ]
+  ],
+  "all_outputs_qualified": true,
+  "repair_host_regression": {
+    "lifecycle_cases": 156,
+    "new_fragment_cases": 40,
+    "page_cases": 276,
+    "trim_cases": 204,
+    "gain_cases": 144,
+    "sanitizers": [
+      "ASan",
+      "UBSan"
+    ]
+  },
+  "family1_regression": {
+    "old_expectation_failed": true,
+    "pre_word_source": "51b4f03b8",
+    "baseline_open_refusal": {
+      "opens": 2,
+      "created": 1,
+      "destroyed": 1,
+      "live": 0,
+      "outputs": 0,
+      "ready": 0,
+      "size": 0,
+      "pending": 0
+    },
+    "original_failure_report_sha256": "e86fb49f8f3123ee4f4968649dec55e56ef601cca3017b5eff08d1a73f75b736",
+    "updated_report_sha256": "41873ee68cf9b7dc82dddbce579a6f5343adc732e0d14adc0d2926afd18391a2",
+    "unchanged_numeric_oracle": true,
+    "variants": {
+      "byte": {
+        "measurements": {
+          "suite": "ogg-family1-dispatch",
+          "passed": true,
+          "positive_schedules": 43,
+          "host_controls": 12,
+          "creator_pcm_samples_exact": 12983296,
+          "family1_output_chunks": 20052,
+          "legacy_output_chunks": 552,
+          "gain_layout_forwarded": true,
+          "close_retry_preserves_cfg_page_planes": true,
+          "native_oom_qualified": false,
+          "production_task_executed": false
+        },
+        "word_storage_measurements": {
+          "suite": "ogg-family1-word-storage",
+          "passed": true,
+          "enabled": 0,
+          "controls": 0,
+          "creator_pcm_samples_exact": 0,
+          "peak_live_planes": 0,
+          "allocation_attempts": 0,
+          "native_oom_qualified": false,
+          "native_word_access_qualified": false
+        }
+      },
+      "word": {
+        "measurements": {
+          "suite": "ogg-family1-dispatch",
+          "passed": true,
+          "positive_schedules": 43,
+          "host_controls": 12,
+          "creator_pcm_samples_exact": 12983296,
+          "family1_output_chunks": 20052,
+          "legacy_output_chunks": 552,
+          "gain_layout_forwarded": true,
+          "close_retry_preserves_cfg_page_planes": true,
+          "native_oom_qualified": false,
+          "production_task_executed": false
+        },
+        "word_storage_measurements": {
+          "suite": "ogg-family1-word-storage",
+          "passed": true,
+          "enabled": 1,
+          "controls": 23,
+          "creator_pcm_samples_exact": 383992,
+          "peak_live_planes": 16,
+          "allocation_attempts": 186,
+          "native_oom_qualified": false,
+          "native_word_access_qualified": false
+        }
+      },
+      "limited": {
+        "measurements": {
+          "suite": "cyd-audio-channel-limit",
+          "rejected_headers": 7,
+          "invalid_crc_controls": 3,
+          "mono_stereo_schedules": 2,
+          "flac_counts": 8,
+          "adts_configurations": 8,
+          "passed": true
+        }
+      }
+    },
+    "final_source_records_identical": true
+  },
+  "compiler_frame_regression": {
+    "original_decoder_bytes": 1744,
+    "oversized_candidate_bytes": 3728,
+    "final_decoder_bytes": 1760,
+    "word_helper_bytes": 2144,
+    "all_three_final_elves_pass": true,
+    "oversized_candidate_rejected": true,
+    "total_runtime_stack_depth_verified": false,
+    "reports": {
+      "pdm": "85e274241a5b8a50c329aff688eddba0b4624b28351638a8a8d31fae92b21505",
+      "continuous": "b64c08f1e0ec2d08e3ea2f7cd3cdb795d304ed5dbb3eb939e26fbad18bcc984c",
+      "legacy": "7fbbf62347d5dd8afebca616767623faeffc7baddd3b03f23a3c00a5c5862586"
+    },
+    "checker_sha256": "57a4f68e7d164072c2178196d91ea86b05ed142a95bab2e742dcc114f431832a"
+  },
+  "sdk_task_regression": {
+    "passed": true,
+    "report_sha256": "66f5e05f3cc910fa7e273fe47fd0d0ef5fb4ead5a1bca68bdebd59d44b3d42c7",
+    "source_and_runtime_bindings_verified": true,
+    "measurements": {
+      "cases": [
+        {
+          "id": "T0",
+          "ordered_eof": 1,
+          "fixture": "OPUS20",
+          "pcm_bytes": 2112000,
+          "sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f",
+          "opens": 1,
+          "closes": 1,
+          "http_cleanup": 1,
+          "writes": 1100,
+          "metadata": 1
+        },
+        {
+          "id": "T1",
+          "stop_reopen": 1,
+          "partial_pcm": 160032,
+          "stop_generation": 3,
+          "discard_generation": 3,
+          "fixture": "OPUS20",
+          "pcm_bytes": 2112000,
+          "sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f",
+          "opens": 3,
+          "closes": 3,
+          "http_cleanup": 3,
+          "writes": 1100,
+          "metadata": 1
+        },
+        {
+          "id": "T2",
+          "maintenance_resume": 1,
+          "partial_pcm": 160032,
+          "held_quiet": 1,
+          "play_blocked": 1,
+          "token_consumed": 1,
+          "stale_rejected": 1,
+          "fixture": "OPUS20",
+          "pcm_bytes": 2112000,
+          "sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f",
+          "opens": 5,
+          "closes": 5,
+          "http_cleanup": 5,
+          "writes": 1100,
+          "metadata": 1
+        },
+        {
+          "id": "T0",
+          "ordered_eof": 1,
+          "fixture": "OPUS120",
+          "pcm_bytes": 2112000,
+          "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0",
+          "opens": 6,
+          "closes": 6,
+          "http_cleanup": 6,
+          "writes": 734,
+          "metadata": 1
+        },
+        {
+          "id": "T1",
+          "stop_reopen": 1,
+          "partial_pcm": 183072,
+          "stop_generation": 10,
+          "discard_generation": 10,
+          "fixture": "OPUS120",
+          "pcm_bytes": 2112000,
+          "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0",
+          "opens": 8,
+          "closes": 8,
+          "http_cleanup": 8,
+          "writes": 734,
+          "metadata": 1
+        },
+        {
+          "id": "T2",
+          "maintenance_resume": 1,
+          "partial_pcm": 183072,
+          "held_quiet": 1,
+          "play_blocked": 1,
+          "token_consumed": 1,
+          "stale_rejected": 1,
+          "fixture": "OPUS120",
+          "pcm_bytes": 2112000,
+          "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0",
+          "opens": 10,
+          "closes": 10,
+          "http_cleanup": 10,
+          "writes": 734,
+          "metadata": 1
+        },
+        {
+          "id": "T0",
+          "ordered_eof": 1,
+          "fixture": "VORBIS",
+          "pcm_bytes": 2112000,
+          "sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
+          "opens": 11,
+          "closes": 11,
+          "http_cleanup": 11,
+          "writes": 1044,
+          "metadata": 1
+        },
+        {
+          "id": "T1",
+          "stop_reopen": 1,
+          "partial_pcm": 167680,
+          "stop_generation": 17,
+          "discard_generation": 17,
+          "fixture": "VORBIS",
+          "pcm_bytes": 2112000,
+          "sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
+          "opens": 13,
+          "closes": 13,
+          "http_cleanup": 13,
+          "writes": 1044,
+          "metadata": 1
+        },
+        {
+          "id": "T2",
+          "maintenance_resume": 1,
+          "partial_pcm": 167680,
+          "held_quiet": 1,
+          "play_blocked": 1,
+          "token_consumed": 1,
+          "stale_rejected": 1,
+          "fixture": "VORBIS",
+          "pcm_bytes": 2112000,
+          "sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910",
+          "opens": 15,
+          "closes": 15,
+          "http_cleanup": 15,
+          "writes": 1044,
+          "metadata": 1
+        }
+      ],
+      "chain": {
+        "links": 3,
+        "one_http": 1,
+        "same_generation": 1,
+        "single_eof": 1,
+        "cross_link_reads": 2,
+        "pcm_bytes": 6336000,
+        "sha256": "0d56ce88a31d08d58d5e40a531c69f34bb9cc66a52c76fdb583233a07611dd1b",
+        "opens": 18,
+        "closes": 18,
+        "http_cleanup": 16
+      },
+      "links": [
+        {
+          "fixture": "OPUS20",
+          "index": 0,
+          "codec": "OPUS20",
+          "bytes": 2112000,
+          "sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f"
+        },
+        {
+          "fixture": "OPUS20",
+          "index": 0,
+          "codec": "OPUS20",
+          "bytes": 2112000,
+          "sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f"
+        },
+        {
+          "fixture": "OPUS20",
+          "index": 0,
+          "codec": "OPUS20",
+          "bytes": 2112000,
+          "sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f"
+        },
+        {
+          "fixture": "OPUS120",
+          "index": 0,
+          "codec": "OPUS120",
+          "bytes": 2112000,
+          "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0"
+        },
+        {
+          "fixture": "OPUS120",
+          "index": 0,
+          "codec": "OPUS120",
+          "bytes": 2112000,
+          "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0"
+        },
+        {
+          "fixture": "OPUS120",
+          "index": 0,
+          "codec": "OPUS120",
+          "bytes": 2112000,
+          "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0"
+        },
+        {
+          "fixture": "VORBIS",
+          "index": 0,
+          "codec": "VORBIS",
+          "bytes": 2112000,
+          "sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910"
+        },
+        {
+          "fixture": "VORBIS",
+          "index": 0,
+          "codec": "VORBIS",
+          "bytes": 2112000,
+          "sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910"
+        },
+        {
+          "fixture": "VORBIS",
+          "index": 0,
+          "codec": "VORBIS",
+          "bytes": 2112000,
+          "sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910"
+        },
+        {
+          "fixture": "CHAIN",
+          "index": 0,
+          "codec": "OPUS20",
+          "bytes": 2112000,
+          "sha256": "b63b58b563d2a20d90a7bef235e5c1099dc52433db19083492d9c7098345469f"
+        },
+        {
+          "fixture": "CHAIN",
+          "index": 1,
+          "codec": "VORBIS",
+          "bytes": 2112000,
+          "sha256": "e2c316f3e6b7a4a919027ab918cef54fc60a741a944aac26fc215ce33d396910"
+        },
+        {
+          "fixture": "CHAIN",
+          "index": 2,
+          "codec": "OPUS120",
+          "bytes": 2112000,
+          "sha256": "4110db997c16a05c329284bb6105468752c25d67818e3a99b8c9d47c5f481fd0"
+        }
+      ],
+      "memory": [
+        {
+          "fixture": "OPUS20",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 180852,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS20",
+          "stage": "STOP_QUIET",
+          "heap_free": 235304,
+          "heap_min": 180852,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS20",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 180848,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS20",
+          "stage": "MAINTENANCE_HELD",
+          "heap_free": 235304,
+          "heap_min": 180848,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS20",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 180848,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS120",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 166508,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS120",
+          "stage": "STOP_QUIET",
+          "heap_free": 235304,
+          "heap_min": 166508,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS120",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 166504,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS120",
+          "stage": "MAINTENANCE_HELD",
+          "heap_free": 235304,
+          "heap_min": 166504,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "OPUS120",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 166504,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "VORBIS",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 164864,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "VORBIS",
+          "stage": "STOP_QUIET",
+          "heap_free": 235304,
+          "heap_min": 164864,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "VORBIS",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 164864,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "VORBIS",
+          "stage": "MAINTENANCE_HELD",
+          "heap_free": 235304,
+          "heap_min": 164864,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "VORBIS",
+          "stage": "EOF_DONE",
+          "heap_free": 235600,
+          "heap_min": 164864,
+          "largest_internal": 110580
+        },
+        {
+          "fixture": "CHAIN",
+          "stage": "CHAIN_DONE",
+          "heap_free": 235600,
+          "heap_min": 164864,
+          "largest_internal": 110580
+        }
+      ],
+      "fixtures": [
+        {
+          "fixture": "OPUS20",
+          "encoded": 706319,
+          "max_page": 54597
+        },
+        {
+          "fixture": "OPUS120",
+          "encoded": 707097,
+          "max_page": 61475
+        },
+        {
+          "fixture": "VORBIS",
+          "encoded": 703584,
+          "max_page": 58231
+        }
+      ],
+      "complete": {
+        "cases": 10,
+        "actual_audio_service_tu": 1,
+        "opens": 18,
+        "closes": 18,
+        "live_decoders": 0,
+        "real_http_cleanup": 16,
+        "live_clients": 0,
+        "process_calls": 6204,
+        "resize_requests": 6,
+        "resize_retries": 6,
+        "initial_capacity_checks": 18,
+        "output_flushes": 10,
+        "core_bindings": 1,
+        "stream_stack_free": 3772,
+        "decode_stack_free": 772,
+        "output_stack_free": 2540,
+        "heap_free": 235600,
+        "heap_min": 164864,
+        "largest_internal": 110580,
+        "heap_integrity": 1,
+        "hardware": 0
+      },
+      "public_handles": [
+        {
+          "fixture": "OPUS20",
+          "instance": 1,
+          "generation": 1,
+          "offset": 0,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 567,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "OPUS20",
+          "instance": 2,
+          "generation": 2,
+          "offset": 567,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 45,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "OPUS20",
+          "instance": 3,
+          "generation": 4,
+          "offset": 612,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 567,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "OPUS20",
+          "instance": 4,
+          "generation": 5,
+          "offset": 1179,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 45,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "OPUS20",
+          "instance": 5,
+          "generation": 7,
+          "offset": 1224,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 567,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 6,
+          "generation": 8,
+          "offset": 1791,
+          "resizes": 1,
+          "retries": 1,
+          "initial": 12288,
+          "calls": 361,
+          "last_capacity": 23040
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 7,
+          "generation": 9,
+          "offset": 2152,
+          "resizes": 1,
+          "retries": 1,
+          "initial": 12288,
+          "calls": 34,
+          "last_capacity": 23040
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 8,
+          "generation": 11,
+          "offset": 2186,
+          "resizes": 1,
+          "retries": 1,
+          "initial": 12288,
+          "calls": 361,
+          "last_capacity": 23040
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 9,
+          "generation": 12,
+          "offset": 2547,
+          "resizes": 1,
+          "retries": 1,
+          "initial": 12288,
+          "calls": 34,
+          "last_capacity": 23040
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 10,
+          "generation": 14,
+          "offset": 2581,
+          "resizes": 1,
+          "retries": 1,
+          "initial": 12288,
+          "calls": 361,
+          "last_capacity": 23040
+        },
+        {
+          "fixture": "VORBIS",
+          "instance": 11,
+          "generation": 15,
+          "offset": 2942,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 559,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "VORBIS",
+          "instance": 12,
+          "generation": 16,
+          "offset": 3501,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 49,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "VORBIS",
+          "instance": 13,
+          "generation": 18,
+          "offset": 3550,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 559,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "VORBIS",
+          "instance": 14,
+          "generation": 19,
+          "offset": 4109,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 49,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "VORBIS",
+          "instance": 15,
+          "generation": 21,
+          "offset": 4158,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 559,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "CHAIN",
+          "instance": 16,
+          "generation": 22,
+          "offset": 4717,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 567,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "CHAIN",
+          "instance": 17,
+          "generation": 22,
+          "offset": 5284,
+          "resizes": 0,
+          "retries": 0,
+          "initial": 12288,
+          "calls": 559,
+          "last_capacity": 12288
+        },
+        {
+          "fixture": "CHAIN",
+          "instance": 18,
+          "generation": 22,
+          "offset": 5843,
+          "resizes": 1,
+          "retries": 1,
+          "initial": 12288,
+          "calls": 361,
+          "last_capacity": 23040
+        }
+      ],
+      "resize_observations": [
+        {
+          "fixture": "OPUS120",
+          "instance": 6,
+          "call": 6,
+          "global_call": 1797,
+          "raw_len": 2048,
+          "consumed": 0,
+          "decoded_size": 0,
+          "needed_size": 23040,
+          "capacity": 12288,
+          "eos": 0,
+          "result": -8
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 7,
+          "call": 6,
+          "global_call": 2158,
+          "raw_len": 2048,
+          "consumed": 0,
+          "decoded_size": 0,
+          "needed_size": 23040,
+          "capacity": 12288,
+          "eos": 0,
+          "result": -8
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 8,
+          "call": 6,
+          "global_call": 2192,
+          "raw_len": 2048,
+          "consumed": 0,
+          "decoded_size": 0,
+          "needed_size": 23040,
+          "capacity": 12288,
+          "eos": 0,
+          "result": -8
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 9,
+          "call": 6,
+          "global_call": 2553,
+          "raw_len": 2048,
+          "consumed": 0,
+          "decoded_size": 0,
+          "needed_size": 23040,
+          "capacity": 12288,
+          "eos": 0,
+          "result": -8
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 10,
+          "call": 6,
+          "global_call": 2587,
+          "raw_len": 2048,
+          "consumed": 0,
+          "decoded_size": 0,
+          "needed_size": 23040,
+          "capacity": 12288,
+          "eos": 0,
+          "result": -8
+        },
+        {
+          "fixture": "CHAIN",
+          "instance": 18,
+          "call": 6,
+          "global_call": 5849,
+          "raw_len": 2048,
+          "consumed": 0,
+          "decoded_size": 0,
+          "needed_size": 23040,
+          "capacity": 12288,
+          "eos": 0,
+          "result": -8
+        }
+      ],
+      "retry_observations": [
+        {
+          "fixture": "OPUS120",
+          "instance": 6,
+          "call": 7,
+          "global_call": 1798,
+          "capacity": 23040,
+          "raw_len": 2048,
+          "eos": 0,
+          "arguments_advanced_once": 1,
+          "consumed": 2048,
+          "decoded_size": 23040,
+          "needed_size": 0,
+          "result": 0
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 7,
+          "call": 7,
+          "global_call": 2159,
+          "capacity": 23040,
+          "raw_len": 2048,
+          "eos": 0,
+          "arguments_advanced_once": 1,
+          "consumed": 2048,
+          "decoded_size": 23040,
+          "needed_size": 0,
+          "result": 0
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 8,
+          "call": 7,
+          "global_call": 2193,
+          "capacity": 23040,
+          "raw_len": 2048,
+          "eos": 0,
+          "arguments_advanced_once": 1,
+          "consumed": 2048,
+          "decoded_size": 23040,
+          "needed_size": 0,
+          "result": 0
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 9,
+          "call": 7,
+          "global_call": 2554,
+          "capacity": 23040,
+          "raw_len": 2048,
+          "eos": 0,
+          "arguments_advanced_once": 1,
+          "consumed": 2048,
+          "decoded_size": 23040,
+          "needed_size": 0,
+          "result": 0
+        },
+        {
+          "fixture": "OPUS120",
+          "instance": 10,
+          "call": 7,
+          "global_call": 2588,
+          "capacity": 23040,
+          "raw_len": 2048,
+          "eos": 0,
+          "arguments_advanced_once": 1,
+          "consumed": 2048,
+          "decoded_size": 23040,
+          "needed_size": 0,
+          "result": 0
+        },
+        {
+          "fixture": "CHAIN",
+          "instance": 18,
+          "call": 7,
+          "global_call": 5850,
+          "capacity": 23040,
+          "raw_len": 2048,
+          "eos": 0,
+          "arguments_advanced_once": 1,
+          "consumed": 2048,
+          "decoded_size": 23040,
+          "needed_size": 0,
+          "result": 0
+        }
+      ],
+      "independent_position_reference": true,
+      "numeric_conformance_claim": false,
+      "physical_device": false
+    },
+    "task_watchdog_seconds": 20,
+    "interrupt_watchdog_ms": 1000,
+    "synthetic_transport_and_output": true,
+    "full_pcm_independent_oracle": false
+  },
+  "sdk_nonpassing_attempts": [
+    {
+      "stage": "link",
+      "reason": "old output seam lacks layout and header-gain APIs",
+      "report_sha256": "60ad9bc9318ba19c2975450d5350affd01d1577c17d1bfdb52b397821db4aed5"
+    },
+    {
+      "stage": "assembler output",
+      "reason": "No space left on device",
+      "report_sha256": "a0a733ee31a5b2930c9885503581dcf65cca10fca2fbd0a1bd03bbe248e6d584"
+    }
+  ],
+  "provisional_word_candidate": {
+    "static_decoder_frame_bytes": 3728,
+    "superseded_for_raw_opus_stack_headroom": true,
+    "full_application_reports": [
+      {
+        "variant": "pdm",
+        "report_sha256": "5f39a8765efb85319dc4d5a981ac2725d98040a865b0b8b524edd4d5eae33c0b"
+      },
+      {
+        "variant": "continuous",
+        "report_sha256": "879418a4863d4d0db95b293fabf1b89da438752d73c34b047144798ee2eaaf79"
+      },
+      {
+        "variant": "legacy",
+        "report_sha256": "4f81ffc97c490b314e7ccf57b8775f77f61538caf4c1ec602602cd230a7436ed"
+      }
+    ]
+  }
 }

@@ -5,6 +5,35 @@ separate ESP32/Xtensa evidence. The donor uses IDF 6.1 and dynamic TLS buffers;
 CYD uses pinned IDF 6.0.2 with its existing TLS policy, TFT/SPI DMA and two cores.
 Neither donor SDK patch hashes nor its measured savings apply automatically.
 
+## Verified Ogg pages in word-capable RAM
+
+On classic ESP32, the [Ogg playback owner](../idf/esp32-cyd2usb-native/main/ogg_playback.h)
+selects the existing word-capable page allocator after the byte-addressable
+BOS page. Payloads of at least 4,096 bytes can use
+`MALLOC_CAP_INTERNAL | MALLOC_CAP_32BIT`; allocation refusal keeps the
+previous contiguous-byte fallback. This capability can use IRAM as well as
+DRAM and does not guarantee a separate memory region.
+
+[The page owner](../idf/components/native_stream/include/ogg_page_input.h)
+keeps the header/lacing byte-addressable and accesses word storage only via
+aligned 32-bit loads/stores. The public Espressif simple decoder receives
+the complete, unchanged encoding through a 2,048-byte stack buffer after
+the entire page passes CRC. A retained prefix is copied by the existing
+pending owner before that buffer is reused. Only the final fragment carries
+EOS; drain, decoder close and page ACK retain their previous order.
+The next link starts with ordinary BOS storage. The C3 caller is unchanged.
+The staging buffer lives in a separate non-inlined helper so raw Opus does
+not inherit its stack frame. [The ELF regression](../tests/check-cyd-ogg-stack.py)
+bounds the common decoder frame to 2,048 bytes and the staging helper to
+2,304 bytes, separately from actual task stack-watermark measurements.
+
+The [full-application Vorbis resource controls](../tests/results/cyd-vorbis-openeth-20261117/README.md)
+preserve the two original memory failures and the repaired runs. Host checks
+cover byte identity, retained prefixes, all resize-consumption forms,
+allocation refusal, cancellation, CRC rejection and maximum-size continued
+pages. These are storage and caller changes; Vorbis synthesis remains the
+unchanged Espressif library, and physical qualification stays separate.
+
 ## Completed GET request-buffer release
 
 [audio_service.c](../idf/esp32-cyd2usb-native/main/audio_service.c), `open_stream`,

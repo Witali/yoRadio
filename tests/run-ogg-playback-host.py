@@ -17,7 +17,7 @@ VENDOR = REPO / '.idf/esp-adf-libs/esp_audio_codec'
 HARNESS = Path('tests/native/ogg_playback_host.c')
 MAIN = Path('idf/esp32-cyd2usb-native/main')
 SHARED = Path('idf/components/native_stream/include')
-INPUTS = [HARNESS, Path('tests/native/ogg_legacy_raw_unselected.c'),
+INPUTS = [HARNESS, Path('tests/native/ogg_playback_fragments.h'), Path('tests/native/ogg_legacy_raw_unselected.c'),
           *[MAIN / n for n in ('ogg_playback.h','opus_family1_playback.h','opus_family1_decoder.h','audio_channel_policy.h')],
           *[SHARED / n for n in ('ogg_page_input.h','opus_pcm_trim.h','ogg_opus_timeline.h','decoder_pending_input.h',
              'opus_tags_stream.h','ogg_opus_audio_packets.h','opus_family1_mapping.h','opus_multistream_framing.h','pcm_channel_layout.h')]]

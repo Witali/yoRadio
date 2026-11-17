@@ -191,6 +191,12 @@ integration equality with that vendor baseline, rather than independent
 numeric Vorbis conformance. The SHA probe uses the public PSA hash API and
 adds diagnostic state and work on the output task.
 
+For the complete GCC application ELF, run
+`tests/check-cyd-ogg-stack.py --elf <ELF> --objdump <matching-Xtensa-objdump> --output .build/<fresh-report>.json`.
+It bounds the common decoder frame separately from the word-page staging
+helper, so raw Opus does not acquire the 2 KiB buffer. Runtime stack
+watermarks remain a separate observation.
+
 For Helix MP3, use `--codec mp3 --through-eof` with the PCM and PCM MD5
 probes and `CONFIG_YORADIO_MP3_DECODER_HELIX=y`. Compare builds with
 `CONFIG_YORADIO_AUDIO_MONO` enabled and disabled. The fixture repeats a

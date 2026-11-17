@@ -150,6 +150,27 @@ static inline bool opi_ack(ogg_page_input *s, uint32_t generation,
     return true;
 }
 
+/* Copy a slice of the complete verified encoding, including its header.
+ * Word payloads are read only through aligned 32-bit accesses. */
+static inline bool opi_copy_page(const ogg_page_input *s, size_t at,
+                                 uint8_t *output, size_t bytes)
+{
+    if (!s->ready || at > s->size || bytes > s->size - at || (bytes && !output))
+        return false;
+    if (!bytes) return true;
+    size_t header = 27u + s->page[26];
+    if (at < header) {
+        size_t count = header - at;
+        if (count > bytes) count = bytes;
+        if (count) memcpy(output, s->page + at, count);
+        at += count;
+        output += count;
+        bytes -= count;
+    }
+    if (bytes) opi_copy_payload(s, at, output, bytes);
+    return true;
+}
+
 /* Header consumers keep their own state after ACK. Retain the small header
  * allocation, so a large tag page cannot hold RAM across decoder creation. */
 static inline void opi_release_idle_large_page(ogg_page_input *s)

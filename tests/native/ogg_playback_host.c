@@ -80,11 +80,15 @@ static uint32_t first_page_size(const esp_audio_simple_dec_raw_t *raw)
     return n;
 }
 
+static esp_audio_err_t (*fragment_process)(esp_audio_simple_dec_raw_t *,
+                                          esp_audio_simple_dec_out_t *);
+
 esp_audio_err_t esp_audio_simple_dec_process(esp_audio_simple_dec_handle_t handle,
     esp_audio_simple_dec_raw_t *raw, esp_audio_simple_dec_out_t *frame)
 {
     assert(handle == &state && state.live && ++state.calls < 200);
     assert(state.owner->input.ready && state.owner->input.event.crc_verified);
+    if (fragment_process) return fragment_process(raw, frame);
     if (state.mode == CANCEL_AFTER) state.cancelled = true;
     if (state.mode == PROCESS_FAIL) return ESP_AUDIO_ERR_FAIL;
     if (state.mode == BAD_CONSUMED) { raw->consumed = raw->len + 1; return ESP_AUDIO_ERR_OK; }
@@ -308,6 +312,8 @@ static unsigned run_case(enum mode mode, size_t chunk, unsigned fail_at, bool cr
     return used_allocations;
 }
 
+#include "ogg_playback_fragments.h"
+
 int main(void)
 {
     const size_t chunks[] = {0, 1, 27, 257};
@@ -328,6 +334,7 @@ int main(void)
         run_case(STALL_HEAD, 0, ordinal, false, 1);
         run_case(STALL_HEAD, 0, 0, false, 1);
     }
+    fragmented_pages();
     printf("{\"suite\":\"ogg-playback-host\",\"cases\":%u,\"passed\":true,\"actual_wrapper\":true,"
            "\"vendor_executed\":false,\"production_selected\":false,\"live_allocations\":%u}\n", cases, live_allocations);
     return 0;

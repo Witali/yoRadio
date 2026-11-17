@@ -119,14 +119,16 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-14 | Espressif — в работе; custom — отложен | [Переиспользуется Espressif Vorbis/Ogg](CYD_ESPRESSIF_VORBIS_REUSE.md) с отдельными Xtensa/RISC-V архивами и прежними task bindings. CYD получил C3 yield/typed open errors; обе платы сохраняют короткие непрочитанные префиксы через общий owner. [CYD host/compile](../tests/results/cyd-espressif-reuse-20261030/PENDING_HOST.md), [C3: 39 decode/152 maintenance/13 controls](../tests/results/cyd-espressif-reuse-20261030/C3_PENDING.md) и [неизменённый vendor в SDK/QEMU обеих целей](../tests/results/cyd-espressif-reuse-20261030/NATIVE.md) проверены: полный PCM совпадает при 4096/257/1-byte feeds, прежний префикс точен. [Actual CYD audio task](../tests/results/cyd-vorbis-task-20261030/NATIVE.md) проходит EOF/Stop/reopen/maintenance; final-byte EOS сохраняет полный PCM. [Реальные Ogg backpressure и OOM recovery](../tests/results/cyd-ogg-runtime-controls-20261104/README.md) проверены. Ресурсы radio/TLS/TFT и физическая приёмка остаются. [Собственный расширенный decoder](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md) отложен; прежние numerical/private scopes автоматически не возобновлять. [Public AAC-Plus и 48 actual-task сценариев](../tests/results/cyd-aac-playback-task-20261101/README.md) завершены; compact/private ABI/reset/owner-view scopes остаются отложенными. |
 | CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; 42 host tests проходят, 1 symlink case пропущен. Изолированный sdkconfig сохраняет аппаратные настройки и обеспечивает минимум два SNTP servers. [Шесть CYD сборок после N5](../tests/results/cyd-network-settings-20261020/SDK.md) проверены: vendor/custom FLAC во всех трёх backend; [C3 N4 image](../tests/results/network-power-transfer-20261019/SDK.md) сохраняет отдельный baseline; конфигурации, image/ELF/compiler hashes, task affinity и запас OTA сохранены. Фактические DWARF размеры структур и static symbols зафиксированы без заявления об экономии heap. Единая физическая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend ещё впереди. |
 
-Полный [Vorbis/TLS/PDM с TFT и WebUI](../tests/results/cyd-vorbis-openeth-20261117/README.md)
-выявил незакрытый ресурсный предел Espressif Ogg-пути. Штатные статические
-TLS-буферы оставили OpenETH без блока приёма; динамические буферы дошли до
-41 920 кадров и отказа повторного RX-выделения 16 749 байт. Ни один из этих
-двух прогонов не завершил полный поток. Контрольная сумма всего PCM добавлена
-в стенд; следующая проверка — сокращение одновременного хранения проверенной
-Ogg-страницы и входа vendor-декодера. Это программная работа этапа 14,
-независимая от физической приёмки и отложенного собственного Vorbis.
+Полный [Vorbis/TLS с TFT и WebUI](../tests/results/cyd-vorbis-openeth-20261117/README.md)
+выявил нехватку памяти при одновременном хранении проверенной Ogg-страницы
+и входа vendor-декодера. Payload страницы теперь использует существующий
+32-bit-capable store classic ESP32, а публичный декодер получает исходные
+байты блоками по 2 КиБ после полной проверки CRC. Все три выхода прошли
+528 000 кадров с точным SHA-256 всего PCM, полным TLS и WebUI после EOF;
+минимум heap — 38 640/40 132/36 728 байт для PDM/continuous/legacy.
+Исходные настройки SDK сохранены, включая статические TLS-буферы и TCP.
+Оба прежних непрохождения сохранены отдельно. Синтез остаётся в неизменённой
+Espressif-библиотеке; физическая приёмка и собственный Vorbis отделены.
 
 Дополнительная [проверка status keys](../tests/results/ws-status-key-20261023/README.md)
 устранила зависимость публикации WebSocket от padding структуры в CYD и C3.
