@@ -35,7 +35,8 @@ def main():
     reader=importlib.util.module_from_spec(spec);spec.loader.exec_module(reader)
     original=(native/'qemu.stdout.log').read_text('utf-8')+'\n'+(native/'qemu.stderr.log').read_text('utf-8')
     original=original.replace('\r\n','\n')
-    measured=reader.validate_log(original,report['pcm_reference'])
+    initial_capacity=report.get('expected_initial_pcm_capacity',12288)
+    measured=reader.validate_log(original,report['pcm_reference'],initial_capacity)
     need(json.loads(json.dumps(measured))==report['measurements'],'whole original public reference/task transcript accepted')
     before={str(path):sha(path) for path in (READER,native/'report.json',native/'qemu.stdout.log',native/'qemu.stderr.log')}
     out.mkdir(parents=True)
@@ -58,6 +59,7 @@ def main():
 
     case='CYD_AAC_TASK_CASE';end='CYD_AAC_TASK_COMPLETE';run='CYD_AAC_TASK_PCM_RUN'
     controls=[
+        ('wrong_initial_PCM_capacity',lambda:alter('CYD_AAC_TASK_OBS_INITIAL',{}, {'capacity':lambda value:int(value)-1})),
         ('public_AAC_Plus_disabled',lambda:alter('CYD_AAC_TASK_OBS_OPEN',{}, {'aac_plus':0})),
         ('NULL_public_configuration',lambda:alter('CYD_AAC_TASK_OBS_OPEN',{}, {'cfg_size':0})),
         ('ADTS_configuration_disabled',lambda:alter('CYD_AAC_TASK_OBS_OPEN',{}, {'no_adts_header':1})),
@@ -101,7 +103,7 @@ def main():
     ]
     rejected=[]
     for name,make in controls:
-        try:reader.validate_log(make(),report['pcm_reference'])
+        try:reader.validate_log(make(),report['pcm_reference'],initial_capacity)
         except ValueError as error:rejected.append(dict(name=name,reason=str(error)))
         else:raise ValueError('contradictory original-data copy accepted: '+name)
     need(all(sha(path)==digest for path,digest in before.items()),'all original native evidence remains unchanged')

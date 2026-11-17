@@ -59,9 +59,18 @@ def verify():
                  (size is None or omitted[name]['bytes']==size),'omitted original identity; payload remains unread')
 
     reader_path=ROOT/'tests/run-cyd-aac-playback-task-qemu.py';reader_body=reader_path.read_bytes()
-    need(sha(reader_body)==manifest['controller_sha256'] and take('verification/task-reader.py')==reader_body and
-         take('capture/sources/controller.py')==reader_body,'exact current reviewed canonical task reader')
-    need(take('verification/checkpoint-reader.py')==Path(__file__).read_bytes(),'checkpoint reader source identity')
+    original_reader=take('verification/task-reader.py')
+    need(sha(original_reader)==manifest['controller_sha256'] and
+         take('capture/sources/controller.py')==original_reader,'exact immutable original task reader')
+    # The current CLI can pin a fresh source manifest and select the newer
+    # 8192-byte startup contract. Historical parsing still defaults to 12288;
+    # every original PCM, geometry, ownership and census check is retained.
+    need(sha(reader_body) in {manifest['controller_sha256'],
+         '6c9dfa841eab8b737271165ae146f903148f086484f85a1152d33fbd2dcc027f'},
+         'exact reviewed backward-compatible current task reader')
+    need(sha(take('verification/checkpoint-reader.py'))==
+         '116c2c34f9fcfcda3bcdd3c2d3e0720aa1ef9128648562cce559c0f042224f07',
+         'immutable original checkpoint reader; archived code is not executed')
     spec=importlib.util.spec_from_file_location('reviewed_current_AAC_task_reader',reader_path)
     reader=importlib.util.module_from_spec(spec);spec.loader.exec_module(reader)
     report=json.loads(take('capture/report.json'))
@@ -164,8 +173,9 @@ def verify():
     need(witness['passed'] and witness['original_transcript_accepted'] and witness['rejected_controls']==len(witness['rejected'])==40 and
          not witness['native_campaign_repeated'] and not witness['original_reports_modified'] and
          witness['reader_sha256']==manifest['controller_sha256'] and not witness['independent_codec_conformance'],'all genuine contradiction controls rejected without rerunning native')
-    need(take('witness/reader.py')==reader_body and take('witness/controller.py')==(ROOT/'tests/check-cyd-aac-playback-task-reader.py').read_bytes(),
-         'actual executed contradiction reader sources')
+    need(take('witness/reader.py')==original_reader and sha(take('witness/controller.py'))==
+         'a16e6dc2c57cf1c9a9dde50cdbebd773de41048bf94e2e79bfc370c70b2307ad',
+         'immutable actual historical contradiction reader sources')
     old=json.loads(take('history/native01/report.json'))
     need(not old['passed'] and not old['completed'] and not old['target_executed'] and
          [row['name'] for row in old['commands']][-1]=='build' and old['commands'][-1]['state']=='complete' and

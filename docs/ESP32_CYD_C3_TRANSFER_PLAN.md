@@ -138,6 +138,18 @@ vendor/custom FLAC × PDM/continuous/legacy. Конфигурации SDK поб
 Число warnings прежнее; изменение одного analyzer trace разобрано в отчёте.
 C3 сохраняет [предыдущую отдельную сборку и host-регрессию](../tests/results/cyd-production-refresh-20261117/README.md).
 
+Для public AAC добавлен [отдельный полный LC/HE эталон](../tests/results/cyd-aac-tls-reference-20261117/README.md)
+на неизменённых Espressif-библиотеках. LC прошёл полный TLS и WebUI после EOF.
+[Проверка памяти AAC](../tests/results/cyd-aac-memory-20261117/README.md)
+снизила стартовый PCM до 8 КиБ и освобождает idle-вход до прежнего минимума
+четыре слота перед публикацией AAC. Все 48 actual-task сценариев и полные PCM
+сохранены, 60/60 владельцев закрыты, 41 контроль противоречивых данных отклонён;
+текущий полный PDM Clang проходит 53 units/100 warnings/0 errors.
+Полный HE-AAC с TLS/TFT/WebUI пока не проходит: исходная библиотека отключает
+SBR при отказе 55 128 байт, а новые варианты доходят до давления памяти сети.
+Следом проверяется документированный public frame-input API; compact/private
+AAC, его reset и owner-view остаются отложенными.
+
 Дополнительная [проверка status keys](../tests/results/ws-status-key-20261023/README.md)
 устранила зависимость публикации WebSocket от padding структуры в CYD и C3.
 CYD: 59 host-групп; C3: 42 сценария/7 controls и focused GCC/Clang обеих целей проходят;
@@ -410,8 +422,10 @@ compact/private, сохранён в таблице как отложенный,
   Все прежние отложенные пункты сохраняются; повторно они не запускались.
 ### Остальная активная очередь
 
-- AAC compact owners: собственная Xtensa ABI/PCM/OOM/lifetime адаптация;
-  прежний private owner-view сохраняет пометку «отложен».
+- Public AAC: закрыть [полный HE-AAC TLS/TFT/WebUI ресурсный прогон](../tests/results/cyd-aac-memory-20261117/README.md)
+  с полным PCM и WebUI после EOF. Проверить публичную подачу готовых ADTS-кадров.
+- AAC compact/private owners, ABI, reset и owner-view **отложены**;
+  этот scope не возобновляется проверками public API.
 - FLAC: [полный TLS-прогон custom FLAC](../tests/results/cyd-flac-openeth-20261116/README.md) пройден в QEMU с continuous DAC, TFT и WebUI после EOF.
   Со штатным watchdog custom FLAC прошёл совмещённую нагрузку на PDM, continuous и legacy DAC. Физическое vendor/custom A/B остаётся открытым.
   Target OOM/backpressure/semantic controls остаются явно отложенными; обычные

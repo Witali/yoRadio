@@ -41,6 +41,20 @@ freezing full source/SDK/compiler identities. Preparation and preflight do not
 execute native code or freeze production. A native result is qualified only by
 its complete terminal capture and separate data-only witness/evidence checks.
 
+For a current-source rerun, review and pin a fresh manifest of the same twelve
+production/API paths, then pass both `--source-release <manifest.json>` and
+`--source-release-sha256 <exact-manifest-SHA-256>`. The historical digest
+remains the default. A new manifest cannot replace required paths, add
+external files or accept stale hashes/sizes. The controller rechecks its pins
+before freezing, records the explicit manifest identity and still validates
+the actual compiler dependency closure and all complete PCM contracts.
+The current native campaign expects exactly 8,192 initial PCM bytes. Use
+`--initial-pcm-capacity 12288` only for a reviewed pre-optimization control.
+The selected capacity is compiled into the diagnostic assertion and recorded
+in the report; full PCM hashes and geometry retain their original contracts.
+Historical transcript validation retains its 12,288-byte default. The frozen
+November 1 archive, original readers and original failures remain unchanged.
+
 ```text
 python -B tests/run-cyd-aac-playback-task-qemu.py --prepare-only --output .build/<fresh-preparation>
 python -B tests/run-cyd-aac-playback-task-qemu.py --preflight-only --output .build/<fresh-native-campaign>

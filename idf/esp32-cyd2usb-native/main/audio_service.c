@@ -99,6 +99,15 @@ static QueueHandle_t s_commands;
 static adaptive_input_t *s_encoded;
 #define encoded_acquire adaptive_input_acquire
 static BaseType_t encoded_commit(adaptive_input_t *input, encoded_packet_t *packet) {
+#if defined(CONFIG_YORADIO_AAC_DECODER_ESPRESSIF) && CONFIG_YORADIO_AAC_PLUS
+    if (packet->codec == NATIVE_CODEC_AAC && packet->data_size) {
+        /* Release idle excess slots before publishing the first AAC bytes,
+         * while the decoder has not allocated its full SBR workspace yet.
+         * Busy leases retain their data and retire through the normal API. */
+        adaptive_input_stats_t pool = adaptive_input_stats(input);
+        if (pool.limit != pool.minimum) adaptive_input_set_limit(input, pool.minimum);
+    }
+#endif
     return adaptive_input_commit_size(input, packet, sizeof(*packet) + packet->data_size);
 }
 #define encoded_receive adaptive_input_receive
@@ -1135,7 +1144,15 @@ static void decoder_task(void *argument) {
             } else
 #endif
             {
-                uint8_t *resized = realloc(output, DECODE_BUFFER_INITIAL);
+                uint32_t initial_size = DECODE_BUFFER_INITIAL;
+#ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
+                /* A stereo HE-AAC frame has 2048 PCM16 samples per channel.
+                 * Keep the existing public needed_size growth path for larger
+                 * output instead of fragmenting RAM with unused startup PCM. */
+                if (codec == NATIVE_CODEC_AAC)
+                    initial_size = 2048u * 2u * sizeof(int16_t);
+#endif
+                uint8_t *resized = realloc(output, initial_size);
                 if (!resized) {
                     ESP_LOGE(TAG, "%s PCM buffer allocation failed",
                              codec_name(codec));
@@ -1143,7 +1160,7 @@ static void decoder_task(void *argument) {
                     goto packet_done;
                 }
                 output = resized;
-                output_size = DECODE_BUFFER_INITIAL;
+                output_size = initial_size;
                 esp_audio_simple_dec_cfg_t cfg = {
                     .dec_type = simple_decoder_type(codec),
                     .dec_cfg = NULL,

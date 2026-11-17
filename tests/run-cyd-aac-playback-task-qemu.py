@@ -34,12 +34,34 @@ PUBLIC_MANIFEST_SHA='f22687d4e404e0c45672f225322827ffb54061795b21acb96ff3045f492
 PUBLIC_ARCHIVE_SHA='3a8b1eceb58eb5b2560d1bf763823b1378177780d151d60bc5d167225c17c1af'
 CONTRACT=ROOT/'tests/prepare-cyd-aac-playback-contract.py'
 SOURCE_RELEASE_SHA='73599ab651a72f153e777bc47dec5d816e1e38224e0795195db426da11c1d3e7'
+SOURCE_RELEASE_FILES = {
+    'idf/esp32-cyd2usb-native/main/' + name for name in
+    ('audio_service.c', 'native_audio_output.c', 'native_audio_output.h', 'ogg_playback.h', 'aac_public_config.h')
+} | {
+    'idf/components/native_stream/include/' + name for name in
+    ('pcm_channel_layout.h', 'pcm_speaker_mix.h', 'pcm_header_gain.h')
+} | {
+    'idf/components/native_audio_normalizer/' + name for name in
+    ('native_audio_normalizer.cpp', 'native_audio_normalizer.h')
+} | {'yoRadio/src/audioI2S/AudioNormalizer.cpp', 'yoRadio/src/audioI2S/AudioNormalizer.h'}
 
 def need(value,reason):
     if not value:raise ValueError(reason)
 
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def reviewed_source_release(path, expected_sha):
+    need(re.fullmatch(r'[a-f0-9]{64}', expected_sha) and path.is_file() and sha(path) == expected_sha,
+         'exact explicitly pinned source/API manifest')
+    release = json.loads(path.read_bytes())
+    need(set(release['files']) == SOURCE_RELEASE_FILES,
+         'all twelve required source/API paths; no substitutions or external paths')
+    for relative, pin in release['files'].items():
+        need(sha(ROOT / relative) == pin['sha256'] and (ROOT / relative).stat().st_size == pin['bytes'],
+             'every reviewed source/API file is unchanged before native execution')
+    return release
 
 
 def write_json(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8',newline='\n')
@@ -51,8 +73,10 @@ def prepare_contract():
     return module.contracts()
 
 
-def reference_header(contract):
-    header=['#pragma once','extern const uint8_t aac_fixture_start[] asm("_binary_fixtures_bin_start");','extern const uint8_t aac_fixture_end[] asm("_binary_fixtures_bin_end");']
+def reference_header(contract, initial_capacity=12288):
+    need(initial_capacity in (8192,12288),'explicit AAC initial PCM capacity')
+    header=['#pragma once','#define AAC_EXPECTED_INITIAL_CAPACITY '+str(initial_capacity),
+            'extern const uint8_t aac_fixture_start[] asm("_binary_fixtures_bin_start");','extern const uint8_t aac_fixture_end[] asm("_binary_fixtures_bin_end");']
     entries=[]
     for row in contract['fixtures']:
         entries.append('{"'+row['name']+'",aac_fixture_start+'+str(row['blob_offset'])+','+str(row['bytes'])+','+str(row['hold_offset'])+','+str(row['pcm_bytes'])+','+str(row['rate'])+','+str(row['channels'])+','+str(row['bits'])+',"'+row['pcm_sha256']+'"}')
@@ -80,8 +104,9 @@ def fields(line,tag):
     return row
 
 
-def validate_log(log,contract):
+def validate_log(log,contract,initial_capacity=12288):
     """Recount whole actual public API/task observations, without codec claims."""
+    need(initial_capacity in (8192,12288),'known initial AAC buffer contract')
     log=log.replace('\r\n','\n')
     need(not re.search(r'CYD_AAC_TASK_FAILURE|Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP|watchdog.*triggered|stack (?:smashing|overflow)',log,re.I),
          'no unexpected reference/task/runtime fault')
@@ -197,7 +222,7 @@ def validate_log(log,contract):
         else:
             need(active and row['instance']==active['instance'] and row['fixture']==active['fixture'],'public process observation belongs to real live handle')
             if tag=='INITIAL':
-                need(active['initial'] is None and row['call']==1 and row['global_call']==active['offset']+1 and row['capacity']==12288,'unchanged production initial output capacity')
+                need(active['initial'] is None and row['call']==1 and row['global_call']==active['offset']+1 and row['capacity']==initial_capacity,'exact selected production initial output capacity')
                 active['initial']=row['capacity']
             elif tag=='RESIZE':
                 need(pending is None and row['result']==-8 and row['decoded_size']==0 and 0<=row['consumed']<=row['raw_len'] and row['needed_size']>row['capacity'],'genuine public buffer growth')
@@ -234,7 +259,8 @@ class Campaign:
                            actual_rtos=True, target_executed=False, production_firmware=False,
                            physical_device=False, external_network=False, private_codec_abi=False,
                            custom_decoder=False, oom_injection=False, output_backpressure=False, same_vendor_AAC_integration_oracle=True,
-                           full_pcm_independent_oracle=False, performance_or_radio_resource_claim=False)
+                           full_pcm_independent_oracle=False, performance_or_radio_resource_claim=False,
+                           expected_initial_pcm_capacity=args.initial_pcm_capacity)
         self.environment = os.environ.copy()
         self.environment.update(GIT_OPTIONAL_LOCKS='0', PYTHONNOUSERSITE='1', PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
 
@@ -299,13 +325,7 @@ class Campaign:
 
 
     def freeze_sources(self):
-        release=json.loads(self.args.source_release.read_bytes())
-        need(sha(self.args.source_release)==SOURCE_RELEASE_SHA and len(release['files'])==12,
-             'exact root-authorized final source/API release')
-        for relative,pin in release['files'].items():
-            path=ROOT/relative
-            need(sha(path)==pin['sha256'] and path.stat().st_size==pin['bytes'],
-                 'every released production source is current before snapshot')
+        release=reviewed_source_release(self.args.source_release,self.args.source_release_sha256)
         self.freeze(self.args.source_release,Path('sources/reference/production-source-release.json'),
                     'root-authorized complete source/API release, captured without modifying production')
         main = ROOT / MAIN
@@ -336,7 +356,7 @@ class Campaign:
             bound=self.sources[str((ROOT/relative).resolve())]
             need(bound['sha256']==pin['sha256'] and bound['bytes']==pin['bytes'],
                  'all twelve released source bytes joined to the actual frozen input manifest')
-        self.report['production_source_release_sha256']=SOURCE_RELEASE_SHA
+        self.report['production_source_release_sha256']=self.args.source_release_sha256
         write_json(self.out / 'source-manifest.json', self.sources)
 
 
@@ -502,7 +522,7 @@ class Campaign:
             log = self.run_command('qemu', [self.args.qemu, '-audiodev', 'none,id=quiet', '-M', 'esp32,audiodev=quiet', '-smp', '2',
                 '-L', self.args.rom, '-display', 'none', '-monitor', 'none', '-serial', 'stdio', '-no-reboot', '-snapshot', '-nic', 'none',
                 '-drive', 'file=' + str(flash).replace(',', ',,') + ',if=mtd,format=raw'], self.args.qemu_timeout)
-            self.report['measurements']=validate_log(log+'\n'+(self.out/'qemu.stderr.log').read_text(errors='replace'),self.report['pcm_reference'])
+            self.report['measurements']=validate_log(log+'\n'+(self.out/'qemu.stderr.log').read_text(errors='replace'),self.report['pcm_reference'],self.args.initial_pcm_capacity)
             self.verify_repositories('-after')
             need(self.verify_inputs(), 'every bound input unchanged after target execution')
             self.report.update(passed=True, completed=True)
@@ -524,7 +544,7 @@ class Campaign:
         self.freeze(PUBLIC/'captures.zip',Path('sources/reference/public-captures.zip'),'original public checkpoint data; not executed as a program')
         for row in contract['fixtures']:
             self.freeze(ROOT/row['path'],Path('sources/fixtures')/row['name'],'complete original public FDK synthetic fixture')
-        for name,content in [('reference.h',reference_header(contract).encode()),('fixtures.bin',blob)]:
+        for name,content in [('reference.h',reference_header(contract,self.args.initial_pcm_capacity).encode()),('fixtures.bin',blob)]:
             path=self.out/'sources/harness/project/main'/name;path.write_bytes(content)
             self.freeze(path,path.relative_to(self.out),'derived exact original fixture view and same-vendor contracts')
         path=self.out/'reference-contract.json';write_json(path,contract)
@@ -540,6 +560,10 @@ def arguments():
     parser.add_argument('--build-timeout',type=int,default=1200)
     parser.add_argument('--qemu-timeout',type=int,default=600)
     parser.add_argument('--source-release',type=Path,default=ROOT/'.build/cyd-aac-source-release-20261101-01.json')
+    parser.add_argument('--source-release-sha256',default=SOURCE_RELEASE_SHA,
+                        help='Explicit SHA-256 of the reviewed twelve-file manifest; default is the historical checkpoint')
+    parser.add_argument('--initial-pcm-capacity',type=int,choices=(8192,12288),default=8192,
+                        help='Exact initial AAC output capacity expected from production (default: 8192)')
     args=parser.parse_args();args.output=args.output.resolve()
     args.source_release=args.source_release.resolve()
     need(args.output.is_relative_to(ROOT/'.build') and args.output!=ROOT/'.build' and not args.output.exists(),'fresh output strictly in task-local ignored build directory')
@@ -550,12 +574,7 @@ def arguments():
     args.rom=Path('C:/Work/QEMU-ESP32/pc-bios');args.powershell=Path(shutil.which('pwsh.exe') or '');args.git=Path(shutil.which('git.exe') or shutil.which('git') or '')
     contract,unused=prepare_contract()
     if not args.prepare_only:
-        need(args.source_release.is_file() and sha(args.source_release)==SOURCE_RELEASE_SHA,
-             'exact root-authorized source/API release exists')
-        release=json.loads(args.source_release.read_bytes())
-        need(len(release['files'])==12 and all(sha(ROOT/relative)==pin['sha256'] and
-             (ROOT/relative).stat().st_size==pin['bytes'] for relative,pin in release['files'].items()),
-             'all twelve source/API release files are unchanged before any native action')
+        reviewed_source_release(args.source_release,args.source_release_sha256)
         need(sys.platform=='win32','installed Windows SDK/QEMU launcher')
         required=[args.idf/'export.ps1',args.idf/'tools/idf.py',args.idf_python,args.qemu,args.powershell,args.git,args.rom/'esp32-v3-rom.bin',args.rom/'esp32-v3-rom-app.bin',HARNESS/'project/main/main.cpp',HARNESS/'sdk-build.ps1']
         need(all(path.is_file() for path in required),'complete installed native dependencies and prepared target')
@@ -569,7 +588,7 @@ def main():
     args=arguments()
     if args.prepare_only:
         contract,blob=prepare_contract();args.output.mkdir(parents=True)
-        write_json(args.output/'contract.json',contract);(args.output/'reference.h').write_text(reference_header(contract),encoding='utf-8',newline='\n');(args.output/'fixtures.bin').write_bytes(blob)
+        write_json(args.output/'contract.json',contract);(args.output/'reference.h').write_text(reference_header(contract,args.initial_pcm_capacity),encoding='utf-8',newline='\n');(args.output/'fixtures.bin').write_bytes(blob)
         print(json.dumps(dict(passed=True,prepared_only=True,production_sources_frozen=False,target_executed=False,base_complete_cases=36,continuous_public_observations=12)))
         return 0
     if args.preflight_only:

@@ -274,7 +274,7 @@ extern "C" esp_audio_err_t __wrap_esp_audio_simple_dec_process(esp_audio_simple_
         ++initial_capacity_checks;
         printf("CYD_AAC_TASK_OBS_INITIAL fixture=%s instance=%u call=%u global_call=%u capacity=%u\n",
                active->name,observed_instance,call,global_call,(unsigned)capacity);
-        check(capacity>=12288,"production_initial_capacity_not_reduced");
+        check(capacity==AAC_EXPECTED_INITIAL_CAPACITY,"production_initial_capacity_matches_selected_contract");
     }
     esp_audio_err_t result=__real_esp_audio_simple_dec_process(decoder,raw,frame);
     ++process_calls;last_capacity=capacity;retry_pending=false;
