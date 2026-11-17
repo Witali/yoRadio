@@ -181,9 +181,10 @@ static void page(physical *p,unsigned flags,uint64_t gp,const uint8_t *table,uns
     ogg_page independent={.header=to,.header_len=(long)header,.body=to+header,.body_len=(long)bytes};ogg_page_checksum_set(&independent);p->size+=total;
 }
 static physical make(const corpus *source,unsigned style,unsigned serial,bool long_tags,bool extended) {
-    physical p={.serial=serial,.head_bytes=extended?300u:21u+source->channels,.tags_bytes=long_tags?70000:16};
-    p.head=calloc(p.head_bytes,1);p.tags=calloc(p.tags_bytes,1);assert(p.head && p.tags);memcpy(p.head,source->head,21u+source->channels);
-    if(extended)memset(p.head+21u+source->channels,0x5a,p.head_bytes-21u-source->channels);
+    size_t head_bytes = source->head[18] == 0 ? 19u : 21u + source->channels;
+    physical p={.serial=serial,.head_bytes=extended?300u:head_bytes,.tags_bytes=long_tags?70000:16};
+    p.head=calloc(p.head_bytes,1);p.tags=calloc(p.tags_bytes,1);assert(p.head && p.tags);memcpy(p.head,source->head,head_bytes);
+    if(extended)memset(p.head+head_bytes,0x5a,p.head_bytes-head_bytes);
     memcpy(p.tags,"OpusTags",8);
     if(long_tags){put32(p.tags+8,(uint32_t)p.tags_bytes-16u);memset(p.tags+12,'x',p.tags_bytes-16u);}
     uint8_t table[255];unsigned n=laces(table,p.head_bytes);page(&p,2,0,table,n,p.head,p.head_bytes);
@@ -255,7 +256,14 @@ static void clean(opus_family1_playback *s,ogg_page_input *input) {
 static void positive(const corpus *source,const reference *ref,unsigned style,size_t chunk,bool cached,bool long_tags,bool extended) {
     physical bytes=make(source,style,77,long_tags,extended);creator_walk(&bytes,source);ogg_page_input input={0};opi_reset(&input,42);opus_family1_playback s={0};reset_backend(&s);stats.cache_full=cached;
     output_context out={.reference=ref};ofp_callbacks cb=callbacks(&out);stats.cancelled=&out.cancelled;reader r={.chunk=chunk};
-    while(ready(&input,&bytes,&r))successful_page(&s,&input,&cb);
+    while(ready(&input,&bytes,&r)) {
+        unsigned flags = input.event.flags;
+        successful_page(&s,&input,&cb);
+        if (source->head[18] == 0 && (flags & OOPT_TAGS)) {
+            assert(!(flags & OOPT_LINK_END) && stats.opens == 1 &&
+                   stats.live == 1 && stats.decodes == 0);
+        }
+    }
     assert(r.at==bytes.size && opi_finish(&input)==OPI_FINISHED && out.emitted==ref->logical_frames && !ofp_has_input(&s) && !stats.live && stats.created==stats.destroyed);
     if(!s.plan.needed)assert(!stats.created && !plane_alloc.calls && !scratch_alloc.calls);
     if(source->plc)assert(plane_alloc.peak==92160 && plane_alloc.calls==2 && scratch_alloc.calls==2);
@@ -373,6 +381,16 @@ int main(int argc,char **argv) {
     const uint8_t maps[8][8]={{7},{6,0},{5,5,255},{7,0,6,1},{255,255,255,255,255},{0,1,2,3,4,5},{7,7,6,5,0,255,1},{0,7,0,7,255,5,6,255}};
     for(unsigned c=1;c<=8;++c){corpus v=variant(source+2,c,maps[c-1]);reference r=creator_reference(&v);positive(&v,&r,0,257,false,false,false);free(r.pcm);}
     for(unsigned cached=0;cached<2;++cached)positive(source+3,ref+3,1,257,cached!=0,false,false);
+    for (unsigned channels = 1; channels <= 2; ++channels) {
+        const uint8_t identity[] = {0, 1};
+        corpus family0 = variant(source + 3, channels, identity);
+        family0.head[18] = 0;
+        family0.coupled = channels - 1;
+        reference expected = creator_reference(&family0);
+        positive(&family0, &expected, 1, 257, false, false, false);
+        positive(&family0, &expected, 2, 1, true, true, true);
+        free(expected.pcm);
+    }
     positive(source+2,ref+2,1,1,false,true,true);chain(source,ref);
     corpus empty=source[2];empty.count=empty.pre_skip=empty.logical=0;put16(empty.head+10,0);reference empty_ref={.channels=8};positive(&empty,&empty_ref,0,1,false,true,false);
     corpus growth=plc_growth();reference growth_ref=creator_reference(&growth);for(unsigned cached=0;cached<2;++cached)positive(&growth,&growth_ref,0,257,cached!=0,false,false);

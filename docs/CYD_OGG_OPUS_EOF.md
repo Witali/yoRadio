@@ -12,6 +12,12 @@ logical link. The original lookahead caller remains the explicitly disabled
 timeline option's raw-vendor fallback. Historical raw-output measurements below
 remain decoder regression references, rather than current default playback.
 
+The optional `CONFIG_YORADIO_OGG_OPUS_RAW=y` path sends CRC-verified Opus
+Family 0 packets to the public Espressif Opus decoder. It creates the
+decoder after OpusTags and uses the same packet and trim owners as Family 1.
+The [concurrent HTTPS run](../tests/results/cyd-ogg-large-pages-20261117/README.md)
+preserves the original Ogg page layout, final PCM and WebUI through EOF.
+
 ## Production task integration
 
 The [actual CYD task checkpoint](../tests/results/cyd-ogg-playback-task-20261101/README.md)

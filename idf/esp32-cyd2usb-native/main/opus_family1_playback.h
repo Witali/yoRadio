@@ -2,7 +2,7 @@
 #define YORADIO_OPUS_FAMILY1_PLAYBACK_H
 
 /* Adapter for a caller's SAME CRC-verified ogg_page_input owner.
- * Only family1 is handled here; this does not feed a second page observer.
+ * Mapping families 0 and 1 share the same verified page and packet owner.
  * Initialize at a stable address with {0}; do not move a live owner. The caller
  * routes the verified HEAD and every following page through ofp_page, including
  * comment continuation/nil pages. AUDIO starts only at the committed TAGS event.
@@ -339,7 +339,7 @@ static inline ofp_result ofp_close_eos(opus_family1_playback *s,ogg_page_input *
     s->phase=OFP_EMPTY;s->source=NULL;s->close_page_token=0;return ofp_code(OFP_OK);
 }
 
-/* Process exactly one ready verified family1 page. On a non-EOS successful
+/* Process exactly one ready verified Opus page. On a non-EOS successful
  * page the selected handles persist. A failed close is the ONLY retryable page
  * result; it cannot synthesize/publish that EOS PCM again. Public API seams are
  * optional and intended for explicitly labelled HOST contract qualification.
@@ -349,7 +349,7 @@ static inline ofp_result ofp_page(opus_family1_playback *s,ogg_page_input *input
     if(!s || !input || !callbacks || !callbacks->cancelled || !callbacks->output48_s16le)return ofp_code(OFP_ARGUMENT);
     if(s->anchor && s->anchor!=s)return ofp_code(OFP_MOVED);
     if(s->blocked)return ofp_block(s,OFP_BUSY,0);
-    if(!input->ready || !input->event.crc_verified || !input->event.opus || input->event.mapping!=1 ||
+    if(!input->ready || !input->event.crc_verified || !input->event.opus || input->event.mapping>1 ||
         !(input->event.flags&OOPT_PAGE))return ofp_code(OFP_ARGUMENT);
     if(s->phase!=OFP_EMPTY && (s->source!=input || input->event.generation!=s->generation || input->event.serial!=s->serial))
         return ofp_block(s,OFP_CONTAINER,OPI_INVALID);
@@ -362,11 +362,12 @@ static inline ofp_result ofp_page(opus_family1_playback *s,ogg_page_input *input
     if(s->phase==OFP_EMPTY) {
         if(!(input->event.flags&OOPT_HEAD) || (input->event.flags&OOPT_TAGS) || input->size<27 || !input->page)return ofp_code(OFP_ARGUMENT);
         size_t payload=27u+input->page[26];opus_family1_plan plan;
-        of1_status parsed=payload<=input->size?of1_plan_header(input->page+payload,input->size-payload,&plan):OF1_INVALID;
+        of1_status parsed=payload<=input->size?of01_plan_header(input->page+payload,input->size-payload,&plan):OF1_INVALID;
         if(parsed!=OF1_OK){ofp_result r=ofp_code(OFP_HEADER);r.detail=parsed;return r;}
         if(plan.channels!=input->event.channels || plan.pre_skip!=input->event.pre_skip)return ofp_code(OFP_ARGUMENT);
         s->anchor=s;s->source=input;s->plan=plan;s->generation=input->event.generation;s->serial=input->event.serial;
-        s->head_bytes=(uint8_t)(21u+plan.channels);memcpy(s->head,input->page+payload,s->head_bytes);
+        s->head_bytes=input->event.mapping==0?19u:(uint8_t)(21u+plan.channels);
+        memcpy(s->head,input->page+payload,s->head_bytes);
         s->plane_count=0;
         for(unsigned speaker=0;speaker<plan.channels;++speaker) {
             unsigned plane=0;

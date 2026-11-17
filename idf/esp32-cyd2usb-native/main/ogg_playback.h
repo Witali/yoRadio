@@ -93,6 +93,7 @@ static inline bool ogp_has_input(const ogg_playback *s)
 
 typedef struct {
     const ogg_playback_callbacks *callbacks;
+    bool family0;
 } ogp_family1_context;
 
 static inline bool ogp_family1_cancelled(void *user)
@@ -104,7 +105,9 @@ static inline bool ogp_family1_cancelled(void *user)
 static inline void ogp_family1_yield(void *user)
 {
     const ogp_family1_context *context = user;
-    if (context->callbacks->yield)
+    if (context->family0 && context->callbacks->after_process)
+        context->callbacks->after_process(context->callbacks->context);
+    else if (context->callbacks->yield)
         context->callbacks->yield(context->callbacks->context);
 }
 
@@ -116,6 +119,9 @@ static inline bool ogp_family1_output(void *user, uint32_t generation,
     esp_audio_simple_dec_info_t info = {
         .sample_rate = 48000, .bits_per_sample = 16, .channel = plan->channels,
     };
+    if (context->family0)
+        return context->callbacks->output(context->callbacks->context, &info,
+                                          pcm, bytes, plan->header_gain_q8);
     return context->callbacks->output_layout(context->callbacks->context,
         &info, pcm, bytes, plan->header_gain_q8, PCM_CHANNEL_LAYOUT_VORBIS);
 }
@@ -123,11 +129,12 @@ static inline bool ogp_family1_output(void *user, uint32_t generation,
 static inline ogg_playback_status ogp_family1_page(ogg_playback *s,
     const ogg_playback_callbacks *callbacks, int32_t *cause)
 {
-    if (!callbacks->output_layout) {
+    bool family0 = s->input.event.mapping == 0;
+    if (!family0 && !callbacks->output_layout) {
         *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
         return OGP_INFO;
     }
-    ogp_family1_context context = {.callbacks = callbacks};
+    ogp_family1_context context = {.callbacks = callbacks, .family0 = family0};
     const ofp_callbacks selected = {
         .cancelled = ogp_family1_cancelled, .output48_s16le = ogp_family1_output,
         .yield = ogp_family1_yield, .context = &context,
@@ -136,7 +143,7 @@ static inline ogg_playback_status ogp_family1_page(ogg_playback *s,
     for (;;) {
         ofp_result result = ofp_page(&s->family1, &s->input, &selected, NULL);
         if (result.code == OFP_OK) {
-            if (opening && s->family1.phase == OFP_TAGS && callbacks->prepare_family1)
+            if (!family0 && opening && s->family1.phase == OFP_TAGS && callbacks->prepare_family1)
                 callbacks->prepare_family1(callbacks->context, &s->family1.plan);
 #if defined(ESP_PLATFORM) && CONFIG_IDF_TARGET_ESP32
             const ogg_page_word_allocator *allocator = s->family1.phase == OFP_AUDIO
@@ -180,7 +187,11 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
     }
 #endif
     bool eos = (page->flags & OOPT_LINK_END) != 0;
-    if (page->opus && page->mapping == 1) {
+    if (page->opus && (page->mapping == 1
+#if CONFIG_YORADIO_OGG_OPUS_RAW
+        || page->mapping == 0
+#endif
+        )) {
         if (page->flags & OOPT_HEAD) {
             /* A caller may have prepared a simple Ogg handle before HEAD.
              * Its public void close is complete before the raw path starts.

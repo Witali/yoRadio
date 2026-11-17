@@ -81,7 +81,7 @@ static inline ofd_result ofd_open(opus_family1_decoder *s,const uint8_t *head,si
     if(!s)return ofd_code(OFD_ARGUMENT);
     if(s->anchor && s->anchor!=s)return ofd_code(OFD_MOVED);
     if(s->active || ofd_has_handles(s))return ofd_code(OFD_BUSY);
-    opus_family1_plan prepared;of1_status parsed=of1_plan_header(head,bytes,&prepared);
+    opus_family1_plan prepared;of1_status parsed=of01_plan_header(head,bytes,&prepared);
     if(parsed!=OF1_OK){ofd_result r=ofd_code(OFD_HEADER);r.detail=parsed;return r;}
     ofd_public_api selected=api?*api:(ofd_public_api){esp_opus_dec_open,esp_opus_dec_decode,esp_opus_dec_close};
     if(!selected.open || !selected.decode || !selected.close)return ofd_code(OFD_ARGUMENT);

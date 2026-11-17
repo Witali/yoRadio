@@ -154,6 +154,14 @@ Use `--short-opus-pages` for the paired run with eight original Opus
 packets per page. The packet bytes, headers and final granule are
 preserved. The original page layout is the default.
 
+For the early Opus decoder open test, keep the original page layout and use
+PDM with the same TLS options above. Build the control with
+`CONFIG_YORADIO_OGG_OPUS_RAW` disabled and the replay with it enabled. Add
+`'-D','CYD_OPENETH_OPUS_HEAP_PROBE=ON'` to each build. The successful
+packet-level run logs a stereo decoder open after OpusTags and checks the
+full radio response, exact output, and the same verified HTTPS connection
+through EOF. [Results](../../results/cyd-ogg-large-pages-20261117/README.md)
+
 ## Other playback fixtures
 
 For Helix MP3, use `--codec mp3 --through-eof` with the PCM and PCM MD5

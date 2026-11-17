@@ -53,6 +53,25 @@ static inline of1_status of1_plan_header(const uint8_t *head,size_t bytes,opus_f
     *out=next;return OF1_OK;
 }
 
+/* Family 0 has one elementary stream and an implicit identity map. */
+static inline of1_status of01_plan_header(const uint8_t *head, size_t bytes,
+                                         opus_family1_plan *out) {
+    if (!head || !out || bytes < 19) return OF1_INVALID;
+    if (head[18] != 0) return of1_plan_header(head, bytes, out);
+    if (memcmp(head, "OpusHead", 8) || head[9] < 1 || head[9] > 2)
+        return OF1_INVALID;
+    if (head[8] & 0xf0u) return OF1_VERSION;
+    unsigned gain = head[16] | (unsigned)head[17] << 8;
+    *out = (opus_family1_plan) {
+        .input_rate = of1_le32(head + 12),
+        .pre_skip = (uint16_t)(head[10] | (unsigned)head[11] << 8),
+        .header_gain_q8 = (int16_t)(gain < 32768u ? (int32_t)gain : (int32_t)gain - 65536),
+        .channels = head[9], .streams = 1, .coupled = head[9] - 1, .needed = 1,
+        .map = {0, 1}, .stream_channels = {head[9]}, .speaker_channel = {0, 1},
+    };
+    return OF1_OK;
+}
+
 /* Each needed buffer is public PCM16 LE in the plan's stream_id order. Empty
  * trimmed blocks may have zero frames/bytes. Silent/duplicate speakers borrow
  * no additional PCM. Outputs remain unchanged on invalid input.

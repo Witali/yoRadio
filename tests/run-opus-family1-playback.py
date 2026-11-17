@@ -95,7 +95,7 @@ def main():
         symbol=next(line for line in command('static-zero-symbol',[nm,'-S','--defined-only',host(binary)]).decode().splitlines() if line.endswith(' ofp_zero_chunk'))
         need(int(symbol.split()[1],16)==2048 and symbol.split()[2]=='r','actual read-only static zero symbol');report['static_zero_symbol']=symbol
         result=json.loads(command('test',['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1',host(binary),*[host(p) for p in paths]]))
-        need(result['passed'] and result['positive_schedules']==34 and result['host_contract_controls']==27 and result['eos_close_retry']==1 and
+        need(result['passed'] and result['positive_schedules']==38 and result['host_contract_controls']==27 and result['eos_close_retry']==1 and
             result['maximum_unique_plane_bytes']==92160 and result['maximum_output_chunk_bytes']==2048 and result['whole_original_120ms_packets']==92 and
             result['gain_metadata_only'] and result['scripted_host_statuses'] and result['native_esp_oom_qualified'] is False,'complete real synthesis/held-page/close/refusal inventory')
         report['measurements']=result

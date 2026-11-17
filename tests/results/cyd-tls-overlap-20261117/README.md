@@ -19,7 +19,8 @@ The original fixture on the same image has pages up to 54,597 bytes.
 With HTTPS live, decoding failed before any audio output. Health
 recorded one failed 26,504-byte allocation and associated its sequence
 with the Ogg decoder's result `-7`. The radio returned its static RX loan.
-The allocation site and a fix for the original layout remain open.
+The [follow-up with early Opus initialization](../cyd-ogg-large-pages-20261117/README.md)
+identified that allocation and played the original page layout through EOF.
 
 FFmpeg with libopus produced the same PCM MD5 for both Ogg layouts.
 The re-page profile changes transport framing only. Both runs

@@ -323,7 +323,10 @@ kept the radio's static RX and the WebUI's heap RX live through that
 retry. A shorter Ogg page layout completed with the exact control PCM
 and a WebUI asset read on the same HTTPS connection after EOF. The
 original page layout failed on a 26,504-byte allocation during the
-decoder call. That layout and physical Wi-Fi still require qualification.
+decoder call. The [packet-level Opus option](../tests/results/cyd-ogg-large-pages-20261117/README.md)
+creates the decoder after OpusTags. The original pages then play through
+EOF with both TLS sessions live and the same PCM as the control. The
+maximum page geometry and physical Wi-Fi still require qualification.
 
 ## Actual TLS traffic in isolated SDK/QEMU
 

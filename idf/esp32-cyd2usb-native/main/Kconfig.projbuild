@@ -31,6 +31,15 @@ menu "yoRadio native firmware"
             exposes the channel count. Reject wider PCM at the output of all
             codecs. Disable this option for experimental multichannel playback.
 
+    config YORADIO_OGG_OPUS_RAW
+        bool "Feed verified Ogg Opus Family 0 packets to the public Opus decoder"
+        depends on YORADIO_OGG_TIMELINE
+        default n
+        help
+            Open the Opus decoder after the comment header, before allocating
+            an audio page. Use the packet reader shared with Family 1 to
+            retain the original page checks, channel count and playback bounds.
+
     config YORADIO_AUDIO_MONO
         bool "Decode MP3 directly to mono with Helix"
         depends on YORADIO_MP3_DECODER_HELIX
