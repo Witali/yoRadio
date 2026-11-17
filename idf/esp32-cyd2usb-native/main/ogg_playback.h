@@ -172,6 +172,96 @@ static inline ogg_playback_status ogp_family1_page(ogg_playback *s,
     }
 }
 
+/* Process a borrowed encoded fragment of an already verified page. The page
+ * owner retains the generation, EOS close/drain and ACK responsibilities. */
+static inline ogg_playback_status ogp_decode_fragment(ogg_playback *s,
+    const oopt_event *page, uint8_t *data, size_t size, bool eos,
+    esp_audio_simple_dec_handle_t *decoder, uint8_t **output, size_t *capacity,
+    decoder_pending_input_t *pending, const ogg_playback_callbacks *callbacks,
+    int32_t *cause)
+{
+    uint8_t *input;
+    uint32_t bytes;
+    bool owned;
+    decoder_pending_input_status_t prepared = decoder_pending_input_prepare(
+        pending, data, size, &input, &bytes, &owned);
+    if (prepared != DECODER_PENDING_INPUT_OK) {
+        *cause = prepared == DECODER_PENDING_INPUT_NO_MEMORY ?
+                 ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
+        return prepared == DECODER_PENDING_INPUT_NO_MEMORY ? OGP_MEMORY : OGP_CONTAINER;
+    }
+    esp_audio_simple_dec_raw_t raw = {.buffer = input, .len = bytes, .eos = eos};
+    for (;;) {
+        if (callbacks->cancelled(callbacks->context)) return OGP_CANCELLED;
+        if (*capacity > UINT32_MAX) { *cause = ESP_AUDIO_ERR_INVALID_PARAMETER; return OGP_DECODER; }
+        esp_audio_simple_dec_out_t frame = {.buffer = *output, .len = (uint32_t)*capacity};
+        raw.consumed = 0;
+        esp_audio_err_t result = esp_audio_simple_dec_process(*decoder, &raw, &frame);
+        ++s->calls;
+        if (callbacks->after_process) callbacks->after_process(callbacks->context);
+        else if ((s->calls & 31u) == 0u && callbacks->yield) callbacks->yield(callbacks->context);
+        if (callbacks->cancelled(callbacks->context)) return OGP_CANCELLED;
+        if (raw.consumed > raw.len || frame.decoded_size > *capacity) {
+            *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
+            return OGP_DECODER;
+        }
+        raw.buffer += raw.consumed;
+        raw.len -= raw.consumed;
+        if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
+            if (frame.decoded_size || frame.needed_size <= *capacity) {
+                *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
+                return OGP_DECODER;
+            }
+            uint8_t *larger = realloc(*output, frame.needed_size);
+            if (!larger) { *cause = ESP_AUDIO_ERR_MEM_LACK; return OGP_MEMORY; }
+            *output = larger;
+            *capacity = frame.needed_size;
+            /* Retry also when input was fully consumed into the public
+             * decoder's cache. No original byte is fed to the observer twice.
+             */
+            continue;
+        }
+        if (result != ESP_AUDIO_ERR_OK) {
+            *cause = result;
+            return result == ESP_AUDIO_ERR_MEM_LACK ? OGP_MEMORY : OGP_DECODER;
+        }
+        if (frame.decoded_size) {
+            esp_audio_simple_dec_info_t info = {0};
+            result = esp_audio_simple_dec_get_info(*decoder, &info);
+            if (result != ESP_AUDIO_ERR_OK) { *cause = result; return OGP_INFO; }
+            if (audio_channel_limit_exceeded(info.channel)) {
+                *cause = info.channel;
+                return OGP_CHANNEL_LIMIT;
+            }
+            opus_pcm_span span = {0, frame.decoded_size};
+            if (page->opus && opt_clip(&s->trim, s->generation,
+                    info.sample_rate, info.channel, info.bits_per_sample,
+                    frame.decoded_size, &span) != OPT_OK) {
+                *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
+                return OGP_INFO;
+            }
+            if (span.size && !callbacks->output(callbacks->context, &info,
+                    *output + span.offset, span.size,
+                    page->opus ? s->header_gain_q8 : 0)) {
+                *cause = ESP_AUDIO_ERR_FAIL;
+                return callbacks->cancelled(callbacks->context) ? OGP_CANCELLED : OGP_OUTPUT;
+            }
+        }
+        if (!raw.consumed && !frame.decoded_size && raw.len) {
+            if (eos) { *cause = ESP_AUDIO_ERR_DATA_LACK; return OGP_DECODER; }
+            prepared = decoder_pending_input_retain(pending, raw.buffer, raw.len, owned);
+            if (prepared != DECODER_PENDING_INPUT_OK) {
+                *cause = prepared == DECODER_PENDING_INPUT_NO_MEMORY ?
+                         ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
+                return prepared == DECODER_PENDING_INPUT_NO_MEMORY ? OGP_MEMORY : OGP_CONTAINER;
+            }
+            break;
+        }
+        if (eos ? (!raw.len && !raw.consumed && !frame.decoded_size) : !raw.len) break;
+    }
+    return OGP_OK;
+}
+
 static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
     esp_audio_simple_dec_handle_t *decoder, uint8_t **output, size_t *capacity,
     decoder_pending_input_t *pending, const ogg_playback_callbacks *callbacks,
@@ -255,85 +345,10 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
             return result == ESP_AUDIO_ERR_MEM_LACK ? OGP_MEMORY : OGP_DECODER;
         }
     }
-    uint8_t *input;
-    uint32_t bytes;
-    bool owned;
-    decoder_pending_input_status_t prepared = decoder_pending_input_prepare(
-        pending, s->input.page, s->input.size, &input, &bytes, &owned);
-    if (prepared != DECODER_PENDING_INPUT_OK) {
-        *cause = prepared == DECODER_PENDING_INPUT_NO_MEMORY ?
-                 ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
-        return prepared == DECODER_PENDING_INPUT_NO_MEMORY ? OGP_MEMORY : OGP_CONTAINER;
-    }
-    esp_audio_simple_dec_raw_t raw = {.buffer = input, .len = bytes, .eos = eos};
-    for (;;) {
-        if (callbacks->cancelled(callbacks->context)) return OGP_CANCELLED;
-        if (*capacity > UINT32_MAX) { *cause = ESP_AUDIO_ERR_INVALID_PARAMETER; return OGP_DECODER; }
-        esp_audio_simple_dec_out_t frame = {.buffer = *output, .len = (uint32_t)*capacity};
-        raw.consumed = 0;
-        esp_audio_err_t result = esp_audio_simple_dec_process(*decoder, &raw, &frame);
-        ++s->calls;
-        if (callbacks->after_process) callbacks->after_process(callbacks->context);
-        else if ((s->calls & 31u) == 0u && callbacks->yield) callbacks->yield(callbacks->context);
-        if (callbacks->cancelled(callbacks->context)) return OGP_CANCELLED;
-        if (raw.consumed > raw.len || frame.decoded_size > *capacity) {
-            *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
-            return OGP_DECODER;
-        }
-        raw.buffer += raw.consumed;
-        raw.len -= raw.consumed;
-        if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
-            if (frame.decoded_size || frame.needed_size <= *capacity) {
-                *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
-                return OGP_DECODER;
-            }
-            uint8_t *larger = realloc(*output, frame.needed_size);
-            if (!larger) { *cause = ESP_AUDIO_ERR_MEM_LACK; return OGP_MEMORY; }
-            *output = larger;
-            *capacity = frame.needed_size;
-            /* Retry also when input was fully consumed into the public
-             * decoder's cache. No original byte is fed to the observer twice.
-             */
-            continue;
-        }
-        if (result != ESP_AUDIO_ERR_OK) {
-            *cause = result;
-            return result == ESP_AUDIO_ERR_MEM_LACK ? OGP_MEMORY : OGP_DECODER;
-        }
-        if (frame.decoded_size) {
-            esp_audio_simple_dec_info_t info = {0};
-            result = esp_audio_simple_dec_get_info(*decoder, &info);
-            if (result != ESP_AUDIO_ERR_OK) { *cause = result; return OGP_INFO; }
-            if (audio_channel_limit_exceeded(info.channel)) {
-                *cause = info.channel;
-                return OGP_CHANNEL_LIMIT;
-            }
-            opus_pcm_span span = {0, frame.decoded_size};
-            if (page->opus && opt_clip(&s->trim, s->generation,
-                    info.sample_rate, info.channel, info.bits_per_sample,
-                    frame.decoded_size, &span) != OPT_OK) {
-                *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;
-                return OGP_INFO;
-            }
-            if (span.size && !callbacks->output(callbacks->context, &info,
-                    *output + span.offset, span.size,
-                    page->opus ? s->header_gain_q8 : 0)) {
-                *cause = ESP_AUDIO_ERR_FAIL;
-                return callbacks->cancelled(callbacks->context) ? OGP_CANCELLED : OGP_OUTPUT;
-            }
-        }
-        if (!raw.consumed && !frame.decoded_size && raw.len) {
-            if (eos) { *cause = ESP_AUDIO_ERR_DATA_LACK; return OGP_DECODER; }
-            prepared = decoder_pending_input_retain(pending, raw.buffer, raw.len, owned);
-            if (prepared != DECODER_PENDING_INPUT_OK) {
-                *cause = prepared == DECODER_PENDING_INPUT_NO_MEMORY ?
-                         ESP_AUDIO_ERR_MEM_LACK : ESP_AUDIO_ERR_INVALID_PARAMETER;
-                return prepared == DECODER_PENDING_INPUT_NO_MEMORY ? OGP_MEMORY : OGP_CONTAINER;
-            }
-            break;
-        }
-        if (eos ? (!raw.len && !raw.consumed && !frame.decoded_size) : !raw.len) break;
-    }
+    ogg_playback_status decoded = ogp_decode_fragment(s, page,
+        s->input.page, s->input.size, eos, decoder, output, capacity,
+        pending, callbacks, cause);
+    if (decoded != OGP_OK) return decoded;
     if (eos) {
         if (page->opus && opt_finish(&s->trim, s->generation) != OPT_OK) {
             *cause = ESP_AUDIO_ERR_DATA_LACK;
