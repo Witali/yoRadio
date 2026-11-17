@@ -1,0 +1,389 @@
+{
+  "source_commit": "f72600f1add2da21aca1c6ff159c9e1abebed021",
+  "physical_tested": false,
+  "source_policy": {
+    "tracked_sources_clean": true,
+    "preexisting_untracked_test_files": 3,
+    "cyd_export_allow_dirty": true,
+    "test_units_in_production_compile_commands": 0
+  },
+  "c3_host_regression": {
+    "pcm_and_metadata_comparisons": 6,
+    "passed": true,
+    "normalizer_cases": 648,
+    "normalizer_max_error_lsb": 0
+  },
+  "rows": [
+    {
+      "profile": "vendor-pdm",
+      "firmware": "firmware/development/esp32-cyd2usb-native-transfer-20261117-vendor-pdm/app.bin",
+      "image": {
+        "bytes": 1581408,
+        "sha256": "7c782e7a15de5c947e28f5b05055c59291637dac52dabf74159f8f52efe407f5"
+      },
+      "minimum_ota_free_bytes": 188064,
+      "clang_units": 53,
+      "warnings": 100,
+      "errors": 0,
+      "sdk_frontends": [
+        "esp_http_client.c",
+        "esp_tls_mbedtls.c",
+        "ssl_tls.c"
+      ],
+      "config_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "new_or_increased_warning_occurrences": [
+        {
+          "file": "idf/components/native_stream/include/opus_family1_mapping.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/audio_channel_policy.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "profile": "vendor-continuous",
+      "firmware": "firmware/development/esp32-cyd2usb-native-transfer-20261117-vendor-continuous/app.bin",
+      "image": {
+        "bytes": 1575392,
+        "sha256": "f7c8bdb37161b64ced7e8ee49cc53b190fc1f4c0435748aaffe2f918ceb8f3cf"
+      },
+      "minimum_ota_free_bytes": 194080,
+      "clang_units": 53,
+      "warnings": 98,
+      "errors": 0,
+      "sdk_frontends": [
+        "esp_http_client.c",
+        "esp_tls_mbedtls.c",
+        "ssl_tls.c"
+      ],
+      "config_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "new_or_increased_warning_occurrences": [
+        {
+          "file": "idf/components/native_stream/include/opus_family1_mapping.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/audio_channel_policy.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "profile": "vendor-legacy",
+      "firmware": "firmware/development/esp32-cyd2usb-native-transfer-20261117-vendor-legacy/app.bin",
+      "image": {
+        "bytes": 1580992,
+        "sha256": "332178aea662fa24b86cbe60bf3cd3d540a44578af6dec35ceeb7d59be0c73dd"
+      },
+      "minimum_ota_free_bytes": 188480,
+      "clang_units": 54,
+      "warnings": 99,
+      "errors": 0,
+      "sdk_frontends": [
+        "esp_http_client.c",
+        "esp_tls_mbedtls.c",
+        "ssl_tls.c",
+        "i2s_legacy.c"
+      ],
+      "config_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "new_or_increased_warning_occurrences": [
+        {
+          "file": "idf/components/native_stream/include/opus_family1_mapping.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/audio_channel_policy.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 2
+        },
+        {
+          "file": "idf/components/native_stream/include/pcm_speaker_mix.h",
+          "check": "clang-analyzer-core.UndefinedBinaryOperatorResult",
+          "message": "The left operand of '*' is a garbage value",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "profile": "custom-flac-pdm",
+      "firmware": "firmware/development/esp32-cyd2usb-native-transfer-20261117-custom-flac-pdm/app.bin",
+      "image": {
+        "bytes": 1553312,
+        "sha256": "1bb40e64de0e6e0e92e01310139bc06cc5e86728054d49063d76dedd0d6da353"
+      },
+      "minimum_ota_free_bytes": 216160,
+      "clang_units": 53,
+      "warnings": 100,
+      "errors": 0,
+      "sdk_frontends": [
+        "esp_http_client.c",
+        "esp_tls_mbedtls.c",
+        "ssl_tls.c"
+      ],
+      "config_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "new_or_increased_warning_occurrences": [
+        {
+          "file": "idf/components/native_stream/include/opus_family1_mapping.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/audio_channel_policy.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "profile": "custom-flac-continuous",
+      "firmware": "firmware/development/esp32-cyd2usb-native-transfer-20261117-custom-flac-continuous/app.bin",
+      "image": {
+        "bytes": 1547344,
+        "sha256": "c78a2656c6a5696028c06d0cf5472dee90218548344a772e652ce1791f81cd8c"
+      },
+      "minimum_ota_free_bytes": 222128,
+      "clang_units": 53,
+      "warnings": 98,
+      "errors": 0,
+      "sdk_frontends": [
+        "esp_http_client.c",
+        "esp_tls_mbedtls.c",
+        "ssl_tls.c"
+      ],
+      "config_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "new_or_increased_warning_occurrences": [
+        {
+          "file": "idf/components/native_stream/include/opus_family1_mapping.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/audio_channel_policy.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 2
+        }
+      ]
+    },
+    {
+      "profile": "custom-flac-legacy",
+      "firmware": "firmware/development/esp32-cyd2usb-native-transfer-20261117-custom-flac-legacy/app.bin",
+      "image": {
+        "bytes": 1552912,
+        "sha256": "4cadcd341d5d60e3f21f7820287b7536b7b84c737c1e67a7634640c3197b8258"
+      },
+      "minimum_ota_free_bytes": 216560,
+      "clang_units": 54,
+      "warnings": 99,
+      "errors": 0,
+      "sdk_frontends": [
+        "esp_http_client.c",
+        "esp_tls_mbedtls.c",
+        "ssl_tls.c",
+        "i2s_legacy.c"
+      ],
+      "config_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "new_or_increased_warning_occurrences": [
+        {
+          "file": "idf/components/native_stream/include/opus_family1_mapping.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/audio_channel_policy.h",
+          "check": "bugprone-suspicious-string-compare",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "occurrences": 2
+        },
+        {
+          "file": "idf/components/native_stream/include/pcm_speaker_mix.h",
+          "check": "clang-analyzer-core.UndefinedBinaryOperatorResult",
+          "message": "The left operand of '*' is a garbage value",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "profile": "c3",
+      "firmware": "firmware/development/esp32c3-oled-native-transfer-20261117/app.bin",
+      "image": {
+        "bytes": 1523776,
+        "sha256": "73fe4110899f45cc5154960304ad10e4a6572b6f2c9f6e5b912de6524607ebe1"
+      },
+      "minimum_ota_free_bytes": 376768,
+      "clang_units": 61,
+      "warnings": 122,
+      "errors": 0,
+      "sdk_frontends": [
+        "esp_http_client.c",
+        "esp_tls_mbedtls.c",
+        "ssl_tls.c"
+      ],
+      "config_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "new_or_increased_warning_occurrences": [
+        {
+          "file": "idf/esp32c3-oled-native/main/audio_service.c",
+          "check": "clang-analyzer-deadcode.DeadStores",
+          "message": "Value stored to 'load_tenths' during its initialization is never read",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32c3-oled-native/main/audio_service.c",
+          "check": "clang-analyzer-deadcode.DeadStores",
+          "message": "Value stored to 'speed_hundredths' during its initialization is never read",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32c3-oled-native/main/native_audio_output.c",
+          "check": "clang-analyzer-deadcode.DeadStores",
+          "message": "Value stored to 'tenths' during its initialization is never read",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/components/native_storage/include/radio_control_impl.h",
+          "check": "clang-analyzer-deadcode.DeadStores",
+          "message": "Value stored to 'elapsed_ms' during its initialization is never read",
+          "occurrences": 1
+        },
+        {
+          "file": "idf/esp32c3-oled-native/main/websocket_service.c",
+          "check": "clang-analyzer-deadcode.DeadStores",
+          "message": "Value stored to 'tenths' during its initialization is never read",
+          "occurrences": 1
+        }
+      ]
+    }
+  ],
+  "cyd_task_profile": {
+    "radio_stream": {
+      "core": 0,
+      "priority": 3,
+      "stack_bytes": 6144
+    },
+    "audio_decode": {
+      "core": 1,
+      "priority": 5,
+      "stack_bytes": 16384
+    },
+    "audio_output": {
+      "core": 1,
+      "priority": 6,
+      "stack_bytes": 4096
+    }
+  }
+}
