@@ -168,6 +168,15 @@ page. The padded audio packet spans two verified pages and stays within
 the Family 0 packet policy. The controller checks the full response and
 the same PCM MD5 used for the original layout.
 
+For the DAC comparison, build the same profile with
+`CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_DAC=y` or
+`CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC=y`, with the other audio
+output choices disabled. Reuse the TLS material and all probes above.
+The `--expect-input-reclaim` controller also accepts both DAC profiles.
+It requires exactly 528,000 decoded PCM frames at EOF and the same PCM MD5,
+complete driver writes and the existing post-EOF HTTPS checks. The legacy
+run uses QEMU's 96 kHz DAC model and its longer existing EOF deadline.
+
 ## Other playback fixtures
 
 For Helix MP3, use `--codec mp3 --through-eof` with the PCM and PCM MD5

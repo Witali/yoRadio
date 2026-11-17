@@ -782,10 +782,10 @@ def main():
                                     or args.codec != 'opus'):
         parser.error('--radio-ota-lifecycle requires stereo TLS/Opus, the static RX and PCM probes')
     if args.expect_input_reclaim is not None and not (
-            args.full_tls_records and args.codec == 'opus' and not args.opus_family1 and backend == 'pdm'
+            args.full_tls_records and args.codec == 'opus' and not args.opus_family1
             and config.get('YORADIO_TLS_STATIC_RX_RESERVE') and config.get('YORADIO_TLS_INPUT_RECLAIM')
             and re.fullmatch(r'[0-9a-f]{32}', args.expect_input_reclaim)):
-        parser.error('--expect-input-reclaim requires the TLS RX and reclaim probes, PDM, full stereo Opus and a PCM MD5')
+        parser.error('--expect-input-reclaim requires the TLS RX and reclaim probes, full stereo Opus and a PCM MD5')
     web_https = args.web_https_fixture.resolve(strict=True) if args.web_https_fixture else None
     if web_https is not None and (not args.expect_input_reclaim or not web_https.is_relative_to(ROOT / '.build')):
         parser.error('--web-https-fixture requires the local fixture and --expect-input-reclaim')

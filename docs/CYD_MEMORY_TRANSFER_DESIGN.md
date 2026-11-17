@@ -330,8 +330,11 @@ The [page boundary tests](../tests/results/cyd-ogg-page-maximum-20261117/README.
 extend that PDM profile to a 65,307-byte OpusTags page and a 65,306-byte
 audio page. Validated comment pages release large staging allocations
 before the decoder opens. The packet reader skips unnecessary padding in
-copied Family 0 packets. The DAC profiles and physical Wi-Fi still
-require qualification with these fixtures.
+copied Family 0 packets. The [DAC matrix](../tests/results/cyd-opus-dac-matrix-20261117/README.md)
+also completed the original layout and both boundaries on continuous
+and legacy DAC. All six runs preserved the PCM and post-EOF HTTPS
+connection through the allocator recovery. Physical Wi-Fi and audio
+timing still require the board.
 
 ## Actual TLS traffic in isolated SDK/QEMU
 
