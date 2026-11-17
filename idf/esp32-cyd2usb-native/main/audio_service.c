@@ -855,6 +855,7 @@ static bool custom_flac_output(void *user, const custom_flac_info_t *info,
 typedef struct {
     uint32_t generation;
     bool info_failed;
+    stream_fairness_t *decode_budget;
 } ogg_output_context_t;
 
 static bool ogg_output_cancelled(void *user) {
@@ -898,6 +899,16 @@ static void ogg_output_yield(void *user) {
     vTaskDelay(1);
 }
 
+static void ogg_after_process(void *user) {
+    ogg_output_context_t *context = user;
+    if (stream_fairness_due(context->decode_budget, (uint64_t)esp_timer_get_time())) {
+        // Leave at least one whole scheduler tick for idle on this core,
+        // including when the delay starts just before a tick boundary.
+        vTaskDelay(2);
+        stream_fairness_begin(context->decode_budget, (uint64_t)esp_timer_get_time());
+    }
+}
+
 static void ogg_reset_for_task(ogg_playback *playback, uint32_t generation) {
     while (!ogp_reset(playback, generation)) vTaskDelay(1);
 }
@@ -928,6 +939,8 @@ static void decoder_task(void *argument) {
     decoder_eof_input_t eof_input = {0};
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
     ogg_playback ogg = {0};
+    stream_fairness_t ogg_decode_budget;
+    stream_fairness_begin(&ogg_decode_budget, (uint64_t)esp_timer_get_time());
 #endif
     esp_audio_simple_dec_handle_t decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
@@ -1203,11 +1216,15 @@ static void decoder_task(void *argument) {
 #endif
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
         if (codec == NATIVE_CODEC_OGG) {
-            ogg_output_context_t context = {.generation = generation};
+            ogg_output_context_t context = {
+                .generation = generation,
+                .decode_budget = &ogg_decode_budget,
+            };
             const ogg_playback_callbacks callbacks = {
                 .cancelled = ogg_output_cancelled, .output = ogg_output_pcm,
                 .yield = ogg_output_yield, .context = &context,
                 .output_layout = ogg_output_layout,
+                .after_process = ogg_after_process,
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
                 .prepare_family1 = ogg_prepare_family1,
 #endif

@@ -65,6 +65,8 @@ typedef struct {
                           int16_t header_gain_q8, pcm_channel_layout layout);
     /* After a verified Family 1 identification page, before opening decoders. */
     void (*prepare_family1)(void *context, const opus_family1_plan *plan);
+    /* Optional scheduling checkpoint after a public simple-decoder call. */
+    void (*after_process)(void *context);
 } ogg_playback_callbacks;
 
 /* A real raw close refusal retains its cfg/handle, page and packet ownership.
@@ -259,7 +261,9 @@ static inline ogg_playback_status ogp_decode_page(ogg_playback *s,
         esp_audio_simple_dec_out_t frame = {.buffer = *output, .len = (uint32_t)*capacity};
         raw.consumed = 0;
         esp_audio_err_t result = esp_audio_simple_dec_process(*decoder, &raw, &frame);
-        if ((++s->calls & 31u) == 0u) callbacks->yield(callbacks->context);
+        ++s->calls;
+        if (callbacks->after_process) callbacks->after_process(callbacks->context);
+        else if ((s->calls & 31u) == 0u && callbacks->yield) callbacks->yield(callbacks->context);
         if (callbacks->cancelled(callbacks->context)) return OGP_CANCELLED;
         if (raw.consumed > raw.len || frame.decoded_size > *capacity) {
             *cause = ESP_AUDIO_ERR_INVALID_PARAMETER;

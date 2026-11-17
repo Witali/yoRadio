@@ -33,18 +33,20 @@ enum mode {
     NORMAL, RESIZE_ZERO, RESIZE_PARTIAL, RESIZE_ALL, STALL_HEAD,
     CANCEL_BEFORE, CANCEL_AFTER, YIELD_CANCEL, OPEN_MEMORY, PROCESS_FAIL,
     INFO_FAIL, BAD_RATE, BAD_CHANNEL, BAD_BITS, BAD_PCM_SIZE, BAD_CONSUMED,
-    BAD_DECODED, BAD_NEEDED, BAD_RESIZE_OUTPUT, OUTPUT_FAIL, MODES
+    BAD_DECODED, BAD_NEEDED, BAD_RESIZE_OUTPUT, OUTPUT_FAIL,
+    PROCESS_CHECKPOINT, CHECKPOINT_CANCEL, MODES
 };
 static const char *names[] = {
     "normal","resize_zero","resize_partial","resize_all_nonterminal","retained_head",
     "cancel_before","cancel_after","yield_cancel","open_memory","process_fail",
     "info_fail","bad_rate","bad_channel","bad_bits","bad_pcm_size","bad_consumed",
-    "bad_decoded","bad_needed","bad_resize_output","output_failure"
+    "bad_decoded","bad_needed","bad_resize_output","output_failure",
+    "process_checkpoint","checkpoint_cancel"
 };
 typedef struct {
     enum mode mode;
     ogg_playback *owner;
-    unsigned opens, closes, calls, outputs, yields, retries, stage, audio;
+    unsigned opens, closes, calls, outputs, yields, retries, stage, audio, checkpoints;
     unsigned first_sample, last_sample;
     size_t bytes;
     bool live, cancelled, stalled, resized, cached, cleanup;
@@ -173,6 +175,13 @@ static void yield(void *context)
     if (state.mode == YIELD_CANCEL) state.cancelled = true;
 }
 
+static void after_process(void *context)
+{
+    assert(context == &state);
+    assert(++state.checkpoints == state.calls);
+    if (state.mode == CHECKPOINT_CANCEL) state.cancelled = true;
+}
+
 typedef struct { uint8_t p[4096]; size_t n; } encoded;
 static uint32_t crc(const uint8_t *p, size_t n)
 {
@@ -255,6 +264,7 @@ static unsigned run_case(enum mode mode, size_t chunk, unsigned fail_at, bool cr
     for (unsigned i = 0; i < links; ++i) final = add_link(&bytes, i + 77, mode == RESIZE_ALL);
     if (crc_bad) bytes.p[final + 22] ^= 1;
     ogg_playback_callbacks cb = {.cancelled=cancelled,.output=output,.yield=yield,.context=&state};
+    if (mode == PROCESS_CHECKPOINT || mode == CHECKPOINT_CANCEL) cb.after_process = after_process;
     ogg_playback_status status = OGP_OK;
     int32_t cause = 0;
     for (size_t at = 0; at < bytes.n && status == OGP_OK;) {
@@ -268,7 +278,8 @@ static unsigned run_case(enum mode mode, size_t chunk, unsigned fail_at, bool cr
     ogg_playback_status expected = OGP_OK;
     if (fail_at) expected = OGP_MEMORY;
     else if (crc_bad) expected = OGP_CONTAINER;
-    else if (mode == CANCEL_BEFORE || mode == CANCEL_AFTER || mode == YIELD_CANCEL) expected = OGP_CANCELLED;
+    else if (mode == CANCEL_BEFORE || mode == CANCEL_AFTER || mode == YIELD_CANCEL ||
+             mode == CHECKPOINT_CANCEL) expected = OGP_CANCELLED;
     else if (mode == OPEN_MEMORY) expected = OGP_MEMORY;
     else if (mode == PROCESS_FAIL || mode == BAD_CONSUMED || mode == BAD_DECODED || mode == BAD_NEEDED || mode == BAD_RESIZE_OUTPUT) expected = OGP_DECODER;
     else if (mode == INFO_FAIL || mode == BAD_RATE || mode == BAD_CHANNEL || mode == BAD_BITS || mode == BAD_PCM_SIZE) expected = OGP_INFO;
@@ -289,6 +300,8 @@ static unsigned run_case(enum mode mode, size_t chunk, unsigned fail_at, bool cr
     }
     if (crc_bad) assert(!state.outputs && state.calls == 2);
     if (mode == YIELD_CANCEL && !fail_at) assert(state.yields == 1 && s.calls == 32);
+    if (mode == PROCESS_CHECKPOINT) assert(state.checkpoints == state.calls && !state.yields);
+    if (mode == CHECKPOINT_CANCEL) assert(state.checkpoints == 1 && !state.outputs);
     unsigned used_allocations = allocations;
     clear(&s, &decoder, &pcm, &pending);
     ++cases;
