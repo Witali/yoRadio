@@ -21,6 +21,7 @@ RX_WAIT = re.compile(r'CYD_OPENETH_RX_WAIT request=(\d+) heap=(\d+) largest=(\d+
 OPUS_OPEN = re.compile(r'^CYD_OPENETH_OPUS_OPEN channels=(\d+) result=(-?\d+) free=(\d+) largest=(\d+) '
                        r'remaining=(\d+) remaining_largest=(\d+)$', re.M)
 TLS_RX_EVENT = re.compile(r'^CYD_OPENETH_TLS_RX (loan|return)$', re.M)
+RECLAIM_EVENT = re.compile(r'^CYD_OPENETH_RECLAIM ([a-z0-9_= ]+)$', re.M)
 # The pinned Opus fixture's EOS granule 528312 minus pre-skip 312 gives
 # 528000 mono output samples. PDM pads to 512-sample writes and counts the
 # 704 bias samples written after DMA preload, at two bytes per sample.
@@ -96,12 +97,12 @@ def sample(port):
     return sample
 
 
-def require_clean_health(report):
+def require_clean_health(report, expected_allocation_failures=0):
     for group, key in (('decoder_failure', 'sequence'), ('stream_failure', 'sequence'), ('output', 'failures')):
         if report[group][key] != 0:
             raise RuntimeError(f'Unexpected {group} counter')
-    if report['allocation_failures'] != 0:
-        raise RuntimeError('Unexpected allocation failure')
+    if report['allocation_failures'] != expected_allocation_failures:
+        raise RuntimeError('Unexpected allocation failure count')
 
 
 def observe_tls_record_headers(context, lengths):
@@ -294,7 +295,21 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
         raise RuntimeError('Unexpected audio driver fault after EOF')
     report['web_asset_after_eof'] = check_asset(port)
     report['observed'].append('WebUI after EOF')
-    require_clean_health(final)
+    reference_md5 = report.get('input_reclaim_pcm_reference')
+    if reference_md5 is not None:
+        uart = guest_log(log_path)
+        if pcm_probe_flushes(uart) != [dict(frames=OPUS_EOF_PCM_FRAMES, status=0)]:
+            raise RuntimeError('Unexpected decoded PCM count after reclaim')
+        recorded = re.findall(r'^CYD_OPENETH_PCM_MD5 ([0-9a-f]{32})\s*$', uart, re.M)
+        if recorded != [reference_md5]:
+            raise RuntimeError('PCM differs from the same stream decoded without allocator pressure')
+        if TLS_RX_EVENT.findall(uart) != ['loan', 'return']:
+            raise RuntimeError('Expected the static RX reserve to stay loaned until playback ended')
+        require_clean_health(final, expected_allocation_failures=1)
+        report['pcm_md5'] = recorded[0]
+        report['observed'] += ['identical PCM after input reclaim', 'static RX returned at EOF']
+    else:
+        require_clean_health(final)
 
 
 def start_station(port):
@@ -456,11 +471,28 @@ def observe_channel_rejection(port, server, guest, log_path, report):
     report['observed'] += ['encoded channel limit over verified TLS', 'WebUI after channel rejection']
 
 
+def observe_input_reclaim(health, uart):
+    event, = RECLAIM_EVENT.findall(uart)
+    proof = {key: int(value) for key, value in (field.split('=') for field in event.split())}
+    released = proof['released_after'] - proof['released_before']
+    if not (0 < proof['request'] and proof['largest'] < proof['request'] and proof['recovered'] == 1
+            and 0 < released <= proof['budget']
+            and proof['minimum'] <= proof['resident_after'] == proof['resident_before'] - released):
+        raise RuntimeError('The failed Mbed TLS allocation did not recover through bounded idle-slot release')
+    if (health['last_allocation_failure'] != {'size': proof['request'], 'caps': proof['caps']}
+            or health['input']['released'] != proof['released_after']
+            or TLS_RX_EVENT.findall(uart) != ['loan']):
+        raise RuntimeError('Missing allocator, live RX or production input-pool evidence for reclaim')
+    require_clean_health(health, expected_allocation_failures=1)
+    return proof
+
+
 def observe_playback(port, server, guest, log_path, report, through_eof):
     backend = report['audio_backend']
     fixture = server.fixtures['station']
     codec = fixture['codec']
     pcm_probe = uses_pcm_probe(backend, fixture)
+    reclaim = 'input_reclaim_pcm_reference' in report
     status_codec = {'opus': 'OGG', 'flac': 'FLAC'}[codec]
     start_station(port)
     until = time.monotonic() + 40
@@ -469,7 +501,8 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
         if FATAL.search(uart) or guest.poll() is not None:
             raise RuntimeError('Guest stopped or logged a failure during playback')
         status = json.loads(request(port, '/api/native/status'))
-        if (status['audio'] and status['codec'] == status_codec and
+        if ((not reclaim or RECLAIM_EVENT.search(uart))
+                and status['audio'] and status['codec'] == status_codec and
                 status['pcm_sample_rate_hz'] == 48000 and status['pcm_channels'] == fixture['pcm_channels']):
             first = sample(port)
             report['first_active_health'] = first
@@ -479,6 +512,9 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
         time.sleep(0.2)
     else:
         raise RuntimeError(f'No active {codec} playback with output writes before the deadline')
+    if reclaim:
+        report['input_reclaim_pressure'] = observe_input_reclaim(first, uart)
+        report['observed'].append('failed Mbed TLS allocation recovered through idle-slot release')
     report['playing_health'] = [first]
     report['web_asset_during_playback'] = check_asset(port)
     end = time.monotonic() + 5
@@ -512,8 +548,8 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
         if report['health'][-1]['output_driver']['writes'] != 0:
             raise RuntimeError('EOF check requires an idle driver before Play')
         observe_eof(port, server, events[0], guest, log_path, status['generation'], report)
-    require_clean_health(first)
-    require_clean_health(second)
+    require_clean_health(first, expected_allocation_failures=int(reclaim))
+    require_clean_health(second, expected_allocation_failures=int(reclaim))
 
 
 def main():
@@ -535,6 +571,8 @@ def main():
                         help='Serve and verify actual maximum-size TLS 1.2 application records')
     parser.add_argument('--radio-ota-lifecycle', action='store_true',
                         help='Check TLS RX reuse and failed/successful OTA during playback in disposable QEMU')
+    parser.add_argument('--expect-input-reclaim', metavar='PCM_MD5',
+                        help='Verify a recovered allocation and match PCM to the no-pressure control')
     args = parser.parse_args()
     build, qemu, rom = (path.resolve(strict=True) for path in (args.build, args.qemu, args.rom))
     output = args.output.resolve()
@@ -571,6 +609,11 @@ def main():
                                     or not config.get('YORADIO_TLS_STATIC_RX_RESERVE')
                                     or args.codec != 'opus'):
         parser.error('--radio-ota-lifecycle requires stereo TLS/Opus, the static RX and PCM probes')
+    if args.expect_input_reclaim is not None and not (
+            args.full_tls_records and args.codec == 'opus' and not args.opus_family1 and backend == 'pdm'
+            and config.get('YORADIO_TLS_STATIC_RX_RESERVE') and config.get('YORADIO_TLS_INPUT_RECLAIM')
+            and re.fullmatch(r'[0-9a-f]{32}', args.expect_input_reclaim)):
+        parser.error('--expect-input-reclaim requires the TLS RX and reclaim probes, PDM, full stereo Opus and a PCM MD5')
     flac_decoder = None
     if args.codec == 'flac':
         decoders = [name for name in ('ESPRESSIF', 'CUSTOM') if config.get('YORADIO_FLAC_DECODER_' + name)]
@@ -610,6 +653,8 @@ def main():
                   native_diagnostics=config.get('YORADIO_NATIVE_DIAGNOSTICS', False))
     if args.full_tls_records:
         report['tls_application_payload_lengths'] = []
+    if args.expect_input_reclaim is not None:
+        report['input_reclaim_pcm_reference'] = args.expect_input_reclaim
     if flac_decoder is not None:
         report['flac_decoder'] = flac_decoder
     if args.opus_family1:

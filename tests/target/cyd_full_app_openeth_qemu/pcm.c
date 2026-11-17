@@ -14,6 +14,10 @@ static md5_context_t pcm_md5;
 static uint64_t pcm_frames;
 static uint64_t last_report;
 
+#ifdef CYD_OPENETH_RECLAIM_PROBE
+void cyd_openeth_note_playback(void);
+#endif
+
 #ifdef CYD_OPENETH_PCM_CHANNEL_METRICS
 static struct {
     uint64_t energy;
@@ -86,6 +90,9 @@ esp_err_t __wrap_native_audio_output_write_pcm(const uint8_t *data, size_t size,
     esp_rom_md5_update(&pcm_md5, data, size);
 #endif
     pcm_frames += size / frame_bytes;
+#ifdef CYD_OPENETH_RECLAIM_PROBE
+    if (channels == 2) cyd_openeth_note_playback();
+#endif
     if (!last_report || pcm_frames - last_report >= 4800) {
         printf("CYD_OPENETH_PCM_PROGRESS frames=%" PRIu64 "\n", pcm_frames);
         last_report = pcm_frames;

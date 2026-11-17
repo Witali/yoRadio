@@ -42,6 +42,15 @@ function(cyd_attach_openeth_probe)
                         "-Wl,--wrap=yoradio_tls_static_rx_free"
                         "-Wl,--wrap=yoradio_tls_static_rx_zeroize_free")
   endif()
+  if(CYD_OPENETH_RECLAIM_PROBE)
+    if(NOT CYD_OPENETH_TLS_RX_PROBE OR NOT CYD_OPENETH_PCM_MD5 OR
+       NOT CONFIG_YORADIO_TLS_INPUT_RECLAIM)
+      message(FATAL_ERROR "The reclaim probe requires static RX and PCM MD5 probes and TLS input reclaim")
+    endif()
+    target_sources(${app} PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/input_pressure.c")
+    target_compile_definitions(${app} PRIVATE CYD_OPENETH_RECLAIM_PROBE=1)
+    target_link_options(${app} INTERFACE "-Wl,--wrap=esp_http_client_read")
+  endif()
   if(CYD_OPENETH_RX_BACKOFF)
     cyd_overlay_sdk_source(esp_eth src/openeth/esp_eth_mac_openeth.c
       "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/prepare-rx-source.py" openeth-rx-overlay)

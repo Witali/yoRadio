@@ -309,8 +309,15 @@ The [combined PDM profile](../tests/results/cyd-tls-combined-options-20261117/RE
 also enabled early MPI and idle input reclaim with the static reserve.
 It completed the same TLS file and OTA lifecycle with the five-second
 watchdog. The EOF run measured 13,632 bytes minimum free heap and
-recorded zero allocation failures. Full-application allocator pressure
-and physical Wi-Fi remain open.
+recorded zero allocation failures.
+
+The next [full-application pressure test](../tests/results/cyd-tls-input-pressure-20261117/README.md)
+observed a failed 1,536-byte Mbed TLS allocation and a successful retry
+after the production pool freed one idle slot. The radio retained the
+static RX loan and produced the same PCM as the control. The follow-up
+also exercised the elapsed-time Ogg decoder budget after two IDLE1
+watchdog events in earlier runs. Concurrent TLS clients under pressure
+in the full application and physical Wi-Fi remain open.
 
 ## Actual TLS traffic in isolated SDK/QEMU
 

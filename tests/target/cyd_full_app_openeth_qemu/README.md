@@ -113,6 +113,25 @@ After the software reset it checks the running `app1` slot, ELF hash,
 WebUI asset and fresh TLS playback. All writes are to the QEMU snapshot.
 The controller also checks the original flash file digest after QEMU exits.
 
+## Input reclaim under allocator pressure
+
+Use the PDM stereo Opus profile with static TLS RX and
+`CONFIG_YORADIO_TLS_INPUT_RECLAIM=y`. Enable the RX probe, PCM probe and
+PCM MD5 in both builds. First run the ordinary profile through EOF with
+`--full-tls-records` and capture the single `CYD_OPENETH_PCM_MD5` from its
+UART log. Then build with `'-D','CYD_OPENETH_RECLAIM_PROBE=ON'`, stage
+its flash fixture and repeat the same command with
+`--expect-input-reclaim <control PCM MD5>`.
+
+After the first decoded write, the probe checks for an idle slot between
+reads and makes one Mbed TLS allocation under real internal heap pressure.
+The production stream task performs the request, which keeps the slot
+available to reclaim while the probe measures and allocates. The
+controller requires one recorded allocation failure of the measured size,
+a successful retry through bounded idle-slot release, a live static RX loan, byte-identical
+PCM and working WebUI through EOF.
+[Probe](input_pressure.c)
+
 ## Other playback fixtures
 
 For a matched FLAC comparison, use two copies of the same TLS diagnostic
