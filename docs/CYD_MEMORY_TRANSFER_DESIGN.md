@@ -325,8 +325,13 @@ and a WebUI asset read on the same HTTPS connection after EOF. The
 original page layout failed on a 26,504-byte allocation during the
 decoder call. The [packet-level Opus option](../tests/results/cyd-ogg-large-pages-20261117/README.md)
 creates the decoder after OpusTags. The original pages then play through
-EOF with both TLS sessions live and the same PCM as the control. The
-maximum page geometry and physical Wi-Fi still require qualification.
+EOF with both TLS sessions live and the same PCM as the control.
+The [page boundary tests](../tests/results/cyd-ogg-page-maximum-20261117/README.md)
+extend that PDM profile to a 65,307-byte OpusTags page and a 65,306-byte
+audio page. Validated comment pages release large staging allocations
+before the decoder opens. The packet reader skips unnecessary padding in
+copied Family 0 packets. The DAC profiles and physical Wi-Fi still
+require qualification with these fixtures.
 
 ## Actual TLS traffic in isolated SDK/QEMU
 

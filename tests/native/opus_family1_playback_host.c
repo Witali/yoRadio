@@ -66,6 +66,8 @@ static void cfg_stable(const host_handle *h) {
     bool found=false;for(unsigned i=0;i<8;++i)if(h->cfg==&owner->decoder.cfg[i])found=true;assert(found);
 }
 esp_audio_err_t esp_opus_dec_open(void *opaque,uint32_t bytes,void **out) {
+    assert(owner->source && !owner->source->ready && !owner->source->size &&
+           owner->source->capacity <= 27u + 255u && !owner->source->word_capacity);
     const esp_opus_dec_cfg_t *cfg=opaque;assert(cfg && out && !*out && bytes==sizeof(*cfg) && cfg->sample_rate==48000 &&
         (cfg->channel==1 || cfg->channel==2) && cfg->frame_duration==ESP_OPUS_DEC_FRAME_DURATION_INVALID);++stats.opens;
     if(stats.opens==stats.open_refuse)return ESP_AUDIO_ERR_MEM_LACK; /* HOST double, no creator call. */
@@ -287,7 +289,8 @@ static void failure(const corpus *source,const reference *ref,failure_kind kind,
     while(ready(&input,&bytes,&r)) {result=ofp_page(&s,&input,&cb,NULL);if(result.code!=OFP_OK)break;assert(!input.ready);++acknowledged;}
     ofp_status expected=kind==FAIL_OPEN || kind==FAIL_PLANES || kind==FAIL_SCRATCH || kind==FAIL_PACKET?OFP_MEMORY:
         kind==FAIL_DECODE?OFP_DECODER:kind==FAIL_OUTPUT?OFP_OUTPUT:OFP_CANCELLED;
-    assert(result.code==expected && s.blocked && input.ready && result.cleanup_pending==(stats.live!=0));
+    const bool held_page = kind != FAIL_OPEN && kind != CANCEL_OPEN;
+    assert(result.code==expected && s.blocked && input.ready==held_page && result.cleanup_pending==(stats.live!=0));
     if(kind==FAIL_OPEN)assert(result.decoder.public_error_known && result.decoder.public_error==ESP_AUDIO_ERR_MEM_LACK && stats.created==ordinal-1 && !stats.live);
     if(kind==FAIL_DECODE)assert(result.decoder.public_error_known && result.decoder.public_error==ESP_AUDIO_ERR_FAIL && stats.syntheses==ordinal-1 && !out.published);
     if(kind==FAIL_PLANES)assert(result.detail>0 && !result.decoder.public_error_known &&
@@ -295,10 +298,13 @@ static void failure(const corpus *source,const reference *ref,failure_kind kind,
     if(kind==FAIL_SCRATCH)assert(result.decoder.code==OFD_MEMORY && !result.decoder.public_error_known && result.detail==(ordinal==1?3840:23040));
     if(kind==FAIL_OUTPUT || kind==CANCEL_OUTPUT)assert(out.published==ordinal-1 && out.emitted==(ordinal-1)*128u);
     if(kind==CANCEL_OPEN)assert(stats.created==s.plan.needed && !stats.decodes && stats.live==s.plan.needed);
-    uint8_t *saved=malloc(input.size);assert(saved);memcpy(saved,input.page,input.size);size_t held=input.size;uint64_t token=input.event.token;unsigned calls=stats.decodes,published=out.published;
+    size_t held=input.size;
+    uint8_t *saved=held?malloc(held):NULL;
+    if(held){assert(saved);memcpy(saved,input.page,held);}
+    uint64_t token=input.event.token;unsigned calls=stats.decodes,published=out.published;
     ofp_result busy=ofp_page(&s,&input,&cb,NULL);
-    assert(busy.code==OFP_BUSY && busy.cleanup_pending==(stats.live!=0) && input.ready && input.event.token==token && input.size==held && !memcmp(input.page,saved,held) && stats.decodes==calls && out.published==published);
-    assert(ofp_abandon(&s).code==OFP_OK && input.ready && input.event.token==token && input.size==held && !memcmp(input.page,saved,held));free(saved);
+    assert(busy.code==OFP_BUSY && busy.cleanup_pending==(stats.live!=0) && input.ready==held_page && input.event.token==token && input.size==held && (!held || !memcmp(input.page,saved,held)) && stats.decodes==calls && out.published==published);
+    assert(ofp_abandon(&s).code==OFP_OK && input.ready==held_page && input.event.token==token && input.size==held && (!held || !memcmp(input.page,saved,held)));free(saved);
     clean(&s,&input);physical_free(&bytes);++controls;
 }
 static void close_retry(const corpus *source,const reference *ref) {

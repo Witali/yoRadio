@@ -166,6 +166,24 @@ def helix_mp3_fixture(mono):
                 pcm_md5=None, source_channels=2)
 
 
+def ogg_page(header, crc, sequence, flags, granule, laces, body):
+    if len(laces) > 255 or sum(laces) != len(body):
+        raise ValueError('Invalid lacing for the Ogg fixture')
+    page = bytearray(header[:27])
+    page[5] = flags
+    page[6:14] = granule.to_bytes(8, 'little')
+    page[18:22] = sequence.to_bytes(4, 'little')
+    page[22:26] = bytes(4)
+    page[26] = len(laces)
+    page += laces + body
+    page[22:26] = crc(page).to_bytes(4, 'little')
+    return bytes(page)
+
+
+def ogg_laces(packet):
+    return bytes([255]) * (len(packet) // 255) + bytes((len(packet) % 255,))
+
+
 def shorten_opus_pages(fixture):
     original = fixture['data']
     reader = runpy.run_path(str(ROOT / 'tests/fixtures/opus_header_gain/generate.py'))
@@ -181,16 +199,9 @@ def shorten_opus_pages(fixture):
         group = audio[first:first + 8]
         finished = first + len(group)
         eos = finished == len(audio)
-        lace = bytes(n for packet in group for n in [255] * (len(packet) // 255) + [len(packet) % 255])
-        page = bytearray(original[:27])
-        page[5] = 4 if eos else 0
-        page[6:14] = (final if eos else finished * 960).to_bytes(8, 'little')
-        page[18:22] = (first // 8 + 2).to_bytes(4, 'little')
-        page[22:26] = bytes(4)
-        page[26] = len(lace)
-        page += lace + b''.join(group)
-        page[22:26] = crc(page).to_bytes(4, 'little')
-        result.append(page)
+        lace = b''.join(map(ogg_laces, group))
+        result.append(ogg_page(original, crc, first // 8 + 2, 4 if eos else 0,
+                               final if eos else finished * 960, lace, b''.join(group)))
     body = b''.join(result)
     shorter, copied = parse(body)
     if copied != packets:
@@ -198,6 +209,65 @@ def shorten_opus_pages(fixture):
     fixture['data'] = body
     return dict(sha256=digest(body), pages=len(shorter),
                 largest_page=max(page['end'] - page['offset'] for page in shorter))
+
+
+def pad_opus_frame(packet, length):
+    if packet[0] & 3 or length <= len(packet) + 2:
+        raise ValueError('Expected one Opus frame and room for Code 3 padding')
+    # Code 3 with one CBR frame. Each 255 in the padding length uses one byte
+    # of header and adds 254 bytes of ignored trailing data (RFC 6716 §3.2.5).
+    extended, last = divmod(length - len(packet) - 2, 255)
+    body = (bytes((packet[0] | 3, 0x41)) + b'\xff' * extended + bytes((last,))
+            + packet[1:] + bytes(extended * 254 + last))
+    if len(body) != length:
+        raise ValueError('Unexpected padded Opus packet length')
+    return body
+
+
+def opus_page_boundary(fixture, boundary):
+    original = fixture['data']
+    reader = runpy.run_path(str(ROOT / 'tests/fixtures/opus_header_gain/generate.py'))
+    parse, crc = reader['parse'], reader['crc']
+    pages, packets = parse(original)
+    final = int.from_bytes(original[pages[-1]['offset'] + 6:pages[-1]['offset'] + 14], 'little')
+    if len(packets) != 553 or final != 528312:
+        raise ValueError('Unexpected source for the page boundary fixture')
+    if boundary == 'tags':
+        packets[1] = packets[1].ljust(65025, b'\0')
+        result = [original[:pages[0]['end']],
+                  ogg_page(original, crc, 1, 0, 2**64 - 1, b'\xff' * 255, packets[1]),
+                  ogg_page(original, crc, 2, 1, 0, b'\0', b'')]
+        for page in pages[2:]:
+            header = original[page['offset']:page['payload']]
+            result.append(ogg_page(header, crc, len(result), header[5],
+                                   int.from_bytes(header[6:14], 'little'),
+                                   header[27:], original[page['payload']:page['end']]))
+        maximum = 65307
+    elif boundary == 'audio':
+        # An audio page of 65,306 bytes has one completed lace of 254 and all
+        # other laces 255. The continued packet stays under the 61,440 B cap.
+        packets[2] = pad_opus_frame(packets[2], 3824)
+        packets[3] = pad_opus_frame(packets[3], 61255)
+        result = [original[:pages[1]['end']],
+                  ogg_page(original, crc, 2, 0, 960, ogg_laces(packets[2]) + b'\xff'*240,
+                           packets[2] + packets[3][:61200]),
+                  ogg_page(original, crc, 3, 1, 1920, bytes((55,)), packets[3][61200:])]
+        for first in range(4, len(packets), 42):
+            group = packets[first:first + 42]
+            finished = first + len(group)
+            eos = finished == len(packets)
+            result.append(ogg_page(original, crc, len(result) + 1, 4 if eos else 0,
+                                   final if eos else (finished - 2) * 960,
+                                   b''.join(map(ogg_laces, group)), b''.join(group)))
+        maximum = 65306
+    else:
+        raise ValueError('Unknown Ogg Opus boundary fixture')
+    body = b''.join(result)
+    checked, copied = parse(body)
+    if copied != packets or max(p['end'] - p['offset'] for p in checked) != maximum:
+        raise ValueError('Ogg boundary fixture differs from the expected packets or page geometry')
+    fixture['data'] = body
+    return dict(boundary=boundary, sha256=digest(body), pages=len(checked), largest_page=maximum)
 
 
 def family1_fixture(manifest):
@@ -668,8 +738,11 @@ def main():
                         help='Verify a recovered allocation and match PCM to the no-pressure control')
     parser.add_argument('--web-https-fixture', type=Path,
                         help='Stage the local diagnostic HTTPS NVS and hold one verified WebUI connection')
-    parser.add_argument('--short-opus-pages', action='store_true',
+    layout = parser.add_mutually_exclusive_group()
+    layout.add_argument('--short-opus-pages', action='store_true',
                         help='Use eight original Opus packets per page for the HTTPS overlap fixture')
+    layout.add_argument('--opus-page-boundary', choices=('tags', 'audio'),
+                        help='Use a maximum-size comment or audio page in the HTTPS overlap fixture')
     args = parser.parse_args()
     build, qemu, rom = (path.resolve(strict=True) for path in (args.build, args.qemu, args.rom))
     output = args.output.resolve()
@@ -718,6 +791,8 @@ def main():
         parser.error('--web-https-fixture requires the local fixture and --expect-input-reclaim')
     if args.short_opus_pages and not web_https:
         parser.error('--short-opus-pages requires the HTTPS overlap fixture')
+    if args.opus_page_boundary and not (web_https and config.get('YORADIO_OGG_OPUS_RAW')):
+        parser.error('--opus-page-boundary requires the HTTPS overlap fixture and packet-level Opus')
     flac_decoder = None
     if args.codec == 'flac':
         decoders = [name for name in ('ESPRESSIF', 'CUSTOM') if config.get('YORADIO_FLAC_DECODER_' + name)]
@@ -731,6 +806,8 @@ def main():
         else:
             fixture = family1_fixture(args.opus_family1) if args.opus_family1 else station_fixture(args.codec)
     repaging = shorten_opus_pages(fixture) if args.short_opus_pages else None
+    if args.opus_page_boundary:
+        repaging = opus_page_boundary(fixture, args.opus_page_boundary)
     flash, parts = flash_parts(build)
     if web_https:
         nvs = (web_https / 'nvs.bin').read_bytes()

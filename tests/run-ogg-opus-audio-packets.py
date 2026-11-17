@@ -61,6 +61,7 @@ def main():
             'all actual host allocation seams preserve the held page/cursor/prefix/token and cleanly retry or abandon')
         need(result['word_page_schedules'] == 10 and result['word_allocations'] == result['word_releases'] == 10 and
              result['word_refusals'] == 1, 'word pages preserve packet bytes and CRC, release storage and fall back to byte pages')
+        need(result['family0_padding_schedules'] == 4, 'Family 0 copied padding, retry and encoded packet limit')
         report['measurements']=result;report['realloc_controls']=controls;report['allocation_failure_injected']=result['allocation_failure_injected']
         need(command('libogg-post-sha',['sha256sum',library]).decode().strip()==report['libogg_identity'],'unchanged creator library')
         need(command('compiler-post-sha',['sha256sum',compiler]).decode().strip()==report['compiler_identity'],'unchanged compiler')

@@ -162,6 +162,12 @@ packet-level run logs a stereo decoder open after OpusTags and checks the
 full radio response, exact output, and the same verified HTTPS connection
 through EOF. [Results](../../results/cyd-ogg-large-pages-20261117/README.md)
 
+With the same options, use `--opus-page-boundary tags` for a 65,307-byte
+comment page and `--opus-page-boundary audio` for a 65,306-byte audio
+page. The padded audio packet spans two verified pages and stays within
+the Family 0 packet policy. The controller checks the full response and
+the same PCM MD5 used for the original layout.
+
 ## Other playback fixtures
 
 For Helix MP3, use `--codec mp3 --through-eof` with the PCM and PCM MD5

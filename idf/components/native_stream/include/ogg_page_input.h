@@ -150,6 +150,19 @@ static inline bool opi_ack(ogg_page_input *s, uint32_t generation,
     return true;
 }
 
+/* Header consumers keep their own state after ACK. Retain the small header
+ * allocation, so a large tag page cannot hold RAM across decoder creation. */
+static inline void opi_release_idle_large_page(ogg_page_input *s)
+{
+    if (s->ready || s->size) return;
+    if (s->capacity > 27u + 255u) {
+        OGG_PAGE_INPUT_FREE(s->page);
+        s->page = NULL;
+        s->capacity = 0;
+    }
+    opi_release_word_payload(s);
+}
+
 static inline ogg_page_input_status opi_observe(ogg_page_input *s,
                                                 const uint8_t *data, size_t size)
 {

@@ -324,6 +324,11 @@ static inline void ofp_sink_yield(void *opaque) {
 static inline ofp_result ofp_ack_headers(opus_family1_playback *s,ogg_page_input *input) {
     return opi_ack(input,s->generation,input->event.token)?ofp_code(OFP_OK):ofp_block(s,OFP_CONTAINER,OPI_INVALID);
 }
+static inline ofp_result ofp_ack_tags(opus_family1_playback *s,ogg_page_input *input) {
+    ofp_result acknowledged = ofp_ack_headers(s,input);
+    if (acknowledged.code == OFP_OK) opi_release_idle_large_page(input);
+    return acknowledged;
+}
 static inline ofp_result ofp_close_eos(opus_family1_playback *s,ogg_page_input *input) {
     ofd_result closed=ofd_close(&s->decoder);
     if(closed.code!=OFD_OK || closed.cleanup_pending) {
@@ -387,13 +392,15 @@ static inline ofp_result ofp_page(opus_family1_playback *s,ogg_page_input *input
     if(s->phase==OFP_TAGS) {
         opus_tags_status tags=ots_page(&s->tags,input);
         if(tags<0)return ofp_block(s,OFP_HEADER,tags);
-        if(tags==OTS_MORE)return ofp_ack_headers(s,input);
+        if(tags==OTS_MORE)return ofp_ack_tags(s,input);
         if(!opk_start_link(&s->packets,input))return ofp_block(s,OFP_PACKET,OPK_INVALID);
         if(!eos) {
+            ofp_result acknowledged=ofp_ack_tags(s,input);
+            if(acknowledged.code!=OFP_OK)return acknowledged;
             ofd_result opened=ofd_open(&s->decoder,s->head,s->head_bytes,s->generation,api);
             if(opened.code!=OFD_OK){ofp_result r=ofp_block(s,ofp_decoder_code(opened),opened.detail);r.decoder=opened;return r;}
             if(callbacks->cancelled(callbacks->context))return ofp_block(s,OFP_CANCELLED,0);
-            s->phase=OFP_AUDIO;return ofp_ack_headers(s,input);
+            s->phase=OFP_AUDIO;return ofp_code(OFP_OK);
         }
     } else {
         if(input->event.flags&OOPT_TAGS)return ofp_block(s,OFP_CONTAINER,OPI_INVALID);
