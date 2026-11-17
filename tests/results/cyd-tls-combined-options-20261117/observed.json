@@ -1,0 +1,71 @@
+{
+  "profile": "dual-core ESP32 PDM over QEMU OpenETH, ESP-IDF 6.0.2",
+  "static_rx": true,
+  "early_mpi": true,
+  "idle_reclaim": true,
+  "linked_code": {
+    "early_mpi_entry": true,
+    "input_bind_entry": true,
+    "allocator_wrapper": true,
+    "config_delta": [
+      "YORADIO_TLS_EARLY_MPI_LOCK",
+      "YORADIO_TLS_INPUT_RECLAIM"
+    ]
+  },
+  "eof_report_sha256": "d8dfcdee5865ac3f4915a04e60fbf3c00090be26b3600e7361828efa9738f8b7",
+  "ota_report_sha256": "1e64821d33759404d2d92e7a7aedde9f1a2b22d9ed7085d73354d269703bb747",
+  "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+  "runner_sha256": "3ed826da55de5fad42b628ba6629dd728f53c44e1e4343b410200f2f0935aa99",
+  "flash_sha256": "4bed15b763f29f4294175c203d0c1de3c5fe4d1cc394d3754f72309cd0e72336",
+  "config_sha256": "5c2957c4cffce63fe7bd3b45cb51a59aff334bf41dd6565194669800bc44ec12",
+  "task_watchdog_seconds": 5,
+  "eof": {
+    "tls_body_bytes": 706319,
+    "full_body_records": 43,
+    "tail_bytes": 1807,
+    "accepted_pdm_bytes": 1058176,
+    "minimum_heap_bytes": 13632,
+    "control_minimum_heap_bytes": 12504,
+    "largest_free_dma_block_during_webui_bytes": 18432,
+    "stack_free_min_bytes": {
+      "stream": 1508,
+      "decode": 2588,
+      "output": 2804,
+      "http": 1216
+    },
+    "alloc_failures": 0,
+    "web_asset": {
+      "bytes": 13588,
+      "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+    }
+  },
+  "ota": {
+    "stop_and_reconnect": {
+      "first_generation": 1,
+      "next_generation": 3,
+      "released_heap": 130612
+    },
+    "truncated_upload": {
+      "status": 400,
+      "sent_bytes": 8466,
+      "resumed_generation": 5
+    },
+    "complete_upload": {
+      "status": 200,
+      "sent_bytes": 1242706,
+      "partition": "app1",
+      "reset_reason": 3,
+      "playback_generation": 1
+    },
+    "reserved_rx_events": [
+      "loan",
+      "return",
+      "loan",
+      "return",
+      "loan",
+      "return",
+      "loan",
+      "return"
+    ]
+  }
+}

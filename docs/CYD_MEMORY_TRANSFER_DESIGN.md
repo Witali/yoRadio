@@ -296,8 +296,7 @@ used the same complete stereo Opus fixture, ESP-IDF 6.0.2 and five-second
 task watchdog for PDM, continuous DAC and legacy DAC. All three reached
 EOF with the expected output count, zero allocation failures and the exact
 WebUI asset during playback and after EOF. Legacy DAC recorded the lowest
-heap watermark at 9,908 bytes. The matrix uses the diagnostic OpenETH
-transport. Combined option testing and physical Wi-Fi remain open.
+heap watermark at 9,908 bytes. The matrix uses diagnostic OpenETH.
 
 The [PDM Stop/Play and OTA test](../tests/results/cyd-openeth-ota-lifecycle-20261116/README.md)
 observed four loans and returns of the static RX buffer across independent
@@ -305,6 +304,13 @@ TLS connections. The full application resumed audio after verification
 rejected a partial upload, then booted the same application from the
 alternate slot after a successful upload. WebUI and TLS audio worked
 after the software reset.
+
+The [combined PDM profile](../tests/results/cyd-tls-combined-options-20261117/README.md)
+also enabled early MPI and idle input reclaim with the static reserve.
+It completed the same TLS file and OTA lifecycle with the five-second
+watchdog. The EOF run measured 13,632 bytes minimum free heap and
+recorded zero allocation failures. Full-application allocator pressure
+and physical Wi-Fi remain open.
 
 ## Actual TLS traffic in isolated SDK/QEMU
 
@@ -375,14 +381,14 @@ measurements; QEMU observations do not establish them.
 
 ## Remaining work
 
-- Finish complete radio-boot, concurrent radio/WebUI/OTA traffic and physical qualification of the
-  CYD-specific TLS/full-record RX reservation against the
+- Finish physical radio boot and qualify concurrent clients under memory
+  pressure in the full application against the
   [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
   CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity
   formula do not apply. Preserve the SDK full-record capacity expression,
   ordinary allocator/free pairing and input reclaim; verify cleanup, OOM,
-  reconnect and concurrent clients. Complete the early-MPI radio-boot and
-  physical gates; its SDK void API does not offer recoverable OOM. Its seven
+  reconnect and concurrent clients. Complete the early-MPI physical gates.
+  Its SDK void API aborts on allocation failure. Its seven
   full-application exports are already qualified.
 - Measure internal/DMA heap, largest blocks, TLS peaks, stack margins and
   scheduler latency on CYD with TFT, network and audio active. Select input
