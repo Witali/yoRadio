@@ -213,7 +213,12 @@ static void dispatch_failure(const corpus *source,const reference *ref,unsigned 
     assert(c.prepared==(unsigned)(mode!=6));
     if(mode<=1)assert(c.outputs==3 && c.emitted==256 && !stats.live && p.wrapper.input.ready && p.wrapper.family1.trim.raw_position==960);
     if(mode==2)assert(!c.outputs && !stats.live && p.wrapper.input.ready);
-    if(mode==3)assert(stats.opens==2 && stats.created==1 && stats.destroyed==1 && !stats.live && !c.outputs && p.wrapper.input.ready);
+    /* Early open happens after the Tags page has been acknowledged. A
+     * partial-open refusal closes its handle and retains only blocked state. */
+    if(mode==3)assert(stats.opens==2 && stats.created==1 && stats.destroyed==1 && !stats.live && !c.outputs &&
+        !p.wrapper.input.ready && !p.wrapper.input.size && !p.wrapper.input.timeline.pending &&
+        p.wrapper.family1.blocked && p.wrapper.family1.phase==OFP_TAGS &&
+        !ofd_has_handles(&p.wrapper.family1.decoder));
     if(mode==4 || mode==5)assert(!stats.syntheses && !stats.live && !c.outputs && p.wrapper.input.ready && cause==(mode==4?15360:3840));
 #ifdef DISPATCH_WORD_STORAGE
     if(mode==4)assert(dispatch_words.calls==1 && dispatch_word_empty());
