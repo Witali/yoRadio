@@ -1,0 +1,190 @@
+{
+  "passed": true,
+  "state": "TERMINAL_PASS",
+  "scope": "complete direct public AAC integration identity; not independent numerical conformance",
+  "physical_tested": false,
+  "expected": {
+    "lc": {
+      "input_bytes": 443706,
+      "input_sha256": "1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5",
+      "adts_frames": 517,
+      "core_rate": 48000,
+      "pcm_frames": 529408,
+      "repetitions": 1,
+      "source_sha256": "1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5"
+    },
+    "he": {
+      "input_bytes": 102420,
+      "input_sha256": "b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3",
+      "adts_frames": 300,
+      "core_rate": 24000,
+      "pcm_frames": 614400,
+      "repetitions": 20,
+      "source_sha256": "747259aaafad92a280e793a4e0b7fce05d39443959ef3d3cba463b980d92f7da"
+    }
+  },
+  "archives": {
+    "libesp_audio_codec.a": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+    "libesp_audio_simple_dec.a": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6"
+  },
+  "qemu": {
+    "bytes": 73096757,
+    "sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02"
+  },
+  "elf": {
+    "bytes": 3497624,
+    "sha256": "c0cf7812daa5ae319ab49d575a55998766d2f1e1f5cc50a2b564a95332a341e2"
+  },
+  "flash_parts": [
+    {
+      "offset": 4096,
+      "file": "bootloader/bootloader.bin",
+      "bytes": 26096,
+      "sha256": "747cbaa9d3c9634df1844dfa52b1598cd1667e5b5463f8dbfb7a54321e017d42"
+    },
+    {
+      "offset": 32768,
+      "file": "partition_table/partition-table.bin",
+      "bytes": 3072,
+      "sha256": "c9a826e85500d14d1854ce78e47452d4614a1be371bbd056278d2cb3398fbbfd"
+    },
+    {
+      "offset": 65536,
+      "file": "cyd_aac_tls_reference.bin",
+      "bytes": 833568,
+      "sha256": "1d68fc145c06ee679c502a06b5e59c3a463ccd085b361c5c5049eea8c92060a3"
+    }
+  ],
+  "inputs": {
+    "CMakeLists.txt": {
+      "bytes": 210,
+      "sha256": "5a81498c3b399c12bbae1c3482e872183ef6e8ecba03d5f826a3f50cf7c2207a"
+    },
+    "partitions.csv": {
+      "bytes": 96,
+      "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b"
+    },
+    "sdkconfig.defaults": {
+      "bytes": 1353,
+      "sha256": "ee12219c09bf31b2459aef252d771b7f44cf928f0c01072af27690bfb6cbc87d"
+    },
+    "main/CMakeLists.txt": {
+      "bytes": 276,
+      "sha256": "0acef9d05202d3e0e30ccdc8a7168e48b9a2a10cafb0160c4c7797d8014851d1"
+    },
+    "main/fixtures.bin": {
+      "bytes": 546206,
+      "sha256": "b9c4cff1407ce3945e6911a2e761226c9bc82e47c2fb66d2433e15705e06dbc6"
+    },
+    "main/main.c": {
+      "bytes": 6190,
+      "sha256": "b0dd4091f793f2aa51cfb1a29cce63ad30c63ed3b0d56860a5bc8d3bc24eafa8"
+    }
+  },
+  "runner": {
+    "bytes": 12302,
+    "sha256": "8af4af7341a3d2142232a311437994bbfd922c9fdc50c555ee74bcce0fa0f50b"
+  },
+  "watchdog_seconds": 5,
+  "revisions": {
+    "vendor": "67b8d0e98f58c774b8652480893037273190e8dc",
+    "sdk": "7101770dc6db2667b3c477cc31365dd1acd6db4e"
+  },
+  "compiler": {
+    "bytes": 906240,
+    "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+  },
+  "compiled_reference_source": {
+    "bytes": 6190,
+    "sha256": "b0dd4091f793f2aa51cfb1a29cce63ad30c63ed3b0d56860a5bc8d3bc24eafa8"
+  },
+  "compile_command_sha256": "727044c71a3cbcf08a244c292a1733f7d26fa319fc93234c372e1a86e9b04ef7",
+  "qemu_exit_status": 0,
+  "cases": [
+    {
+      "profile": "lc",
+      "plus": 1,
+      "input": 443706,
+      "input_sha256": "1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5",
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 529408,
+      "pcm_bytes": 2117632,
+      "pcm_sha256": "95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0",
+      "calls": 518,
+      "resizes": 0,
+      "heap_before": 283168,
+      "heap_after": 283068,
+      "stack_free": 14644,
+      "core": 1,
+      "priority": 3,
+      "drained": 1
+    },
+    {
+      "profile": "lc",
+      "plus": 0,
+      "input": 443706,
+      "input_sha256": "1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5",
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 529408,
+      "pcm_bytes": 2117632,
+      "pcm_sha256": "95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0",
+      "calls": 518,
+      "resizes": 0,
+      "heap_before": 283068,
+      "heap_after": 283068,
+      "stack_free": 14644,
+      "core": 1,
+      "priority": 3,
+      "drained": 1
+    },
+    {
+      "profile": "he",
+      "plus": 1,
+      "input": 102420,
+      "input_sha256": "b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3",
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 614400,
+      "pcm_bytes": 2457600,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "calls": 301,
+      "resizes": 0,
+      "heap_before": 283068,
+      "heap_after": 283068,
+      "stack_free": 14004,
+      "core": 1,
+      "priority": 3,
+      "drained": 1
+    },
+    {
+      "profile": "he",
+      "plus": 0,
+      "input": 102420,
+      "input_sha256": "b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3",
+      "rate": 24000,
+      "channels": 2,
+      "bits": 16,
+      "frames": 307200,
+      "pcm_bytes": 1228800,
+      "pcm_sha256": "025a8f45c5efeeb8e9424e9088c27c3a74cce92f61d8f9f66ab8d6d25530cf7d",
+      "calls": 301,
+      "resizes": 0,
+      "heap_before": 283068,
+      "heap_after": 283068,
+      "stack_free": 14004,
+      "core": 1,
+      "priority": 3,
+      "drained": 1
+    }
+  ],
+  "log": {
+    "bytes": 4665,
+    "sha256": "847d22e95f2cb0a31b5f55e4494a3b204d999178f1d597c0fdd1f6fc63992215"
+  },
+  "original_local_report_sha256": "b970671604f3848140ea9f702a37519988f889c79fa6c609535cf36e20b03525"
+}

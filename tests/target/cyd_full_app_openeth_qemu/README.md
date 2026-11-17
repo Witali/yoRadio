@@ -179,6 +179,57 @@ run uses QEMU's 96 kHz DAC model and its longer existing EOF deadline.
 
 ## Other playback fixtures
 
+For public Espressif AAC, enable the PCM and PCM SHA-256 probes, retain
+`CONFIG_YORADIO_AAC_PLUS=y`, then run with
+`--codec aac --aac-profile he --through-eof --full-tls-records`.
+The HE fixture contains 20 consecutive copies of the original synthetic
+48 kHz test segment: 102,420 encoded bytes, 300 ADTS frames and 614,400
+stereo PCM frames. `--aac-profile lc` selects the complete 443,706-byte
+calibration input with 517 ADTS frames and 529,408 PCM frames. ADTS
+accounting and decoded PCM geometry are checked separately.
+
+Both complete PCM identities come from a separate direct public decoder
+on LX6, without the production parser, pending owner or audio pipeline.
+The HE hash is measured across the whole continuous input, including all
+segment boundaries. The controller never concatenates short PCM hashes.
+It requires the expected SHA-256 at the ordered final flush, audio progress
+across a WebUI asset read and the exact asset again after EOF. These are
+same-vendor integration identities, not independent numeric AAC conformance.
+The public configuration follows the
+[Espressif simple-decoder example](https://github.com/espressif/esp-adf-libs/blob/master/esp_audio_codec/test_apps/audio_codec_test/main/simple_decoder_test.c).
+The pinned local AAC header is authoritative for this library revision.
+
+To reproduce the isolated reference, use a fresh campaign and result directory:
+
+```powershell
+& $py -B "$target/aac-reference.py" prepare --campaign .build/aac-reference
+$env:IDF_PATH = "$deps/v6.0.2"
+$env:IDF_TOOLS_PATH = "$deps/tools-v6.0.2"
+$env:AAC_REFERENCE_VENDOR = "$deps/esp-adf-libs/esp_audio_codec"
+$env:IDF_COMPONENT_MANAGER = '0'
+. "$env:IDF_PATH/export.ps1"
+& $py "$env:IDF_PATH/tools/idf.py" -C .build/aac-reference/project -B .build/aac-reference/build -D "SDKCONFIG=$((Resolve-Path .build/aac-reference).Path)/sdkconfig" build
+& $py -B "$target/aac-reference.py" run --campaign .build/aac-reference --qemu $qemu --rom $rom --output .build/aac-reference-run
+```
+
+The reference checks all input bytes, complete PCM geometry and real empty
+EOS drain. Four actual handles close, original encoded bytes stay unchanged,
+and repeated cases restore heap. AAC-Plus off preserves LC and decodes HE
+at its 24 kHz core rate, demonstrating that the full-rate control is active.
+Both idle watchdogs, five-second task watchdog, assertions, canaries and
+light heap poisoning remain enabled. The runner verifies frozen project
+inputs, linked vendor component paths, original archives and ELF identity.
+Its embedded fixtures and flash image remain local under ignored `.build`.
+Compact/private AAC and late SBR/PS transitions remain separate scopes.
+
+For memory diagnosis only, add `'-D','CYD_OPENETH_ALLOCATION_PROBE=ON'`.
+This observes at most 12 public `malloc`/`calloc` requests of at least 32 KiB,
+with free-byte and largest-block snapshots before each call and its real
+success result. ROM printing avoids a logging allocation. The snapshots
+are observations across concurrent tasks, not an atomic heap reservation.
+No request is refused, redirected or retried by this probe. Normal
+production builds do not include it.
+
 For Espressif Vorbis, build with `'-D','CYD_OPENETH_PCM_PROBE=ON'` and
 `'-D','CYD_OPENETH_PCM_SHA256=ON'`, then run with
 `--codec vorbis --through-eof --full-tls-records`. The tracked stereo

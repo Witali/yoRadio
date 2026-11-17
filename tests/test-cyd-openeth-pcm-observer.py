@@ -144,6 +144,21 @@ class PcmObserverTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'Expected a single PCM MD5'):
             self.observe_eof(flush, **args)
 
+    def test_aac_checks_complete_public_reference_and_final_tail(self):
+        for profile in ('lc', 'he'):
+            fixture = probe.aac_fixture(profile)
+            self.assertEqual(fixture['pcm_rate'], 48000)
+            self.assertTrue(probe.uses_pcm_probe('pdm', fixture))
+            sha = fixture['pcm_sha256']
+            flush = f'CYD_OPENETH_PCM_FLUSH frames={fixture["pcm_frames"]} status=0\n'
+            checksum = f'CYD_OPENETH_PCM_SHA256 {sha}\n'
+            args = dict(backend='pdm', codec='aac', pcm_sha256=sha, pcm_frames=fixture['pcm_frames'])
+            self.assertEqual(self.observe_eof(flush + checksum, **args)['pcm_sha256'], sha)
+            for log in (flush, flush + checksum * 2, flush + checksum.replace(sha, '0' * 64),
+                        flush.replace(str(fixture['pcm_frames']), str(fixture['pcm_frames'] - 1)) + checksum):
+                with self.subTest(profile=profile), self.assertRaises(RuntimeError):
+                    self.observe_eof(log, **args)
+
 
 if __name__ == '__main__':
     unittest.main()

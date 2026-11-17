@@ -174,6 +174,52 @@ def helix_mp3_fixture(mono):
                 pcm_md5=None, source_channels=2)
 
 
+def aac_fixture(profile):
+    if profile == 'lc':
+        folder = ROOT / 'tests/fixtures/esp32c3_calibration'
+        filename = 'aac-lc-320.aac'
+        info, = [row for row in json.loads((folder / 'manifest.json').read_bytes())['fixtures']
+                 if row['file'] == filename]
+        repetitions, core_rate = 1, 48000
+    elif profile == 'he':
+        folder = ROOT / 'tests/fixtures/aac_stream_format'
+        filename = 'he-48000-stereo.aac'
+        info = json.loads((folder / 'manifest.json').read_bytes())['files'][filename]
+        repetitions, core_rate = 20, 24000
+    else:
+        raise ValueError('Unknown AAC fixture profile')
+    segment = (folder / filename).read_bytes()
+    if digest(segment) != info['sha256']:
+        raise ValueError('AAC source differs from its fixture manifest')
+    at, adts_frames = 0, 0
+    rates = (96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
+             16000, 12000, 11025, 8000, 7350)
+    while at < len(segment):
+        head = segment[at:at + 7]
+        if len(head) != 7 or head[0] != 255 or head[1] & 246 != 240:
+            raise ValueError('Incomplete AAC fixture ADTS header')
+        rate_index = (head[2] >> 2) & 15
+        channels = ((head[2] & 1) << 2) | (head[3] >> 6)
+        size = ((head[3] & 3) << 11) | (head[4] << 3) | (head[5] >> 5)
+        if (rate_index >= len(rates) or rates[rate_index] != core_rate or channels != 2 or
+                size < (7 if head[1] & 1 else 9) or size > len(segment) - at or head[6] & 3):
+            raise ValueError('Unexpected AAC fixture ADTS geometry')
+        at += size
+        adts_frames += 1
+    if not adts_frames:
+        raise ValueError('Empty AAC fixture')
+    frames = adts_frames * repetitions * 1024 * (48000 // core_rate)
+    # Measured from complete direct-public LX6 reference decoding; never
+    # concatenate the short segment's PCM digests to construct this identity.
+    reference = {'lc': '95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0',
+                 'he': '44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362'}
+    return dict(data=segment * repetitions, seconds=frames / 48000, codec='aac', mime='audio/aac',
+                pcm_frames=frames, pcm_channels=2, pcm_rate=48000, pcm_md5=None,
+                pcm_sha256=reference[profile], aac_profile=profile,
+                adts_frames=adts_frames * repetitions, core_rate=core_rate,
+                source_sha256=info['sha256'], repetitions=repetitions)
+
+
 def ogg_page(header, crc, sequence, flags, granule, laces, body):
     if len(laces) > 255 or sum(laces) != len(body):
         raise ValueError('Invalid lacing for the Ogg fixture')
@@ -650,7 +696,7 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
     pcm_probe = uses_pcm_probe(backend, fixture)
     reclaim = 'input_reclaim_pcm_reference' in report
     overlap = web_socket is not None
-    name = {'opus': 'Opus', 'vorbis': 'Vorbis', 'flac': 'FLAC', 'mp3': 'MP3'}[codec]
+    name = {'opus': 'Opus', 'vorbis': 'Vorbis', 'flac': 'FLAC', 'mp3': 'MP3', 'aac': 'AAC'}[codec]
     status_codec = 'OGG' if codec in ('opus', 'vorbis') else name
     start_station(port)
     until = time.monotonic() + 40
@@ -659,11 +705,14 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
         if FATAL.search(uart) or guest.poll() is not None:
             raise RuntimeError('Guest stopped or logged a failure during playback')
         status = json.loads(request(port, '/api/native/status'))
+        if codec == 'aac' and status['audio'] and status['codec'] == 'AAC' and 'aac_first_pcm' not in report:
+            report['aac_first_pcm'] = {key: status[key] for key in
+                                      ('codec', 'format', 'pcm_sample_rate_hz', 'pcm_channels')}
         if ((not reclaim or RECLAIM_EVENT.search(uart))
                 and (not overlap or TLS_OVERLAP.search(uart))
                 and status['audio'] and status['codec'] == status_codec
                 and ('source_channels' not in fixture or status['channels'] == fixture['source_channels'])
-                and status['pcm_sample_rate_hz'] == 48000
+                and status['pcm_sample_rate_hz'] == fixture.get('pcm_rate', 48000)
                 and status['pcm_channels'] == fixture['pcm_channels']):
             first = sample(port)
             report['first_active_health'] = first
@@ -735,8 +784,10 @@ def main():
     parser.add_argument('--rom', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--tls-material', type=Path, help='Local disposable CA and server certificate/key directory')
-    parser.add_argument('--codec', choices=('opus', 'vorbis', 'flac', 'mp3'), default='opus',
+    parser.add_argument('--codec', choices=('opus', 'vorbis', 'flac', 'mp3', 'aac'), default='opus',
                         help='Select the TLS audio fixture (default: opus)')
+    parser.add_argument('--aac-profile', choices=('he', 'lc'), default='he',
+                        help='AAC fixture profile; requires --codec aac (default: he)')
     parser.add_argument('--opus-family1', type=Path,
                         help='Use a manifest from prepare-opus-family1.py instead of stereo Opus')
     parser.add_argument('--expect-channel-limit', action='store_true',
@@ -782,6 +833,9 @@ def main():
         parser.error('--codec vorbis requires --through-eof and the PCM SHA-256 probe')
     if args.codec == 'mp3' and not (args.through_eof and config.get('YORADIO_MP3_DECODER_HELIX')):
         parser.error('--codec mp3 requires Helix, --through-eof and the PCM MD5 probe')
+    if args.codec == 'aac' and not (args.through_eof and config.get('YORADIO_AAC_DECODER_ESPRESSIF')
+                                   and config.get('YORADIO_AAC_PLUS')):
+        parser.error('--codec aac requires public Espressif AAC-Plus, --through-eof and the PCM SHA-256 probe')
     if args.opus_family1 and (args.codec != 'opus' or not (args.through_eof or args.expect_channel_limit)):
         parser.error('--opus-family1 requires Opus and an EOF or channel limit check')
     stereo_only = config.get('YORADIO_AUDIO_STEREO_ONLY', False)
@@ -818,6 +872,8 @@ def main():
     if material:
         if args.codec == 'mp3':
             fixture = helix_mp3_fixture(config.get('YORADIO_AUDIO_MONO', False))
+        elif args.codec == 'aac':
+            fixture = aac_fixture(args.aac_profile)
         else:
             fixture = family1_fixture(args.opus_family1) if args.opus_family1 else station_fixture(args.codec)
     repaging = shorten_opus_pages(fixture) if args.short_opus_pages else None
@@ -867,6 +923,11 @@ def main():
         report['opus_repaging'] = repaging
     if flac_decoder is not None:
         report['flac_decoder'] = flac_decoder
+    if args.codec == 'aac':
+        report['aac_fixture'] = {key: fixture[key] for key in ('aac_profile', 'adts_frames', 'core_rate',
+            'pcm_rate', 'pcm_channels', 'pcm_frames', 'pcm_sha256', 'source_sha256', 'repetitions')}
+        report['aac_fixture']['input_bytes'] = len(fixture['data'])
+        report['aac_fixture']['input_sha256'] = digest(fixture['data'])
     if args.opus_family1:
         report['opus_family1'] = fixture['family1']
 
