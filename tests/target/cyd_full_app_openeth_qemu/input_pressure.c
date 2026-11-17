@@ -13,6 +13,10 @@ enum { PRESSURE_BLOCK_BYTES = 1024, PRESSURE_MAX_BLOCKS = 96, TLS_REQUEST_BYTES 
 
 static atomic_bool s_playing;
 
+#ifdef CYD_OPENETH_TLS_OVERLAP_PROBE
+unsigned cyd_openeth_heap_rx_owners(void);
+#endif
+
 void cyd_openeth_note_playback(void) {
     atomic_store(&s_playing, true);
 }
@@ -20,6 +24,10 @@ void cyd_openeth_note_playback(void) {
 static void probe_input_reclaim(void) {
     static bool attempted;
     if (attempted) return;
+#ifdef CYD_OPENETH_TLS_OVERLAP_PROBE
+    unsigned heap_rx_before = cyd_openeth_heap_rx_owners();
+    if (heap_rx_before != 1) return;
+#endif
     native_input_health_t before = audio_service_input_health();
     if (before.resident <= before.minimum ||
         before.ready + before.reading + before.writing >= before.resident) {
@@ -43,6 +51,9 @@ static void probe_input_reclaim(void) {
     before = audio_service_input_health();
     void *recovered = largest < TLS_REQUEST_BYTES ? mbedtls_calloc(1, TLS_REQUEST_BYTES) : NULL;
     native_input_health_t after = audio_service_input_health();
+#ifdef CYD_OPENETH_TLS_OVERLAP_PROBE
+    unsigned heap_rx_after = cyd_openeth_heap_rx_owners();
+#endif
     bool success = recovered != NULL;
     mbedtls_free(recovered);
     while (held) heap_caps_free(blocks[--held]);
@@ -53,6 +64,10 @@ static void probe_input_reclaim(void) {
            " released_after=%" PRIu32 " caps=%" PRIu32 "\n",
            (unsigned)TLS_REQUEST_BYTES, largest, (unsigned)success, before.resident, after.resident,
            before.minimum, before.target - before.minimum, before.released, after.released, caps);
+#ifdef CYD_OPENETH_TLS_OVERLAP_PROBE
+    printf("CYD_OPENETH_TLS_OVERLAP heap_rx_before=%u heap_rx_after=%u\n",
+           heap_rx_before, heap_rx_after);
+#endif
 }
 
 int __real_esp_http_client_read(esp_http_client_handle_t, char *, int);

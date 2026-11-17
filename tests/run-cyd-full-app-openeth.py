@@ -7,8 +7,10 @@ import json
 import os
 from pathlib import Path
 import re
+import runpy
 import shlex
 import socket
+import ssl
 import subprocess
 import sys
 import time
@@ -22,6 +24,8 @@ OPUS_OPEN = re.compile(r'^CYD_OPENETH_OPUS_OPEN channels=(\d+) result=(-?\d+) fr
                        r'remaining=(\d+) remaining_largest=(\d+)$', re.M)
 TLS_RX_EVENT = re.compile(r'^CYD_OPENETH_TLS_RX (loan|return)$', re.M)
 RECLAIM_EVENT = re.compile(r'^CYD_OPENETH_RECLAIM ([a-z0-9_= ]+)$', re.M)
+TLS_OVERLAP = re.compile(r'^CYD_OPENETH_TLS_OVERLAP heap_rx_before=(\d+) heap_rx_after=(\d+)$', re.M)
+HEAP_RX_EVENT = re.compile(r'^CYD_OPENETH_TLS_HEAP_RX (loan|return)$', re.M)
 # The pinned Opus fixture's EOS granule 528312 minus pre-skip 312 gives
 # 528000 mono output samples. PDM pads to 512-sample writes and counts the
 # 704 bias samples written after DMA preload, at two bytes per sample.
@@ -68,7 +72,12 @@ def flash_parts(build):
 
 
 def request(port, uri, method='GET', *, timeout=8):
-    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=timeout)
+    persistent = isinstance(port, http.client.HTTPSConnection)
+    connection = port if persistent else http.client.HTTPConnection('127.0.0.1', port, timeout=timeout)
+    if persistent:
+        connection.timeout = timeout
+        if connection.sock:
+            connection.sock.settimeout(timeout)
     try:
         connection.request(method, uri)
         response = connection.getresponse()
@@ -79,7 +88,8 @@ def request(port, uri, method='GET', *, timeout=8):
     except TimeoutError as error:
         raise TimeoutError(f'{method} {uri} timed out') from error
     finally:
-        connection.close()
+        if not persistent:
+            connection.close()
 
 
 def sample(port):
@@ -142,6 +152,40 @@ def station_fixture(codec):
     frames, md5 = flac_streaminfo(data) if codec == 'flac' else (OPUS_EOF_PCM_FRAMES, None)
     return dict(data=data, seconds=frames / 48000, codec=codec, mime=mime,
                 pcm_frames=frames, pcm_channels=2, pcm_md5=md5)
+
+
+def shorten_opus_pages(fixture):
+    original = fixture['data']
+    reader = runpy.run_path(str(ROOT / 'tests/fixtures/opus_header_gain/generate.py'))
+    parse, crc = reader['parse'], reader['crc']
+    pages, packets = parse(original)
+    audio = packets[2:]
+    final = int.from_bytes(original[pages[-1]['offset'] + 6:pages[-1]['offset'] + 14], 'little')
+    # This pinned fixture contains 551 audio packets of 960 samples each.
+    if len(audio) != 551 or final != 528312:
+        raise ValueError('Unexpected source for the short-page Opus fixture')
+    result = [original[:pages[1]['end']]]
+    for first in range(0, len(audio), 8):
+        group = audio[first:first + 8]
+        finished = first + len(group)
+        eos = finished == len(audio)
+        lace = bytes(n for packet in group for n in [255] * (len(packet) // 255) + [len(packet) % 255])
+        page = bytearray(original[:27])
+        page[5] = 4 if eos else 0
+        page[6:14] = (final if eos else finished * 960).to_bytes(8, 'little')
+        page[18:22] = (first // 8 + 2).to_bytes(4, 'little')
+        page[22:26] = bytes(4)
+        page[26] = len(lace)
+        page += lace + b''.join(group)
+        page[22:26] = crc(page).to_bytes(4, 'little')
+        result.append(page)
+    body = b''.join(result)
+    shorter, copied = parse(body)
+    if copied != packets:
+        raise ValueError('Ogg repaging altered the original packets')
+    fixture['data'] = body
+    return dict(sha256=digest(body), pages=len(shorter),
+                largest_page=max(page['end'] - page['offset'] for page in shorter))
 
 
 def family1_fixture(manifest):
@@ -241,7 +285,7 @@ def require_family1_metrics(uart, reference_metrics):
     return [dict(energy=energy, crossings=crossings) for energy, crossings in measured]
 
 
-def observe_eof(port, server, event, guest, log_path, generation, report):
+def observe_eof(port, server, event, guest, log_path, generation, report, web_socket=None):
     backend = report['audio_backend']
     fixture = server.fixtures['station']
     # The legacy driver emits x16 stereo words. The model caps the DAC clock
@@ -293,6 +337,10 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
     report['observed'] += ['complete TLS response', 'ordered EOF with exact output count']
     if any(driver[key] for key in ('errors', 'timeouts', 'short_writes', 'saturated')):
         raise RuntimeError('Unexpected audio driver fault after EOF')
+    if web_socket is not None:
+        if port.sock is not web_socket:
+            raise RuntimeError('WebUI TLS socket changed during the overlap run')
+        report['web_tls_connection_preserved'] = True
     report['web_asset_after_eof'] = check_asset(port)
     report['observed'].append('WebUI after EOF')
     reference_md5 = report.get('input_reclaim_pcm_reference')
@@ -310,6 +358,17 @@ def observe_eof(port, server, event, guest, log_path, generation, report):
         report['observed'] += ['identical PCM after input reclaim', 'static RX returned at EOF']
     else:
         require_clean_health(final)
+    if web_socket is not None:
+        def web_rx_returned(uart):
+            activity = HEAP_RX_EVENT.findall(uart)
+            loans = 0
+            for event in activity:
+                loans += 1 if event == 'loan' else -1
+                if loans < 0:
+                    raise RuntimeError('Unmatched HTTPS RX release')
+            return len(activity) // 2 if activity and loans == 0 else None
+        report['web_heap_rx_releases'] = wait_for_observation(
+            guest, log_path, web_rx_returned, 'HTTPS RX release after the final static response', timeout=15)
 
 
 def start_station(port):
@@ -487,12 +546,13 @@ def observe_input_reclaim(health, uart):
     return proof
 
 
-def observe_playback(port, server, guest, log_path, report, through_eof):
+def observe_playback(port, server, guest, log_path, report, through_eof, web_socket=None):
     backend = report['audio_backend']
     fixture = server.fixtures['station']
     codec = fixture['codec']
     pcm_probe = uses_pcm_probe(backend, fixture)
     reclaim = 'input_reclaim_pcm_reference' in report
+    overlap = web_socket is not None
     status_codec = {'opus': 'OGG', 'flac': 'FLAC'}[codec]
     start_station(port)
     until = time.monotonic() + 40
@@ -502,6 +562,7 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
             raise RuntimeError('Guest stopped or logged a failure during playback')
         status = json.loads(request(port, '/api/native/status'))
         if ((not reclaim or RECLAIM_EVENT.search(uart))
+                and (not overlap or TLS_OVERLAP.search(uart))
                 and status['audio'] and status['codec'] == status_codec and
                 status['pcm_sample_rate_hz'] == 48000 and status['pcm_channels'] == fixture['pcm_channels']):
             first = sample(port)
@@ -515,8 +576,21 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
     if reclaim:
         report['input_reclaim_pressure'] = observe_input_reclaim(first, uart)
         report['observed'].append('failed Mbed TLS allocation recovered through idle-slot release')
+    if overlap:
+        if TLS_OVERLAP.findall(uart) != [('1', '1')]:
+            raise RuntimeError('Expected one ordinary TLS RX buffer alongside the reserved radio RX')
+        report['tls_overlap'] = {'heap_rx_before': 1, 'heap_rx_after': 1}
+        report['observed'].append('allocator recovery with radio TLS and WebUI HTTPS both live')
     report['playing_health'] = [first]
-    report['web_asset_during_playback'] = check_asset(port)
+    if overlap:
+        # The static asset route deliberately closes its connection. Use a
+        # regular WebUI API response before checking EOF on this same socket.
+        capabilities = json.loads(request(port, '/api/native/capabilities'))
+        if capabilities['firmware'] != 'esp32-cyd2usb-native' or not capabilities['radio']:
+            raise RuntimeError('Expected the real WebUI capabilities over HTTPS')
+        report['https_capabilities_during_playback'] = True
+    else:
+        report['web_asset_during_playback'] = check_asset(port)
     end = time.monotonic() + 5
     while time.monotonic() < end:
         if FATAL.search(guest_log(log_path)) or guest.poll() is not None:
@@ -541,13 +615,13 @@ def observe_playback(port, server, guest, log_path, report, through_eof):
     if pcm_probe:
         report['pcm_progress_during_webui'] = [initial, after]
     report['observed'] += [f'{"Opus" if codec == "opus" else "FLAC"} audio over verified TLS',
-                           'audio progress across WebUI asset read']
+                           'audio progress across HTTPS WebUI API' if overlap else 'audio progress across WebUI asset read']
     if not through_eof:
         request(port, '/api/native/radio?action=stop', 'POST')
     if through_eof:
         if report['health'][-1]['output_driver']['writes'] != 0:
             raise RuntimeError('EOF check requires an idle driver before Play')
-        observe_eof(port, server, events[0], guest, log_path, status['generation'], report)
+        observe_eof(port, server, events[0], guest, log_path, status['generation'], report, web_socket)
     require_clean_health(first, expected_allocation_failures=int(reclaim))
     require_clean_health(second, expected_allocation_failures=int(reclaim))
 
@@ -573,6 +647,10 @@ def main():
                         help='Check TLS RX reuse and failed/successful OTA during playback in disposable QEMU')
     parser.add_argument('--expect-input-reclaim', metavar='PCM_MD5',
                         help='Verify a recovered allocation and match PCM to the no-pressure control')
+    parser.add_argument('--web-https-fixture', type=Path,
+                        help='Stage the local diagnostic HTTPS NVS and hold one verified WebUI connection')
+    parser.add_argument('--short-opus-pages', action='store_true',
+                        help='Use eight original Opus packets per page for the HTTPS overlap fixture')
     args = parser.parse_args()
     build, qemu, rom = (path.resolve(strict=True) for path in (args.build, args.qemu, args.rom))
     output = args.output.resolve()
@@ -614,6 +692,11 @@ def main():
             and config.get('YORADIO_TLS_STATIC_RX_RESERVE') and config.get('YORADIO_TLS_INPUT_RECLAIM')
             and re.fullmatch(r'[0-9a-f]{32}', args.expect_input_reclaim)):
         parser.error('--expect-input-reclaim requires the TLS RX and reclaim probes, PDM, full stereo Opus and a PCM MD5')
+    web_https = args.web_https_fixture.resolve(strict=True) if args.web_https_fixture else None
+    if web_https is not None and (not args.expect_input_reclaim or not web_https.is_relative_to(ROOT / '.build')):
+        parser.error('--web-https-fixture requires the local fixture and --expect-input-reclaim')
+    if args.short_opus_pages and not web_https:
+        parser.error('--short-opus-pages requires the HTTPS overlap fixture')
     flac_decoder = None
     if args.codec == 'flac':
         decoders = [name for name in ('ESPRESSIF', 'CUSTOM') if config.get('YORADIO_FLAC_DECODER_' + name)]
@@ -623,12 +706,20 @@ def main():
     fixture = None
     if material:
         fixture = family1_fixture(args.opus_family1) if args.opus_family1 else station_fixture(args.codec)
+    repaging = shorten_opus_pages(fixture) if args.short_opus_pages else None
     flash, parts = flash_parts(build)
+    if web_https:
+        nvs = (web_https / 'nvs.bin').read_bytes()
+        if len(nvs) != 0x5000 or flash[0x9000:0xe000] != b'\xff' * len(nvs):
+            raise ValueError('Expected the erased 20 KiB NVS layout')
+        flash[0x9000:0xe000] = nvs
+        parts.append(dict(file='diagnostic-web-nvs', offset=0x9000, bytes=len(nvs), sha256=digest(nvs)))
     output.mkdir(parents=True)
     flash_path = output / 'qemu-flash.bin'
     flash_path.write_bytes(flash)
     flash_sha = digest(flash)
     web_port = local_port()
+    web_guest_port = 443 if web_https else 80
     machine = 'esp32,st7789=on,audiodev=quiet'
     if backend == 'dac':
         machine += ',dac-rate=48000'
@@ -637,7 +728,8 @@ def main():
     command = [str(qemu), '-global', 'driver=ssi.esp32.spi,property=input-delay-ns,value=25',
                '-audiodev', 'none,id=quiet', '-M', machine, '-smp', '2',
                '-L', str(rom), '-display', 'none', '-monitor', 'none', '-serial', 'stdio',
-               '-no-reboot', '-snapshot', '-nic', f'user,model=open_eth,restrict=on,hostfwd=tcp:127.0.0.1:{web_port}-:80',
+               '-no-reboot', '-snapshot', '-nic',
+               f'user,model=open_eth,restrict=on,hostfwd=tcp:127.0.0.1:{web_port}-:{web_guest_port}',
                '-drive', f'file={str(flash_path).replace(",", ",,")},if=mtd,format=raw']
     if args.radio_ota_lifecycle:
         command.remove('-no-reboot')
@@ -655,6 +747,8 @@ def main():
         report['tls_application_payload_lengths'] = []
     if args.expect_input_reclaim is not None:
         report['input_reclaim_pcm_reference'] = args.expect_input_reclaim
+    if repaging:
+        report['opus_repaging'] = repaging
     if flac_decoder is not None:
         report['flac_decoder'] = flac_decoder
     if args.opus_family1:
@@ -668,6 +762,14 @@ def main():
     server = None
     stack = ExitStack()
     try:
+        web = web_port
+        if web_https:
+            context = ssl.create_default_context(cafile=str(web_https / 'ca.pem'))
+            context.minimum_version = context.maximum_version = ssl.TLSVersion.TLSv1_2
+            context.set_ecdh_curve('prime256v1')
+            web = http.client.HTTPSConnection('127.0.0.1', web_port, context=context)
+            stack.callback(web.close)
+        web_protocol = 'HTTPS' if web_https else 'HTTP'
         if material:
             server = stack.enter_context(tls_station(material, fixture,
                                                      report.get('tls_application_payload_lengths')))
@@ -701,9 +803,9 @@ def main():
                 uart = guest_log(log_path)
                 if FATAL.search(uart) or guest.poll() is not None:
                     raise RuntimeError('Guest stopped or logged a startup failure')
-                if 'CYD_OPENETH_READY' in uart and 'Native HTTP server started' in uart:
+                if 'CYD_OPENETH_READY' in uart and f'Native {web_protocol} server started' in uart:
                     try:
-                        first = sample(web_port)
+                        first = sample(web)
                     except (OSError, http.client.HTTPException):
                         time.sleep(0.2)
                         continue
@@ -716,29 +818,39 @@ def main():
             report['health'] = [first]
             save()
             require_clean_health(first)
-            asset = check_asset(web_port)
-            second = sample(web_port)
+            asset = None if web_https else check_asset(web)
+            second = sample(web)
+            verified_socket = web.sock if web_https else None
+            if web_https:
+                if not verified_socket or verified_socket.version() != 'TLSv1.2':
+                    raise RuntimeError('Expected the provisioned WebUI to keep a verified TLS 1.2 session')
+                report['web_tls_version'] = verified_socket.version()
             if second['uptime_ms'] < first['uptime_ms']:
                 raise RuntimeError('Guest reset between the resource samples')
-            report.update(health=[first, second], web_asset=asset,
-                          observed=['ST7789', 'OpenETH IPv4', 'audio tasks', 'HTTP health', 'SPIFFS WebUI asset'])
+            report.update(health=[first, second],
+                          observed=['ST7789', 'OpenETH IPv4', 'audio tasks', f'{web_protocol} health'])
+            if asset:
+                report['web_asset'] = asset
+                report['observed'].append('SPIFFS WebUI asset')
             save()
             require_clean_health(second)
             if server:
                 try:
                     if args.expect_channel_limit:
-                        observe_channel_rejection(web_port, server, guest, log_path, report)
+                        observe_channel_rejection(web, server, guest, log_path, report)
                     elif args.radio_ota_lifecycle:
                         application, = [part for part in parts if part['offset'] == 0x10000]
                         start = application['offset']
                         image = bytes(flash[start:start + application['bytes']])
-                        observe_radio_ota_lifecycle(web_port, server, guest, log_path, report, image)
+                        observe_radio_ota_lifecycle(web, server, guest, log_path, report, image)
+                    elif web_https:
+                        observe_playback(web, server, guest, log_path, report, args.through_eof, verified_socket)
                     else:
-                        observe_playback(web_port, server, guest, log_path, report, args.through_eof)
+                        observe_playback(web, server, guest, log_path, report, args.through_eof)
                 except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):
                     if guest.poll() is None:
                         try:
-                            report['last_reachable_health'] = sample(web_port)
+                            report['last_reachable_health'] = sample(web)
                         except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):
                             pass
                     raise

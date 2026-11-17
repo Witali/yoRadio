@@ -8,7 +8,7 @@ import re
 ROOT = Path(__file__).resolve().parents[3]
 
 
-def write_local_ca(output):
+def write_local_ca(output, address='10.0.2.100'):
     from cryptography import x509
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import rsa
@@ -30,9 +30,9 @@ def write_local_ca(output):
           .add_extension(x509.BasicConstraints(ca=True, path_length=0), critical=True)
           .sign(ca_key, hashes.SHA256()))
     server_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    server = (certificate(name('10.0.2.100'), ca_name, server_key)
+    server = (certificate(name(address), ca_name, server_key)
               .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)
-              .add_extension(x509.SubjectAlternativeName([x509.IPAddress(ipaddress.ip_address('10.0.2.100'))]), critical=False)
+              .add_extension(x509.SubjectAlternativeName([x509.IPAddress(ipaddress.ip_address(address))]), critical=False)
               .add_extension(x509.ExtendedKeyUsage([ExtendedKeyUsageOID.SERVER_AUTH]), critical=False)
               .sign(ca_key, hashes.SHA256()))
     (output / 'ca.pem').write_bytes(ca.public_bytes(serialization.Encoding.PEM))

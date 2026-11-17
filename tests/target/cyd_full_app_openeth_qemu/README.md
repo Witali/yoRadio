@@ -132,6 +132,28 @@ a successful retry through bounded idle-slot release, a live static RX loan, byt
 PCM and working WebUI through EOF.
 [Probe](input_pressure.c)
 
+## Radio TLS and HTTPS WebUI under pressure
+
+Build the reclaim profile above with
+`'-D','CYD_OPENETH_TLS_OVERLAP_PROBE=ON'`. Prepare the disposable WebUI
+identity using the ESP-IDF 6.0.2 NVS generator.
+
+```powershell
+& $py -B "$target/prepare-https.py" --nvsgen "$deps/v6.0.2/components/nvs_flash/nvs_partition_generator/nvs_partition_gen.py" --output .build/openeth-https
+```
+
+Add `--web-https-fixture .build/openeth-https` to the full-record
+input-reclaim run. The controller holds one verified TLS 1.2/P-256
+connection to the production WebUI. It requires one heap RX buffer at
+the allocator retry, a live static radio RX loan, working API requests
+while PCM advances, and the exact static asset at EOF. The static route
+closes its connection after the asset. The test waits for the heap RX
+release before exiting.
+
+Use `--short-opus-pages` for the paired run with eight original Opus
+packets per page. The packet bytes, headers and final granule are
+preserved. The original page layout is the default.
+
 ## Other playback fixtures
 
 For a matched FLAC comparison, use two copies of the same TLS diagnostic

@@ -316,8 +316,14 @@ observed a failed 1,536-byte Mbed TLS allocation and a successful retry
 after the production pool freed one idle slot. The radio retained the
 static RX loan and produced the same PCM as the control. The follow-up
 also exercised the elapsed-time Ogg decoder budget after two IDLE1
-watchdog events in earlier runs. Concurrent TLS clients under pressure
-in the full application and physical Wi-Fi remain open.
+watchdog events in earlier runs.
+
+The [concurrent HTTPS run](../tests/results/cyd-tls-overlap-20261117/README.md)
+kept the radio's static RX and the WebUI's heap RX live through that
+retry. A shorter Ogg page layout completed with the exact control PCM
+and a WebUI asset read on the same HTTPS connection after EOF. The
+original page layout failed on a 26,504-byte allocation during the
+decoder call. That layout and physical Wi-Fi still require qualification.
 
 ## Actual TLS traffic in isolated SDK/QEMU
 
