@@ -154,6 +154,18 @@ def station_fixture(codec):
                 pcm_frames=frames, pcm_channels=2, pcm_md5=md5)
 
 
+def helix_mp3_fixture(mono):
+    segment = (ROOT / 'tests/fixtures/helix_mono/mpeg1.mp3').read_bytes()
+    if digest(segment) != 'd26ac21143727b0cd9305413748ebf95954e3c93b7e647f384c508f06c26ee35':
+        raise ValueError('Unexpected 48 kHz Helix M/S test segment')
+    # 18 MPEG-1 Layer III frames per segment with 1152 samples each.
+    repetitions = 28
+    frames = repetitions * 18 * 1152
+    return dict(data=segment * repetitions, seconds=frames / 48000, codec='mp3',
+                mime='audio/mpeg', pcm_frames=frames, pcm_channels=1 if mono else 2,
+                pcm_md5=None, source_channels=2)
+
+
 def shorten_opus_pages(fixture):
     original = fixture['data']
     reader = runpy.run_path(str(ROOT / 'tests/fixtures/opus_header_gain/generate.py'))
@@ -329,10 +341,12 @@ def observe_eof(port, server, event, guest, log_path, generation, report, web_so
             raise RuntimeError('Incomplete driver writes after EOF')
         if 'family1' in fixture:
             report['family1_pcm_metrics'] = require_family1_metrics(uart, fixture['family1']['metrics'])
-        elif fixture['pcm_md5'] is not None:
+        elif fixture['pcm_md5'] is not None or fixture['codec'] == 'mp3':
             pcm_digests = re.findall(r'^CYD_OPENETH_PCM_MD5 ([0-9a-f]{32})\s*$', uart, re.M)
-            if pcm_digests != [fixture['pcm_md5']]:
+            if fixture['pcm_md5'] is not None and pcm_digests != [fixture['pcm_md5']]:
                 raise RuntimeError('Decoded PCM differs from FLAC STREAMINFO MD5')
+            if len(pcm_digests) != 1:
+                raise RuntimeError('Expected a single PCM MD5 after EOF')
             report['pcm_md5'] = pcm_digests[0]
     report['observed'] += ['complete TLS response', 'ordered EOF with exact output count']
     if any(driver[key] for key in ('errors', 'timeouts', 'short_writes', 'saturated')):
@@ -553,7 +567,8 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
     pcm_probe = uses_pcm_probe(backend, fixture)
     reclaim = 'input_reclaim_pcm_reference' in report
     overlap = web_socket is not None
-    status_codec = {'opus': 'OGG', 'flac': 'FLAC'}[codec]
+    name = {'opus': 'Opus', 'flac': 'FLAC', 'mp3': 'MP3'}[codec]
+    status_codec = 'OGG' if codec == 'opus' else name
     start_station(port)
     until = time.monotonic() + 40
     while time.monotonic() < until:
@@ -563,8 +578,10 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
         status = json.loads(request(port, '/api/native/status'))
         if ((not reclaim or RECLAIM_EVENT.search(uart))
                 and (not overlap or TLS_OVERLAP.search(uart))
-                and status['audio'] and status['codec'] == status_codec and
-                status['pcm_sample_rate_hz'] == 48000 and status['pcm_channels'] == fixture['pcm_channels']):
+                and status['audio'] and status['codec'] == status_codec
+                and ('source_channels' not in fixture or status['channels'] == fixture['source_channels'])
+                and status['pcm_sample_rate_hz'] == 48000
+                and status['pcm_channels'] == fixture['pcm_channels']):
             first = sample(port)
             report['first_active_health'] = first
             initial = output_progress(first, uart, pcm_probe)
@@ -612,9 +629,11 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
     report['playing_health'].append(second)
     report['tls_peer'] = {key: events[0][key] for key in ('tls_version', 'tls_cipher', 'sent')}
     report['playback'] = {key: status[key] for key in ('codec', 'format', 'pcm_sample_rate_hz', 'pcm_channels')}
+    if 'source_channels' in fixture:
+        report['playback']['channels'] = status['channels']
     if pcm_probe:
         report['pcm_progress_during_webui'] = [initial, after]
-    report['observed'] += [f'{"Opus" if codec == "opus" else "FLAC"} audio over verified TLS',
+    report['observed'] += [f'{name} audio over verified TLS',
                            'audio progress across HTTPS WebUI API' if overlap else 'audio progress across WebUI asset read']
     if not through_eof:
         request(port, '/api/native/radio?action=stop', 'POST')
@@ -633,7 +652,7 @@ def main():
     parser.add_argument('--rom', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--tls-material', type=Path, help='Local disposable CA and server certificate/key directory')
-    parser.add_argument('--codec', choices=('opus', 'flac'), default='opus',
+    parser.add_argument('--codec', choices=('opus', 'flac', 'mp3'), default='opus',
                         help='Select the TLS audio fixture (default: opus)')
     parser.add_argument('--opus-family1', type=Path,
                         help='Use a manifest from prepare-opus-family1.py instead of stereo Opus')
@@ -673,6 +692,8 @@ def main():
         parser.error('Opus --through-eof requires the Ogg timeline')
     if args.codec == 'flac' and not args.through_eof:
         parser.error('--codec flac requires --through-eof and the PCM MD5 probe')
+    if args.codec == 'mp3' and not (args.through_eof and config.get('YORADIO_MP3_DECODER_HELIX')):
+        parser.error('--codec mp3 requires Helix, --through-eof and the PCM MD5 probe')
     if args.opus_family1 and (args.codec != 'opus' or not (args.through_eof or args.expect_channel_limit)):
         parser.error('--opus-family1 requires Opus and an EOF or channel limit check')
     stereo_only = config.get('YORADIO_AUDIO_STEREO_ONLY', False)
@@ -705,7 +726,10 @@ def main():
         flac_decoder = decoders[0].lower()
     fixture = None
     if material:
-        fixture = family1_fixture(args.opus_family1) if args.opus_family1 else station_fixture(args.codec)
+        if args.codec == 'mp3':
+            fixture = helix_mp3_fixture(config.get('YORADIO_AUDIO_MONO', False))
+        else:
+            fixture = family1_fixture(args.opus_family1) if args.opus_family1 else station_fixture(args.codec)
     repaging = shorten_opus_pages(fixture) if args.short_opus_pages else None
     flash, parts = flash_parts(build)
     if web_https:

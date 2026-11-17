@@ -31,6 +31,16 @@ menu "yoRadio native firmware"
             exposes the channel count. Reject wider PCM at the output of all
             codecs. Disable this option for experimental multichannel playback.
 
+    config YORADIO_AUDIO_MONO
+        bool "Decode MP3 directly to mono with Helix"
+        depends on YORADIO_MP3_DECODER_HELIX
+        default n
+        help
+            Accept both mono and stereo MP3 and emit one PCM channel. For
+            compatible mid/side stereo granules, skip decoding the side
+            spectrum. Other stereo modes still decode both spectra as needed.
+            The output stage cannot apply balance to MP3 decoded this way.
+
     config YORADIO_NATIVE_WEB
         bool
         default y

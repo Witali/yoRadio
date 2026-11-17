@@ -74,7 +74,7 @@ esp_err_t __wrap_native_audio_output_write_pcm(const uint8_t *data, size_t size,
     if (result != ESP_OK || bits != 16 || !frame_bytes || size % frame_bytes) {
         return result;
     }
-    if (channels != 2) {
+    if (channels > 2) {
 #ifdef CYD_OPENETH_PCM_CHANNEL_METRICS
         if (!measure_channels(data, size, channels)) {
             return result;

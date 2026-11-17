@@ -156,6 +156,22 @@ preserved. The original page layout is the default.
 
 ## Other playback fixtures
 
+For Helix MP3, use `--codec mp3 --through-eof` with the PCM and PCM MD5
+probes and `CONFIG_YORADIO_MP3_DECODER_HELIX=y`. Compare builds with
+`CONFIG_YORADIO_AUDIO_MONO` enabled and disabled. The fixture repeats a
+48 kHz stereo MP3 segment containing M/S frames. The controller checks
+stereo source metadata, the configured PCM channel count, the exact frame count
+at EOF and a subsequent WebUI asset request. It records the MD5 of decoded
+PCM accepted by the backend.
+
+On ESP-IDF 6.0.2 with PDM, both Helix builds consumed all 193,536 MP3 bytes
+and delivered 580,608 PCM frames through EOF. Status reported two source
+channels in both builds, with one PCM channel in the mono build and two in
+the stereo build. The WebUI served the exact JavaScript asset after EOF in
+both runs with zero allocation failures. The
+[Helix host regressions](../../esp8266-helix-golden.test.js) check the
+skipped M/S work, fallback modes and overlap state.
+
 For a matched FLAC comparison, use two copies of the same TLS diagnostic
 configuration and local CA. Select `CONFIG_YORADIO_FLAC_DECODER_ESPRESSIF`
 in the first and `CONFIG_YORADIO_FLAC_DECODER_CUSTOM` in the second. Use

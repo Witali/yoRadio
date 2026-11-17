@@ -69,6 +69,17 @@ Supported decoder selections are `auto`, `mp3`, `aac`, `flac`, `ogg`,
 MP3 uses Espressif `esp_audio_codec` by default. yoRadio Helix MP3 and
 minimp3 remain compile-time alternatives in `menuconfig` for diagnostics and
 are not exposed as a WebUI setting.
+
+For direct mono MP3 decoding, select `CONFIG_YORADIO_MP3_DECODER_HELIX=y`
+and enable `CONFIG_YORADIO_AUDIO_MONO=y`. The Helix decoder accepts mono
+and stereo sources and emits one PCM channel. For compatible M/S
+granules it can skip the side spectrum while keeping the bit reservoir in
+sync. Helix uses its full stereo path for independent stereo and intensity
+stereo. Status reports source and PCM channels separately. MP3 balance
+applies only when the decoder emits stereo PCM. The other decoders
+keep their own channel handling. By default, `CONFIG_YORADIO_AUDIO_STEREO_ONLY`
+limits sources to mono and stereo across codecs.
+
 The optional ordinary PWM audio-level LED is disabled for CYD by default. It
 can be configured under `menuconfig -> yoRadio audio level LED` after choosing
 a GPIO verified to be free on the exact board revision.

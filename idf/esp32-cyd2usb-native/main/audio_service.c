@@ -310,13 +310,14 @@ static void state_set_decoder_bitrate(uint32_t generation, uint32_t bitrate_bps)
 }
 
 static bool publish_stream_info(uint32_t generation, native_codec_t codec,
-                                 const esp_audio_simple_dec_info_t *info) {
+                                 const esp_audio_simple_dec_info_t *info,
+                                 uint8_t source_channels) {
     if (generation != atomic_load(&s_generation) ||
         generation == atomic_load(&s_failed_generation) || !info->sample_rate ||
         !native_audio_output_supports_pcm(info->bits_per_sample, info->channel)) return false;
     native_stream_info_t description = {
         .codec=codec_name(codec), .sample_rate_hz=info->sample_rate,
-        .channels=info->channel, .bits_per_sample=info->bits_per_sample,
+        .channels=source_channels, .bits_per_sample=info->bits_per_sample,
         .pcm_sample_rate_hz=info->sample_rate, .pcm_channels=info->channel,
         // The public AAC API confirms decoder PCM, not nominal HE/PS layout.
         .format_is_pcm=codec==NATIVE_CODEC_AAC,
@@ -816,7 +817,10 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
             .channel = info->channels,
             .bitrate = info->bitrate,
     };
-    if (!publish_stream_info(context->generation,context->codec,&context->stream_info)) return false;
+    uint8_t source_channels = context->codec == NATIVE_CODEC_MP3
+        ? info->stream_channels : info->channels;
+    if (!publish_stream_info(context->generation, context->codec, &context->stream_info,
+                             source_channels)) return false;
     return send_pcm(context->generation, &context->stream_info, pcm, pcm_size);
 }
 #endif
@@ -880,7 +884,7 @@ static bool ogg_output_layout(void *user, const esp_audio_simple_dec_info_t *inf
                               int16_t header_gain_q8, pcm_channel_layout layout) {
     ogg_output_context_t *context = user;
     if (ogg_output_cancelled(context)) return false;
-    if (!publish_stream_info(context->generation, NATIVE_CODEC_OGG, info)) {
+    if (!publish_stream_info(context->generation, NATIVE_CODEC_OGG, info, info->channel)) {
         context->info_failed = true;
         return false;
     }
@@ -1338,7 +1342,8 @@ static void decoder_task(void *argument) {
                         end_reason = AUDIO_END_CHANNEL_LIMIT;
                         break;
                     }
-                    if (info_result != ESP_AUDIO_ERR_OK || !publish_stream_info(generation,codec,&info)) {
+                    if (info_result != ESP_AUDIO_ERR_OK ||
+                        !publish_stream_info(generation, codec, &info, info.channel)) {
                         failure_stage = NATIVE_HEALTH_INFO;
                         failure_result = info_result == ESP_AUDIO_ERR_OK ? ESP_FAIL : (int32_t)info_result;
                         end_reason = AUDIO_END_DECODE_FAILED;

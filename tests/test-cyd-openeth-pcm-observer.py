@@ -110,6 +110,21 @@ class PcmObserverTests(unittest.TestCase):
             with self.subTest(log=log), self.assertRaisesRegex(RuntimeError, 'FLAC STREAMINFO MD5'):
                 self.observe_eof(log, **args)
 
+    def test_helix_mp3_checks_eof_for_mono_and_stereo_builds(self):
+        mono = probe.helix_mp3_fixture(True)
+        stereo = probe.helix_mp3_fixture(False)
+        self.assertEqual(mono['data'], stereo['data'])
+        self.assertEqual((mono['source_channels'], mono['pcm_channels']), (2, 1))
+        self.assertEqual((stereo['source_channels'], stereo['pcm_channels']), (2, 2))
+        self.assertEqual(mono['pcm_frames'], stereo['pcm_frames'])
+        flush = f'CYD_OPENETH_PCM_FLUSH frames={mono["pcm_frames"]} status=0\n'
+        checksum = 'c4ca4238a0b923820dcc509a6f75849b'
+        args = dict(backend='pdm', codec='mp3', pcm_frames=mono['pcm_frames'])
+        self.assertEqual(self.observe_eof(flush + f'CYD_OPENETH_PCM_MD5 {checksum}\n',
+                                          **args)['pcm_md5'], checksum)
+        with self.assertRaisesRegex(RuntimeError, 'Expected a single PCM MD5'):
+            self.observe_eof(flush, **args)
+
 
 if __name__ == '__main__':
     unittest.main()

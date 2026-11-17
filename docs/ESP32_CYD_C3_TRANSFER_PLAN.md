@@ -240,6 +240,13 @@ DMA-памяти завершилось ошибкой.
 доступное от декодера. Многоканальный профиль включается отключением этой
 настройки. [Настройка сборки](../idf/esp32-cyd2usb-native/main/Kconfig.projbuild).
 
+В варианте Helix MP3 ключ `CONFIG_YORADIO_AUDIO_MONO=y` включает прямое
+декодирование в моно. Для совместимых гранул M/S Helix пропускает обработку
+бокового спектра. Исходное число каналов и число каналов PCM публикуются отдельно.
+[Настройка CYD](../idf/esp32-cyd2usb-native/README.md) ·
+[Реализация Helix](../yoRadio/src/audioI2S/mp3_decoder/mp3_mono.h) ·
+[Проверка в QEMU](../tests/target/cyd_full_app_openeth_qemu/README.md#other-playback-fixtures).
+
 В экспериментальном профиле для шести и восьми каналов нужно измерить память состояний, CRC-буфера и PCM
 на 120 мс. В дереве уже есть [фиксированный libopus с разделённой памятью CELT](../esp8266/rtos-sdk-native/components/opus_decoder/UPSTREAM.md)
 для ESP8266. Его размеры и время выполнения нужно измерить на LX6, а

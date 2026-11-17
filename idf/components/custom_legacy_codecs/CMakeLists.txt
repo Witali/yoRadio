@@ -22,3 +22,6 @@ idf_component_register(
   REQUIRES custom_codec_support esp_timer log)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+if(CONFIG_YORADIO_AUDIO_MONO)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_HELIX_MP3_MONO=1)
+endif()
