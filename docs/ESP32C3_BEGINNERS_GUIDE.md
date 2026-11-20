@@ -1,5 +1,8 @@
 # Build and flash yoRadio on an ESP32-C3 OLED board: beginner's guide
 
+For a Russian guide to the hardware-accepted October image and the newer,
+hardware-untested November image, see [ESP32-C3 flashing instructions](ESP32C3_FLASHING_RU.md).
+
 This guide starts with a Windows computer that has no development tools installed.
 It explains how to install a ready-made firmware image or compile the firmware
 yourself, program a board for the first time, and update it later.
@@ -60,7 +63,7 @@ a firmware that already implements OTA; it cannot migrate an Arduino installatio
    in a browser. With deep sleep enabled, hold **BOOT for over 500 ms** and
    release it first. The Update page keeps the awake board available while open.
 3. Open **Update**, or append `/update.html` to the radio's address, for example
-   `http://192.168.100.4/update.html` (replace the IP with yours).
+   `http://192.0.2.1/update.html` (replace the IP with yours).
 4. Select **firmware**, choose `app.bin`, then press **Update**. The layout and
    progress bar are the shared Arduino/CYD/ESP8266 WebUI. On native C3 only
    application updates are offered; use **Board** for individual WebUI files.
@@ -83,11 +86,11 @@ support if installed; check its manifest before downgrading.
 For command-line use with the same upload format (optional):
 
 ```powershell
-curl.exe --fail-with-body -F "updatetarget=firmware" -F "update=@C:\path\to\app.bin" http://192.168.100.4/update
+curl.exe --fail-with-body -F "updatetarget=firmware" -F "update=@C:\path\to\app.bin" http://192.0.2.1/update
 ```
 
 The successful response is `OK`. After reboot,
-`http://192.168.100.4/api/native/ota` reports the running version, application
+`http://192.0.2.1/api/native/ota` reports the running version, application
 ELF hash and app slot. The app slot alternates between `app0` and `app1`.
 
 ## 1. Install Git and PowerShell
@@ -680,7 +683,7 @@ Upload `firmware/development/local-esp32c3/app.bin` through **Update** as descri
 above. For example, replacing the IP with the radio's current address:
 
 ```powershell
-curl.exe --fail-with-body -F "updatetarget=firmware" -F "update=@firmware/development/local-esp32c3/app.bin" http://192.168.100.4/update
+curl.exe --fail-with-body -F "updatetarget=firmware" -F "update=@firmware/development/local-esp32c3/app.bin" http://192.0.2.1/update
 ```
 
 If the installed firmware lacks OTA support, use the application-only USB update

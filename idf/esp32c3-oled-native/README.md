@@ -29,6 +29,9 @@ Optional deep sleep or external RTC settings need separate qualification.
 The generic board defaults and older experiments described below are distinct
 from this explicitly selected profile. See the
 [beginner guide](../../docs/ESP32C3_BEGINNERS_GUIDE.md) for setup and flashing.
+The [Russian flashing guide](../../docs/ESP32C3_FLASHING_RU.md) identifies the
+latest hardware-accepted image and a newer November build that has not been
+tested on a physical board.
 
 ## Hardware profile
 
