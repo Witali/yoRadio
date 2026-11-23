@@ -122,3 +122,9 @@ It is excluded because CYD retains both cores and its task bindings. The
 normal word-only Ogg storage remains separate. Compact/private AAC and the
 extended custom Vorbis branch stay deferred. Physical Wi-Fi/audio and
 realistic network throughput await separate tests.
+
+An additional [one-setting HTTP timeout control](../cyd-aac-web-timeout-20261123/README.md)
+retains the ordinary network profile and increases the send timeout from 1
+to 10 seconds. It also remains NONPASS with a partial WebUI response and RX
+memory pressure. No production timeout was changed and no original failure
+was relabeled as a resource success.

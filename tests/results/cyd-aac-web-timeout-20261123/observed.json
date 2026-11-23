@@ -1,0 +1,82 @@
+{
+  "passed": false,
+  "physical_tested": false,
+  "production_changed": false,
+  "comparison": "Only HTTP send timeout changed from 1 to 10 seconds; default TCP and TLS/watchdog/instrumentation/codec settings unchanged.",
+  "original_control": "tests/results/cyd-aac-resource-profile-20261123/fair-default-pdm/run-he",
+  "state": "TERMINAL_NONPASS",
+  "reason": "IncompleteRead(5120 bytes read)",
+  "complete_pcm": false,
+  "last_pcm_progress": 261632,
+  "rx_pressure": {
+    "wait_episodes": 6,
+    "recovered": 6,
+    "samples": [
+      {
+        "request": 1522,
+        "heap": 2312,
+        "largest": 1280,
+        "dma_largest": 1280
+      },
+      {
+        "request": 1522,
+        "heap": 5444,
+        "largest": 1536,
+        "dma_largest": 1536
+      },
+      {
+        "request": 1522,
+        "heap": 2304,
+        "largest": 1280,
+        "dma_largest": 1280
+      },
+      {
+        "request": 1522,
+        "heap": 5000,
+        "largest": 2304,
+        "dma_largest": 2304
+      },
+      {
+        "request": 1522,
+        "heap": 3312,
+        "largest": 2304,
+        "dma_largest": 2304
+      },
+      {
+        "request": 1522,
+        "heap": 3212,
+        "largest": 1280,
+        "dma_largest": 1280
+      }
+    ]
+  },
+  "source_manifest_scope": "project translation units only; not complete compiler dependency closure",
+  "evidence": {
+    "report.json": {
+      "bytes": 17336,
+      "sha256": "d5e5d1f3ac71557f121f0e53a3160e22717905e3ad70d5bb36670f4028bb8c14"
+    },
+    "qemu.log": {
+      "bytes": 6575,
+      "sha256": "28f7fabd7fe7a885eeb0849ce66b1c8f7a50fdd05684d9e40faaefbf1c05b1ff"
+    },
+    "fixture-identity.json": {
+      "bytes": 11229,
+      "sha256": "bf0ed679389c144c68b96dcbe8f446a6fbb7953c75691b884b4b9d4530e2dbde"
+    }
+  },
+  "local_controller": {
+    "bytes": 3146,
+    "sha256": "cd7f0abaf95202cb8b3b197bf6f3cd47f80363d697f4832aa498365657e8aacf"
+  },
+  "local_build_recipe": {
+    "bytes": 1989,
+    "sha256": "93e019c5898aff5b06e3c4919c210b661957f314ebacb6030a20ce8cdb43a40f"
+  },
+  "local_build_terminal": {
+    "bytes": 149,
+    "sha256": "1f938d114333b4ca6868257b567e4542cf89c9703ee30db5b5df4565d848aae4"
+  },
+  "build_terminal_scope": "PowerShell/fixture summary only; native SDK output also streamed to the execution session.",
+  "interpretation": "Increasing the timeout does not fix the default-profile HE-AAC memory/resource failure; no production timeout change was made."
+}
