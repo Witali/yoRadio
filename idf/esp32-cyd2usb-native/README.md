@@ -80,6 +80,20 @@ applies only when the decoder emits stereo PCM. The other decoders
 keep their own channel handling. By default, `CONFIG_YORADIO_AUDIO_STEREO_ONLY`
 limits sources to mono and stereo across codecs.
 
+In a compatible MP3 M/S granule, the mono sum `(L + R) / 2` depends only
+on the mid spectrum, up to the codec's normalization. Helix can therefore
+skip the side Huffman decoding, side dequantization and second IMDCT.
+It still advances over the side bits and maintains overlap state. A granule
+using intensity stereo, different channel windows or incompatible overlap
+uses the full path before mixing. This is not equivalent to discarding
+the right channel.
+
+`YORADIO_AUDIO_STEREO_ONLY` limits source channels; `YORADIO_AUDIO_MONO`
+selects this Helix MP3 optimization. Neither option forces every vendor
+decoder to reconstruct mono internally. The CYD output backends already
+mix decoded stereo for the onboard mono amplifier. AAC's public `channel`
+configuration describes headerless input, rather than a forced mono output.
+
 The optional ordinary PWM audio-level LED is disabled for CYD by default. It
 can be configured under `menuconfig -> yoRadio audio level LED` after choosing
 a GPIO verified to be free on the exact board revision.
