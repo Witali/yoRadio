@@ -229,6 +229,16 @@ inputs, linked vendor component paths, original archives and ELF identity.
 Its embedded fixtures and flash image remain local under ignored `.build`.
 Compact/private AAC and late SBR/PS transitions remain separate scopes.
 
+The [full-application HE-AAC resource comparison](../../results/cyd-aac-resource-profile-20261123/README.md)
+uses quiet production instrumentation and the original five-second watchdog.
+The measured optional profiles use TCP RX 5,760/mailbox 6/TX 2,880 bytes for
+PDM and continuous DAC, and RX 2,880/mailbox 6/TX 2,880 for legacy DAC.
+Each retains full 16,384/4,096-byte TLS record capacities and checks all
+614,400 stereo frames, complete PCM SHA-256, and WebUI after EOF with zero
+allocation failures. The ordinary network defaults remain unchanged; their
+HE-AAC resource gate is still NONPASS. These finite QEMU results do not
+qualify Wi-Fi throughput, additional clients or physical audio.
+
 For the public input/buffer memory comparison, add
 `--frame-input --small-buffers --fragmented-input` to `prepare`, using fresh
 campaign/result paths. The resulting 14 cases retain the four original

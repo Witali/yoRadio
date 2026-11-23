@@ -1,0 +1,107 @@
+Adding SPI flash device
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:1
+load:0x3fff0040,len:5380
+load:0x40078000,len:16216
+load:0x40080400,len:3800
+entry 0x400805e0
+I (1249) cpu_start: Multicore app
+I (3098) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (3102) cpu_start: Pro cpu start user code
+I (3102) cpu_start: cpu freq: 240000000 Hz
+I (3102) app_init: Application information:
+I (3103) app_init: Project name:     yoradio_cyd2usb_native
+I (3103) app_init: App version:      v0.9.693-2150-gdc2a30ef0-dirty
+I (3104) app_init: Compile time:     Nov 23 2026 18:31:24
+I (3109) app_init: ELF file SHA256:  913eebf9a...
+I (3109) app_init: ESP-IDF:          v6.0.2
+I (3109) efuse_init: Min chip rev:     v0.0
+I (3109) efuse_init: Max chip rev:     v3.99 
+I (3110) efuse_init: Chip rev:         v0.0
+I (3111) heap_init: Initializing. RAM available for dynamic allocation:
+I (3111) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (3112) heap_init: At 3FFB8B08 len 000274F8 (157 KiB): DRAM
+I (3112) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (3112) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (3113) heap_init: At 4008EEC4 len 0001113C (68 KiB): IRAM
+I (3144) spi_flash: detected chip: gd
+I (3155) spi_flash: flash io: qio
+I (3171) main_task: Started on CPU0
+I (3178) main_task: Calling app_main()
+I (3180) yoradio_native: Starting pure ESP-IDF yoRadio (Arduino-free)
+I (3670) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (7586) display: ST7789: SPI2 DMA, 80000000 Hz, two 320x4 strips (5120 bytes)
+I (7631) main_task: Returned from app_main()
+I (7649) esp_eth.netif.netif_glue: 52:54:00:12:34:56
+I (7651) esp_eth.netif.netif_glue: ethernet attached to netif
+E (7754) esp_eth: esp_eth_ioctl(533): add mac address to filter not supported
+E (7757) esp_eth.netif.netif_glue: eth_set_mac_filter(56): failed to add mac filter
+E (7757) esp_netif_lwip: Failed to add multicast filter for IPv4
+I (8768) esp_netif_handlers: eth ip: 10.0.2.15, mask: 255.255.255.0, gw: 0.0.0.0
+CYD_OPENETH_READY
+I (8773) audio: Pipeline ready: I2S PDM, 16 KiB compressed + 8 KiB PCM, free heap 185208
+I (11627) radio_control: Validated playlist index: 1 stations
+I (11630) radio_control: Smart Start state: 2
+I (11649) web: Native HTTP server started
+W (17002) httpd_txrx: httpd_sock_err: error in recv : 128
+I (17151) radio_control: Saved last station: 1
+I (17154) radio_control: Selected station 1: OpenETH fixture
+I (17507) esp-x509-crt-bundle: Certificate validated
+W (18491) opencores.emac: emac_opencores_isr_handler: RX frame dropped (0x14)
+W (18499) opencores.emac: emac_opencores_isr_handler: RX frame dropped (0x14)
+I (19798) ESP_ES_PARSER: The version of es_parser is v1.0.1
+CYD_OPENETH_ALLOCATION index=0 call=calloc bytes=35460 free_before=136756 largest_before=110592 success=1
+CYD_OPENETH_ALLOCATION index=1 call=calloc bytes=55128 free_before=84216 largest_before=63488 success=1
+I (19922) audio_output: PDM fixed at 48000 Hz, carrier 6144000 Hz on GPIO26
+I (19926) audio_output: PDM resampler input changed to 48000 Hz
+CYD_OPENETH_PCM_PROGRESS frames=768
+CYD_OPENETH_PCM_PROGRESS frames=5632
+CYD_OPENETH_PCM_PROGRESS frames=11008
+CYD_OPENETH_PCM_PROGRESS frames=15872
+CYD_OPENETH_PCM_PROGRESS frames=21248
+CYD_OPENETH_PCM_PROGRESS frames=26112
+CYD_OPENETH_PCM_PROGRESS frames=31488
+CYD_OPENETH_PCM_PROGRESS frames=36352
+CYD_OPENETH_PCM_PROGRESS frames=41728
+CYD_OPENETH_PCM_PROGRESS frames=46592
+CYD_OPENETH_PCM_PROGRESS frames=51968
+CYD_OPENETH_PCM_PROGRESS frames=56832
+CYD_OPENETH_PCM_PROGRESS frames=62208
+W (27799) opencores.emac: CYD_OPENETH_RX_WAIT request=1522 heap=2096 largest=1152 dma=1152
+CYD_OPENETH_PCM_PROGRESS frames=67072
+I (28440) opencores.emac: CYD_OPENETH_RX_RECOVERED
+W (28451) opencores.emac: CYD_OPENETH_RX_WAIT request=1522 heap=3692 largest=1536 dma=1536
+I (28455) opencores.emac: CYD_OPENETH_RX_RECOVERED
+W (28455) opencores.emac: CYD_OPENETH_RX_WAIT request=1522 heap=2176 largest=1152 dma=1152
+CYD_OPENETH_PCM_PROGRESS frames=72448
+CYD_OPENETH_PCM_PROGRESS frames=77312
+CYD_OPENETH_PCM_PROGRESS frames=82688
+W (30347) httpd_txrx: httpd_sock_err: error in send : 11
+W (30353) httpd_txrx: httpd_sock_err: error in recv : 128
+CYD_OPENETH_PCM_PROGRESS frames=87552
+CYD_OPENETH_PCM_PROGRESS frames=92928
+CYD_OPENETH_PCM_PROGRESS frames=97792
+CYD_OPENETH_PCM_PROGRESS frames=103168
+CYD_OPENETH_PCM_PROGRESS frames=108032
+CYD_OPENETH_PCM_PROGRESS frames=113408
+CYD_OPENETH_PCM_PROGRESS frames=118272
+CYD_OPENETH_PCM_PROGRESS frames=123648
+CYD_OPENETH_PCM_PROGRESS frames=128512
+CYD_OPENETH_PCM_PROGRESS frames=133888
+CYD_OPENETH_PCM_PROGRESS frames=138752
+CYD_OPENETH_PCM_PROGRESS frames=144128
+CYD_OPENETH_PCM_PROGRESS frames=148992
+CYD_OPENETH_PCM_PROGRESS frames=154368
+CYD_OPENETH_PCM_PROGRESS frames=159232
+CYD_OPENETH_PCM_PROGRESS frames=164608
+I (40724) opencores.emac: CYD_OPENETH_RX_RECOVERED
+W (40730) opencores.emac: emac_opencores_isr_handler: RX frame dropped (0x14)
+W (40750) opencores.emac: CYD_OPENETH_RX_WAIT request=1522 heap=3092 largest=1152 dma=1152
+CYD_OPENETH_PCM_PROGRESS frames=169472
+CYD_OPENETH_PCM_PROGRESS frames=174848
+W (42362) httpd_txrx: httpd_sock_err: error in send : 11
+W (42362) httpd_uri: httpd_uri: uri handler execution failed

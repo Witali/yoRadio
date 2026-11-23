@@ -35,6 +35,34 @@ isolated comparison build:
 .\build.ps1 -BuildDirectory build-legacy-dac -AudioBackend legacy
 ```
 
+The optional `sdkconfig.tcp-rx-four-segments.defaults` reuses the C3
+receive-burst experiment: a 5,760-byte TCP receive window and six mailbox
+entries. It retains full 16 KiB TLS records and is not a board default.
+Apply it to a fresh PDM configuration with:
+
+```powershell
+.\build.ps1 -BuildDirectory build-rx4 -Sdkconfig sdkconfig.rx4 -IdfArguments @('-D','SDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.tcp-rx-four-segments.defaults','build')
+```
+
+For continuous or legacy DAC, select the matching `-AudioBackend` and retain
+`sdkconfig.dac.defaults` or `sdkconfig.legacy-dac.defaults`, respectively,
+in the defaults list before this overlay. A smaller window reduces the
+bandwidth-delay budget: requalify remote high-bitrate playback at realistic
+RTT before promoting it. Local QEMU success does not establish Wi-Fi throughput.
+
+The separate `sdkconfig.tcp-tx-two-segments.defaults` limits queued TCP
+transmit data to 2,880 bytes. The HE-AAC memory comparison combines both
+overlays; append the TX overlay after the RX overlay in a fresh configuration.
+This also reduces the WebUI transmit bandwidth-delay budget. It changes
+neither TLS record capacity nor audio precision, and is not a board default.
+
+The [complete application HE-AAC comparison](../../tests/results/cyd-aac-resource-profile-20261123/README.md)
+passes with RX-four/TX-two on PDM and continuous DAC. Legacy DAC uses
+`sdkconfig.tcp-rx-two-segments.defaults` with the TX-two overlay instead;
+its mailbox remains at the SDK minimum of six entries. These finite QEMU
+runs have small heap margins. The original RX-eight/TX-four defaults are
+retained, and their full HE-AAC resource test remains nonpassing.
+
 To flash only the application and preserve Wi-Fi/SPIFFS:
 
 ```powershell

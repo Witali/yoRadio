@@ -81,3 +81,12 @@ now verifies complete-frame input, ordinary parsed output growth and matched
 fragmented input. Complete PCM is preserved, but the matched HE frame-mode
 saving is only 636 bytes. No production frame assembly was introduced and
 the full-application HE resource gate remains NONPASS.
+
+Further November 23 follow-up: [full-application resource profiles](../cyd-aac-resource-profile-20261123/README.md)
+now complete HE-AAC/TLS/TFT and WebUI after EOF on PDM and both DAC outputs,
+using optional TCP budgets and the original watchdogs. The generic decoder's
+call-count yield was replaced by the existing elapsed-time fairness policy;
+all current task PCM/lifecycle regressions pass. Default network settings
+remain unchanged and their full HE resource control remains NONPASS. The
+new finite successes do not qualify physical Wi-Fi, additional clients or
+realistic-RTT throughput; original failures remain preserved.

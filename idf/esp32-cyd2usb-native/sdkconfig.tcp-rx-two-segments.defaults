@@ -1,0 +1,6 @@
+# Optional legacy-DAC HE-AAC receive-memory profile; not board defaults.
+# Two 1440-byte TCP segments; retain the SDK minimum of six mailbox entries.
+# TLS still accepts full 16 KiB records. Use instead of the RX-four overlay.
+# Requalify remote high-bitrate throughput at realistic RTT before promotion.
+CONFIG_LWIP_TCP_WND_DEFAULT=2880
+CONFIG_LWIP_TCP_RECVMBOX_SIZE=6

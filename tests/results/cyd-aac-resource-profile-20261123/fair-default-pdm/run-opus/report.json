@@ -1,0 +1,905 @@
+{
+  "state": "TERMINAL_PASS",
+  "scope": "OpenETH full-application boot and TLS audio with concurrent WebUI through EOF with full TLS records",
+  "passed": true,
+  "flash_parts": [
+    {
+      "file": "bootloader/bootloader.bin",
+      "offset": 4096,
+      "bytes": 25488,
+      "sha256": "88f77b8867241262bd67bf0b35eff86c19696c7354ba5f8db69ffa2329d0ceef"
+    },
+    {
+      "file": "partition_table/partition-table.bin",
+      "offset": 32768,
+      "bytes": 3072,
+      "sha256": "e7b020b1aebdeb1f5e49770080c1d45aa1a79c4b4d468a309b3a8f6fc5039ae2"
+    },
+    {
+      "file": "ota_data_initial.bin",
+      "offset": 57344,
+      "bytes": 8192,
+      "sha256": "7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f"
+    },
+    {
+      "file": "yoradio_cyd2usb_native.bin",
+      "offset": 65536,
+      "bytes": 1268000,
+      "sha256": "dd4e3757676548f17cf898de047b112109cbf09c080b7d57d993d4a25cf2a042"
+    },
+    {
+      "file": "spiffs.bin",
+      "offset": 3604480,
+      "bytes": 589824,
+      "sha256": "e5fa7e0a33845bbaa57936f118834dc22b0cee5dea71e161351499c3704c5e44"
+    }
+  ],
+  "flash_sha256": "3625156a019476719c515e611756d71775400f7d394ff7a845ccbafa1ba2ec7c",
+  "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+  "config_sha256": "09ca7ea50e7e947ac5e657567707df71ef55d639bd2c74ea5f9eccacb5e37566",
+  "openeth": true,
+  "audio_backend": "pdm",
+  "physical_tested": false,
+  "command": [
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-openeth-ota-lifecycle-20261116\\qemu-system-xtensa.exe",
+    "-global",
+    "driver=ssi.esp32.spi,property=input-delay-ns,value=25",
+    "-audiodev",
+    "none,id=quiet",
+    "-M",
+    "esp32,st7789=on,audiodev=quiet",
+    "-smp",
+    "2",
+    "-L",
+    "C:\\Work\\QEMU-ESP32\\pc-bios",
+    "-display",
+    "none",
+    "-monitor",
+    "none",
+    "-serial",
+    "stdio",
+    "-no-reboot",
+    "-snapshot",
+    "-nic",
+    "user,model=open_eth,restrict=on,hostfwd=tcp:127.0.0.1:55293-:80,guestfwd=tcp:10.0.2.100:18080-tcp:127.0.0.1:55294",
+    "-drive",
+    "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\caqt23a\\fair-default-pdm\\run-opus\\qemu-flash.bin,if=mtd,format=raw"
+  ],
+  "runner_sha256": "1380aae8fbbf141e32cb3ecb6e4bd732623f76ed0e9b2b4c6be6df958bccceab",
+  "task_watchdog_seconds": 5,
+  "web_asset_io_timeout_seconds": 25,
+  "native_diagnostics": false,
+  "tls_application_payload_lengths": [
+    185,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    16408,
+    1831
+  ],
+  "qemu_pid": 23008,
+  "health": [
+    {
+      "boot_id": "d5111ed3f29d7922",
+      "reset_reason": 1,
+      "uptime_ms": 12154,
+      "heap": 167432,
+      "largest": 110592,
+      "minimum_heap": 161512,
+      "tasks": 18,
+      "memory": {
+        "internal_free": 167432,
+        "internal_largest": 110592,
+        "dma_free": 167432,
+        "dma_largest": 110592
+      },
+      "cpu": {
+        "enabled": false,
+        "available": false,
+        "sample_uptime_ms": 0,
+        "snapshot_failures": 0,
+        "overall_percent": null,
+        "core_percent": [
+          null,
+          null
+        ],
+        "tasks": {
+          "stream": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "decode": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "output": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "http": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          }
+        }
+      },
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 0,
+        "requested_bytes": 0,
+        "written_bytes": 0,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": null,
+        "timing_enabled": false,
+        "timing_samples": 0,
+        "invalid_time_samples": 0,
+        "write_us": null,
+        "max_write_us": null
+      },
+      "input": {
+        "available": true,
+        "leased": true,
+        "resident": 8,
+        "minimum": 4,
+        "target": 8,
+        "limit": 8,
+        "ready": 0,
+        "reading": 0,
+        "writing": 0,
+        "released": 0,
+        "ready_payload_bytes": 0,
+        "reading_payload_bytes": 0
+      }
+    },
+    {
+      "boot_id": "d5111ed3f29d7922",
+      "reset_reason": 1,
+      "uptime_ms": 22513,
+      "heap": 167288,
+      "largest": 110592,
+      "minimum_heap": 159460,
+      "tasks": 18,
+      "memory": {
+        "internal_free": 167288,
+        "internal_largest": 110592,
+        "dma_free": 167288,
+        "dma_largest": 110592
+      },
+      "cpu": {
+        "enabled": false,
+        "available": false,
+        "sample_uptime_ms": 0,
+        "snapshot_failures": 0,
+        "overall_percent": null,
+        "core_percent": [
+          null,
+          null
+        ],
+        "tasks": {
+          "stream": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "decode": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "output": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "http": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          }
+        }
+      },
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 0,
+        "requested_bytes": 0,
+        "written_bytes": 0,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": null,
+        "timing_enabled": false,
+        "timing_samples": 0,
+        "invalid_time_samples": 0,
+        "write_us": null,
+        "max_write_us": null
+      },
+      "input": {
+        "available": true,
+        "leased": true,
+        "resident": 8,
+        "minimum": 4,
+        "target": 8,
+        "limit": 8,
+        "ready": 0,
+        "reading": 0,
+        "writing": 0,
+        "released": 0,
+        "ready_payload_bytes": 0,
+        "reading_payload_bytes": 0
+      }
+    }
+  ],
+  "observed": [
+    "ST7789",
+    "OpenETH IPv4",
+    "audio tasks",
+    "HTTP health",
+    "SPIFFS WebUI asset",
+    "Opus audio over verified TLS",
+    "audio progress across WebUI asset read",
+    "full-sized TLS 1.2 records",
+    "complete TLS response",
+    "ordered EOF with exact output count",
+    "WebUI after EOF"
+  ],
+  "web_asset": {
+    "bytes": 13588,
+    "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+  },
+  "first_active_health": {
+    "boot_id": "d5111ed3f29d7922",
+    "reset_reason": 1,
+    "uptime_ms": 26502,
+    "heap": 80640,
+    "largest": 73728,
+    "minimum_heap": 73236,
+    "tasks": 18,
+    "memory": {
+      "internal_free": 80640,
+      "internal_largest": 73728,
+      "dma_free": 80640,
+      "dma_largest": 73728
+    },
+    "cpu": {
+      "enabled": false,
+      "available": false,
+      "sample_uptime_ms": 0,
+      "snapshot_failures": 0,
+      "overall_percent": null,
+      "core_percent": [
+        null,
+        null
+      ],
+      "tasks": {
+        "stream": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "decode": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "output": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "http": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        }
+      }
+    },
+    "allocation_failures": 0,
+    "last_allocation_failure": {
+      "size": 0,
+      "caps": 0
+    },
+    "decoder_failure": {
+      "sequence": 0,
+      "generation": 0,
+      "codec": 0,
+      "stage": 0,
+      "result": 0,
+      "completion": 0,
+      "input_bytes": 0,
+      "allocation_sequence": 0
+    },
+    "stream_failure": {
+      "sequence": 0,
+      "generation": 0,
+      "completion": 0,
+      "result": 0
+    },
+    "output": {
+      "failures": 0,
+      "write_errors": 0,
+      "configure_errors": 0,
+      "flush_errors": 0,
+      "generation": 0,
+      "stage": 0,
+      "result": 0
+    },
+    "output_driver": {
+      "writes": 4,
+      "requested_bytes": 3456,
+      "written_bytes": 3456,
+      "errors": 0,
+      "timeouts": 0,
+      "short_writes": 0,
+      "saturated": false,
+      "completion_queue_drops": 0,
+      "timing_enabled": false,
+      "timing_samples": 0,
+      "invalid_time_samples": 0,
+      "write_us": null,
+      "max_write_us": null
+    },
+    "input": {
+      "available": true,
+      "leased": true,
+      "resident": 8,
+      "minimum": 4,
+      "target": 8,
+      "limit": 8,
+      "ready": 5,
+      "reading": 1,
+      "writing": 0,
+      "released": 0,
+      "ready_payload_bytes": 10240,
+      "reading_payload_bytes": 2048
+    }
+  },
+  "playing_health": [
+    {
+      "boot_id": "d5111ed3f29d7922",
+      "reset_reason": 1,
+      "uptime_ms": 26502,
+      "heap": 80640,
+      "largest": 73728,
+      "minimum_heap": 73236,
+      "tasks": 18,
+      "memory": {
+        "internal_free": 80640,
+        "internal_largest": 73728,
+        "dma_free": 80640,
+        "dma_largest": 73728
+      },
+      "cpu": {
+        "enabled": false,
+        "available": false,
+        "sample_uptime_ms": 0,
+        "snapshot_failures": 0,
+        "overall_percent": null,
+        "core_percent": [
+          null,
+          null
+        ],
+        "tasks": {
+          "stream": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "decode": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "output": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "http": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          }
+        }
+      },
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 4,
+        "requested_bytes": 3456,
+        "written_bytes": 3456,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": 0,
+        "timing_enabled": false,
+        "timing_samples": 0,
+        "invalid_time_samples": 0,
+        "write_us": null,
+        "max_write_us": null
+      },
+      "input": {
+        "available": true,
+        "leased": true,
+        "resident": 8,
+        "minimum": 4,
+        "target": 8,
+        "limit": 8,
+        "ready": 5,
+        "reading": 1,
+        "writing": 0,
+        "released": 0,
+        "ready_payload_bytes": 10240,
+        "reading_payload_bytes": 2048
+      }
+    },
+    {
+      "boot_id": "d5111ed3f29d7922",
+      "reset_reason": 1,
+      "uptime_ms": 35622,
+      "heap": 68812,
+      "largest": 65536,
+      "minimum_heap": 62456,
+      "tasks": 18,
+      "memory": {
+        "internal_free": 68812,
+        "internal_largest": 65536,
+        "dma_free": 68812,
+        "dma_largest": 65536
+      },
+      "cpu": {
+        "enabled": false,
+        "available": false,
+        "sample_uptime_ms": 0,
+        "snapshot_failures": 0,
+        "overall_percent": null,
+        "core_percent": [
+          null,
+          null
+        ],
+        "tasks": {
+          "stream": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "decode": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "output": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          },
+          "http": {
+            "percent_of_one_core": null,
+            "stack_free_min": null
+          }
+        }
+      },
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      },
+      "decoder_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "codec": 0,
+        "stage": 0,
+        "result": 0,
+        "completion": 0,
+        "input_bytes": 0,
+        "allocation_sequence": 0
+      },
+      "stream_failure": {
+        "sequence": 0,
+        "generation": 0,
+        "completion": 0,
+        "result": 0
+      },
+      "output": {
+        "failures": 0,
+        "write_errors": 0,
+        "configure_errors": 0,
+        "flush_errors": 0,
+        "generation": 0,
+        "stage": 0,
+        "result": 0
+      },
+      "output_driver": {
+        "writes": 126,
+        "requested_bytes": 128384,
+        "written_bytes": 128384,
+        "errors": 0,
+        "timeouts": 0,
+        "short_writes": 0,
+        "saturated": false,
+        "completion_queue_drops": 20,
+        "timing_enabled": false,
+        "timing_samples": 0,
+        "invalid_time_samples": 0,
+        "write_us": null,
+        "max_write_us": null
+      },
+      "input": {
+        "available": true,
+        "leased": true,
+        "resident": 8,
+        "minimum": 4,
+        "target": 8,
+        "limit": 8,
+        "ready": 7,
+        "reading": 1,
+        "writing": 0,
+        "released": 0,
+        "ready_payload_bytes": 14336,
+        "reading_payload_bytes": 2048
+      }
+    }
+  ],
+  "web_asset_during_playback": {
+    "bytes": 13588,
+    "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+  },
+  "health_during_webui": {
+    "boot_id": "d5111ed3f29d7922",
+    "reset_reason": 1,
+    "uptime_ms": 35622,
+    "heap": 68812,
+    "largest": 65536,
+    "minimum_heap": 62456,
+    "tasks": 18,
+    "memory": {
+      "internal_free": 68812,
+      "internal_largest": 65536,
+      "dma_free": 68812,
+      "dma_largest": 65536
+    },
+    "cpu": {
+      "enabled": false,
+      "available": false,
+      "sample_uptime_ms": 0,
+      "snapshot_failures": 0,
+      "overall_percent": null,
+      "core_percent": [
+        null,
+        null
+      ],
+      "tasks": {
+        "stream": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "decode": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "output": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "http": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        }
+      }
+    },
+    "allocation_failures": 0,
+    "last_allocation_failure": {
+      "size": 0,
+      "caps": 0
+    },
+    "decoder_failure": {
+      "sequence": 0,
+      "generation": 0,
+      "codec": 0,
+      "stage": 0,
+      "result": 0,
+      "completion": 0,
+      "input_bytes": 0,
+      "allocation_sequence": 0
+    },
+    "stream_failure": {
+      "sequence": 0,
+      "generation": 0,
+      "completion": 0,
+      "result": 0
+    },
+    "output": {
+      "failures": 0,
+      "write_errors": 0,
+      "configure_errors": 0,
+      "flush_errors": 0,
+      "generation": 0,
+      "stage": 0,
+      "result": 0
+    },
+    "output_driver": {
+      "writes": 126,
+      "requested_bytes": 128384,
+      "written_bytes": 128384,
+      "errors": 0,
+      "timeouts": 0,
+      "short_writes": 0,
+      "saturated": false,
+      "completion_queue_drops": 20,
+      "timing_enabled": false,
+      "timing_samples": 0,
+      "invalid_time_samples": 0,
+      "write_us": null,
+      "max_write_us": null
+    },
+    "input": {
+      "available": true,
+      "leased": true,
+      "resident": 8,
+      "minimum": 4,
+      "target": 8,
+      "limit": 8,
+      "ready": 7,
+      "reading": 1,
+      "writing": 0,
+      "released": 0,
+      "ready_payload_bytes": 14336,
+      "reading_payload_bytes": 2048
+    }
+  },
+  "tls_peer": {
+    "tls_version": "TLSv1.2",
+    "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+    "sent": 376832
+  },
+  "playback": {
+    "codec": "OGG",
+    "format": "OGG 48 kHz stereo",
+    "pcm_sample_rate_hz": 48000,
+    "pcm_channels": 2
+  },
+  "eof_status": {
+    "audio": false,
+    "connecting": false,
+    "format": "stream ended",
+    "generation": 1
+  },
+  "eof_health": {
+    "boot_id": "d5111ed3f29d7922",
+    "reset_reason": 1,
+    "uptime_ms": 93747,
+    "heap": 156356,
+    "largest": 110592,
+    "minimum_heap": 59376,
+    "tasks": 18,
+    "memory": {
+      "internal_free": 156356,
+      "internal_largest": 110592,
+      "dma_free": 156356,
+      "dma_largest": 110592
+    },
+    "cpu": {
+      "enabled": false,
+      "available": false,
+      "sample_uptime_ms": 0,
+      "snapshot_failures": 0,
+      "overall_percent": null,
+      "core_percent": [
+        null,
+        null
+      ],
+      "tasks": {
+        "stream": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "decode": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "output": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        },
+        "http": {
+          "percent_of_one_core": null,
+          "stack_free_min": null
+        }
+      }
+    },
+    "allocation_failures": 0,
+    "last_allocation_failure": {
+      "size": 0,
+      "caps": 0
+    },
+    "decoder_failure": {
+      "sequence": 0,
+      "generation": 0,
+      "codec": 0,
+      "stage": 0,
+      "result": 0,
+      "completion": 0,
+      "input_bytes": 0,
+      "allocation_sequence": 0
+    },
+    "stream_failure": {
+      "sequence": 0,
+      "generation": 0,
+      "completion": 0,
+      "result": 0
+    },
+    "output": {
+      "failures": 0,
+      "write_errors": 0,
+      "configure_errors": 0,
+      "flush_errors": 0,
+      "generation": 0,
+      "stage": 0,
+      "result": 0
+    },
+    "output_driver": {
+      "writes": 1034,
+      "requested_bytes": 1058176,
+      "written_bytes": 1058176,
+      "errors": 0,
+      "timeouts": 0,
+      "short_writes": 0,
+      "saturated": false,
+      "completion_queue_drops": 20,
+      "timing_enabled": false,
+      "timing_samples": 0,
+      "invalid_time_samples": 0,
+      "write_us": null,
+      "max_write_us": null
+    },
+    "input": {
+      "available": true,
+      "leased": true,
+      "resident": 8,
+      "minimum": 4,
+      "target": 8,
+      "limit": 8,
+      "ready": 0,
+      "reading": 0,
+      "writing": 0,
+      "released": 0,
+      "ready_payload_bytes": 0,
+      "reading_payload_bytes": 0
+    }
+  },
+  "web_asset_after_eof": {
+    "bytes": 13588,
+    "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+  },
+  "controller_stop": true,
+  "qemu_exit_status": 1,
+  "peer_observations": [
+    {
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "sent": 706319,
+      "complete": true
+    }
+  ],
+  "flash_unchanged": true,
+  "uart_sha256": "039e2fff6120e1f10fefab770eb6c0dfc8cf089b531622f00a2904aed31315a4",
+  "guest_fault_observed": false,
+  "openeth_rx_pressure": {
+    "wait_episodes": 0,
+    "recovered": 0,
+    "samples": []
+  }
+}

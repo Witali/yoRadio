@@ -1,0 +1,4731 @@
+{
+  "scope": "Full application OpenETH TLS with original vendor AAC; not physical Wi-Fi or numerical codec conformance",
+  "physical_tested": false,
+  "private_codec_abi": false,
+  "normal_defaults_changed": false,
+  "code_before_fairness": {
+    "bytes": 81093,
+    "sha256": "dc56d4bc45855ca54dc721b2aa4476aa785d5bd14413eaddba4cd7887011600e"
+  },
+  "code_after_fairness": {
+    "bytes": 81045,
+    "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+  },
+  "cases": [
+    {
+      "profile": "quiet-pdm",
+      "case": "run-he",
+      "state": "TERMINAL_NONPASS",
+      "reason": "IncompleteRead(2048 bytes read)",
+      "source": "before",
+      "full_aac_pcm": false,
+      "frames": null,
+      "allocation_failures": null,
+      "minimum_heap": null,
+      "rx_wait_episodes": 4,
+      "guest_fault": false,
+      "report": {
+        "bytes": 14689,
+        "sha256": "c18bef5616ce975e1abd44502f0fb98851dbe6627b818896fb90d64673654f70"
+      },
+      "uart": {
+        "bytes": 5508,
+        "sha256": "4a4493c50a70683ea33ab65b034aae0657a2c0b002670ec55fa9f4922dde4ad0"
+      }
+    },
+    {
+      "profile": "quiet-tcp4-pdm",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "before",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 0,
+      "minimum_heap": 3712,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22560,
+        "sha256": "201c8dbf4cc8bfdf45a912aabe868a9214666f327084963eca6adb0e6eb561cd"
+      },
+      "uart": {
+        "bytes": 8113,
+        "sha256": "4df51d93a231380e57870d33ba91bdd80c39a9896871a126fe235f19336d7537"
+      }
+    },
+    {
+      "profile": "quiet-tcp4-pdm",
+      "case": "run-lc",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "before",
+      "full_aac_pcm": true,
+      "frames": 529408,
+      "allocation_failures": 0,
+      "minimum_heap": 59912,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22834,
+        "sha256": "7d35920fabc7c5ddeafd182703b03dc19b360b6f0c4c2a5fff42f9e8f89cb33d"
+      },
+      "uart": {
+        "bytes": 7368,
+        "sha256": "9755ceb3ae184ef2b65318d53bb0c374ba02fd4ecfb9f649725a402dd4bc13de"
+      }
+    },
+    {
+      "profile": "quiet-tcp4-continuous",
+      "case": "run-he",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Guest stopped or logged a failure during WebUI sampling",
+      "source": "before",
+      "full_aac_pcm": false,
+      "frames": null,
+      "allocation_failures": null,
+      "minimum_heap": null,
+      "rx_wait_episodes": 0,
+      "guest_fault": true,
+      "report": {
+        "bytes": 16731,
+        "sha256": "4a5bc0f0771b6f7d2a4ca6588c7b6ce3926ba3bdfdb132734adcc6067a59b271"
+      },
+      "uart": {
+        "bytes": 4281,
+        "sha256": "1b7ff138ab4be487b05d2b8b2a1f78afc349fbfdc12f8707b443d5edcb05e6ea"
+      }
+    },
+    {
+      "profile": "quiet-tcp4-legacy",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "before",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 0,
+      "minimum_heap": 3516,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22624,
+        "sha256": "ff1f6f02243eb175e032d2fe991c1ded3c84ed78a4a12cc2ebf8f973f8dba8eb"
+      },
+      "uart": {
+        "bytes": 8215,
+        "sha256": "22e2850b948693dad353b2b5d32000242e86c035b193f4ed17f1c7e28cd6f8f1"
+      }
+    },
+    {
+      "profile": "fair-default-pdm",
+      "case": "run-he",
+      "state": "TERMINAL_NONPASS",
+      "reason": "IncompleteRead(0 bytes read)",
+      "source": "after",
+      "full_aac_pcm": false,
+      "frames": null,
+      "allocation_failures": null,
+      "minimum_heap": null,
+      "rx_wait_episodes": 1,
+      "guest_fault": false,
+      "report": {
+        "bytes": 14325,
+        "sha256": "b8174a139cf8e0b29ff627a21aaa1f8c59ae185580021fbb84efabab1b54f667"
+      },
+      "uart": {
+        "bytes": 4891,
+        "sha256": "f8d9848bbb4fbb94e871464473ef74a71e122bdae2b62ca3312899b260d75ca3"
+      }
+    },
+    {
+      "profile": "fair-default-pdm",
+      "case": "run-opus",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "after",
+      "full_aac_pcm": null,
+      "frames": null,
+      "allocation_failures": 0,
+      "minimum_heap": 59376,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22120,
+        "sha256": "e482e9438ea6764f0301807b029314b73fc6d2b7a0fd81d1362161d182070892"
+      },
+      "uart": {
+        "bytes": 9080,
+        "sha256": "039e2fff6120e1f10fefab770eb6c0dfc8cf089b531622f00a2904aed31315a4"
+      }
+    },
+    {
+      "profile": "fair-tcp4-pdm",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "after",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 0,
+      "minimum_heap": 3420,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22566,
+        "sha256": "5a7297e1d02c41e7f13f66752b628639312dbb4e6f7288b57e448511ad7ad228"
+      },
+      "uart": {
+        "bytes": 8113,
+        "sha256": "d4c11387a10d96d0c814b0f4b4ad0297eda84eebcefabdd77b782758b979bbf8"
+      }
+    },
+    {
+      "profile": "fair-tcp4-continuous",
+      "case": "run-he",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Unexpected allocation failure count",
+      "source": "after",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 1,
+      "minimum_heap": 2804,
+      "rx_wait_episodes": 1,
+      "guest_fault": false,
+      "report": {
+        "bytes": 25187,
+        "sha256": "e0620b68add9a67628ece81f98280f20a03c802e2d61eb1fefbcf38046319fa9"
+      },
+      "uart": {
+        "bytes": 8179,
+        "sha256": "0fd40060ee770c45e876453e3ca731bd3dbccf5659e5fa8609f93b48db831d60"
+      }
+    },
+    {
+      "profile": "fair-tcp4-legacy",
+      "case": "run-he",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Unexpected allocation failure count",
+      "source": "after",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 1,
+      "minimum_heap": 2844,
+      "rx_wait_episodes": 1,
+      "guest_fault": false,
+      "report": {
+        "bytes": 25207,
+        "sha256": "f82f47e37e4e0e1fb666c6228b3ca28ff594ff755e332c1a115aa5ffa434bd82"
+      },
+      "uart": {
+        "bytes": 8421,
+        "sha256": "713ce6afafbd3663e7ba65892faeff8a2c2c32b93b5bfa261f3434766cb1361d"
+      }
+    },
+    {
+      "profile": "fair-tcp4-tx2-pdm",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "after",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 0,
+      "minimum_heap": 2216,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22569,
+        "sha256": "689d1fb3ebcbcab0a6c2bd2c25419e014dcc746b51e8cadfd1b11fb601d585f2"
+      },
+      "uart": {
+        "bytes": 8106,
+        "sha256": "b1bc1564b05e302701287cdcd896b570fc1714e894ffb308685243d82de70032"
+      }
+    },
+    {
+      "profile": "fair-tcp4-tx2-continuous",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "after",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 0,
+      "minimum_heap": 2928,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22609,
+        "sha256": "8f3f750dfa192e06fda24461caafe3192f9d37f469df6fd033d0c8c7d9321c67"
+      },
+      "uart": {
+        "bytes": 7976,
+        "sha256": "0cbba3390fec6dc6eca8bdc809f1da525421336a836514f15a0b334f2348bbae"
+      }
+    },
+    {
+      "profile": "fair-tcp4-tx2-legacy",
+      "case": "run-he",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Unexpected allocation failure count",
+      "source": "after",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 1,
+      "minimum_heap": 1800,
+      "rx_wait_episodes": 1,
+      "guest_fault": false,
+      "report": {
+        "bytes": 25211,
+        "sha256": "f55159d34c6f887de5147f227422dc04f680337f9002a5cb6c8e6ac274ac1118"
+      },
+      "uart": {
+        "bytes": 8414,
+        "sha256": "587d13d1e12e4d6e057ea1c56d65ba2df81cc1c25cb63c6d0f10fe2a79c2f569"
+      }
+    },
+    {
+      "profile": "fair-tcp2-tx2-legacy",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "source": "after",
+      "full_aac_pcm": true,
+      "frames": 614400,
+      "allocation_failures": 0,
+      "minimum_heap": 1588,
+      "rx_wait_episodes": 0,
+      "guest_fault": false,
+      "report": {
+        "bytes": 22625,
+        "sha256": "0c5cfde4c6e709369f9b294fc9aac900b8ad1707b51be5ccc558b67d8fe71e21"
+      },
+      "uart": {
+        "bytes": 8215,
+        "sha256": "6494a052ace1ff0cd0e02ff35dfdf62ec37ac65582d78d3a35c76cc1d1b03f47"
+      }
+    }
+  ],
+  "builds": {
+    "quiet-pdm": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 11520,
+        "LWIP_TCP_RECVMBOX_SIZE": 10,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49178,
+        "sha256": "09ca7ea50e7e947ac5e657567707df71ef55d639bd2c74ea5f9eccacb5e37566"
+      },
+      "source_bindings": {
+        "head": "dc2a30ef07fa37f8ec80930bb31fe151a88dfecf",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81093,
+            "sha256": "dc56d4bc45855ca54dc721b2aa4476aa785d5bd14413eaddba4cd7887011600e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49178,
+          "sha256": "09ca7ea50e7e947ac5e657567707df71ef55d639bd2c74ea5f9eccacb5e37566"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "e0c3b1fc9b55f42c5d5af90dac6655fa8978e0215c3724172a1ccc88feb05d7a"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10626700,
+        "sha256": "913eebf9a77323279318f5ba4fc571c7705442f203ce330831f8e1809b177177"
+      },
+      "link_map": {
+        "bytes": 9249438,
+        "sha256": "82faef271e7d2f513596de19e9884fa8a8b7929124f29c592e2f2616ea1190bc"
+      },
+      "compile_commands": {
+        "bytes": 6670266,
+        "sha256": "4419ec3f53f65985cb9cea19e80104dd5d5823b64906156f217c8c27817905a7"
+      },
+      "compiled_project_version": "v0.9.693-2150-gdc2a30ef0-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 153560,
+        "sha256": "313c7ee270550d13f8d7494411ee1e2d466b18d68aed11fa8c0054b7d9f6edd0"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "quiet-tcp4-pdm": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "34b99d3075b5a890e3e22c8affb6b565aab88cc84263f91ecb37ca62ac70f890"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81093,
+            "sha256": "dc56d4bc45855ca54dc721b2aa4476aa785d5bd14413eaddba4cd7887011600e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "34b99d3075b5a890e3e22c8affb6b565aab88cc84263f91ecb37ca62ac70f890"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "e0c3b1fc9b55f42c5d5af90dac6655fa8978e0215c3724172a1ccc88feb05d7a"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10626708,
+        "sha256": "0d07b8c190fe53485a0cf1d9f30339ef35efbf495ce81c24fce33104291d8978"
+      },
+      "link_map": {
+        "bytes": 9249518,
+        "sha256": "6bc387c2ed9ddeb445f6a5b620b566e9b0882d72105613d99d7233729f7cbe9a"
+      },
+      "compile_commands": {
+        "bytes": 6670266,
+        "sha256": "4419ec3f53f65985cb9cea19e80104dd5d5823b64906156f217c8c27817905a7"
+      },
+      "compiled_project_version": "v0.9.693-2150-gdc2a30ef0-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 138348,
+        "sha256": "78ab163e136fdde6d401e492f926f66afd35f8a11d7c0f632d25d90439c409c3"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "quiet-tcp4-continuous": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "67e71840e3a8ff5db770dbb61d7854b8e1dc2acc1458540d94939b800bafd26d"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81093,
+            "sha256": "dc56d4bc45855ca54dc721b2aa4476aa785d5bd14413eaddba4cd7887011600e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "67e71840e3a8ff5db770dbb61d7854b8e1dc2acc1458540d94939b800bafd26d"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "d073a139e41d3fa2252528ffe7dee55f3bc4b8ed468b0b95d2aeedbd31aca462"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10571596,
+        "sha256": "41abeda4402a3ac46bd3c48db9de65a055b7d01fb14b620ff27887b412fc99fa"
+      },
+      "link_map": {
+        "bytes": 9230980,
+        "sha256": "d02f8af74c8919b99518d4c26b81bf2bbd4d5d090ee6d271944b3f0025891e18"
+      },
+      "compile_commands": {
+        "bytes": 6693373,
+        "sha256": "d1ef8b85cb5fcf02fb038b69acee7e2294ffc51636d545bf0aedada0b80a0001"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 154508,
+        "sha256": "2f08d54d7b861eb1d9a700afebcecd91c26c0d07af89cccbdc2cc15277c6b250"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "quiet-tcp4-legacy": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": true
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "e6d2f5208a3d51847613534f8451df99eb2886e3d51bf551763c37f3924dc695"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81093,
+            "sha256": "dc56d4bc45855ca54dc721b2aa4476aa785d5bd14413eaddba4cd7887011600e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/compat/idf5_legacy_dac_backend.cpp",
+            "bytes": 2602,
+            "sha256": "84701c5244fced985fe5761353f1aa10cba51cfb58f91cad5cff2dc6a2253b53"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "e6d2f5208a3d51847613534f8451df99eb2886e3d51bf551763c37f3924dc695"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "8a14b869d55b61a6a398fc06f532bbfe7b11e78ea32b4cca4f846dab34db46e8"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10616404,
+        "sha256": "e2ae22a4db41f794e361e304c6ecfbaa24d4335d3314057e2099c22a18d71c48"
+      },
+      "link_map": {
+        "bytes": 9242840,
+        "sha256": "d0c596f816564c469c73670898f0c453d6363882c462dbab0c7b3003dd084598"
+      },
+      "compile_commands": {
+        "bytes": 6715344,
+        "sha256": "12aa82569db2e64f170a9430edaf14b4464203b643ebcf46d84cb90c812f6f81"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 156888,
+        "sha256": "1540d600120cc602505c324f78fd5fb8d602bc2b1a94d1f19ebf485889d006ab"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-default-pdm": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 11520,
+        "LWIP_TCP_RECVMBOX_SIZE": 10,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49178,
+        "sha256": "09ca7ea50e7e947ac5e657567707df71ef55d639bd2c74ea5f9eccacb5e37566"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49178,
+          "sha256": "09ca7ea50e7e947ac5e657567707df71ef55d639bd2c74ea5f9eccacb5e37566"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "e0c3b1fc9b55f42c5d5af90dac6655fa8978e0215c3724172a1ccc88feb05d7a"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10631436,
+        "sha256": "928dd02e4a2a9a128fe8730e264ced16ab8fb4a4c8d542093eb2459305e5d355"
+      },
+      "link_map": {
+        "bytes": 9249336,
+        "sha256": "f6710dd7d0c44361d040c4a1cf2f0d1d97941795faed9a1102f92bc8f388cd0e"
+      },
+      "compile_commands": {
+        "bytes": 6631242,
+        "sha256": "575e55b7931ff866fbaff182d2e2a252688859af91adeca7de98822d076e3b76"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 157227,
+        "sha256": "091740fd2ac021d24b95dcbdb74a0259d55d250d08acec327e0ad9b5d020bb7b"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-tcp4-pdm": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "34b99d3075b5a890e3e22c8affb6b565aab88cc84263f91ecb37ca62ac70f890"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "34b99d3075b5a890e3e22c8affb6b565aab88cc84263f91ecb37ca62ac70f890"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "e0c3b1fc9b55f42c5d5af90dac6655fa8978e0215c3724172a1ccc88feb05d7a"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10631548,
+        "sha256": "49c321450ffd9b2ca51a04bb86c4f9d97340cc42a46eae1b4bf4cbda326b5cfe"
+      },
+      "link_map": {
+        "bytes": 9249376,
+        "sha256": "538ce4b4dbaccb5a8a9eaa584d17800d09fb3d360420845a14fc50bdb4322c0f"
+      },
+      "compile_commands": {
+        "bytes": 6670266,
+        "sha256": "e95d22c5042f9eaed291783929c2ee878e450deaffcf744c99e5a7b3ea6ce454"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 24876,
+        "sha256": "50d63d13a6104f54db0318c7614f4dbb2e24d72b2ea21fbdb5b0bebbdea60cf8"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-tcp4-continuous": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "67e71840e3a8ff5db770dbb61d7854b8e1dc2acc1458540d94939b800bafd26d"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "67e71840e3a8ff5db770dbb61d7854b8e1dc2acc1458540d94939b800bafd26d"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "d073a139e41d3fa2252528ffe7dee55f3bc4b8ed468b0b95d2aeedbd31aca462"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10572340,
+        "sha256": "119ab361f05f673836178558332d4245f91cf04af4d3dbd86d31e0f79942cd86"
+      },
+      "link_map": {
+        "bytes": 9230838,
+        "sha256": "52e76d1c220e305f8ece9ae53e5b2acf14c01e65ee63e5fbdb7f45b519ba9aa6"
+      },
+      "compile_commands": {
+        "bytes": 6693373,
+        "sha256": "d1ef8b85cb5fcf02fb038b69acee7e2294ffc51636d545bf0aedada0b80a0001"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 25246,
+        "sha256": "82240cb28f5d251bedbf449a13816ee1c8126113c0e6cd73eb2c6830b3d2d097"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-tcp4-legacy": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": true
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "e6d2f5208a3d51847613534f8451df99eb2886e3d51bf551763c37f3924dc695"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/compat/idf5_legacy_dac_backend.cpp",
+            "bytes": 2602,
+            "sha256": "84701c5244fced985fe5761353f1aa10cba51cfb58f91cad5cff2dc6a2253b53"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "e6d2f5208a3d51847613534f8451df99eb2886e3d51bf551763c37f3924dc695"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "8a14b869d55b61a6a398fc06f532bbfe7b11e78ea32b4cca4f846dab34db46e8"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10617148,
+        "sha256": "61c29896c611b40b530dc08bd80e96ad7ad98c061952dc728ce570267154522d"
+      },
+      "link_map": {
+        "bytes": 9242760,
+        "sha256": "af8d5470116d8ff9c7962f085bc309e020aaaaf89e9df9f37cd92a6806842e1c"
+      },
+      "compile_commands": {
+        "bytes": 6715344,
+        "sha256": "12aa82569db2e64f170a9430edaf14b4464203b643ebcf46d84cb90c812f6f81"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 24959,
+        "sha256": "b5f00f4d84f8aa3ba10f477402668bafec7d94f3b8b32c35e073b3a19e88866e"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-tcp4-tx2-pdm": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 2880,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "b3c328ac570960dd67cedcd0f11f09f48bba876bfd324a189c04effbde8764bd"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "b3c328ac570960dd67cedcd0f11f09f48bba876bfd324a189c04effbde8764bd"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "e0c3b1fc9b55f42c5d5af90dac6655fa8978e0215c3724172a1ccc88feb05d7a"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_SND_BUF_DEFAULT",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10631572,
+        "sha256": "8ec0b225c4be5f2e7a7a8f52ab3bf9d1f757010fc703ada1112a663c0a7005ca"
+      },
+      "link_map": {
+        "bytes": 9249376,
+        "sha256": "7b2b5f5d7af28f04eec4cc4809b1bc6d0b8e4f977b690e8b7be52dee8eaab880"
+      },
+      "compile_commands": {
+        "bytes": 6670266,
+        "sha256": "e95d22c5042f9eaed291783929c2ee878e450deaffcf744c99e5a7b3ea6ce454"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 138832,
+        "sha256": "2e1425babcfec7602b8252e7f89383db8c51b42dc70f18635cbd6d99eb9962a1"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-tcp4-tx2-continuous": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 2880,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": false
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "a127ebf3074f17331f7d7152baa6d5cb656c4d68f6ddd40afd73d7ba6d990ffe"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "a127ebf3074f17331f7d7152baa6d5cb656c4d68f6ddd40afd73d7ba6d990ffe"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "d073a139e41d3fa2252528ffe7dee55f3bc4b8ed468b0b95d2aeedbd31aca462"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_SND_BUF_DEFAULT",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10572364,
+        "sha256": "3ad0267693517736f340eef2eae7456d1f889efe526aa4665f487f79c2a5a85c"
+      },
+      "link_map": {
+        "bytes": 9230838,
+        "sha256": "e2f386b6aeb6adb166802f0eabf7c45e27b701a63f145f9118848e08e9e6027a"
+      },
+      "compile_commands": {
+        "bytes": 6693373,
+        "sha256": "d1ef8b85cb5fcf02fb038b69acee7e2294ffc51636d545bf0aedada0b80a0001"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 139079,
+        "sha256": "210dc52ff40600135c0cc803233ef9e759d44bcb8d58d9dc2754a053fd0ba876"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-tcp4-tx2-legacy": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 5760,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 2880,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": true
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "c0bd3b32fa201adf373e9cbad4769fae089b01cf7b9dc9d572499b040d40c3ab"
+      },
+      "source_bindings": {
+        "head": "f68b0ba6c1fb0374f6423b3f86151777b4af9a31",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/compat/idf5_legacy_dac_backend.cpp",
+            "bytes": 2602,
+            "sha256": "84701c5244fced985fe5761353f1aa10cba51cfb58f91cad5cff2dc6a2253b53"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "c0bd3b32fa201adf373e9cbad4769fae089b01cf7b9dc9d572499b040d40c3ab"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "8a14b869d55b61a6a398fc06f532bbfe7b11e78ea32b4cca4f846dab34db46e8"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_SND_BUF_DEFAULT",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10617164,
+        "sha256": "6a6d242e978ce85e69cd6c4a90601c272214e1a03dde9cb84616d41e371e4269"
+      },
+      "link_map": {
+        "bytes": 9242760,
+        "sha256": "f17e686bcddf83995708edabbed93c9d019fa681524f1f3b8952bdead0b93422"
+      },
+      "compile_commands": {
+        "bytes": 6715344,
+        "sha256": "12aa82569db2e64f170a9430edaf14b4464203b643ebcf46d84cb90c812f6f81"
+      },
+      "compiled_project_version": "v0.9.693-2151-gf68b0ba6c-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 141479,
+        "sha256": "5fbea8de3557e9c7b408ed20fd9de83bc8587a70f9eb78691cb3766f8c0e40f6"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    },
+    "fair-tcp2-tx2-legacy": {
+      "policy": {
+        "IDF_TARGET": "esp32",
+        "FREERTOS_UNICORE": false,
+        "ESP_SYSTEM_SINGLE_CORE_MODE": null,
+        "FREERTOS_HZ": 1000,
+        "ESP_TASK_WDT_TIMEOUT_S": 5,
+        "ESP_INT_WDT_TIMEOUT_MS": 300,
+        "YORADIO_NATIVE_DIAGNOSTICS": false,
+        "FREERTOS_GENERATE_RUN_TIME_STATS": false,
+        "FREERTOS_USE_TRACE_FACILITY": false,
+        "LWIP_TCP_MSS": 1440,
+        "LWIP_TCP_WND_DEFAULT": 2880,
+        "LWIP_TCP_RECVMBOX_SIZE": 6,
+        "LWIP_TCP_SND_BUF_DEFAULT": 2880,
+        "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+        "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+        "MBEDTLS_DYNAMIC_BUFFER": false,
+        "YORADIO_TLS_STATIC_RX_RESERVE": false,
+        "YORADIO_AUDIO_STEREO_ONLY": true,
+        "YORADIO_AAC_PLUS": true,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_PDM": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_DAC": false,
+        "YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC": true
+      },
+      "config": {
+        "bytes": 49176,
+        "sha256": "a85621b093022a380f814080bfbddc08295170ccdb1ab895e14d8eb8370ae643"
+      },
+      "source_bindings": {
+        "head": "9029d41405f9a0ad8f3e4931257580e8d5d2c695",
+        "scope": "actual project translation units; not a complete compiler dependency closure",
+        "project_units": [
+          {
+            "file": "idf/components/audio_level_led/audio_level_led.c",
+            "bytes": 4436,
+            "sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646"
+          },
+          {
+            "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+            "bytes": 1057,
+            "sha256": "e649a8ac63079f901a135cabc733624271f033766e6f4c71f69112ce1c19ecdc"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+            "bytes": 6625,
+            "sha256": "aff4fe21d9b99e5deff3725fcfcf4f8c8cb4411c37a10158f97c79c4a88f972d"
+          },
+          {
+            "file": "idf/components/native_audio_settings/native_audio_settings.c",
+            "bytes": 10646,
+            "sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536"
+          },
+          {
+            "file": "idf/components/native_storage/file_transaction.c",
+            "bytes": 3563,
+            "sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef"
+          },
+          {
+            "file": "idf/components/native_stream/icy_title.c",
+            "bytes": 2162,
+            "sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780"
+          },
+          {
+            "file": "idf/components/native_stream/adaptive_input.c",
+            "bytes": 14519,
+            "sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca"
+          },
+          {
+            "file": "idf/components/native_web_transport/native_web_transport.c",
+            "bytes": 17573,
+            "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_sink.c",
+            "bytes": 5941,
+            "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_form.c",
+            "bytes": 3405,
+            "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+          },
+          {
+            "file": "idf/components/native_ota/native_ota_http.c",
+            "bytes": 10911,
+            "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp.c",
+            "bytes": 4687,
+            "sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508"
+          },
+          {
+            "file": "idf/components/native_time/native_time_sntp_context.c",
+            "bytes": 3818,
+            "sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_store.c",
+            "bytes": 10236,
+            "sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_file.c",
+            "bytes": 2043,
+            "sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_json.c",
+            "bytes": 10641,
+            "sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_http.c",
+            "bytes": 6071,
+            "sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751"
+          },
+          {
+            "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+            "bytes": 6970,
+            "sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493"
+          },
+          {
+            "file": "idf/components/native_network_power/native_network_power.c",
+            "bytes": 3231,
+            "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+            "bytes": 4218,
+            "sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a"
+          },
+          {
+            "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+            "bytes": 13387,
+            "sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3"
+          },
+          {
+            "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+            "bytes": 13024,
+            "sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26"
+          },
+          {
+            "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+            "bytes": 39323,
+            "sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+            "bytes": 5400,
+            "sha256": "b757741e5eff2636ea25f789c3aa4365633fdcc20dabb9f1211369c9195e46bc"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+            "bytes": 81045,
+            "sha256": "4f5ef85c16da5c975943e564056df4dc85be95b011b84410a3b5bd7ecab76673"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+            "bytes": 1240,
+            "sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+            "bytes": 147,
+            "sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+            "bytes": 8769,
+            "sha256": "61c17223d4e805f6c8645a5c8a3bb3ce9385e4de31189bdd09be2c230c1b6902"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+            "bytes": 40139,
+            "sha256": "1e20102ca3ee8de45dffcf2aa6a59b4cc67bb84bebdbbedac9ffb22796b9c6c0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_output_metrics.c",
+            "bytes": 3050,
+            "sha256": "ceed55370b02bc42ff6e2866c6257f66e339f11a1364ddce395e75d887191e72"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+            "bytes": 10461,
+            "sha256": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+            "bytes": 8842,
+            "sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+            "bytes": 6754,
+            "sha256": "01e2f78f01833b61891c1594ea866268564b59eb5fa57a2192897cb95702d9ad"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+            "bytes": 9270,
+            "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_profiles.c",
+            "bytes": 1578,
+            "sha256": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_netif.c",
+            "bytes": 1369,
+            "sha256": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+            "bytes": 33419,
+            "sha256": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+            "bytes": 5979,
+            "sha256": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_service.c",
+            "bytes": 7412,
+            "sha256": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/time_settings.c",
+            "bytes": 8735,
+            "sha256": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+            "bytes": 28023,
+            "sha256": "f068ba6572d5aaebc31c66ef483ef084f290e60526b255df7adfa746bcda76e8"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+            "bytes": 8552,
+            "sha256": "92e764299c46ab0e72cd51a9612695a73405ed99e287371e730e5755a846a89d"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+            "bytes": 14288,
+            "sha256": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_reboot.c",
+            "bytes": 4559,
+            "sha256": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_ota.c",
+            "bytes": 2699,
+            "sha256": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_wifi.c",
+            "bytes": 1742,
+            "sha256": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_time.c",
+            "bytes": 8155,
+            "sha256": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+            "bytes": 7545,
+            "sha256": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+            "bytes": 39780,
+            "sha256": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+            "bytes": 29883,
+            "sha256": "34660f5cf4df940fa35bfdde1bd773bcf3a180c953a25e3c6f9e1b2cbf9ed2e5"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/compat/idf5_legacy_dac_backend.cpp",
+            "bytes": 2602,
+            "sha256": "84701c5244fced985fe5761353f1aa10cba51cfb58f91cad5cff2dc6a2253b53"
+          },
+          {
+            "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+            "bytes": 386,
+            "sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/network.c",
+            "bytes": 2614,
+            "sha256": "eec8a608a3410394031167d75f89f680d53d7262a9ee177e4dd454748bf2f6c0"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/allocation.c",
+            "bytes": 1961,
+            "sha256": "97ba075e885a565c682db76babedc85b24b2a04758f6e37f7a933bc48d884c55"
+          },
+          {
+            "file": "tests/target/cyd_full_app_openeth_qemu/pcm.c",
+            "bytes": 5765,
+            "sha256": "ae50ad27e4a621a8a7114fcf8aae1a88234d66a261a25bd4f94f639fe159dfb0"
+          }
+        ],
+        "config": {
+          "bytes": 49176,
+          "sha256": "a85621b093022a380f814080bfbddc08295170ccdb1ab895e14d8eb8370ae643"
+        },
+        "original_production_config": {
+          "bytes": 49107,
+          "sha256": "8a14b869d55b61a6a398fc06f532bbfe7b11e78ea32b4cca4f846dab34db46e8"
+        },
+        "config_changed_keys": [
+          "ETH_DMA_BUFFER_SIZE",
+          "ETH_DMA_RX_BUFFER_NUM",
+          "ETH_DMA_TX_BUFFER_NUM",
+          "ETH_IRAM_OPTIMIZATION",
+          "ETH_OPENETH_DMA_RX_BUFFER_NUM",
+          "ETH_OPENETH_DMA_TX_BUFFER_NUM",
+          "ETH_USE_ESP32_EMAC",
+          "ETH_USE_OPENETH",
+          "LWIP_TCP_RECVMBOX_SIZE",
+          "LWIP_TCP_SND_BUF_DEFAULT",
+          "LWIP_TCP_WND_DEFAULT",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE",
+          "MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH"
+        ]
+      },
+      "elf": {
+        "bytes": 10617164,
+        "sha256": "fac365c8ffaf24a7ebd293d0ad33364f835b7d95d5d54502ea5ad24607d43d64"
+      },
+      "link_map": {
+        "bytes": 9242760,
+        "sha256": "1629c983bb6f8fb8c31c491617c771258a52f3bf4f7a3cf3587f80af986aad72"
+      },
+      "compile_commands": {
+        "bytes": 6715344,
+        "sha256": "57bdd55a04ad98d19f36229ccd4d529d8cd0f5b9099135f66c71e21f25bac566"
+      },
+      "compiled_project_version": "v0.9.693-2152-g9029d4140-dirty",
+      "workspace_head_scope": "The bindings head records workspace HEAD at snapshot; compiled version and byte pins are separate.",
+      "original_build_terminal": {
+        "bytes": 141694,
+        "sha256": "20278ad4a96f4262285b67d2fc6fdd4b9d0b4442613fac4c574ce9f5c99fc3d5"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "original_vendor_link_paths_verified": true
+    }
+  },
+  "qualification": {
+    "aac-task.json": {
+      "bytes": 332306,
+      "sha256": "32027616325f25b5c757b6fda28d124956e4dd8aa647f1e852b1d883a9142112"
+    },
+    "aac-witness.json": {
+      "bytes": 6900,
+      "sha256": "e5cf9cd3077c9d44aa44751ea92a777bbb049d72b29336696f3c8759e7b56c18"
+    },
+    "clang-comparison.json": {
+      "bytes": 369,
+      "sha256": "7ea6a548fb552ec9d1df4bf218fa610de143422615d724efa5904f144cddb1fd"
+    },
+    "clang.json": {
+      "bytes": 56119,
+      "sha256": "7ac7cdbf8a482dafbf6d4e871adfffc8bca0838729e763c41a20cd7c1ddc49bf"
+    },
+    "decoder-fairness-host.log": {
+      "bytes": 376,
+      "sha256": "06b07c1392a7e4aa151f88d59fb183bfd5e591d7f1fcbf724b59764456a23999"
+    },
+    "ogg-stack.json": {
+      "bytes": 484,
+      "sha256": "ff7591f2ec341befe96454ca49fb483f417a4e59c5ef9d8e68bcdc4ed55817e4"
+    },
+    "reviewed-source-release.json": {
+      "bytes": 2086,
+      "sha256": "c1f0fdd6e87677e746400e9ae3a1ce666504dab02f7a3a6aaf8ddf33e7c933d9"
+    },
+    "overlay-pdm.json": {
+      "bytes": 525,
+      "sha256": "73ec4aeeed29da403784b7a72e1ad6a7d992f94090d4a4f46c93c335562157f8"
+    },
+    "overlay-continuous.json": {
+      "bytes": 563,
+      "sha256": "74899697af8eef54283f45534f0af8d279905bf9940172a37a17eefb9e0519f7"
+    },
+    "overlay-legacy.json": {
+      "bytes": 572,
+      "sha256": "a45b08dba17a07a7911c30af72be592a8a28243ad642734ce8b76768762f3d26"
+    }
+  },
+  "repositories": {
+    "sdk": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+    "vendor": "67b8d0e98f58c774b8652480893037273190e8dc",
+    "legacy_sdk": "735507283d5b2f9fb363a1901172dbd9e847945d"
+  },
+  "rx2_preparation": {
+    "initial_requested_mailbox": 4,
+    "sdk_minimum": 6,
+    "actual_executed_mailbox": 6,
+    "initial_script": {
+      "bytes": 777,
+      "sha256": "11e013ec4ad6694ddfb03e994a5d7c667874239038de0c0deb80967f0116f2a4"
+    },
+    "corrected_script": {
+      "bytes": 774,
+      "sha256": "86685fc69e6888cb87152e5b7dcb559172be1c5489e366913934a991301ed9d1"
+    },
+    "note": "SDK normalized the private initial request to 6; compiled policy was checked before execution. Reproduction retains 6 explicitly."
+  },
+  "archives": {
+    "libesp_audio_codec.a": {
+      "bytes": 4384572,
+      "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58"
+    },
+    "libesp_audio_simple_dec.a": {
+      "bytes": 156872,
+      "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6"
+    }
+  },
+  "native_witness_identities": {
+    "source-manifest.json": {
+      "bytes": 191965,
+      "sha256": "2e7f138bc1554915cced52a4c62cf68d5364d9c444726835727654db1c16432e"
+    },
+    "actual-compiler-closure.json": {
+      "bytes": 537636,
+      "sha256": "e4ed1494f47fc7a51e72f0f3a0042bc446a6edd4cfd5d45328618fc3f73067b9"
+    },
+    "execution-bundle.json": {
+      "bytes": 263397,
+      "sha256": "a9803f28f029af376bd4a30b4389169da152f9e24d62bad7c319f820cd2dcce1"
+    },
+    "qemu.stdout.log": {
+      "bytes": 186887,
+      "sha256": "0a97773733b5cc49f1bfacb4786d69bf4fddf9724767dae3a22251732926a261"
+    },
+    "qemu.stderr.log": {
+      "bytes": 25,
+      "sha256": "9b84897e8a8cf208b80b43c2c8e5868a877c1971cf171cdbf76cdaebb34d7096"
+    }
+  },
+  "published_overlay_checks": {
+    "pdm": {
+      "result": {
+        "bytes": 525,
+        "sha256": "73ec4aeeed29da403784b7a72e1ad6a7d992f94090d4a4f46c93c335562157f8"
+      },
+      "configuration": {
+        "bytes": 49105,
+        "sha256": "d8e8caf9a2278b7032b5e3ce5eb15b07999c03b3ed179b669e4a3e2cfd62bfdd"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 759,
+        "sha256": "08b8536a6ba3cb222febcf6055384a89754e97a141205d51417851d922d15d2a"
+      },
+      "published_defaults": {
+        "sdkconfig.defaults": {
+          "bytes": 3874,
+          "sha256": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3"
+        },
+        "sdkconfig.tcp-rx-four-segments.defaults": {
+          "bytes": 429,
+          "sha256": "5c846b003ea393d820a78e07d2dfac59eb7b4fa8a9b8a242ea30cf8b1ac63300"
+        },
+        "sdkconfig.tcp-tx-two-segments.defaults": {
+          "bytes": 334,
+          "sha256": "90b39aa405668509cbf845c4fea1e110f8f32511da4d7737d9a7ccc3452fd1d6"
+        }
+      }
+    },
+    "continuous": {
+      "result": {
+        "bytes": 563,
+        "sha256": "74899697af8eef54283f45534f0af8d279905bf9940172a37a17eefb9e0519f7"
+      },
+      "configuration": {
+        "bytes": 49105,
+        "sha256": "80aa93434f415817aab38dc01e3566534b3474386c817c54f05d67c947bee235"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "published_defaults": {
+        "sdkconfig.defaults": {
+          "bytes": 3874,
+          "sha256": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3"
+        },
+        "sdkconfig.dac.defaults": {
+          "bytes": 167,
+          "sha256": "df2a480342c13588d7e2414513a7a4d0a36bb3fd1f70e22bafcb0f5e2346f114"
+        },
+        "sdkconfig.tcp-rx-four-segments.defaults": {
+          "bytes": 429,
+          "sha256": "5c846b003ea393d820a78e07d2dfac59eb7b4fa8a9b8a242ea30cf8b1ac63300"
+        },
+        "sdkconfig.tcp-tx-two-segments.defaults": {
+          "bytes": 334,
+          "sha256": "90b39aa405668509cbf845c4fea1e110f8f32511da4d7737d9a7ccc3452fd1d6"
+        }
+      }
+    },
+    "legacy": {
+      "result": {
+        "bytes": 572,
+        "sha256": "a45b08dba17a07a7911c30af72be592a8a28243ad642734ce8b76768762f3d26"
+      },
+      "configuration": {
+        "bytes": 49105,
+        "sha256": "5ecf6bc3684db4c186b7209d7389e5ae19f54d421b9e694d38427061762a3bcd"
+      },
+      "original_sdk_activation_log": {
+        "bytes": 477,
+        "sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+      },
+      "published_defaults": {
+        "sdkconfig.defaults": {
+          "bytes": 3874,
+          "sha256": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3"
+        },
+        "sdkconfig.legacy-dac.defaults": {
+          "bytes": 234,
+          "sha256": "f513213d132508d852d9ae07d04d7efe8a036f816cc9c8747c5b299ffe6e25ff"
+        },
+        "sdkconfig.tcp-rx-two-segments.defaults": {
+          "bytes": 370,
+          "sha256": "d5905a53d837553e258dcdb524d0a4e944a6b5bf9551ee35286621e3c5cafb7b"
+        },
+        "sdkconfig.tcp-tx-two-segments.defaults": {
+          "bytes": 334,
+          "sha256": "90b39aa405668509cbf845c4fea1e110f8f32511da4d7737d9a7ccc3452fd1d6"
+        }
+      }
+    }
+  }
+}
