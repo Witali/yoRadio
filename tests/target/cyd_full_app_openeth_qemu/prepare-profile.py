@@ -45,7 +45,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sdkconfig', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--tls-diagnostics', action='store_true', help='Use a 30 s task watchdog, telemetry and a disposable local CA')
+    tls = parser.add_mutually_exclusive_group()
+    tls.add_argument('--tls-diagnostics', action='store_true', help='Use a 30 s task watchdog, telemetry and a disposable local CA')
+    tls.add_argument('--tls-production-policy', action='store_true',
+                     help='Add a disposable CA while retaining quiet production watchdog and instrumentation settings')
     args = parser.parse_args()
     output = args.output.resolve()
     if not output.is_relative_to(ROOT / '.build') or output == ROOT / '.build':
@@ -53,13 +56,16 @@ def main():
     seed = args.sdkconfig.read_text()
     if not re.search(r'^CONFIG_IDF_TARGET="esp32"$', seed, re.M):
         raise ValueError('Expected a classic ESP32 production sdkconfig')
+    if args.tls_production_policy and re.search(r'^CONFIG_YORADIO_NATIVE_DIAGNOSTICS=y$', seed, re.M):
+        raise ValueError('Production-policy TLS requires a quiet source sdkconfig')
     output.mkdir(parents=True)
     values = {'ETH_USE_OPENETH': 'y', 'ETH_USE_ESP32_EMAC': 'n'}
-    if args.tls_diagnostics:
+    if args.tls_diagnostics or args.tls_production_policy:
         write_local_ca(output)
-        values.update(ESP_TASK_WDT_TIMEOUT_S='30', YORADIO_NATIVE_DIAGNOSTICS='y',
-                      MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE='y',
+        values.update(MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE='y',
                       MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE_PATH=f'"{(output / "ca.pem").as_posix()}"')
+    if args.tls_diagnostics:
+        values.update(ESP_TASK_WDT_TIMEOUT_S='30', YORADIO_NATIVE_DIAGNOSTICS='y')
     for key, value in values.items():
         seed = re.sub(rf'(?m)^(?:CONFIG_{key}=.*|# CONFIG_{key} is not set)\n?', '', seed)
         seed += f'\nCONFIG_{key}={value}\n'

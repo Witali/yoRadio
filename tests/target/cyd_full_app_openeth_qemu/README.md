@@ -16,11 +16,11 @@ executable and ROM directory.
 ```powershell
 $deps = 'C:/Work/yoRadio/.idf'
 $baseConfig = 'path/to/built/vendor-pdm/sdkconfig'
-$qemu = '.build/cyd-qemu-idf6-build-05/qemu-system-xtensa.exe'
+$qemu = '.build/cyd-openeth-ota-lifecycle-20261116/qemu-system-xtensa.exe'
 $rom = 'C:/Work/QEMU-ESP32/pc-bios'
 $py = "$deps/tools-v6.0.2/python_env/idf6.0_py3.12_env/Scripts/python.exe"
 $target = 'tests/target/cyd_full_app_openeth_qemu'
-& $py -B "$target/prepare-profile.py" --sdkconfig $baseConfig --output .build/openeth-profile --tls-diagnostics
+& $py -B "$target/prepare-profile.py" --sdkconfig $baseConfig --output .build/openeth-profile --tls-production-policy
 $profile = (Resolve-Path .build/openeth-profile).Path
 $hook = (Resolve-Path "$target/attach.cmake").Path.Replace('\','/')
 & ./idf/esp32-cyd2usb-native/build.ps1 -DependencyRoot $deps -BuildDirectory "$profile/build" -Sdkconfig "$profile/sdkconfig" -IdfArguments @('-D','IDF_TOOLCHAIN=gcc','-D',"CMAKE_PROJECT_yoradio_cyd2usb_native_INCLUDE=$hook",'build')
@@ -29,13 +29,20 @@ $hook = (Resolve-Path "$target/attach.cmake").Path.Replace('\','/')
 & $py -B tests/run-cyd-full-app-openeth.py --build .build/openeth-fixture --qemu $qemu --rom $rom --tls-material $profile --output .build/openeth-load
 ```
 
-Use fresh output directories for each run. The TLS profile adds telemetry, a
-30-second task watchdog and a one-day local CA. Keep the generated key in the
-ignored profile directory. The fixture copies tracked WebUI assets and stages a
-one-station TSV playlist and its index into a separate SPIFFS image. The boot
-control serves the exact gzip JavaScript asset and reports the actual guest's
-heap and stack samples. The load case selects station 1 through the WebUI API
-and requires progress in the audio driver's byte counter across a WebUI read.
+Use fresh output directories for each run. `--tls-production-policy` requires
+a quiet source configuration and adds a one-day local CA without changing
+watchdogs, native instrumentation, TCP windows or TLS record capacities.
+Keep the generated key in the ignored profile directory. Use the mutually
+exclusive `--tls-diagnostics` only when CPU/stack profiling is intended: it
+enables the sampler and a 30-second task watchdog. The sampler adds a 4 KiB
+task stack plus working arrays, so this is a different memory policy.
+
+The fixture copies tracked WebUI assets and stages a one-station TSV playlist
+and its index into a separate SPIFFS image. The boot control serves the exact
+gzip JavaScript asset and reads the real guest's health endpoint. Quiet builds
+retain fault counters and on-demand heap health without the CPU/stack sampler.
+The load case selects station 1 through the WebUI API and requires progress in
+the audio driver's byte counter across a WebUI read.
 
 For the OpenETH receive-memory experiment, add `'-D','CYD_OPENETH_RX_BACKOFF=ON'`
 to `-IdfArguments` before `'build'`. Use a new build directory with the same
