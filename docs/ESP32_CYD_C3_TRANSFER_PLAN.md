@@ -1,7 +1,17 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-11-17. Ветка: `codex/cyd-espressif-vorbis`.
+Обновлено: 2026-11-23. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
+
+Текущая точка: [HE-AAC/TLS/TFT/WebUI прошёл в QEMU на всех трёх выходах](../tests/results/cyd-aac-resource-profile-20261123/README.md)
+с опциональными бюджетами TCP и штатными watchdog. [Шесть обычных production-образов](../tests/results/cyd-aac-fairness-production-20261123/README.md)
+обновлены после AAC memory/fairness исправлений, без изменения конфигураций
+платы и сети. Полный Clang: 320 project units и 20 SDK frontend, без ошибок
+и новых предупреждений. Обычный сетевой профиль HE-AAC остаётся NONPASS;
+физические Wi-Fi/аудио и реальный RTT ещё не проверены. Явно отложенные
+private AAC, собственный Vorbis и дополнительные target error-сценарии FLAC
+не объявляются выполненными. Ниже сохранены предыдущие контрольные точки.
+
 После [точки остановки 4 ноября](../tests/results/cyd-transfer-pause-20261104/README.md)
 закрыты шесть production-сборок и шесть Clang-профилей CYD. Исправлен путь к
 `stream_fairness.h` на C3, собран полный образ и пройдены Clang и хостовая
@@ -145,10 +155,13 @@ C3 сохраняет [предыдущую отдельную сборку и h
 четыре слота перед публикацией AAC. Все 48 actual-task сценариев и полные PCM
 сохранены, 60/60 владельцев закрыты, 41 контроль противоречивых данных отклонён;
 текущий полный PDM Clang проходит 53 units/100 warnings/0 errors.
-Полный HE-AAC с TLS/TFT/WebUI пока не проходит: исходная библиотека отключает
-SBR при отказе 55 128 байт, а новые варианты доходят до давления памяти сети.
-Следом проверяется документированный public frame-input API; compact/private
-AAC, его reset и owner-view остаются отложенными.
+Полный HE-AAC с TLS/TFT/WebUI на обычном сетевом профиле пока не проходит:
+исходная библиотека отключала SBR при отказе 55 128 байт, а текущий default
+доходит до давления памяти сети. [Public frame-input API проверен](../tests/results/cyd-aac-public-input-memory-20261123/README.md),
+но малой экономии недостаточно для нового production owner. [Опциональные
+профили TCP](../tests/results/cyd-aac-resource-profile-20261123/README.md) прошли
+полный HE-AAC на трёх выходах; compact/private AAC, reset и owner-view остаются
+отложенными.
 
 Дополнительная [проверка status keys](../tests/results/ws-status-key-20261023/README.md)
 устранила зависимость публикации WebSocket от padding структуры в CYD и C3.
@@ -326,8 +339,11 @@ compact/private, сохранён в таблице как отложенный,
 41 отрицательный контроль, ASan/UBSan проверки реальной функции уступки,
 полный PDM Clang (53 units, 0 errors, прежние 100 warnings), статические
 кадры decoder/Ogg 1760/2144 и полный TLS/Opus на обычном сетевом профиле.
-Новые production-экспорты ещё не обновлены; compact/private AAC остаётся
-отложенным.
+[Шесть обычных production-экспортов обновлены](../tests/results/cyd-aac-fairness-production-20261123/README.md):
+vendor/custom FLAC × PDM/continuous/legacy, конфигурации побайтно прежние,
+оба OTA-слота и статические стеки проверены. Полный Clang прошёл 320 units
+и 20 SDK frontend без ошибок и без изменения каталога предупреждений.
+Compact/private AAC остаётся отложенным.
 
 Физическая приёмка выделена отдельно и ждёт подключения платы. Собственный
 расширенный Vorbis отложен и не включён в четыре активных блока; перенос
