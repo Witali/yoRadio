@@ -72,6 +72,137 @@ def validate_log(text, expected):
     return rows
 
 
+def validate_frame_log(text, expected, base_cases):
+    lines = [line for line in text.splitlines() if line.startswith('AAC_TLS_FRAME_REFERENCE')]
+    if len(lines) != 5 or lines[-1] != 'AAC_TLS_FRAME_REFERENCE_COMPLETE cases=4 handles_closed=4 heap_integrity=1':
+        raise ValueError('Incomplete frame-input reference census')
+    full = {row['profile']: row for row in base_cases if row['plus'] == 1}
+    keys = set(base_cases[0]) | {'initial_capacity', 'empty_retries', 'encoded_frames', 'last_frame_eos'}
+    rows = []
+    for index, line in enumerate(lines[:-1]):
+        fields = [field.split('=') for field in line.removeprefix('AAC_TLS_FRAME_REFERENCE ').split()]
+        if any(len(field) != 2 for field in fields):
+            raise ValueError('Malformed frame-input record')
+        row = dict(fields)
+        if len(fields) != len(keys) or set(row) != keys:
+            raise ValueError('Unexpected frame-input fields')
+        for key in keys - {'profile', 'input_sha256', 'pcm_sha256'}:
+            if not row[key].isdigit():
+                raise ValueError('Invalid frame-input observation')
+            row[key] = int(row[key])
+        profile = ('lc', 'he')[index // 2]
+        capacity = (12288, 1024)[index % 2]
+        fixture, baseline = expected[profile], full[profile]
+        identity = ('input', 'input_sha256', 'rate', 'channels', 'bits', 'frames', 'pcm_bytes', 'pcm_sha256')
+        if not (row['profile'] == profile and row['plus'] == 1 and row['initial_capacity'] == capacity
+                and row['core'] == 1 and row['priority'] == 3 and row['last_frame_eos'] == 1
+                and row['drained'] == 0 and row['encoded_frames'] == fixture['adts_frames']
+                and all(row[key] == baseline[key] for key in identity)
+                and 0 < row['calls'] < fixture['adts_frames'] * 4 + 16
+                and 0 < row['stack_free'] <= 16384 and row['heap_before'] == row['heap_after'] > 0
+                and 0 <= row['empty_retries'] <= row['resizes']
+                and (capacity != 1024 or row['resizes'] > 0)):
+            raise ValueError('Frame input differs from full PCM, input, retry or task contract')
+        rows.append(row)
+    return rows
+
+
+def validate_buffer_log(text, expected, base_cases):
+    lines = [line for line in text.splitlines() if line.startswith('AAC_TLS_BUFFER_REFERENCE')]
+    if len(lines) != 3 or lines[-1] != 'AAC_TLS_BUFFER_REFERENCE_COMPLETE cases=2 handles_closed=2 heap_integrity=1':
+        raise ValueError('Incomplete parsed-buffer reference census')
+    full = {row['profile']: row for row in base_cases if row['plus'] == 1}
+    rows = []
+    for profile, line in zip(('lc', 'he'), lines[:-1]):
+        pairs = [field.split('=') for field in line.removeprefix('AAC_TLS_BUFFER_REFERENCE ').split()]
+        if any(len(pair) != 2 for pair in pairs):
+            raise ValueError('Malformed parsed-buffer reference')
+        row = dict(pairs)
+        keys = set(base_cases[0]) | {'initial_capacity'}
+        if len(pairs) != len(keys) or set(row) != keys:
+            raise ValueError('Unexpected parsed-buffer fields')
+        for key in keys - {'profile', 'input_sha256', 'pcm_sha256'}:
+            if not row[key].isdigit():
+                raise ValueError('Invalid parsed-buffer observation')
+            row[key] = int(row[key])
+        baseline = full[profile]
+        if not (row['profile'] == profile and row['plus'] == 1 and row['initial_capacity'] == 1024
+                and row['drained'] == 1 and row['core'] == 1 and row['priority'] == 3
+                and row['heap_before'] == row['heap_after'] > 0 and row['resizes'] > 0
+                and 0 < row['stack_free'] <= 16384 and 0 < row['calls'] < expected[profile]['adts_frames'] * 4 + 16
+                and all(row[key] == baseline[key] for key in
+                        ('input', 'input_sha256', 'rate', 'channels', 'bits', 'frames', 'pcm_bytes', 'pcm_sha256'))):
+            raise ValueError('Parsed-buffer input differs from complete reference PCM or lifetime')
+        rows.append(row)
+    return rows
+
+
+def validate_fragment_log(text, expected, base_cases):
+    lines = [line for line in text.splitlines() if line.startswith('AAC_TLS_FRAGMENT_REFERENCE')]
+    if len(lines) != 5 or lines[-1] != 'AAC_TLS_FRAGMENT_REFERENCE_COMPLETE cases=4 handles_closed=4 heap_integrity=1':
+        raise ValueError('Incomplete fragmented-input reference census')
+    full = {row['profile']: row for row in base_cases if row['plus'] == 1}
+    rows = []
+    keys = set(base_cases[0]) | {'initial_capacity', 'framed', 'chunk', 'encoded_frames', 'last_frame_eos'}
+    for index, line in enumerate(lines[:-1]):
+        pairs = [field.split('=') for field in line.removeprefix('AAC_TLS_FRAGMENT_REFERENCE ').split()]
+        if any(len(pair) != 2 for pair in pairs):
+            raise ValueError('Malformed fragmented-input reference')
+        row = dict(pairs)
+        if len(pairs) != len(keys) or set(row) != keys:
+            raise ValueError('Unexpected fragmented-input fields')
+        for key in keys - {'profile', 'input_sha256', 'pcm_sha256'}:
+            if not row[key].isdigit():
+                raise ValueError('Invalid fragmented-input observation')
+            row[key] = int(row[key])
+        profile, framed = ('lc', 'he')[index // 2], index % 2
+        fixture, baseline = expected[profile], full[profile]
+        if not (row['profile'] == profile and row['plus'] == 1 and row['framed'] == framed
+                and row['initial_capacity'] == 8192 and row['chunk'] == 257
+                and row['drained'] == 1 - framed and row['encoded_frames'] == (fixture['adts_frames'] if framed else 0)
+                and row['last_frame_eos'] == framed and row['core'] == 1 and row['priority'] == 3
+                and row['heap_before'] == row['heap_after'] > 0 and row['resizes'] == 0
+                and 0 < row['stack_free'] <= 16384
+                and 0 < row['calls'] < fixture['adts_frames'] * 4 + 16 + 2 * (fixture['input_bytes'] // 257 + 1)
+                and all(row[key] == baseline[key] for key in
+                        ('input', 'input_sha256', 'rate', 'channels', 'bits', 'frames', 'pcm_bytes', 'pcm_sha256'))):
+            raise ValueError('Fragmented input differs from complete reference PCM or ownership')
+        rows.append(row)
+    return rows
+
+
+def validate_memory_log(text, expectations, require_samples=False):
+    lines = [line for line in text.splitlines() if line.startswith('AAC_TLS_MEMORY')]
+    if len(lines) != len(expectations):
+        raise ValueError('Incomplete live-memory census')
+    rows = []
+    keys = {'profile', 'plus', 'framed', 'initial_capacity', 'final_capacity', 'live_free'}
+    sampled = {'chunk', 'min_live_free'}
+    for line, (case, framed, initial, chunk) in zip(lines, expectations):
+        pairs = [field.split('=') for field in line.removeprefix('AAC_TLS_MEMORY ').split()]
+        if any(len(pair) != 2 for pair in pairs):
+            raise ValueError('Malformed live-memory observation')
+        row = dict(pairs)
+        if len(pairs) != len(row) or set(row) not in (keys, keys | sampled):
+            raise ValueError('Unexpected live-memory fields')
+        if require_samples and set(row) != keys | sampled:
+            raise ValueError('Missing sampled memory observations')
+        for key in set(row) - {'profile'}:
+            if not row[key].isdigit():
+                raise ValueError('Invalid live-memory observation')
+            row[key] = int(row[key])
+        row.setdefault('chunk', 0)
+        row.setdefault('min_live_free', None)
+        if not (row['profile'] == case['profile'] and row['plus'] == case['plus']
+                and row['framed'] == framed and row['initial_capacity'] == initial and row['chunk'] == chunk
+                and row['final_capacity'] >= initial and 0 < row['live_free'] < case['heap_before']
+                and (case['resizes'] > 0 or row['final_capacity'] == initial)
+                and (row['min_live_free'] is None or 0 < row['min_live_free'] < case['heap_before'])):
+            raise ValueError('Live memory differs from the completed case or buffer policy')
+        rows.append(row)
+    return rows
+
+
 def main():
     if not __debug__:
         raise RuntimeError('Run the reference controller without Python -O')
@@ -81,6 +212,9 @@ def main():
     parser.add_argument('--qemu', type=Path)
     parser.add_argument('--rom', type=Path)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--frame-input', action='store_true', help='Prepare four additional complete-frame public API cases')
+    parser.add_argument('--small-buffers', action='store_true', help='Prepare two parsed cases with forced public output growth')
+    parser.add_argument('--fragmented-input', action='store_true', help='Prepare four 257-byte transport cases')
     args = parser.parse_args()
     campaign = args.campaign.resolve()
     if not campaign.is_relative_to(ROOT / '.build') or campaign == ROOT / '.build':
@@ -89,6 +223,16 @@ def main():
         campaign.mkdir(parents=True)
         project = campaign / 'project'
         shutil.copytree(PROJECT, project)
+        if args.frame_input:
+            cmake = project / 'main/CMakeLists.txt'
+            with cmake.open('a', encoding='utf-8', newline='\n') as out:
+                out.write('\ntarget_compile_definitions(${COMPONENT_LIB} PRIVATE AAC_REFERENCE_FRAME_INPUT=1)\n')
+        if args.small_buffers:
+            with (project / 'main/CMakeLists.txt').open('a', encoding='utf-8', newline='\n') as out:
+                out.write('\ntarget_compile_definitions(${COMPONENT_LIB} PRIVATE AAC_REFERENCE_SMALL_BUFFER=1)\n')
+        if args.fragmented_input:
+            with (project / 'main/CMakeLists.txt').open('a', encoding='utf-8', newline='\n') as out:
+                out.write('\ntarget_compile_definitions(${COMPONENT_LIB} PRIVATE AAC_REFERENCE_FRAGMENTED_INPUT=1)\n')
         seed = ROOT / 'tests/target/cyd_aac_public_config_qemu'
         shutil.copyfile(seed / 'partitions.csv', project / 'partitions.csv')
         config = (seed / 'sdkconfig.common.defaults').read_text()
@@ -107,7 +251,9 @@ def main():
                                   pcm_frames=fixture['pcm_frames'], repetitions=fixture['repetitions'],
                                   source_sha256=fixture['source_sha256'])
         (project / 'main/fixtures.bin').write_bytes(struct.pack('<4I', 0x41414354, 1, 2, 32) + b''.join(entries + payloads))
-        manifest = dict(schema=1, expected=expected, inputs={p.relative_to(project).as_posix(): pin(p)
+        manifest = dict(schema=1, expected=expected, frame_input=args.frame_input, small_buffers=args.small_buffers,
+                        fragmented_input=args.fragmented_input,
+                        inputs={p.relative_to(project).as_posix(): pin(p)
                         for p in project.rglob('*') if p.is_file()}, archives=ARCHIVES,
                         preparer=pin(Path(__file__)))
         (campaign / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
@@ -195,7 +341,21 @@ def main():
                     child.wait()
                 report['qemu_exit_status'] = child.returncode
         assert child.returncode == 0, 'Reference QEMU did not exit successfully'
-        rows = validate_log((output / 'qemu.log').read_text('utf-8', errors='replace'), manifest['expected'])
+        text = (output / 'qemu.log').read_text('utf-8', errors='replace')
+        rows = validate_log(text, manifest['expected'])
+        if manifest.get('small_buffers'):
+            report['buffer_cases'] = validate_buffer_log(text, manifest['expected'], rows)
+        if manifest.get('fragmented_input'):
+            report['fragment_cases'] = validate_fragment_log(text, manifest['expected'], rows)
+        if manifest.get('frame_input'):
+            report['frame_cases'] = validate_frame_log(text, manifest['expected'], rows)
+        if manifest.get('frame_input') or manifest.get('small_buffers') or manifest.get('fragmented_input'):
+            expectations = [(case, 0, 12288, 0) for case in rows]
+            expectations += [(case, 1, case['initial_capacity'], 0) for case in report.get('frame_cases', [])]
+            expectations += [(case, 0, case['initial_capacity'], 0) for case in report.get('buffer_cases', [])]
+            expectations += [(case, case['framed'], 8192, 257) for case in report.get('fragment_cases', [])]
+            report['live_memory'] = validate_memory_log(text, expectations, require_samples=bool(manifest.get('fragmented_input')))
+        report['handles_closed'] = 4 + 4 * bool(manifest.get('frame_input')) + 2 * bool(manifest.get('small_buffers')) + 4 * bool(manifest.get('fragmented_input'))
         report.update(passed=True, state='TERMINAL_PASS', cases=rows)
     except Exception as error:
         report.update(state='TERMINAL_NONPASS', failure_type=type(error).__name__)
@@ -203,7 +363,10 @@ def main():
     finally:
         report['log'] = pin(output / 'qemu.log') if (output / 'qemu.log').is_file() else None
         save()
-    print(json.dumps(dict(passed=True, cases=4, identities={r['profile']: r['pcm_sha256'] for r in rows if r['plus']})))
+    print(json.dumps(dict(passed=True, cases=4, frame_cases=len(report.get('frame_cases', [])),
+                          buffer_cases=len(report.get('buffer_cases', [])), handles_closed=report['handles_closed'],
+                          fragment_cases=len(report.get('fragment_cases', [])),
+                          identities={r['profile']: r['pcm_sha256'] for r in rows if r['plus']})))
     return 0
 
 

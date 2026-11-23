@@ -1,0 +1,100 @@
+Adding SPI flash device
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6272
+load:0x40078000,len:15820
+load:0x40080400,len:3920
+entry 0x40080644
+I (717) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (719) boot: compile time Nov 23 2026 18:18:43
+I (719) boot: Multicore bootloader
+I (793) boot: chip revision: v0.0
+I (796) boot.esp32: SPI Speed      : 40MHz
+I (796) boot.esp32: SPI Mode       : DIO
+I (797) boot.esp32: SPI Flash Size : 4MB
+I (811) boot: Enabling RNG early entropy source...
+I (830) boot: Partition Table:
+I (831) boot: ## Label            Usage          Type ST Offset   Length
+I (835) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (836) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (836) boot:  2 factory          factory app      00 00 00010000 003f0000
+I (846) boot: End of partition table
+I (917) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=96be4h (617444) map
+I (1143) esp_image: segment 1: paddr=000a6c0c vaddr=3ffb0000 size=027a8h ( 10152) load
+I (1175) esp_image: segment 2: paddr=000a93bc vaddr=40080000 size=06c5ch ( 27740) load
+I (1215) esp_image: segment 3: paddr=000b0020 vaddr=400d0020 size=28440h (164928) map
+I (1261) esp_image: segment 4: paddr=000d8468 vaddr=40086c5c size=03d1ch ( 15644) load
+I (1299) esp_image: segment 5: paddr=000dc18c vaddr=50000000 size=00028h (    40) load
+I (1413) boot: Loaded app from partition at offset 0x10000
+I (1414) boot: Disabling RNG early entropy source...
+I (1440) cpu_start: Multicore app
+I (3667) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (3672) cpu_start: Pro cpu start user code
+I (3673) cpu_start: cpu freq: 240000000 Hz
+I (3673) app_init: Application information:
+I (3673) app_init: Project name:     cyd_aac_tls_reference
+I (3674) app_init: App version:      v0.9.693-2148-g0861b48fc-dirty
+I (3674) app_init: Compile time:     Nov 23 2026 18:19:49
+I (3674) app_init: ELF file SHA256:  e0dd26be1...
+I (3675) app_init: ESP-IDF:          v6.0.2
+I (3675) efuse_init: Min chip rev:     v0.0
+I (3675) efuse_init: Max chip rev:     v3.99 
+I (3676) efuse_init: Chip rev:         v0.0
+I (3677) heap_init: Initializing. RAM available for dynamic allocation:
+I (3679) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (3680) heap_init: At 3FFB3108 len 0002CEF8 (179 KiB): DRAM
+I (3680) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (3680) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (3681) heap_init: At 4008A978 len 00015688 (85 KiB): IRAM
+I (3760) spi_flash: detected chip: gd
+I (3774) spi_flash: flash io: dio
+I (3813) main_task: Started on CPU0
+I (3819) main_task: Calling app_main()
+I (3944) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_REFERENCE profile=lc plus=1 input=443706 input_sha256=1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5 rate=48000 channels=2 bits=16 frames=529408 pcm_bytes=2117632 pcm_sha256=95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0 calls=518 resizes=0 heap_before=283168 heap_after=283068 stack_free=14564 core=1 priority=3 drained=1
+AAC_TLS_MEMORY profile=lc plus=1 framed=0 initial_capacity=12288 final_capacity=12288 live_free=216764 chunk=0 min_live_free=216616
+I (4985) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_REFERENCE profile=lc plus=0 input=443706 input_sha256=1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5 rate=48000 channels=2 bits=16 frames=529408 pcm_bytes=2117632 pcm_sha256=95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0 calls=518 resizes=0 heap_before=283068 heap_after=283068 stack_free=14564 core=1 priority=3 drained=1
+AAC_TLS_MEMORY profile=lc plus=0 framed=0 initial_capacity=12288 final_capacity=12288 live_free=217856 chunk=0 min_live_free=217708
+I (5917) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_REFERENCE profile=he plus=1 input=102420 input_sha256=b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3 rate=48000 channels=2 bits=16 frames=614400 pcm_bytes=2457600 pcm_sha256=44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362 calls=301 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=1
+AAC_TLS_MEMORY profile=he plus=1 framed=0 initial_capacity=12288 final_capacity=12288 live_free=160244 chunk=0 min_live_free=160096
+I (7145) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_REFERENCE profile=he plus=0 input=102420 input_sha256=b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3 rate=24000 channels=2 bits=16 frames=307200 pcm_bytes=1228800 pcm_sha256=025a8f45c5efeeb8e9424e9088c27c3a74cce92f61d8f9f66ab8d6d25530cf7d calls=301 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=1
+AAC_TLS_MEMORY profile=he plus=0 framed=0 initial_capacity=12288 final_capacity=12288 live_free=217856 chunk=0 min_live_free=217708
+AAC_TLS_FRAME_REFERENCE profile=lc plus=1 input=443706 input_sha256=1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5 rate=48000 channels=2 bits=16 frames=529408 pcm_bytes=2117632 pcm_sha256=95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0 calls=517 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=0 initial_capacity=12288 empty_retries=0 encoded_frames=517 last_frame_eos=1
+AAC_TLS_MEMORY profile=lc plus=1 framed=1 initial_capacity=12288 final_capacity=12288 live_free=216916 chunk=0 min_live_free=216768
+AAC_TLS_RESIZE profile=lc framed=1 initial_capacity=1024 old_capacity=1024 needed=4096 offered=642 consumed=0
+AAC_TLS_FRAME_REFERENCE profile=lc plus=1 input=443706 input_sha256=1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5 rate=48000 channels=2 bits=16 frames=529408 pcm_bytes=2117632 pcm_sha256=95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0 calls=518 resizes=1 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=0 initial_capacity=1024 empty_retries=0 encoded_frames=517 last_frame_eos=1
+AAC_TLS_MEMORY profile=lc plus=1 framed=1 initial_capacity=1024 final_capacity=4096 live_free=225608 chunk=0 min_live_free=225460
+AAC_TLS_FRAME_REFERENCE profile=he plus=1 input=102420 input_sha256=b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3 rate=48000 channels=2 bits=16 frames=614400 pcm_bytes=2457600 pcm_sha256=44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362 calls=300 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=0 initial_capacity=12288 empty_retries=0 encoded_frames=300 last_frame_eos=1
+AAC_TLS_MEMORY profile=he plus=1 framed=1 initial_capacity=12288 final_capacity=12288 live_free=160396 chunk=0 min_live_free=160248
+AAC_TLS_RESIZE profile=he framed=1 initial_capacity=1024 old_capacity=1024 needed=4096 offered=341 consumed=0
+AAC_TLS_FRAME_REFERENCE profile=he plus=1 input=102420 input_sha256=b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3 rate=48000 channels=2 bits=16 frames=614400 pcm_bytes=2457600 pcm_sha256=44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362 calls=601 resizes=1 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=0 initial_capacity=1024 empty_retries=0 encoded_frames=300 last_frame_eos=1
+AAC_TLS_MEMORY profile=he plus=1 framed=1 initial_capacity=1024 final_capacity=4096 live_free=164732 chunk=0 min_live_free=164584
+AAC_TLS_FRAME_REFERENCE_COMPLETE cases=4 handles_closed=4 heap_integrity=1
+I (12380) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_RESIZE profile=lc framed=0 initial_capacity=1024 old_capacity=1024 needed=4096 offered=443706 consumed=0
+AAC_TLS_BUFFER_REFERENCE profile=lc plus=1 input=443706 input_sha256=1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5 rate=48000 channels=2 bits=16 frames=529408 pcm_bytes=2117632 pcm_sha256=95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0 calls=519 resizes=1 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=1 initial_capacity=1024
+AAC_TLS_MEMORY profile=lc plus=1 framed=0 initial_capacity=1024 final_capacity=4096 live_free=225456 chunk=0 min_live_free=225308
+I (13381) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_RESIZE profile=he framed=0 initial_capacity=1024 old_capacity=1024 needed=4096 offered=102420 consumed=0
+AAC_TLS_BUFFER_REFERENCE profile=he plus=1 input=102420 input_sha256=b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3 rate=48000 channels=2 bits=16 frames=614400 pcm_bytes=2457600 pcm_sha256=44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362 calls=602 resizes=1 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=1 initial_capacity=1024
+AAC_TLS_MEMORY profile=he plus=1 framed=0 initial_capacity=1024 final_capacity=4096 live_free=164580 chunk=0 min_live_free=164432
+AAC_TLS_BUFFER_REFERENCE_COMPLETE cases=2 handles_closed=2 heap_integrity=1
+I (14720) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_FRAGMENT_REFERENCE profile=lc plus=1 input=443706 input_sha256=1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5 rate=48000 channels=2 bits=16 frames=529408 pcm_bytes=2117632 pcm_sha256=95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0 calls=2244 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=1 initial_capacity=8192 framed=0 chunk=257 encoded_frames=0 last_frame_eos=0
+AAC_TLS_MEMORY profile=lc plus=1 framed=0 initial_capacity=8192 final_capacity=8192 live_free=219936 chunk=257 min_live_free=219788
+AAC_TLS_FRAGMENT_REFERENCE profile=lc plus=1 input=443706 input_sha256=1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5 rate=48000 channels=2 bits=16 frames=529408 pcm_bytes=2117632 pcm_sha256=95c66ea66a1af8cfdd70a38441f83a2599b7e690ccdd336bb462b8c41ef45ff0 calls=517 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=0 initial_capacity=8192 framed=1 chunk=257 encoded_frames=517 last_frame_eos=1
+AAC_TLS_MEMORY profile=lc plus=1 framed=1 initial_capacity=8192 final_capacity=8192 live_free=221012 chunk=257 min_live_free=220864
+I (17106) ESP_ES_PARSER: The version of es_parser is v1.0.1
+AAC_TLS_FRAGMENT_REFERENCE profile=he plus=1 input=102420 input_sha256=b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3 rate=48000 channels=2 bits=16 frames=614400 pcm_bytes=2457600 pcm_sha256=44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362 calls=699 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=1 initial_capacity=8192 framed=0 chunk=257 encoded_frames=0 last_frame_eos=0
+AAC_TLS_MEMORY profile=he plus=1 framed=0 initial_capacity=8192 final_capacity=8192 live_free=163856 chunk=257 min_live_free=163708
+AAC_TLS_FRAGMENT_REFERENCE profile=he plus=1 input=102420 input_sha256=b8dfa45339a107eed10d26240f8b83d6fe3b04e4a3911429b023254cb3fdd9a3 rate=48000 channels=2 bits=16 frames=614400 pcm_bytes=2457600 pcm_sha256=44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362 calls=300 resizes=0 heap_before=283068 heap_after=283068 stack_free=13828 core=1 priority=3 drained=0 initial_capacity=8192 framed=1 chunk=257 encoded_frames=300 last_frame_eos=1
+AAC_TLS_MEMORY profile=he plus=1 framed=1 initial_capacity=8192 final_capacity=8192 live_free=164492 chunk=257 min_live_free=164344
+AAC_TLS_FRAGMENT_REFERENCE_COMPLETE cases=4 handles_closed=4 heap_integrity=1
+AAC_TLS_REFERENCE_COMPLETE cases=4 handles_closed=4 heap_integrity=1

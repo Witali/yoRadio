@@ -285,7 +285,7 @@ DMA-памяти завершилось ошибкой.
 
 ## Что осталось по переносу
 
-Состояние программных проверок на 17 ноября 2026 года.
+Состояние программных проверок на 23 ноября 2026 года.
 
 Программная часть этапов 01–10 выполнена. Остаются четыре активных блока
 доводки и проверки; это не четыре небольшие правки. Пятый раздел, AAC
@@ -299,6 +299,14 @@ compact/private, сохранён в таблице как отложенный,
 | FLAC | Обычная current-source регрессия и конечный production-policy watchdog gate пройдены в SDK/QEMU. Финальные vendor/custom exports пройдены. [A/B полного приложения в QEMU](../tests/results/cyd-flac-openeth-20261116/README.md) показал точный PCM custom FLAC и отказ выделения памяти Espressif на том же потоке. Custom FLAC прошёл этот сценарий со штатным watchdog на всех трёх выходах. Физический A/B остаётся. Target OOM/backpressure/semantic controls [явно отложены](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md). [Входы](CYD_FLAC_TRANSFER_DESIGN.md). |
 | Память и TLS | [Изолированный SDK/QEMU](../tests/results/cyd-tls-traffic-20261101/README.md) проверил full records, два клиента, reserve/reclaim/MPI и pressure/recovery. [Полное приложение в QEMU OpenETH](../tests/results/cyd-static-rx-output-matrix-20261116/README.md) прошло статический TLS RX, TFT и WebUI одновременно с Opus на всех трёх выходах. На PDM [Stop/Play и OTA](../tests/results/cyd-openeth-ota-lifecycle-20261116/README.md) подтвердили повторное использование RX, возобновление после отказа OTA и запуск из второго раздела. [Совместный профиль RX, early MPI и reclaim](../tests/results/cyd-tls-combined-options-20261117/README.md) прошёл тот же OTA-сценарий и полный TLS/Opus. Под давлением heap [повтор Mbed TLS после освобождения idle-слота](../tests/results/cyd-tls-input-pressure-20261117/README.md) сохранил точный PCM и доступность WebUI до и после EOF. [Одновременные радио TLS и WebUI HTTPS](../tests/results/cyd-tls-overlap-20261117/README.md) прошли тот же повтор и EOF на коротких страницах Ogg. [Раннее открытие Opus](../tests/results/cyd-ogg-large-pages-20261117/README.md) прошло с исходными страницами, а [проверки границ страниц](../tests/results/cyd-ogg-page-maximum-20261117/README.md) подтвердили 65 307 байт OpusTags и 65 306 байт аудио при включённом `CONFIG_YORADIO_OGG_OPUS_RAW` на PDM. [Шесть прогонов обоих DAC](../tests/results/cyd-opus-dac-matrix-20261117/README.md) прошли те же три потока с точным PCM и тем же HTTPS-сеансом WebUI после EOF. Приёмка Wi-Fi и физических выходов ждёт платы. [Проект](CYD_MEMORY_TRANSFER_DESIGN.md). |
 | Финальные сборки и регрессия | [Обновлённая production-матрица](../tests/results/cyd-production-refresh-20261117/README.md) собрала шесть CYD-прошивок vendor/custom FLAC на PDM, continuous DAC и legacy DAC, а также обычную production-прошивку C3. Все семь образов прошли проверки ELF, чипа, контрольной суммы и OTA-разделов. Clang проверил 381 единицу проекта и 23 SDK frontend без ошибок разбора. C3 host-регрессия подтвердила шесть PCM/metadata сравнений и 648 точных случаев нормализатора. Предупреждения сохранены с отдельным разбором. Приёмка Wi-Fi и физических выходов ждёт платы. |
+
+23 ноября [сравнение публичных режимов AAC](../tests/results/cyd-aac-public-input-memory-20261123/README.md)
+прошло все 14 изолированных SDK/QEMU случаев с полным исходным PCM и
+закрытием всех handles. На одинаковом 8-КиБ PCM-буфере и порциях входа
+по 257 байт подача полных ADTS-кадров сэкономила только 636 байт для HE.
+Это не обосновывает новый production frame owner как решение нехватки RAM.
+Полный HE-AAC/TLS/TFT/WebUI остаётся NONPASS; публичная диагностика памяти
+продолжается, compact/private AAC остаётся отложенным.
 
 Физическая приёмка выделена отдельно и ждёт подключения платы. Собственный
 расширенный Vorbis отложен и не включён в четыре активных блока; перенос

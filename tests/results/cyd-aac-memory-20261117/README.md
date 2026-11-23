@@ -75,3 +75,9 @@ The next public-API check is complete ADTS frame input, to measure whether
 the decoder can avoid a second input-assembly owner. Its resource benefit
 and complete PCM identity are still unproven. Compact/private AAC remains
 deferred. [All observed outcomes and identities](observed.json)
+
+Follow-up, November 23: the [14-case public API comparison](../cyd-aac-public-input-memory-20261123/README.md)
+now verifies complete-frame input, ordinary parsed output growth and matched
+fragmented input. Complete PCM is preserved, but the matched HE frame-mode
+saving is only 636 bytes. No production frame assembly was introduced and
+the full-application HE resource gate remains NONPASS.

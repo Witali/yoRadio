@@ -222,6 +222,25 @@ inputs, linked vendor component paths, original archives and ELF identity.
 Its embedded fixtures and flash image remain local under ignored `.build`.
 Compact/private AAC and late SBR/PS transitions remain separate scopes.
 
+For the public input/buffer memory comparison, add
+`--frame-input --small-buffers --fragmented-input` to `prepare`, using fresh
+campaign/result paths. The resulting 14 cases retain the four original
+controls, add four complete-frame cases at 12,288 and 1,024 initial PCM
+bytes, two ordinary-parser growth cases at 1,024 bytes and four matched
+8,192-byte cases with 257-byte input availability increments. The small
+buffers must grow through the real public `needed_size` response. Frame
+mode presents complete ADTS frames and marks the actual last frame EOS;
+it does not claim an empty-input drain. The ordinary parser retains its
+empty EOS drain. All modes must reproduce the entire baseline PCM.
+
+Fragment availability grows a contiguous flash view. This measures the
+public parser separately from production transport or a future frame
+assembly buffer. `live_free` is sampled before close; `min_live_free` is
+the minimum sampled after public process calls, not the global heap peak.
+The controller binds each observation to its completed case and buffer
+policy. The [measured comparison](../../results/cyd-aac-public-input-memory-20261123/README.md)
+does not establish full-application TLS margins or modify production input.
+
 For memory diagnosis only, add `'-D','CYD_OPENETH_ALLOCATION_PROBE=ON'`.
 This observes at most 12 public `malloc`/`calloc` requests of at least 32 KiB,
 with free-byte and largest-block snapshots before each call and its real
