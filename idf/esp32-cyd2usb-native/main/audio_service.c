@@ -62,6 +62,14 @@
 #define MAX_HTTP_REDIRECTS 5
 #define STREAM_READ_TIMEOUT_MS 250
 
+static void decoder_yield_if_due(stream_fairness_t *budget) {
+    if (stream_fairness_due(budget, (uint64_t)esp_timer_get_time())) {
+        // Leave a whole tick for idle even when the wait starts at a tick edge.
+        vTaskDelay(2);
+        stream_fairness_begin(budget, (uint64_t)esp_timer_get_time());
+    }
+}
+
 typedef struct {
     uint32_t generation;
     native_codec_t requested_codec;
@@ -914,12 +922,7 @@ static void ogg_output_yield(void *user) {
 
 static void ogg_after_process(void *user) {
     ogg_output_context_t *context = user;
-    if (stream_fairness_due(context->decode_budget, (uint64_t)esp_timer_get_time())) {
-        // Leave at least one whole scheduler tick for idle on this core,
-        // including when the delay starts just before a tick boundary.
-        vTaskDelay(2);
-        stream_fairness_begin(context->decode_budget, (uint64_t)esp_timer_get_time());
-    }
+    decoder_yield_if_due(context->decode_budget);
 }
 
 static void ogg_reset_for_task(ogg_playback *playback, uint32_t generation) {
@@ -950,10 +953,10 @@ static void decoder_task(void *argument) {
     size_t output_size = 0;
     decoder_pending_input_t pending = {0};
     decoder_eof_input_t eof_input = {0};
+    stream_fairness_t decode_budget;
+    stream_fairness_begin(&decode_budget, (uint64_t)esp_timer_get_time());
 #ifdef CONFIG_YORADIO_OGG_TIMELINE
     ogg_playback ogg = {0};
-    stream_fairness_t ogg_decode_budget;
-    stream_fairness_begin(&ogg_decode_budget, (uint64_t)esp_timer_get_time());
 #endif
     esp_audio_simple_dec_handle_t decoder = NULL;
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
@@ -968,7 +971,6 @@ static void decoder_task(void *argument) {
     uint32_t generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
     uint32_t failed_generation = 0;
-    uint32_t process_calls = 0;
 #if CONFIG_YORADIO_AUDIO_STEREO_ONLY
     audio_channel_probe_t channel_probe = {0};
 #endif
@@ -1239,7 +1241,7 @@ static void decoder_task(void *argument) {
         if (codec == NATIVE_CODEC_OGG) {
             ogg_output_context_t context = {
                 .generation = generation,
-                .decode_budget = &ogg_decode_budget,
+                .decode_budget = &decode_budget,
             };
             const ogg_playback_callbacks callbacks = {
                 .cancelled = ogg_output_cancelled, .output = ogg_output_pcm,
@@ -1310,9 +1312,9 @@ static void decoder_task(void *argument) {
                 raw.consumed = 0;
                 esp_audio_err_t result =
                     esp_audio_simple_dec_process(decoder, &raw, &frame);
-                // PCM backpressure normally gives the idle task time to run.
-                // Header-only input can consume many packets without producing PCM.
-                if ((++process_calls & 31U) == 0U) vTaskDelay(1);
+                // Bound busy time even when output does not block. A fixed
+                // call count cannot bound a series of expensive AAC frames.
+                decoder_yield_if_due(&decode_budget);
                 if (generation != atomic_load(&s_generation)) break;
                 failure_stage = NATIVE_HEALTH_PROCESS;
                 failure_result = (int32_t)result;
