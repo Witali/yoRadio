@@ -109,6 +109,7 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
                ROOT / 'idf/components/native_audio_settings/native_audio_settings.h',
                ROOT / 'idf/components/native_storage/include/radio_control.h',
                ROOT / 'idf/components/native_stream/include/json_buffer.h',
+               ROOT / 'idf/components/native_stream/include/pcm_channel_layout.h',
                ROOT / 'idf/components/native_stream/include/websocket_message.h',
                ROOT / 'idf/components/native_web_transport/include/native_web_transport.h',
                ROOT / 'idf/components/native_network_power/include/native_network_power.h',
