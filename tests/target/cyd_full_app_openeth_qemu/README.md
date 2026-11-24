@@ -285,6 +285,33 @@ are observations across concurrent tasks, not an atomic heap reservation.
 No request is refused, redirected or retried by this probe. Normal
 production builds do not include it.
 
+For the separate small-pbuf failure diagnosis, add
+`'-D','CYD_OPENETH_PBUF_FAILURE_PROBE=ON'` together with
+`'-D','CYD_OPENETH_PCM_PROBE=ON'`. The opt-in linker wrapper forwards the
+public `pbuf_alloc` call once and preserves its pointer/NULL result. Only a
+NULL return updates a fixed four-entry table of layer, full-width type,
+length, derived RAM-allocation size and immediate call-site PC. The pinned
+Xtensa SDK helper normalizes return-address window bits and subtracts three
+before the PC is recorded. The table
+occupies 128 bytes plus its separate target critical-section lock; the EOF
+snapshot also uses output-task stack. This overhead can change a marginal
+run's failure count and must be included in target qualification.
+
+The failed-call path performs no heap query, allocation, task discovery or
+logging. After the real PCM flush, `CYD_OPENETH_PBUF_FAILURE_SUMMARY` and
+`CYD_OPENETH_PBUF_FAILURE` lines report a locked snapshot outside the lock.
+Counts are cumulative, with explicit saturation and overflow. A derived size
+of zero means unavailable for that type/overflow branch, not an observed
+zero-byte malloc. This diagnostic does not modify the global allocation
+failure counters or relax the controller's zero-failure gate.
+
+GNU wrapping covers linked external references, not necessarily calls
+resolved within `pbuf.c`. Verify actual `tcp_out` wrapper references and
+symbolize captured PCs against the exact linked ELF before attributing
+failures. Compare classified counts with the independent global heap-fault
+count and retain any unexplained remainder. The option is off unless
+explicitly requested in this diagnostic build and is absent from production.
+
 For Espressif Vorbis, build with `'-D','CYD_OPENETH_PCM_PROBE=ON'` and
 `'-D','CYD_OPENETH_PCM_SHA256=ON'`, then run with
 `--codec vorbis --through-eof --full-tls-records`. The tracked stereo

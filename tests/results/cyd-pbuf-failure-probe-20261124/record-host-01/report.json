@@ -1,0 +1,165 @@
+{
+  "scope": "Portable table only; actual external pthread mutex with concurrent snapshots. Production wrapper, target ABI/frames and hardware timing are separate checks.",
+  "physical_tested": false,
+  "table_bytes": 128,
+  "key_bytes": 20,
+  "entry_bytes": 28,
+  "slots": 4,
+  "writer_events": 100000,
+  "sources": {
+    "pbuf_failure_record.h": "abd40e262a573337bd51efe2f364ae3e5bc37eae21c63c31559061fadac68072",
+    "pbuf_failure_record_test.c": "0855559e914ed988894e1b048698a7be36095814ce19c16f769072c715a205b0",
+    "run-cyd-pbuf-failure-record.py": "ede51f34a9abf4b11dd32f2b046dd1b61139e7f28cb2acc89151ed075c62ea81"
+  },
+  "variants": {
+    "candidate": {
+      "source_sha256": "abd40e262a573337bd51efe2f364ae3e5bc37eae21c63c31559061fadac68072",
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-pthread",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/candidate",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/candidate/pbuf_failure_record_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/candidate/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/candidate/test"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-pbuf_failure_record_test.su",
+          "sha256": "0124bf2810bbd1e93202eb91bd352c0ddcdff198ef00cd62fccefc6e79073b1c"
+        }
+      ]
+    },
+    "narrow-type-negative": {
+      "source_sha256": "7860aa8595d5467c4785f405607e794f6457b3479690691e3ccbb11d0740d0b7",
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-pthread",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/narrow-type-negative",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/narrow-type-negative/pbuf_failure_record_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/narrow-type-negative/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/narrow-type-negative/test"
+      ],
+      "returncode": 42,
+      "expected_returncode": 42,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-pbuf_failure_record_test.su",
+          "sha256": "3e0a1d62eda0206349ea82542ac4229fcfde90ab024801cc11978a31701a03df"
+        }
+      ]
+    },
+    "ignore-caller-negative": {
+      "source_sha256": "1c05cad47c064b8471e2353935ef73ec048eaa2f17a604a15c4bbf143de82de6",
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-pthread",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/ignore-caller-negative",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/ignore-caller-negative/pbuf_failure_record_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/ignore-caller-negative/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/ignore-caller-negative/test"
+      ],
+      "returncode": 42,
+      "expected_returncode": 42,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-pbuf_failure_record_test.su",
+          "sha256": "4e35992c620728dc9ef501ef250fb71b73a2752153d87f59e909c20b286c36d4"
+        }
+      ]
+    },
+    "wrap-total-negative": {
+      "source_sha256": "5ccab6cf44859909254b501b830f651225e53fd3c80aaa3f25bedd985d9ceca4",
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-pthread",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/wrap-total-negative",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/wrap-total-negative/pbuf_failure_record_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/wrap-total-negative/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/record-host-01/wrap-total-negative/test"
+      ],
+      "returncode": 42,
+      "expected_returncode": 42,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-pbuf_failure_record_test.su",
+          "sha256": "802cb47af981c6e6a175f88df138027d818ea78ad6e0e97353fa644c71b7cf12"
+        }
+      ]
+    }
+  },
+  "passed": true
+}

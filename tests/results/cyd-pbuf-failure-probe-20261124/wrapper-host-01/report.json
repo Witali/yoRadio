@@ -1,0 +1,78 @@
+{
+  "state": "TERMINAL_NONPASS",
+  "passed": false,
+  "physical_tested": false,
+  "scope": "Actual root wrapper and record header, explicit public SDK stubs, exact SDK PC helper, external pthread lock. Header calls pass through scope-checking trampolines into unchanged inline bodies. No firmware, target ABI size, linker wrap coverage or physical timing qualification.",
+  "sources": {
+    "tests/run-cyd-pbuf-failure-probe.py": {
+      "bytes": 10626,
+      "sha256": "00d1bec06aee9851d57f7ba93707b4358b65890a121d13f3af565359a106c5fe"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure.c": {
+      "bytes": 3843,
+      "sha256": "6bd8a1ed0b87bac323af36cfb77a35465dbbd0104ccbb2fda042e4ce121fa848"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure_record.h": {
+      "bytes": 3388,
+      "sha256": "abd40e262a573337bd51efe2f364ae3e5bc37eae21c63c31559061fadac68072"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure_probe_test.c": {
+      "bytes": 12248,
+      "sha256": "83cd680827faf208021adae42407013ca6481ec4d86d3dee4ea2f722d0cb249e"
+    }
+  },
+  "sdk_public_headers": {
+    "esp_cpu_utils.h": {
+      "bytes": 791,
+      "sha256": "8cc93319400baefa525cf200c829152f0dfb0ae55e060cb30adfea77a2254f75"
+    },
+    "pbuf.h": {
+      "bytes": 14819,
+      "sha256": "1f3112b8e76ad1bbd32f7727eb735e71a57e67d72b56e8252574e2b8df05ced8"
+    },
+    "mem.h": {
+      "bytes": 2518,
+      "sha256": "8316ef0f864b4770827dcf2c3045592e4845adcb27da1874a7800db88b0ce638"
+    },
+    "arch.h": {
+      "bytes": 14685,
+      "sha256": "a65577f358c6c7ae230bde79e8cca5be0cdf34780c73877054efde6f99c1bd00"
+    },
+    "lwipopts.h": {
+      "bytes": 56099,
+      "sha256": "0fd3d876ff9a13c14186a15d617ae44ab9ef06b7701ae3ed84632dbaa2834043"
+    }
+  },
+  "copied_pc_header": {
+    "bytes": 791,
+    "sha256": "8cc93319400baefa525cf200c829152f0dfb0ae55e060cb30adfea77a2254f75"
+  },
+  "stubs": {
+    "esp_attr.h": {
+      "bytes": 31,
+      "sha256": "3169cbcf4229887cc322b6b16824155b526b32bb02ed1eeca14cd8da2c260388"
+    },
+    "esp_cpu_utils.h": {
+      "bytes": 791,
+      "sha256": "8cc93319400baefa525cf200c829152f0dfb0ae55e060cb30adfea77a2254f75"
+    },
+    "esp_rom_sys.h": {
+      "bytes": 52,
+      "sha256": "0984efb46ce58ab89929a292814102b687c29293b3f9ab3a083f3d273b9901a1"
+    },
+    "freertos/FreeRTOS.h": {
+      "bytes": 498,
+      "sha256": "b49f94b653c5686efefe12455a33834af2c401c4f031c684e37307b414f4490f"
+    },
+    "lwip/mem.h": {
+      "bytes": 245,
+      "sha256": "f7a97ca92fb740843cf3d0ec4350c5a2f81c26d6b82e65edfba2eff9b48fc0dd"
+    },
+    "lwip/pbuf.h": {
+      "bytes": 609,
+      "sha256": "bc902703cf6ca8e813fff5dcce5a59e2f3dea2f3c647782badc3fd40cc520016"
+    }
+  },
+  "variants": {},
+  "reason": "Host compiler unavailable; see compiler-version.log"
+}

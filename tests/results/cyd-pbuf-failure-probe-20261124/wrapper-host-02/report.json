@@ -1,0 +1,348 @@
+{
+  "state": "TERMINAL_PASS",
+  "passed": true,
+  "physical_tested": false,
+  "scope": "Actual root wrapper and record header, explicit public SDK stubs, exact SDK PC helper, external pthread lock. Header calls pass through scope-checking trampolines into unchanged inline bodies. No firmware, target ABI size, linker wrap coverage or physical timing qualification.",
+  "sources": {
+    "tests/run-cyd-pbuf-failure-probe.py": {
+      "bytes": 10626,
+      "sha256": "00d1bec06aee9851d57f7ba93707b4358b65890a121d13f3af565359a106c5fe"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure.c": {
+      "bytes": 3843,
+      "sha256": "6bd8a1ed0b87bac323af36cfb77a35465dbbd0104ccbb2fda042e4ce121fa848"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure_record.h": {
+      "bytes": 3388,
+      "sha256": "abd40e262a573337bd51efe2f364ae3e5bc37eae21c63c31559061fadac68072"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure_probe_test.c": {
+      "bytes": 12248,
+      "sha256": "83cd680827faf208021adae42407013ca6481ec4d86d3dee4ea2f722d0cb249e"
+    }
+  },
+  "sdk_public_headers": {
+    "esp_cpu_utils.h": {
+      "bytes": 791,
+      "sha256": "8cc93319400baefa525cf200c829152f0dfb0ae55e060cb30adfea77a2254f75"
+    },
+    "pbuf.h": {
+      "bytes": 14819,
+      "sha256": "1f3112b8e76ad1bbd32f7727eb735e71a57e67d72b56e8252574e2b8df05ced8"
+    },
+    "mem.h": {
+      "bytes": 2518,
+      "sha256": "8316ef0f864b4770827dcf2c3045592e4845adcb27da1874a7800db88b0ce638"
+    },
+    "arch.h": {
+      "bytes": 14685,
+      "sha256": "a65577f358c6c7ae230bde79e8cca5be0cdf34780c73877054efde6f99c1bd00"
+    },
+    "lwipopts.h": {
+      "bytes": 56099,
+      "sha256": "0fd3d876ff9a13c14186a15d617ae44ab9ef06b7701ae3ed84632dbaa2834043"
+    }
+  },
+  "copied_pc_header": {
+    "bytes": 791,
+    "sha256": "8cc93319400baefa525cf200c829152f0dfb0ae55e060cb30adfea77a2254f75"
+  },
+  "stubs": {
+    "esp_attr.h": {
+      "bytes": 31,
+      "sha256": "3169cbcf4229887cc322b6b16824155b526b32bb02ed1eeca14cd8da2c260388"
+    },
+    "esp_cpu_utils.h": {
+      "bytes": 791,
+      "sha256": "8cc93319400baefa525cf200c829152f0dfb0ae55e060cb30adfea77a2254f75"
+    },
+    "esp_rom_sys.h": {
+      "bytes": 52,
+      "sha256": "0984efb46ce58ab89929a292814102b687c29293b3f9ab3a083f3d273b9901a1"
+    },
+    "freertos/FreeRTOS.h": {
+      "bytes": 498,
+      "sha256": "b49f94b653c5686efefe12455a33834af2c401c4f031c684e37307b414f4490f"
+    },
+    "lwip/mem.h": {
+      "bytes": 245,
+      "sha256": "f7a97ca92fb740843cf3d0ec4350c5a2f81c26d6b82e65edfba2eff9b48fc0dd"
+    },
+    "lwip/pbuf.h": {
+      "bytes": 609,
+      "sha256": "bc902703cf6ca8e813fff5dcce5a59e2f3dea2f3c647782badc3fd40cc520016"
+    }
+  },
+  "variants": {
+    "actual": {
+      "passed": true,
+      "expected": "PASS",
+      "returncode": 0,
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-optimize-sibling-calls",
+        "-fno-ipa-icf",
+        "-fno-pie",
+        "-no-pie",
+        "-fno-builtin-malloc",
+        "-fno-builtin-calloc",
+        "-fno-builtin-realloc",
+        "-fno-builtin-free",
+        "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc,--wrap=free",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/stubs",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/actual/pbuf_failure_probe_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/actual/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/actual/test"
+      ],
+      "wrapper": {
+        "bytes": 3843,
+        "sha256": "6bd8a1ed0b87bac323af36cfb77a35465dbbd0104ccbb2fda042e4ce121fa848"
+      },
+      "log": {
+        "bytes": 147,
+        "sha256": "7221f3caa7121146108826f943624870381df3b3b07a7de30215bb0f22729c82"
+      }
+    },
+    "duplicate-real-call": {
+      "passed": true,
+      "expected": "assertion rejection",
+      "returncode": 134,
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-optimize-sibling-calls",
+        "-fno-ipa-icf",
+        "-fno-pie",
+        "-no-pie",
+        "-fno-builtin-malloc",
+        "-fno-builtin-calloc",
+        "-fno-builtin-realloc",
+        "-fno-builtin-free",
+        "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc,--wrap=free",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/stubs",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/duplicate-real-call/pbuf_failure_probe_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/duplicate-real-call/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/duplicate-real-call/test"
+      ],
+      "wrapper": {
+        "bytes": 3893,
+        "sha256": "46226dee969612c2261c5938387a393a120a69ecce9253730e3ae784ace87b2e"
+      },
+      "log": {
+        "bytes": 205,
+        "sha256": "25fcfd67205e268d8690fa9a4ae14cc7e65d104d18f988a100cadc3b86f15da2"
+      }
+    },
+    "record-success": {
+      "passed": true,
+      "expected": "assertion rejection",
+      "returncode": 134,
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-optimize-sibling-calls",
+        "-fno-ipa-icf",
+        "-fno-pie",
+        "-no-pie",
+        "-fno-builtin-malloc",
+        "-fno-builtin-calloc",
+        "-fno-builtin-realloc",
+        "-fno-builtin-free",
+        "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc,--wrap=free",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/stubs",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/record-success/pbuf_failure_probe_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/record-success/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/record-success/test"
+      ],
+      "wrapper": {
+        "bytes": 3842,
+        "sha256": "72c660fd994eb34c55139ef2c37999c1cd3ec194b6c80c2392783e387af1a076"
+      },
+      "log": {
+        "bytes": 216,
+        "sha256": "f668171180fc744acc1d34dd2f989d0b00c03ffe4ec4698e633d894da72202b0"
+      }
+    },
+    "log-under-critical": {
+      "passed": true,
+      "expected": "assertion rejection",
+      "returncode": 134,
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-optimize-sibling-calls",
+        "-fno-ipa-icf",
+        "-fno-pie",
+        "-no-pie",
+        "-fno-builtin-malloc",
+        "-fno-builtin-calloc",
+        "-fno-builtin-realloc",
+        "-fno-builtin-free",
+        "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc,--wrap=free",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/stubs",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/log-under-critical/pbuf_failure_probe_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/log-under-critical/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/log-under-critical/test"
+      ],
+      "wrapper": {
+        "bytes": 3891,
+        "sha256": "13b9c1b6f70f9961ddede740ee5a8cb46bf0bd5a539471cff4a22fdc2843b8cf"
+      },
+      "log": {
+        "bytes": 195,
+        "sha256": "fd0bebaac3a41f04abfc3fbca06140b88f25e256da30f3aedd1fcaebda4b3092"
+      }
+    },
+    "snapshot-outside-lock": {
+      "passed": true,
+      "expected": "assertion rejection",
+      "returncode": 134,
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-optimize-sibling-calls",
+        "-fno-ipa-icf",
+        "-fno-pie",
+        "-no-pie",
+        "-fno-builtin-malloc",
+        "-fno-builtin-calloc",
+        "-fno-builtin-realloc",
+        "-fno-builtin-free",
+        "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc,--wrap=free",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/stubs",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/snapshot-outside-lock/pbuf_failure_probe_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/snapshot-outside-lock/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/snapshot-outside-lock/test"
+      ],
+      "wrapper": {
+        "bytes": 3843,
+        "sha256": "f6a55a21445808d9fdbabc5a9f85875f1ce0e7f0d1a1217ca136af5320840829"
+      },
+      "log": {
+        "bytes": 206,
+        "sha256": "bfe8dfd77fb8405ab9e0ba8f4cd83336f23d52731eb402edc1910112bc8f493b"
+      }
+    },
+    "extra-hot-heap": {
+      "passed": true,
+      "expected": "assertion rejection",
+      "returncode": 134,
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-optimize-sibling-calls",
+        "-fno-ipa-icf",
+        "-fno-pie",
+        "-no-pie",
+        "-fno-builtin-malloc",
+        "-fno-builtin-calloc",
+        "-fno-builtin-realloc",
+        "-fno-builtin-free",
+        "-Wl,--wrap=malloc,--wrap=calloc,--wrap=realloc,--wrap=free",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/stubs",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/extra-hot-heap/pbuf_failure_probe_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/extra-hot-heap/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cpbuf24/wrapper-host-02/extra-hot-heap/test"
+      ],
+      "wrapper": {
+        "bytes": 3919,
+        "sha256": "2949d61574adf9c80ceb31f909f6419b282a70fca62cf6732c6e3e8a29db7310"
+      },
+      "log": {
+        "bytes": 203,
+        "sha256": "a3bfa456cc33365f8a6ac71bb345db14396f632306a9be6f9bdea50fa7b4260f"
+      }
+    }
+  },
+  "host_geometry": {
+    "pbuf_bytes": 24,
+    "mem_size_t_bytes": 8,
+    "lock_bytes": 40,
+    "record_bytes": 128
+  }
+}

@@ -20,6 +20,11 @@ PDM completion_queue_drops отдельно растёт с 0 на EOF до 116 
 Clang проверки проходят без новых предупреждений. Следующий программный gate —
 локализовать allocator и обоснованно уменьшить peak DRAM без урезания WebUI,
 числа клиентов, TLS records или изменения привязок аудиозадач.
+Для следующего gate добавлен отдельный [ограниченный pbuf probe](../tests/results/cyd-pbuf-failure-probe-20261124/README.md):
+таблица 128 B плюс lock, NULL-only запись после реального вызова, вывод после
+PCM EOF. ASan/UBSan проверяют 100000 обновлений таблицы, 2000 параллельных
+wrapper calls и восемь испорченных controls. SDK/ELF и QEMU attribution пока
+не выполнены; allocator origin и RTC-off NONPASS этим не переквалифицированы.
 
 Предыдущая точка: [финальный контроль после WebUI и закрытия WS](../tests/results/cyd-openeth-rx-exact-20261124/README.md#final-resource-check-after-webui-and-peer-closure)
 пройден в QEMU на PDM, continuous DAC и legacy DAC. Во всех трёх новых

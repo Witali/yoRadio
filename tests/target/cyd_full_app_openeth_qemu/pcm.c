@@ -117,6 +117,9 @@ esp_err_t __wrap_native_audio_output_write_pcm(const uint8_t *data, size_t size,
 }
 
 esp_err_t __real_native_audio_output_flush_pcm(void);
+#ifdef CYD_OPENETH_PBUF_FAILURE_PROBE
+void cyd_openeth_pbuf_failure_dump(void);
+#endif
 esp_err_t __wrap_native_audio_output_flush_pcm(void) {
     esp_err_t result = __real_native_audio_output_flush_pcm();
     printf("CYD_OPENETH_PCM_FLUSH frames=%" PRIu64 " status=%d\n", pcm_frames, (int)result);
@@ -157,6 +160,9 @@ esp_err_t __wrap_native_audio_output_flush_pcm(void) {
         text[sizeof(text) - 1] = '\0';
         printf("CYD_OPENETH_PCM_MD5 %s\n", text);
     }
+#endif
+#ifdef CYD_OPENETH_PBUF_FAILURE_PROBE
+    cyd_openeth_pbuf_failure_dump();
 #endif
     return result;
 }
