@@ -115,6 +115,43 @@ def require_clean_health(report, expected_allocation_failures=0):
         raise RuntimeError('Unexpected allocation failure count')
 
 
+def finalize_webui_checks(port, guest, report, websocket_peers=None, *, through_eof=False):
+    if websocket_peers is not None:
+        closed = websocket_peers.close()
+        report['websocket'] = websocket_peers.summary()
+        if not closed:
+            raise RuntimeError('A live WebSocket peer failed or did not close')
+    if not through_eof or not report['passed']:
+        return
+    if guest is None or guest.poll() is not None:
+        raise RuntimeError('Guest stopped before the final post-EOF resource check')
+
+    # The EOF observer has already checked the final asset and peer commands.
+    # Close peers first, then make health the last WebUI request so it also
+    # covers those operations and this final status read while QEMU is live.
+    status = json.loads(request(port, '/api/native/status'))
+    if not isinstance(status, dict):
+        raise RuntimeError('Invalid final post-EOF status')
+    report['post_eof_status'] = {key: status.get(key) for key in
+                               ('audio', 'connecting', 'format', 'generation')}
+    final = sample(port)
+    report['post_eof_health'] = final
+    expected_allocations = int('input_reclaim_pcm_reference' in report)
+    require_clean_health(final, expected_allocation_failures=expected_allocations)
+    if (any(final['output'][key] for key in ('write_errors', 'configure_errors', 'flush_errors')) or
+            any(final['output_driver'][key] for key in ('errors', 'timeouts', 'short_writes', 'saturated'))):
+        raise RuntimeError('Unexpected output fault after the final WebUI/peer checks')
+    eof = report['eof_health']
+    if (final['boot_id'] != eof['boot_id'] or final['boot_id'] != report['health'][0]['boot_id'] or
+            final['uptime_ms'] < eof['uptime_ms']):
+        raise RuntimeError('Guest reset during the final post-EOF WebUI/peer checks')
+    if report['post_eof_status'] != report['eof_status']:
+        raise RuntimeError('Playback state or generation changed after EOF')
+    if guest.poll() is not None:
+        raise RuntimeError('Guest stopped during the final post-EOF resource check')
+    report['observed'].append('clean resources after final WebUI and peer closure')
+
+
 def observe_tls_record_headers(context, lengths):
     def record(_connection, direction, _version, content_type, _message_type, header):
         # CPython passes OpenSSL's record-header messages as type 0x100.
@@ -1059,11 +1096,11 @@ def main():
     except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException) as error:
         report['reason'] = str(error)
     finally:
-        if websocket_peers is not None:
-            if not websocket_peers.close():
-                report['passed'] = False
-                report.setdefault('reason', 'A live WebSocket peer failed or did not close')
-            report['websocket'] = websocket_peers.summary()
+        try:
+            finalize_webui_checks(web, guest, report, websocket_peers, through_eof=args.through_eof)
+        except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException) as error:
+            report['passed'] = False
+            report.setdefault('reason', str(error))
         if guest is not None:
             if guest.poll() is None:
                 report['controller_stop'] = True
