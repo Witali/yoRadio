@@ -6,6 +6,8 @@ production startup task then initializes the audio tasks, radio control and
 WebUI. The application also initializes ST7789 and its normal SPI DMA buffers.
 QEMU exposes HTTP on a loopback port. With `--tls-material`, the guest can
 reach one local TLS station through a restricted guest forwarding rule.
+Its network snapshot wrapper reads the actual Ethernet interface for WebUI
+status; Wi-Fi profile/RSSI fields remain unavailable rather than invented.
 [Espressif's classic ESP32 QEMU Ethernet documentation](https://github.com/espressif/esp-toolchain-docs/blob/main/qemu/esp32/README.md#ethernet-support)
 
 The SDK 6.0.2 Python environment supplies `cryptography` for the optional TLS
@@ -36,6 +38,23 @@ Keep the generated key in the ignored profile directory. Use the mutually
 exclusive `--tls-diagnostics` only when CPU/stack profiling is intended: it
 enables the sampler and a 30-second task watchdog. The sampler adds a 4 KiB
 task stack plus working arrays, so this is a different memory policy.
+
+Add `--websocket-clients 2` to keep two real HTTP WebUI WebSocket clients
+alive from idle through full TLS playback and EOF. This optional check uses
+the installed Python `websockets` package, disables compression/proxies,
+continuously drains messages, requires fresh status in each phase, sends
+application `ping` commands and checks replies and normal close codes.
+It retains all existing PCM, TLS, allocation and static-asset gates. Use it
+with the ordinary HTTP idle or `--through-eof` scenario, separately from
+HTTPS-overlap, OTA, reclaim and expected-channel-rejection experiments.
+
+For the [RTC SLOW workspace experiment](../../../docs/CYD_WS_RTC_MEMORY.md),
+enable `CONFIG_YORADIO_WS_STATUS_RTC_SLOW` in an isolated profile and add
+`'-D','CYD_OPENETH_RTC_ACCESS_PROBE=ON'` to the build arguments. The optional
+probe asserts byte/string access on a separate 64-byte RTC buffer from each
+CPU before starting the WebSocket service. Inspect the saved ELF for actual
+application workspace placement and remaining RTC space. This does not
+measure physical access timing or qualify sleep/wake behavior.
 
 The fixture copies tracked WebUI assets and stages a one-station TSV playlist
 and its index into a separate SPIFFS image. The boot control serves the exact

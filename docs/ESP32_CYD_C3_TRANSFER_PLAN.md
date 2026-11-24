@@ -1,9 +1,20 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-11-23. Ветка: `codex/cyd-espressif-vorbis`.
+Обновлено: 2026-11-24. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 
-Текущая точка: [HE-AAC/TLS/TFT/WebUI прошёл в QEMU на всех трёх выходах](../tests/results/cyd-aac-resource-profile-20261123/README.md)
+Текущая точка: добавлена выключенная по умолчанию [опция RTC SLOW для
+рабочей памяти WebSocket](CYD_WS_RTC_MEMORY.md). На обычном TCP-профиле она
+освобождает ровно 6560 байт DRAM в парной PDM-сборке. [Новые результаты](../tests/results/cyd-ws-rtc-memory-20261124/README.md)
+сохраняют исходные NONPASS и проверки полного HE-AAC/TLS/WebUI с двумя
+живыми WebSocket-клиентами. PDM и continuous DAC проходят; legacy DAC выдаёт
+весь PCM и WebUI, но сохраняет один отказ выделения памяти и статус NONPASS.
+Успешный повтор PDM достиг всего 324 байт minimum
+heap; это не запас для произвольной нагрузки. Опция остаётся experimental,
+её обычные production-экспорты, физические Wi-Fi/аудио и RTC timing/sleep
+ещё нужны. Привязки аудиозадач к ядрам и все отложенные пункты сохранены.
+
+Предыдущая точка: [HE-AAC/TLS/TFT/WebUI прошёл в QEMU на всех трёх выходах](../tests/results/cyd-aac-resource-profile-20261123/README.md)
 с опциональными бюджетами TCP и штатными watchdog. [Шесть обычных production-образов](../tests/results/cyd-aac-fairness-production-20261123/README.md)
 обновлены после AAC memory/fairness исправлений, без изменения конфигураций
 платы и сети. Полный Clang: 320 project units и 20 SDK frontend, без ошибок

@@ -1,0 +1,52 @@
+Adding SPI flash device
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:1
+load:0x3fff0040,len:5380
+load:0x40078000,len:16216
+load:0x40080400,len:3800
+entry 0x400805e0
+I (1193) cpu_start: Multicore app
+I (2948) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (2951) cpu_start: Pro cpu start user code
+I (2952) cpu_start: cpu freq: 240000000 Hz
+I (2952) app_init: Application information:
+I (2953) app_init: Project name:     yoradio_cyd2usb_native
+I (2953) app_init: App version:      v0.9.693-2157-g354e9a189-dirty
+I (2954) app_init: Compile time:     Nov 24 2026 14:39:23
+I (2959) app_init: ELF file SHA256:  c870b5e94...
+I (2959) app_init: ESP-IDF:          v6.0.2
+I (2959) efuse_init: Min chip rev:     v0.0
+I (2959) efuse_init: Max chip rev:     v3.99 
+I (2959) efuse_init: Chip rev:         v0.0
+I (2960) heap_init: Initializing. RAM available for dynamic allocation:
+I (2961) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (2961) heap_init: At 3FFB7318 len 00028CE8 (163 KiB): DRAM
+I (2962) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (2962) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (2962) heap_init: At 4008EEC4 len 0001113C (68 KiB): IRAM
+I (3003) spi_flash: detected chip: gd
+I (3010) spi_flash: flash io: qio
+I (3032) main_task: Started on CPU0
+I (3039) main_task: Calling app_main()
+I (3039) yoradio_native: Starting pure ESP-IDF yoRadio (Arduino-free)
+I (3474) audio_settings: Restored volume 192, balance 0, normalization 0/20/-3/5000
+I (7790) display: ST7789: SPI2 DMA, 80000000 Hz, two 320x4 strips (5120 bytes)
+I (7839) main_task: Returned from app_main()
+I (7858) esp_eth.netif.netif_glue: 52:54:00:12:34:56
+I (7858) esp_eth.netif.netif_glue: ethernet attached to netif
+E (7959) esp_eth: esp_eth_ioctl(533): add mac address to filter not supported
+E (7962) esp_eth.netif.netif_glue: eth_set_mac_filter(56): failed to add mac filter
+E (7962) esp_netif_lwip: Failed to add multicast filter for IPv4
+I (8977) esp_netif_handlers: eth ip: 10.0.2.15, mask: 255.255.255.0, gw: 0.0.0.0
+CYD_OPENETH_READY
+I (8981) audio: Pipeline ready: I2S PDM, 16 KiB compressed + 8 KiB PCM, free heap 191336
+I (12119) radio_control: Validated playlist index: 1 stations
+I (12121) radio_control: Smart Start state: 2
+CYD_RTC_ACCESS core=0 phases=256 bytes=64 PASS
+CYD_RTC_ACCESS core=1 phases=256 bytes=64 PASS
+I (12224) web: Native HTTP server started
+W (18112) httpd_txrx: httpd_sock_err: error in recv : 128

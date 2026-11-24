@@ -1,0 +1,419 @@
+{
+  "physical_tested": false,
+  "scope": "Finite QEMU runs, host sanitizer regressions and normal-PDM static analysis. Artifact and project-TU bindings are not full compiler dependency closure.",
+  "cases": [
+    {
+      "label": "control-pdm",
+      "case": "run-he",
+      "state": "TERMINAL_NONPASS",
+      "reason": "IncompleteRead(1024 bytes read)",
+      "minimum_heap": null,
+      "allocation_failures": null,
+      "pcm_frames": 0,
+      "pcm_sha256": null,
+      "websocket_clients": 0,
+      "files": {
+        "report.json": {
+          "file": "runs/control-pdm/run-he/report.json",
+          "bytes": 14664,
+          "sha256": "433d91440e9f73c1d5337611ae028f8721fa8a97d282426699a798360d6130e6"
+        },
+        "qemu.log": {
+          "file": "runs/control-pdm/run-he/qemu.log",
+          "bytes": 5124,
+          "sha256": "d93860e049395cb332b7f5852d2abbc3927123a43cc3fe8baec117f5bf5bc0fc"
+        },
+        "rtc-access.json": {
+          "file": "runs/control-pdm/run-he/rtc-access.json",
+          "bytes": 742,
+          "sha256": "2dc1e124bf016b16e6db1b7260f1d0bd8894eb4f400fdd11b932c2aa63c1fa2d"
+        }
+      }
+    },
+    {
+      "label": "rtc-pdm",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "minimum_heap": 3704,
+      "allocation_failures": 0,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 0,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-pdm/run-he/report.json",
+          "bytes": 22559,
+          "sha256": "ebf622a73cf9836c972fcb9bb0f455ab006b6971b2bf48b103878a91d4a4d7ef"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-pdm/run-he/qemu.log",
+          "bytes": 8358,
+          "sha256": "b95df1335f600677f3dc3144d3f73ba97d39ccc90386410783ccd9d950934d7d"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-pdm/run-he/rtc-access.json",
+          "bytes": 739,
+          "sha256": "f90049e2b76cec4366ab247f94bbb20a7a410db4a472618176f2cd3ac35e3b81"
+        }
+      }
+    },
+    {
+      "label": "rtc-continuous",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "minimum_heap": 6732,
+      "allocation_failures": 0,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 0,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-continuous/run-he/report.json",
+          "bytes": 22602,
+          "sha256": "3a144747e2a8cd30615868be484b6e8c60fd953dd728ae962999487507faa7c8"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-continuous/run-he/qemu.log",
+          "bytes": 8300,
+          "sha256": "a3d4b9ab2808931b08d0ada9132551ff92ff3a6caac536fefa7a2bf2cf5b0d98"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-continuous/run-he/rtc-access.json",
+          "bytes": 739,
+          "sha256": "595ab0abd35648b3c6a8803f9b6ed979638b3e92e8e7d3552db093dd7e331114"
+        }
+      }
+    },
+    {
+      "label": "rtc-legacy",
+      "case": "run-he",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "minimum_heap": 1784,
+      "allocation_failures": 0,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 0,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-legacy/run-he/report.json",
+          "bytes": 22616,
+          "sha256": "5c34ad3dfd6f59114bd423e2f269f1050d6417e311eed47197b55b14cfe277c1"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-legacy/run-he/qemu.log",
+          "bytes": 8381,
+          "sha256": "88c23c82954b3f8cad32c520cd4a9d67ad53da057afdad2370487e93ca5b1e0e"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-legacy/run-he/rtc-access.json",
+          "bytes": 739,
+          "sha256": "3af99b0f529240ff0ab37aa2aeac4efdf5ceb70ab336560146022339e156a829"
+        }
+      }
+    },
+    {
+      "label": "rtc-pdm",
+      "case": "run-he-ws2",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Missing WebSocket status at idle",
+      "minimum_heap": null,
+      "allocation_failures": null,
+      "pcm_frames": 0,
+      "pcm_sha256": null,
+      "websocket_clients": 2,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-pdm/run-he-ws2/report.json",
+          "bytes": 6409,
+          "sha256": "a9d4214e2702f639738bb566706b3a3b3391365bba34750f97f94ee76834c6f0"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-pdm/run-he-ws2/qemu.log",
+          "bytes": 2650,
+          "sha256": "3e6ebae4f218ba0895fa9418989ec0195d9b5aedf360195d5ba15f74bef9d6b0"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-pdm/run-he-ws2/rtc-access.json",
+          "bytes": 741,
+          "sha256": "963fa38458c358e502dab7a23ea3d87b944fb7e774baef6dc3cb96ed07d157b6"
+        }
+      }
+    },
+    {
+      "label": "rtc-pdm-netview",
+      "case": "run-he-ws2",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Unexpected allocation failure count",
+      "minimum_heap": 2832,
+      "allocation_failures": 4,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 2,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-pdm-netview/run-he-ws2/report.json",
+          "bytes": 27936,
+          "sha256": "036d88f4e6955fe40529358631509aac9161f21315bec0c867e45064d5d5efc5"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-pdm-netview/run-he-ws2/qemu.log",
+          "bytes": 8994,
+          "sha256": "1ad63444c64d1dea95e30c87caf458b57b47a9f161c58cc946d606419664a4fc"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-pdm-netview/run-he-ws2/rtc-access.json",
+          "bytes": 742,
+          "sha256": "9d609640ddd2cb0e3991c8c31a15f7bc32ca0f646c15181fb09b37410c5d606c"
+        }
+      }
+    },
+    {
+      "label": "rtc-pdm-workspace",
+      "case": "run-he-ws2",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "minimum_heap": 1800,
+      "allocation_failures": 0,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 2,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-pdm-workspace/run-he-ws2/report.json",
+          "bytes": 25239,
+          "sha256": "dbfee7214e7c365866e31d1d7739c41e513ae745cc2881a4fb71f38aa53784ef"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-pdm-workspace/run-he-ws2/qemu.log",
+          "bytes": 8418,
+          "sha256": "c49d0c282d4f321a75542387dcd2f1d516d205201a7891ff11c5b78081af6f74"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-pdm-workspace/run-he-ws2/rtc-access.json",
+          "bytes": 739,
+          "sha256": "cc61401fdaca09265f51adc61f292c5f796de902844749444529f2d93bbe44c8"
+        }
+      }
+    },
+    {
+      "label": "control-pdm-workspace",
+      "case": "run-he-ws2-fresh-status",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Remote end closed connection without response",
+      "minimum_heap": null,
+      "allocation_failures": null,
+      "pcm_frames": 0,
+      "pcm_sha256": null,
+      "websocket_clients": 2,
+      "files": {
+        "report.json": {
+          "file": "runs/control-pdm-workspace/run-he-ws2-fresh-status/report.json",
+          "bytes": 16826,
+          "sha256": "79c9efa28f6cbd44457675da3b4303103cd893d5a8d589aeedfbda364aef0d81"
+        },
+        "qemu.log": {
+          "file": "runs/control-pdm-workspace/run-he-ws2-fresh-status/qemu.log",
+          "bytes": 5281,
+          "sha256": "e9eb6218fdcb783c2d9354f160839b7baa754ebedaf146f0e009edde24b1ce65"
+        },
+        "rtc-access.json": {
+          "file": "runs/control-pdm-workspace/run-he-ws2-fresh-status/rtc-access.json",
+          "bytes": 742,
+          "sha256": "5a892b7e2c262420154cabaad295c913e925666ee9ae8fd069578a0996b47194"
+        }
+      }
+    },
+    {
+      "label": "rtc-pdm-workspace",
+      "case": "run-he-ws2-fresh-status",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "minimum_heap": 324,
+      "allocation_failures": 0,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 2,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-pdm-workspace/run-he-ws2-fresh-status/report.json",
+          "bytes": 25254,
+          "sha256": "57502eff4b75778a48062575a83acf8d2fc57b0cf1748de20fcfdc5aa925ea84"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-pdm-workspace/run-he-ws2-fresh-status/qemu.log",
+          "bytes": 8418,
+          "sha256": "07919a13e87a478c2fd9ee225580e903d38aa2c002cc605eba8ff7bb04c80ea0"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-pdm-workspace/run-he-ws2-fresh-status/rtc-access.json",
+          "bytes": 739,
+          "sha256": "8cd827cbf1b150fd19fe27a6c563213329b27c5d2271f0ad36353084a5b9db34"
+        }
+      }
+    },
+    {
+      "label": "rtc-continuous-workspace",
+      "case": "run-he-ws2-fresh-status",
+      "state": "TERMINAL_PASS",
+      "reason": null,
+      "minimum_heap": 1744,
+      "allocation_failures": 0,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 2,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-continuous-workspace/run-he-ws2-fresh-status/report.json",
+          "bytes": 25282,
+          "sha256": "dd712ba121ae32fef8298876d59c8d2424df07c73c0fc5c8bde7b5cb013c3d7d"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-continuous-workspace/run-he-ws2-fresh-status/qemu.log",
+          "bytes": 8359,
+          "sha256": "2d88d40df96cee294332cd2d4048219ff70d0ac06f03ff4cc46c2d343c9c3c64"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-continuous-workspace/run-he-ws2-fresh-status/rtc-access.json",
+          "bytes": 739,
+          "sha256": "8eba679efc60210e01486e5ca9dc10c229cf4d804212007517032f1e1292b40a"
+        }
+      }
+    },
+    {
+      "label": "rtc-legacy-workspace",
+      "case": "run-he-ws2-fresh-status",
+      "state": "TERMINAL_NONPASS",
+      "reason": "Unexpected allocation failure count",
+      "minimum_heap": 1412,
+      "allocation_failures": 1,
+      "pcm_frames": 614400,
+      "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+      "websocket_clients": 2,
+      "files": {
+        "report.json": {
+          "file": "runs/rtc-legacy-workspace/run-he-ws2-fresh-status/report.json",
+          "bytes": 27898,
+          "sha256": "87c5cd1ead0f0c66b7f27ec077abe4a8333f3ea9e5f096211a0eaf60e3eb0485"
+        },
+        "qemu.log": {
+          "file": "runs/rtc-legacy-workspace/run-he-ws2-fresh-status/qemu.log",
+          "bytes": 8673,
+          "sha256": "18c72ce4b6e193348a357ece6cf73d1d5ae6c417500cc81a60da8f5a522bc72c"
+        },
+        "rtc-access.json": {
+          "file": "runs/rtc-legacy-workspace/run-he-ws2-fresh-status/rtc-access.json",
+          "bytes": 742,
+          "sha256": "8aa3308ecf1b858d93b9c0f9655b7803ee5053a49e0592925b353f5e7baa2d34"
+        }
+      }
+    }
+  ],
+  "identities": {
+    "control-pdm": {
+      "file": "identities/control-pdm.json",
+      "bytes": 12585,
+      "sha256": "b193e3786095117148e1c8d197cf85dc47cd04bec48cf9a6a50210d5419f9438"
+    },
+    "rtc-pdm": {
+      "file": "identities/rtc-pdm.json",
+      "bytes": 12596,
+      "sha256": "e34026cb1bf743745571a458ba6c9076c4fd529ced2c47e1211f8cf492abe11f"
+    },
+    "rtc-continuous": {
+      "file": "identities/rtc-continuous.json",
+      "bytes": 12603,
+      "sha256": "5f716e8d1dd1194ba61ca95bd06cb0ce447b8b4d86d3ee629f272c0d41e563f8"
+    },
+    "rtc-legacy": {
+      "file": "identities/rtc-legacy.json",
+      "bytes": 12803,
+      "sha256": "614f8e11725275a4c3aa1f3f1d7890c840d1871be249972079b919d0ab829e0a"
+    },
+    "rtc-pdm-netview": {
+      "file": "identities/rtc-pdm-netview.json",
+      "bytes": 12604,
+      "sha256": "9e1779258c00628dc1f4d4179cbd997c874c8420e7e2bc2db3779cb73fa0bf34"
+    },
+    "rtc-pdm-workspace": {
+      "file": "identities/rtc-pdm-workspace.json",
+      "bytes": 12835,
+      "sha256": "fc688469b61207c849e45dd172ee9d669eb590fc76f13fddf1659c556279f6d7"
+    },
+    "control-pdm-workspace": {
+      "file": "identities/control-pdm-workspace.json",
+      "bytes": 12814,
+      "sha256": "12b730bfc189b2bd99e3d3ac2046593b0b76ef69b8b69948100271fff37bba4f"
+    },
+    "rtc-continuous-workspace": {
+      "file": "identities/rtc-continuous-workspace.json",
+      "bytes": 12842,
+      "sha256": "e97c849e24d56febe43bbde85f57b137e2304eef7bd1fd4edfd40394dcc567b7"
+    },
+    "rtc-legacy-workspace": {
+      "file": "identities/rtc-legacy-workspace.json",
+      "bytes": 13042,
+      "sha256": "1fd4e38830fe18c71a0b478b8542d62a59ace8d10683ff820ff316a29729f27f"
+    }
+  },
+  "qualification": {
+    "host-dram-report.json": {
+      "file": "qualification/host-dram-report.json",
+      "bytes": 7275,
+      "sha256": "47508509a9dec3beb73294b15d24b33ec90ddbd223ed45fdb3973ac33502f7ec"
+    },
+    "host-dram-test.log": {
+      "file": "qualification/host-dram-test.log",
+      "bytes": 5127,
+      "sha256": "060f20bcaf65925b8c10378847acad510ccc9de21ab88968d3e6ef37dba4be04"
+    },
+    "host-rtc-report.json": {
+      "file": "qualification/host-rtc-report.json",
+      "bytes": 7274,
+      "sha256": "d117ca34f53ff90228276f3f88e975482b2685a8402168fdfa9ade10ab4e7384"
+    },
+    "host-rtc-test.log": {
+      "file": "qualification/host-rtc-test.log",
+      "bytes": 5127,
+      "sha256": "060f20bcaf65925b8c10378847acad510ccc9de21ab88968d3e6ef37dba4be04"
+    },
+    "qualification/clang-report.json": {
+      "file": "qualification/clang-report.json",
+      "bytes": 56119,
+      "sha256": "48d85c2c9462eaf2af89ada0230dd977de879b473ee42dac4ed288ec7bd089ac"
+    },
+    "qualification/clang-comparison.json": {
+      "file": "qualification/clang-comparison.json",
+      "bytes": 154,
+      "sha256": "aa48fe6586ad70e076897759a97f4ed2970ebc80ef67b54f8e51af716bb92de4"
+    },
+    "qualification/clang-config-delta.json": {
+      "file": "qualification/clang-config-delta.json",
+      "bytes": 1806,
+      "sha256": "579cacdb5522d8dbde82456903cc5e3a23ce2febcd0806794676634f19fe958e"
+    },
+    "qualification/host-retained-before.log": {
+      "file": "qualification/host-retained-before.log",
+      "bytes": 275,
+      "sha256": "12abff9318057ebe8f6d40e736f6ce46682478e16674c5f77911404742d6dbbf"
+    }
+  },
+  "matched_pdm": {
+    "config_difference": [
+      "YORADIO_WS_STATUS_RTC_SLOW"
+    ],
+    "workspace_object_bytes": 6560,
+    "heap_start_reduction": 6560,
+    "bss_reduction": 6560,
+    "rtc_geometry": {
+      "rtc_slow_used_bytes": 6664,
+      "rtc_slow_reserved_bytes": 24,
+      "rtc_slow_data_capacity_bytes": 8168,
+      "rtc_slow_free_bytes": 1504,
+      "heap_start": 1073443176,
+      "dram_bss_bytes": 17240
+    }
+  }
+}

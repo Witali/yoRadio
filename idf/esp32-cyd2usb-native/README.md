@@ -63,6 +63,11 @@ its mailbox remains at the SDK minimum of six entries. These finite QEMU
 runs have small heap margins. The original RX-eight/TX-four defaults are
 retained, and their full HE-AAC resource test remains nonpassing.
 
+The experimental `sdkconfig.ws-status-rtc-slow.defaults` instead moves the
+existing WebSocket workspace to classic ESP32 RTC SLOW memory, preserving
+the ordinary TCP settings. It is disabled by default and excludes ULP use.
+See [memory placement, build instructions and qualification limits](../../docs/CYD_WS_RTC_MEMORY.md).
+
 To flash only the application and preserve Wi-Fi/SPIFFS:
 
 ```powershell
