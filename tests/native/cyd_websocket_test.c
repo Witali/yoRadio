@@ -37,6 +37,19 @@ static httpd_uri_t registered_route;
 static httpd_work_fn_t queued_work;
 static void *queued_argument;
 static void (*task_entry)(void *);
+#ifdef WS_TIMER_SCHEDULER
+static void (*timer_callback)(void *);
+static esp_event_handler_t event_handler;
+static atomic_uint queued_events;
+static bool timer_created, timer_active, timer_start_failure, timer_delete_failure;
+static bool event_registration_failure, event_post_failure;
+static bool dispatch_before_post_failure;
+static unsigned event_registrations;
+static void execute_events(void);
+static pthread_mutex_t queue_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t queue_condition = PTHREAD_COND_INITIALIZER;
+static bool queue_hold, queue_entered, queue_release;
+#endif
 static native_state_t state;
 static radio_control_snapshot_t radio;
 static native_input_health_t input;
@@ -174,6 +187,14 @@ int lwip_select(int highest, fd_set *readable, fd_set *writable, fd_set *excepti
 }
 esp_err_t httpd_queue_work(httpd_handle_t server, httpd_work_fn_t callback, void *argument) {
     assert(server == s_server); ++queue_calls; if (queue_failure) return ESP_FAIL;
+#ifdef WS_TIMER_SCHEDULER
+    pthread_mutex_lock(&queue_mutex);
+    if (queue_hold) {
+        queue_entered = true; pthread_cond_broadcast(&queue_condition);
+        while (!queue_release) pthread_cond_wait(&queue_condition, &queue_mutex);
+    }
+    pthread_mutex_unlock(&queue_mutex);
+#endif
     assert(!queued_work); queued_work = callback; queued_argument = argument; return ESP_OK;
 }
 int shutdown(int socket, int how) {
@@ -236,15 +257,63 @@ int xTaskCreate(void (*entry)(void *), const char *name, unsigned stack, void *a
     assert(!strcmp(name, "websocket_status") && stack == 2048 && !argument && priority == 2 && !handle);
     if (task_failure) return 0; task_entry = entry; return pdPASS;
 }
+#ifdef WS_TIMER_SCHEDULER
+esp_err_t esp_timer_create(const esp_timer_create_args_t *args, esp_timer_handle_t *out) {
+    assert(!timer_created && args->callback && !args->arg && args->dispatch_method == ESP_TIMER_TASK);
+    assert(args->skip_unhandled_events && !strcmp(args->name, "ws_status"));
+    if (task_failure) return ESP_ERR_NO_MEM;
+    timer_callback = args->callback; timer_created = true; *out = (void *)2; return ESP_OK;
+}
+esp_err_t esp_timer_start_periodic(esp_timer_handle_t timer, uint64_t period) {
+    assert(timer == (void *)2 && timer_created && !timer_active && period == 100000);
+    if (timer_start_failure) return ESP_FAIL;
+    timer_active = true; return ESP_OK;
+}
+esp_err_t esp_timer_stop(esp_timer_handle_t timer) {
+    assert(timer == (void *)2 && timer_created);
+    if (!timer_active) return ESP_ERR_INVALID_STATE;
+    timer_active = false; return ESP_OK;
+}
+esp_err_t esp_timer_delete(esp_timer_handle_t timer) {
+    assert(timer == (void *)2 && timer_created && !timer_active);
+    if (timer_delete_failure) return ESP_FAIL;
+    timer_created = false; return ESP_OK;
+}
+esp_err_t esp_event_handler_register(esp_event_base_t base, int32_t id, esp_event_handler_t callback, void *argument) {
+    assert(base == WS_STATUS_EVENT && id == 0 && !argument && !event_handler);
+    if (event_registration_failure) return ESP_ERR_NO_MEM;
+    event_handler = callback; ++event_registrations; return ESP_OK;
+}
+esp_err_t esp_event_post(esp_event_base_t base, int32_t id, const void *data, size_t size, unsigned wait) {
+    assert(base == WS_STATUS_EVENT && id == 0 && !data && !size && !wait && event_handler);
+    if (dispatch_before_post_failure) {
+        assert(atomic_load(&queued_events) == 1); execute_events(); return ESP_ERR_TIMEOUT;
+    }
+    if (event_post_failure) return ESP_ERR_TIMEOUT;
+    atomic_fetch_add(&queued_events, 1U); return ESP_OK;
+}
+static void execute_events(void) {
+    while (atomic_load(&queued_events)) {
+        atomic_fetch_sub(&queued_events, 1U);
+        event_handler(NULL, WS_STATUS_EVENT, 0, NULL);
+    }
+}
+static void *event_thread(void *argument) { (void)argument; execute_events(); return NULL; }
+#endif
 void vTaskDelay(unsigned ticks) {
     assert(ticks == 1 || ticks == 10 || ticks == 100);
     if (ticks == 1) { ++transport_yields; now_us += 1000; }
     if (ticks == 100 && stop_task_after_delay) atomic_store(&s_running,false);
+#ifndef WS_TIMER_SCHEDULER
     if (!atomic_load(&s_running) && task_entry && !suspend_task_exit) { void (*entry)(void *) = task_entry; task_entry = NULL; entry(NULL); }
+#endif
 }
 void vTaskDelete(void *task) { assert(!task); }
 
 static void execute_work(void) {
+#ifdef WS_TIMER_SCHEDULER
+    execute_events();
+#endif
     assert(queued_work);
     httpd_work_fn_t callback = queued_work; void *argument = queued_argument;
     queued_work = NULL; queued_argument = NULL;
@@ -266,6 +335,13 @@ static void reset(void) {
     for (int i = 0; i < 16; ++i) close_socket(i);
     queued_work = NULL; // Models httpd_stop joining/discarding queued work.
     assert(websocket_service_server_stopped(s_server) == ESP_OK);
+#ifdef WS_TIMER_SCHEDULER
+    assert(!timer_created && !timer_active && !atomic_load(&s_producers));
+    s_event_registered = false; event_handler = NULL; atomic_store(&queued_events, 0);
+    timer_start_failure = timer_delete_failure = event_registration_failure = event_post_failure = false;
+    dispatch_before_post_failure = false;
+    queue_hold = queue_entered = queue_release = false; event_registrations = 0;
+#endif
     memset(sockets, 0, sizeof(sockets)); memset(deliveries, 0, sizeof(deliveries)); memset(&state, 0, sizeof(state));
     memset(&radio, 0, sizeof(radio)); memset(&input, 0, sizeof(input));
     delivery_count = shutdown_count = queue_calls = capture_calls = command_calls = recv_calls = http_errors = 0;
@@ -526,8 +602,14 @@ int main(void) {
     reset(); start(); open_socket(7, true); poll_status();
     strcpy(state.title, "latest before callback");
     for (unsigned i = 0; i < 10000; ++i) poll_status();
+#ifdef WS_TIMER_SCHEDULER
+    execute_events();
+#endif
     assert(queue_calls == 1); execute_work(); assert(strstr(deliveries[0].text, "latest before callback"));
     first = delivery_count; slow_send = true; now_us = WS_HEARTBEAT_US; cycle();
+#ifdef WS_TIMER_SCHEDULER
+    execute_events();
+#endif
     assert(queue_calls == 2); cycle(); assert(contains_delivery(first, 7, "changed during slow send"));
 
     reset(); start(); open_socket(7, true); cycle(); poll_status();
@@ -549,13 +631,21 @@ int main(void) {
     task_failure = true; assert(websocket_service_start() == ESP_ERR_NO_MEM); assert(websocket_service_stop() == ESP_OK);
     assert(websocket_service_server_stopped((void *)1) == ESP_OK);
 
-    reset(); start(); open_socket(7, true); poll_status(); assert(websocket_service_stop() == ESP_OK);
+    reset(); start(); open_socket(7, true); poll_status();
+#ifdef WS_TIMER_SCHEDULER
+    execute_events();
+#endif
+    assert(websocket_service_stop() == ESP_OK);
     execute_work(); assert(!delivery_count);
     assert(websocket_service_server_stopped((void *)2) == ESP_ERR_INVALID_ARG);
     close_socket(7); assert(websocket_service_server_stopped((void *)1) == ESP_OK);
     start(); open_socket(7, true); cycle(); assert(delivery_count == 3);
 
-    reset(); start(); queue_failure = true; poll_status(); assert(!atomic_load(&s_work_pending) && !queued_work);
+    reset(); start(); queue_failure = true; poll_status();
+#ifdef WS_TIMER_SCHEDULER
+    execute_events();
+#endif
+    assert(!atomic_load(&s_work_pending) && !queued_work);
     queue_failure = false; open_socket(7, true); cycle(); assert(delivery_count == 3);
 
     reset(); start(); open_socket(7, true); context_failure = true; cycle();
@@ -580,6 +670,61 @@ int main(void) {
     assert(strstr(deliveries[0].text,"final title") && !strstr(deliveries[0].text,"between title") && strstr(deliveries[1].text,"\"current\":1"));
 
     reset(); start();
+#ifdef WS_TIMER_SCHEDULER
+    timer_callback(NULL); execute_events();
+    assert(queued_work && websocket_service_stop() == ESP_OK);
+    execute_work(); assert(!delivery_count);
+
+    reset(); start(); open_socket(7,true); poll_status(); queue_hold = true;
+    pthread_t blocked;
+    assert(!pthread_create(&blocked, NULL, event_thread, NULL));
+    pthread_mutex_lock(&queue_mutex);
+    while (!queue_entered) pthread_cond_wait(&queue_condition, &queue_mutex);
+    pthread_mutex_unlock(&queue_mutex);
+    assert(websocket_service_stop() == ESP_ERR_TIMEOUT);
+    assert(websocket_service_start() == ESP_ERR_INVALID_STATE);
+    assert(websocket_service_server_stopped((void *)1) == ESP_ERR_INVALID_STATE);
+    timer_callback(NULL); // A late timer callback must not enter the closed gate.
+    pthread_mutex_lock(&queue_mutex); queue_release = true;
+    pthread_cond_broadcast(&queue_condition); pthread_mutex_unlock(&queue_mutex);
+    assert(!pthread_join(blocked, NULL));
+    assert(websocket_service_stop() == ESP_OK); execute_work(); assert(!delivery_count);
+
+    reset(); start(); open_socket(7,true); event_post_failure = true; timer_callback(NULL);
+    assert(!atomic_load(&s_work_pending) && !atomic_load(&queued_events) && !queue_calls);
+    event_post_failure = false; cycle(); assert(delivery_count == 3);
+
+    // An old payload-free event may consume the current reservation while
+    // a concurrent producer's post fails. That failure must not forget
+    // HTTPD work which the old event already enqueued.
+    reset(); start(); open_socket(7,true); poll_status();
+    assert(websocket_service_stop() == ESP_OK && atomic_load(&queued_events) == 1);
+    assert(websocket_service_start() == ESP_OK);
+    dispatch_before_post_failure = true; poll_status();
+    assert(queued_work && queue_calls == 1); dispatch_before_post_failure = false;
+    for (unsigned i = 0; i < 10000; ++i) poll_status();
+    execute_work(); assert(queue_calls == 1 && delivery_count == 3);
+
+    reset(); assert(websocket_service_register((void *)1, &state) == ESP_OK);
+    event_registration_failure = true; assert(websocket_service_start() == ESP_ERR_NO_MEM);
+    assert(!timer_created && !s_event_registered);
+    event_registration_failure = false; timer_start_failure = true;
+    assert(websocket_service_start() == ESP_FAIL && !timer_created && !atomic_load(&s_running));
+    assert(event_registrations == 1); timer_start_failure = false;
+    assert(websocket_service_start() == ESP_OK && event_registrations == 1);
+    timer_delete_failure = true; assert(websocket_service_stop() == ESP_FAIL);
+    assert(websocket_service_server_stopped((void *)1) == ESP_ERR_INVALID_STATE);
+    timer_delete_failure = false; assert(websocket_service_stop() == ESP_OK);
+
+    reset(); start(); open_socket(7,true); poll_status();
+    assert(atomic_load(&queued_events) == 1 && !queued_work);
+    assert(websocket_service_stop() == ESP_OK); close_socket(7);
+    assert(websocket_service_server_stopped((void *)1) == ESP_OK);
+    start(); open_socket(8,true); poll_status();
+    assert(atomic_load(&queued_events) == 2 && event_registrations == 1);
+    execute_work(); assert(queue_calls == 1 && contains_delivery(0, 8, "\"status\":"));
+    assert(!contains_delivery(0, 7, "\"status\":"));
+#else
     void (*entry)(void *)=task_entry; task_entry=NULL; stop_task_after_delay=true; entry(NULL);
     assert(!atomic_load(&s_task_alive) && queued_work && websocket_service_stop() == ESP_OK);
     execute_work(); assert(!delivery_count);
@@ -587,6 +732,7 @@ int main(void) {
     reset(); start(); suspend_task_exit=true;
     assert(websocket_service_stop() == ESP_ERR_TIMEOUT && websocket_service_server_stopped((void *)1) == ESP_ERR_INVALID_STATE);
     suspend_task_exit=false; assert(websocket_service_stop() == ESP_OK);
+#endif
 
     reset(); start(); open_socket(7, true); cycle();
     const char *valid[] = {"ping", "getindex=1", "getsystem", "getactive", "play=65535", "stop=1", "toggle", "prev", "next=1",
@@ -709,7 +855,11 @@ int main(void) {
 
     reset(); start(); open_socket(7, true); cycle();
     pthread_t left, right; assert(!pthread_create(&left, NULL, producer, NULL)); assert(!pthread_create(&right, NULL, producer, NULL));
-    pthread_join(left, NULL); pthread_join(right, NULL); assert(queue_calls == 2); execute_work();
+    pthread_join(left, NULL); pthread_join(right, NULL);
+#ifdef WS_TIMER_SCHEDULER
+    execute_events();
+#endif
+    assert(queue_calls == 2); execute_work();
     assert(contains_delivery(3, 7, "\"file\":"));
 
     reset(); start(); open_socket(7, true);

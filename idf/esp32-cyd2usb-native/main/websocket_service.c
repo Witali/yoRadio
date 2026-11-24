@@ -8,6 +8,7 @@
 #include "sdkconfig.h"
 #include "audio_service.h"
 #include "esp_timer.h"
+#include "esp_event.h"
 #include "freertos/task.h"
 #include "json_buffer.h"
 #include "lwip/sockets.h"
@@ -43,7 +44,7 @@
 #define WS_STATUS_BYTES 5120U
 #define WS_POLL_MS 100U
 #define WS_HEARTBEAT_US 2000000LL
-#define WS_TASK_STACK 2048U
+#define WS_TIMER_SCHEDULER 1
 #define WS_FRAME_BUDGET_US 1000000LL
 #define WS_MESSAGE_BUDGET_US 5000000ULL
 
@@ -74,7 +75,15 @@ typedef struct {
 
 static httpd_handle_t s_server;
 static native_state_t *s_state;
-static atomic_bool s_running, s_task_alive, s_work_pending;
+static atomic_bool s_running;
+enum { WS_WORK_IDLE, WS_WORK_EVENT, WS_WORK_HTTPD };
+static atomic_uint s_work_pending;
+// Bit zero admits callbacks; higher bits count callbacks that own admission.
+// Stop closes admission before waiting, including callbacks not entered yet.
+static atomic_uint s_producers;
+static esp_timer_handle_t s_poll_timer;
+static bool s_event_registered;
+ESP_EVENT_DEFINE_BASE(WS_STATUS_EVENT);
 static atomic_uint s_playlist_revision;
 // Only the HTTPD task touches these objects. Queued work contains no payload or
 // captured fd, and every send completes before this workspace is reused.
@@ -424,20 +433,46 @@ static void status_work(void *argument) {
     atomic_store(&s_work_pending, false);
 }
 
-static void poll_status(void) {
-    bool expected = false;
-    if (!atomic_load(&s_running) || !atomic_compare_exchange_strong(&s_work_pending, &expected, true)) return;
-    if (httpd_queue_work(s_server, status_work, NULL) != ESP_OK) atomic_store(&s_work_pending, false);
+static bool producer_enter(void) {
+    unsigned state = atomic_load(&s_producers);
+    while (state & 1U) {
+        if (state + 2U < state) return false;
+        if (atomic_compare_exchange_weak(&s_producers, &state, state + 2U)) return true;
+    }
+    return false;
 }
 
-static void status_task(void *argument) {
-    (void)argument;
-    while (atomic_load(&s_running)) {
-        poll_status();
-        vTaskDelay(pdMS_TO_TICKS(WS_POLL_MS));
+static void status_event(void *argument, esp_event_base_t base, int32_t id, void *data) {
+    (void)argument; (void)base; (void)id; (void)data;
+    if (!producer_enter()) return;
+    unsigned expected = WS_WORK_EVENT;
+    if (atomic_load(&s_running) && atomic_compare_exchange_strong(
+            &s_work_pending, &expected, WS_WORK_HTTPD)) {
+        if (httpd_queue_work(s_server, status_work, NULL) != ESP_OK)
+            atomic_store(&s_work_pending, WS_WORK_IDLE);
     }
-    atomic_store(&s_task_alive, false);
-    vTaskDelete(NULL);
+    atomic_fetch_sub(&s_producers, 2U);
+}
+
+static void poll_status(void) {
+    if (!producer_enter()) return;
+    unsigned expected = WS_WORK_IDLE;
+    if (atomic_load(&s_running) && atomic_compare_exchange_strong(
+            &s_work_pending, &expected, WS_WORK_EVENT)) {
+        // A timer callback must neither wait nor perform socket operations.
+        // No event payload means the pinned SDK also needs no payload malloc.
+        if (esp_event_post(WS_STATUS_EVENT, 0, NULL, 0, 0) != ESP_OK) {
+            // A late event may already have handed this poll to HTTPD.
+            expected = WS_WORK_EVENT;
+            atomic_compare_exchange_strong(&s_work_pending, &expected, WS_WORK_IDLE);
+        }
+    }
+    atomic_fetch_sub(&s_producers, 2U);
+}
+
+static void status_timer(void *argument) {
+    (void)argument;
+    poll_status();
 }
 
 static bool number(const char *text, int minimum, int maximum, int *result) {
@@ -582,25 +617,50 @@ esp_err_t websocket_service_register(httpd_handle_t server, native_state_t *stat
 }
 
 esp_err_t websocket_service_start(void) {
-    if (!s_server || atomic_load(&s_running) || atomic_load(&s_task_alive)) return ESP_ERR_INVALID_STATE;
+    if (!s_server || atomic_load(&s_running) || s_poll_timer) return ESP_ERR_INVALID_STATE;
+    // Process-lifetime registration: late payload-free events remain safe
+    // across Stop/restart, without unregistering under another event handler.
+    if (!s_event_registered) {
+        esp_err_t result = esp_event_handler_register(WS_STATUS_EVENT, 0, status_event, NULL);
+        if (result != ESP_OK) return result;
+        s_event_registered = true;
+    }
+    const esp_timer_create_args_t timer = {.callback=status_timer,
+        .dispatch_method=ESP_TIMER_TASK, .name="ws_status", .skip_unhandled_events=true};
+    esp_err_t result = esp_timer_create(&timer, &s_poll_timer);
+    if (result != ESP_OK) return result;
+    atomic_store(&s_producers, 1U);
     atomic_store(&s_running, true);
-    atomic_store(&s_task_alive, true);
-    if (xTaskCreate(status_task, "websocket_status", WS_TASK_STACK, NULL, 2, NULL) != pdPASS) {
-        atomic_store(&s_running, false); atomic_store(&s_task_alive, false);
-        return ESP_ERR_NO_MEM;
+    result = esp_timer_start_periodic(s_poll_timer, WS_POLL_MS * UINT64_C(1000));
+    if (result != ESP_OK) {
+        esp_err_t cleanup = websocket_service_stop();
+        return cleanup == ESP_OK ? result : cleanup;
     }
     return ESP_OK;
 }
 
 esp_err_t websocket_service_stop(void) {
     atomic_store(&s_running, false);
-    for (unsigned attempt = 0; attempt < 50U && atomic_load(&s_task_alive); ++attempt)
+    atomic_fetch_and(&s_producers, ~1U);
+    if (s_poll_timer) {
+        esp_err_t result = esp_timer_stop(s_poll_timer);
+        if (result != ESP_OK && result != ESP_ERR_INVALID_STATE) return result;
+    }
+    for (unsigned attempt = 0; attempt < 50U && atomic_load(&s_producers); ++attempt)
         vTaskDelay(pdMS_TO_TICKS(10));
-    return atomic_load(&s_task_alive) ? ESP_ERR_TIMEOUT : ESP_OK;
+    if (atomic_load(&s_producers)) return ESP_ERR_TIMEOUT;
+    unsigned expected = WS_WORK_EVENT;
+    atomic_compare_exchange_strong(&s_work_pending, &expected, WS_WORK_IDLE);
+    if (s_poll_timer) {
+        esp_err_t result = esp_timer_delete(s_poll_timer);
+        if (result != ESP_OK) return result;
+        s_poll_timer = NULL;
+    }
+    return ESP_OK;
 }
 
 esp_err_t websocket_service_server_stopped(httpd_handle_t server) {
-    if (atomic_load(&s_task_alive) || atomic_load(&s_running)) return ESP_ERR_INVALID_STATE;
+    if (s_poll_timer || atomic_load(&s_producers) || atomic_load(&s_running)) return ESP_ERR_INVALID_STATE;
     if (s_server && s_server != server) return ESP_ERR_INVALID_ARG;
     s_server = NULL; s_state = NULL;
     memset(s_clients, 0, sizeof(s_clients));

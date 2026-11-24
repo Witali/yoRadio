@@ -49,7 +49,29 @@ int xTaskCreate(void (*)(void *),const char *,unsigned,void *,unsigned,void *);
 void vTaskDelay(unsigned);
 void vTaskDelete(void *);
 ''',
-        'esp_timer.h': '#pragma once\n#include <stdint.h>\nint64_t esp_timer_get_time(void);\n',
+        'esp_timer.h': '''#pragma once
+#include <stdint.h>
+#include <stdbool.h>
+#include "esp_err.h"
+typedef void *esp_timer_handle_t;
+typedef struct { void (*callback)(void *); void *arg; int dispatch_method; const char *name; bool skip_unhandled_events; } esp_timer_create_args_t;
+#define ESP_TIMER_TASK 0
+int64_t esp_timer_get_time(void);
+esp_err_t esp_timer_create(const esp_timer_create_args_t *,esp_timer_handle_t *);
+esp_err_t esp_timer_start_periodic(esp_timer_handle_t,uint64_t);
+esp_err_t esp_timer_stop(esp_timer_handle_t);
+esp_err_t esp_timer_delete(esp_timer_handle_t);
+''',
+        'esp_event.h': '''#pragma once
+#include <stddef.h>
+#include <stdint.h>
+#include "esp_err.h"
+typedef const char *esp_event_base_t;
+typedef void (*esp_event_handler_t)(void *,esp_event_base_t,int32_t,void *);
+#define ESP_EVENT_DEFINE_BASE(name) esp_event_base_t name = #name
+esp_err_t esp_event_handler_register(esp_event_base_t,int32_t,esp_event_handler_t,void *);
+esp_err_t esp_event_post(esp_event_base_t,int32_t,const void *,size_t,unsigned);
+''',
         'native_web_transport.h': '''#pragma once
 #include "esp_http_server.h"
 #include <sys/types.h>
