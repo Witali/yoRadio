@@ -28,7 +28,7 @@ These are diagnostic OpenETH RTC-on fixtures. They do not qualify production Wi-
 
 All four original controllers pass. Every run receives the full 102,420-byte
 HE-AAC input over TLS1.2 with full-sized records, flushes all 614,400 stereo
-PCM frames at 48kHz with SHA256 `44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362`,
+PCM frames at 48 kHz with SHA256 `44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362`,
 and serves the identical 13,588-byte WebUI asset before, during and after EOF.
 Two live WebSocket clients require fresh status and application pongs in all
 three phases, then close normally. Allocation failures, output failures,
@@ -70,5 +70,44 @@ distinct snapshots. The last EOF snapshot precedes the final WebUI asset read an
 WebSocket EOF command/normal closure. Zero allocation/output failures therefore
 means zero in every available snapshot through that EOF boundary; it is not an
 independent post-close memory observation. A final post-asset/post-close health
-gate and a new three-output control are being added separately. Earlier raw PASS
+gate and a new three-output control have now completed, as recorded below. Earlier raw PASS
 states remain the results of the original controller and are not relabeled.
+
+## Final resource check after WebUI and peer closure
+
+The [strengthened controller](../../run-cyd-full-app-openeth.py) closes both peers,
+reads final status, then records `post_eof_health` while QEMU is still live.
+[Fourteen host regressions](post-eof-host/report.json), including a late allocation
+failure after an initially clean EOF sample and real main/finally failure/cleanup,
+pass alongside the existing thirteen PCM/EOF observer tests. Expected reclaim
+allocation count remains exactly one for the separate intentional-pressure mode;
+these HE-AAC cases require zero. Earlier PCM/TLS/asset/peer assertions remain.
+
+All three fresh native controls pass with controller commit `c1f7f3abf` and the
+same frozen images/configurations/model as the preceding matrix:
+
+| Backend | Minimum heap bytes | EOF allocation failures | Post-asset/close allocation failures |
+| --- | ---: | ---: | ---: |
+| PDM | 6,184 | 0 | 0 |
+| Continuous DAC | 6,836 | 0 | 0 |
+| Legacy DAC | 4,304 | 0 | 0 |
+
+[The final matrix](post-eof-native/matrix-summary.json) binds complete TLS input,
+614,400 exact PCM frames/hash, identical WebUI assets in all three phases,
+fresh two-client status/pongs/normal close, clean final fault counters,
+unchanged boot/generation/EOF state and the post-close observation marker.
+Reports, UART and input bindings retain their original bytes. QEMU is stopped
+intentionally after the last observation; exit status 1 is not presented as a
+clean guest exit 0 or a guest crash.
+
+In this PDM control `completion_queue_drops` is zero at EOF and 89 in the final
+post-close sample, with zero allocation, write, timeout or short-write failures.
+This is distinct completion-notification telemetry. The pinned SDK discards an
+old queue entry when the completion queue is full and enqueues the latest buffer;
+our PDM configuration enables `auto_clear_after_cb`. The observed increase is
+after the stream ended. Decoder PCM equality and these counters do not establish
+physical DMA/analog quality. The earlier four-case values remain unchanged.
+
+This closes the last-operation monitoring gap for these three diagnostic
+RTC-on/normal-TCP HE-AAC workloads. RTC-off resources, production Wi-Fi, physical
+outputs and RTC timing/sleep remain separate; no default profile is promoted.

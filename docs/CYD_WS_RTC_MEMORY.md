@@ -106,5 +106,8 @@ Earlier failures keep their original states. This does not qualify RTC-off
 HE-AAC headroom, production Wi-Fi, physical DMA/audio or sleep/wake behavior.
 
 The original final EOF health sample precedes the last asset read and peer
-closure. A separate post-asset/post-close health gate is still being added;
-zero counters in the saved samples do not independently qualify that last interval.
+closure. The [new post-close controls](../tests/results/cyd-openeth-rx-exact-20261124/post-eof-native/matrix-summary.json)
+now independently qualify that last interval on all three outputs: complete
+TLS/HE-AAC/PCM/WebUI, zero allocation/write failures, and unchanged boot/EOF
+generation. The PDM completion-notification counter rises from zero at EOF to 89
+after close, separately from memory/write errors; physical timing remains open.

@@ -1,0 +1,1461 @@
+{
+  "controller_source_commit": "c1f7f3abf8458b2976bb72919f2b26b4eb9b704f",
+  "controller": {
+    "bytes": 62859,
+    "sha256": "ca236ed51cbb54e06391e7cfb5b88ef465594ccfbd122e52ddcade64f479cc4f"
+  },
+  "fixture_source_commit": "482a3896033a5ef2f8131a728923457b6ff25b6e",
+  "original_evidence_commit": "eda70a7782068da57d8044244059bb013b95c5c1",
+  "original_packages_verified": {
+    "host": {
+      "manifest": {
+        "bytes": 2436,
+        "sha256": "ae1264080339bec9dc009d04f73777ca6e680f4d0cf9bda5ea3e614b1adb16e8"
+      },
+      "files_verified": 17
+    },
+    "sdk": {
+      "manifest": {
+        "bytes": 14734,
+        "sha256": "8b1b64f2162fb7c3984260c72e4fbd140e8bf010e28d13d91f42fb7a1d3bf826"
+      },
+      "files_verified": 97
+    },
+    "native": {
+      "manifest": {
+        "bytes": 2900,
+        "sha256": "d8b672b9a626028cf9e41ae58ab4eefc63125fa58cde8b904df46d6476a50f85"
+      },
+      "files_verified": 19
+    },
+    "published_redactions": {
+      "declaration": {
+        "bytes": 3056,
+        "sha256": "e77f787809e9b0cdcc078a91c21a1b4c5e7e1c58826abb8d8f9d5aec908434d3"
+      },
+      "files": 6,
+      "replacements": 9,
+      "scope": "Verify the intentionally published redacted bytes, never substitute private raw CMake logs."
+    }
+  },
+  "qemu": {
+    "bytes": 73096245,
+    "sha256": "28068f674d06c4322aa72989756d7dd3734bb0d06c4aa1acf21b919ccb3465f4"
+  },
+  "cases": [
+    {
+      "backend": "legacy",
+      "label": "run-he-ws2-post-eof",
+      "state": "TERMINAL_PASS",
+      "passed": true,
+      "reason": null,
+      "gates": {
+        "tls_full_102420_and_record_geometry": {
+          "passed": true,
+          "wire_lengths": [
+            185,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            4140
+          ],
+          "peers": [
+            {
+              "tls_version": "TLSv1.2",
+              "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+              "sent": 102420,
+              "complete": true
+            }
+          ]
+        },
+        "pcm_exact_614400": {
+          "passed": true,
+          "sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+          "flushes": [
+            {
+              "frames": 614400,
+              "status": 0
+            }
+          ]
+        },
+        "webui_three_assets": {
+          "passed": true,
+          "expected": {
+            "bytes": 13588,
+            "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+          },
+          "observed": {
+            "web_asset": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_during_playback": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_after_eof": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            }
+          }
+        },
+        "two_websocket_peers": {
+          "passed": true,
+          "evidence": {
+            "clients": 2,
+            "client_library": "websockets",
+            "client_version": "17.0.1",
+            "continuously_drained": true,
+            "compression": false,
+            "proxy": false,
+            "status_receipts": [
+              160,
+              161
+            ],
+            "phases": {
+              "idle": [
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                },
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                }
+              ],
+              "playing": [
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                },
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                }
+              ],
+              "eof": [
+                {
+                  "receipt": 160,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                },
+                {
+                  "receipt": 161,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                }
+              ]
+            },
+            "errors": [],
+            "application_pongs": [
+              3,
+              3
+            ],
+            "command_phases": {
+              "idle": [
+                1,
+                1
+              ],
+              "playing": [
+                2,
+                2
+              ],
+              "eof": [
+                3,
+                3
+              ]
+            },
+            "close_codes": [
+              1000,
+              1000
+            ],
+            "readers_stopped": true
+          }
+        },
+        "eof_fault_counters_zero": {
+          "passed": true,
+          "fault_counters": {
+            "allocation_failures": 0,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry; deliberately not silently folded into or erased by the zero-fault gate."
+        },
+        "post_eof_fault_counters_zero": {
+          "passed": true,
+          "fault_counters": {
+            "allocation_failures": 0,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry; deliberately not silently folded into or erased by the zero-fault gate."
+        },
+        "stable_boot_generation_and_eof": {
+          "passed": true,
+          "initial_boot_id": "c8d427f2e44cea4a",
+          "eof_status": {
+            "audio": false,
+            "connecting": false,
+            "format": "stream ended",
+            "generation": 1
+          },
+          "post_eof_status": {
+            "audio": false,
+            "connecting": false,
+            "format": "stream ended",
+            "generation": 1
+          },
+          "eof_boot_id": "c8d427f2e44cea4a",
+          "post_eof_boot_id": "c8d427f2e44cea4a"
+        },
+        "final_observed_marker": {
+          "passed": true,
+          "observed": [
+            "ST7789",
+            "OpenETH IPv4",
+            "audio tasks",
+            "HTTP health",
+            "SPIFFS WebUI asset",
+            "AAC audio over verified TLS",
+            "audio progress across WebUI asset read",
+            "full-sized TLS 1.2 records",
+            "complete TLS response",
+            "ordered EOF with exact output count",
+            "WebUI after EOF",
+            "clean resources after final WebUI and peer closure"
+          ]
+        },
+        "guest_intentionally_stopped_after_observation": {
+          "passed": true,
+          "controller_stop": true,
+          "qemu_exit_status": 1,
+          "guest_fault_observed": false,
+          "flash_unchanged": true
+        }
+      },
+      "all_independent_gates_demonstrated": true,
+      "eof_health": {
+        "boot_id": "c8d427f2e44cea4a",
+        "reset_reason": 1,
+        "uptime_ms": 322336,
+        "heap": 172164,
+        "largest": 110592,
+        "minimum_heap": 4304,
+        "tasks": 17,
+        "memory": {
+          "internal_free": 172164,
+          "internal_largest": 110592,
+          "dma_free": 172164,
+          "dma_largest": 110592
+        },
+        "cpu": {
+          "enabled": false,
+          "available": false,
+          "sample_uptime_ms": 0,
+          "snapshot_failures": 0,
+          "overall_percent": null,
+          "core_percent": [
+            null,
+            null
+          ],
+          "tasks": {
+            "stream": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "decode": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "output": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "http": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            }
+          }
+        },
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "output_driver": {
+          "writes": 19222,
+          "requested_bytes": 39366656,
+          "written_bytes": 39366656,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "saturated": false,
+          "completion_queue_drops": null,
+          "timing_enabled": false,
+          "timing_samples": 0,
+          "invalid_time_samples": 0,
+          "write_us": null,
+          "max_write_us": null
+        },
+        "input": {
+          "available": true,
+          "leased": true,
+          "resident": 4,
+          "minimum": 4,
+          "target": 8,
+          "limit": 4,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "released": 4,
+          "ready_payload_bytes": 0,
+          "reading_payload_bytes": 0
+        }
+      },
+      "post_eof_health": {
+        "boot_id": "c8d427f2e44cea4a",
+        "reset_reason": 1,
+        "uptime_ms": 330495,
+        "heap": 172524,
+        "largest": 110592,
+        "minimum_heap": 4304,
+        "tasks": 17,
+        "memory": {
+          "internal_free": 172524,
+          "internal_largest": 110592,
+          "dma_free": 172524,
+          "dma_largest": 110592
+        },
+        "cpu": {
+          "enabled": false,
+          "available": false,
+          "sample_uptime_ms": 0,
+          "snapshot_failures": 0,
+          "overall_percent": null,
+          "core_percent": [
+            null,
+            null
+          ],
+          "tasks": {
+            "stream": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "decode": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "output": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "http": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            }
+          }
+        },
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "output_driver": {
+          "writes": 19730,
+          "requested_bytes": 40407040,
+          "written_bytes": 40407040,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "saturated": false,
+          "completion_queue_drops": null,
+          "timing_enabled": false,
+          "timing_samples": 0,
+          "invalid_time_samples": 0,
+          "write_us": null,
+          "max_write_us": null
+        },
+        "input": {
+          "available": true,
+          "leased": true,
+          "resident": 4,
+          "minimum": 4,
+          "target": 8,
+          "limit": 4,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "released": 4,
+          "ready_payload_bytes": 0,
+          "reading_payload_bytes": 0
+        }
+      },
+      "report_binding": {
+        "bytes": 27873,
+        "sha256": "c15c4c7ea95a02a42ef8d9ec95dd83e74c2c814035e8938416ddac69cd79f57a"
+      },
+      "input_binding": {
+        "bytes": 1190,
+        "sha256": "c254e18e870187337030132898b0754e38c6606e4f58541b7c39bc84992f3512"
+      },
+      "image": {
+        "bytes": 1276432,
+        "sha256": "5ff0e3bc9c1d59e59527a4a7e58202805897a35ae9342051cff0f29aadf00b18"
+      },
+      "config": {
+        "bytes": 49211,
+        "sha256": "5170e7bbe00679def2b90bceffd7222f772e4c9b22a66e2e05effbf1bb73da22"
+      }
+    },
+    {
+      "backend": "pdm",
+      "label": "run-he-ws2-post-eof",
+      "state": "TERMINAL_PASS",
+      "passed": true,
+      "reason": null,
+      "gates": {
+        "tls_full_102420_and_record_geometry": {
+          "passed": true,
+          "wire_lengths": [
+            185,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            4140
+          ],
+          "peers": [
+            {
+              "tls_version": "TLSv1.2",
+              "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+              "sent": 102420,
+              "complete": true
+            }
+          ]
+        },
+        "pcm_exact_614400": {
+          "passed": true,
+          "sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+          "flushes": [
+            {
+              "frames": 614400,
+              "status": 0
+            }
+          ]
+        },
+        "webui_three_assets": {
+          "passed": true,
+          "expected": {
+            "bytes": 13588,
+            "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+          },
+          "observed": {
+            "web_asset": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_during_playback": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_after_eof": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            }
+          }
+        },
+        "two_websocket_peers": {
+          "passed": true,
+          "evidence": {
+            "clients": 2,
+            "client_library": "websockets",
+            "client_version": "17.0.1",
+            "continuously_drained": true,
+            "compression": false,
+            "proxy": false,
+            "status_receipts": [
+              51,
+              51
+            ],
+            "phases": {
+              "idle": [
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                },
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                }
+              ],
+              "playing": [
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                },
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                }
+              ],
+              "eof": [
+                {
+                  "receipt": 51,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                },
+                {
+                  "receipt": 51,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                }
+              ]
+            },
+            "errors": [],
+            "application_pongs": [
+              3,
+              3
+            ],
+            "command_phases": {
+              "idle": [
+                1,
+                1
+              ],
+              "playing": [
+                2,
+                2
+              ],
+              "eof": [
+                3,
+                3
+              ]
+            },
+            "close_codes": [
+              1000,
+              1000
+            ],
+            "readers_stopped": true
+          }
+        },
+        "eof_fault_counters_zero": {
+          "passed": true,
+          "fault_counters": {
+            "allocation_failures": 0,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": 0,
+          "queue_drop_scope": "Separate telemetry; deliberately not silently folded into or erased by the zero-fault gate."
+        },
+        "post_eof_fault_counters_zero": {
+          "passed": true,
+          "fault_counters": {
+            "allocation_failures": 0,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": 89,
+          "queue_drop_scope": "Separate telemetry; deliberately not silently folded into or erased by the zero-fault gate."
+        },
+        "stable_boot_generation_and_eof": {
+          "passed": true,
+          "initial_boot_id": "e74ff3db2e516577",
+          "eof_status": {
+            "audio": false,
+            "connecting": false,
+            "format": "stream ended",
+            "generation": 1
+          },
+          "post_eof_status": {
+            "audio": false,
+            "connecting": false,
+            "format": "stream ended",
+            "generation": 1
+          },
+          "eof_boot_id": "e74ff3db2e516577",
+          "post_eof_boot_id": "e74ff3db2e516577"
+        },
+        "final_observed_marker": {
+          "passed": true,
+          "observed": [
+            "ST7789",
+            "OpenETH IPv4",
+            "audio tasks",
+            "HTTP health",
+            "SPIFFS WebUI asset",
+            "AAC audio over verified TLS",
+            "audio progress across WebUI asset read",
+            "full-sized TLS 1.2 records",
+            "complete TLS response",
+            "ordered EOF with exact output count",
+            "WebUI after EOF",
+            "clean resources after final WebUI and peer closure"
+          ]
+        },
+        "guest_intentionally_stopped_after_observation": {
+          "passed": true,
+          "controller_stop": true,
+          "qemu_exit_status": 1,
+          "guest_fault_observed": false,
+          "flash_unchanged": true
+        }
+      },
+      "all_independent_gates_demonstrated": true,
+      "eof_health": {
+        "boot_id": "e74ff3db2e516577",
+        "reset_reason": 1,
+        "uptime_ms": 99618,
+        "heap": 172552,
+        "largest": 110592,
+        "minimum_heap": 6184,
+        "tasks": 17,
+        "memory": {
+          "internal_free": 172552,
+          "internal_largest": 110592,
+          "dma_free": 172552,
+          "dma_largest": 110592
+        },
+        "cpu": {
+          "enabled": false,
+          "available": false,
+          "sample_uptime_ms": 0,
+          "snapshot_failures": 0,
+          "overall_percent": null,
+          "core_percent": [
+            null,
+            null
+          ],
+          "tasks": {
+            "stream": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "decode": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "output": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "http": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            }
+          }
+        },
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "output_driver": {
+          "writes": 1202,
+          "requested_bytes": 1230208,
+          "written_bytes": 1230208,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "saturated": false,
+          "completion_queue_drops": 0,
+          "timing_enabled": false,
+          "timing_samples": 0,
+          "invalid_time_samples": 0,
+          "write_us": null,
+          "max_write_us": null
+        },
+        "input": {
+          "available": true,
+          "leased": true,
+          "resident": 4,
+          "minimum": 4,
+          "target": 8,
+          "limit": 4,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "released": 4,
+          "ready_payload_bytes": 0,
+          "reading_payload_bytes": 0
+        }
+      },
+      "post_eof_health": {
+        "boot_id": "e74ff3db2e516577",
+        "reset_reason": 1,
+        "uptime_ms": 105428,
+        "heap": 172752,
+        "largest": 110592,
+        "minimum_heap": 6184,
+        "tasks": 17,
+        "memory": {
+          "internal_free": 172752,
+          "internal_largest": 110592,
+          "dma_free": 172752,
+          "dma_largest": 110592
+        },
+        "cpu": {
+          "enabled": false,
+          "available": false,
+          "sample_uptime_ms": 0,
+          "snapshot_failures": 0,
+          "overall_percent": null,
+          "core_percent": [
+            null,
+            null
+          ],
+          "tasks": {
+            "stream": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "decode": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "output": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "http": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            }
+          }
+        },
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "output_driver": {
+          "writes": 1202,
+          "requested_bytes": 1230208,
+          "written_bytes": 1230208,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "saturated": false,
+          "completion_queue_drops": 89,
+          "timing_enabled": false,
+          "timing_samples": 0,
+          "invalid_time_samples": 0,
+          "write_us": null,
+          "max_write_us": null
+        },
+        "input": {
+          "available": true,
+          "leased": true,
+          "resident": 4,
+          "minimum": 4,
+          "target": 8,
+          "limit": 4,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "released": 4,
+          "ready_payload_bytes": 0,
+          "reading_payload_bytes": 0
+        }
+      },
+      "report_binding": {
+        "bytes": 27810,
+        "sha256": "fc177613067b47ff8cf8e79912f851dece6f9d9aaa964bc962d9938c99b7f824"
+      },
+      "input_binding": {
+        "bytes": 1187,
+        "sha256": "ae62b361eba198e6a494167dbb5020b8ae6a294f1d25e9ba400c1c7fc2cd27ea"
+      },
+      "image": {
+        "bytes": 1276192,
+        "sha256": "d4db6c946b4f747635c2d3ba2c08c00bdd64530291502b1847afa8113006899a"
+      },
+      "config": {
+        "bytes": 49211,
+        "sha256": "4b845923dd60ad5fc84553ad2aa59ef28336995a0fa33bd8352e8e57585fa612"
+      }
+    },
+    {
+      "backend": "continuous",
+      "label": "run-he-ws2-post-eof",
+      "state": "TERMINAL_PASS",
+      "passed": true,
+      "reason": null,
+      "gates": {
+        "tls_full_102420_and_record_geometry": {
+          "passed": true,
+          "wire_lengths": [
+            185,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            4140
+          ],
+          "peers": [
+            {
+              "tls_version": "TLSv1.2",
+              "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+              "sent": 102420,
+              "complete": true
+            }
+          ]
+        },
+        "pcm_exact_614400": {
+          "passed": true,
+          "sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+          "flushes": [
+            {
+              "frames": 614400,
+              "status": 0
+            }
+          ]
+        },
+        "webui_three_assets": {
+          "passed": true,
+          "expected": {
+            "bytes": 13588,
+            "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+          },
+          "observed": {
+            "web_asset": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_during_playback": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_after_eof": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            }
+          }
+        },
+        "two_websocket_peers": {
+          "passed": true,
+          "evidence": {
+            "clients": 2,
+            "client_library": "websockets",
+            "client_version": "17.0.1",
+            "continuously_drained": true,
+            "compression": false,
+            "proxy": false,
+            "status_receipts": [
+              33,
+              33
+            ],
+            "phases": {
+              "idle": [
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                },
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                }
+              ],
+              "playing": [
+                {
+                  "receipt": 3,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                },
+                {
+                  "receipt": 3,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                }
+              ],
+              "eof": [
+                {
+                  "receipt": 33,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                },
+                {
+                  "receipt": 33,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                }
+              ]
+            },
+            "errors": [],
+            "application_pongs": [
+              3,
+              3
+            ],
+            "command_phases": {
+              "idle": [
+                1,
+                1
+              ],
+              "playing": [
+                2,
+                2
+              ],
+              "eof": [
+                3,
+                3
+              ]
+            },
+            "close_codes": [
+              1000,
+              1000
+            ],
+            "readers_stopped": true
+          }
+        },
+        "eof_fault_counters_zero": {
+          "passed": true,
+          "fault_counters": {
+            "allocation_failures": 0,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry; deliberately not silently folded into or erased by the zero-fault gate."
+        },
+        "post_eof_fault_counters_zero": {
+          "passed": true,
+          "fault_counters": {
+            "allocation_failures": 0,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry; deliberately not silently folded into or erased by the zero-fault gate."
+        },
+        "stable_boot_generation_and_eof": {
+          "passed": true,
+          "initial_boot_id": "e55090e4aef86c4d",
+          "eof_status": {
+            "audio": false,
+            "connecting": false,
+            "format": "stream ended",
+            "generation": 1
+          },
+          "post_eof_status": {
+            "audio": false,
+            "connecting": false,
+            "format": "stream ended",
+            "generation": 1
+          },
+          "eof_boot_id": "e55090e4aef86c4d",
+          "post_eof_boot_id": "e55090e4aef86c4d"
+        },
+        "final_observed_marker": {
+          "passed": true,
+          "observed": [
+            "ST7789",
+            "OpenETH IPv4",
+            "audio tasks",
+            "HTTP health",
+            "SPIFFS WebUI asset",
+            "AAC audio over verified TLS",
+            "audio progress across WebUI asset read",
+            "full-sized TLS 1.2 records",
+            "complete TLS response",
+            "ordered EOF with exact output count",
+            "WebUI after EOF",
+            "clean resources after final WebUI and peer closure"
+          ]
+        },
+        "guest_intentionally_stopped_after_observation": {
+          "passed": true,
+          "controller_stop": true,
+          "qemu_exit_status": 1,
+          "guest_fault_observed": false,
+          "flash_unchanged": true
+        }
+      },
+      "all_independent_gates_demonstrated": true,
+      "eof_health": {
+        "boot_id": "e55090e4aef86c4d",
+        "reset_reason": 1,
+        "uptime_ms": 50025,
+        "heap": 173052,
+        "largest": 90112,
+        "minimum_heap": 6836,
+        "tasks": 17,
+        "memory": {
+          "internal_free": 173052,
+          "internal_largest": 90112,
+          "dma_free": 173052,
+          "dma_largest": 90112
+        },
+        "cpu": {
+          "enabled": false,
+          "available": false,
+          "sample_uptime_ms": 0,
+          "snapshot_failures": 0,
+          "overall_percent": null,
+          "core_percent": [
+            null,
+            null
+          ],
+          "tasks": {
+            "stream": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "decode": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "output": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "http": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            }
+          }
+        },
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "output_driver": {
+          "writes": 1051,
+          "requested_bytes": 653824,
+          "written_bytes": 653824,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "saturated": false,
+          "completion_queue_drops": null,
+          "timing_enabled": false,
+          "timing_samples": 0,
+          "invalid_time_samples": 0,
+          "write_us": null,
+          "max_write_us": null
+        },
+        "input": {
+          "available": true,
+          "leased": true,
+          "resident": 4,
+          "minimum": 4,
+          "target": 8,
+          "limit": 4,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "released": 4,
+          "ready_payload_bytes": 0,
+          "reading_payload_bytes": 0
+        }
+      },
+      "post_eof_health": {
+        "boot_id": "e55090e4aef86c4d",
+        "reset_reason": 1,
+        "uptime_ms": 62622,
+        "heap": 173256,
+        "largest": 90112,
+        "minimum_heap": 6836,
+        "tasks": 17,
+        "memory": {
+          "internal_free": 173256,
+          "internal_largest": 90112,
+          "dma_free": 173256,
+          "dma_largest": 90112
+        },
+        "cpu": {
+          "enabled": false,
+          "available": false,
+          "sample_uptime_ms": 0,
+          "snapshot_failures": 0,
+          "overall_percent": null,
+          "core_percent": [
+            null,
+            null
+          ],
+          "tasks": {
+            "stream": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "decode": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "output": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            },
+            "http": {
+              "percent_of_one_core": null,
+              "stack_free_min": null
+            }
+          }
+        },
+        "allocation_failures": 0,
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        },
+        "stream_failure": {
+          "sequence": 0,
+          "generation": 0,
+          "completion": 0,
+          "result": 0
+        },
+        "output": {
+          "failures": 0,
+          "write_errors": 0,
+          "configure_errors": 0,
+          "flush_errors": 0,
+          "generation": 0,
+          "stage": 0,
+          "result": 0
+        },
+        "output_driver": {
+          "writes": 1479,
+          "requested_bytes": 763392,
+          "written_bytes": 763392,
+          "errors": 0,
+          "timeouts": 0,
+          "short_writes": 0,
+          "saturated": false,
+          "completion_queue_drops": null,
+          "timing_enabled": false,
+          "timing_samples": 0,
+          "invalid_time_samples": 0,
+          "write_us": null,
+          "max_write_us": null
+        },
+        "input": {
+          "available": true,
+          "leased": true,
+          "resident": 4,
+          "minimum": 4,
+          "target": 8,
+          "limit": 4,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "released": 4,
+          "ready_payload_bytes": 0,
+          "reading_payload_bytes": 0
+        }
+      },
+      "report_binding": {
+        "bytes": 27846,
+        "sha256": "ed0101de6f25018c653458ca027e526dcf4ab93f740fc2a049c5cf458f31e9aa"
+      },
+      "input_binding": {
+        "bytes": 1194,
+        "sha256": "772171194a79350a6d1f7ccc42bc60e64dcd1f7a1fce3df379159662e50b240c"
+      },
+      "image": {
+        "bytes": 1270416,
+        "sha256": "6f9f281a5921c118ee02efd579a62bcea74ffa3cfd4577a6c50af44841cea1ea"
+      },
+      "config": {
+        "bytes": 49211,
+        "sha256": "a57cf33a85f0827be5d048f7e0ad6b82dc7535d4db0f7e913b712ffcaa9487f1"
+      }
+    }
+  ],
+  "all_original_controller_pass": true,
+  "physical_tested": false,
+  "packager": {
+    "bytes": 17465,
+    "sha256": "da3c0ef613c590ddf0a4ba6dde10c40294023cdc44c47d0b978ca1b49f392f2a"
+  },
+  "scope": "New final health/status after the final WebUI asset and peer closure. Original controller states remain authoritative; None means missing/partial proof, not success. Completion queue drops remain separate telemetry. No original outcome is relabeled."
+}
