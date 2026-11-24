@@ -96,3 +96,15 @@ All six image/ELF/OTA/frame checks and focused WebSocket Clang checks pass.
 The normal matrix separately completed full Clang. These builds establish
 configuration and linkage, not a new runtime memory margin or physical
 qualification. The option remains experimental and off by default.
+
+The [exact-length OpenETH RX follow-up](../tests/results/cyd-openeth-rx-exact-20261124/README.md)
+now passes the complete TLS/HE-AAC/two-client workload on PDM, continuous DAC
+and legacy DAC, plus a preselected legacy repeat, with zero allocation failures.
+Only the diagnostic Ethernet driver changes; the normal network settings,
+RTC-on workspace, application sources and audio task bindings stay fixed.
+Earlier failures keep their original states. This does not qualify RTC-off
+HE-AAC headroom, production Wi-Fi, physical DMA/audio or sleep/wake behavior.
+
+The original final EOF health sample precedes the last asset read and peer
+closure. A separate post-asset/post-close health gate is still being added;
+zero counters in the saved samples do not independently qualify that last interval.

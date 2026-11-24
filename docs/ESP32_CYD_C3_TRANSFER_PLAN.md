@@ -3,7 +3,23 @@
 Обновлено: 2026-11-24. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 
-Текущая точка: [исправление START в модели QEMU](../tests/results/cyd-i2s-dma-start-20261124/README.md)
+Текущая точка: [OpenETH с выделением RX по длине кадра](../tests/results/cyd-openeth-rx-exact-20261124/README.md)
+прошёл полный TLS/HE-AAC на PDM, continuous DAC и legacy DAC; заранее назначенный
+повтор legacy тоже проходит. Во всех четырёх случаях — 614400 точных PCM-кадров,
+WebUI до/во время/после EOF, два живых WS-клиента и ноль allocation/output failures.
+Minimum heap: PDM 6716 B, continuous 7028 B, legacy 5580/4568 B. PDM отдельно
+сохраняет четыре completion-queue overflow события; это не доказательство
+физического DMA timing. Все старые NONPASS остаются исходными результатами.
+18 ASan/UBSan host случаев и exact MAX-allocation negative проходят; три SDK
+сборки меняют только OpenETH objects среди 2855 объектов. Шесть matched
+whole-driver Clang проверок не добавляют предупреждений. Опция RTC включена;
+обычные TCP/TLS, watchdog и привязки задач сохранены. Это диагностический
+OpenETH профиль, не приёмка production Wi-Fi или RTC-off HE-AAC defaults.
+Последний EOF health в этих четырёх исходных контроллерах снят до финального
+WebUI asset и WS close. Добавляется отдельный снимок после них и повтор
+трёх выходов; отсутствие late allocation failures пока не объявляется доказанным.
+
+Предыдущая точка 24 ноября: [исправление START в модели QEMU](../tests/results/cyd-i2s-dma-start-20261124/README.md)
 проходит все десять реальных DMA QTest-проверок; прежняя модель стабильно
 проваливает четыре новых случая. [Полные сравнения приложения](../tests/results/cyd-i2s-dma-native-20261124/README.md)
 сохраняют все исходы: на исправленной модели continuous DAC проходит два
@@ -352,9 +368,12 @@ START regression/patch: `10f8c46dc`. Ниже отделены перенесё�
 
 Программная часть этапов 01–10 и выбранные публичные codec/memory реализации
 перенесены. Таблица перечисляет их результат, а не четыре ещё отсутствующие
-фичи. Активная программная проверка — RX copy-buffer OpenETH и повтор полного
-HE-AAC/TLS с двумя WebSocket-клиентами без отказов выделения памяти. Текущий
-RTC-on legacy-прогон выдаёт весь PCM, но его ресурсный gate остаётся NONPASS.
+фичи. [RX copy-buffer OpenETH и полный RTC-on HE-AAC/TLS gate](../tests/results/cyd-openeth-rx-exact-20261124/README.md)
+теперь пройдены на всех трёх выходах, включая второй legacy-прогон, без
+отказов выделения памяти. Изначальный legacy NONPASS не переписывается;
+новый driver-only образ квалифицирован отдельно.
+Активная проверка — закрыть пробел final health после последнего WebUI/WS close
+и повторить полный поток на трёх выходах с этим дополнительным gate.
 Прежний continuous-DAC тайм-аут сохранён: два новых quiet-повтора проходят,
 однако точная причинная связь с исправленным START ещё не установлена.
 RTC-off default-профиль для той же HE-AAC нагрузки не квалифицирован; успех
@@ -541,7 +560,7 @@ static-only TCP/TLS budget с общим response deadline и slow-client/WS/aud
   Все прежние отложенные пункты сохраняются; повторно они не запускались.
 ### Остальная активная очередь
 
-- Public AAC: public API/task и [14 ADTS input сравнений](../tests/results/cyd-aac-public-input-memory-20261123/README.md) завершены; дополнительные frame owners ради 636 B не вводятся. Полный HE-AAC/TLS/PCM/WebUI пройден на всех выходах с опциональными TCP-профилями. На обычном TCP с RTC и shared scheduler PDM/continuous проходят, но [новый legacy resource control](../tests/results/cyd-i2s-dma-native-20261124/README.md) сохраняет один RX allocation failure. Довести этот gate до нуля; не считать его прохождением RTC-off default-профиля.
+- Public AAC: public API/task и [14 ADTS input сравнений](../tests/results/cyd-aac-public-input-memory-20261123/README.md) завершены; дополнительные frame owners ради 636 B не вводятся. Полный HE-AAC/TLS/PCM/WebUI пройден на всех выходах с опциональными TCP-профилями. На обычном TCP с RTC и shared scheduler [все три выхода и повтор legacy](../tests/results/cyd-openeth-rx-exact-20261124/README.md) проходят после exact-length OpenETH RX без allocation failures. Прежний fixed-size RX NONPASS сохранён. RTC-off default-профиль для той же нагрузки остаётся отдельным неподтверждённым gate; не подменять его RTC-on успехом.
 - AAC compact/private owners, ABI, reset и owner-view **отложены**;
   этот scope не возобновляется проверками public API.
 - FLAC: [полный TLS-прогон custom FLAC](../tests/results/cyd-flac-openeth-20261116/README.md) пройден в QEMU с continuous DAC, TFT и WebUI после EOF.
