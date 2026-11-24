@@ -111,3 +111,9 @@ physical DMA/analog quality. The earlier four-case values remain unchanged.
 This closes the last-operation monitoring gap for these three diagnostic
 RTC-on/normal-TCP HE-AAC workloads. RTC-off resources, production Wi-Fi, physical
 outputs and RTC timing/sleep remain separate; no default profile is promoted.
+
+The later [matched RTC-off controls](../cyd-openeth-no-rtc-20261124/README.md)
+now complete the same full TLS/HE-AAC/PCM/WebUI/two-peer workload on all three
+outputs, but fail the allocation gate: legacy 171 failures, PDM 25, continuous
+DAC 35. Only RTC workspace placement changes. These new NONPASS results stay
+separate from this RTC-on matrix and do not modify any original evidence.

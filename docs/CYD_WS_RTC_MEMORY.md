@@ -111,3 +111,17 @@ now independently qualify that last interval on all three outputs: complete
 TLS/HE-AAC/PCM/WebUI, zero allocation/write failures, and unchanged boot/EOF
 generation. The PDM completion-notification counter rises from zero at EOF to 89
 after close, separately from memory/write errors; physical timing remains open.
+
+The [matched RTC-off controls](../tests/results/cyd-openeth-no-rtc-20261124/README.md)
+now complete all three full TLS/HE-AAC/PCM/WebUI/two-peer workloads, but their
+zero-allocation resource gates fail: legacy 171 failures / 964-byte minimum,
+PDM 25 / 972, continuous DAC 35 / 2,312. Each last allocation is 1,512 bytes
+with caps 6,144, while OpenETH RX-wait telemetry is zero. The original five
+owners occupy 6,560 additional DRAM bytes; all other effective configuration,
+tasks, TLS capacities and input data stay fixed. The independent 64-byte RTC
+probe remains enabled: diagnostic RTC usage is 104 bytes plus the separate
+24-byte reservation, leaving 8,064. GCC and focused Clang checks pass.
+These NONPASS results are retained independently from the RTC-on successes;
+neither the RTC option nor a new network/memory setting is promoted by them.
+RTC-off PDM separately records 116 completion-notification drops in the later
+last-reachable sample, versus zero at EOF, with zero write/timeout errors.

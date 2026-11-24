@@ -3,7 +3,25 @@
 Обновлено: 2026-11-24. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 
-Текущая точка: [финальный контроль после WebUI и закрытия WS](../tests/results/cyd-openeth-rx-exact-20261124/README.md#final-resource-check-after-webui-and-peer-closure)
+Текущая точка: [обычный профиль без RTC](../tests/results/cyd-openeth-no-rtc-20261124/README.md)
+проверен на всех трёх выходах с тем же исправленным OpenETH и QEMU.
+Полный TLS/HE-AAC, 614400 точных PCM-кадров, WebUI после EOF и два WS-клиента
+проходят, но все три resource gates — NONPASS: legacy 171 allocation failures
+при minimum heap 964 B, PDM 25 / 972 B, continuous DAC 35 / 2312 B.
+Последний отказ в каждом случае — 1512 B / caps 6144; RX_WAIT OpenETH равен нулю.
+Ошибка конкретного TCP TX allocator пока выведена из размера и исходников,
+а не доказана runtime caller trace. Нулевые decoder/output/write/timeout counters
+не отменяют отказов памяти. Final post-close gate прерван прежней проверкой
+на EOF; last-reachable health сохранён отдельно.
+PDM completion_queue_drops отдельно растёт с 0 на EOF до 116 в позднем снимке;
+это счётчик уведомлений, не доказательство потери PCM или физического timing.
+Только RTC-опция выключена:
+дополнительные 6560 B workspace снова находятся в DRAM. Три GCC и focused
+Clang проверки проходят без новых предупреждений. Следующий программный gate —
+локализовать allocator и обоснованно уменьшить peak DRAM без урезания WebUI,
+числа клиентов, TLS records или изменения привязок аудиозадач.
+
+Предыдущая точка: [финальный контроль после WebUI и закрытия WS](../tests/results/cyd-openeth-rx-exact-20261124/README.md#final-resource-check-after-webui-and-peer-closure)
 пройден в QEMU на PDM, continuous DAC и legacy DAC. Во всех трёх новых
 прогонах — полный TLS/HE-AAC, 614400 точных PCM-кадров, WebUI после EOF,
 ноль allocation/output/write failures и после последнего запроса/закрытия
@@ -386,8 +404,11 @@ START regression/patch: `10f8c46dc`. Ниже отделены перенесё�
 новый driver-only образ квалифицирован отдельно.
 Пробел final health после последнего WebUI/WS close закрыт: [три новых
 полных прогона](../tests/results/cyd-openeth-rx-exact-20261124/post-eof-native/matrix-summary.json)
-проходят с нулём allocation/write failures. RTC-off default HE-AAC gate
-не подменяется этими RTC-on результатами и остаётся неподтверждённым.
+проходят с нулём allocation/write failures. [RTC-off контроль](../tests/results/cyd-openeth-no-rtc-20261124/README.md)
+теперь выполнен на всех трёх выходах и сохраняет NONPASS по памяти:
+legacy/PDM/continuous — 171/25/35 отказов, несмотря на полный точный PCM и WebUI.
+Эти результаты не подменяются RTC-on успехом. Следующий offline gate —
+точная локализация 1512-byte allocation и проверяемое снижение peak DRAM.
 Прежний continuous-DAC тайм-аут сохранён: два новых quiet-повтора проходят,
 однако точная причинная связь с исправленным START ещё не установлена.
 RTC-off default-профиль для той же HE-AAC нагрузки не квалифицирован; успех

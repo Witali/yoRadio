@@ -1,0 +1,1937 @@
+{
+  "fixture_source_commit": "7595a79958b8a2ef56babb24c43259fcf536b6dd",
+  "controller_source_commit": "7595a79958b8a2ef56babb24c43259fcf536b6dd",
+  "controller": {
+    "bytes": 62859,
+    "sha256": "ca236ed51cbb54e06391e7cfb5b88ef465594ccfbd122e52ddcade64f479cc4f"
+  },
+  "qemu": {
+    "bytes": 73096245,
+    "sha256": "28068f674d06c4322aa72989756d7dd3734bb0d06c4aa1acf21b919ccb3465f4"
+  },
+  "websocket_helper": {
+    "bytes": 7095,
+    "sha256": "681eea4df39d3a1610d502223ed61d2f648e30be7d6ee7b34466f0a45593a839"
+  },
+  "rtc_workspace": false,
+  "rtc_probe_enabled": true,
+  "selected_configuration": {
+    "FREERTOS_UNICORE": false,
+    "ESP_DEFAULT_CPU_FREQ_MHZ": 240,
+    "ESP_TASK_WDT_TIMEOUT_S": 5,
+    "ESP_INT_WDT_TIMEOUT_MS": 300,
+    "LWIP_TCP_WND_DEFAULT": 11520,
+    "LWIP_TCP_RECVMBOX_SIZE": 10,
+    "LWIP_TCP_SND_BUF_DEFAULT": 5760,
+    "MBEDTLS_SSL_IN_CONTENT_LEN": 16384,
+    "MBEDTLS_SSL_OUT_CONTENT_LEN": 4096,
+    "MBEDTLS_DYNAMIC_BUFFER": false,
+    "YORADIO_WS_STATUS_RTC_SLOW": false,
+    "YORADIO_TLS_STATIC_RX_RESERVE": false,
+    "YORADIO_AUDIO_STEREO_ONLY": true,
+    "YORADIO_NATIVE_DIAGNOSTICS": false
+  },
+  "qualified_driver_sha256": "e4808727b9a3a5a0e1617d57f0d39a11bdf85443b9e3556990ea4822cef60882",
+  "cases": [
+    {
+      "backend": "legacy",
+      "label": "run-he-ws2-post-eof",
+      "state": "TERMINAL_NONPASS",
+      "passed": false,
+      "reason": "Unexpected allocation failure count",
+      "gates": {
+        "tls_full_102420_and_record_geometry": {
+          "passed": true,
+          "wire_lengths": [
+            185,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            4140
+          ],
+          "peers": [
+            {
+              "tls_version": "TLSv1.2",
+              "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+              "sent": 102420,
+              "complete": true
+            }
+          ]
+        },
+        "pcm_exact_614400": {
+          "passed": true,
+          "sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+          "uart_flushes": [
+            {
+              "frames": 614400,
+              "status": 0
+            }
+          ],
+          "uart_digests": [
+            "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362"
+          ]
+        },
+        "webui_three_assets": {
+          "passed": true,
+          "expected": {
+            "bytes": 13588,
+            "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+          },
+          "observed": {
+            "web_asset": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_during_playback": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_after_eof": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            }
+          }
+        },
+        "two_websocket_peers": {
+          "passed": true,
+          "present": true,
+          "evidence": {
+            "clients": 2,
+            "client_library": "websockets",
+            "client_version": "17.0.1",
+            "continuously_drained": true,
+            "compression": false,
+            "proxy": false,
+            "status_receipts": [
+              157,
+              158
+            ],
+            "phases": {
+              "idle": [
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                },
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                }
+              ],
+              "playing": [
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                },
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                }
+              ],
+              "eof": [
+                {
+                  "receipt": 157,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                },
+                {
+                  "receipt": 158,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                }
+              ]
+            },
+            "errors": [],
+            "application_pongs": [
+              3,
+              3
+            ],
+            "command_phases": {
+              "idle": [
+                1,
+                1
+              ],
+              "playing": [
+                2,
+                2
+              ],
+              "eof": [
+                3,
+                3
+              ]
+            },
+            "close_codes": [
+              1000,
+              1000
+            ],
+            "readers_stopped": true
+          }
+        },
+        "eof_fault_counters_zero": {
+          "passed": false,
+          "present": true,
+          "fault_counters": {
+            "allocation_failures": 171,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+        },
+        "post_eof_fault_counters_zero": {
+          "passed": null,
+          "present": false,
+          "fault_counters": {
+            "allocation_failures": null,
+            "decoder_failure.sequence": null,
+            "stream_failure.sequence": null,
+            "output.failures": null,
+            "output.write_errors": null,
+            "output.configure_errors": null,
+            "output.flush_errors": null,
+            "output_driver.errors": null,
+            "output_driver.timeouts": null,
+            "output_driver.short_writes": null,
+            "output_driver.saturated": null
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+        },
+        "available_health_fault_counters_zero": {
+          "passed": false,
+          "observations": {
+            "health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              },
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "first_active_health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "playing_health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              },
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "health_during_webui": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "eof_health": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 171,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "last_reachable_health": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 171,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ]
+          }
+        },
+        "stable_boot_generation_and_eof": {
+          "passed": null
+        },
+        "final_observed_marker": {
+          "passed": null,
+          "present": false
+        },
+        "guest_intentionally_stopped_after_observation": {
+          "passed": true,
+          "qemu_exit_status": 1
+        }
+      },
+      "all_independent_gates_demonstrated": false,
+      "health_evidence": {
+        "eof_health": {
+          "boot_id": "4a114505e8cb026a",
+          "reset_reason": 1,
+          "uptime_ms": 324106,
+          "heap": 165592,
+          "largest": 110592,
+          "minimum_heap": 964,
+          "tasks": 17,
+          "memory": {
+            "internal_free": 165592,
+            "internal_largest": 110592,
+            "dma_free": 165592,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": false,
+            "available": false,
+            "sample_uptime_ms": 0,
+            "snapshot_failures": 0,
+            "overall_percent": null,
+            "core_percent": [
+              null,
+              null
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "allocation_failures": 171,
+          "last_allocation_failure": {
+            "size": 1512,
+            "caps": 6144
+          },
+          "decoder_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "codec": 0,
+            "stage": 0,
+            "result": 0,
+            "completion": 0,
+            "input_bytes": 0,
+            "allocation_sequence": 0
+          },
+          "stream_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "completion": 0,
+            "result": 0
+          },
+          "output": {
+            "failures": 0,
+            "write_errors": 0,
+            "configure_errors": 0,
+            "flush_errors": 0,
+            "generation": 0,
+            "stage": 0,
+            "result": 0
+          },
+          "output_driver": {
+            "writes": 19243,
+            "requested_bytes": 39409664,
+            "written_bytes": 39409664,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": false,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          },
+          "input": {
+            "available": true,
+            "leased": true,
+            "resident": 4,
+            "minimum": 4,
+            "target": 8,
+            "limit": 4,
+            "ready": 0,
+            "reading": 0,
+            "writing": 0,
+            "released": 4,
+            "ready_payload_bytes": 0,
+            "reading_payload_bytes": 0
+          }
+        },
+        "last_reachable_health": {
+          "boot_id": "4a114505e8cb026a",
+          "reset_reason": 1,
+          "uptime_ms": 333055,
+          "heap": 165748,
+          "largest": 110592,
+          "minimum_heap": 964,
+          "tasks": 17,
+          "memory": {
+            "internal_free": 165748,
+            "internal_largest": 110592,
+            "dma_free": 165748,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": false,
+            "available": false,
+            "sample_uptime_ms": 0,
+            "snapshot_failures": 0,
+            "overall_percent": null,
+            "core_percent": [
+              null,
+              null
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "allocation_failures": 171,
+          "last_allocation_failure": {
+            "size": 1512,
+            "caps": 6144
+          },
+          "decoder_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "codec": 0,
+            "stage": 0,
+            "result": 0,
+            "completion": 0,
+            "input_bytes": 0,
+            "allocation_sequence": 0
+          },
+          "stream_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "completion": 0,
+            "result": 0
+          },
+          "output": {
+            "failures": 0,
+            "write_errors": 0,
+            "configure_errors": 0,
+            "flush_errors": 0,
+            "generation": 0,
+            "stage": 0,
+            "result": 0
+          },
+          "output_driver": {
+            "writes": 19763,
+            "requested_bytes": 40474624,
+            "written_bytes": 40474624,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": false,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          },
+          "input": {
+            "available": true,
+            "leased": true,
+            "resident": 4,
+            "minimum": 4,
+            "target": 8,
+            "limit": 4,
+            "ready": 0,
+            "reading": 0,
+            "writing": 0,
+            "released": 4,
+            "ready_payload_bytes": 0,
+            "reading_payload_bytes": 0
+          }
+        }
+      },
+      "missing_final_report_fields": [
+        "post_eof_status",
+        "post_eof_health"
+      ],
+      "image": {
+        "bytes": 1269872,
+        "sha256": "ef79f0e56a50de42a093d03d08f917447a6ff6e99fde4ee77b06c74260ab22ee"
+      },
+      "config": {
+        "bytes": 49212,
+        "sha256": "bf6a0b73b9715bbb723b96ea65337ff75d5680fa9681ccdcf973c1dec15e60ad"
+      },
+      "qualification": {
+        "bytes": 4702,
+        "sha256": "fae902110d08beb34bd8d1f0d93c03fa8e24fc30c9c66cf8a484c5e20ee56419"
+      },
+      "report_binding": {
+        "bytes": 27737,
+        "sha256": "171a71d4487151a0f449355ea71edc1a1a484a2a9835efaea0f298586b5d5b4b"
+      },
+      "input_binding": {
+        "bytes": 1247,
+        "sha256": "525965a4b3bc5bf6a0ee77c4faf8b4f9018ae70a8e499e5320b536697237332e"
+      },
+      "rtc_geometry": {
+        "rtc_slow_used_bytes": 104,
+        "rtc_slow_reserved_bytes": 24,
+        "rtc_slow_free_bytes": 8064,
+        "heap_start": 1073448808,
+        "dram_bss_bytes": 22856
+      },
+      "qualified_driver_sha256": "e4808727b9a3a5a0e1617d57f0d39a11bdf85443b9e3556990ea4822cef60882"
+    },
+    {
+      "backend": "pdm",
+      "label": "run-he-ws2-post-eof",
+      "state": "TERMINAL_NONPASS",
+      "passed": false,
+      "reason": "Unexpected allocation failure count",
+      "gates": {
+        "tls_full_102420_and_record_geometry": {
+          "passed": true,
+          "wire_lengths": [
+            185,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            4140
+          ],
+          "peers": [
+            {
+              "tls_version": "TLSv1.2",
+              "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+              "sent": 102420,
+              "complete": true
+            }
+          ]
+        },
+        "pcm_exact_614400": {
+          "passed": true,
+          "sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+          "uart_flushes": [
+            {
+              "frames": 614400,
+              "status": 0
+            }
+          ],
+          "uart_digests": [
+            "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362"
+          ]
+        },
+        "webui_three_assets": {
+          "passed": true,
+          "expected": {
+            "bytes": 13588,
+            "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+          },
+          "observed": {
+            "web_asset": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_during_playback": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_after_eof": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            }
+          }
+        },
+        "two_websocket_peers": {
+          "passed": true,
+          "present": true,
+          "evidence": {
+            "clients": 2,
+            "client_library": "websockets",
+            "client_version": "17.0.1",
+            "continuously_drained": true,
+            "compression": false,
+            "proxy": false,
+            "status_receipts": [
+              52,
+              52
+            ],
+            "phases": {
+              "idle": [
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                },
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                }
+              ],
+              "playing": [
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                },
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                }
+              ],
+              "eof": [
+                {
+                  "receipt": 52,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                },
+                {
+                  "receipt": 52,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                }
+              ]
+            },
+            "errors": [],
+            "application_pongs": [
+              3,
+              3
+            ],
+            "command_phases": {
+              "idle": [
+                1,
+                1
+              ],
+              "playing": [
+                2,
+                2
+              ],
+              "eof": [
+                3,
+                3
+              ]
+            },
+            "close_codes": [
+              1000,
+              1000
+            ],
+            "readers_stopped": true
+          }
+        },
+        "eof_fault_counters_zero": {
+          "passed": false,
+          "present": true,
+          "fault_counters": {
+            "allocation_failures": 25,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": 0,
+          "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+        },
+        "post_eof_fault_counters_zero": {
+          "passed": null,
+          "present": false,
+          "fault_counters": {
+            "allocation_failures": null,
+            "decoder_failure.sequence": null,
+            "stream_failure.sequence": null,
+            "output.failures": null,
+            "output.write_errors": null,
+            "output.configure_errors": null,
+            "output.flush_errors": null,
+            "output_driver.errors": null,
+            "output_driver.timeouts": null,
+            "output_driver.short_writes": null,
+            "output_driver.saturated": null
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+        },
+        "available_health_fault_counters_zero": {
+          "passed": false,
+          "observations": {
+            "health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              },
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "first_active_health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": 0,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "playing_health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": 0,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              },
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 1,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": 0,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "health_during_webui": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 1,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": 0,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "eof_health": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 25,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": 0,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "last_reachable_health": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 25,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": 116,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ]
+          }
+        },
+        "stable_boot_generation_and_eof": {
+          "passed": null
+        },
+        "final_observed_marker": {
+          "passed": null,
+          "present": false
+        },
+        "guest_intentionally_stopped_after_observation": {
+          "passed": true,
+          "qemu_exit_status": 1
+        }
+      },
+      "all_independent_gates_demonstrated": false,
+      "health_evidence": {
+        "eof_health": {
+          "boot_id": "f1a988676fb7d14a",
+          "reset_reason": 1,
+          "uptime_ms": 102325,
+          "heap": 166324,
+          "largest": 110592,
+          "minimum_heap": 972,
+          "tasks": 17,
+          "memory": {
+            "internal_free": 166324,
+            "internal_largest": 110592,
+            "dma_free": 166324,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": false,
+            "available": false,
+            "sample_uptime_ms": 0,
+            "snapshot_failures": 0,
+            "overall_percent": null,
+            "core_percent": [
+              null,
+              null
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "allocation_failures": 25,
+          "last_allocation_failure": {
+            "size": 1512,
+            "caps": 6144
+          },
+          "decoder_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "codec": 0,
+            "stage": 0,
+            "result": 0,
+            "completion": 0,
+            "input_bytes": 0,
+            "allocation_sequence": 0
+          },
+          "stream_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "completion": 0,
+            "result": 0
+          },
+          "output": {
+            "failures": 0,
+            "write_errors": 0,
+            "configure_errors": 0,
+            "flush_errors": 0,
+            "generation": 0,
+            "stage": 0,
+            "result": 0
+          },
+          "output_driver": {
+            "writes": 1202,
+            "requested_bytes": 1230208,
+            "written_bytes": 1230208,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": 0,
+            "timing_enabled": false,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          },
+          "input": {
+            "available": true,
+            "leased": true,
+            "resident": 4,
+            "minimum": 4,
+            "target": 8,
+            "limit": 4,
+            "ready": 0,
+            "reading": 0,
+            "writing": 0,
+            "released": 4,
+            "ready_payload_bytes": 0,
+            "reading_payload_bytes": 0
+          }
+        },
+        "last_reachable_health": {
+          "boot_id": "f1a988676fb7d14a",
+          "reset_reason": 1,
+          "uptime_ms": 110003,
+          "heap": 166320,
+          "largest": 110592,
+          "minimum_heap": 972,
+          "tasks": 17,
+          "memory": {
+            "internal_free": 166320,
+            "internal_largest": 110592,
+            "dma_free": 166320,
+            "dma_largest": 110592
+          },
+          "cpu": {
+            "enabled": false,
+            "available": false,
+            "sample_uptime_ms": 0,
+            "snapshot_failures": 0,
+            "overall_percent": null,
+            "core_percent": [
+              null,
+              null
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "allocation_failures": 25,
+          "last_allocation_failure": {
+            "size": 1512,
+            "caps": 6144
+          },
+          "decoder_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "codec": 0,
+            "stage": 0,
+            "result": 0,
+            "completion": 0,
+            "input_bytes": 0,
+            "allocation_sequence": 0
+          },
+          "stream_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "completion": 0,
+            "result": 0
+          },
+          "output": {
+            "failures": 0,
+            "write_errors": 0,
+            "configure_errors": 0,
+            "flush_errors": 0,
+            "generation": 0,
+            "stage": 0,
+            "result": 0
+          },
+          "output_driver": {
+            "writes": 1202,
+            "requested_bytes": 1230208,
+            "written_bytes": 1230208,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": 116,
+            "timing_enabled": false,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          },
+          "input": {
+            "available": true,
+            "leased": true,
+            "resident": 4,
+            "minimum": 4,
+            "target": 8,
+            "limit": 4,
+            "ready": 0,
+            "reading": 0,
+            "writing": 0,
+            "released": 4,
+            "ready_payload_bytes": 0,
+            "reading_payload_bytes": 0
+          }
+        }
+      },
+      "missing_final_report_fields": [
+        "post_eof_status",
+        "post_eof_health"
+      ],
+      "image": {
+        "bytes": 1269632,
+        "sha256": "b0a92539947cde243862bf41d95ef10f5c4d40e82c54b15caf317fb4b736052d"
+      },
+      "config": {
+        "bytes": 49212,
+        "sha256": "b316d5cf49efe0818252ace4f27aa064c34213d4848f829cef27e00d809dd352"
+      },
+      "qualification": {
+        "bytes": 2967,
+        "sha256": "4190cf2fca0950dcc2442a563516e9eb8e662518edf5ea5d8acedeab89dd9515"
+      },
+      "report_binding": {
+        "bytes": 27688,
+        "sha256": "6a1d9bb22d83384e81263b50915b865a26a716ae95820d9fe565c26d09bfe279"
+      },
+      "input_binding": {
+        "bytes": 1244,
+        "sha256": "f7dfa9352b0ab80331869a83f9e48dc59f619addc3a9417c0140b777eb1be557"
+      },
+      "rtc_geometry": {
+        "rtc_slow_used_bytes": 104,
+        "rtc_slow_reserved_bytes": 24,
+        "rtc_slow_free_bytes": 8064,
+        "heap_start": 1073449752,
+        "dram_bss_bytes": 23816
+      },
+      "qualified_driver_sha256": "e4808727b9a3a5a0e1617d57f0d39a11bdf85443b9e3556990ea4822cef60882"
+    },
+    {
+      "backend": "continuous",
+      "label": "run-he-ws2-post-eof",
+      "state": "TERMINAL_NONPASS",
+      "passed": false,
+      "reason": "Unexpected allocation failure count",
+      "gates": {
+        "tls_full_102420_and_record_geometry": {
+          "passed": true,
+          "wire_lengths": [
+            185,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            16408,
+            4140
+          ],
+          "peers": [
+            {
+              "tls_version": "TLSv1.2",
+              "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+              "sent": 102420,
+              "complete": true
+            }
+          ]
+        },
+        "pcm_exact_614400": {
+          "passed": true,
+          "sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+          "uart_flushes": [
+            {
+              "frames": 614400,
+              "status": 0
+            }
+          ],
+          "uart_digests": [
+            "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362"
+          ]
+        },
+        "webui_three_assets": {
+          "passed": true,
+          "expected": {
+            "bytes": 13588,
+            "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+          },
+          "observed": {
+            "web_asset": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_during_playback": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            },
+            "web_asset_after_eof": {
+              "bytes": 13588,
+              "sha256": "1c74f0cfb097f8c187515e31adfa9cf1b1d00936772dbb2fda61c70207b99019"
+            }
+          }
+        },
+        "two_websocket_peers": {
+          "passed": true,
+          "present": true,
+          "evidence": {
+            "clients": 2,
+            "client_library": "websockets",
+            "client_version": "17.0.1",
+            "continuously_drained": true,
+            "compression": false,
+            "proxy": false,
+            "status_receipts": [
+              29,
+              29
+            ],
+            "phases": {
+              "idle": [
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                },
+                {
+                  "receipt": 1,
+                  "audio": false,
+                  "generation": 0,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 606,
+                  "sha256": "b612450f9671bc86a8b40317c1c85c5e98b533e6e5e563ce01a2692097525a10"
+                }
+              ],
+              "playing": [
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                },
+                {
+                  "receipt": 4,
+                  "audio": true,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 642,
+                  "sha256": "b24822ec79e34ae4d6333c903f28bc9cbc62382acac73dcc8d5896a1b34aca0f"
+                }
+              ],
+              "eof": [
+                {
+                  "receipt": 29,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                },
+                {
+                  "receipt": 29,
+                  "audio": false,
+                  "generation": 1,
+                  "network_online": true,
+                  "rssi_valid": false,
+                  "rssi": 0,
+                  "json_bytes": 622,
+                  "sha256": "ddc1bc57b61b78caf517b62c24f5a65dd1b72079a6d29e5363233212b0fc1842"
+                }
+              ]
+            },
+            "errors": [],
+            "application_pongs": [
+              3,
+              3
+            ],
+            "command_phases": {
+              "idle": [
+                1,
+                1
+              ],
+              "playing": [
+                2,
+                2
+              ],
+              "eof": [
+                3,
+                3
+              ]
+            },
+            "close_codes": [
+              1000,
+              1000
+            ],
+            "readers_stopped": true
+          }
+        },
+        "eof_fault_counters_zero": {
+          "passed": false,
+          "present": true,
+          "fault_counters": {
+            "allocation_failures": 35,
+            "decoder_failure.sequence": 0,
+            "stream_failure.sequence": 0,
+            "output.failures": 0,
+            "output.write_errors": 0,
+            "output.configure_errors": 0,
+            "output.flush_errors": 0,
+            "output_driver.errors": 0,
+            "output_driver.timeouts": 0,
+            "output_driver.short_writes": 0,
+            "output_driver.saturated": false
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+        },
+        "post_eof_fault_counters_zero": {
+          "passed": null,
+          "present": false,
+          "fault_counters": {
+            "allocation_failures": null,
+            "decoder_failure.sequence": null,
+            "stream_failure.sequence": null,
+            "output.failures": null,
+            "output.write_errors": null,
+            "output.configure_errors": null,
+            "output.flush_errors": null,
+            "output_driver.errors": null,
+            "output_driver.timeouts": null,
+            "output_driver.short_writes": null,
+            "output_driver.saturated": null
+          },
+          "completion_queue_drops": null,
+          "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+        },
+        "available_health_fault_counters_zero": {
+          "passed": false,
+          "observations": {
+            "health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              },
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "first_active_health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "playing_health": [
+              {
+                "passed": true,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 0,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              },
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 1,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "health_during_webui": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 1,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "eof_health": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 35,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ],
+            "last_reachable_health": [
+              {
+                "passed": false,
+                "present": true,
+                "fault_counters": {
+                  "allocation_failures": 35,
+                  "decoder_failure.sequence": 0,
+                  "stream_failure.sequence": 0,
+                  "output.failures": 0,
+                  "output.write_errors": 0,
+                  "output.configure_errors": 0,
+                  "output.flush_errors": 0,
+                  "output_driver.errors": 0,
+                  "output_driver.timeouts": 0,
+                  "output_driver.short_writes": 0,
+                  "output_driver.saturated": false
+                },
+                "completion_queue_drops": null,
+                "queue_drop_scope": "Separate telemetry, never erased or silently treated as a PCM oracle."
+              }
+            ]
+          }
+        },
+        "stable_boot_generation_and_eof": {
+          "passed": null
+        },
+        "final_observed_marker": {
+          "passed": null,
+          "present": false
+        },
+        "guest_intentionally_stopped_after_observation": {
+          "passed": true,
+          "qemu_exit_status": 1
+        }
+      },
+      "all_independent_gates_demonstrated": false,
+      "health_evidence": {
+        "eof_health": {
+          "boot_id": "5db0c3534089e433",
+          "reset_reason": 1,
+          "uptime_ms": 56661,
+          "heap": 166644,
+          "largest": 102400,
+          "minimum_heap": 2312,
+          "tasks": 17,
+          "memory": {
+            "internal_free": 166644,
+            "internal_largest": 102400,
+            "dma_free": 166644,
+            "dma_largest": 102400
+          },
+          "cpu": {
+            "enabled": false,
+            "available": false,
+            "sample_uptime_ms": 0,
+            "snapshot_failures": 0,
+            "overall_percent": null,
+            "core_percent": [
+              null,
+              null
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "allocation_failures": 35,
+          "last_allocation_failure": {
+            "size": 1512,
+            "caps": 6144
+          },
+          "decoder_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "codec": 0,
+            "stage": 0,
+            "result": 0,
+            "completion": 0,
+            "input_bytes": 0,
+            "allocation_sequence": 0
+          },
+          "stream_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "completion": 0,
+            "result": 0
+          },
+          "output": {
+            "failures": 0,
+            "write_errors": 0,
+            "configure_errors": 0,
+            "flush_errors": 0,
+            "generation": 0,
+            "stage": 0,
+            "result": 0
+          },
+          "output_driver": {
+            "writes": 1133,
+            "requested_bytes": 674816,
+            "written_bytes": 674816,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": false,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          },
+          "input": {
+            "available": true,
+            "leased": true,
+            "resident": 4,
+            "minimum": 4,
+            "target": 8,
+            "limit": 4,
+            "ready": 0,
+            "reading": 0,
+            "writing": 0,
+            "released": 4,
+            "ready_payload_bytes": 0,
+            "reading_payload_bytes": 0
+          }
+        },
+        "last_reachable_health": {
+          "boot_id": "5db0c3534089e433",
+          "reset_reason": 1,
+          "uptime_ms": 64561,
+          "heap": 166532,
+          "largest": 102400,
+          "minimum_heap": 2312,
+          "tasks": 17,
+          "memory": {
+            "internal_free": 166532,
+            "internal_largest": 102400,
+            "dma_free": 166532,
+            "dma_largest": 102400
+          },
+          "cpu": {
+            "enabled": false,
+            "available": false,
+            "sample_uptime_ms": 0,
+            "snapshot_failures": 0,
+            "overall_percent": null,
+            "core_percent": [
+              null,
+              null
+            ],
+            "tasks": {
+              "stream": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "decode": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "output": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              },
+              "http": {
+                "percent_of_one_core": null,
+                "stack_free_min": null
+              }
+            }
+          },
+          "allocation_failures": 35,
+          "last_allocation_failure": {
+            "size": 1512,
+            "caps": 6144
+          },
+          "decoder_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "codec": 0,
+            "stage": 0,
+            "result": 0,
+            "completion": 0,
+            "input_bytes": 0,
+            "allocation_sequence": 0
+          },
+          "stream_failure": {
+            "sequence": 0,
+            "generation": 0,
+            "completion": 0,
+            "result": 0
+          },
+          "output": {
+            "failures": 0,
+            "write_errors": 0,
+            "configure_errors": 0,
+            "flush_errors": 0,
+            "generation": 0,
+            "stage": 0,
+            "result": 0
+          },
+          "output_driver": {
+            "writes": 1384,
+            "requested_bytes": 739072,
+            "written_bytes": 739072,
+            "errors": 0,
+            "timeouts": 0,
+            "short_writes": 0,
+            "saturated": false,
+            "completion_queue_drops": null,
+            "timing_enabled": false,
+            "timing_samples": 0,
+            "invalid_time_samples": 0,
+            "write_us": null,
+            "max_write_us": null
+          },
+          "input": {
+            "available": true,
+            "leased": true,
+            "resident": 4,
+            "minimum": 4,
+            "target": 8,
+            "limit": 4,
+            "ready": 0,
+            "reading": 0,
+            "writing": 0,
+            "released": 4,
+            "ready_payload_bytes": 0,
+            "reading_payload_bytes": 0
+          }
+        }
+      },
+      "missing_final_report_fields": [
+        "post_eof_status",
+        "post_eof_health"
+      ],
+      "image": {
+        "bytes": 1263856,
+        "sha256": "8d8b69bf2f7fb488b8721a65c262de8eb578ca5a1739bb95094564dd5ff5f774"
+      },
+      "config": {
+        "bytes": 49212,
+        "sha256": "813d9d3f5000fa4948132c2b56dc3702a73030abe62c9aefe0f49003ca20b717"
+      },
+      "qualification": {
+        "bytes": 4714,
+        "sha256": "1d53d2d387d993683be7465dfaa9869e5c4897f27c3432c567abada14bc512ad"
+      },
+      "report_binding": {
+        "bytes": 27723,
+        "sha256": "f343b6ea1394e971097b015fd881077eeffc7443eb88ccff6102f76c358cc9d4"
+      },
+      "input_binding": {
+        "bytes": 1251,
+        "sha256": "d34bf3d39ee75fd1b87b2f7724b6498af44655107969e0214a60cdbe231e5172"
+      },
+      "rtc_geometry": {
+        "rtc_slow_used_bytes": 104,
+        "rtc_slow_reserved_bytes": 24,
+        "rtc_slow_free_bytes": 8064,
+        "heap_start": 1073448744,
+        "dram_bss_bytes": 22808
+      },
+      "qualified_driver_sha256": "e4808727b9a3a5a0e1617d57f0d39a11bdf85443b9e3556990ea4822cef60882"
+    }
+  ],
+  "all_original_controller_pass": false,
+  "physical_tested": false,
+  "packager": {
+    "bytes": 22026,
+    "sha256": "1d25201254a5314a132361f86530a7bff2be88fefee19af45ecd27467ce6bc3c"
+  },
+  "scope": "Finite RTC-OFF full-app observations with the unchanged strengthened controller. True/false/null distinguish proved/failed/missing gates. Original states and absent fields are preserved. last_reachable_health is separately labeled and never substituted for post_eof_health. RTC access probe remains on; this is not a no-RTC-storage-at-all or physical Wi-Fi/audio qualification."
+}

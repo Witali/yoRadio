@@ -1,0 +1,299 @@
+{
+  "source_commit": "7595a79958b8a2ef56babb24c43259fcf536b6dd",
+  "project_source_reference": "b65437a1bc59c9d269ce7bece597efddc70cea58",
+  "scope": "RTC workspace off/on isolated static control; native HE-AAC/two-client/post-close health belongs to root.",
+  "rtc_workspace": false,
+  "rtc_probe_enabled": true,
+  "physical_tested": false,
+  "native_run": false,
+  "original_failed_outcomes_preserved": true,
+  "rows": [
+    {
+      "backend": "legacy",
+      "fixture": ".build/cnortc24/legacy/fixture",
+      "qualification": ".build/cnortc24/legacy/qualification.json",
+      "qualification_identity": {
+        "bytes": 4702,
+        "sha256": "fae902110d08beb34bd8d1f0d93c03fa8e24fc30c9c66cf8a484c5e20ee56419"
+      },
+      "image": {
+        "bytes": 1269872,
+        "sha256": "ef79f0e56a50de42a093d03d08f917447a6ff6e99fde4ee77b06c74260ab22ee"
+      },
+      "image_size_change_bytes": -6560,
+      "elf": {
+        "bytes": 10630560,
+        "sha256": "9efe343d05557650fd0996f89de14d26235a4864f46750ec05c698662c45c97a"
+      },
+      "objects_compared": 953,
+      "changed_raw_objects": 2,
+      "changed_allocated": [
+        ".build/cyd-vorbis-openeth-20261117/word-legacy/b/esp-idf/esp_bootloader_format/CMakeFiles/__idf_esp_bootloader_format.dir/esp_bootloader_desc.c.obj",
+        ".build/cyd-vorbis-openeth-20261117/word-legacy/b/esp-idf/main/CMakeFiles/__idf_main.dir/websocket_service.c.obj"
+      ],
+      "unlinked_bootloader_date_exceptions": [
+        {
+          "exception": "unextracted_bootloader_descriptor_date_time_only",
+          "source": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_bootloader_format\\esp_bootloader_desc.c",
+          "section": ".rodata.esp_bootloader_desc",
+          "before_sha256": "14ecef3ac600df9aabadf05515a6994e5672b21e16d9b241cf9dcd3448f6ec4c",
+          "after_sha256": "cc90d562228287de3ef527ce61de42d308e097a367de881bc969cbc96343a298",
+          "field_offset": 40,
+          "field_bytes": 24,
+          "before_date_time": "Nov 24 2026 14:34:14",
+          "after_date_time": "Nov 24 2026 15:49:54",
+          "other_56_bytes_identical": true,
+          "map_elf_proofs": [
+            {
+              "elf": {
+                "bytes": 10637120,
+                "sha256": "c07fadd1216d347c28529f633e15ddcf8cac5500a917cd25d92772c2278f15ce"
+              },
+              "map": {
+                "bytes": 9249286,
+                "sha256": "817aa782d606973a9ad44056142e054d7c5a06e9def834fc8f20e3756bc577c4"
+              },
+              "archive_member_absent": true,
+              "section_absent": true,
+              "symbols_absent": true
+            },
+            {
+              "elf": {
+                "bytes": 10630560,
+                "sha256": "9efe343d05557650fd0996f89de14d26235a4864f46750ec05c698662c45c97a"
+              },
+              "map": {
+                "bytes": 9249362,
+                "sha256": "a54de1bb4af5b6d795c54aab6b278987bbe4f82b14bda384301a833820f9cdd6"
+              },
+              "archive_member_absent": true,
+              "section_absent": true,
+              "symbols_absent": true
+            }
+          ],
+          "original_nonpass_outcomes_preserved": true
+        }
+      ],
+      "effective_config_delta": {
+        "YORADIO_WS_STATUS_RTC_SLOW": {
+          "before_present": true,
+          "before": true,
+          "after_present": true,
+          "after": false
+        }
+      },
+      "geometry": {
+        "rtc_slow_used_bytes": 104,
+        "rtc_slow_reserved_bytes": 24,
+        "rtc_slow_free_bytes": 8064,
+        "heap_start": 1073448808,
+        "dram_bss_bytes": 22856
+      },
+      "dram_bss_increase_bytes": 6560,
+      "heap_start_increase_bytes": 6560,
+      "static_frames": {
+        "decoder_task": 1760,
+        "ogp_decode_word_page": 2144
+      },
+      "lint": [
+        {
+          "unit": "websocket",
+          "warnings": 1,
+          "errors": 0
+        },
+        {
+          "unit": "openeth",
+          "warnings": 32,
+          "errors": 0
+        }
+      ],
+      "outcomes": {
+        "original_controller": "TERMINAL_NONPASS",
+        "first_static_continuation": "TERMINAL_NONPASS",
+        "reviewed_static_continuation": "TERMINAL_PASS",
+        "rebuild": false,
+        "first_failure": "Helper expected LF, actual generated header uses CRLF",
+        "second_failure": "Unextracted bootloader descriptor date field; subsequently reviewed with exact byte/map/ELF proof"
+      },
+      "descriptor_context": "Original A/B PROJECT_VER/date preserved; not a clean new production release."
+    },
+    {
+      "backend": "pdm",
+      "fixture": ".build/cnortc24/pdm/fixture",
+      "qualification": ".build/cnortc24/pdm/qualification.json",
+      "qualification_identity": {
+        "bytes": 2967,
+        "sha256": "4190cf2fca0950dcc2442a563516e9eb8e662518edf5ea5d8acedeab89dd9515"
+      },
+      "image": {
+        "bytes": 1269632,
+        "sha256": "b0a92539947cde243862bf41d95ef10f5c4d40e82c54b15caf317fb4b736052d"
+      },
+      "image_size_change_bytes": -6560,
+      "elf": {
+        "bytes": 10644852,
+        "sha256": "1bc801229d41e9bbf03dfd09df32ca6075456890c23656c5bb22ad3713838f35"
+      },
+      "objects_compared": 951,
+      "changed_raw_objects": 1,
+      "changed_allocated": [
+        ".build/caqt23a/fair-default-pdm/b/esp-idf/main/CMakeFiles/__idf_main.dir/websocket_service.c.obj"
+      ],
+      "unlinked_bootloader_date_exceptions": [],
+      "effective_config_delta": {
+        "YORADIO_WS_STATUS_RTC_SLOW": {
+          "before_present": true,
+          "before": true,
+          "after_present": true,
+          "after": false
+        }
+      },
+      "geometry": {
+        "rtc_slow_used_bytes": 104,
+        "rtc_slow_reserved_bytes": 24,
+        "rtc_slow_free_bytes": 8064,
+        "heap_start": 1073449752,
+        "dram_bss_bytes": 23816
+      },
+      "dram_bss_increase_bytes": 6560,
+      "heap_start_increase_bytes": 6560,
+      "static_frames": {
+        "decoder_task": 1760,
+        "ogp_decode_word_page": 2144
+      },
+      "lint": [
+        {
+          "unit": "websocket",
+          "warnings": 1,
+          "errors": 0
+        },
+        {
+          "unit": "openeth",
+          "warnings": 32,
+          "errors": 0
+        }
+      ],
+      "outcomes": {
+        "original_controller": "TERMINAL_PASS"
+      },
+      "descriptor_context": "Original A/B PROJECT_VER/date preserved; not a clean new production release."
+    },
+    {
+      "backend": "continuous",
+      "fixture": ".build/cnortc24/continuous/fixture",
+      "qualification": ".build/cnortc24/continuous/qualification.json",
+      "qualification_identity": {
+        "bytes": 4714,
+        "sha256": "1d53d2d387d993683be7465dfaa9869e5c4897f27c3432c567abada14bc512ad"
+      },
+      "image": {
+        "bytes": 1263856,
+        "sha256": "8d8b69bf2f7fb488b8721a65c262de8eb578ca5a1739bb95094564dd5ff5f774"
+      },
+      "image_size_change_bytes": -6560,
+      "elf": {
+        "bytes": 10589852,
+        "sha256": "add8b7590789a91c6d7dd12967e4911492cbd1eecf8c842c8c5620bb48ba86ac"
+      },
+      "objects_compared": 951,
+      "changed_raw_objects": 2,
+      "changed_allocated": [
+        ".build/cyd-vorbis-openeth-20261117/word-continuous/b/esp-idf/esp_bootloader_format/CMakeFiles/__idf_esp_bootloader_format.dir/esp_bootloader_desc.c.obj",
+        ".build/cyd-vorbis-openeth-20261117/word-continuous/b/esp-idf/main/CMakeFiles/__idf_main.dir/websocket_service.c.obj"
+      ],
+      "unlinked_bootloader_date_exceptions": [
+        {
+          "exception": "unextracted_bootloader_descriptor_date_time_only",
+          "source": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_bootloader_format\\esp_bootloader_desc.c",
+          "section": ".rodata.esp_bootloader_desc",
+          "before_sha256": "67c14d829e22031c9d4d368b764a548a482e28158b09038f120d92941cd19674",
+          "after_sha256": "cc90d562228287de3ef527ce61de42d308e097a367de881bc969cbc96343a298",
+          "field_offset": 40,
+          "field_bytes": 24,
+          "before_date_time": "Nov 24 2026 14:34:13",
+          "after_date_time": "Nov 24 2026 15:49:54",
+          "other_56_bytes_identical": true,
+          "map_elf_proofs": [
+            {
+              "elf": {
+                "bytes": 10596412,
+                "sha256": "b18941673894d8ac52947d9e1b10ed20618d7ed9bc801b2fe39475aff4d57188"
+              },
+              "map": {
+                "bytes": 9237678,
+                "sha256": "92a1740a461a55a6cb7fcad8d3727aaf4da56cf7caa914a4454b46651569555e"
+              },
+              "archive_member_absent": true,
+              "section_absent": true,
+              "symbols_absent": true
+            },
+            {
+              "elf": {
+                "bytes": 10589852,
+                "sha256": "add8b7590789a91c6d7dd12967e4911492cbd1eecf8c842c8c5620bb48ba86ac"
+              },
+              "map": {
+                "bytes": 9237754,
+                "sha256": "cf2e79213120aa1e9d40482ec9576b2fa54b3211173a31951bb3e205e732d1eb"
+              },
+              "archive_member_absent": true,
+              "section_absent": true,
+              "symbols_absent": true
+            }
+          ],
+          "original_nonpass_outcomes_preserved": true
+        }
+      ],
+      "effective_config_delta": {
+        "YORADIO_WS_STATUS_RTC_SLOW": {
+          "before_present": true,
+          "before": true,
+          "after_present": true,
+          "after": false
+        }
+      },
+      "geometry": {
+        "rtc_slow_used_bytes": 104,
+        "rtc_slow_reserved_bytes": 24,
+        "rtc_slow_free_bytes": 8064,
+        "heap_start": 1073448744,
+        "dram_bss_bytes": 22808
+      },
+      "dram_bss_increase_bytes": 6560,
+      "heap_start_increase_bytes": 6560,
+      "static_frames": {
+        "decoder_task": 1760,
+        "ogp_decode_word_page": 2144
+      },
+      "lint": [
+        {
+          "unit": "websocket",
+          "warnings": 1,
+          "errors": 0
+        },
+        {
+          "unit": "openeth",
+          "warnings": 32,
+          "errors": 0
+        }
+      ],
+      "outcomes": {
+        "original_controller": "TERMINAL_PASS"
+      },
+      "descriptor_context": "Original A/B PROJECT_VER/date preserved; not a clean new production release."
+    }
+  ],
+  "compilers_quiet": true,
+  "state": "TERMINAL_PASS",
+  "qemu": {
+    "path": ".build/cdac-model24/fixed-self-clear/qemu-system-xtensa.exe",
+    "bytes": 73096245,
+    "sha256": "28068f674d06c4322aa72989756d7dd3734bb0d06c4aa1acf21b919ccb3465f4"
+  },
+  "objects_compared": 2855,
+  "focused_whole_tu_checks": 6,
+  "new_warnings": 0,
+  "protected_inputs_reverified": 207,
+  "production_app_metadata_files_unchanged": 24,
+  "free_disk_gib": 7.79
+}

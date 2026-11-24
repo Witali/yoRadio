@@ -91,3 +91,8 @@ now independently qualify that last interval on all three outputs: complete
 TLS/HE-AAC/PCM/WebUI, zero allocation/write failures, and unchanged boot/EOF
 generation. The PDM completion-notification counter rises from zero at EOF to 89
 after close, separately from memory/write errors; physical timing remains open.
+
+The [RTC-off controls](../tests/results/cyd-openeth-no-rtc-20261124/README.md)
+now pass complete TLS/HE-AAC/PCM and WebUI on all three outputs, but retain
+171/25/35 allocation failures on legacy/PDM/continuous. The ordinary DRAM
+resource gate remains NONPASS; RTC-on success does not qualify that profile.
