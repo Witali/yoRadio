@@ -1,0 +1,46 @@
+{
+  "state_after": {
+    "head": "b65437a1bc59c9d269ce7bece597efddc70cea58",
+    "tracked_status": "",
+    "index_sha256": "76f51a4fb2ecc4b85f6c4ba483d8196e4977d4db7bbcbaf1d1ace14cc81da1e1"
+  },
+  "baseline_source": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-pdm-dma-qemu-20261113\\esp32_i2s_dac.c",
+    "bytes": 11912,
+    "sha256": "a05e52b1cfa0f4c5a1d74bed70efb8761d8a54cf18a120b10c45f1887cd3c286"
+  },
+  "private_baseline_copy": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\retained_model.c",
+    "bytes": 11912,
+    "sha256": "a05e52b1cfa0f4c5a1d74bed70efb8761d8a54cf18a120b10c45f1887cd3c286"
+  },
+  "fixed_source": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\esp32_i2s_dac.c",
+    "bytes": 11935,
+    "sha256": "b8ca03a6534fb4880fcdf87374ef7273fcb60c6b192261d1c13e1b27419e432d"
+  },
+  "baseline_object": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\baseline-recompiled.obj",
+    "bytes": 46240,
+    "sha256": "30be297358d6fef894223208a70d3e7d5ee0a35c99d3d4c5521b60fa28f9eb86"
+  },
+  "fixed_object": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\fixed-self-clear.obj",
+    "bytes": 46180,
+    "sha256": "abeb86b10e4fd3ac13a05e866b0196e66ea7fd47d41bc421c4079a9563bcbb8e"
+  },
+  "baseline_exe": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\baseline-recompiled\\qemu-system-xtensa.exe",
+    "bytes": 73096757,
+    "sha256": "7777736d45575785cde464f46f5787492c9dee75787d0deb8772692bbe96b829"
+  },
+  "fixed_exe": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\fixed-self-clear\\qemu-system-xtensa.exe",
+    "bytes": 73096245,
+    "sha256": "28068f674d06c4322aa72989756d7dd3734bb0d06c4aa1acf21b919ccb3465f4"
+  },
+  "patch": {
+    "old": "s->regs[address / 4] = val & ~I2S_OUT_LINK_PARK;",
+    "new": "s->regs[address / 4] = val & ~(I2S_OUT_LINK_PARK | I2S_OUT_LINK_START);"
+  }
+}

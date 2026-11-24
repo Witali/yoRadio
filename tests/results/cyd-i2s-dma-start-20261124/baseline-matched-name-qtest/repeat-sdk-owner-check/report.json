@@ -1,0 +1,215 @@
+{
+  "case": "repeat-sdk-owner-check",
+  "passed": false,
+  "checks": [
+    {
+      "label": "first SDK transfer completes",
+      "actual": 69632,
+      "expected": 69632,
+      "passed": true
+    },
+    {
+      "label": "first transfer writes owner back",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "label": "address-only RMW does not complete B",
+      "actual": 69632,
+      "expected": 0,
+      "passed": false
+    },
+    {
+      "label": "address-only RMW preserves B ownership",
+      "actual": false,
+      "expected": true,
+      "passed": false
+    },
+    {
+      "label": "address-only RMW preserves last EOF A",
+      "actual": 1073418272,
+      "expected": 1073418240,
+      "passed": false
+    },
+    {
+      "label": "second START self-clears",
+      "actual": true,
+      "expected": false,
+      "passed": false
+    },
+    {
+      "label": "explicit START completes B exactly once",
+      "actual": 16384,
+      "expected": 69632,
+      "passed": false
+    },
+    {
+      "label": "explicit START returns B",
+      "actual": 1073418272,
+      "expected": 1073418272,
+      "passed": true
+    },
+    {
+      "label": "second transfer writes owner back",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    }
+  ],
+  "qemu_command": [
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\baseline-matched-name\\qemu-system-xtensa.exe",
+    "-M",
+    "esp32,audiodev=quiet,dac-rate=48000",
+    "-smp",
+    "2",
+    "-accel",
+    "qtest",
+    "-L",
+    "C:\\Work\\QEMU-ESP32\\pc-bios",
+    "-nic",
+    "none",
+    "-audiodev",
+    "none,id=quiet",
+    "-display",
+    "none",
+    "-serial",
+    "none",
+    "-monitor",
+    "none",
+    "-qtest",
+    "stdio",
+    "-qtest-log",
+    "none"
+  ],
+  "transactions": [
+    {
+      "command": "writel 0x3ff4f008 0x1",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f008 0x0",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f018 0xffffffff",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f060 0x1140",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1000 0xc0010010",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1004 0x3ffb2000",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1008 0x0",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb2000 0x81238123",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1020 0xc0010010",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1024 0x3ffb2000",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1028 0x0",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb2000 0x81238123",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f008 0x10",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f030 0x200b1000",
+      "reply": ""
+    },
+    {
+      "command": "clock_step 100000",
+      "reply": "100000"
+    },
+    {
+      "command": "readl 0x3ff4f00c",
+      "reply": "0x0000000000011000"
+    },
+    {
+      "command": "readl 0x3ffb1000",
+      "reply": "0x0000000040010010"
+    },
+    {
+      "command": "writel 0x3ff4f018 0xffffffff",
+      "reply": ""
+    },
+    {
+      "command": "readl 0x3ff4f030",
+      "reply": "0x00000000a00b1000"
+    },
+    {
+      "command": "writel 0x3ff4f030 0xa00b1020",
+      "reply": ""
+    },
+    {
+      "command": "clock_step 100000",
+      "reply": "200000"
+    },
+    {
+      "command": "readl 0x3ff4f00c",
+      "reply": "0x0000000000011000"
+    },
+    {
+      "command": "readl 0x3ffb1020",
+      "reply": "0x0000000040010010"
+    },
+    {
+      "command": "readl 0x3ff4f038",
+      "reply": "0x000000003ffb1020"
+    },
+    {
+      "command": "writel 0x3ff4f018 0xffffffff",
+      "reply": ""
+    },
+    {
+      "command": "readl 0x3ff4f030",
+      "reply": "0x00000000a00b1020"
+    },
+    {
+      "command": "writel 0x3ff4f030 0xa00b1020",
+      "reply": ""
+    },
+    {
+      "command": "readl 0x3ff4f030",
+      "reply": "0x00000000200b1020"
+    },
+    {
+      "command": "clock_step 100000",
+      "reply": "300000"
+    },
+    {
+      "command": "readl 0x3ff4f00c",
+      "reply": "0x0000000000004000"
+    },
+    {
+      "command": "readl 0x3ff4f038",
+      "reply": "0x000000003ffb1020"
+    },
+    {
+      "command": "readl 0x3ffb1020",
+      "reply": "0x0000000040010010"
+    }
+  ]
+}

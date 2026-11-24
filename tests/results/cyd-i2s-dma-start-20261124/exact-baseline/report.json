@@ -1,0 +1,103 @@
+{
+  "qemu": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-openeth-ota-lifecycle-20261116\\qemu-system-xtensa.exe",
+  "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+  "test_sha256": "4b67ae320475323957f26596eed3b4b300df865e089cf1e160e97cb1d27bfa72",
+  "legacy_test_sha256": "a54e922ad80192708442a4c2fa7a313dedcd91eb7fc0292a3f6cf05f024831aa",
+  "new_cases": [
+    {
+      "case": "self-clear-tx-on",
+      "passed": false,
+      "failed_checks": [
+        {
+          "label": "START self-clears after command",
+          "actual": true,
+          "expected": false,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "case": "self-clear-tx-off",
+      "passed": false,
+      "failed_checks": [
+        {
+          "label": "START self-clears after command",
+          "actual": true,
+          "expected": false,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "case": "repeat-sdk-owner-off",
+      "passed": false,
+      "failed_checks": [
+        {
+          "label": "address-only RMW does not complete B",
+          "actual": 69632,
+          "expected": 0,
+          "passed": false
+        },
+        {
+          "label": "address-only RMW preserves B ownership",
+          "actual": false,
+          "expected": true,
+          "passed": false
+        },
+        {
+          "label": "address-only RMW preserves last EOF A",
+          "actual": 1073418272,
+          "expected": 1073418240,
+          "passed": false
+        },
+        {
+          "label": "second START self-clears",
+          "actual": true,
+          "expected": false,
+          "passed": false
+        }
+      ]
+    },
+    {
+      "case": "repeat-sdk-owner-check",
+      "passed": false,
+      "failed_checks": [
+        {
+          "label": "address-only RMW does not complete B",
+          "actual": 69632,
+          "expected": 0,
+          "passed": false
+        },
+        {
+          "label": "address-only RMW preserves B ownership",
+          "actual": false,
+          "expected": true,
+          "passed": false
+        },
+        {
+          "label": "address-only RMW preserves last EOF A",
+          "actual": 1073418272,
+          "expected": 1073418240,
+          "passed": false
+        },
+        {
+          "label": "second START self-clears",
+          "actual": true,
+          "expected": false,
+          "passed": false
+        },
+        {
+          "label": "explicit START completes B exactly once",
+          "actual": 16384,
+          "expected": 69632,
+          "passed": false
+        }
+      ]
+    }
+  ],
+  "new_passed": 0,
+  "new_total": 4,
+  "legacy_six_passed": true,
+  "legacy_returncode": 0,
+  "scope": "Real QEMU qtest MMIO, no guest instructions, firmware, TLS, or timing qualification."
+}

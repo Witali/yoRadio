@@ -1,0 +1,11 @@
+--- retained_model.c
++++ esp32_i2s_dac.c
+@@ -253,7 +253,7 @@
+         }
+         break;
+     case I2S_OUT_LINK_REG:
+-        s->regs[address / 4] = val & ~I2S_OUT_LINK_PARK;
++        s->regs[address / 4] = val & ~(I2S_OUT_LINK_PARK | I2S_OUT_LINK_START);
+         if (val & I2S_OUT_LINK_STOP) {
+             esp32_i2s_dac_stop(s);
+         }

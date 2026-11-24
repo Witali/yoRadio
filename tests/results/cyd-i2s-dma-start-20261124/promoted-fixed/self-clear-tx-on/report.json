@@ -1,0 +1,123 @@
+{
+  "case": "self-clear-tx-on",
+  "passed": true,
+  "checks": [
+    {
+      "label": "START self-clears after command",
+      "actual": false,
+      "expected": false,
+      "passed": true
+    },
+    {
+      "label": "valid transfer completes",
+      "actual": 69632,
+      "expected": 69632,
+      "passed": true
+    },
+    {
+      "label": "EOF address is A",
+      "actual": 1073418240,
+      "expected": 1073418240,
+      "passed": true
+    }
+  ],
+  "qemu_command": [
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cdac-model24\\fixed-self-clear\\qemu-system-xtensa.exe",
+    "-M",
+    "esp32,audiodev=quiet,dac-rate=48000",
+    "-smp",
+    "2",
+    "-accel",
+    "qtest",
+    "-L",
+    "C:\\Work\\QEMU-ESP32\\pc-bios",
+    "-nic",
+    "none",
+    "-audiodev",
+    "none,id=quiet",
+    "-display",
+    "none",
+    "-serial",
+    "none",
+    "-monitor",
+    "none",
+    "-qtest",
+    "stdio",
+    "-qtest-log",
+    "none"
+  ],
+  "transactions": [
+    {
+      "command": "writel 0x3ff4f008 0x1",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f008 0x0",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f018 0xffffffff",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f060 0x140",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1000 0xc0010010",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1004 0x3ffb2000",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1008 0x0",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb2000 0x81238123",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1020 0xc0010010",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1024 0x3ffb2000",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb1028 0x0",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ffb2000 0x81238123",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f008 0x10",
+      "reply": ""
+    },
+    {
+      "command": "writel 0x3ff4f030 0x200b1000",
+      "reply": ""
+    },
+    {
+      "command": "readl 0x3ff4f030",
+      "reply": "0x00000000000b1000"
+    },
+    {
+      "command": "clock_step 100000",
+      "reply": "100000"
+    },
+    {
+      "command": "readl 0x3ff4f00c",
+      "reply": "0x0000000000011000"
+    },
+    {
+      "command": "readl 0x3ff4f038",
+      "reply": "0x000000003ffb1000"
+    }
+  ]
+}

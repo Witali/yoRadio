@@ -1,0 +1,73 @@
+{
+  "status": "PASS: deterministic register-semantics regression and START-only private fix",
+  "scope": "Not a full-app timeout resolution or timing qualification; no native HE tests.",
+  "results": {
+    "exact-baseline": {
+      "qemu_sha256": "eb88d36f5bea48f547615ee147cf01985f9adf301112e2954ad90b8ca461ed02",
+      "new_passed": 0,
+      "new_total": 4,
+      "legacy_six_passed": true
+    },
+    "baseline-matched-name-qtest": {
+      "qemu_sha256": "7f52dc8801c4dc0c3393f38eeaba3601eb30f7421785a948a3de7462eb5a184a",
+      "new_passed": 0,
+      "new_total": 4,
+      "legacy_six_passed": true
+    },
+    "baseline-recompiled-qtest": {
+      "qemu_sha256": "7777736d45575785cde464f46f5787492c9dee75787d0deb8772692bbe96b829",
+      "new_passed": 0,
+      "new_total": 4,
+      "legacy_six_passed": true
+    },
+    "fixed-self-clear-qtest": {
+      "qemu_sha256": "28068f674d06c4322aa72989756d7dd3734bb0d06c4aa1acf21b919ccb3465f4",
+      "new_passed": 4,
+      "new_total": 4,
+      "legacy_six_passed": true
+    },
+    "baseline-recompiled-self-contained-qtest": {
+      "qemu_sha256": "7777736d45575785cde464f46f5787492c9dee75787d0deb8772692bbe96b829",
+      "new_passed": 0,
+      "new_total": 4,
+      "legacy_six_passed": true
+    },
+    "fixed-self-clear-self-contained-qtest": {
+      "qemu_sha256": "28068f674d06c4322aa72989756d7dd3734bb0d06c4aa1acf21b919ccb3465f4",
+      "new_passed": 4,
+      "new_total": 4,
+      "legacy_six_passed": true
+    }
+  },
+  "unchanged_model_recompile_byte_identical_to_retained_object": true,
+  "unchanged_relink_normalized_whole_image_identical_to_selected": true,
+  "normalization": [
+    "COFF TimeDateStamp",
+    "IMAGE_EXPORT_DIRECTORY.TimeDateStamp",
+    "OptionalHeader.CheckSum"
+  ],
+  "source_change": "--- retained_model.c\n+++ esp32_i2s_dac.c\n@@ -253,7 +253,7 @@\n         }\n         break;\n     case I2S_OUT_LINK_REG:\n-        s->regs[address / 4] = val & ~I2S_OUT_LINK_PARK;\n+        s->regs[address / 4] = val & ~(I2S_OUT_LINK_PARK | I2S_OUT_LINK_START);\n         if (val & I2S_OUT_LINK_STOP) {\n             esp32_i2s_dac_stop(s);\n         }\n",
+  "link_input_records": 701,
+  "compiler_dependency_records": {
+    "baseline-recompiled": 420,
+    "fixed-self-clear": 420
+  },
+  "private_artifact_bytes": 293290137,
+  "state_before": {
+    "head": "b65437a1bc59c9d269ce7bece597efddc70cea58",
+    "tracked_status": "",
+    "index_sha256": "76f51a4fb2ecc4b85f6c4ba483d8196e4977d4db7bbcbaf1d1ace14cc81da1e1"
+  },
+  "state_after": {
+    "head": "b65437a1bc59c9d269ce7bece597efddc70cea58",
+    "tracked_status": "",
+    "index_sha256": "76f51a4fb2ecc4b85f6c4ba483d8196e4977d4db7bbcbaf1d1ace14cc81da1e1"
+  },
+  "hardware_reference": {
+    "url": "https://documentation.espressif.com/ESP32_Technical_Reference_Manual_en.pdf#page=60",
+    "revision_observed": "5.9",
+    "section": "2.6",
+    "printed_page": 60,
+    "fact": "I2S_OUTLINK_START and I2S_INLINK_START self-clear in hardware."
+  }
+}
