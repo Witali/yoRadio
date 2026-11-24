@@ -20,6 +20,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--source-ref', help='Qualify a historical production implementation with the current regression harness')
+    parser.add_argument('--rtc-status', action='store_true',
+                        help='Exercise the RTC status option with a host section attribute; target memory is a separate check')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -100,6 +102,8 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
 ''',
         'compat.h': '#include <stddef.h>\nsize_t strlcpy(char *,const char *,size_t);\n',
     }
+    stubs['sdkconfig.h'] += '#define CONFIG_YORADIO_WS_STATUS_RTC_SLOW ' + str(int(args.rtc_status)) + '\n'
+    stubs['esp_attr.h'] = '#pragma once\n#define RTC_SLOW_ATTR __attribute__((section(".rtc.force_slow.test")))\n'
     for relative, contents in stubs.items():
         path = out / relative
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -125,6 +129,8 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
     binary = out / 'cyd-websocket'
     production = MAIN / 'websocket_service.c'
     source = subprocess.check_output(['git', 'show', args.source_ref + ':' + production.relative_to(ROOT).as_posix()], cwd=ROOT) if args.source_ref else (frozen_main / 'websocket_service.c').read_bytes()
+    if args.rtc_status and b'CONFIG_YORADIO_WS_STATUS_RTC_SLOW' not in source:
+        raise ValueError('The selected implementation does not support the RTC status option')
     (out / 'websocket-under-test.c').write_bytes(source)
     fixture = (frozen / 'tests/native/cyd_websocket_test.c').read_text().replace(
         '#include "../../idf/esp32-cyd2usb-native/main/websocket_service.c"',
@@ -168,6 +174,7 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
     assert maximum is not None
     assert b'18 scalar and 4 string changes detected' in log
     report = {'passed': True, 'sanitizers': ['ASan', 'UBSan'], 'maximum_json_bytes': maximum_bytes,
+              'rtc_status_option': args.rtc_status, 'rtc_target_memory_qualified': False,
               'status_key_comparison': {'padding_ignored': True, 'string_tails_ignored': True, 'scalar_fields': 18, 'string_fields': 4},
               'source_ref': args.source_ref, 'qualified_implementation_sha256': hashlib.sha256(source).hexdigest(),
               'status_capacity': 5120, 'websocket_client_limit': 2, 'queued_status_work_limit': 1,

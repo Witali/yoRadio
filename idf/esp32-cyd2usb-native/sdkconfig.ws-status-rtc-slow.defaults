@@ -1,0 +1,5 @@
+# Optional classic ESP32 WebSocket-cache placement; not board defaults.
+# Move the full status buffer, snapshots, client state and socket list out of DRAM.
+# RTC SLOW is shared by both cores. Its remaining space and access latency
+# require separate qualification; ULP coprocessor use disables this option.
+CONFIG_YORADIO_WS_STATUS_RTC_SLOW=y

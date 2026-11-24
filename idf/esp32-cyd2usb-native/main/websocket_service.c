@@ -18,6 +18,13 @@
 #include "websocket_message.h"
 #include "native_web_transport.h"
 
+#if CONFIG_YORADIO_WS_STATUS_RTC_SLOW
+#include "esp_attr.h"
+#define WS_STATUS_STORAGE RTC_SLOW_ATTR
+#else
+#define WS_STATUS_STORAGE
+#endif
+
 #if !CONFIG_HTTPD_WS_SUPPORT
 #error "CYD WebSocket service requires CONFIG_HTTPD_WS_SUPPORT=y"
 #endif
@@ -71,12 +78,12 @@ static atomic_bool s_running, s_task_alive, s_work_pending;
 static atomic_uint s_playlist_revision;
 // Only the HTTPD task touches these objects. Queued work contains no payload or
 // captured fd, and every send completes before this workspace is reused.
-static ws_client_t s_clients[WS_CLIENT_LIMIT];
-static ws_status_key_t s_previous, s_current;
+static WS_STATUS_STORAGE ws_client_t s_clients[WS_CLIENT_LIMIT];
+static WS_STATUS_STORAGE ws_status_key_t s_previous, s_current;
 static bool s_have_previous;
 static uint32_t s_status_revision;
-static char s_status[WS_STATUS_BYTES];
-static int s_sockets[CONFIG_LWIP_MAX_SOCKETS];
+static WS_STATUS_STORAGE char s_status[WS_STATUS_BYTES];
+static WS_STATUS_STORAGE int s_sockets[CONFIG_LWIP_MAX_SOCKETS];
 
 static void session_free(void *context) {
     ws_client_t *client = context;
@@ -566,7 +573,11 @@ esp_err_t websocket_service_register(httpd_handle_t server, native_state_t *stat
         .ws_pre_handshake_cb = websocket_handshake_transport,
         .ws_post_handshake_cb = websocket_handshake_transport};
     esp_err_t result = httpd_register_uri_handler(server, &route);
-    if (result == ESP_OK) { s_server = server; s_state = state; }
+    if (result == ESP_OK) {
+        // RTC data can survive a deep-sleep wake while the server starts fresh.
+        memset(s_clients, 0, sizeof(s_clients));
+        s_server = server; s_state = state;
+    }
     return result;
 }
 

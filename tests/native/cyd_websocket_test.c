@@ -387,6 +387,17 @@ static void status_key_comparison_regressions(void) {
 
 int main(void) {
     status_key_comparison_regressions();
+
+    // RTC data can survive a deep-sleep wake while ordinary service flags
+    // restart from zero. A new server must not inherit old client leases.
+    reset();
+    for (unsigned i = 0; i < WS_CLIENT_LIMIT; ++i) {
+        s_clients[i].used = s_clients[i].closing = s_clients[i].initialized = true;
+        s_clients[i].socket = 100 + (int)i;
+    }
+    start(); open_socket(7, true); open_socket(8, true); cycle();
+    assert(contains_delivery(0, 7, "\"status\":") && contains_delivery(0, 8, "\"status\":"));
+    assert(!shutdown_count && "new registration must discard retained RTC client state");
     reset(); start(); open_socket(7, false);
     httpd_req_t ordinary_get = {.socket = 7, .method = HTTP_GET};
     assert(registered_route.handler(&ordinary_get) == ESP_OK && http_errors == 1);

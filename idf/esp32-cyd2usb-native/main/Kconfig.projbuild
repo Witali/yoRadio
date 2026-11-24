@@ -62,6 +62,20 @@ menu "yoRadio native firmware"
         range 1 2
         default 2
 
+    config YORADIO_WS_STATUS_RTC_SLOW
+        bool "Store WebSocket workspace in ESP32 RTC slow memory"
+        depends on IDF_TARGET_ESP32 && !ULP_COPROC_ENABLED
+        default n
+        help
+            Place the full JSON buffer, both status snapshots, fixed client
+            state and socket list in RTC slow memory, freeing about 6 KiB of
+            ordinary DRAM. Retained client state is cleared when a new server
+            is registered. This region is
+            accessible to both classic ESP32 cores but is slower and cannot
+            serve DMA. Message capacity and task bindings stay unchanged.
+            Reserves part of the 8 KiB RTC slow region; the linker rejects
+            configurations whose other RTC data no longer fits. Experimental.
+
     config YORADIO_WEB_FILE_CHUNK_BYTES
         int "Static content chunk bytes"
         range 512 2048
