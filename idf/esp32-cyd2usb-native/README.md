@@ -68,6 +68,10 @@ existing WebSocket workspace to classic ESP32 RTC SLOW memory, preserving
 the ordinary TCP settings. It is disabled by default and excludes ULP use.
 See [memory placement, build instructions and qualification limits](../../docs/CYD_WS_RTC_MEMORY.md).
 
+WebSocket status polling now uses existing SDK timer/event tasks, freeing
+the previous dedicated polling stack independently of the RTC option.
+See the [scheduler contract and saved resource results](../../docs/CYD_WS_SCHEDULER.md).
+
 To flash only the application and preserve Wi-Fi/SPIFFS:
 
 ```powershell

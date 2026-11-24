@@ -79,3 +79,9 @@ The opt-in configuration still needs normal production exports and physical
 Wi-Fi/audio, RTC timing and sleep/wake testing. The existing six production
 images predate this option and are unchanged. Extended custom Vorbis and
 private AAC work remain deferred.
+
+The [shared-scheduler follow-up](CYD_WS_SCHEDULER.md) frees additional task
+memory and completes the legacy two-client workload without an allocation
+failure. It preserves an intermittent continuous-DAC output timeout as a
+separate open issue. The original RTC-placement outcomes above remain the
+results of their own source revision and are not relabeled.

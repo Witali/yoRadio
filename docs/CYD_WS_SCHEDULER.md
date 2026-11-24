@@ -48,7 +48,7 @@ only trigger a current, coalesced poll rather than use an old server handle.
 
 ## Qualification boundary
 
-Host ASan/UBSan tests cover the actual production core with deferred event
+Host ASan/UBSan tests pass 64 groups for the actual production core with deferred event
 and HTTPD seams, a real concurrent blocked producer, bounded stop/retry,
 late events, startup/delete failures, event-queue pressure and coalescing.
 The failed-post/late-event interleaving first reproduced duplicate HTTPD
@@ -64,3 +64,9 @@ the nominal stack also removes a task control block, while the new timer,
 handler and admission state consume memory. Neither the stack constant nor
 a host result alone establishes recovered target heap or physical timing.
 Physical Wi-Fi/audio and realistic network contention remain separate.
+
+The [SDK/QEMU observations](../tests/results/cyd-ws-shared-scheduler-20261124/README.md)
+show 17 initial tasks instead of 18 and 1,872–2,156 more free bytes in early
+snapshots. All three outputs have a complete current-source HE-AAC pass;
+one continuous-DAC output timeout is retained separately, so repeatability
+is still open. Normal production exports remain a separate next step.
