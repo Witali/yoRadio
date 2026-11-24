@@ -1,0 +1,81 @@
+{
+  "sdk_source_sha256": "b0526b76120abffe37ee8bd87b9e204880da18a5c02383e5d39b8e001bbcbb7d",
+  "candidate_sha256": "e4808727b9a3a5a0e1617d57f0d39a11bdf85443b9e3556990ea4822cef60882",
+  "exact_prior_overlay_sha256": "77827f4605a712e9057484fe5999c8a3405e3e617f3f45e52ca8933d96be6cca",
+  "wrong_source_guard_passed": true,
+  "crlf_normalization_passed": true,
+  "sources": {
+    "max-allocation-control.inc": "a15c5d6f041916748f9bbb9599a58adfc51686604687c5e14fbe3b5454a6ddb5",
+    "openeth.h": "0f93a3f976959195bed82d07c78e10bfda09c1ebbc7273681ca4870f925b2fb8",
+    "prepare-rx-source.py": "b57bba4efafe4fd6b388502b58622efba4eacd696c166dba04368f834f3e0d5f",
+    "runner.py": "80577821bd6963559705074c12ad0380edaf9e2c1c19408e56d2567f7b64b272",
+    "sdk-generated.c": "e4808727b9a3a5a0e1617d57f0d39a11bdf85443b9e3556990ea4822cef60882",
+    "sdk-original.c": "b0526b76120abffe37ee8bd87b9e204880da18a5c02383e5d39b8e001bbcbb7d",
+    "sdk-prior-overlay.c": "77827f4605a712e9057484fe5999c8a3405e3e617f3f45e52ca8933d96be6cca",
+    "test.c": "fe6118428152f3aa5a75aa265cbd5d111ed84089667c92d469069b8cbe89ed2a"
+  },
+  "physical_tested": false,
+  "scope": "Actual generated SDK RX task and unchanged receive body, host platform/allocator stubs; no firmware or QEMU timing qualification.",
+  "variants": {
+    "candidate": {
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/candidate",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/sources/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/candidate/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/candidate/test"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "function_source_sha256": "bcdfd733ebf50096e77c83957c03a2b6e8e78bc1ce01a9bd54f3afe7cac8283e",
+      "passed": true
+    },
+    "max-allocation-control": {
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/max-allocation-control",
+        "-DMAX_ALLOCATION_CONTROL=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/sources/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/max-allocation-control/test"
+      ],
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-openeth-rx-exact-20261124-02/max-allocation-control/test"
+      ],
+      "returncode": 17,
+      "expected_returncode": 17,
+      "function_source_sha256": "9cc4227d577d8108b88b6ce8b9bc329e80cb2d7ac78e84c5c4b9802e5ec276e0",
+      "passed": true
+    }
+  },
+  "passed": true
+}

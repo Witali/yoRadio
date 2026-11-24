@@ -25,7 +25,16 @@ AFTER = b'''    uint32_t length = 0;
                 if (desc.e) {
                     break;
                 }
-                length = ETH_MAX_PACKET_SIZE;
+                if (!desc.len || desc.len > ETH_MAX_PACKET_SIZE || desc.len > DMA_BUF_SIZE) {
+                    // Drop malformed frames without allocating or copying their payload.
+                    ESP_LOGW(TAG, "CYD_OPENETH_RX_DROP length=%" PRIu16, desc.len);
+                    openeth_rx_desc_t dropped = desc;
+                    dropped.e = 1;
+                    *(volatile openeth_rx_desc_t *)openeth_rx_desc(emac->cur_rx_desc) = dropped;
+                    emac->cur_rx_desc = (emac->cur_rx_desc + 1) % RX_BUF_COUNT;
+                    continue;
+                }
+                length = desc.len;
                 buffer = malloc(length);
                 if (!buffer) {
                     if (!waiting_for_memory) {
