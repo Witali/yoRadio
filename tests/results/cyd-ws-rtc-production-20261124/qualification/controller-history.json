@@ -1,0 +1,37 @@
+{
+  "scope": "Orchestration/helper outcomes, separate from production/compiler and runtime results.",
+  "original_focused_controller": {
+    "state": "TERMINAL_NONPASS",
+    "phase": "waiting for RTC GCC",
+    "reason": "Concurrent in-place status JSON write was temporarily empty; no next-profile compiler invocation had begun.",
+    "identity": {
+      "bytes": 1486,
+      "sha256": "aa85e417193ce4fbf623b4ecb09ba1c099c16669adb6994e67d88498812d9193"
+    }
+  },
+  "resumed_focused_controller": {
+    "state": "TERMINAL_PASS",
+    "validated_first_profile_reused": true,
+    "remaining_profiles": 5,
+    "identity": {
+      "bytes": 6912,
+      "sha256": "717a07fa577e2fd5447e225052c7981048555de9e39ce754dd52917ec5aa2f54"
+    }
+  },
+  "aggregation_attempts": [
+    {
+      "state": "TERMINAL_NONPASS",
+      "phase": "aggregation-helper",
+      "reason": "The mono-disabled Kconfig symbol is absent from generated JSON, as in matching normal configs; direct dictionary indexing was too strict.",
+      "source": "summarize-first-attempt.py",
+      "production_or_compiler_failure": false
+    },
+    {
+      "state": "TERMINAL_PASS",
+      "phase": "aggregation-helper",
+      "source": "summarize.py",
+      "result": ".build/cyd-ws-rtc-production-20261124/qualified/matrix.json"
+    }
+  ],
+  "runtime_outcomes_reclassified": false
+}

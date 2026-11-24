@@ -69,4 +69,10 @@ The [SDK/QEMU observations](../tests/results/cyd-ws-shared-scheduler-20261124/RE
 show 17 initial tasks instead of 18 and 1,872–2,156 more free bytes in early
 snapshots. All three outputs have a complete current-source HE-AAC pass;
 one continuous-DAC output timeout is retained separately, so repeatability
-is still open. Normal production exports remain a separate next step.
+is still open. [Six ordinary production exports](../tests/results/cyd-ws-production-20261124/README.md)
+and [six opt-in RTC exports](../tests/results/cyd-ws-rtc-production-20261124/README.md)
+are now saved from clean `b65437a1b`. Full normal Clang covers 320 project
+units and 20 SDK frontend checks without new warnings or errors; the RTC
+matrix additionally checks the changed whole WebSocket unit in all six
+profiles. Image, ELF, OTA and static-frame checks do not replace runtime
+or physical acceptance.

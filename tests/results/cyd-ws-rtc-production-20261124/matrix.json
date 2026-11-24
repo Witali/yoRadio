@@ -1,0 +1,915 @@
+{
+  "source_commit": "b65437a1bc59c9d269ce7bece597efddc70cea58",
+  "experimental": true,
+  "rtc_slow": true,
+  "physical_tested": false,
+  "scope": "Six normal-network RTC-on production images and six focused whole WebSocket translation units. Normal full-project Clang and SDK frontends are separately qualified.",
+  "normal_qualification": {
+    "matrix": {
+      "bytes": 17684,
+      "sha256": "d05454b42382b52e77e585a1bc8b6c09dc701ddffa0ac3d932e5911eb20add4d"
+    },
+    "clang_units": 320,
+    "sdk_frontends": 20,
+    "local_matrix": ".build/cyd-ws-normal-production-20261124/qualified/matrix.json",
+    "public_report": "../cyd-ws-production-20261124/README.md"
+  },
+  "source_policy": {
+    "tracked_sources_clean": true,
+    "preexisting_untracked_test_files": 3,
+    "export_allow_dirty": true,
+    "test_units_in_production_compile_commands": 0
+  },
+  "cyd_task_profile": {
+    "radio_stream": {
+      "core": 0,
+      "priority": 3,
+      "stack_bytes": 6144
+    },
+    "audio_decode": {
+      "core": 1,
+      "priority": 5,
+      "stack_bytes": 16384
+    },
+    "audio_output": {
+      "core": 1,
+      "priority": 6,
+      "stack_bytes": 4096
+    }
+  },
+  "repositories": {
+    "sdk": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+    "legacy_sdk": "735507283d5b2f9fb363a1901172dbd9e847945d",
+    "vendor": "67b8d0e98f58c774b8652480893037273190e8dc"
+  },
+  "vendor_archives": {
+    "libesp_audio_codec.a": {
+      "bytes": 4384572,
+      "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58"
+    },
+    "libesp_audio_simple_dec.a": {
+      "bytes": 156872,
+      "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6"
+    }
+  },
+  "orchestration": {
+    "original_clang_controller": "TERMINAL_NONPASS",
+    "reason": "Concurrent in-place build status JSON write was transiently empty before the next focused check; no production/compiler failure.",
+    "retained_original_status": {
+      "bytes": 1486,
+      "sha256": "aa85e417193ce4fbf623b4ecb09ba1c099c16669adb6994e67d88498812d9193"
+    },
+    "resumed_controller": "TERMINAL_PASS",
+    "completed_first_profile_reused": true
+  },
+  "rows": [
+    {
+      "profile": "vendor-pdm",
+      "backend": "pdm",
+      "experimental": true,
+      "rtc_slow": true,
+      "physical_tested": false,
+      "firmware": "firmware/development/esp32-cyd2usb-native-ws-rtc-20261124-vendor-pdm/app.bin",
+      "image": {
+        "bytes": 1588544,
+        "sha256": "36f7678ece5f96785c21fc8147dc7550f8560df51b1c99cab432cde7aa80474b"
+      },
+      "elf": {
+        "bytes": 11949304,
+        "sha256": "86c8ab3590aa959cfd0711b47eb5fc2460eb30a1f967f9524edd3659bd542649"
+      },
+      "minimum_ota_free_bytes": 180928,
+      "geometry": {
+        "workspace_object_bytes": 6560,
+        "rtc_used_bytes": 6600,
+        "rtc_reserved_bytes": 24,
+        "rtc_data_capacity_bytes": 8168,
+        "rtc_free_bytes": 1568,
+        "normal_to_rtc_heap_start_reduction": 6560,
+        "normal_to_rtc_bss_reduction": 6560
+      },
+      "workspace": {
+        "s_status": {
+          "bytes": 5120,
+          "address": 1342177360,
+          "section": ".rtc.force_slow"
+        },
+        "s_previous": {
+          "bytes": 508,
+          "address": 1342182988,
+          "section": ".rtc.force_slow"
+        },
+        "s_current": {
+          "bytes": 508,
+          "address": 1342182480,
+          "section": ".rtc.force_slow"
+        },
+        "s_clients": {
+          "bytes": 384,
+          "address": 1342183496,
+          "section": ".rtc.force_slow"
+        },
+        "s_sockets": {
+          "bytes": 40,
+          "address": 1342177320,
+          "section": ".rtc.force_slow"
+        }
+      },
+      "dram_control_and_dma": {
+        "s_running": {
+          "bytes": 1,
+          "address": 1073446124,
+          "section": ".dram0.bss"
+        },
+        "s_work_pending": {
+          "bytes": 4,
+          "address": 1073446120,
+          "section": ".dram0.bss"
+        },
+        "s_producers": {
+          "bytes": 4,
+          "address": 1073446116,
+          "section": ".dram0.bss"
+        },
+        "s_playlist_revision": {
+          "bytes": 4,
+          "address": 1073446104,
+          "section": ".dram0.bss"
+        },
+        "s_poll_timer": {
+          "bytes": 4,
+          "address": 1073446112,
+          "section": ".dram0.bss"
+        },
+        "s_display": {
+          "bytes": 5168,
+          "address": 1073434656,
+          "section": ".dram0.bss"
+        }
+      },
+      "static_frame_bytes": {
+        "decoder_task": 1760,
+        "ogp_decode_word_page": 2144
+      },
+      "normal_configuration_delta": [
+        "YORADIO_WS_STATUS_RTC_SLOW"
+      ],
+      "identities": {
+        "manifest": {
+          "bytes": 4167,
+          "sha256": "24e90ea2bd43d26e3b3f9eea90c571b8f1057b704d355a0e6f5e864b0fe58dbf"
+        },
+        "sdkconfig_json": {
+          "bytes": 49148,
+          "sha256": "1808c0352ab395b3c004b24c54102a750de628af683eff7b86d1a0c60d7724c2"
+        },
+        "compile_commands": {
+          "bytes": 6674058,
+          "sha256": "24ea7043a2968c526543c9bfc7795b6782864e32065d16ea8eba96ba2b93e329"
+        },
+        "stack": {
+          "bytes": 484,
+          "sha256": "fdf4eaa64e8fc7eee47a171e669290c8766c5b501abddd97857f5bdeb722d2b5"
+        }
+      },
+      "clang_units": 1,
+      "warnings": 1,
+      "errors": 0,
+      "exact_warning_catalog_unchanged": true,
+      "typed_compiler_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "focused_report": {
+        "bytes": 13885,
+        "sha256": "4d7970dad430cb4ccee1fb193a19d882c2b3224b67c006ad151141abb20fb94e"
+      },
+      "proofs": {
+        "production-check.json": "qualification/vendor-pdm/production-check.json",
+        "focused-clang.json": "qualification/vendor-pdm/focused-clang.json",
+        "compiler-config-delta.json": "qualification/vendor-pdm/compiler-config-delta.json",
+        "normal-config-delta.json": "qualification/vendor-pdm/normal-config-delta.json",
+        "ws-memory.json": "qualification/vendor-pdm/ws-memory.json",
+        "stack-frame.json": "qualification/vendor-pdm/stack-frame.json"
+      }
+    },
+    {
+      "profile": "vendor-continuous",
+      "backend": "continuous",
+      "experimental": true,
+      "rtc_slow": true,
+      "physical_tested": false,
+      "firmware": "firmware/development/esp32-cyd2usb-native-ws-rtc-20261124-vendor-continuous/app.bin",
+      "image": {
+        "bytes": 1582592,
+        "sha256": "43b74dcf4d4e53604649bb48c67d367965140a19b6cc108b74cd1c612b571382"
+      },
+      "elf": {
+        "bytes": 11894200,
+        "sha256": "df30c1447d903ef59d4c9cbd5e1046a765730aa7fb061e17d4656d87e0bbb71f"
+      },
+      "minimum_ota_free_bytes": 186880,
+      "geometry": {
+        "workspace_object_bytes": 6560,
+        "rtc_used_bytes": 6600,
+        "rtc_reserved_bytes": 24,
+        "rtc_data_capacity_bytes": 8168,
+        "rtc_free_bytes": 1568,
+        "normal_to_rtc_heap_start_reduction": 6560,
+        "normal_to_rtc_bss_reduction": 6560
+      },
+      "workspace": {
+        "s_status": {
+          "bytes": 5120,
+          "address": 1342177360,
+          "section": ".rtc.force_slow"
+        },
+        "s_previous": {
+          "bytes": 508,
+          "address": 1342182988,
+          "section": ".rtc.force_slow"
+        },
+        "s_current": {
+          "bytes": 508,
+          "address": 1342182480,
+          "section": ".rtc.force_slow"
+        },
+        "s_clients": {
+          "bytes": 384,
+          "address": 1342183496,
+          "section": ".rtc.force_slow"
+        },
+        "s_sockets": {
+          "bytes": 40,
+          "address": 1342177320,
+          "section": ".rtc.force_slow"
+        }
+      },
+      "dram_control_and_dma": {
+        "s_running": {
+          "bytes": 1,
+          "address": 1073445076,
+          "section": ".dram0.bss"
+        },
+        "s_work_pending": {
+          "bytes": 4,
+          "address": 1073445072,
+          "section": ".dram0.bss"
+        },
+        "s_producers": {
+          "bytes": 4,
+          "address": 1073445068,
+          "section": ".dram0.bss"
+        },
+        "s_playlist_revision": {
+          "bytes": 4,
+          "address": 1073445056,
+          "section": ".dram0.bss"
+        },
+        "s_poll_timer": {
+          "bytes": 4,
+          "address": 1073445064,
+          "section": ".dram0.bss"
+        },
+        "s_display": {
+          "bytes": 5168,
+          "address": 1073434640,
+          "section": ".dram0.bss"
+        }
+      },
+      "static_frame_bytes": {
+        "decoder_task": 1760,
+        "ogp_decode_word_page": 2144
+      },
+      "normal_configuration_delta": [
+        "YORADIO_WS_STATUS_RTC_SLOW"
+      ],
+      "identities": {
+        "manifest": {
+          "bytes": 4456,
+          "sha256": "9b6408107fc5b733dcae0d0bead547b5acb384679d480b4ee28710ef74529ec3"
+        },
+        "sdkconfig_json": {
+          "bytes": 49148,
+          "sha256": "a05bced7322814b5952434b4274bef698847528532a7d067def55c298781ef64"
+        },
+        "compile_commands": {
+          "bytes": 6697212,
+          "sha256": "cfd57f225808affd9ef425548dba0dd55c734fb368400b1729be0b57304003db"
+        },
+        "stack": {
+          "bytes": 484,
+          "sha256": "2c6d3bb1ec5a6c6d3ab1f32fcc3faf3a983b07dab105719dc23d56fe7ea86af5"
+        }
+      },
+      "clang_units": 1,
+      "warnings": 1,
+      "errors": 0,
+      "exact_warning_catalog_unchanged": true,
+      "typed_compiler_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "focused_report": {
+        "bytes": 13906,
+        "sha256": "7bd89b33b7c335c054065d149a98dcbd21c85b086b6ff3ee11dd05ea95372f21"
+      },
+      "proofs": {
+        "production-check.json": "qualification/vendor-continuous/production-check.json",
+        "focused-clang.json": "qualification/vendor-continuous/focused-clang.json",
+        "compiler-config-delta.json": "qualification/vendor-continuous/compiler-config-delta.json",
+        "normal-config-delta.json": "qualification/vendor-continuous/normal-config-delta.json",
+        "ws-memory.json": "qualification/vendor-continuous/ws-memory.json",
+        "stack-frame.json": "qualification/vendor-continuous/stack-frame.json"
+      }
+    },
+    {
+      "profile": "vendor-legacy",
+      "backend": "legacy",
+      "experimental": true,
+      "rtc_slow": true,
+      "physical_tested": false,
+      "firmware": "firmware/development/esp32-cyd2usb-native-ws-rtc-20261124-vendor-legacy/app.bin",
+      "image": {
+        "bytes": 1588128,
+        "sha256": "a8626f3f433d5145d730cc3d68e615b9b7859eab7269aaa2109e5d6f48f92423"
+      },
+      "elf": {
+        "bytes": 11930716,
+        "sha256": "dedecb572ede07219ed5e1d3983881b75932509f945cd3e8b51615d3d89c9d9e"
+      },
+      "minimum_ota_free_bytes": 181344,
+      "geometry": {
+        "workspace_object_bytes": 6560,
+        "rtc_used_bytes": 6600,
+        "rtc_reserved_bytes": 24,
+        "rtc_data_capacity_bytes": 8168,
+        "rtc_free_bytes": 1568,
+        "normal_to_rtc_heap_start_reduction": 6560,
+        "normal_to_rtc_bss_reduction": 6560
+      },
+      "workspace": {
+        "s_status": {
+          "bytes": 5120,
+          "address": 1342177360,
+          "section": ".rtc.force_slow"
+        },
+        "s_previous": {
+          "bytes": 508,
+          "address": 1342182988,
+          "section": ".rtc.force_slow"
+        },
+        "s_current": {
+          "bytes": 508,
+          "address": 1342182480,
+          "section": ".rtc.force_slow"
+        },
+        "s_clients": {
+          "bytes": 384,
+          "address": 1342183496,
+          "section": ".rtc.force_slow"
+        },
+        "s_sockets": {
+          "bytes": 40,
+          "address": 1342177320,
+          "section": ".rtc.force_slow"
+        }
+      },
+      "dram_control_and_dma": {
+        "s_running": {
+          "bytes": 1,
+          "address": 1073445116,
+          "section": ".dram0.bss"
+        },
+        "s_work_pending": {
+          "bytes": 4,
+          "address": 1073445112,
+          "section": ".dram0.bss"
+        },
+        "s_producers": {
+          "bytes": 4,
+          "address": 1073445108,
+          "section": ".dram0.bss"
+        },
+        "s_playlist_revision": {
+          "bytes": 4,
+          "address": 1073445096,
+          "section": ".dram0.bss"
+        },
+        "s_poll_timer": {
+          "bytes": 4,
+          "address": 1073445104,
+          "section": ".dram0.bss"
+        },
+        "s_display": {
+          "bytes": 5168,
+          "address": 1073434672,
+          "section": ".dram0.bss"
+        }
+      },
+      "static_frame_bytes": {
+        "decoder_task": 1760,
+        "ogp_decode_word_page": 2144
+      },
+      "normal_configuration_delta": [
+        "YORADIO_WS_STATUS_RTC_SLOW"
+      ],
+      "identities": {
+        "manifest": {
+          "bytes": 4427,
+          "sha256": "437be11aed08e1074c904b91104e23540cb77c62fdb70da5b9b45f2ec5fb4749"
+        },
+        "sdkconfig_json": {
+          "bytes": 49148,
+          "sha256": "fd11bb1babd1e216636d9eecf8e3230eeb970b59090e6cc6f3cf4caf74a5b696"
+        },
+        "compile_commands": {
+          "bytes": 6718082,
+          "sha256": "db4ff1958a201da4772be74c109b34a78530895d0ba81538e5e038f84bc1de0f"
+        },
+        "stack": {
+          "bytes": 484,
+          "sha256": "59e9f13e4ac19fc5bbd36f74f0b52dae930f8051f05dcce5e354b5be2b2ec065"
+        }
+      },
+      "clang_units": 1,
+      "warnings": 1,
+      "errors": 0,
+      "exact_warning_catalog_unchanged": true,
+      "typed_compiler_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "focused_report": {
+        "bytes": 14209,
+        "sha256": "76938cab5ae43898ee861b9208a3003dc610ac760dbe3ef94196fa0a227eb85d"
+      },
+      "proofs": {
+        "production-check.json": "qualification/vendor-legacy/production-check.json",
+        "focused-clang.json": "qualification/vendor-legacy/focused-clang.json",
+        "compiler-config-delta.json": "qualification/vendor-legacy/compiler-config-delta.json",
+        "normal-config-delta.json": "qualification/vendor-legacy/normal-config-delta.json",
+        "ws-memory.json": "qualification/vendor-legacy/ws-memory.json",
+        "stack-frame.json": "qualification/vendor-legacy/stack-frame.json"
+      }
+    },
+    {
+      "profile": "custom-flac-pdm",
+      "backend": "pdm",
+      "experimental": true,
+      "rtc_slow": true,
+      "physical_tested": false,
+      "firmware": "firmware/development/esp32-cyd2usb-native-ws-rtc-20261124-custom-flac-pdm/app.bin",
+      "image": {
+        "bytes": 1561872,
+        "sha256": "164e7568f00bbfc750541866ab57e5e6b9f83317003fa74899f0d16a19b4b667"
+      },
+      "elf": {
+        "bytes": 12013024,
+        "sha256": "486c8185e8f17d463f8a101e88c0bb11f3cfac0734af62c2bdff6dfde0189b66"
+      },
+      "minimum_ota_free_bytes": 207600,
+      "geometry": {
+        "workspace_object_bytes": 6560,
+        "rtc_used_bytes": 6600,
+        "rtc_reserved_bytes": 24,
+        "rtc_data_capacity_bytes": 8168,
+        "rtc_free_bytes": 1568,
+        "normal_to_rtc_heap_start_reduction": 6560,
+        "normal_to_rtc_bss_reduction": 6560
+      },
+      "workspace": {
+        "s_status": {
+          "bytes": 5120,
+          "address": 1342177360,
+          "section": ".rtc.force_slow"
+        },
+        "s_previous": {
+          "bytes": 508,
+          "address": 1342182988,
+          "section": ".rtc.force_slow"
+        },
+        "s_current": {
+          "bytes": 508,
+          "address": 1342182480,
+          "section": ".rtc.force_slow"
+        },
+        "s_clients": {
+          "bytes": 384,
+          "address": 1342183496,
+          "section": ".rtc.force_slow"
+        },
+        "s_sockets": {
+          "bytes": 40,
+          "address": 1342177320,
+          "section": ".rtc.force_slow"
+        }
+      },
+      "dram_control_and_dma": {
+        "s_running": {
+          "bytes": 1,
+          "address": 1073446124,
+          "section": ".dram0.bss"
+        },
+        "s_work_pending": {
+          "bytes": 4,
+          "address": 1073446120,
+          "section": ".dram0.bss"
+        },
+        "s_producers": {
+          "bytes": 4,
+          "address": 1073446116,
+          "section": ".dram0.bss"
+        },
+        "s_playlist_revision": {
+          "bytes": 4,
+          "address": 1073446104,
+          "section": ".dram0.bss"
+        },
+        "s_poll_timer": {
+          "bytes": 4,
+          "address": 1073446112,
+          "section": ".dram0.bss"
+        },
+        "s_display": {
+          "bytes": 5168,
+          "address": 1073434656,
+          "section": ".dram0.bss"
+        }
+      },
+      "static_frame_bytes": {
+        "decoder_task": 1744,
+        "ogp_decode_word_page": 2144
+      },
+      "normal_configuration_delta": [
+        "YORADIO_WS_STATUS_RTC_SLOW"
+      ],
+      "identities": {
+        "manifest": {
+          "bytes": 4202,
+          "sha256": "7b8e14da6c6867bc79a2ee73a2c6a3f410284f1058ca32f1e047836dbdd310e5"
+        },
+        "sdkconfig_json": {
+          "bytes": 49148,
+          "sha256": "f90496088fe5275ad2e1207ee04510976590b2a54e56240777f0f0d1109b3cda"
+        },
+        "compile_commands": {
+          "bytes": 6690304,
+          "sha256": "9fc58d8d65a8647e7fc411fbb9b1dd690a35df88f9c13661b46df913ef4753f7"
+        },
+        "stack": {
+          "bytes": 484,
+          "sha256": "75dc8d375433bc3aa5562692a2255549257c0d3d4dfab726658e323a4a86d019"
+        }
+      },
+      "clang_units": 1,
+      "warnings": 1,
+      "errors": 0,
+      "exact_warning_catalog_unchanged": true,
+      "typed_compiler_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "focused_report": {
+        "bytes": 13900,
+        "sha256": "acd3584beb8add1d7cb3195dc7139bb549b37ca9f71cb4dbf6195eb6cd4bc4f5"
+      },
+      "proofs": {
+        "production-check.json": "qualification/custom-flac-pdm/production-check.json",
+        "focused-clang.json": "qualification/custom-flac-pdm/focused-clang.json",
+        "compiler-config-delta.json": "qualification/custom-flac-pdm/compiler-config-delta.json",
+        "normal-config-delta.json": "qualification/custom-flac-pdm/normal-config-delta.json",
+        "ws-memory.json": "qualification/custom-flac-pdm/ws-memory.json",
+        "stack-frame.json": "qualification/custom-flac-pdm/stack-frame.json"
+      }
+    },
+    {
+      "profile": "custom-flac-continuous",
+      "backend": "continuous",
+      "experimental": true,
+      "rtc_slow": true,
+      "physical_tested": false,
+      "firmware": "firmware/development/esp32-cyd2usb-native-ws-rtc-20261124-custom-flac-continuous/app.bin",
+      "image": {
+        "bytes": 1555744,
+        "sha256": "83799734bcc2576eca1a639399135b3ff2056a3a8c856675e53631958cc930ed"
+      },
+      "elf": {
+        "bytes": 11957920,
+        "sha256": "c9cb90dfd21e232bf5476895df1e1e7af83cd4ac7f0082d4f5b57c2f5112080d"
+      },
+      "minimum_ota_free_bytes": 213728,
+      "geometry": {
+        "workspace_object_bytes": 6560,
+        "rtc_used_bytes": 6600,
+        "rtc_reserved_bytes": 24,
+        "rtc_data_capacity_bytes": 8168,
+        "rtc_free_bytes": 1568,
+        "normal_to_rtc_heap_start_reduction": 6560,
+        "normal_to_rtc_bss_reduction": 6560
+      },
+      "workspace": {
+        "s_status": {
+          "bytes": 5120,
+          "address": 1342177360,
+          "section": ".rtc.force_slow"
+        },
+        "s_previous": {
+          "bytes": 508,
+          "address": 1342182988,
+          "section": ".rtc.force_slow"
+        },
+        "s_current": {
+          "bytes": 508,
+          "address": 1342182480,
+          "section": ".rtc.force_slow"
+        },
+        "s_clients": {
+          "bytes": 384,
+          "address": 1342183496,
+          "section": ".rtc.force_slow"
+        },
+        "s_sockets": {
+          "bytes": 40,
+          "address": 1342177320,
+          "section": ".rtc.force_slow"
+        }
+      },
+      "dram_control_and_dma": {
+        "s_running": {
+          "bytes": 1,
+          "address": 1073445092,
+          "section": ".dram0.bss"
+        },
+        "s_work_pending": {
+          "bytes": 4,
+          "address": 1073445088,
+          "section": ".dram0.bss"
+        },
+        "s_producers": {
+          "bytes": 4,
+          "address": 1073445084,
+          "section": ".dram0.bss"
+        },
+        "s_playlist_revision": {
+          "bytes": 4,
+          "address": 1073445072,
+          "section": ".dram0.bss"
+        },
+        "s_poll_timer": {
+          "bytes": 4,
+          "address": 1073445080,
+          "section": ".dram0.bss"
+        },
+        "s_display": {
+          "bytes": 5168,
+          "address": 1073434656,
+          "section": ".dram0.bss"
+        }
+      },
+      "static_frame_bytes": {
+        "decoder_task": 1744,
+        "ogp_decode_word_page": 2144
+      },
+      "normal_configuration_delta": [
+        "YORADIO_WS_STATUS_RTC_SLOW"
+      ],
+      "identities": {
+        "manifest": {
+          "bytes": 4491,
+          "sha256": "9288b53e6d17a6af577c11835b1eca40307528b28951d74a4701b9b134a2b31c"
+        },
+        "sdkconfig_json": {
+          "bytes": 49148,
+          "sha256": "ecf658226da9cc6530f238222664c58b39e93e120c8bb067a5adb1b530dfb0c5"
+        },
+        "compile_commands": {
+          "bytes": 6713320,
+          "sha256": "6cf87f79855b6fbab0524bf2cde3768d9f8efa71c1b6d4b984b057ae56c65197"
+        },
+        "stack": {
+          "bytes": 484,
+          "sha256": "2de3cb7370b9ca24ed7c10ca6f0acf723336d2b3e8b8463b697c3842f495717b"
+        }
+      },
+      "clang_units": 1,
+      "warnings": 1,
+      "errors": 0,
+      "exact_warning_catalog_unchanged": true,
+      "typed_compiler_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "focused_report": {
+        "bytes": 13921,
+        "sha256": "8b7efc34283ea062b9cb11c7f222d4bb61845480ff95072de29ec67a0c83ccbf"
+      },
+      "proofs": {
+        "production-check.json": "qualification/custom-flac-continuous/production-check.json",
+        "focused-clang.json": "qualification/custom-flac-continuous/focused-clang.json",
+        "compiler-config-delta.json": "qualification/custom-flac-continuous/compiler-config-delta.json",
+        "normal-config-delta.json": "qualification/custom-flac-continuous/normal-config-delta.json",
+        "ws-memory.json": "qualification/custom-flac-continuous/ws-memory.json",
+        "stack-frame.json": "qualification/custom-flac-continuous/stack-frame.json"
+      }
+    },
+    {
+      "profile": "custom-flac-legacy",
+      "backend": "legacy",
+      "experimental": true,
+      "rtc_slow": true,
+      "physical_tested": false,
+      "firmware": "firmware/development/esp32-cyd2usb-native-ws-rtc-20261124-custom-flac-legacy/app.bin",
+      "image": {
+        "bytes": 1561200,
+        "sha256": "df4b8aa1862e8c0c4bc5521a018c5fff9e8b9c40abe65ea0d63040a7213b57b9"
+      },
+      "elf": {
+        "bytes": 11994412,
+        "sha256": "49a0240ef938e6af3172b34f48828aa90728caee555643b523f3acc9d2f3244b"
+      },
+      "minimum_ota_free_bytes": 208272,
+      "geometry": {
+        "workspace_object_bytes": 6560,
+        "rtc_used_bytes": 6600,
+        "rtc_reserved_bytes": 24,
+        "rtc_data_capacity_bytes": 8168,
+        "rtc_free_bytes": 1568,
+        "normal_to_rtc_heap_start_reduction": 6560,
+        "normal_to_rtc_bss_reduction": 6560
+      },
+      "workspace": {
+        "s_status": {
+          "bytes": 5120,
+          "address": 1342177360,
+          "section": ".rtc.force_slow"
+        },
+        "s_previous": {
+          "bytes": 508,
+          "address": 1342182988,
+          "section": ".rtc.force_slow"
+        },
+        "s_current": {
+          "bytes": 508,
+          "address": 1342182480,
+          "section": ".rtc.force_slow"
+        },
+        "s_clients": {
+          "bytes": 384,
+          "address": 1342183496,
+          "section": ".rtc.force_slow"
+        },
+        "s_sockets": {
+          "bytes": 40,
+          "address": 1342177320,
+          "section": ".rtc.force_slow"
+        }
+      },
+      "dram_control_and_dma": {
+        "s_running": {
+          "bytes": 1,
+          "address": 1073445116,
+          "section": ".dram0.bss"
+        },
+        "s_work_pending": {
+          "bytes": 4,
+          "address": 1073445112,
+          "section": ".dram0.bss"
+        },
+        "s_producers": {
+          "bytes": 4,
+          "address": 1073445108,
+          "section": ".dram0.bss"
+        },
+        "s_playlist_revision": {
+          "bytes": 4,
+          "address": 1073445096,
+          "section": ".dram0.bss"
+        },
+        "s_poll_timer": {
+          "bytes": 4,
+          "address": 1073445104,
+          "section": ".dram0.bss"
+        },
+        "s_display": {
+          "bytes": 5168,
+          "address": 1073434672,
+          "section": ".dram0.bss"
+        }
+      },
+      "static_frame_bytes": {
+        "decoder_task": 1744,
+        "ogp_decode_word_page": 2144
+      },
+      "normal_configuration_delta": [
+        "YORADIO_WS_STATUS_RTC_SLOW"
+      ],
+      "identities": {
+        "manifest": {
+          "bytes": 4462,
+          "sha256": "b078e13a6e33e70f2e73a3f754a1b16358c8f4753ec0f0382fbe607b5df4d890"
+        },
+        "sdkconfig_json": {
+          "bytes": 49148,
+          "sha256": "ee749902217beb1c5b130c9197d9b314eb1a2b4943c0c0711f51a4194c644936"
+        },
+        "compile_commands": {
+          "bytes": 6734274,
+          "sha256": "f9693b4fa6483421d1134f97e4de98562151768f9d618131a1a8220232fc2383"
+        },
+        "stack": {
+          "bytes": 484,
+          "sha256": "eb778660a425003f09f269da49f17a50b0b128bdd991615f6ac73bb5f68c237a"
+        }
+      },
+      "clang_units": 1,
+      "warnings": 1,
+      "errors": 0,
+      "exact_warning_catalog_unchanged": true,
+      "typed_compiler_delta_keys": [
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR",
+        "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE",
+        "COMPILER_NO_MERGE_CONSTANTS",
+        "COMPILER_RT_LIB_CLANGRT",
+        "COMPILER_STATIC_ANALYZER",
+        "IDF_TOOLCHAIN",
+        "IDF_TOOLCHAIN_CLANG",
+        "IDF_TOOLCHAIN_GCC",
+        "LIBC_NEWLIB",
+        "LIBC_NEWLIB_NANO_FORMAT",
+        "LIBC_PICOLIBC",
+        "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY"
+      ],
+      "focused_report": {
+        "bytes": 14224,
+        "sha256": "c5df7184a0b0545db4d5d5c971e8cb27c362d14f6c74981832e2ae3dcb3d9e67"
+      },
+      "proofs": {
+        "production-check.json": "qualification/custom-flac-legacy/production-check.json",
+        "focused-clang.json": "qualification/custom-flac-legacy/focused-clang.json",
+        "compiler-config-delta.json": "qualification/custom-flac-legacy/compiler-config-delta.json",
+        "normal-config-delta.json": "qualification/custom-flac-legacy/normal-config-delta.json",
+        "ws-memory.json": "qualification/custom-flac-legacy/ws-memory.json",
+        "stack-frame.json": "qualification/custom-flac-legacy/stack-frame.json"
+      }
+    }
+  ],
+  "runtime_archive": "../cyd-ws-shared-scheduler-20261124/README.md",
+  "qualification_scope": "Production artifact/static qualification only; diagnostic runtime outcomes, including original NONPASS, remain separately archived."
+}

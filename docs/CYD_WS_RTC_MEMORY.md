@@ -75,13 +75,24 @@ The successful PDM repeat reached only 324 bytes of minimum free heap.
 Passing this finite workload does not establish a robust margin for more
 clients or different traffic. The option therefore remains experimental.
 
-The opt-in configuration still needs normal production exports and physical
-Wi-Fi/audio, RTC timing and sleep/wake testing. The existing six production
-images predate this option and are unchanged. Extended custom Vorbis and
-private AAC work remain deferred.
+At this original runtime checkpoint, normal production exports were still
+pending. Physical Wi-Fi/audio, RTC timing and sleep/wake testing remain open.
+Extended custom Vorbis and private AAC work remain deferred.
 
 The [shared-scheduler follow-up](CYD_WS_SCHEDULER.md) frees additional task
 memory and completes the legacy two-client workload without an allocation
 failure. It preserves an intermittent continuous-DAC output timeout as a
 separate open issue. The original RTC-placement outcomes above remain the
 results of their own source revision and are not relabeled.
+
+The [production RTC matrix](../tests/results/cyd-ws-rtc-production-20261124/README.md)
+now supplies six real Wi-Fi applications from clean source `b65437a1b`:
+vendor/custom FLAC on PDM, continuous DAC and legacy DAC. Each differs from
+its [ordinary RTC-off counterpart](../tests/results/cyd-ws-production-20261124/README.md)
+only by the RTC option, and recovers exactly 6,560 bytes of DRAM. In these
+normal images RTC usage is 6,600 bytes plus the separate 24-byte reservation,
+leaving 1,568 bytes; the diagnostic figures above include a 64-byte probe.
+All six image/ELF/OTA/frame checks and focused WebSocket Clang checks pass.
+The normal matrix separately completed full Clang. These builds establish
+configuration and linkage, not a new runtime memory margin or physical
+qualification. The option remains experimental and off by default.

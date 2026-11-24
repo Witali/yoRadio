@@ -3,7 +3,21 @@
 Обновлено: 2026-11-24. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 
-Текущая точка: [WebSocket больше не требует отдельной задачи со стеком 2 КиБ](CYD_WS_SCHEDULER.md).
+Текущая точка: сохранены [шесть обычных production-образов](../tests/results/cyd-ws-production-20261124/README.md)
+и [шесть отдельных RTC-образов](../tests/results/cyd-ws-rtc-production-20261124/README.md)
+из чистого `b65437a1b`: vendor/custom FLAC × PDM/continuous/legacy.
+Обычная матрица прошла полный Clang: 320 project units и 20 SDK frontend,
+0 errors и прежние 594 предупреждения. RTC-матрица прошла шесть focused
+WebSocket Clang checks без новых предупреждений. Опция RTC остаётся
+experimental/default-off; все шесть пар освобождают ровно 6560 байт DRAM.
+В обычных RTC-образах занято 6600 байт плюс 24 байта резерва, свободно 1568;
+диагностические образы ниже включают дополнительную 64-байтную пробу.
+Конфигурации платы, сети, watchdog и привязки аудиозадач сохранены.
+Открыты разбор continuous-DAC тайм-аута, итоговая сверка плана и физическая
+приёмка после подключения платы. Сборки не подменяют ресурсные runtime gates;
+явно отложенные codec-пункты не возобновлялись.
+
+Предыдущая точка 24 ноября: [WebSocket больше не требует отдельной задачи со стеком 2 КиБ](CYD_WS_SCHEDULER.md).
 64 группы ASan/UBSan проходят с RTC и без него; Clang — 53 units, без новых
 предупреждений. [Полный HE-AAC/TLS с двумя клиентами](../tests/results/cyd-ws-shared-scheduler-20261124/README.md)
 с включённой опцией RTC проходит на всех трёх выходах без отказов памяти.
