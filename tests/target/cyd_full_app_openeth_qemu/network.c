@@ -4,14 +4,36 @@
 #include "esp_eth_netif_glue.h"
 #include "esp_event.h"
 #include "esp_netif.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include <stdio.h>
+#include <string.h>
 
 #define GOT_IPV4 BIT0
 
 static EventGroupHandle_t s_events;
 static esp_netif_t *s_eth_netif;
+
+// The Wi-Fi runtime is intentionally absent in this OpenETH application.
+// Publish the real Ethernet interface view for WebUI status capture instead;
+// no Wi-Fi profile, RSSI, power or settings-worker result is synthesized.
+esp_err_t __wrap_network_service_snapshot(network_snapshot_t *out, uint32_t timeout_ms) {
+    (void)timeout_ms; // These pinned ESP-NETIF getters are non-blocking reads.
+    if (!out) return ESP_ERR_INVALID_ARG;
+    if (!s_eth_netif) return ESP_ERR_INVALID_STATE;
+    esp_netif_ip_info_t ipv4;
+    esp_err_t result = esp_netif_get_ip_info(s_eth_netif, &ipv4);
+    if (result != ESP_OK) return result;
+    bool online = esp_netif_is_netif_up(s_eth_netif) && ipv4.ip.addr != 0;
+    memset(out, 0, sizeof(*out));
+    out->phase = online ? NETWORK_ONLINE : NETWORK_WAIT_START;
+    out->profile_index = out->target_profile = NETWORK_NO_PROFILE;
+    out->online = online;
+    out->ipv4 = online ? ipv4.ip.addr : 0;
+    out->updated_us = (uint64_t)esp_timer_get_time();
+    return ESP_OK;
+}
 
 static void on_ipv4(void *arg, esp_event_base_t base, int32_t id, void *data) {
     (void)arg;

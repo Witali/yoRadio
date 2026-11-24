@@ -421,7 +421,7 @@ def require_family1_metrics(uart, reference_metrics):
     return [dict(energy=energy, crossings=crossings) for energy, crossings in measured]
 
 
-def observe_eof(port, server, event, guest, log_path, generation, report, web_socket=None):
+def observe_eof(port, server, event, guest, log_path, generation, report, web_socket=None, websocket_peers=None):
     backend = report['audio_backend']
     fixture = server.fixtures['station']
     # The legacy driver emits x16 stereo words. The model caps the DAC clock
@@ -485,6 +485,8 @@ def observe_eof(port, server, event, guest, log_path, generation, report, web_so
             raise RuntimeError('WebUI TLS socket changed during the overlap run')
         report['web_tls_connection_preserved'] = True
     report['web_asset_after_eof'] = check_asset(port)
+    if websocket_peers is not None:
+        websocket_peers.require_status('eof', audio=False, generation=generation)
     report['observed'].append('WebUI after EOF')
     reference_md5 = report.get('input_reclaim_pcm_reference')
     if reference_md5 is not None:
@@ -689,7 +691,7 @@ def observe_input_reclaim(health, uart):
     return proof
 
 
-def observe_playback(port, server, guest, log_path, report, through_eof, web_socket=None):
+def observe_playback(port, server, guest, log_path, report, through_eof, web_socket=None, websocket_peers=None):
     backend = report['audio_backend']
     fixture = server.fixtures['station']
     codec = fixture['codec']
@@ -731,6 +733,8 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
         report['tls_overlap'] = {'heap_rx_before': 1, 'heap_rx_after': 1}
         report['observed'].append('allocator recovery with radio TLS and WebUI HTTPS both live')
     report['playing_health'] = [first]
+    if websocket_peers is not None:
+        websocket_peers.require_status('playing', audio=True, generation=status['generation'])
     if overlap:
         # The static asset route deliberately closes its connection. Use a
         # regular WebUI API response before checking EOF on this same socket.
@@ -772,7 +776,7 @@ def observe_playback(port, server, guest, log_path, report, through_eof, web_soc
     if through_eof:
         if report['health'][-1]['output_driver']['writes'] != 0:
             raise RuntimeError('EOF check requires an idle driver before Play')
-        observe_eof(port, server, events[0], guest, log_path, status['generation'], report, web_socket)
+        observe_eof(port, server, events[0], guest, log_path, status['generation'], report, web_socket, websocket_peers)
     require_clean_health(first, expected_allocation_failures=int(reclaim))
     require_clean_health(second, expected_allocation_failures=int(reclaim))
 
@@ -796,6 +800,8 @@ def main():
                         help='Require the full TLS response, exact audio output, and WebUI after EOF')
     parser.add_argument('--full-tls-records', action='store_true',
                         help='Serve and verify actual maximum-size TLS 1.2 application records')
+    parser.add_argument('--websocket-clients', type=int, choices=(0, 1, 2), default=0,
+                        help='Keep real, continuously drained HTTP WebUI WebSocket peers through playback and EOF')
     parser.add_argument('--radio-ota-lifecycle', action='store_true',
                         help='Check TLS RX reuse and failed/successful OTA during playback in disposable QEMU')
     parser.add_argument('--expect-input-reclaim', metavar='PCM_MD5',
@@ -856,6 +862,17 @@ def main():
             and re.fullmatch(r'[0-9a-f]{32}', args.expect_input_reclaim)):
         parser.error('--expect-input-reclaim requires the TLS RX and reclaim probes, full stereo Opus and a PCM MD5')
     web_https = args.web_https_fixture.resolve(strict=True) if args.web_https_fixture else None
+    websocket_factory = None
+    if args.websocket_clients:
+        if web_https or args.radio_ota_lifecycle or args.expect_channel_limit or args.expect_input_reclaim is not None:
+            parser.error('--websocket-clients requires the ordinary HTTP WebUI idle or EOF scenario')
+        if material and not args.through_eof:
+            parser.error('--websocket-clients with radio TLS requires --through-eof')
+        peer_helper = ROOT / 'tests/target/cyd_full_app_openeth_qemu/websocket_peers.py'
+        try:
+            websocket_factory = runpy.run_path(str(peer_helper))['WebSocketPeers']
+        except ImportError:
+            parser.error('--websocket-clients requires the installed websockets Python package')
     if web_https is not None and (not args.expect_input_reclaim or not web_https.is_relative_to(ROOT / '.build')):
         parser.error('--web-https-fixture requires the local fixture and --expect-input-reclaim')
     if args.short_opus_pages and not web_https:
@@ -937,6 +954,7 @@ def main():
     save()
     guest = None
     server = None
+    websocket_peers = None
     stack = ExitStack()
     try:
         web = web_port
@@ -996,6 +1014,11 @@ def main():
             save()
             require_clean_health(first)
             asset = None if web_https else check_asset(web)
+            if websocket_factory is not None:
+                websocket_peers = websocket_factory(args.websocket_clients)
+                websocket_peers.open(web)
+                websocket_peers.require_status('idle', audio=False)
+                report['websocket_peer_helper_sha256'] = digest(peer_helper.read_bytes())
             second = sample(web)
             verified_socket = web.sock if web_https else None
             if web_https:
@@ -1023,7 +1046,8 @@ def main():
                     elif web_https:
                         observe_playback(web, server, guest, log_path, report, args.through_eof, verified_socket)
                     else:
-                        observe_playback(web, server, guest, log_path, report, args.through_eof)
+                        observe_playback(web, server, guest, log_path, report, args.through_eof,
+                                         websocket_peers=websocket_peers)
                 except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException):
                     if guest.poll() is None:
                         try:
@@ -1035,6 +1059,11 @@ def main():
     except (OSError, RuntimeError, ValueError, KeyError, http.client.HTTPException) as error:
         report['reason'] = str(error)
     finally:
+        if websocket_peers is not None:
+            if not websocket_peers.close():
+                report['passed'] = False
+                report.setdefault('reason', 'A live WebSocket peer failed or did not close')
+            report['websocket'] = websocket_peers.summary()
         if guest is not None:
             if guest.poll() is None:
                 report['controller_stop'] = True
