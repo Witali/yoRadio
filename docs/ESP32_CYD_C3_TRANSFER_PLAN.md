@@ -3,7 +3,28 @@
 Обновлено: 2026-11-26. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 
-Текущая точка: [реальная трасса pbuf в QEMU](../tests/results/cyd-pbuf-failure-probe-20261124/native/README.md)
+Текущая точка: [полный RTC-off TLS/HE-AAC на трёх выходах](../tests/results/cyd-ws-streaming-20261126/README.md)
+проходит после потоковой выдачи WS-статуса в `799f6787`. Постоянный rendered
+buffer 5120 B заменён staging 1024 B и счётчиком длины 4 B; логическая ёмкость
+5120 B, все поля/экранирование, два клиента и общий deadline кадра сохранены.
+Измеренная экономия BSS/heap-start: legacy 4080 B, PDM/continuous по 4096 B.
+
+Во всех трёх прогонах полный TLS/HE-AAC даёт 614400 PCM-кадров с прежним
+SHA-256, работают WebUI после EOF и оба WS-клиента. После последнего asset
+request и закрытия клиентов global allocation failures равен нулю; отдельный
+pbuf-снимок на PCM flush также присутствует и равен нулю. Минимальная свободная
+память: legacy 3716 B, PDM 3908 B, continuous 6064 B. GCC/Clang/ELF gates
+проходят без изменения TCP/TLS, двухъядерной конфигурации и привязок задач.
+ASan/UBSan проверяют 79 групп в обоих режимах хранения, 81501 JSON differential
+cases и downstream C3/CYD. Счётчик PDM completion notifications 0 → 117 после
+EOF сохранён отдельно; это не счётчик потери PCM.
+
+Следующий offline gate — независимая actual-target проверка WS/WSS по RFC;
+её клиент и launcher подготовлены, но native cases ещё не запускались.
+Физическая Wi-Fi/аудиопроверка и явно отложенные private Vorbis/AAC scopes
+остаются отдельными пунктами. Неуспешные предыдущие прогоны сохранены.
+
+Предыдущая точка: [реальная трасса pbuf в QEMU](../tests/results/cyd-pbuf-failure-probe-20261124/native/README.md)
 локализовала все 10 наблюдённых отказов continuous DAC в `tcp_write` →
 `tcp_pbuf_prealloc`: PBUF_RAM, запрос 1512 B при MSS 1440. Полный PCM равен
 614400 кадров с прежним SHA, WebUI после EOF и два WS-клиента проходят;

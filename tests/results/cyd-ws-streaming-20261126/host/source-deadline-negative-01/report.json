@@ -1,0 +1,23 @@
+{
+  "kind": "PRODUCTION_SOURCE_NEGATIVE_CONTROL",
+  "expected_rejection_observed": true,
+  "production_qualified": false,
+  "mutation": "Renew frame_deadline_us before every nonempty staging flush",
+  "single_source_insertion": true,
+  "original_sha256": "6ff6490ccce6592ad5a986336bb266efab815bf0040945cf3dd6f385bad42a6b",
+  "mutant_sha256": "b1ed37c80c34b9d754726802c3c6e8b0cc7a831fc9c28c45b4a8072ccb99d976",
+  "host_program_exit_code": 6,
+  "integrated_runner_exit_code": 1,
+  "compile_succeeded": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "rejection_function": "capture_wire_bytes",
+  "rejection_assertion": "client && client->frame_deadline_us == capture->deadline_us",
+  "failure_log_sha256": "55a41c66cdc792bd3d3ab1afc921a141b4394ff14e4f49b0cb1c1e4f441f538a",
+  "harness_sha256": "c6bf2b083e10c1fe363ea2cb07dd11057e729a089401ee9ff9496e1458061fdf",
+  "runner_sha256": "f18a232d97835d9d55dcb58542fce656538861205b056fc5ab111f10a2230c85",
+  "scope": "One DRAM host run of the actual private production-source mutant through integrated runner; no target build, QEMU, guest traffic or tracked edits.",
+  "diagnostic_attempt": "Optional host gdb unavailable; no debugger rerun of the program occurred; exact assertion is sufficient for this receipt."
+}

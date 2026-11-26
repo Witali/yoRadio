@@ -1,0 +1,68 @@
+In file included from /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/integration.c:10:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:45:8: error: unknown type name ‘esp_timer_handle_t’
+   45 | static esp_timer_handle_t s_poll_timer;
+      |        ^~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:47:1: error: data definition has no type or storage class [-Werror]
+   47 | ESP_EVENT_DEFINE_BASE(WS_STATUS_EVENT);
+      | ^~~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:47:1: error: type defaults to ‘int’ in declaration of ‘ESP_EVENT_DEFINE_BASE’ [-Werror=implicit-int]
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:47:1: error: parameter names (without types) in function declaration [-Werror]
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:51:8: error: unknown type name ‘WS_STATUS_STORAGE’
+   51 | static WS_STATUS_STORAGE ws_client_t s_clients[WS_CLIENT_LIMIT];
+      |        ^~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:51:38: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘s_clients’
+   51 | static WS_STATUS_STORAGE ws_client_t s_clients[WS_CLIENT_LIMIT];
+      |                                      ^~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:52:8: error: unknown type name ‘WS_STATUS_STORAGE’
+   52 | static WS_STATUS_STORAGE ws_status_key_t s_previous, s_current;
+      |        ^~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:52:42: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘s_previous’
+   52 | static WS_STATUS_STORAGE ws_status_key_t s_previous, s_current;
+      |                                          ^~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:55:25: error: expected ‘;’ before ‘char’
+   55 | static WS_STATUS_STORAGE char s_status_stage[WS_STATUS_STAGE_BYTES];
+      |                         ^~~~~
+      |                         ;
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:57:25: error: expected ‘;’ before ‘int’
+   57 | static WS_STATUS_STORAGE int s_sockets[CONFIG_LWIP_MAX_SOCKETS];
+      |                         ^~~~
+      |                         ;
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc: In function ‘session_free’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:65:24: error: ‘s_clients’ undeclared (first use in this function); did you mean ‘client’?
+   65 |         if (client == &s_clients[i]) {
+      |                        ^~~~~~~~~
+      |                        client
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:65:24: note: each undeclared identifier is reported only once for each function it appears in
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc: In function ‘send_complete_frame_bytes’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:78:66: error: ‘s_clients’ undeclared (first use in this function); did you mean ‘client’?
+   78 |     for (size_t i = 0; i < WS_CLIENT_LIMIT; ++i) if (context == &s_clients[i]) client = &s_clients[i];
+      |                                                                  ^~~~~~~~~
+      |                                                                  client
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc: In function ‘receive_complete_frame_bytes’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:116:66: error: ‘s_clients’ undeclared (first use in this function); did you mean ‘client’?
+  116 |     for (size_t i = 0; i < WS_CLIENT_LIMIT; ++i) if (context == &s_clients[i]) client = &s_clients[i];
+      |                                                                  ^~~~~~~~~
+      |                                                                  client
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc: In function ‘find_client’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:160:25: error: ‘s_clients’ undeclared (first use in this function); did you mean ‘ws_client_t’?
+  160 |         if (context == &s_clients[i]) return &s_clients[i];
+      |                         ^~~~~~~~~
+      |                         ws_client_t
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc: In function ‘websocket_service_register’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/application.inc:283:16: error: ‘s_clients’ undeclared (first use in this function); did you mean ‘ws_client_t’?
+  283 |         memset(s_clients, 0, sizeof(s_clients));
+      |                ^~~~~~~~~
+      |                ws_client_t
+In file included from /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/integration.c:11:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/sources/tests/native/ws_integration/platform.c: In function ‘httpd_resp_send_err’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/sources/tests/native/ws_integration/platform.c:64:29: error: ‘s_clients’ undeclared (first use in this function); did you mean ‘ws_client_t’?
+   64 |     for(size_t i=0;i<sizeof(s_clients)/sizeof(*s_clients);++i)assert(!s_clients[i].used);
+      |                             ^~~~~~~~~
+      |                             ws_client_t
+In file included from /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/cyd/integration.c:12:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/sources/tests/native/ws_integration/test.c: In function ‘close_session’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/protocol-integrated-01/sources/tests/native/ws_integration/test.c:41:29: error: ‘s_clients’ undeclared (first use in this function); did you mean ‘ws_client_t’?
+   41 |     for(size_t i=0;i<sizeof(s_clients)/sizeof(*s_clients);++i)
+      |                             ^~~~~~~~~
+      |                             ws_client_t
+cc1: all warnings being treated as errors

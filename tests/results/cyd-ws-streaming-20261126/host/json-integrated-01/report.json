@@ -1,0 +1,231 @@
+{
+  "scope": "Private portable representation only; exact original f7 JSON header is the differential oracle. No target frames, network framing, timing or hardware qualification.",
+  "source_commit_reference": "f7dee344fb30ce109f2d30a01f0325d353e3b2eb",
+  "physical_tested": false,
+  "original_header_sha256": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+  "source_pins": {
+    "tests/native/json_sink_test.c": "c480f650fdadf40f940f2c8688ff28926698632398b96b5dde7ac9dea71577e5",
+    "tests/run-json-sink.py": "4e41b6af0cab3c05e652a4c9671a977f0b1373768401cfdacbc037c6952db203",
+    "idf/components/native_stream/include/json_string_span.h": "31c8f2bf53560ecc240a7e383df279d92d5b1da3210d084ce460d9ca25d35973",
+    "idf/components/native_stream/include/json_buffer.h": "878cedfc75662a8a67e51e40ccf47f279b25ecbd428f74c0aadad3cf6492f183",
+    "idf/components/native_stream/include/json_sink.h": "c5ae11e5339c1ce0fd25bad06e13950501e89d3a1b85319e35490126978016d3"
+  },
+  "variants": {
+    "candidate": {
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/candidate",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/candidate/test_json_sink.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/candidate/test"
+      ],
+      "compiled_header_pins": {
+        "json_buffer.h": "44f4699aad6d04a4ed57f5724564d55f3a7c1c763ded3b2043c5912b249668af",
+        "json_sink.h": "1b57982ae2ce1c4f0c4eda98c2e2eb2b12b6298c4c138bb18b67e8eac358e141",
+        "json_string_span.h": "79305f71a91da54b0f228d5601f272a8049d7fa75a3527e2c14d0363daad5f32",
+        "original_json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+      },
+      "build_returncode": 0,
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/candidate/test"
+      ],
+      "returncode": 0,
+      "expected_returncode": 0,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-test_json_sink.su",
+          "sha256": "1c59c907d7038c0b2a11d92cafedd03b29d2248d685b9c40e3b1e8463d46fb20"
+        }
+      ],
+      "differential_cases": 81501,
+      "host_buffer_layout_bytes": 32
+    },
+    "replacement-codepoint-negative": {
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/replacement-codepoint-negative",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/replacement-codepoint-negative/test_json_sink.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/replacement-codepoint-negative/test"
+      ],
+      "compiled_header_pins": {
+        "json_buffer.h": "44f4699aad6d04a4ed57f5724564d55f3a7c1c763ded3b2043c5912b249668af",
+        "json_sink.h": "1b57982ae2ce1c4f0c4eda98c2e2eb2b12b6298c4c138bb18b67e8eac358e141",
+        "json_string_span.h": "e74cd7cd5ce3fbe7f68e1039509c2a0dd8884bd7b6fda9733f685a5e7e872bcb",
+        "original_json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+      },
+      "build_returncode": 0,
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/replacement-codepoint-negative/test"
+      ],
+      "returncode": 42,
+      "expected_returncode": 42,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-test_json_sink.su",
+          "sha256": "ac46c076df8ab7b3d9aea0024f28c0508a2a91c7729e8c4a8a4448ce2afd4f7d"
+        }
+      ]
+    },
+    "capacity-off-by-one-negative": {
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/capacity-off-by-one-negative",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/capacity-off-by-one-negative/test_json_sink.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/capacity-off-by-one-negative/test"
+      ],
+      "compiled_header_pins": {
+        "json_buffer.h": "44f4699aad6d04a4ed57f5724564d55f3a7c1c763ded3b2043c5912b249668af",
+        "json_sink.h": "5a2a73880cbd58a00dd35223e6fc03d6e2a962a7c071da1056e98c222212d3ae",
+        "json_string_span.h": "79305f71a91da54b0f228d5601f272a8049d7fa75a3527e2c14d0363daad5f32",
+        "original_json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+      },
+      "build_returncode": 0,
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/capacity-off-by-one-negative/test"
+      ],
+      "returncode": 42,
+      "expected_returncode": 42,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-test_json_sink.su",
+          "sha256": "401ae8b5948d6a871a70d44fd68fb225af214ea2a5df03d458379318cb4549c2"
+        }
+      ]
+    },
+    "ignore-writer-failure-negative": {
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/ignore-writer-failure-negative",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/ignore-writer-failure-negative/test_json_sink.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/ignore-writer-failure-negative/test"
+      ],
+      "compiled_header_pins": {
+        "json_buffer.h": "44f4699aad6d04a4ed57f5724564d55f3a7c1c763ded3b2043c5912b249668af",
+        "json_sink.h": "b85026896116a933def9fc0214f175dbc61a095edc3f0bc2178f14eeb237adc1",
+        "json_string_span.h": "79305f71a91da54b0f228d5601f272a8049d7fa75a3527e2c14d0363daad5f32",
+        "original_json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+      },
+      "build_returncode": 0,
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/ignore-writer-failure-negative/test"
+      ],
+      "returncode": 42,
+      "expected_returncode": 42,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-test_json_sink.su",
+          "sha256": "1889f08b0a641ecc3ac963d4e4195ea61227d431a26f2677852dbd6ca2c291da"
+        }
+      ]
+    },
+    "unchecked-overflow-negative": {
+      "build_command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-fstack-usage",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/unchecked-overflow-negative",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/unchecked-overflow-negative/test_json_sink.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/unchecked-overflow-negative/test"
+      ],
+      "compiled_header_pins": {
+        "json_buffer.h": "44f4699aad6d04a4ed57f5724564d55f3a7c1c763ded3b2043c5912b249668af",
+        "json_sink.h": "6bb757df2c62efe0b056da74f33c6162a423ba8c5ac23f7ea1deb6aa784a100b",
+        "json_string_span.h": "79305f71a91da54b0f228d5601f272a8049d7fa75a3527e2c14d0363daad5f32",
+        "original_json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+      },
+      "build_returncode": 0,
+      "test_command": [
+        "env",
+        "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+        "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cws-stream26/json-integrated-01/unchecked-overflow-negative/test"
+      ],
+      "returncode": 42,
+      "expected_returncode": 42,
+      "passed": true,
+      "host_stack_usage": [
+        {
+          "file": "test-test_json_sink.su",
+          "sha256": "434beeed30cfb0edd5eb60402f8c42d32ae5487bc9e7608adf7e0be8be1ab890"
+        }
+      ]
+    }
+  },
+  "passed": true,
+  "groups": 6,
+  "differential_cases": 81501,
+  "rejected_controls": 4
+}
