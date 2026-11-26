@@ -1,0 +1,41 @@
+test_false_positive_window_and_endian_relations_rejected (__main__.PositiveWindowTests.test_false_positive_window_and_endian_relations_rejected) ... ok
+test_positive_small_window_head_and_wrap_supported (__main__.PositiveWindowTests.test_positive_small_window_head_and_wrap_supported) ... ok
+test_actual_reader_reset_handoff_and_sender_reset_never_promoted (__main__.RemoteTerminationTests.test_actual_reader_reset_handoff_and_sender_reset_never_promoted) ... ok
+test_both_timeout_bases_require_actual_caller_minus_three (__main__.RemoteTerminationTests.test_both_timeout_bases_require_actual_caller_minus_three) ... ok
+test_controls_require_exact_normal_Close_and_orderly_TLS (__main__.RemoteTerminationTests.test_controls_require_exact_normal_Close_and_orderly_TLS) ... ok
+test_exact_close_payload_recorded_only_after_complete_send (__main__.RemoteTerminationTests.test_exact_close_payload_recorded_only_after_complete_send) ... ok
+test_final_proof_shape_owner_tuple_and_no_inference (__main__.RemoteTerminationTests.test_final_proof_shape_owner_tuple_and_no_inference) ... FAIL
+test_peer_only_RST_missing_witness_or_bad_handoff_never_pass (__main__.RemoteTerminationTests.test_peer_only_RST_missing_witness_or_bad_handoff_never_pass) ... ok
+test_plain_and_ragged_EOF_require_real_abort_and_server_termination (__main__.RemoteTerminationTests.test_plain_and_ragged_EOF_require_real_abort_and_server_termination) ... ok
+test_ragged_tls_and_verification_failure_are_not_reset (__main__.RemoteTerminationTests.test_ragged_tls_and_verification_failure_are_not_reset) ... ok
+test_receive_reset_distinct_from_EOF_and_local_or_send_reset (__main__.RemoteTerminationTests.test_receive_reset_distinct_from_EOF_and_local_or_send_reset) ... ok
+test_reset_pending_until_final_matching_server_RST (__main__.RemoteTerminationTests.test_reset_pending_until_final_matching_server_RST) ... ok
+test_command_and_io_bounds_and_stop_before_send (__main__.Tests.test_command_and_io_bounds_and_stop_before_send) ... ok
+test_complete_group_trailing_playlist_and_initialization (__main__.Tests.test_complete_group_trailing_playlist_and_initialization) ... ok
+test_declared_bounds (__main__.Tests.test_declared_bounds) ... ok
+test_final_wire_accounting_cannot_precede_cleanup (__main__.Tests.test_final_wire_accounting_cannot_precede_cleanup) ... ok
+test_frozen_pin_and_exact_reader (__main__.Tests.test_frozen_pin_and_exact_reader) ... ok
+test_missing_wrong_fd_deadline_and_host_witness_rejected (__main__.Tests.test_missing_wrong_fd_deadline_and_host_witness_rejected) ... ok
+test_no_reads_while_withheld_and_close_not_eof (__main__.Tests.test_no_reads_while_withheld_and_close_not_eof) ... ok
+test_no_witness_no_final_accounting_no_eof_promotion (__main__.Tests.test_no_witness_no_final_accounting_no_eof_promotion) ... ok
+test_preconnect_buffer_order_and_failure_cleanup (__main__.Tests.test_preconnect_buffer_order_and_failure_cleanup) ... ok
+test_same_frame_deadline_and_no_snapshot_mutation (__main__.Tests.test_same_frame_deadline_and_no_snapshot_mutation) ... ok
+test_same_socket_cross_thread_io_rejected_without_read_lock (__main__.Tests.test_same_socket_cross_thread_io_rejected_without_read_lock) ... ok
+test_scripted_modes_threads_cleanup_no_live_socket (__main__.Tests.test_scripted_modes_threads_cleanup_no_live_socket) ... ok
+test_scripted_watchdog_joins_all_workers (__main__.Tests.test_scripted_watchdog_joins_all_workers) ... ok
+test_select_zero_basis_actual_ticks_no_invented_clock (__main__.Tests.test_select_zero_basis_actual_ticks_no_invented_clock) ... ok
+test_status_schema_negative_controls (__main__.Tests.test_status_schema_negative_controls) ... ok
+test_wss_uses_exact_frozen_verifier_and_cipher (__main__.Tests.test_wss_uses_exact_frozen_verifier_and_cipher) ... ok
+
+======================================================================
+FAIL: test_final_proof_shape_owner_tuple_and_no_inference (__main__.RemoteTerminationTests.test_final_proof_shape_owner_tuple_and_no_inference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File ".build\cws-rfc26\test-pressure-peer-v2.py", line 470, in test_final_proof_shape_owner_tuple_and_no_inference
+    self.assertEqual(o.snapshot()["wire"]["selected_slow_terminal"]["server"]["rsts"],1)
+AssertionError: 999 != 1
+
+----------------------------------------------------------------------
+Ran 28 tests in 12.343s
+
+FAILED (failures=1)

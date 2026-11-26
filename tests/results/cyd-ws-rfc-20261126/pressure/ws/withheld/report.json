@@ -1,0 +1,718 @@
+{
+  "state": "PASS",
+  "mode": "withheld",
+  "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+  "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+  "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+  "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+  "physical_tested": false,
+  "pressure_objective": "PASS",
+  "control_state": "INCOMPLETE",
+  "errors": [],
+  "raw_material_outside_repositories": true,
+  "original_peer_watchdog_unchanged": true,
+  "roles": [
+    {
+      "role": "slow",
+      "guest_fd": 57,
+      "pcb": "0x3ffbd478",
+      "guest_tuple": {
+        "local_ip": "10.0.2.15",
+        "remote_ip": "10.0.2.2",
+        "local_port": 80,
+        "remote_port": 62947
+      }
+    },
+    {
+      "role": "healthy",
+      "guest_fd": 58,
+      "pcb": "0x3ffbd30c",
+      "guest_tuple": {
+        "local_ip": "10.0.2.15",
+        "remote_ip": "10.0.2.2",
+        "local_port": 80,
+        "remote_port": 62948
+      }
+    }
+  ],
+  "post_close_health": {
+    "boot_id": "d9fef29e35978194",
+    "uptime_ms": 18952,
+    "heap": 171076,
+    "largest": 110592,
+    "minimum_heap": 159156,
+    "allocation_failures": 0,
+    "decoder_sequence": 0,
+    "stream_sequence": 0,
+    "output_failures": 0,
+    "write_errors": 0,
+    "write_timeouts": 0,
+    "short_writes": 0,
+    "completion_queue_drops": null
+  },
+  "health_after_peer_and_debugger_close": true,
+  "elapsed_seconds": 22.454,
+  "outer_seconds": 210.0,
+  "peer_joined": true,
+  "collector_joined_before_close": true,
+  "watcher_joined": true,
+  "provisional_wire_samples": 98,
+  "guest_stopped": true,
+  "observer": {
+    "binding": {
+      "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+      "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+      "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+      "guest_fd": 57,
+      "pcb": "0x3ffbd478",
+      "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5"
+    },
+    "guest_tuple": {
+      "local_ip": "10.0.2.15",
+      "remote_ip": "10.0.2.2",
+      "local_port": 80,
+      "remote_port": 62947
+    },
+    "wire_guard": {
+      "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+      "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+      "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+      "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+      "evidence_sha256": "c253815bf97fe2981a562cbf56e06ed12ce6854305b695922fa5de029e717723",
+      "max_unique_server_tcp_payload": 8388608,
+      "coverage": "all-owned-server-connections-from-connect"
+    },
+    "pressure": {
+      "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+      "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+      "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+      "guest_fd": 57,
+      "pcb": "0x3ffbd478",
+      "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+      "kind": "guest-pressure",
+      "origin": "root-gdb-send-frame",
+      "evidence_sha256": "eef7d72477a2e03f941f67a71572b58f737b9eb1bd9a761bf364834fc8a47347",
+      "frame_id": "fd57-d18836160",
+      "start_us": 17836160,
+      "deadline_us": 18836160,
+      "observed_us": 17838777,
+      "start_basis": "derived-from-stored-deadline",
+      "entry_clock_observed": false,
+      "source_constructor_budget_us": 1000000,
+      "errno": "EAGAIN",
+      "clock_basis": "actual-target-retry-clock",
+      "would_block_write": true,
+      "pressure_basis": "positive-peer-window-unsent-head-blocked",
+      "guest_queue_sample_site": "actual-would-block-branch",
+      "debugger": {
+        "max_stops": 512,
+        "max_single_stop_seconds": 2.0,
+        "max_total_pause_seconds": 30.0,
+        "stops": 4,
+        "max_observed_stop_seconds": 0.4529999999795109,
+        "total_observed_pause_seconds": 1.046000000089407,
+        "budget_exceeded": false
+      },
+      "guest_queue": {
+        "snd_wnd": 286,
+        "snd_buf": 0,
+        "snd_queuelen": 4,
+        "unsent": "0x3ffbd610",
+        "unacked": "0x0",
+        "cwnd": 24500,
+        "lastack": 1649468502,
+        "unsent_head": {
+          "pointer": "0x3ffbd610",
+          "tcphdr_pointer": "0x3ffbd8ec",
+          "len": 1440,
+          "seqno_raw": 1457803362,
+          "seqno_host": 1649468502,
+          "seqno_conversion": "ntohl-u32-from-little-endian-target",
+          "seq_distance": 0,
+          "sequence_end": 1440
+        }
+      }
+    },
+    "timeout": {
+      "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+      "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+      "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+      "guest_fd": 57,
+      "pcb": "0x3ffbd478",
+      "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+      "kind": "guest-timeout",
+      "origin": "root-gdb-send-frame",
+      "evidence_sha256": "ecdcaa3790c01b44682eeb5c6065cad563fda877c1b09c6b90d41aaf6f58b03c",
+      "frame_id": "fd57-d18836160",
+      "start_us": 17836160,
+      "deadline_us": 18836160,
+      "observed_us": null,
+      "start_basis": "derived-from-stored-deadline",
+      "entry_clock_observed": false,
+      "source_constructor_budget_us": 1000000,
+      "preselect_us": 17838777,
+      "remaining_us": 997383,
+      "timeval_us": 997383,
+      "select_result": 0,
+      "caller_result": -3,
+      "tick_before": 17786,
+      "tick_after": 18801,
+      "tick_delta": 1015,
+      "tick_hz": 1000,
+      "result": "HTTPD_SOCK_ERR_TIMEOUT",
+      "timeout_basis": "select-zero-original-remainder",
+      "debugger": {
+        "max_stops": 512,
+        "max_single_stop_seconds": 2.0,
+        "max_total_pause_seconds": 30.0,
+        "stops": 9,
+        "max_observed_stop_seconds": 0.4529999999795109,
+        "total_observed_pause_seconds": 1.9990000003017485,
+        "budget_exceeded": false
+      },
+      "post_select_timer_observed": false,
+      "tick_quantization_us": 1000,
+      "tick_lateness_estimate_us": 17617
+    },
+    "wire": {
+      "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+      "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+      "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+      "guest_fd": 57,
+      "pcb": "0x3ffbd478",
+      "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+      "kind": "wire-accounting",
+      "origin": "root-pcap-unique-tcp",
+      "evidence_sha256": "14ebafaa2f3099ac8f23c193f5429bfbb6dfeebeab9fa520b94997ccb5de6001",
+      "unique_tcp_payload_bytes": 217246,
+      "final": true,
+      "coverage": "all-owned-server-connections-from-connect",
+      "selected_slow_terminal": {
+        "role": "slow",
+        "guest_fd": 57,
+        "pcb": "0x3ffbd478",
+        "guest_tuple": {
+          "local_ip": "10.0.2.15",
+          "remote_ip": "10.0.2.2",
+          "local_port": 80,
+          "remote_port": 62947
+        },
+        "terminal_basis": "captured-rst-with-sequence-and-ack-consistency",
+        "server": {
+          "payload_bytes": 203871,
+          "fin_offset": null,
+          "sequence_end": 203871,
+          "fin_acked": false,
+          "max_ack": 4734,
+          "rsts": 1
+        },
+        "peer": {
+          "payload_bytes": 5168,
+          "fin_offset": null,
+          "sequence_end": 5168,
+          "fin_acked": false,
+          "max_ack": 203871,
+          "rsts": 0
+        },
+        "captured_ranges_contiguous": true,
+        "missing_bytes_inferred": false
+      }
+    },
+    "invalid": [],
+    "incomplete_reasons": [],
+    "connections_closed": true
+  },
+  "collector": {
+    "state": "PROJECT_TIMEOUT_WITNESSED",
+    "category": null,
+    "initial_clients": [
+      {
+        "client_index": 0,
+        "guest_fd": 57,
+        "pcb": "0x3ffbd478",
+        "guest_tuple": {
+          "local_ip": "10.0.2.15",
+          "remote_ip": "10.0.2.2",
+          "local_port": 80,
+          "remote_port": 62947
+        },
+        "closing": false
+      },
+      {
+        "client_index": 1,
+        "guest_fd": 58,
+        "pcb": "0x3ffbd30c",
+        "guest_tuple": {
+          "local_ip": "10.0.2.15",
+          "remote_ip": "10.0.2.2",
+          "local_port": 80,
+          "remote_port": 62948
+        },
+        "closing": false
+      }
+    ],
+    "debugger": {
+      "max_stops": 512,
+      "max_single_stop_seconds": 2.0,
+      "max_total_pause_seconds": 30.0,
+      "stops": 10,
+      "max_observed_stop_seconds": 0.4529999999795109,
+      "total_observed_pause_seconds": 2.014000000199303,
+      "budget_exceeded": false,
+      "scope": "Observed host stop-to-resume intervals; excludes some RSP latency, not guest latency"
+    },
+    "attached": false,
+    "started": true,
+    "closed": true,
+    "mode": "withheld",
+    "events": 28,
+    "io_cleanup": {
+      "process_stopped": true,
+      "reader_joined": true,
+      "stdin_closed": true,
+      "stdout_closed": true,
+      "pipe_EOF": true,
+      "issues": []
+    }
+  },
+  "peer": {
+    "mode": "withheld",
+    "declaration": {
+      "case_watchdog_seconds": 30.0,
+      "io_cutoff_seconds": 27.0,
+      "cleanup_seconds": 3.0,
+      "max_commands": 593,
+      "hard_max_commands": 1024,
+      "command_payload_bytes": 8,
+      "max_command_wire_bytes": 8302,
+      "max_application_ws_bytes": 6288739,
+      "slow_stimulus_commands": 511,
+      "planned_total_commands": 524,
+      "max_total_attempted_client_ws_bytes": 16383,
+      "max_legal_group_bytes": 5199,
+      "unsolicited_reserve": 3129798,
+      "initialization_reserve": 10398,
+      "control_reserve": 65536,
+      "separate_tls_reserve": 2097152,
+      "max_unique_server_tcp_payload": 8388608,
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "tls_record_count_inferred": false,
+      "receive_buffer_requested": 2048,
+      "max_inflight_stimulus_bytes": 14,
+      "syscall_timeout_seconds": 0.1,
+      "frozen_client_sha256": "3dcfc669de604238fd237ee5490e794f9988e547aa7de3a8c343d8fa57bae9f0"
+    },
+    "errors": [],
+    "threads_joined": true,
+    "healthy_progress_after_stimulus": true,
+    "slow_transport_eof": true,
+    "slow_resume_pong": false,
+    "slow_close_seen": false,
+    "slow_local_close": true,
+    "watchdog_fired": false,
+    "observation_exhausted": false,
+    "sender_joined_before_read": true,
+    "slow_closed_before_reader": false,
+    "slow_remote_reset": false,
+    "slow_termination_kind": "orderly-eof",
+    "slow_secure": false,
+    "slow_normal_close_sent": false,
+    "slow_normal_close_received": false,
+    "slow_reader_timeout_token": {
+      "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+      "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+      "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+      "guest_fd": 57,
+      "pcb": "0x3ffbd478",
+      "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+      "guest_tuple": {
+        "local_ip": "10.0.2.15",
+        "remote_ip": "10.0.2.2",
+        "local_port": 80,
+        "remote_port": 62947
+      },
+      "frame_id": "fd57-d18836160",
+      "start_us": 17836160,
+      "deadline_us": 18836160,
+      "timeout_basis": "select-zero-original-remainder",
+      "caller_result": -3
+    },
+    "slow_termination_token": {
+      "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+      "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+      "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+      "guest_fd": 57,
+      "pcb": "0x3ffbd478",
+      "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+      "guest_tuple": {
+        "local_ip": "10.0.2.15",
+        "remote_ip": "10.0.2.2",
+        "local_port": 80,
+        "remote_port": 62947
+      },
+      "frame_id": "fd57-d18836160",
+      "start_us": 17836160,
+      "deadline_us": 18836160,
+      "timeout_basis": "select-zero-original-remainder",
+      "caller_result": -3
+    },
+    "local_closed_at_termination": false,
+    "initialization": [
+      {
+        "complete_groups": 1,
+        "server_ws_bytes": 661
+      },
+      {
+        "complete_groups": 1,
+        "server_ws_bytes": 661
+      }
+    ],
+    "calibration": [
+      {
+        "complete_groups": 1,
+        "server_ws_bytes": 661
+      },
+      {
+        "complete_groups": 1,
+        "server_ws_bytes": 661
+      }
+    ],
+    "receive_buffers": [
+      {
+        "requested": 2048,
+        "actual": [
+          2048
+        ]
+      },
+      {
+        "requested": 2048,
+        "actual": [
+          2048
+        ]
+      }
+    ],
+    "tls": [
+      null,
+      null
+    ],
+    "withheld_prefetched_ws_bytes": 0,
+    "slow_eof_observed_at_sender_join": false,
+    "slow_clean_tls_eof": null,
+    "withheld_read_calls": 0,
+    "slow_received_ws_bytes": 71548,
+    "healthy_received_ws_bytes": 9105,
+    "commands_attempted": 367,
+    "commands_completed": 367,
+    "partial_command_frames": 0,
+    "max_command_input_bytes": 5138,
+    "elapsed_seconds": 11.219000000040978,
+    "attempted_client_ws_bytes": 5328,
+    "decoded_server_ws_bytes": 80653,
+    "slow_io_overlaps": 0,
+    "healthy_io_overlaps": 0,
+    "state": "PASS",
+    "pressure_objective": "PASS",
+    "control_state": "INCOMPLETE",
+    "observer": {
+      "binding": {
+        "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+        "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+        "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+        "guest_fd": 57,
+        "pcb": "0x3ffbd478",
+        "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5"
+      },
+      "guest_tuple": {
+        "local_ip": "10.0.2.15",
+        "remote_ip": "10.0.2.2",
+        "local_port": 80,
+        "remote_port": 62947
+      },
+      "wire_guard": {
+        "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+        "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+        "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+        "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+        "evidence_sha256": "c253815bf97fe2981a562cbf56e06ed12ce6854305b695922fa5de029e717723",
+        "max_unique_server_tcp_payload": 8388608,
+        "coverage": "all-owned-server-connections-from-connect"
+      },
+      "pressure": {
+        "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+        "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+        "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+        "guest_fd": 57,
+        "pcb": "0x3ffbd478",
+        "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+        "kind": "guest-pressure",
+        "origin": "root-gdb-send-frame",
+        "evidence_sha256": "eef7d72477a2e03f941f67a71572b58f737b9eb1bd9a761bf364834fc8a47347",
+        "frame_id": "fd57-d18836160",
+        "start_us": 17836160,
+        "deadline_us": 18836160,
+        "observed_us": 17838777,
+        "start_basis": "derived-from-stored-deadline",
+        "entry_clock_observed": false,
+        "source_constructor_budget_us": 1000000,
+        "errno": "EAGAIN",
+        "clock_basis": "actual-target-retry-clock",
+        "would_block_write": true,
+        "pressure_basis": "positive-peer-window-unsent-head-blocked",
+        "guest_queue_sample_site": "actual-would-block-branch",
+        "debugger": {
+          "max_stops": 512,
+          "max_single_stop_seconds": 2.0,
+          "max_total_pause_seconds": 30.0,
+          "stops": 4,
+          "max_observed_stop_seconds": 0.4529999999795109,
+          "total_observed_pause_seconds": 1.046000000089407,
+          "budget_exceeded": false
+        },
+        "guest_queue": {
+          "snd_wnd": 286,
+          "snd_buf": 0,
+          "snd_queuelen": 4,
+          "unsent": "0x3ffbd610",
+          "unacked": "0x0",
+          "cwnd": 24500,
+          "lastack": 1649468502,
+          "unsent_head": {
+            "pointer": "0x3ffbd610",
+            "tcphdr_pointer": "0x3ffbd8ec",
+            "len": 1440,
+            "seqno_raw": 1457803362,
+            "seqno_host": 1649468502,
+            "seqno_conversion": "ntohl-u32-from-little-endian-target",
+            "seq_distance": 0,
+            "sequence_end": 1440
+          }
+        }
+      },
+      "timeout": {
+        "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+        "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+        "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+        "guest_fd": 57,
+        "pcb": "0x3ffbd478",
+        "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+        "kind": "guest-timeout",
+        "origin": "root-gdb-send-frame",
+        "evidence_sha256": "ecdcaa3790c01b44682eeb5c6065cad563fda877c1b09c6b90d41aaf6f58b03c",
+        "frame_id": "fd57-d18836160",
+        "start_us": 17836160,
+        "deadline_us": 18836160,
+        "observed_us": null,
+        "start_basis": "derived-from-stored-deadline",
+        "entry_clock_observed": false,
+        "source_constructor_budget_us": 1000000,
+        "preselect_us": 17838777,
+        "remaining_us": 997383,
+        "timeval_us": 997383,
+        "select_result": 0,
+        "caller_result": -3,
+        "tick_before": 17786,
+        "tick_after": 18801,
+        "tick_delta": 1015,
+        "tick_hz": 1000,
+        "result": "HTTPD_SOCK_ERR_TIMEOUT",
+        "timeout_basis": "select-zero-original-remainder",
+        "debugger": {
+          "max_stops": 512,
+          "max_single_stop_seconds": 2.0,
+          "max_total_pause_seconds": 30.0,
+          "stops": 9,
+          "max_observed_stop_seconds": 0.4529999999795109,
+          "total_observed_pause_seconds": 1.9990000003017485,
+          "budget_exceeded": false
+        },
+        "post_select_timer_observed": false,
+        "tick_quantization_us": 1000,
+        "tick_lateness_estimate_us": 17617
+      },
+      "wire": {
+        "run_id": "r06-5bb7e6766118497fa000607d12910a21",
+        "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+        "elf_sha256": "3811af87f91fb563ead8e61ae5c188bc74f4495b07bb9e230834e4cef50f85bb",
+        "guest_fd": 57,
+        "pcb": "0x3ffbd478",
+        "inputs_sha256": "322f3dbafbd79cfcce38ef259d73d6cdfe506c2b92e756dd97c25139da6bd1d5",
+        "kind": "wire-accounting",
+        "origin": "root-pcap-unique-tcp",
+        "evidence_sha256": "14ebafaa2f3099ac8f23c193f5429bfbb6dfeebeab9fa520b94997ccb5de6001",
+        "unique_tcp_payload_bytes": 217246,
+        "final": true,
+        "coverage": "all-owned-server-connections-from-connect",
+        "selected_slow_terminal": {
+          "role": "slow",
+          "guest_fd": 57,
+          "pcb": "0x3ffbd478",
+          "guest_tuple": {
+            "local_ip": "10.0.2.15",
+            "remote_ip": "10.0.2.2",
+            "local_port": 80,
+            "remote_port": 62947
+          },
+          "terminal_basis": "captured-rst-with-sequence-and-ack-consistency",
+          "server": {
+            "payload_bytes": 203871,
+            "fin_offset": null,
+            "sequence_end": 203871,
+            "fin_acked": false,
+            "max_ack": 4734,
+            "rsts": 1
+          },
+          "peer": {
+            "payload_bytes": 5168,
+            "fin_offset": null,
+            "sequence_end": 5168,
+            "fin_acked": false,
+            "max_ack": 203871,
+            "rsts": 0
+          },
+          "captured_ranges_contiguous": true,
+          "missing_bytes_inferred": false
+        }
+      },
+      "invalid": [],
+      "incomplete_reasons": [],
+      "connections_closed": true
+    }
+  },
+  "wire": {
+    "record_alignment_complete": true,
+    "final_wire_complete": true,
+    "records": 1911,
+    "flows": [
+      {
+        "server_ip": "10.0.2.15",
+        "server_port": 80,
+        "peer_ip": "10.0.2.2",
+        "peer_port": 62946,
+        "selected": false,
+        "unique_server_bytes": 2070,
+        "server_payload_packets": 9,
+        "server_syn_seen": true,
+        "peer_syn_seen": true,
+        "server_window_scale": 0,
+        "peer_window_scale": 0,
+        "peer_zero_windows": [],
+        "fin_or_rst": 2
+      },
+      {
+        "server_ip": "10.0.2.15",
+        "server_port": 80,
+        "peer_ip": "10.0.2.2",
+        "peer_port": 62947,
+        "selected": true,
+        "unique_server_bytes": 203871,
+        "server_payload_packets": 639,
+        "server_syn_seen": true,
+        "peer_syn_seen": true,
+        "server_window_scale": 0,
+        "peer_window_scale": 0,
+        "peer_zero_windows": [],
+        "fin_or_rst": 1
+      },
+      {
+        "server_ip": "10.0.2.15",
+        "server_port": 80,
+        "peer_ip": "10.0.2.2",
+        "peer_port": 62948,
+        "selected": true,
+        "unique_server_bytes": 9234,
+        "server_payload_packets": 83,
+        "server_syn_seen": true,
+        "peer_syn_seen": true,
+        "server_window_scale": 0,
+        "peer_window_scale": 0,
+        "peer_zero_windows": [],
+        "fin_or_rst": 2
+      },
+      {
+        "server_ip": "10.0.2.15",
+        "server_port": 80,
+        "peer_ip": "10.0.2.2",
+        "peer_port": 62951,
+        "selected": false,
+        "unique_server_bytes": 2071,
+        "server_payload_packets": 5,
+        "server_syn_seen": true,
+        "peer_syn_seen": true,
+        "server_window_scale": 0,
+        "peer_window_scale": 0,
+        "peer_zero_windows": [],
+        "fin_or_rst": 2
+      }
+    ],
+    "unique_server_bytes": 217246,
+    "unique_tcp_payload_bytes": 217246,
+    "selected_terminal_coverage": [
+      {
+        "role": "slow",
+        "guest_fd": 57,
+        "pcb": "0x3ffbd478",
+        "guest_tuple": {
+          "local_ip": "10.0.2.15",
+          "remote_ip": "10.0.2.2",
+          "local_port": 80,
+          "remote_port": 62947
+        },
+        "terminal_basis": "captured-rst-with-sequence-and-ack-consistency",
+        "server": {
+          "payload_bytes": 203871,
+          "fin_offset": null,
+          "sequence_end": 203871,
+          "fin_acked": false,
+          "max_ack": 4734,
+          "rsts": 1
+        },
+        "peer": {
+          "payload_bytes": 5168,
+          "fin_offset": null,
+          "sequence_end": 5168,
+          "fin_acked": false,
+          "max_ack": 203871,
+          "rsts": 0
+        },
+        "captured_ranges_contiguous": true,
+        "missing_bytes_inferred": false
+      },
+      {
+        "role": "healthy",
+        "guest_fd": 58,
+        "pcb": "0x3ffbd30c",
+        "guest_tuple": {
+          "local_ip": "10.0.2.15",
+          "remote_ip": "10.0.2.2",
+          "local_port": 80,
+          "remote_port": 62948
+        },
+        "terminal_basis": "both-fins-and-acknowledgments",
+        "server": {
+          "payload_bytes": 9234,
+          "fin_offset": 9234,
+          "sequence_end": 9235,
+          "fin_acked": true,
+          "max_ack": 473,
+          "rsts": 0
+        },
+        "peer": {
+          "payload_bytes": 472,
+          "fin_offset": 472,
+          "sequence_end": 473,
+          "fin_acked": true,
+          "max_ack": 9235,
+          "rsts": 0
+        },
+        "captured_ranges_contiguous": true,
+        "missing_bytes_inferred": false
+      }
+    ],
+    "capture_sha256": "14ebafaa2f3099ac8f23c193f5429bfbb6dfeebeab9fa520b94997ccb5de6001",
+    "pressure_or_deadline_proved": false,
+    "scope": "All captured IPv4 port80/443 server TCP payload; ciphertext included; no payload exported",
+    "no_loss_assumption": "Caller binds pinned filter active from connect, stopped capture and final UART absence of dump-write error; record alignment alone proves no such property",
+    "caller_capture_stopped": true,
+    "caller_final_dump_write_errors_absent": true
+  }
+}
