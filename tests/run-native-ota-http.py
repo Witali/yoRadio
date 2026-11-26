@@ -59,7 +59,7 @@ def main():
     out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
     cyd=ROOT/'idf/esp32-cyd2usb-native/main';c3=ROOT/'idf/esp32c3-oled-native/main'
     files=[Path(__file__),*FIXTURE.glob('*.*'),*COMPONENT.glob('native_ota_*.c'),*COMPONENT.glob('include/*.h'),
-        ROOT/'idf/components/native_storage/include/web_multipart.h',ROOT/'idf/components/native_stream/include/json_buffer.h',
+        ROOT/'idf/components/native_storage/include/web_multipart.h',ROOT/'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h',
         cyd/'web_ota.c',cyd/'web_ota.h',cyd/'web_reboot.c',cyd/'web_reboot.h',cyd/'audio_service.h',
         c3/'web_ota.c',c3/'web_ota.h',c3/'ota_upload.c',c3/'ota_upload.h',c3/'websocket_service.c',c3/'websocket_service.h',c3/'audio_service.h']
     hashes={}

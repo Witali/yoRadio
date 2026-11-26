@@ -10,7 +10,7 @@
 #include "esp_timer.h"
 #include "esp_event.h"
 #include "freertos/task.h"
-#include "json_buffer.h"
+#include "json_sink.h"
 #include "lwip/sockets.h"
 #include "native_audio_output.h"
 #include "native_audio_settings.h"
@@ -42,6 +42,8 @@
 #define WS_CLIENT_LIMIT 2U
 #define WS_COMMAND_LIMIT 96U
 #define WS_STATUS_BYTES 5120U
+#define WS_STATUS_STREAMING 1
+#define WS_STATUS_STAGE_BYTES 1024U
 #define WS_POLL_MS 100U
 #define WS_HEARTBEAT_US 2000000LL
 #define WS_TIMER_SCHEDULER 1
@@ -91,7 +93,8 @@ static WS_STATUS_STORAGE ws_client_t s_clients[WS_CLIENT_LIMIT];
 static WS_STATUS_STORAGE ws_status_key_t s_previous, s_current;
 static bool s_have_previous;
 static uint32_t s_status_revision;
-static WS_STATUS_STORAGE char s_status[WS_STATUS_BYTES];
+static WS_STATUS_STORAGE char s_status_stage[WS_STATUS_STAGE_BYTES];
+static size_t s_status_length;
 static WS_STATUS_STORAGE int s_sockets[CONFIG_LWIP_MAX_SOCKETS];
 
 static void session_free(void *context) {
@@ -318,31 +321,29 @@ static bool same_status(const ws_status_key_t *left, const ws_status_key_t *righ
         strcmp(left->title, right->title) == 0 && strcmp(left->format, right->format) == 0;
 }
 
-static void payload_string(json_buffer_t *out, const char *id, const char *value) {
-    json_buffer_raw(out, "{\"id\":"); json_buffer_string(out, id);
-    json_buffer_raw(out, ",\"value\":"); json_buffer_string(out, value); json_buffer_raw(out, "}");
+static void payload_string(json_sink_t *out, const char *id, const char *value) {
+    json_sink_raw(out, "{\"id\":"); json_sink_string(out, id);
+    json_sink_raw(out, ",\"value\":"); json_sink_string(out, value); json_sink_raw(out, "}");
 }
 
-static void payload_number(json_buffer_t *out, const char *id, long value) {
+static void payload_number(json_sink_t *out, const char *id, long value) {
     char text[32];
     snprintf(text, sizeof(text), "%ld", value);
-    json_buffer_raw(out, "{\"id\":"); json_buffer_string(out, id);
-    json_buffer_raw(out, ",\"value\":"); json_buffer_raw(out, text); json_buffer_raw(out, "}");
+    json_sink_raw(out, "{\"id\":"); json_sink_string(out, id);
+    json_sink_raw(out, ",\"value\":"); json_sink_raw(out, text); json_sink_raw(out, "}");
 }
 
-static void payload_unsigned(json_buffer_t *out, const char *id, uint32_t value) {
+static void payload_unsigned(json_sink_t *out, const char *id, uint32_t value) {
     char text[32];
     snprintf(text, sizeof(text), "%lu", (unsigned long)value);
-    json_buffer_raw(out, "{\"id\":"); json_buffer_string(out, id);
-    json_buffer_raw(out, ",\"value\":"); json_buffer_raw(out, text); json_buffer_raw(out, "}");
+    json_sink_raw(out, "{\"id\":"); json_sink_string(out, id);
+    json_sink_raw(out, ",\"value\":"); json_sink_raw(out, text); json_sink_raw(out, "}");
 }
 
-static bool format_status(const ws_status_key_t *key) {
-    json_buffer_t out;
-    json_buffer_init(&out, s_status, sizeof(s_status));
-    json_buffer_raw(&out, "{\"status\":{\"station\":"); json_buffer_string(&out, key->station);
-    json_buffer_raw(&out, ",\"title\":"); json_buffer_string(&out, key->title);
-    json_buffer_raw(&out, ",\"format\":"); json_buffer_string(&out, key->format);
+static bool format_status(const ws_status_key_t *key, json_sink_t *out) {
+    json_sink_raw(out, "{\"status\":{\"station\":"); json_sink_string(out, key->station);
+    json_sink_raw(out, ",\"title\":"); json_sink_string(out, key->title);
+    json_sink_raw(out, ",\"format\":"); json_sink_string(out, key->format);
     char values[512];
     snprintf(values, sizeof(values), ",\"bitrate\":%lu,\"connecting\":%s,\"audio\":%s,\"generation\":%lu,\"volume\":%u,\"balance\":%d,\"current\":%u,\"count\":%u,\"smartstart\":%s,\"normalization\":%s,\"normgain\":%u,\"normtarget\":%d,\"normtime\":%u,\"network_online\":%s,\"ap_enabled\":%s,\"rssi_valid\":%s,\"rssi\":%d},\"payload\":[",
         (unsigned long)key->bitrate, key->pending ? "true" : "false", key->running ? "true" : "false",
@@ -350,24 +351,27 @@ static bool format_status(const ws_status_key_t *key) {
         key->smartstart ? "true" : "false", key->normalization ? "true" : "false", key->normgain, key->normtarget, key->normtime,
         key->network_online ? "true" : "false", key->ap_enabled ? "true" : "false",
         key->rssi_valid ? "true" : "false", key->rssi);
-    json_buffer_raw(&out, values);
-    payload_string(&out, "nameset", key->name); json_buffer_raw(&out, ",");
-    payload_string(&out, "meta", key->title); json_buffer_raw(&out, ",");
-    payload_number(&out, "volume", key->volume); json_buffer_raw(&out, ",");
-    payload_number(&out, "balance", key->balance); json_buffer_raw(&out, ",");
-    payload_number(&out, "rssi", key->rssi); json_buffer_raw(&out, ",");
-    payload_number(&out, "heap", key->fill); json_buffer_raw(&out, ",");
-    payload_unsigned(&out, "bitrate", key->bitrate); json_buffer_raw(&out, ",");
-    payload_string(&out, "fmt", key->format); json_buffer_raw(&out, ",");
-    payload_string(&out, "playerwrap", key->running ? "playing" : "stopped");
-    json_buffer_raw(&out, "]}");
-    return !out.failed;
+    json_sink_raw(out, values);
+    payload_string(out, "nameset", key->name); json_sink_raw(out, ",");
+    payload_string(out, "meta", key->title); json_sink_raw(out, ",");
+    payload_number(out, "volume", key->volume); json_sink_raw(out, ",");
+    payload_number(out, "balance", key->balance); json_sink_raw(out, ",");
+    payload_number(out, "rssi", key->rssi); json_sink_raw(out, ",");
+    payload_number(out, "heap", key->fill); json_sink_raw(out, ",");
+    payload_unsigned(out, "bitrate", key->bitrate); json_sink_raw(out, ",");
+    payload_string(out, "fmt", key->format); json_sink_raw(out, ",");
+    payload_string(out, "playerwrap", key->running ? "playing" : "stopped");
+    json_sink_raw(out, "]}");
+    return !out->failed;
 }
 
 static bool prepare_status(void) {
     if (!capture_status(&s_current)) return false;
     if (!s_have_previous || !same_status(&s_current, &s_previous)) {
-        if (!format_status(&s_current)) return false;
+        json_sink_t out;
+        json_sink_init(&out, WS_STATUS_BYTES, NULL, NULL);
+        if (!format_status(&s_current, &out)) return false;
+        s_status_length = out.length;
         ++s_status_revision;
         s_previous = s_current;
         s_have_previous = true;
@@ -375,12 +379,76 @@ static bool prepare_status(void) {
     return true;
 }
 
+// Only the HTTPD owner uses this staging area. The key remains immutable
+// between counting and both peers' sends; no pointer survives a callback.
+typedef struct {
+    ws_client_t *client;
+    size_t buffered, sent;
+} ws_status_stream_t;
+
+static bool flush_status_stream(ws_status_stream_t *stream) {
+    if (!stream->buffered) return true;
+    int sent = send_complete_frame_bytes(s_server, stream->client->socket,
+        s_status_stage, stream->buffered, 0);
+    if (sent < 0 || (size_t)sent != stream->buffered) return false;
+    stream->sent += stream->buffered;
+    stream->buffered = 0;
+    return true;
+}
+
+static bool write_status_stream(void *context, const char *data, size_t size) {
+    ws_status_stream_t *stream = context;
+    while (size) {
+        size_t available = sizeof(s_status_stage) - stream->buffered;
+        size_t count = size < available ? size : available;
+        memcpy(s_status_stage + stream->buffered, data, count);
+        stream->buffered += count;
+        data += count;
+        size -= count;
+        if (stream->buffered == sizeof(s_status_stage) &&
+            !flush_status_stream(stream)) return false;
+    }
+    return true;
+}
+
+static esp_err_t send_status_frame(ws_client_t *client) {
+    if (!current_client(client) || client->message.close_sent ||
+        client->message.close_received) return ESP_ERR_INVALID_STATE;
+    // A server sends one unmasked FIN/TEXT frame. Coalesce its canonical
+    // header with the first payload bytes, retaining the full logical limit.
+    if (s_status_length >= WS_STATUS_BYTES) return ESP_ERR_INVALID_SIZE;
+    uint8_t header[4] = {0x81, (uint8_t)s_status_length};
+    size_t header_size = 2;
+    if (s_status_length >= 126U) {
+        header[1] = 126;
+        header[2] = (uint8_t)(s_status_length >> 8);
+        header[3] = (uint8_t)s_status_length;
+        header_size = 4;
+    }
+    ws_status_stream_t stream = {.client=client};
+    json_sink_t out;
+    json_sink_init(&out, WS_STATUS_BYTES, write_status_stream, &stream);
+    // One absolute budget includes every header/payload chunk and retry.
+    client->frame_deadline_us = esp_timer_get_time() + WS_FRAME_BUDGET_US;
+    bool sent = write_status_stream(&stream, (const char *)header, header_size) &&
+        format_status(&s_current, &out) && out.length == s_status_length &&
+        stream.sent + stream.buffered == header_size + s_status_length &&
+        flush_status_stream(&stream);
+    client->frame_deadline_us = 0;
+    if (!sent) {
+        // A partial frame cannot be resumed as a new frame on this session.
+        fail_client(client);
+        return ESP_FAIL;
+    }
+    return ESP_OK;
+}
+
 static esp_err_t send_status(ws_client_t *client, bool force) {
     int64_t now = esp_timer_get_time();
     bool initial = !client->initialized;
     if (force || initial || client->status_revision != s_status_revision ||
         now - client->sent_us >= WS_HEARTBEAT_US) {
-        esp_err_t result = send_text(client, s_status);
+        esp_err_t result = send_status_frame(client);
         if (result != ESP_OK) return result;
         if (initial || client->item != s_current.item) {
             char current[32];

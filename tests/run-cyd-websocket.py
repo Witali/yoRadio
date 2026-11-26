@@ -6,12 +6,17 @@ real IDF framing, TCP timing and board RAM/stack measurements remain separate.
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = next(parent for parent in Path(__file__).resolve().parents
+            if (parent / 'idf/esp32-cyd2usb-native/main/websocket_service.c').is_file())
 MAIN = ROOT / 'idf/esp32-cyd2usb-native/main'
+FIXTURE = Path(__file__).with_name('cyd_websocket_test.c')
+if not FIXTURE.is_file():
+    FIXTURE = ROOT / 'tests/native/cyd_websocket_test.c'
 sys.path.insert(0, str(ROOT / 'tools/codec_benchmark'))
 from run_output_dma_host import host, run
 
@@ -19,7 +24,12 @@ from run_output_dma_host import host, run
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--source-ref', help='Qualify a historical production implementation with the current regression harness')
+    implementation = parser.add_mutually_exclusive_group()
+    implementation.add_argument('--source-ref', help='Qualify a historical production implementation with the current regression harness')
+    implementation.add_argument('--source-file', type=Path, help='Qualify an immutable private implementation/control copy')
+    parser.add_argument('--include-overlay', type=Path, help='Private json_sink/json_buffer/json_string_span header draft directory')
+    parser.add_argument('--capture-control', choices=('drop-byte','reset-deadline','reuse-partial'),
+                        help='Require rejection by the isolated wire oracle; does not qualify production')
     parser.add_argument('--rtc-status', action='store_true',
                         help='Exercise the RTC status option with a host section attribute; target memory is a separate check')
     args = parser.parse_args()
@@ -33,6 +43,7 @@ typedef int esp_err_t;
 #define ESP_FAIL (-1)
 #define ESP_ERR_INVALID_ARG 0x102
 #define ESP_ERR_INVALID_STATE 0x103
+#define ESP_ERR_INVALID_SIZE 0x104
 #define ESP_ERR_NO_MEM 0x101
 #define ESP_ERR_TIMEOUT 0x107
 ''',
@@ -130,7 +141,7 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
         path = out / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(contents)
-    sources = [Path(__file__), ROOT / 'tests/native/cyd_websocket_test.c',
+    sources = [
                MAIN / 'websocket_service.c', *MAIN.glob('*.h'),
                ROOT / 'idf/components/native_audio_settings/native_audio_settings.h',
                ROOT / 'idf/components/native_storage/include/radio_control.h',
@@ -140,9 +151,22 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
                ROOT / 'idf/components/native_web_transport/include/native_web_transport.h',
                ROOT / 'idf/components/native_network_power/include/native_network_power.h',
                ROOT / 'tools/codec_benchmark/run_output_dma_host.py']
+    sink_header = ROOT / 'idf/components/native_stream/include/json_sink.h'
+    if sink_header.is_file():
+        sources.append(sink_header)
+    span_header = sink_header.with_name('json_string_span.h')
+    if span_header.is_file():
+        sources.append(span_header)
     hashes = {}
-    for path in sources:
-        data = path.read_bytes(); relative = path.relative_to(ROOT)
+    labeled_sources = [(Path(__file__), Path('tests/run-cyd-websocket.py')),
+                       (FIXTURE, Path('tests/native/cyd_websocket_test.c'))]
+    labeled_sources += [(path, path.relative_to(ROOT)) for path in sources]
+    if args.include_overlay:
+        for name in ('json_buffer.h', 'json_string_span.h', 'json_sink.h'):
+            labeled_sources.append((args.include_overlay / name,
+                                    Path('idf/components/native_stream/include') / name))
+    for path, relative in labeled_sources:
+        data = path.read_bytes()
         snapshot = out / 'sources' / relative
         snapshot.parent.mkdir(parents=True, exist_ok=True); snapshot.write_bytes(data)
         hashes[relative.as_posix()] = hashlib.sha256(data).hexdigest()
@@ -150,7 +174,9 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
     frozen_main = frozen / MAIN.relative_to(ROOT)
     binary = out / 'cyd-websocket'
     production = MAIN / 'websocket_service.c'
-    source = subprocess.check_output(['git', 'show', args.source_ref + ':' + production.relative_to(ROOT).as_posix()], cwd=ROOT) if args.source_ref else (frozen_main / 'websocket_service.c').read_bytes()
+    source = (subprocess.check_output(['git', 'show', args.source_ref + ':' + production.relative_to(ROOT).as_posix()], cwd=ROOT)
+              if args.source_ref else args.source_file.read_bytes() if args.source_file else
+              (frozen_main / 'websocket_service.c').read_bytes())
     if args.rtc_status and b'CONFIG_YORADIO_WS_STATUS_RTC_SLOW' not in source:
         raise ValueError('The selected implementation does not support the RTC status option')
     (out / 'websocket-under-test.c').write_bytes(source)
@@ -158,6 +184,9 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
         '#include "../../idf/esp32-cyd2usb-native/main/websocket_service.c"',
         '#include "websocket-under-test.c"')
     (out / 'cyd_websocket_test.c').write_text('#define TEST_NETWORK_STATUS '+str(int(b'network_service_snapshot' in source))+'\n'+fixture)
+    build_succeeded = False
+    control_ids = {'drop-byte':1, 'reset-deadline':2, 'reuse-partial':3}
+    control_flags = ['-DTEST_WIRE_CAPTURE_CONTROL='+str(control_ids[args.capture_control])] if args.capture_control else []
     try:
         build = run(['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                      '-Wno-misleading-indentation', '-pthread', '-fsanitize=address,undefined',
@@ -167,16 +196,35 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
                      '-I' + host(frozen / 'idf/components/native_audio_settings'),
                      '-I' + host(frozen / 'idf/components/native_storage/include'),
                      '-I' + host(frozen / 'idf/components/native_network_power/include'),
-                     host(out / 'cyd_websocket_test.c'), '-o', host(binary)])
+                     *control_flags, host(out / 'cyd_websocket_test.c'), '-o', host(binary)])
         (out / 'build.log').write_bytes(build)
+        build_succeeded = True
         log = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                    'UBSAN_OPTIONS=halt_on_error=1', 'timeout', '30', host(binary)])
     except subprocess.CalledProcessError as error:
         (out / 'failure.log').write_bytes(error.output)
+        if args.capture_control:
+            marker={'drop-byte':b'wire-completion-required',
+                    'reset-deadline':b'frame_deadline_us == capture->deadline_us',
+                    'reuse-partial':b'capture->incarnation == sockets[socket].incarnation'}[args.capture_control]
+            rejected=build_succeeded and b'Assertion' in error.output and marker in error.output and error.returncode != 124
+            (out / 'report.json').write_text(json.dumps(dict(kind='WIRE_ORACLE_NEGATIVE_CONTROL',
+                passed=rejected, control=args.capture_control, production_qualified=False,
+                build_succeeded=build_succeeded, expected_assertion_rejected=rejected,
+                source_sha256=hashes, qualified_implementation_sha256=hashlib.sha256(source).hexdigest()),indent=2)+'\n')
+            if rejected:
+                print('PASS isolated wire-oracle rejection: '+args.capture_control)
+                return
         print(error.output.decode(errors='replace'), file=sys.stderr)
         raise
     (out / 'test.log').write_bytes(log)
-    maximum = None
+    if args.capture_control:
+        (out / 'report.json').write_text(json.dumps(dict(kind='WIRE_ORACLE_NEGATIVE_CONTROL',
+            passed=False, control=args.capture_control, production_qualified=False,
+            category='negative-control-not-rejected'),indent=2)+'\n')
+        raise ValueError('The wire oracle accepted its negative control')
+    maximum = maximum_bytes = fixture_groups = streaming_groups = None
+    streaming_samples = []
     for line in log.decode().splitlines():
         if line.startswith('WS_MAX='):
             maximum = json.loads(line.removeprefix('WS_MAX='))
@@ -191,19 +239,49 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
             assert maximum['status']['station'] == '\1' * 95
         elif line.startswith('WS_MAX_BYTES='):
             maximum_bytes = int(line.split('=', 1)[1])
+        elif line.startswith('WS_STREAM_GROUPS='):
+            streaming_groups = int(line.split('=', 1)[1])
+            assert streaming_groups == 15
+            print(line)
+        elif line.startswith('WS_STREAM_SAMPLE='):
+            expected_bytes, raw_json = line.removeprefix('WS_STREAM_SAMPLE=').split('\t',1)
+            expected_bytes = int(expected_bytes)
+            assert len(raw_json.encode('utf-8')) == expected_bytes < 5120
+            sample = json.loads(raw_json)
+            assert isinstance(sample['status'],dict) and isinstance(sample['payload'],list)
+            assert type(sample['status']['audio']) is bool and type(sample['status']['generation']) is int
+            payload = {item['id']:item['value'] for item in sample['payload']}
+            assert payload['meta'] == sample['status']['title'] and payload['fmt'] == sample['status']['format']
+            streaming_samples.append(expected_bytes)
         else:
+            match = re.search(r'PASS CYD WebSocket core: (\d+) fixture groups', line)
+            if match:
+                fixture_groups = int(match[1])
             print(line)
     assert maximum is not None
+    assert maximum_bytes is not None and maximum_bytes < 5120
+    assert fixture_groups is not None and fixture_groups >= 64
+    if streaming_groups is not None:
+        assert streaming_samples == [1019,1020,1021,1023,1024,1025,4899,4899,4899]
+        assert fixture_groups >= 64+streaming_groups
     assert b'18 scalar and 4 string changes detected' in log
     report = {'passed': True, 'sanitizers': ['ASan', 'UBSan'], 'maximum_json_bytes': maximum_bytes,
               'rtc_status_option': args.rtc_status, 'rtc_target_memory_qualified': False,
               'status_key_comparison': {'padding_ignored': True, 'string_tails_ignored': True, 'scalar_fields': 18, 'string_fields': 4},
-              'source_ref': args.source_ref, 'qualified_implementation_sha256': hashlib.sha256(source).hexdigest(),
+              'source_ref': args.source_ref, 'private_source_file': args.source_file is not None,
+              'private_include_overlay': args.include_overlay is not None,
+              'fixture_groups': fixture_groups, 'wire_capture': 'independent accepted-byte frame reassembly per fd incarnation',
+              'streaming_fixture_groups': streaming_groups,
+              'independently_parsed_streaming_json_bytes': streaming_samples,
+              'qualified_implementation_sha256': hashlib.sha256(source).hexdigest(),
               'status_capacity': 5120, 'websocket_client_limit': 2, 'queued_status_work_limit': 1,
               'application_send_frame_budget_us': 1000000, 'application_receive_handler_budget_us': 1000000,
               'separate_budgets': 'HTTPD opcode read before handler and SDK control reads use separate finite per-read fallback budgets; TCP/RTOS timing remains unverified.',
               'source_sha256': hashes,
-              'scope': 'Actual production WS core with deferred HTTPD callbacks, synchronous send completion seams and real concurrent polling producers; no IDF framing/TCP/hardware/stack timing proof.'}
+              'status_streaming': streaming_groups is not None,
+              'status_stage_bytes': 1024 if streaming_groups is not None else None,
+              'status_125_126_header_scope': 'actual header construction inspected on rejected stale-count path; no valid short status target frame claimed' if streaming_groups is not None else None,
+              'scope': 'Actual production WS core with deferred HTTPD callbacks, independent accepted-byte wire framing oracle, synchronous transport seams and real concurrent polling producers; no real IDF/TCP/hardware/stack timing proof.'}
     (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 
 

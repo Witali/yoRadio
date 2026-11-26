@@ -36,7 +36,7 @@ def main():
     if a.case and len(a.case)!=len(set(a.case)):p.error('Each --case must be distinct')
     out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     main=ROOT/'idf/esp32c3-oled-native/main';shared=ROOT/'idf/components/native_stream/include';harness=ROOT/'tests/native/c3_websocket_status_test.c'
-    files=[Path(__file__).resolve(),harness,ROOT/'tests/native/c3_ws_status/platform.h',main/'websocket_service.c',main/'websocket_service.h',main/'native_state.h',main/'websocket_message.h',main/'json_buffer.h',shared/'websocket_message.h',shared/'json_buffer.h']
+    files=[Path(__file__).resolve(),harness,ROOT/'tests/native/c3_ws_status/platform.h',main/'websocket_service.c',main/'websocket_service.h',main/'native_state.h',main/'websocket_message.h',main/'json_buffer.h',shared/'websocket_message.h',shared/'json_buffer.h',shared/'json_string_span.h']
     report={'passed':False,'scope':__doc__,'physical_hardware':False,'full_suite':not a.case,'case_filter':a.case,'cases':{},'negative_controls':{},'source_sha256':{}}
     def save_report():(out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     for f in files:

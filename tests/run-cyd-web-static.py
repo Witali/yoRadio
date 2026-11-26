@@ -28,7 +28,7 @@ def main():
              ROOT/'tests/cyd-native-page.test.js', MAIN/'web_static.c', MAIN/'web_static.h',
              MAIN/'web_pages.cpp', MAIN/'web_pages.h', MAIN/'web_service.c', MAIN/'web_upload.h', MAIN/'web_reboot.h', MAIN/'web_ota.h',
              MAIN/'web_wifi.h', MAIN/'web_time.h',
-             ROOT/'tests/run-cyd-lifecycle.py', ROOT/'idf/components/native_stream/include/json_buffer.h',
+             ROOT/'tests/run-cyd-lifecycle.py', ROOT/'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h',
              ROOT/'idf/components/native_wifi_store/include/native_wifi_public.h',
              ROOT/'tools/codec_benchmark/run_output_dma_host.py']
     hashes = {}

@@ -40,7 +40,7 @@ def main():
              test / 'cyd_network_settings/platform.h', power,
              *[main_dir / name for name in ('network_settings.c', 'network_settings.h',
                  'network_status.h', 'web_network_settings.c', 'web_network_settings.h')],
-             ROOT / 'idf/components/native_stream/include/json_buffer.h']
+             ROOT / 'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h']
     hashes = {f.relative_to(ROOT).as_posix(): hashlib.sha256(f.read_bytes()).hexdigest() for f in files}
     for f in files:
         target = out / 'sources' / f.relative_to(ROOT)

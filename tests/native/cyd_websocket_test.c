@@ -10,7 +10,15 @@
 
 typedef struct { bool live, websocket; unsigned incarnation; void *context; httpd_free_ctx_fn_t free_context; httpd_send_func_t send_override; httpd_recv_func_t recv_override; } socket_t;
 typedef struct { int socket; unsigned incarnation; httpd_ws_type_t type; size_t size; char text[WS_STATUS_BYTES]; } delivery_t;
+typedef struct {
+    unsigned incarnation;
+    uint8_t header[10];
+    size_t header_size, header_needed, payload_size, payload_received;
+    int64_t deadline_us;
+    char payload[WS_STATUS_BYTES];
+} wire_capture_t;
 static socket_t sockets[16];
+static wire_capture_t captures[16];
 static delivery_t deliveries[256];
 static unsigned delivery_count, shutdown_count, queue_calls, capture_calls, command_calls, recv_calls;
 static unsigned http_errors;
@@ -59,6 +67,116 @@ static uint16_t normtime;
 static bool normalization;
 static int64_t now_us;
 static unsigned cases;
+static unsigned sdk_frame_depth, abandoned_partial_frames, captured_frames;
+static int active_wire_socket = -1;
+static bool send_wants_read, recv_wants_write;
+static unsigned read_selects, write_selects;
+static bool mutate_on_status_write, stop_on_status_write;
+static int limited_socket = -1;
+static size_t transport_limit;
+static int timed_socket = -1;
+
+#if defined(WS_STATUS_STREAMING) && WS_STATUS_STREAMING
+_Static_assert(WS_STATUS_STAGE_BYTES == 1024U, "status staging must remain1024 bytes");
+_Static_assert(sizeof(s_status_stage) == 1024U, "production staging storage changed");
+_Static_assert(WS_STATUS_BYTES == 5120U, "logical status capacity must remain5120 bytes");
+_Static_assert(WS_CLIENT_LIMIT == 2U, "two-client contract must remain enabled");
+// This full-size buffer belongs only to the test. Production must stage <=1024.
+static char serializer_view[WS_STATUS_BYTES];
+static size_t serializer_view_length;
+static bool serializer_view_write(void *context, const char *data, size_t size) {
+    assert(context == serializer_view);
+    assert(size < sizeof(serializer_view) - serializer_view_length);
+    memcpy(serializer_view + serializer_view_length, data, size);
+    serializer_view_length += size;
+    serializer_view[serializer_view_length] = 0;
+    return true;
+}
+static const char *test_status_view(void) {
+    serializer_view_length = 0; serializer_view[0] = 0;
+    json_sink_t sink;
+    json_sink_init(&sink, sizeof(serializer_view), serializer_view_write, serializer_view);
+    assert(format_status(&s_current, &sink) && !sink.failed);
+    assert(sink.length == serializer_view_length);
+    return serializer_view;
+}
+#else
+static const char *test_status_view(void) { return s_status; }
+#endif
+
+static void abandon_wire_capture(int socket) {
+    if (captures[socket].header_size) ++abandoned_partial_frames;
+    memset(&captures[socket], 0, sizeof(captures[socket]));
+    captures[socket].incarnation = sockets[socket].incarnation;
+    if (active_wire_socket == socket) active_wire_socket = -1;
+}
+
+static void complete_wire_capture(int socket) {
+    wire_capture_t *capture = &captures[socket];
+    assert(delivery_count < sizeof(deliveries) / sizeof(deliveries[0]));
+    delivery_t *out = &deliveries[delivery_count++];
+    out->socket = socket; out->incarnation = capture->incarnation;
+    out->type = (httpd_ws_type_t)(capture->header[0] & 15U); out->size = capture->payload_size;
+    memcpy(out->text, capture->payload, out->size); out->text[out->size] = 0;
+    ++captured_frames;
+    memset(capture, 0, sizeof(*capture)); capture->incarnation = sockets[socket].incarnation;
+    active_wire_socket = -1;
+}
+
+static void capture_wire_bytes(int socket, const void *data, size_t size) {
+    const uint8_t *bytes = data;
+    wire_capture_t *capture = &captures[socket];
+    assert(capture->incarnation == sockets[socket].incarnation);
+    while (size) {
+        if (!capture->header_size) {
+            assert(active_wire_socket == -1 || active_wire_socket == socket);
+            active_wire_socket = socket; capture->header_needed = 2;
+            ws_client_t *client = sockets[socket].context;
+            capture->deadline_us = client ? client->frame_deadline_us : 0;
+        }
+        ws_client_t *client = sockets[socket].context;
+        // A status may span many transport calls, but not many fresh budgets.
+        if (capture->deadline_us) assert(client && client->frame_deadline_us == capture->deadline_us);
+        if (capture->header_size < capture->header_needed) {
+            capture->header[capture->header_size++] = *bytes++; --size;
+            if (capture->header_size == 2) {
+                assert((capture->header[0] & 0xf0U) == 0x80U); // FIN, no RSV.
+                unsigned opcode = capture->header[0] & 15U;
+                assert(opcode == 1 || opcode == 8 || opcode == 9 || opcode == 10);
+                assert(!(capture->header[1] & 0x80U)); // Server MUST NOT mask.
+                unsigned short_size = capture->header[1] & 0x7fU;
+                capture->header_needed = short_size == 126 ? 4 : short_size == 127 ? 10 : 2;
+            }
+            if (capture->header_size < capture->header_needed) continue;
+            uint64_t payload = capture->header[1] & 0x7fU;
+            if (capture->header_needed > 2) {
+                payload = 0;
+                for (size_t i=2; i<capture->header_needed; ++i) payload=(payload<<8U)|capture->header[i];
+                assert(capture->header_needed == 4 ? payload >= 126 : payload >= 65536 && !(payload>>63U));
+            }
+            assert(payload < WS_STATUS_BYTES);
+            assert((capture->header[0] & 15U) < 8 || payload <= 125);
+            capture->payload_size = (size_t)payload;
+            if (!payload) complete_wire_capture(socket);
+            continue;
+        }
+        size_t take = capture->payload_size - capture->payload_received;
+        if (take > size) take = size;
+        memcpy(capture->payload + capture->payload_received, bytes, take);
+        capture->payload_received += take; bytes += take; size -= take;
+        if (capture->payload_received == capture->payload_size) complete_wire_capture(socket);
+    }
+}
+
+static bool framed_send(int socket) {
+    if (sdk_frame_depth) return true;
+#if defined(WS_STATUS_STREAMING) && WS_STATUS_STREAMING
+    ws_client_t *client = sockets[socket].context;
+    return client && client->frame_deadline_us;
+#else
+    (void)socket; return false;
+#endif
+}
 
 size_t strlcpy(char *target_text, const char *source, size_t size) {
     size_t length = strlen(source);
@@ -156,20 +274,41 @@ ssize_t lwip_recv(int socket, void *data, size_t size, int flags) {
 }
 ssize_t lwip_send(int socket, const void *data, size_t size, int flags) {
     assert(sockets[socket].live && data && (flags & MSG_DONTWAIT));
-    ++raw_send_calls; now_us += io_advance_us;
+    bool framed = framed_send(socket);
+    if (framed && slow_send) {
+        slow_send = false;
+        ws_status_key_t captured = s_current;
+        for (unsigned i = 0; i < 10000; ++i) poll_status();
+        websocket_service_notify_playlist_changed();
+        strcpy(state.title, "changed during slow send");
+        assert(same_status(&captured, &s_current));
+    }
+    if (framed && mutate_on_status_write) {
+        mutate_on_status_write = false;
+        strcpy(state.title, "changed after count before emission completed");
+        radio.item=9; state.audio_generation=77;
+    }
+    ++raw_send_calls;
+    if (timed_socket < 0 || timed_socket == socket) now_us += io_advance_us;
+    if (framed && socket == failed_socket) { errno=EPIPE; return -1; }
+    ssize_t result=(ssize_t)size;
     if (io_position < io_length) {
         int value = io_script[io_position++];
         if (value < 0) { errno = -value; return -1; }
-        return (size_t)value > size ? (ssize_t)size : value;
+        result=(size_t)value > size ? (ssize_t)size : value;
     }
-    return (ssize_t)size;
+    if (transport_limit && socket == limited_socket && result > (ssize_t)transport_limit)
+        result=(ssize_t)transport_limit;
+    if (framed && result > 0) capture_wire_bytes(socket, data, (size_t)result);
+    if (framed && stop_on_status_write) { stop_on_status_write=false; atomic_store(&s_running,false); }
+    return result;
 }
 ssize_t native_web_transport_send(httpd_handle_t server, int socket, const void *data, size_t size, int flags, bool *writable) {
-    assert(server == s_server); *writable = true;
+    assert(server == s_server); *writable = !send_wants_read;
     return lwip_send(socket, data, size, flags);
 }
 ssize_t native_web_transport_recv(httpd_handle_t server, int socket, void *data, size_t size, int flags, bool *writable) {
-    assert(server == s_server); *writable = false;
+    assert(server == s_server); *writable = recv_wants_write;
     return lwip_recv(socket, data, size, flags);
 }
 void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful) {
@@ -178,6 +317,8 @@ void native_web_transport_shutdown(httpd_handle_t server, int socket, bool grace
 }
 int lwip_select(int highest, fd_set *readable, fd_set *writable, fd_set *exception, struct timeval *wait) {
     assert(highest > 0 && (!!readable != !!writable) && !exception && wait);
+    assert(FD_ISSET(highest-1, readable ? readable : writable));
+    if (readable) ++read_selects; else ++write_selects;
     ++select_calls;
     int result = select_position < select_length ? select_script[select_position++] : 1;
     if (result == 0) { now_us += (int64_t)wait->tv_sec * 1000000 + wait->tv_usec; return 0; }
@@ -199,6 +340,7 @@ esp_err_t httpd_queue_work(httpd_handle_t server, httpd_work_fn_t callback, void
 }
 int shutdown(int socket, int how) {
     assert(how == SHUT_RDWR && sockets[socket].live); ++shutdown_count;
+    abandon_wire_capture(socket);
     // shutdown does not close/release the fd. HTTPD owns subsequent cleanup.
     return 0;
 }
@@ -207,27 +349,16 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t server, int socket, httpd_ws_
     assert(frame->final && !frame->fragmented);
     assert(frame->len < WS_STATUS_BYTES);
     if (frame->type == HTTPD_WS_TYPE_TEXT) assert(frame->payload[frame->len] == 0);
-    if (slow_send) {
-        slow_send = false;
-        char copy[WS_STATUS_BYTES]; strcpy(copy, (char *)frame->payload);
-        for (unsigned i = 0; i < 10000; ++i) poll_status();
-        websocket_service_notify_playlist_changed();
-        strcpy(state.title, "changed during slow send");
-        assert(!strcmp(copy, (char *)frame->payload));
-    }
-    if (socket == failed_socket) return ESP_FAIL;
     assert(sockets[socket].send_override);
-    char header[4] = {0};
+    uint8_t header[4] = {(uint8_t)(0x80U | frame->type), (uint8_t)frame->len, 0, 0};
+    if (frame->len > 125) { header[1]=126; header[2]=(uint8_t)(frame->len>>8U); header[3]=(uint8_t)frame->len; }
     // Pinned IDF checks only <0. The production override must hide positive
     // short writes by completing them before returning to these two calls.
-    if (sockets[socket].send_override(server, socket, header, frame->len > 125 ? 4 : 2, 0) < 0 ||
-        sockets[socket].send_override(server, socket, (char *)frame->payload, frame->len, 0) < 0) return ESP_FAIL;
-    assert(delivery_count < 256);
-    delivery_t *out = &deliveries[delivery_count++]; out->socket = socket; out->incarnation = sockets[socket].incarnation;
-    out->type = frame->type; out->size = frame->len;
-    if (frame->len) memcpy(out->text, frame->payload, frame->len);
-    out->text[frame->len] = 0;
-    return ESP_OK;
+    ++sdk_frame_depth;
+    bool sent = sockets[socket].send_override(server, socket, (char *)header, frame->len > 125 ? 4 : 2, 0) >= 0 &&
+        sockets[socket].send_override(server, socket, (char *)frame->payload, frame->len, 0) >= 0;
+    --sdk_frame_depth;
+    return sent ? ESP_OK : ESP_FAIL;
 }
 int httpd_req_to_sockfd(httpd_req_t *request) { return request->socket; }
 esp_err_t httpd_resp_send_err(httpd_req_t *request, int status, const char *message) {
@@ -322,6 +453,7 @@ static void execute_work(void) {
 static void cycle(void) { poll_status(); execute_work(); }
 static void close_socket(int socket) {
     if (!sockets[socket].live) return;
+    abandon_wire_capture(socket);
     if (sockets[socket].free_context) sockets[socket].free_context(sockets[socket].context);
     sockets[socket].live = false; sockets[socket].context = NULL; sockets[socket].free_context = NULL;
     sockets[socket].send_override = NULL;
@@ -329,6 +461,7 @@ static void close_socket(int socket) {
 }
 static void open_socket(int socket, bool websocket) {
     assert(!sockets[socket].live); ++sockets[socket].incarnation; sockets[socket].live = true; sockets[socket].websocket = websocket;
+    abandon_wire_capture(socket);
 }
 static void reset(void) {
     assert(websocket_service_stop() == ESP_OK);
@@ -343,6 +476,10 @@ static void reset(void) {
     queue_hold = queue_entered = queue_release = false; event_registrations = 0;
 #endif
     memset(sockets, 0, sizeof(sockets)); memset(deliveries, 0, sizeof(deliveries)); memset(&state, 0, sizeof(state));
+    memset(captures, 0, sizeof(captures)); active_wire_socket=-1;
+    sdk_frame_depth=abandoned_partial_frames=captured_frames=read_selects=write_selects=0;
+    send_wants_read=recv_wants_write=mutate_on_status_write=stop_on_status_write=false;
+    limited_socket=timed_socket=-1; transport_limit=0;
     memset(&radio, 0, sizeof(radio)); memset(&input, 0, sizeof(input));
     delivery_count = shutdown_count = queue_calls = capture_calls = command_calls = recv_calls = http_errors = 0;
     queue_failure = registration_failure = task_failure = radio_unavailable = setting_failure = slow_send = change_radio_during_capture = context_failure = send_override_failure = recv_override_failure = false;
@@ -461,7 +598,211 @@ static void status_key_comparison_regressions(void) {
     printf("PASS status key: %u padding bytes ignored, 18 scalar and 4 string changes detected\n", padding);
 }
 
+#if defined(WS_STATUS_STREAMING) && WS_STATUS_STREAMING
+static size_t count_status_for_test(const ws_status_key_t *key, size_t capacity, bool success) {
+    json_sink_t count;
+    json_sink_init(&count, capacity, NULL, NULL);
+    assert(format_status(key, &count) == success && count.failed != success);
+    return count.length;
+}
+static void worst_status_for_test(void) {
+    memset(state.station, '\1', sizeof(state.station)-1); state.station[sizeof(state.station)-1]=0;
+    memset(state.title, '\2', sizeof(state.title)-1); state.title[sizeof(state.title)-1]=0;
+    memset(state.stream_format, '\3', sizeof(state.stream_format)-1); state.stream_format[sizeof(state.stream_format)-1]=0;
+    memset(radio.name, '\4', sizeof(radio.name)-1); radio.name[sizeof(radio.name)-1]=0;
+    state.bitrate_kbps=state.audio_generation=UINT32_MAX; state.audio_pending=true;
+    network_view.rssi=state.wifi_rssi=INT8_MIN; volume=UINT8_MAX; balance=INT8_MIN;
+    input.ready=UINT32_MAX-1; input.target=UINT32_MAX;
+    radio.item=radio.count=UINT16_MAX; radio.smartstart=normalization=true;
+    gain=UINT8_MAX; target=INT8_MIN; normtime=UINT16_MAX;
+}
+static const delivery_t *status_delivery_after(unsigned first, int socket) {
+    for (unsigned i=first; i<delivery_count; ++i)
+        if (deliveries[i].socket == socket && strstr(deliveries[i].text,"\"status\":")) return &deliveries[i];
+    return NULL;
+}
+static void assert_no_partial_captures(void) {
+    assert(active_wire_socket == -1);
+    for (size_t i=0;i<sizeof(captures)/sizeof(captures[0]);++i) assert(!captures[i].header_size);
+}
+static void streaming_status_regressions(void) {
+    unsigned start_groups=cases;
+    // Body lengths around1024, and around1020 for a coalesced4-byte header.
+    // The station field occurs once, so a mix of6-byte escapes and ASCII tunes it
+    // exactly without relying on snprintf internals or a production test buffer.
+    const size_t boundaries[]={1019,1020,1021,1023,1024,1025};
+    for (size_t index=0; index<sizeof(boundaries)/sizeof(boundaries[0]); ++index) {
+        size_t wanted=boundaries[index];
+        reset(); start(); open_socket(7,true);
+        state.station[0]=state.title[0]=state.stream_format[0]=radio.name[0]=0;
+        cycle(); ws_status_key_t key=s_current;
+        size_t base=count_status_for_test(&key,WS_STATUS_BYTES,true);
+        assert(base < wanted);
+        size_t controls=(wanted-base)/6, ascii=(wanted-base)%6;
+        assert(controls+ascii < sizeof(key.station));
+        memset(key.station, '\1', controls); memset(key.station+controls,'x',ascii); key.station[controls+ascii]=0;
+        assert(count_status_for_test(&key,WS_STATUS_BYTES,true) == wanted);
+        memcpy(state.station,key.station,sizeof(state.station));
+        unsigned first=delivery_count; cycle();
+        const delivery_t *delivered=status_delivery_after(first,7);
+        assert(delivered && delivered->size == wanted && !strcmp(delivered->text,test_status_view()));
+        printf("WS_STREAM_SAMPLE=%zu\t%s\n",delivered->size,delivered->text);
+        assert_no_partial_captures();
+    }
+
+    // One-byte accepted writes split the extended header and every JSON escape.
+    reset(); start(); open_socket(7,true); worst_status_for_test();
+    limited_socket=7; transport_limit=1; cycle();
+    const delivery_t *maximum=status_delivery_after(0,7);
+    assert(maximum && maximum->size == 4899 && !strcmp(maximum->text,test_status_view()));
+    printf("WS_STREAM_SAMPLE=%zu\t%s\n",maximum->size,maximum->text);
+    assert(raw_send_calls >= maximum->size+4 && delivery_count == 3);
+    assert_no_partial_captures();
+
+    // Count-only and emission must agree exactly; the logical cap reserves NUL.
+    reset(); start(); open_socket(7,true); worst_status_for_test(); cycle();
+    size_t measured=count_status_for_test(&s_current,WS_STATUS_BYTES,true);
+    assert(measured == 4899 && count_status_for_test(&s_current,measured+1,true) == measured);
+    assert(count_status_for_test(&s_current,measured,false) < measured);
+    assert(count_status_for_test(&s_current,0,false) == 0);
+    assert(strlen(test_status_view()) == measured);
+
+    // The pre-count size guard must reject before any I/O or session damage.
+    reset(); start(); open_socket(7,true); cycle();
+    size_t saved_length=s_status_length;
+    unsigned saved_calls=raw_send_calls, saved_deliveries=delivery_count;
+    const size_t invalid_sizes[]={WS_STATUS_BYTES,SIZE_MAX};
+    for (size_t i=0;i<sizeof(invalid_sizes)/sizeof(invalid_sizes[0]);++i) {
+        s_status_length=invalid_sizes[i];
+        assert(send_status_frame(&s_clients[0]) == ESP_ERR_INVALID_SIZE);
+        assert(raw_send_calls == saved_calls && delivery_count == saved_deliveries);
+        assert(!s_clients[0].closing && !s_clients[0].frame_deadline_us);
+    }
+    // Real status bodies cannot be125/126 bytes. Exercise the actual header
+    // branches via an in-range stale count, keeping the true body below1024:
+    // no staged byte may be emitted, and neither probe is a valid target frame.
+    assert(saved_length > 126 && saved_length+4 < WS_STATUS_STAGE_BYTES);
+    for (size_t size=125;size<=126;++size) {
+        s_status_length=size;
+        ws_client_t *client=find_client(7); assert(client);
+        assert(send_status_frame(client) == ESP_FAIL && client->closing && !client->frame_deadline_us);
+        assert(raw_send_calls == saved_calls && delivery_count == saved_deliveries);
+        assert((uint8_t)s_status_stage[0] == 0x81);
+        if (size == 125) assert((uint8_t)s_status_stage[1] == 125);
+        else assert((uint8_t)s_status_stage[1] == 126 && (uint8_t)s_status_stage[2] == 0 && (uint8_t)s_status_stage[3] == 126);
+        assert_no_partial_captures(); close_socket(7); open_socket(7,true);
+    }
+    s_status_length=saved_length;
+    assert(send_status_frame(find_client(7)) == ESP_OK && delivery_count == saved_deliveries+1);
+    assert_no_partial_captures();
+
+    // A stale count within the logical cap can fail after earlier chunks were
+    // accepted. Abort that peer, clear its deadline, and send no later frame on
+    // it; restoring the true count must leave the other peer fully usable.
+    reset(); start(); open_socket(7,true); open_socket(8,true); worst_status_for_test(); cycle();
+    saved_length=s_status_length; saved_deliveries=delivery_count;
+    s_status_length=saved_length+1;
+    assert(send_status_frame(&s_clients[0]) == ESP_FAIL && s_clients[0].closing && !s_clients[0].frame_deadline_us);
+    assert(delivery_count == saved_deliveries && abandoned_partial_frames == 1);
+    saved_calls=raw_send_calls;
+    assert(send_text(&s_clients[0],"must not follow partial frame") == ESP_ERR_INVALID_STATE);
+    assert(raw_send_calls == saved_calls); assert_no_partial_captures();
+    s_status_length=saved_length;
+    assert(send_status_frame(&s_clients[1]) == ESP_OK && delivery_count == saved_deliveries+1);
+    assert(deliveries[delivery_count-1].socket == 8 && deliveries[delivery_count-1].size == 4899);
+    assert_no_partial_captures();
+
+    // Mutation after count and during transport cannot change this logical
+    // status or the second peer's view; the following cycle publishes it.
+    reset(); start(); open_socket(7,true); open_socket(8,true); worst_status_for_test();
+    mutate_on_status_write=true; limited_socket=7; transport_limit=127;
+    cycle(); const delivery_t *first_peer=status_delivery_after(0,7), *second_peer=status_delivery_after(0,8);
+    assert(first_peer && second_peer && first_peer->size == 4899 && second_peer->size == first_peer->size);
+    assert(!memcmp(first_peer->text,second_peer->text,first_peer->size));
+    printf("WS_STREAM_SAMPLE=%zu\t%s\n",first_peer->size,first_peer->text);
+    printf("WS_STREAM_SAMPLE=%zu\t%s\n",second_peer->size,second_peer->text);
+    assert(!strstr(first_peer->text,"changed after count"));
+    assert(!strcmp(first_peer->text,test_status_view()));
+    unsigned first=delivery_count; cycle();
+    assert(contains_delivery(first,7,"changed after count before emission completed"));
+    assert(contains_delivery(first,8,"changed after count before emission completed"));
+    assert_no_partial_captures();
+
+    // A partial successful transport call never grants a new one-second budget.
+    // The healthy peer gets its own fresh budget after the failed peer closes.
+    reset(); start(); open_socket(7,true); open_socket(8,true); worst_status_for_test();
+    limited_socket=timed_socket=7; transport_limit=127; io_advance_us=250001;
+    cycle(); assert(shutdown_count == 1 && s_clients[0].closing);
+    assert(!status_delivery_after(0,7) && status_delivery_after(0,8));
+    assert(abandoned_partial_frames == 1 && !s_clients[0].frame_deadline_us);
+    assert_no_partial_captures();
+    close_socket(7); open_socket(7,true); limited_socket=timed_socket=-1; transport_limit=0; io_advance_us=0;
+    first=delivery_count; cycle();
+    const delivery_t *replacement=status_delivery_after(first,7);
+    assert(replacement && replacement->incarnation == 2 && replacement->size == 4899);
+    assert_no_partial_captures();
+    // Also consume the shared deadline across whole staging flushes. A fresh
+    // deadline per1024-byte chunk must fail this subcase, even when each chunk
+    // itself completes in one successful transport call.
+    first=delivery_count; timed_socket=7; io_advance_us=250001;
+    assert(send_status_frame(&s_clients[0]) == ESP_FAIL && s_clients[0].closing);
+    assert(!status_delivery_after(first,7) && !s_clients[0].frame_deadline_us);
+    assert(abandoned_partial_frames == 2); assert_no_partial_captures();
+    assert(send_status_frame(&s_clients[1]) == ESP_OK && status_delivery_after(first,8));
+    assert_no_partial_captures();
+
+    // TLS WANT_READ during output must wait for readability and preserve bytes.
+    reset(); start(); open_socket(7,true); send_wants_read=true;
+    io_script[0]=-EAGAIN; io_length=1; select_script[0]=1; select_length=1;
+    cycle(); assert(read_selects == 1 && !write_selects && status_delivery_after(0,7));
+    assert_no_partial_captures();
+
+    // TLS WANT_WRITE during input must wait for writability, not readability.
+    reset(); start(); open_socket(7,true); cycle(); recv_wants_write=true;
+    receive_script[0]=-EAGAIN; receive_length=1; select_script[0]=1; select_length=1;
+    assert(transport_command("ping") == ESP_OK && write_selects == 1 && !read_selects);
+    assert(!strcmp(last_text(),"{\"pong\":1}"));
+
+    // Stop admission after the first status chunk: no complete status, no late
+    // continuation on another incarnation, and no production buffer retained.
+    reset(); start(); open_socket(7,true); worst_status_for_test();
+    stop_on_status_write=true; limited_socket=7; transport_limit=127;
+    cycle(); assert(!atomic_load(&s_running) && shutdown_count == 1 && !delivery_count);
+    assert(abandoned_partial_frames == 1 && !s_clients[0].frame_deadline_us);
+    assert_no_partial_captures();
+    printf("WS_STREAM_GROUPS=%u\n", cases-start_groups);
+}
+#endif
+
+#ifdef TEST_WIRE_CAPTURE_CONTROL
+static void rejected_capture_control(void) {
+    reset(); start(); open_socket(7,true);
+    ws_client_t owner={.used=true,.socket=7,.frame_deadline_us=1000000};
+    sockets[7].context=&owner; // Isolated oracle test; no production send needed.
+#if TEST_WIRE_CAPTURE_CONTROL == 1
+    const uint8_t header[]={0x81,3};
+    capture_wire_bytes(7,header,sizeof(header)); capture_wire_bytes(7,"{}",2);
+    assert(delivery_count == 1 && "wire-completion-required");
+#elif TEST_WIRE_CAPTURE_CONTROL == 2
+    const uint8_t first=0x81, rest[]={1,'x'};
+    capture_wire_bytes(7,&first,1); ++owner.frame_deadline_us;
+    capture_wire_bytes(7,rest,sizeof(rest));
+#elif TEST_WIRE_CAPTURE_CONTROL == 3
+    const uint8_t first=0x81, rest[]={1,'x'};
+    capture_wire_bytes(7,&first,1); ++sockets[7].incarnation;
+    capture_wire_bytes(7,rest,sizeof(rest));
+#else
+#error Unknown wire capture negative control
+#endif
+}
+#endif
+
 int main(void) {
+#ifdef TEST_WIRE_CAPTURE_CONTROL
+    rejected_capture_control();
+    puts("WIRE_CONTROL_NOT_REJECTED");
+    return 0;
+#endif
     status_key_comparison_regressions();
 
     // RTC data can survive a deep-sleep wake while ordinary service flags
@@ -770,7 +1111,7 @@ int main(void) {
     reset(); start(); open_socket(7, true); cycle();
     io_script[0]=1; io_script[1]=1; io_script[2]=2; io_script[3]=3; io_length=4;
     unsigned raw_before = raw_send_calls;
-    assert(send_text(&s_clients[0], "short") == ESP_OK && raw_send_calls == raw_before + 4 && io_position == 4);
+    assert(send_text(&s_clients[0], "short") == ESP_OK && raw_send_calls > raw_before && io_position == 4 && !strcmp(last_text(), "short"));
     io_position=0; io_length=2; io_script[0]=-EAGAIN; io_script[1]=-EINTR;
     select_script[0]=-EINTR; select_script[1]=1; select_length=2;
     assert(send_text(&s_clients[0], "retry") == ESP_OK && select_calls == 2 && transport_yields == 2);
@@ -791,8 +1132,8 @@ int main(void) {
     assert(send_text(&s_clients[0], "closed") == ESP_FAIL && shutdown_count == 1);
 
     reset(); start(); open_socket(7, true); cycle();
-    io_advance_us = WS_FRAME_BUDGET_US / 2 + 1; raw_before=raw_send_calls;
-    assert(send_text(&s_clients[0], "shared deadline") == ESP_FAIL && raw_send_calls == raw_before + 2 && shutdown_count == 1);
+    io_advance_us = WS_FRAME_BUDGET_US / 2 + 1; raw_before=raw_send_calls; io_script[0]=1; io_length=1;
+    assert(send_text(&s_clients[0], "shared deadline") == ESP_FAIL && raw_send_calls > raw_before && now_us >= WS_FRAME_BUDGET_US && shutdown_count == 1);
 
     reset(); start(); open_socket(7, true); cycle();
     for (unsigned i=0;i<32;++i) { io_script[i]=-EAGAIN; select_script[i]=1; }
@@ -877,18 +1218,21 @@ int main(void) {
     cycle(); assert(strstr(deliveries[3].text, "\\ufffd"));
 #if TEST_NETWORK_STATUS
     reset(); start(); open_socket(7, true); cycle();
-    assert(strstr(s_status, "\"rssi_valid\":true") && strstr(s_status, "\"rssi\":-42"));
+    assert(strstr(test_status_view(), "\"rssi_valid\":true") && strstr(test_status_view(), "\"rssi\":-42"));
     network_view.rssi_valid=false; network_view.rssi=-70; cycle();
-    assert(strstr(s_status, "\"rssi_valid\":false") && strstr(s_status, "\"rssi\":0"));
+    assert(strstr(test_status_view(), "\"rssi_valid\":false") && strstr(test_status_view(), "\"rssi\":0"));
     network_view.ap_enabled=true; network_view.online=false; cycle();
-    assert(strstr(s_status, "\"ap_enabled\":true") && strstr(s_status, "\"network_online\":false"));
+    assert(strstr(test_status_view(), "\"ap_enabled\":true") && strstr(test_status_view(), "\"network_online\":false"));
     unsigned before_network_failure=delivery_count;
     network_unavailable=true; cycle(); assert(delivery_count==before_network_failure);
     network_unavailable=false; network_view.online=true; network_view.rssi_valid=true;
     network_view.rssi=-30; cycle(); assert(delivery_count>before_network_failure);
-    assert(strstr(s_status, "\"rssi_valid\":true") && strstr(s_status, "\"rssi\":-30"));
+    assert(strstr(test_status_view(), "\"rssi_valid\":true") && strstr(test_status_view(), "\"rssi\":-30"));
     assert(websocket_service_stop()==ESP_OK);
     for(int i=0;i<16;++i)close_socket(i);
+#endif
+#if defined(WS_STATUS_STREAMING) && WS_STATUS_STREAMING
+    streaming_status_regressions();
 #endif
     printf("PASS CYD WebSocket core: %u fixture groups, two clients, bounded async work, fd reuse, malformed commands, maximum JSON\n", cases);
     reset();

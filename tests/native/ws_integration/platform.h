@@ -22,6 +22,13 @@
 #include "http_parser.h"
 #include "websocket_message.h"
 #include "json_buffer.h"
+#ifndef TARGET_C3
+// CYD's status scheduler is outside this protocol fixture. Its declarations
+// occur in the unchanged application prefix; the core harness covers runtime.
+typedef void *esp_timer_handle_t;
+#define ESP_EVENT_DEFINE_BASE(name) const char *name = #name
+#define WS_STATUS_STORAGE
+#endif
 #define CONFIG_HTTPD_WS_SUPPORT 1
 #define CONFIG_HTTPD_WS_STRICTER_RFC6455 1
 #define CONFIG_HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT 1

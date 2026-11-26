@@ -36,7 +36,7 @@ def main():
     for value in fuzz:value.encode('utf-8',errors='strict')
     (OUT/'build.log').write_bytes(build);(OUT/'test.log').write_bytes(log)
     sources=[Path(__file__),ROOT/'tests/native/native_stream_body_test.c',SHARED/'icy_title.c',
-             *[SHARED/'include'/name for name in ('icy_title.h','stream_body.h','json_buffer.h')]]
+             *[SHARED/'include'/name for name in ('icy_title.h','stream_body.h','json_buffer.h','json_string_span.h')]]
     (OUT/'report.json').write_text(json.dumps(dict(passed=True,json_fuzz_cases=1000,
         source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}),indent=2)+'\n')
     print('\n'.join(line for line in log.decode().splitlines() if line.startswith('PASS')))

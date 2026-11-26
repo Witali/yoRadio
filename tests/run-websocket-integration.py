@@ -41,7 +41,7 @@ def main():
                ROOT/'idf/esp32-cyd2usb-native/main/websocket_service.c',
                ROOT/'idf/esp32c3-oled-native/main/websocket_service.c',
                ROOT/'idf/components/native_stream/include/websocket_message.h',
-               ROOT/'idf/components/native_stream/include/json_buffer.h',
+               ROOT/'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h',
                ROOT/'idf/components/native_web_transport/include/native_web_transport.h']
     hashes = {}
     for path in sources:

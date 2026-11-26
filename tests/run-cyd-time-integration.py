@@ -81,7 +81,7 @@ def main():
     files=[Path(__file__),*FIXTURE.glob('*.*'),ROOT/'tests/run-native-ota-http.py',
         ROOT/'tests/native/ws_integration/platform.h',ROOT/'tests/native/native_web_transport/esp_tls_host.c',
         *[mainpath/name for name in ['web_time.c','web_time.h','time_settings.c','time_settings.h','time_service.h']],
-        ROOT/'idf/components/native_time/include/native_time_sntp.h',ROOT/'idf/components/native_stream/include/json_buffer.h',
+        ROOT/'idf/components/native_time/include/native_time_sntp.h',ROOT/'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h',
         ROOT/'idf/components/native_stream/include/websocket_message.h',
         *[mainpath/'compat/httpd_rfc6455'/name for name in ['native_httpd_headers.h']],
         *[ROOT/'idf/components/native_web_transport'/name for name in ['native_web_transport.c','include/native_web_transport.h','tools/pack_tls_bundle.py']]]

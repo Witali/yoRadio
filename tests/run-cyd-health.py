@@ -21,7 +21,7 @@ def main():
     OUT.mkdir(parents=True,exist_ok=False);(OUT/'freertos').mkdir()
     sources=[Path(__file__),ROOT/'tests/native/cyd_health_test.c',
         *[MAIN/name for name in ('native_health.c','native_health.h','native_health_json.c','native_output_metrics.h')],
-        ROOT/'idf/components/native_stream/include/json_buffer.h',ROOT/'tools/codec_benchmark/run_output_dma_host.py']
+        ROOT/'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h',ROOT/'tools/codec_benchmark/run_output_dma_host.py']
     hashes={}
     for path in sources:
         relative=path.relative_to(ROOT)

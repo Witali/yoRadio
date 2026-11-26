@@ -26,7 +26,7 @@ def main():
     out=p.parse_args().output.resolve();out.mkdir(parents=True,exist_ok=False)
     main=ROOT/'idf/esp32c3-oled-native/main';test=ROOT/'tests/native';backend=ROOT/'idf/components/native_time/include'
     files=[Path(__file__).resolve(),*[main/n for n in ('time_service.c','time_service.h','runtime_settings.h','websocket_service.c','json_buffer.h')],
-           *[test/n for n in ('c3_time_service_platform.h','c3_time_service_test.c','c3_time_ws_snapshot_test.c')],backend/'native_time_sntp.h',ROOT/'idf/components/native_stream/include/json_buffer.h']
+           *[test/n for n in ('c3_time_service_platform.h','c3_time_service_test.c','c3_time_ws_snapshot_test.c')],backend/'native_time_sntp.h',ROOT/'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h']
     hashes={f.relative_to(ROOT).as_posix():hashlib.sha256(f.read_bytes()).hexdigest() for f in files}
     for f in files:
         dest=out/'sources'/f.relative_to(ROOT);dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(f.read_bytes())

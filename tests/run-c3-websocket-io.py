@@ -45,7 +45,7 @@ def main():
     (out / 'baseline.c').write_text(baseline)
     message_header = ROOT/'idf/components/native_stream/include/websocket_message.h'
     files = [MAIN, MAIN.with_suffix('.h'), MAIN.with_name('websocket_message.h'), MAIN.with_name('json_buffer.h'),
-             message_header, message_header.with_name('json_buffer.h'),
+             message_header, message_header.with_name('json_buffer.h'), message_header.with_name('json_string_span.h'),
              ROOT/'idf/components/native_web_transport/include/native_web_transport.h', Path(__file__), TEST/'stubs.h', TEST/'test.c']
     hashes = {}
     for path in files:

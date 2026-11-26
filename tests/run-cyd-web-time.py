@@ -25,7 +25,7 @@ def main():
     out=parser.parse_args().output.resolve();out.mkdir(parents=True,exist_ok=False)
     main=ROOT/'idf/esp32-cyd2usb-native/main';test=ROOT/'tests/native';shared=ROOT/'idf/components/native_time/include/native_time_sntp.h'
     files=[Path(__file__).resolve(),test/'cyd_web_time_test.c',test/'cyd_time_platform.h',test/'native_time_platform.h',shared,
-           *[main/name for name in ('time_settings.c','time_settings.h','time_service.h','web_time.c','web_time.h')],ROOT/'idf/components/native_stream/include/json_buffer.h']
+           *[main/name for name in ('time_settings.c','time_settings.h','time_service.h','web_time.c','web_time.h')],ROOT/'idf/components/native_stream/include/json_buffer.h', ROOT/'idf/components/native_stream/include/json_string_span.h']
     hashes={f.relative_to(ROOT).as_posix():hashlib.sha256(f.read_bytes()).hexdigest() for f in files}
     for f in files:
         target=out/'sources'/f.relative_to(ROOT);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(f.read_bytes())
