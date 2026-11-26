@@ -1,0 +1,111 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\pdm\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .iram0.vectors:
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+400f40f8 <__wrap_native_audio_output_write_pcm>:
+400f40f8:	006136        	entry	a1, 48
+400f40fb:	744040        	extui	a4, a4, 0, 8
+400f40fe:	745050        	extui	a5, a5, 0, 8
+400f4101:	05dd      	mov.n	a13, a5
+400f4103:	04cd      	mov.n	a12, a4
+400f4105:	03bd      	mov.n	a11, a3
+400f4107:	02ad      	mov.n	a10, a2
+400f4109:	f53725        	call8	400e947c <native_audio_output_write_pcm>
+400f410c:	0b0c      	movi.n	a11, 0
+400f410e:	190c      	movi.n	a9, 1
+400f4110:	f0c442        	addi	a4, a4, -16
+400f4113:	0b8d      	mov.n	a8, a11
+400f4115:	d55a      	add.n	a13, a5, a5
+400f4117:	938940        	movnez	a8, a9, a4
+400f411a:	83b9d0        	moveqz	a11, a9, a13
+400f411d:	2088b0        	or	a8, a8, a11
+400f4120:	0a4d      	mov.n	a4, a10
+400f4122:	0d7856        	bnez	a8, 400f41fd <__wrap_native_audio_output_write_pcm+0x105>
+400f4125:	9389a0        	movnez	a8, a9, a10
+400f4128:	0d1856        	bnez	a8, 400f41fd <__wrap_native_audio_output_write_pcm+0x105>
+400f412b:	e2a3d0        	remu	a10, a3, a13
+400f412e:	8398a0        	moveqz	a9, a8, a10
+400f4131:	0c8956        	bnez	a9, 400f41fd <__wrap_native_audio_output_write_pcm+0x105>
+400f4134:	0235b6        	bltui	a5, 3, 400f413a <__wrap_native_audio_output_write_pcm+0x42>
+400f4137:	003086        	j	400f41fd <__wrap_native_audio_output_write_pcm+0x105>
+400f413a:	768351        	l32r	a5, 400d1b48 <_stext+0x1b28> (3ffb7da0 <pcm_frames>)
+400f413d:	0588      	l32i.n	a8, a5, 0
+400f413f:	1598      	l32i.n	a9, a5, 4
+400f4141:	208890        	or	a8, a8, a9
+400f4144:	688c      	beqz.n	a8, 400f414e <__wrap_native_audio_output_write_pcm+0x56>
+400f4146:	768581        	l32r	a8, 400d1b5c <_stext+0x1b3c> (3ffb7da8 <pcm_sha256>)
+400f4149:	001246        	j	400f4196 <__wrap_native_audio_output_write_pcm+0x9e>
+400f414c:	d20000        	quos	a0, a0, a0
+400f414f:	810061        	l32r	a6, 400d4550 <panic_handler+0x124> (20413274 <UserFrameTotalSize+0x20413174>)
+400f4152:	e07687        	bbci	a6, 24, 400f4136 <__wrap_native_audio_output_write_pcm+0x3e>
+400f4155:	0008      	l32i.n	a0, a0, 0
+400f4157:	0021d2        	l32i	a13, a1, 0
+400f415a:	00ea16        	beqz	a10, 400f416c <__wrap_native_audio_output_write_pcm+0x74>
+400f415d:	767bd1        	l32r	a13, 400d1b4c <_stext+0x1b2c> (3f4115d0 <_esp_trace_encoder_array_end+0x114b0>)
+400f4160:	767cc1        	l32r	a12, 400d1b50 <_stext+0x1b30> (3f427de4 <__func__$2>)
+400f4163:	767ca1        	l32r	a10, 400d1b54 <_stext+0x1b34> (3f41164a <_esp_trace_encoder_array_end+0x1152a>)
+400f4166:	67a0b2        	movi	a11, 103
+400f4169:	94f4a5        	call8	400890b4 <__assert_func>
+400f416c:	767c81        	l32r	a8, 400d1b5c <_stext+0x1b3c> (3ffb7da8 <pcm_sha256>)
+400f416f:	767ab1        	l32r	a11, 400d1b58 <_stext+0x1b38> (2000009 <UserFrameTotalSize+0x1ffff09>)
+400f4172:	20a880        	or	a10, a8, a8
+400f4175:	0161d2        	s32i	a13, a1, 4
+400f4178:	006182        	s32i	a8, a1, 0
+400f417b:	767e81        	l32r	a8, 400d1b74 <_stext+0x1b54> (4016a2d4 <psa_hash_setup>)
+400f417e:	0008e0        	callx8	a8
+400f4181:	0188      	l32i.n	a8, a1, 0
+400f4183:	11d8      	l32i.n	a13, a1, 4
+400f4185:	da8c      	beqz.n	a10, 400f4196 <__wrap_native_audio_output_write_pcm+0x9e>
+400f4187:	7676d1        	l32r	a13, 400d1b60 <_stext+0x1b40> (3f411650 <_esp_trace_encoder_array_end+0x11530>)
+400f418a:	7671c1        	l32r	a12, 400d1b50 <_stext+0x1b30> (3f427de4 <__func__$2>)
+400f418d:	7671a1        	l32r	a10, 400d1b54 <_stext+0x1b34> (3f41164a <_esp_trace_encoder_array_end+0x1152a>)
+400f4190:	68a0b2        	movi	a11, 104
+400f4193:	94f225        	call8	400890b4 <__assert_func>
+400f4196:	20c330        	or	a12, a3, a3
+400f4199:	20b220        	or	a11, a2, a2
+400f419c:	20a880        	or	a10, a8, a8
+400f419f:	01d9      	s32i.n	a13, a1, 0
+400f41a1:	767581        	l32r	a8, 400d1b78 <_stext+0x1b58> (4016a4bc <psa_hash_update>)
+400f41a4:	0008e0        	callx8	a8
+400f41a7:	01d8      	l32i.n	a13, a1, 0
+400f41a9:	da8c      	beqz.n	a10, 400f41ba <__wrap_native_audio_output_write_pcm+0xc2>
+400f41ab:	766ed1        	l32r	a13, 400d1b64 <_stext+0x1b44> (3f41168c <_esp_trace_encoder_array_end+0x1156c>)
+400f41ae:	7668c1        	l32r	a12, 400d1b50 <_stext+0x1b30> (3f427de4 <__func__$2>)
+400f41b1:	7668a1        	l32r	a10, 400d1b54 <_stext+0x1b34> (3f41164a <_esp_trace_encoder_array_end+0x1152a>)
+400f41b4:	6aa0b2        	movi	a11, 106
+400f41b7:	94efe5        	call8	400890b4 <__assert_func>
+400f41ba:	0588      	l32i.n	a8, a5, 0
+400f41bc:	c2c3d0        	quou	a12, a3, a13
+400f41bf:	cc8a      	add.n	a12, a12, a8
+400f41c1:	15d8      	l32i.n	a13, a5, 4
+400f41c3:	01bc87        	bgeu	a12, a8, 400f41c8 <__wrap_native_audio_output_write_pcm+0xd0>
+400f41c6:	dd1b      	addi.n	a13, a13, 1
+400f41c8:	766831        	l32r	a3, 400d1b68 <_stext+0x1b48> (3ffb7d98 <last_report>)
+400f41cb:	05c9      	s32i.n	a12, a5, 0
+400f41cd:	0398      	l32i.n	a9, a3, 0
+400f41cf:	1388      	l32i.n	a8, a3, 4
+400f41d1:	15d9      	s32i.n	a13, a5, 4
+400f41d3:	20a980        	or	a10, a9, a8
+400f41d6:	2a9c      	beqz.n	a10, 400f41ec <__wrap_native_audio_output_write_pcm+0xf4>
+400f41d8:	c08d80        	sub	a8, a13, a8
+400f41db:	02bc97        	bgeu	a12, a9, 400f41e1 <__wrap_native_audio_output_write_pcm+0xe9>
+400f41de:	ffc882        	addi	a8, a8, -1
+400f41e1:	c09c90        	sub	a9, a12, a9
+400f41e4:	48cc      	bnez.n	a8, 400f41ec <__wrap_native_audio_output_write_pcm+0xf4>
+400f41e6:	73af81        	l32r	a8, 400d10a4 <_stext+0x1084> (12bf <UserFrameTotalSize+0x11bf>)
+400f41e9:	10b897        	bgeu	a8, a9, 400f41fd <__wrap_native_audio_output_write_pcm+0x105>
+400f41ec:	7660a1        	l32r	a10, 400d1b6c <_stext+0x1b4c> (3f4116c4 <_esp_trace_encoder_array_end+0x115a4>)
+400f41ef:	764681        	l32r	a8, 400d1b08 <_stext+0x1ae8> (401842b4 <printf>)
+400f41f2:	0008e0        	callx8	a8
+400f41f5:	0588      	l32i.n	a8, a5, 0
+400f41f7:	1598      	l32i.n	a9, a5, 4
+400f41f9:	0389      	s32i.n	a8, a3, 0
+400f41fb:	1399      	s32i.n	a9, a3, 4
+400f41fd:	042d      	mov.n	a2, a4
+400f41ff:	f01d      	retw.n

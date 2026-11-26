@@ -1,0 +1,673 @@
+{
+  "passed": true,
+  "runtime_verified": false,
+  "physical_tested": false,
+  "scope": "Conservative reachable instruction CFG and literal-backed call targets; branch feasibility and dynamic execution are not proved. Only the four pinned undefined tcp_out references are covered; same-object allocator paths remain separate.",
+  "elf": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf",
+    "bytes": 10652636,
+    "sha256": "2b0f6eb8510cdcbe8839b43f05f74b4149d2ca1f76e91aa04d91e0a1af9a5571"
+  },
+  "objdump": {
+    "path": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+    "bytes": 906240,
+    "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+  },
+  "verifier": {
+    "bytes": 23211,
+    "sha256": "d4e636beb193d9a52460f587300cc07cae4b93285e3b8b3a04cd7a7337dcd90b"
+  },
+  "source_inputs": {
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure.c": {
+      "bytes": 3843,
+      "sha256": "6bd8a1ed0b87bac323af36cfb77a35465dbbd0104ccbb2fda042e4ce121fa848"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure_record.h": {
+      "bytes": 3388,
+      "sha256": "abd40e262a573337bd51efe2f364ae3e5bc37eae21c63c31559061fadac68072"
+    }
+  },
+  "source_binding_scope": "Current source byte identities; build-release/dependency binding is independently owned by SDK qualification.",
+  "sdk_provenance": {
+    "profile": "pdm",
+    "cu": {
+      "offset": 2156631,
+      "source": "C:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/core/tcp_out.c",
+      "directory": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\caqt23a\\fair-default-pdm\\b"
+    },
+    "source": {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\lwip\\lwip\\src\\core\\tcp_out.c",
+      "bytes": 81436,
+      "sha256": "f31f0eef0c9aba4402ebff73b6d99a560b1d7ec219b4e0e5791996c41a832308"
+    },
+    "object_scope": "Frozen pre-probe SDK reference objects. Current build-object identity is independently checked by SDK qualification; no live build output is read here.",
+    "tcp_object": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk-baseline\\pdm\\tcp_out.c.obj",
+      "bytes": 124772,
+      "sha256": "4b83cc23b14e7a18ec4b2ef5c4c0c3196218ee2607f1a1a9b4ab06decb4e264e"
+    },
+    "pbuf_object": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk-baseline\\pdm\\pbuf.c.obj",
+      "bytes": 136800,
+      "sha256": "19d152fdb4a34dbe3b02da75c6307454b75fdbb04f28d1e95805a2614c61b3e8"
+    },
+    "references": [
+      {
+        "section": ".literal.tcp_output_alloc_header_common$constprop$0",
+        "offset": 16,
+        "type": 1
+      },
+      {
+        "section": ".literal.tcp_write",
+        "offset": 76,
+        "type": 1
+      },
+      {
+        "section": ".literal.tcp_split_unsent_seg",
+        "offset": 32,
+        "type": 1
+      },
+      {
+        "section": ".literal.tcp_enqueue_flags",
+        "offset": 40,
+        "type": 1
+      },
+      {
+        "section": ".text.tcp_output_alloc_header_common$constprop$0",
+        "offset": 20,
+        "type": 11
+      },
+      {
+        "section": ".text.tcp_write",
+        "offset": 344,
+        "type": 11
+      },
+      {
+        "section": ".text.tcp_split_unsent_seg",
+        "offset": 116,
+        "type": 11
+      },
+      {
+        "section": ".text.tcp_enqueue_flags",
+        "offset": 72,
+        "type": 11
+      }
+    ]
+  },
+  "tcp_out_sites": [
+    {
+      "function": {
+        "name": "tcp_output_alloc_header_common$constprop$0",
+        "address": 1075086476,
+        "bytes": 186,
+        "binding": "STB_LOCAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075086495,
+        "offset": 19,
+        "instruction": "call8",
+        "target": {
+          "address": 1074741060,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075086495,
+            "encoding": "abaa65"
+          }
+        ],
+        "normalized_return_pc_expected": 1075086495
+      },
+      "reachable_instructions": 66
+    },
+    {
+      "function": {
+        "name": "tcp_write",
+        "address": 1075086924,
+        "bytes": 874,
+        "binding": "STB_GLOBAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075087269,
+        "offset": 345,
+        "instruction": "call8",
+        "target": {
+          "address": 1074741060,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075087269,
+            "encoding": "ab79e5"
+          }
+        ],
+        "normalized_return_pc_expected": 1075087269
+      },
+      "reachable_instructions": 318
+    },
+    {
+      "function": {
+        "name": "tcp_split_unsent_seg",
+        "address": 1075087800,
+        "bytes": 392,
+        "binding": "STB_GLOBAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075087914,
+        "offset": 114,
+        "instruction": "call8",
+        "target": {
+          "address": 1074741060,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075087914,
+            "encoding": "ab51a5"
+          }
+        ],
+        "normalized_return_pc_expected": 1075087914
+      },
+      "reachable_instructions": 145
+    },
+    {
+      "function": {
+        "name": "tcp_enqueue_flags",
+        "address": 1075088192,
+        "bytes": 314,
+        "binding": "STB_GLOBAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075088267,
+        "offset": 75,
+        "instruction": "call8",
+        "target": {
+          "address": 1074741060,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075088267,
+            "encoding": "ab3ba5"
+          }
+        ],
+        "normalized_return_pc_expected": 1075088267
+      },
+      "reachable_instructions": 112
+    }
+  ],
+  "wrapper_calls": [
+    {
+      "site": 1074741072,
+      "offset": 12,
+      "instruction": "call8",
+      "target": {
+        "address": 1075071232,
+        "names": [
+          "pbuf_alloc"
+        ],
+        "kind": "ELF_function"
+      },
+      "provenance": [
+        {
+          "instruction": 1074741072,
+          "encoding": "509ae5"
+        }
+      ],
+      "normalized_return_pc_expected": 1074741072
+    },
+    {
+      "site": 1074741149,
+      "offset": 89,
+      "instruction": "call8",
+      "target": {
+        "address": 1074307096,
+        "names": [
+          "xPortEnterCriticalTimeout"
+        ],
+        "kind": "ELF_function"
+      },
+      "provenance": [
+        {
+          "instruction": 1074741149,
+          "encoding": "9607a5"
+        }
+      ],
+      "normalized_return_pc_expected": 1074741149
+    },
+    {
+      "site": 1074741356,
+      "offset": 296,
+      "instruction": "call8",
+      "target": {
+        "address": 1074306928,
+        "names": [
+          "vPortExitCritical"
+        ],
+        "kind": "ELF_function"
+      },
+      "provenance": [
+        {
+          "instruction": 1074741356,
+          "encoding": "95f025"
+        }
+      ],
+      "normalized_return_pc_expected": 1074741356
+    }
+  ],
+  "symbols": {
+    "wrapper": {
+      "name": "__wrap_pbuf_alloc",
+      "address": 1074741060,
+      "bytes": 306,
+      "binding": "STB_GLOBAL",
+      "section": ".flash.text"
+    },
+    "original": {
+      "name": "pbuf_alloc",
+      "address": 1075071232,
+      "bytes": 336,
+      "binding": "STB_GLOBAL",
+      "section": ".flash.text"
+    }
+  },
+  "wrapper_real_call_dominates_exits_without_cycle": true,
+  "same_object_clone_blind_spot": {
+    "function": {
+      "name": "pbuf_clone",
+      "address": 1075072608,
+      "bytes": 35,
+      "binding": "STB_GLOBAL",
+      "section": ".flash.text"
+    },
+    "original_allocator_call": {
+      "site": 1075072619,
+      "offset": 11,
+      "instruction": "call8",
+      "target": {
+        "address": 1075071232,
+        "names": [
+          "pbuf_alloc"
+        ],
+        "kind": "ELF_function"
+      },
+      "provenance": [
+        {
+          "instruction": 1075072619,
+          "encoding": "ffa965"
+        }
+      ],
+      "normalized_return_pc_expected": 1075072619
+    }
+  },
+  "storage": {
+    "s_pbuf_failures": {
+      "address": 1073421280,
+      "bytes": 128,
+      "section": ".dram0.data"
+    },
+    "s_pbuf_failure_lock": {
+      "address": 1073421408,
+      "bytes": 8,
+      "section": ".dram0.data"
+    }
+  },
+  "raw_disassembly": [
+    {
+      "file": "000-tcp_output_alloc_header_common_constprop_0.txt",
+      "bytes": 3598,
+      "sha256": "0cd38f89e3679b37b386ca357ec381e2b7df3c2f5468cef2ebcf548f3a2f5486",
+      "stderr": {
+        "file": "000-tcp_output_alloc_header_common_constprop_0.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014848c",
+        "--stop-address=0x40148546",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "001-tcp_write.txt",
+      "bytes": 18599,
+      "sha256": "5064e0e4522b049aa6f07ef1eb1fbf32bcea1ab355f80737d9f290682854b0e8",
+      "stderr": {
+        "file": "001-tcp_write.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014864c",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "002-tcp_write-branch.txt",
+      "bytes": 875,
+      "sha256": "bf42481a292f4a9a0114ab4cac0bd59a4e53eae920ce8acc02f79370920a063a",
+      "stderr": {
+        "file": "002-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148994",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "003-tcp_write-branch.txt",
+      "bytes": 17371,
+      "sha256": "fc20c4de0ea88751d28d5869530e124812d28297b3a40c4d7955e1485f53aebe",
+      "stderr": {
+        "file": "003-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148695",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "004-tcp_write-branch.txt",
+      "bytes": 15157,
+      "sha256": "d472fdec4b6a7f3a7baacfab2c8a649cc2c997e549f7ada1280404c6660755e5",
+      "stderr": {
+        "file": "004-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x401486f0",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "005-tcp_write-branch.txt",
+      "bytes": 15219,
+      "sha256": "7dacbb2658b53b636761382f560bcd0b797292102c8b65a5b2fb2c5785429a76",
+      "stderr": {
+        "file": "005-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x401486ed",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "006-tcp_write-branch.txt",
+      "bytes": 2860,
+      "sha256": "db9bf93e86d721b4d325edf5c46f4be602ce24279fe79327a7d8c1fbf462462f",
+      "stderr": {
+        "file": "006-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148928",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "007-tcp_write-branch.txt",
+      "bytes": 2162,
+      "sha256": "e368126b65a46bb0e1c6d700431d4ee1f0e50b2f0186e32ed0662d85eb1a1a96",
+      "stderr": {
+        "file": "007-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148954",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "008-tcp_write-branch.txt",
+      "bytes": 6427,
+      "sha256": "826afa15e284eedd59e7fa48b7ea23ffe0a5df3fe898ae269de9bbdb387ac2d6",
+      "stderr": {
+        "file": "008-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148874",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "009-tcp_write-branch.txt",
+      "bytes": 8676,
+      "sha256": "b17c28bc91d8abb06dc26c7bf7c3c7daaa604f75fe401dfde87c4c969b3c9783",
+      "stderr": {
+        "file": "009-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014880c",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "010-tcp_write-branch.txt",
+      "bytes": 6267,
+      "sha256": "765a45a131ae388dd223d3d5749daf15dd0981a31d8a9ec8c0ba1bc85395e4aa",
+      "stderr": {
+        "file": "010-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014887c",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "011-tcp_write-branch.txt",
+      "bytes": 4717,
+      "sha256": "2b10bee54ef5343bfb39f84118b2cd801761e3f086f19614e95e36d7e99a508b",
+      "stderr": {
+        "file": "011-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x401488d3",
+        "--stop-address=0x401489b6",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "012-tcp_split_unsent_seg.txt",
+      "bytes": 7832,
+      "sha256": "efe2cc8b296819f83a9284cfdd852222686c6aa55a392fc876a08df628b54dc4",
+      "stderr": {
+        "file": "012-tcp_split_unsent_seg.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x401489b8",
+        "--stop-address=0x40148b40",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "013-tcp_enqueue_flags.txt",
+      "bytes": 7281,
+      "sha256": "498dfe0baf04ba83201b00bb4b8413314c2683ec67994c29798ba2e862064b7d",
+      "stderr": {
+        "file": "013-tcp_enqueue_flags.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148b40",
+        "--stop-address=0x40148c7a",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "014-tcp_enqueue_flags-branch.txt",
+      "bytes": 5429,
+      "sha256": "a9fb97987f57700cb60053625bf191ebbe33a778b746d6a0ccd921b9de70af3f",
+      "stderr": {
+        "file": "014-tcp_enqueue_flags-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148b98",
+        "--stop-address=0x40148c7a",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "015-tcp_enqueue_flags-branch.txt",
+      "bytes": 4260,
+      "sha256": "fae830532db806f66888e6a83124e228fbc1af1615e96b33481114db68327fec",
+      "stderr": {
+        "file": "015-tcp_enqueue_flags-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148bcc",
+        "--stop-address=0x40148c7a",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "016-tcp_enqueue_flags-branch.txt",
+      "bytes": 2556,
+      "sha256": "703d896a47b6f59152da5cd232f9c51c1affccfeed7091457e3c9a384c0167a1",
+      "stderr": {
+        "file": "016-tcp_enqueue_flags-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40148c08",
+        "--stop-address=0x40148c7a",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "017-__wrap_pbuf_alloc.txt",
+      "bytes": 5906,
+      "sha256": "1abdf036ebe016fc014c5dcc8e9b4cb13b2416e81c21a9636ba9e3681f8e3a2f",
+      "stderr": {
+        "file": "017-__wrap_pbuf_alloc.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x400f3f44",
+        "--stop-address=0x400f4076",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "018-__wrap_pbuf_alloc-branch.txt",
+      "bytes": 958,
+      "sha256": "8c36c00d0c78cad0355eff7befa590de3e923243cd5697367e4d372f92a6a462",
+      "stderr": {
+        "file": "018-__wrap_pbuf_alloc-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x400f404c",
+        "--stop-address=0x400f4076",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    },
+    {
+      "file": "019-pbuf_clone.txt",
+      "bytes": 850,
+      "sha256": "6c501461be9a32eec1ca32a6ea5892b53f6f05b4e962c2f5a6080e0bbb81cbc6",
+      "stderr": {
+        "file": "019-pbuf_clone.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x40144e60",
+        "--stop-address=0x40144e83",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk\\pdm\\compiled\\yoradio_cyd2usb_native.elf"
+      ]
+    }
+  ]
+}

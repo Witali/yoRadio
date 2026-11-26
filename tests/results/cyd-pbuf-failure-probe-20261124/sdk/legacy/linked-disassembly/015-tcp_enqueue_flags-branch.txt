@@ -1,0 +1,71 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\legacy\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+4014b0e4 <tcp_enqueue_flags+0x8c>:
+4014b0e4:	3a88      	l32i.n	a8, a10, 12
+4014b0e6:	148080        	extui	a8, a8, 0, 2
+4014b0e9:	089c      	beqz.n	a8, 4014b0fd <tcp_enqueue_flags+0xa5>
+4014b0eb:	1d5ed1        	l32r	a13, 40112664 <FLAC__stream_decoder_get_decode_position+0x1cfc> (3f41d0fc <_esp_trace_encoder_array_end+0x1cfdc>)
+4014b0ee:	1d5ac1        	l32r	a12, 40112658 <FLAC__stream_decoder_get_decode_position+0x1cf0> (3f4595ec <__func__$17>)
+4014b0f1:	1d3fa1        	l32r	a10, 401125f0 <FLAC__stream_decoder_get_decode_position+0x1c88> (3f41ce00 <_esp_trace_encoder_array_end+0x1cce0>)
+4014b0f4:	46a4b2        	movi	a11, 0x446
+4014b0f7:	19ec81        	l32r	a8, 401118a8 <FLAC__stream_decoder_get_decode_position+0xf40> (40089244 <__assert_func>)
+4014b0fa:	0008e0        	callx8	a8
+4014b0fd:	041a82        	l16ui	a8, a10, 8
+4014b100:	089c      	beqz.n	a8, 4014b114 <tcp_enqueue_flags+0xbc>
+4014b102:	1d59d1        	l32r	a13, 40112668 <FLAC__stream_decoder_get_decode_position+0x1d00> (3f41d114 <_esp_trace_encoder_array_end+0x1cff4>)
+4014b105:	1d54c1        	l32r	a12, 40112658 <FLAC__stream_decoder_get_decode_position+0x1cf0> (3f4595ec <__func__$17>)
+4014b108:	1d3aa1        	l32r	a10, 401125f0 <FLAC__stream_decoder_get_decode_position+0x1c88> (3f41ce00 <_esp_trace_encoder_array_end+0x1cce0>)
+4014b10b:	47a4b2        	movi	a11, 0x447
+4014b10e:	19e681        	l32r	a8, 401118a8 <FLAC__stream_decoder_get_decode_position+0xf40> (40089244 <__assert_func>)
+4014b111:	0008e0        	callx8	a8
+4014b114:	1c2282        	l32i	a8, a2, 112
+4014b117:	58cc      	bnez.n	a8, 4014b120 <tcp_enqueue_flags+0xc8>
+4014b119:	1c62a2        	s32i	a10, a2, 112
+4014b11c:	000246        	j	4014b129 <tcp_enqueue_flags+0xd1>
+4014b11f:	089d00        	lsx	f9, a13, a0
+4014b122:	0888      	l32i.n	a8, a8, 0
+4014b124:	ff8856        	bnez	a8, 4014b120 <tcp_enqueue_flags+0xc8>
+4014b127:	09a9      	s32i.n	a10, a9, 0
+4014b129:	080c      	movi.n	a8, 0
+4014b12b:	365282        	s16i	a8, a2, 108
+4014b12e:	043030        	extui	a3, a3, 0, 1
+4014b131:	b7cc      	bnez.n	a7, 4014b140 <tcp_enqueue_flags+0xe8>
+4014b133:	e39c      	beqz.n	a3, 4014b155 <tcp_enqueue_flags+0xfd>
+4014b135:	182282        	l32i	a8, a2, 96
+4014b138:	881b      	addi.n	a8, a8, 1
+4014b13a:	186282        	s32i	a8, a2, 96
+4014b13d:	000246        	j	4014b14a <tcp_enqueue_flags+0xf2>
+4014b140:	182282        	l32i	a8, a2, 96
+4014b143:	881b      	addi.n	a8, a8, 1
+4014b145:	186282        	s32i	a8, a2, 96
+4014b148:	938c      	beqz.n	a3, 4014b155 <tcp_enqueue_flags+0xfd>
+4014b14a:	0f1282        	l16ui	a8, a2, 30
+4014b14d:	092c      	movi.n	a9, 32
+4014b14f:	208890        	or	a8, a8, a9
+4014b152:	0f5282        	s16i	a8, a2, 30
+4014b155:	012aa2        	l32i	a10, a10, 4
+4014b158:	420ae5        	call8	4018d208 <pbuf_clen>
+4014b15b:	351282        	l16ui	a8, a2, 106
+4014b15e:	80aa80        	add	a10, a10, a8
+4014b161:	f4a0a0        	extui	a10, a10, 0, 16
+4014b164:	3552a2        	s16i	a10, a2, 106
+4014b167:	023a16        	beqz	a10, 4014b18e <tcp_enqueue_flags+0x136>
+4014b16a:	1d2282        	l32i	a8, a2, 116
+4014b16d:	0a0c      	movi.n	a10, 0
+4014b16f:	b8dc      	bnez.n	a8, 4014b18e <tcp_enqueue_flags+0x136>
+4014b171:	1c2282        	l32i	a8, a2, 112
+4014b174:	68dc      	bnez.n	a8, 4014b18e <tcp_enqueue_flags+0x136>
+4014b176:	1d3dd1        	l32r	a13, 4011266c <FLAC__stream_decoder_get_decode_position+0x1d04> (3f41d140 <_esp_trace_encoder_array_end+0x1d020>)
+4014b179:	1d37c1        	l32r	a12, 40112658 <FLAC__stream_decoder_get_decode_position+0x1cf0> (3f4595ec <__func__$17>)
+4014b17c:	1d1da1        	l32r	a10, 401125f0 <FLAC__stream_decoder_get_decode_position+0x1c88> (3f41ce00 <_esp_trace_encoder_array_end+0x1cce0>)
+4014b17f:	69a4b2        	movi	a11, 0x469
+4014b182:	19c981        	l32r	a8, 401118a8 <FLAC__stream_decoder_get_decode_position+0xf40> (40089244 <__assert_func>)
+4014b185:	0008e0        	callx8	a8
+4014b188:	0f5282        	s16i	a8, a2, 30
+4014b18b:	ffa0a2        	movi	a10, 255
+4014b18e:	0a2d      	mov.n	a2, a10
+4014b190:	f01d      	retw.n

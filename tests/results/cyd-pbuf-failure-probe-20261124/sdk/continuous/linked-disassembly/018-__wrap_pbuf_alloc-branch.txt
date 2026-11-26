@@ -1,0 +1,22 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\continuous\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+400f3cbc <__wrap_pbuf_alloc+0x108>:
+400f3cbc:	1d29a2        	l32i	a10, a9, 116
+400f3cbf:	0d0a66        	bnei	a10, -1, 400f3cd0 <__wrap_pbuf_alloc+0x11c>
+400f3cc2:	1f29a2        	l32i	a10, a9, 124
+400f3cc5:	2b0c      	movi.n	a11, 2
+400f3cc7:	20aab0        	or	a10, a10, a11
+400f3cca:	1f69a2        	s32i	a10, a9, 124
+400f3ccd:	000146        	j	400f3cd6 <__wrap_pbuf_alloc+0x122>
+400f3cd0:	01caa2        	addi	a10, a10, 1
+400f3cd3:	1d69a2        	s32i	a10, a9, 116
+400f3cd6:	7782a1        	l32r	a10, 400d1ae0 <_stext+0x1ac0> (3ffb1c60 <s_pbuf_failure_lock>)
+400f3cd9:	006182        	s32i	a8, a1, 0
+400f3cdc:	963ae5        	call8	4008a08c <vPortExitCritical>
+400f3cdf:	002182        	l32i	a8, a1, 0
+400f3ce2:	082d      	mov.n	a2, a8
+400f3ce4:	f01d      	retw.n

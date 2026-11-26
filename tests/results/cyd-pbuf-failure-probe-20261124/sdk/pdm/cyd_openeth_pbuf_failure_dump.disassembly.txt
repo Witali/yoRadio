@@ -1,0 +1,60 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\pdm\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .iram0.vectors:
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+400f4078 <cyd_openeth_pbuf_failure_dump>:
+400f4078:	018136        	entry	a1, 192
+400f407b:	76b061        	l32r	a6, 400d1b3c <_stext+0x1b1c> (3ffb1c60 <s_pbuf_failure_lock>)
+400f407e:	ffafb2        	movi	a11, -1
+400f4081:	20a660        	or	a10, a6, a6
+400f4084:	95f925        	call8	4008a018 <xPortEnterCriticalTimeout>
+400f4087:	76ab71        	l32r	a7, 400d1b34 <_stext+0x1b14> (3ffb1be0 <s_pbuf_failures>)
+400f408a:	80a0c2        	movi	a12, 128
+400f408d:	07bd      	mov.n	a11, a7
+400f408f:	10c1a2        	addi	a10, a1, 16
+400f4092:	6ff981        	l32r	a8, 400d0078 <_stext+0x58> (4000c2c8 <memcpy>)
+400f4095:	0008e0        	callx8	a8
+400f4098:	1d27c2        	l32i	a12, a7, 116
+400f409b:	06ad      	mov.n	a10, a6
+400f409d:	1e2752        	l32i	a5, a7, 120
+400f40a0:	1c2762        	l32i	a6, a7, 112
+400f40a3:	2461c2        	s32i	a12, a1, 144
+400f40a6:	1f2772        	l32i	a7, a7, 124
+400f40a9:	95ec65        	call8	40089f70 <vPortExitCritical>
+400f40ac:	880c      	movi.n	a8, 8
+400f40ae:	76a4a1        	l32r	a10, 400d1b40 <_stext+0x1b20> (3f4114e0 <_esp_trace_encoder_array_end+0x113c0>)
+400f40b1:	2421c2        	l32i	a12, a1, 144
+400f40b4:	0189      	s32i.n	a8, a1, 0
+400f40b6:	80a0f2        	movi	a15, 128
+400f40b9:	07ed      	mov.n	a14, a7
+400f40bb:	05dd      	mov.n	a13, a5
+400f40bd:	06bd      	mov.n	a11, a6
+400f40bf:	6fed81        	l32r	a8, 400d0074 <_stext+0x54> (40007d54 <esp_rom_printf>)
+400f40c2:	0008e0        	callx8	a8
+400f40c5:	a5ac      	beqz.n	a5, 400f40f3 <cyd_openeth_pbuf_failure_dump+0x7b>
+400f40c7:	10c172        	addi	a7, a1, 16
+400f40ca:	060c      	movi.n	a6, 0
+400f40cc:	67a8      	l32i.n	a10, a7, 24
+400f40ce:	5798      	l32i.n	a9, a7, 20
+400f40d0:	4788      	l32i.n	a8, a7, 16
+400f40d2:	37f8      	l32i.n	a15, a7, 12
+400f40d4:	27e8      	l32i.n	a14, a7, 8
+400f40d6:	17d8      	l32i.n	a13, a7, 4
+400f40d8:	07c8      	l32i.n	a12, a7, 0
+400f40da:	21a9      	s32i.n	a10, a1, 8
+400f40dc:	769aa1        	l32r	a10, 400d1b44 <_stext+0x1b24> (3f41154c <_esp_trace_encoder_array_end+0x1142c>)
+400f40df:	06bd      	mov.n	a11, a6
+400f40e1:	1199      	s32i.n	a9, a1, 4
+400f40e3:	0189      	s32i.n	a8, a1, 0
+400f40e5:	661b      	addi.n	a6, a6, 1
+400f40e7:	6fe381        	l32r	a8, 400d0074 <_stext+0x54> (40007d54 <esp_rom_printf>)
+400f40ea:	0008e0        	callx8	a8
+400f40ed:	1cc772        	addi	a7, a7, 28
+400f40f0:	d89657        	bne	a6, a5, 400f40cc <cyd_openeth_pbuf_failure_dump+0x54>
+400f40f3:	f01d      	retw.n

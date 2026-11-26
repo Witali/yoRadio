@@ -1,0 +1,149 @@
+{
+  "controller_state": "TERMINAL_NONPASS",
+  "controller_reason": "Unexpected allocation failure count",
+  "physical_tested": false,
+  "inputs": {
+    "report": {
+      "bytes": 27739,
+      "sha256": "ef5f428c23bda25c8b2b388724a4122428592d54cd3d19bfb9f1db19dd99c340"
+    },
+    "uart": {
+      "bytes": 8606,
+      "sha256": "54e573e991f58532103bc1817db1a9f0eaa51f4a11c9a5d689427650421d04e2"
+    },
+    "elf": {
+      "bytes": 10597636,
+      "sha256": "48b5065e69412a491e56bd3b3a32a94b4200865af1b1bfdeae738a270edec4a6"
+    },
+    "addr2line": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    },
+    "objdump": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    },
+    "link_report": {
+      "bytes": 23789,
+      "sha256": "cd71094f12876dc5e005b893fa5c8165b2150d13e65d2ac6fa4e0364b8497e27"
+    }
+  },
+  "attribution_available": true,
+  "pbuf_pcm_flush_prefix": {
+    "total": 10,
+    "overflow": 0,
+    "used": 1,
+    "saturated": 0,
+    "table_bytes": 128,
+    "lock_bytes": 8,
+    "entries": [
+      {
+        "index": 0,
+        "layer": 54,
+        "type": 640,
+        "length": 1440,
+        "derived_allocation_bytes": 1512,
+        "caller_pc": 1075091965,
+        "count": 10,
+        "saturated": 0,
+        "target_pc": {
+          "frames": [
+            {
+              "function": "tcp_pbuf_prealloc",
+              "source": "C:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/core/tcp_out.c:266"
+            },
+            {
+              "function": "tcp_write",
+              "source": "C:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/core/tcp_out.c:613"
+            }
+          ],
+          "instruction": {
+            "address": 1075091965,
+            "encoding": "aa1b65",
+            "mnemonic": "call8",
+            "operand": "400f3bb4 <__wrap_pbuf_alloc>"
+          },
+          "disassembly_sha256": "135b85b895b3d2c0becc2234cfbb827c2ef8959acba1b86140372828642d35c6",
+          "scope": "Instruction and source symbolization; the SDK linked-target qualification independently proves wrapper reach."
+        },
+        "verified_tcp_call": {
+          "function": {
+            "name": "tcp_write",
+            "address": 1075091620,
+            "bytes": 874,
+            "binding": "STB_GLOBAL",
+            "section": ".flash.text"
+          },
+          "call": {
+            "site": 1075091965,
+            "offset": 345,
+            "instruction": "call8",
+            "target": {
+              "address": 1074740148,
+              "names": [
+                "__wrap_pbuf_alloc"
+              ],
+              "kind": "ELF_function"
+            },
+            "provenance": [
+              {
+                "instruction": 1075091965,
+                "encoding": "aa1b65"
+              }
+            ],
+            "normalized_return_pc_expected": 1075091965
+          },
+          "reachable_instructions": 318
+        },
+        "tcp_subset_scope": "Matched exact qualified TCP call-site PC"
+      }
+    ]
+  },
+  "health_observations": {
+    "first_active_health": {
+      "uptime_ms": 22500,
+      "minimum_heap": 9696,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      }
+    },
+    "health_during_webui": {
+      "uptime_ms": 30885,
+      "minimum_heap": 2236,
+      "allocation_failures": 10,
+      "last_allocation_failure": {
+        "size": 1512,
+        "caps": 6144
+      }
+    },
+    "eof_health": {
+      "uptime_ms": 47175,
+      "minimum_heap": 2236,
+      "allocation_failures": 10,
+      "last_allocation_failure": {
+        "size": 1512,
+        "caps": 6144
+      }
+    },
+    "post_eof_health": null,
+    "last_reachable_health": {
+      "uptime_ms": 52370,
+      "minimum_heap": 2236,
+      "allocation_failures": 10,
+      "last_allocation_failure": {
+        "size": 1512,
+        "caps": 6144
+      }
+    }
+  },
+  "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+  "pcm_flushes": [
+    {
+      "frames": 614400,
+      "status": 0
+    }
+  ],
+  "interpretation": "The probe is a cumulative PCM-flush prefix. Later EOF/WebUI/peer-close heap counts are independent snapshots, not an atomic common observation. NULL is not automatically a heap failure; retain non-RAM/overflow/saturation, unwrapped paths and unexplained differences. This report never promotes a controller NONPASS."
+}

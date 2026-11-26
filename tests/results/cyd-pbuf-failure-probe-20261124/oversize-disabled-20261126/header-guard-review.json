@@ -1,0 +1,59 @@
+{
+  "scope": "Narrow private checker correction under the root-authorized continuation; no source/SDK policy changes",
+  "original_preflight": {
+    "bytes": 85616,
+    "sha256": "df994a7b5ab351c0dcb5321b7d467a3768ff96668cc3d423925e908468852d44"
+  },
+  "original_release": {
+    "bytes": 382,
+    "sha256": "fc931f05a4643de75be3f9a6d051569f46ad6bd13f16e81d12efa1f416dc4fe3"
+  },
+  "original_execution": {
+    "bytes": 348,
+    "sha256": "2ea200e0da6b6858ffc1fffe03b426f1ba5ba37a45c35dc92d7efb2010315b1c"
+  },
+  "header_changes": [
+    {
+      "operation": "replace",
+      "before": [
+        "#define CONFIG_LWIP_TCP_OVERSIZE_MSS 1"
+      ],
+      "after": [
+        "#define CONFIG_LWIP_TCP_OVERSIZE_DISABLE 1"
+      ]
+    },
+    {
+      "operation": "replace",
+      "before": [
+        "#define CONFIG_TCP_OVERSIZE_MSS CONFIG_LWIP_TCP_OVERSIZE_MSS"
+      ],
+      "after": [
+        "#define CONFIG_TCP_OVERSIZE_DISABLE CONFIG_LWIP_TCP_OVERSIZE_DISABLE"
+      ]
+    }
+  ],
+  "sdk_compatibility_map": {
+    "path": "C:/Work/yoRadio/.idf/v6.0.2/components/lwip/sdkconfig.rename",
+    "bytes": 2432,
+    "sha256": "bd7304cbbaa4fd5ff22a64061595276b3e192dd72f18d5a585c6c86073a46a7d"
+  },
+  "generated_sdkconfig": {
+    "bytes": 82572,
+    "sha256": "6c84045f3dd8d807f653079c0a546dc89847307ef12ea080f7bf48d74ecb25d4"
+  },
+  "continuation_helpers": {
+    "common_reviewed.py": {
+      "bytes": 1843,
+      "sha256": "3939f777dc20f97cfc1677da4dd4429c8bc63f7cbceff80638b12c22f437488f"
+    },
+    "continue-build.py": {
+      "bytes": 5274,
+      "sha256": "412c2de9cfea31eb6c53ca95957a26783fe65a281f9a20617b36f03e58904bab"
+    },
+    "qualify-foundation-reviewed.py": {
+      "bytes": 5567,
+      "sha256": "9400d4a1abb920406bc4539a5ff726983fda523ca615d72b33b821e85a0cf897"
+    }
+  },
+  "reason": "Kconfig emits both the modern choice and its deprecated sdkconfig.rename alias; full JSON has exactly the requested two bool changes. The rewritten SDK seed is separately pinned; its authoritative generated JSON/header are checked before and after build."
+}

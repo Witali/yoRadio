@@ -1,0 +1,85 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\pdm\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .iram0.vectors:
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+400f4204 <__wrap_native_audio_output_flush_pcm>:
+400f4204:	014136        	entry	a1, 160
+400f4207:	f5a925        	call8	400e9c98 <native_audio_output_flush_pcm>
+400f420a:	764f81        	l32r	a8, 400d1b48 <_stext+0x1b28> (3ffb7da0 <pcm_frames>)
+400f420d:	202aa0        	or	a2, a10, a10
+400f4210:	0028c2        	l32i	a12, a8, 0
+400f4213:	765aa1        	l32r	a10, 400d1b7c <_stext+0x1b5c> (3f4116ec <_esp_trace_encoder_array_end+0x115cc>)
+400f4216:	18d8      	l32i.n	a13, a8, 4
+400f4218:	02ed      	mov.n	a14, a2
+400f421a:	763b81        	l32r	a8, 400d1b08 <_stext+0x1ae8> (401842b4 <printf>)
+400f421d:	0008e0        	callx8	a8
+400f4220:	0af256        	bnez	a2, 400f42d3 <__wrap_native_audio_output_flush_pcm+0xcf>
+400f4223:	764981        	l32r	a8, 400d1b48 <_stext+0x1b28> (3ffb7da0 <pcm_frames>)
+400f4226:	764891        	l32r	a9, 400d1b48 <_stext+0x1b28> (3ffb7da0 <pcm_frames>)
+400f4229:	0888      	l32i.n	a8, a8, 0
+400f422b:	1998      	l32i.n	a9, a9, 4
+400f422d:	208890        	or	a8, a8, a9
+400f4230:	09f816        	beqz	a8, 400f42d3 <__wrap_native_audio_output_flush_pcm+0xcf>
+400f4233:	764aa1        	l32r	a10, 400d1b5c <_stext+0x1b3c> (3ffb7da8 <pcm_sha256>)
+400f4236:	64c1d2        	addi	a13, a1, 100
+400f4239:	20a0c2        	movi	a12, 32
+400f423c:	44c1b2        	addi	a11, a1, 68
+400f423f:	196122        	s32i	a2, a1, 100
+400f4242:	765581        	l32r	a8, 400d1b98 <_stext+0x1b78> (4016a508 <psa_hash_finish>)
+400f4245:	0008e0        	callx8	a8
+400f4248:	da8c      	beqz.n	a10, 400f4259 <__wrap_native_audio_output_flush_pcm+0x55>
+400f424a:	764dd1        	l32r	a13, 400d1b80 <_stext+0x1b60> (3f41171c <_esp_trace_encoder_array_end+0x115fc>)
+400f424d:	764dc1        	l32r	a12, 400d1b84 <_stext+0x1b64> (3f427dbc <__func__$1>)
+400f4250:	7641a1        	l32r	a10, 400d1b54 <_stext+0x1b34> (3f41164a <_esp_trace_encoder_array_end+0x1152a>)
+400f4253:	84a0b2        	movi	a11, 132
+400f4256:	94e5e5        	call8	400890b4 <__assert_func>
+400f4259:	1921b2        	l32i	a11, a1, 100
+400f425c:	11cb26        	beqi	a11, 32, 400f4271 <__wrap_native_audio_output_flush_pcm+0x6d>
+400f425f:	764ad1        	l32r	a13, 400d1b88 <_stext+0x1b68> (3f411768 <_esp_trace_encoder_array_end+0x11648>)
+400f4262:	7648c1        	l32r	a12, 400d1b84 <_stext+0x1b64> (3f427dbc <__func__$1>)
+400f4265:	763ba1        	l32r	a10, 400d1b54 <_stext+0x1b34> (3f41164a <_esp_trace_encoder_array_end+0x1152a>)
+400f4268:	85a0b2        	movi	a11, 133
+400f426b:	201110        	or	a1, a1, a1
+400f426e:	94e465        	call8	400890b4 <__assert_func>
+400f4271:	763aa1        	l32r	a10, 400d1b5c <_stext+0x1b3c> (3ffb7da8 <pcm_sha256>)
+400f4274:	1c61b2        	s32i	a11, a1, 112
+400f4277:	764981        	l32r	a8, 400d1b9c <_stext+0x1b7c> (4016a25c <psa_hash_abort>)
+400f427a:	0008e0        	callx8	a8
+400f427d:	1c21b2        	l32i	a11, a1, 112
+400f4280:	011a16        	beqz	a10, 400f4295 <__wrap_native_audio_output_flush_pcm+0x91>
+400f4283:	7642d1        	l32r	a13, 400d1b8c <_stext+0x1b6c> (3f411780 <_esp_trace_encoder_array_end+0x11660>)
+400f4286:	763fc1        	l32r	a12, 400d1b84 <_stext+0x1b64> (3f427dbc <__func__$1>)
+400f4289:	7632a1        	l32r	a10, 400d1b54 <_stext+0x1b34> (3f41164a <_esp_trace_encoder_array_end+0x1152a>)
+400f428c:	86a0b2        	movi	a11, 134
+400f428f:	201110        	or	a1, a1, a1
+400f4292:	94e225        	call8	400890b4 <__assert_func>
+400f4295:	763ed1        	l32r	a13, 400d1b90 <_stext+0x1b70> (3f427da8 <hex$0>)
+400f4298:	44c1a2        	addi	a10, a1, 68
+400f429b:	01cd      	mov.n	a12, a1
+400f429d:	228b76        	loop	a11, 400f42c3 <__wrap_native_audio_output_flush_pcm+0xbf>
+400f42a0:	000a82        	l8ui	a8, a10, 0
+400f42a3:	01caa2        	addi	a10, a10, 1
+400f42a6:	349080        	extui	a9, a8, 0, 4
+400f42a9:	809d90        	add	a9, a13, a9
+400f42ac:	418480        	srli	a8, a8, 4
+400f42af:	000992        	l8ui	a9, a9, 0
+400f42b2:	808d80        	add	a8, a13, a8
+400f42b5:	000882        	l8ui	a8, a8, 0
+400f42b8:	119980        	slli	a9, a9, 8
+400f42bb:	208890        	or	a8, a8, a9
+400f42be:	005c82        	s16i	a8, a12, 0
+400f42c1:	cc2b      	addi.n	a12, a12, 2
+400f42c3:	7634a1        	l32r	a10, 400d1b94 <_stext+0x1b74> (3f4117ac <_esp_trace_encoder_array_end+0x1168c>)
+400f42c6:	080c      	movi.n	a8, 0
+400f42c8:	01bd      	mov.n	a11, a1
+400f42ca:	404182        	s8i	a8, a1, 64
+400f42cd:	760e81        	l32r	a8, 400d1b08 <_stext+0x1ae8> (401842b4 <printf>)
+400f42d0:	0008e0        	callx8	a8
+400f42d3:	ffda65        	call8	400f4078 <cyd_openeth_pbuf_failure_dump>
+400f42d6:	f01d      	retw.n

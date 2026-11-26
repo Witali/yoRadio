@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "scope": "Parser/tool format witness at an actual tcp_write call, not an observed native pbuf failure.",
+  "elf": {
+    "bytes": 10638336,
+    "sha256": "695ec4e4cd1e7647e3524fea480999ec582c28b81cf70ff5c04b3a4593b7c191"
+  },
+  "source": {
+    "bytes": 6805,
+    "sha256": "32011c4f740089126d6aba97951f0f1b33abfc9e0bc0423196efcf552e789612"
+  },
+  "proof": {
+    "frames": [
+      {
+        "function": "tcp_write_checks",
+        "source": "C:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/core/tcp_out.c:344 (discriminator 2)"
+      },
+      {
+        "function": "tcp_write",
+        "source": "C:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/core/tcp_out.c:435 (discriminator 2)"
+      }
+    ],
+    "instruction": {
+      "address": 1075096531,
+      "encoding": "0008e0",
+      "mnemonic": "callx8",
+      "operand": "a8"
+    },
+    "disassembly_sha256": "0c3e64853853829153b39ebe80c36debf94028ae5ec7cfea26f94246ebb864be",
+    "scope": "Instruction and source symbolization; the SDK linked-target qualification independently proves wrapper reach."
+  }
+}

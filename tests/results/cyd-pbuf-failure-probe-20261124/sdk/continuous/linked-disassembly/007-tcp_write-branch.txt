@@ -1,0 +1,42 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\continuous\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+40149bac <tcp_write+0x308>:
+40149bac:	0f1782        	l16ui	a8, a7, 30
+40149baf:	80a092        	movi	a9, 128
+40149bb2:	208890        	or	a8, a8, a9
+40149bb5:	0f5782        	s16i	a8, a7, 30
+40149bb8:	032182        	l32i	a8, a1, 12
+40149bbb:	005816        	beqz	a8, 40149bc4 <tcp_write+0x320>
+40149bbe:	20a880        	or	a10, a8, a8
+40149bc1:	fcde65        	call8	401469a8 <tcp_segs_free>
+40149bc4:	351782        	l16ui	a8, a7, 106
+40149bc7:	a89c      	beqz.n	a8, 40149be5 <tcp_write+0x341>
+40149bc9:	1d2782        	l32i	a8, a7, 116
+40149bcc:	58dc      	bnez.n	a8, 40149be5 <tcp_write+0x341>
+40149bce:	1c2782        	l32i	a8, a7, 112
+40149bd1:	08dc      	bnez.n	a8, 40149be5 <tcp_write+0x341>
+40149bd3:	206bd1        	l32r	a13, 40111d80 <FLAC__stream_decoder_get_decode_position+0x1c54> (3f41cd30 <_esp_trace_encoder_array_end+0x1cc10>)
+40149bd6:	2063c1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+40149bd9:	2056a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149bdc:	2aa3b2        	movi	a11, 0x32a
+40149bdf:	1d1e81        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149be2:	0008e0        	callx8	a8
+40149be5:	ffa022        	movi	a2, 255
+40149be8:	000806        	j	40149c0c <tcp_write+0x368>
+40149beb:	a02200        	addx4	a2, a2, a0
+40149bee:	0646f0        	lsi	f15, a6, 24
+40149bf1:	000000        	ill
+40149bf4:	f5a022        	movi	a2, 245
+40149bf7:	000446        	j	40149c0c <tcp_write+0x368>
+40149bfa:	365732        	s16i	a3, a7, 108
+40149bfd:	31a9      	s32i.n	a10, a1, 12
+40149bff:	ffcd46        	j	40149b38 <tcp_write+0x294>
+40149c02:	3149      	s32i.n	a4, a1, 12
+40149c04:	094d      	mov.n	a4, a9
+40149c06:	ec2a56        	bnez	a10, 40149acc <tcp_write+0x228>
+40149c09:	fffb46        	j	40149bfa <tcp_write+0x356>
+40149c0c:	f01d      	retw.n

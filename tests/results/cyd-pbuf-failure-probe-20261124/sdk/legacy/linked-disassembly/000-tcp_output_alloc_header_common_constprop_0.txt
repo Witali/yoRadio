@@ -1,0 +1,73 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\legacy\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+4014a9a4 <tcp_output_alloc_header_common$constprop$0>:
+4014a9a4:	006136        	entry	a1, 48
+4014a9a7:	181182        	l16ui	a8, a1, 48
+4014a9aa:	14c3b2        	addi	a11, a3, 20
+4014a9ad:	80a2c2        	movi	a12, 0x280
+4014a9b0:	f4b0b0        	extui	a11, a11, 0, 16
+4014a9b3:	2a2c      	movi.n	a10, 34
+4014a9b5:	0189      	s32i.n	a8, a1, 0
+4014a9b7:	aadd25        	call8	400f5788 <__wrap_pbuf_alloc>
+4014a9ba:	023d      	mov.n	a3, a2
+4014a9bc:	747070        	extui	a7, a7, 0, 8
+4014a9bf:	0a2d      	mov.n	a2, a10
+4014a9c1:	097a16        	beqz	a10, 4014aa5c <tcp_output_alloc_header_common$constprop$0+0xb8>
+4014a9c4:	051a92        	l16ui	a9, a10, 10
+4014a9c7:	3a1c      	movi.n	a10, 19
+4014a9c9:	113a97        	bltu	a10, a9, 4014a9de <tcp_output_alloc_header_common$constprop$0+0x3a>
+4014a9cc:	1f0bd1        	l32r	a13, 401125f8 <FLAC__stream_decoder_get_decode_position+0x1c90> (3f41ce48 <_esp_trace_encoder_array_end+0x1cd28>)
+4014a9cf:	1f0bc1        	l32r	a12, 401125fc <FLAC__stream_decoder_get_decode_position+0x1c94> (3f459540 <__func__$7>)
+4014a9d2:	1f07a1        	l32r	a10, 401125f0 <FLAC__stream_decoder_get_decode_position+0x1c88> (3f41ce00 <_esp_trace_encoder_array_end+0x1cce0>)
+4014a9d5:	27a7b2        	movi	a11, 0x727
+4014a9d8:	1bb481        	l32r	a8, 401118a8 <FLAC__stream_decoder_get_decode_position+0xf40> (40089244 <__assert_func>)
+4014a9db:	0008e0        	callx8	a8
+4014a9de:	05ad      	mov.n	a10, a5
+4014a9e0:	1258      	l32i.n	a5, a2, 4
+4014a9e2:	427525        	call8	4018d134 <lwip_htons>
+4014a9e5:	4198a0        	srli	a9, a10, 8
+4014a9e8:	0045a2        	s8i	a10, a5, 0
+4014a9eb:	014592        	s8i	a9, a5, 1
+4014a9ee:	06ad      	mov.n	a10, a6
+4014a9f0:	427425        	call8	4018d134 <lwip_htons>
+4014a9f3:	41d8a0        	srli	a13, a10, 8
+4014a9f6:	74c840        	extui	a12, a4, 8, 8
+4014a9f9:	75b040        	extui	a11, a4, 16, 8
+4014a9fc:	759840        	extui	a9, a4, 24, 8
+4014a9ff:	0345d2        	s8i	a13, a5, 3
+4014aa02:	0245a2        	s8i	a10, a5, 2
+4014aa05:	0545c2        	s8i	a12, a5, 5
+4014aa08:	0645b2        	s8i	a11, a5, 6
+4014aa0b:	074592        	s8i	a9, a5, 7
+4014aa0e:	044542        	s8i	a4, a5, 4
+4014aa11:	03ad      	mov.n	a10, a3
+4014aa13:	427365        	call8	4018d148 <lwip_htonl>
+4014aa16:	1efac1        	l32r	a12, 40112600 <FLAC__stream_decoder_get_decode_position+0x1c98> (5000 <UserFrameTotalSize+0x4f00>)
+4014aa19:	7590a0        	extui	a9, a10, 16, 8
+4014aa1c:	74b8a0        	extui	a11, a10, 8, 8
+4014aa1f:	7588a0        	extui	a8, a10, 24, 8
+4014aa22:	2077c0        	or	a7, a7, a12
+4014aa25:	0a4592        	s8i	a9, a5, 10
+4014aa28:	0845a2        	s8i	a10, a5, 8
+4014aa2b:	0945b2        	s8i	a11, a5, 9
+4014aa2e:	0b4582        	s8i	a8, a5, 11
+4014aa31:	f4a070        	extui	a10, a7, 0, 16
+4014aa34:	426fe5        	call8	4018d134 <lwip_htons>
+4014aa37:	4188a0        	srli	a8, a10, 8
+4014aa3a:	0c45a2        	s8i	a10, a5, 12
+4014aa3d:	01a8      	l32i.n	a10, a1, 0
+4014aa3f:	0d4582        	s8i	a8, a5, 13
+4014aa42:	426f25        	call8	4018d134 <lwip_htons>
+4014aa45:	080c      	movi.n	a8, 0
+4014aa47:	4198a0        	srli	a9, a10, 8
+4014aa4a:	0e45a2        	s8i	a10, a5, 14
+4014aa4d:	0f4592        	s8i	a9, a5, 15
+4014aa50:	104582        	s8i	a8, a5, 16
+4014aa53:	114582        	s8i	a8, a5, 17
+4014aa56:	124582        	s8i	a8, a5, 18
+4014aa59:	134582        	s8i	a8, a5, 19
+4014aa5c:	f01d      	retw.n

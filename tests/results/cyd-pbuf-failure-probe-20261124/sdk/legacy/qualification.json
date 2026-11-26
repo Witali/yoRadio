@@ -1,0 +1,292 @@
+{
+  "passed": true,
+  "source_commit": "f7dee344fb30ce109f2d30a01f0325d353e3b2eb",
+  "backend": "legacy",
+  "physical_tested": false,
+  "native_run": false,
+  "image": {
+    "bytes": 1270768,
+    "sha256": "d93d99729b3c7f5a37d633414e23d6240372bb94397ab0ccbc0b9f0f8b11163d"
+  },
+  "elf": {
+    "bytes": 10638336,
+    "sha256": "695ec4e4cd1e7647e3524fea480999ec582c28b81cf70ff5c04b3a4593b7c191"
+  },
+  "config": {
+    "bytes": 49212,
+    "sha256": "bf6a0b73b9715bbb723b96ea65337ff75d5680fa9681ccdcf973c1dec15e60ad"
+  },
+  "effective_config_delta": {},
+  "cmake_flag_delta": {
+    "CYD_OPENETH_PBUF_FAILURE_PROBE": {
+      "before": false,
+      "after": true
+    }
+  },
+  "main_command_changes": 34,
+  "changed_existing_objects": [
+    {
+      "path": ".build/cyd-vorbis-openeth-20261117/word-legacy/b/esp-idf/main/CMakeFiles/__idf_main.dir/C_/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/target/cyd_full_app_openeth_qemu/pcm.c.obj",
+      "before": {
+        "bytes": 17540,
+        "sha256": "57b6ba1cd98496bfa9722f81b057d9da96a07b7c69086c9b5d191fa300d7945f"
+      },
+      "after": {
+        "bytes": 17716,
+        "sha256": "dd039db2ab074610af52496174b2bae364fbc9ad4fd7a501193a14cd75eac56a"
+      }
+    }
+  ],
+  "new_probe_object": {
+    "bytes": 22212,
+    "sha256": "44d2303cbcc80071b3e42d76340c7a92b1ffa4ddaba3a2757372acfcf7b9da79"
+  },
+  "baseline_snapshot": {
+    "bytes": 15238,
+    "sha256": "36cd180ec569afbc7c86daa65a542b524f6388aa7172f35d06963c1563a8c17c"
+  },
+  "baseline_objects_zip": {
+    "bytes": 15744928,
+    "sha256": "b599520ad21b364447ec2fe4281cd5652d93071bb3d2bcdf92eab7a8199c36f1"
+  },
+  "owners": {
+    "s_pbuf_failures": {
+      "bytes": 128,
+      "address": 1073421296,
+      "section": ".dram0.data",
+      "initial_bytes_sha256": "38723a2e5e8a17aa7950dc008209944e898f69a7bd10a23c839d341e935fd5ca",
+      "initial_hex": null
+    },
+    "s_pbuf_failure_lock": {
+      "bytes": 8,
+      "address": 1073421424,
+      "section": ".dram0.data",
+      "initial_bytes_sha256": "80e1c1b9182ff69cc069adc4defc655b76bf944b0932a4ea690b94a95b06e2ab",
+      "initial_hex": "ffff3fb300000000"
+    }
+  },
+  "memory_delta": {
+    "dram_data_bytes": 136,
+    "dram_bss_bytes": 0,
+    "heap_start_bytes": 144,
+    "linker_alignment_bytes": 8
+  },
+  "rtc_workspace": false,
+  "rtc_probe": true,
+  "pbuf_probe": true,
+  "qemu_sha256": "28068f674d06c4322aa72989756d7dd3734bb0d06c4aa1acf21b919ccb3465f4",
+  "geometry": {
+    "rtc_used_bytes": 104,
+    "rtc_reserved_bytes": 24,
+    "rtc_free_bytes": 8064
+  },
+  "frames": {
+    "__wrap_pbuf_alloc": 48,
+    "cyd_openeth_pbuf_failure_dump": 192,
+    "__wrap_native_audio_output_flush_pcm": 160,
+    "__wrap_native_audio_output_write_pcm": 48
+  },
+  "total_stack_depth_verified": false,
+  "ota_slots": [
+    {
+      "name": "app0",
+      "offset": 65536,
+      "bytes": 1769472
+    },
+    {
+      "name": "app1",
+      "offset": 1835008,
+      "bytes": 1769472
+    }
+  ],
+  "scope": "Build/static/link/Clang qualification for diagnostic pbuf attribution only; no native runtime or physical acceptance.",
+  "pbuf_probe_enabled": true,
+  "rtc_probe_enabled": true,
+  "fixture": ".build/cpbuf24/sdk/legacy/fixture",
+  "baseline_binding": {
+    "source_commit": "7595a79958b8a2ef56babb24c43259fcf536b6dd",
+    "snapshot": {
+      "bytes": 15238,
+      "sha256": "36cd180ec569afbc7c86daa65a542b524f6388aa7172f35d06963c1563a8c17c"
+    },
+    "objects_zip": {
+      "bytes": 15744928,
+      "sha256": "b599520ad21b364447ec2fe4281cd5652d93071bb3d2bcdf92eab7a8199c36f1"
+    }
+  },
+  "project_clang": [
+    {
+      "unit": "pcm-before",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "unit": "pcm",
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "unit": "pbuf-probe",
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "sdk_frontends": [
+    {
+      "unit": "pbuf.c",
+      "source": {
+        "bytes": 52859,
+        "sha256": "951b1723eb1f919ca5cb408f19b00fcb9d464948a126631217ec96412dd1cc77"
+      },
+      "baseline_command_equivalent": true,
+      "config_header_identical": true,
+      "exit_status": 0,
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "unit": "tcp_out.c",
+      "source": {
+        "bytes": 81436,
+        "sha256": "f31f0eef0c9aba4402ebff73b6d99a560b1d7ec219b4e0e5791996c41a832308"
+      },
+      "baseline_command_equivalent": true,
+      "config_header_identical": true,
+      "exit_status": 0,
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "typed_compiler_config_delta": {
+    "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_NO_MERGE_CONSTANTS": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_RT_LIB_CLANGRT": {
+      "before_present": false,
+      "before": null,
+      "after_present": true,
+      "after": false
+    },
+    "COMPILER_STATIC_ANALYZER": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "IDF_TOOLCHAIN": {
+      "before_present": true,
+      "before": "gcc",
+      "after_present": true,
+      "after": "clang"
+    },
+    "IDF_TOOLCHAIN_CLANG": {
+      "before_present": false,
+      "before": null,
+      "after_present": true,
+      "after": true
+    },
+    "IDF_TOOLCHAIN_GCC": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    },
+    "LIBC_NEWLIB": {
+      "before_present": true,
+      "before": false,
+      "after_present": true,
+      "after": true
+    },
+    "LIBC_NEWLIB_NANO_FORMAT": {
+      "before_present": false,
+      "before": null,
+      "after_present": true,
+      "after": true
+    },
+    "LIBC_PICOLIBC": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    },
+    "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    }
+  },
+  "sdk_header_warnings": 18,
+  "sdk_header_warning_scope": "Additional all-header report, including system headers, with unchanged repository checks; existing SDK diagnostics retained.",
+  "link_verification": {
+    "report": {
+      "bytes": 23689,
+      "sha256": "d169968f37afcdeee96b824f7ff9e5551206f8337f067de90a7d48de874e97bb"
+    },
+    "verifier": {
+      "bytes": 23211,
+      "sha256": "d4e636beb193d9a52460f587300cc07cae4b93285e3b8b3a04cd7a7337dcd90b"
+    },
+    "four_tcp_sites_wrapped": true,
+    "wrapper_real_once": true,
+    "wrapper_calls": [
+      "pbuf_alloc",
+      "vPortExitCritical",
+      "xPortEnterCriticalTimeout"
+    ],
+    "hot_heap_log_or_unexpected_helper_calls": false,
+    "same_object_clone_blind_spot": {
+      "function": {
+        "name": "pbuf_clone",
+        "address": 1075082104,
+        "bytes": 35,
+        "binding": "STB_GLOBAL",
+        "section": ".flash.text"
+      },
+      "original_allocator_call": {
+        "site": 1075082115,
+        "offset": 11,
+        "instruction": "call8",
+        "target": {
+          "address": 1075080728,
+          "names": [
+            "pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075082115,
+            "encoding": "ffa965"
+          }
+        ],
+        "normalized_return_pc_expected": 1075082115
+      }
+    }
+  }
+}

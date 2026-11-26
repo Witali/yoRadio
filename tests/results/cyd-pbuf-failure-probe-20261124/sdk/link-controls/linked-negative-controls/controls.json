@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "scope": "Private ELF byte/symbol mutation controls; no build or firmware execution. Original frozen ELF unchanged.",
+  "verifier": {
+    "bytes": 22377,
+    "sha256": "490b82bc618bae7955eac9bbefb845d7da9a27b724c0771a265d0391278cda6a"
+  },
+  "original_elf": {
+    "bytes": 10638336,
+    "sha256": "695ec4e4cd1e7647e3524fea480999ec582c28b81cf70ff5c04b3a4593b7c191"
+  },
+  "controls": [
+    {
+      "control": "sdk-bypasses-wrap",
+      "passed": true,
+      "returncode": 1,
+      "reason": "SDK external allocation bypasses wrapper in tcp_output_alloc_header_common$constprop$0",
+      "elf_sha256": "bb4cd7b9a7b8e4c40ce2d37b96590dc21028c764df2d0e5a3ad3bed10c9892e7"
+    },
+    {
+      "control": "unknown-literal-target",
+      "passed": true,
+      "returncode": 1,
+      "reason": "Resolved call has no true ELF function/defined ROM entry: 0xdeadbeef",
+      "elf_sha256": "5981c05adddefdc8b827cc8d1a7b2b44f4ad9b803d1ca388b4a90ad2a1c10190"
+    },
+    {
+      "control": "duplicate-original-call",
+      "passed": true,
+      "returncode": 1,
+      "reason": "Wrapper does not call the original allocator exactly once",
+      "elf_sha256": "934cad50af64436739771e7b753ca8356d1cda5da27c4301494c030c6123385c"
+    },
+    {
+      "control": "wrapper-name-not-function",
+      "passed": true,
+      "returncode": 1,
+      "reason": "Missing/ambiguous true function binding: __wrap_pbuf_alloc",
+      "elf_sha256": "81f38f2e30091ec4c11adf6842ef22dcba752866a4fddaf951a2513b4aac6eb0"
+    }
+  ]
+}

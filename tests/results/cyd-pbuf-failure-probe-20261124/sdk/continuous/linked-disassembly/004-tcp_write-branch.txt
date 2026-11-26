@@ -1,0 +1,274 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\continuous\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+40149948 <tcp_write+0xa4>:
+40149948:	049d      	mov.n	a9, a4
+4014994a:	002442        	l32i	a4, a4, 0
+4014994d:	ff7456        	bnez	a4, 40149948 <tcp_write+0xa4>
+40149950:	0a09a2        	l8ui	a10, a9, 10
+40149953:	041982        	l16ui	a8, a9, 8
+40149956:	04a0a0        	extui	a10, a10, 0, 1
+40149959:	11aae0        	slli	a10, a10, 2
+4014995c:	80e8a0        	add	a14, a8, a10
+4014995f:	11abe7        	bge	a11, a14, 40149974 <tcp_write+0xd0>
+40149962:	20ffd1        	l32r	a13, 40111d60 <FLAC__stream_decoder_get_decode_position+0x1c34> (3f41cc80 <_esp_trace_encoder_array_end+0x1cb60>)
+40149965:	20ffc1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+40149968:	20f3a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+4014996b:	e9a1b2        	movi	a11, 0x1e9
+4014996e:	1dba81        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149971:	0008e0        	callx8	a8
+40149974:	3617c2        	l16ui	a12, a7, 108
+40149977:	13dc16        	beqz	a12, 40149ab8 <tcp_write+0x214>
+4014997a:	c08b80        	sub	a8, a11, a8
+4014997d:	c0a8a0        	sub	a10, a8, a10
+40149980:	f4a0a0        	extui	a10, a10, 0, 16
+40149983:	11bac7        	bgeu	a10, a12, 40149998 <tcp_write+0xf4>
+40149986:	20f8d1        	l32r	a13, 40111d68 <FLAC__stream_decoder_get_decode_position+0x1c3c> (3f41cc98 <_esp_trace_encoder_array_end+0x1cb78>)
+40149989:	20f6c1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+4014998c:	20eaa1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+4014998f:	fba1b2        	movi	a11, 0x1fb
+40149992:	1db181        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149995:	0008e0        	callx8	a8
+40149998:	638cf0        	minu	a8, a12, a15
+4014999b:	63a8a0        	minu	a10, a8, a10
+4014999e:	c08ca0        	sub	a8, a12, a10
+401499a1:	f43080        	extui	a3, a8, 0, 16
+401499a4:	118316        	beqz	a3, 40149ac0 <tcp_write+0x21c>
+401499a7:	029fa7        	bne	a15, a10, 401499ad <tcp_write+0x109>
+401499aa:	004486        	j	40149ac0 <tcp_write+0x21c>
+401499ad:	20efd1        	l32r	a13, 40111d6c <FLAC__stream_decoder_get_decode_position+0x1c40> (3f41ccb8 <_esp_trace_encoder_array_end+0x1cb98>)
+401499b0:	20edc1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+401499b3:	20e0a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+401499b6:	03a2b2        	movi	a11, 0x203
+401499b9:	1da781        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+401499bc:	0008e0        	callx8	a8
+401499bf:	3617c2        	l16ui	a12, a7, 108
+401499c2:	00a092        	movi	a9, 0
+401499c5:	011c16        	beqz	a12, 401499da <tcp_write+0x136>
+401499c8:	20ead1        	l32r	a13, 40111d70 <FLAC__stream_decoder_get_decode_position+0x1c44> (3f41ccd8 <_esp_trace_encoder_array_end+0x1cbb8>)
+401499cb:	20e6c1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+401499ce:	20d9a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+401499d1:	4da2b2        	movi	a11, 0x24d
+401499d4:	1da181        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+401499d7:	0008e0        	callx8	a8
+401499da:	080c      	movi.n	a8, 0
+401499dc:	3189      	s32i.n	a8, a1, 12
+401499de:	0c3d      	mov.n	a3, a12
+401499e0:	082d      	mov.n	a2, a8
+401499e2:	01b9      	s32i.n	a11, a1, 0
+401499e4:	71c9      	s32i.n	a12, a1, 28
+401499e6:	8199      	s32i.n	a9, a1, 32
+401499e8:	41d9      	s32i.n	a13, a1, 16
+401499ea:	11f9      	s32i.n	a15, a1, 4
+401499ec:	000146        	j	401499f5 <tcp_write+0x151>
+401499ef:	000000        	ill
+401499f2:	202aa0        	or	a2, a10, a10
+401499f5:	01b8      	l32i.n	a11, a1, 0
+401499f7:	80a2c2        	movi	a12, 0x280
+401499fa:	36a0a2        	movi	a10, 54
+401499fd:	aa1b65        	call8	400f3bb4 <__wrap_pbuf_alloc>
+40149a00:	0a4d      	mov.n	a4, a10
+40149a02:	1a6a16        	beqz	a10, 40149bac <tcp_write+0x308>
+40149a05:	0ae8      	l32i.n	a14, a10, 0
+40149a07:	0e9c      	beqz.n	a14, 40149a1b <tcp_write+0x177>
+40149a09:	20dad1        	l32r	a13, 40111d74 <FLAC__stream_decoder_get_decode_position+0x1c48> (3f41cd08 <_esp_trace_encoder_array_end+0x1cbe8>)
+40149a0c:	20dbc1        	l32r	a12, 40111d78 <FLAC__stream_decoder_get_decode_position+0x1c4c> (3f459330 <__func__$21>)
+40149a0f:	20c9a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149a12:	0ea1b2        	movi	a11, 0x10e
+40149a15:	1d9081        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149a18:	0008e0        	callx8	a8
+40149a1b:	1188      	l32i.n	a8, a1, 4
+40149a1d:	21e9      	s32i.n	a14, a1, 8
+40149a1f:	c05830        	sub	a5, a8, a3
+40149a22:	0188      	l32i.n	a8, a1, 0
+40149a24:	f45050        	extui	a5, a5, 0, 16
+40149a27:	635580        	minu	a5, a5, a8
+40149a2a:	051482        	l16ui	a8, a4, 10
+40149a2d:	11a500        	slli	a10, a5, 16
+40149a30:	f49050        	extui	a9, a5, 0, 16
+40149a33:	5189      	s32i.n	a8, a1, 20
+40149a35:	4188      	l32i.n	a8, a1, 16
+40149a37:	095d      	mov.n	a5, a9
+40149a39:	2099a0        	or	a9, a9, a10
+40149a3c:	14a8      	l32i.n	a10, a4, 4
+40149a3e:	b83a      	add.n	a11, a8, a3
+40149a40:	05cd      	mov.n	a12, a5
+40149a42:	2499      	s32i.n	a9, a4, 8
+40149a44:	1a0381        	l32r	a8, 40110250 <FLAC__stream_decoder_get_decode_position+0x124> (4000c2c8 <memcpy>)
+40149a47:	0008e0        	callx8	a8
+40149a4a:	04ad      	mov.n	a10, a4
+40149a4c:	4239a5        	call8	4018bde8 <pbuf_clen>
+40149a4f:	aa6a      	add.n	a10, a10, a6
+40149a51:	f460a0        	extui	a6, a10, 0, 16
+40149a54:	081c      	movi.n	a8, 16
+40149a56:	21e8      	l32i.n	a14, a1, 8
+40149a58:	08b867        	bgeu	a8, a6, 40149a64 <tcp_write+0x1c0>
+40149a5b:	04ad      	mov.n	a10, a4
+40149a5d:	fc0365        	call8	40145a94 <pbuf_free>
+40149a60:	005206        	j	40149bac <tcp_write+0x308>
+40149a63:	27d200        	lsi	f0, a2, 156
+40149a66:	e018      	l32i.n	a1, a0, 56
+40149a68:	ce          	.byte	0xce
+40149a69:	d3d020        	movt	a13, a0, b2
+40149a6c:	b44080        	extui	a4, a8, 0, 12
+40149a6f:	07ad20        	lsi	f2, a13, 28
+40149a72:	ffb925        	call8	40149604 <tcp_create_segment>
+40149a75:	133a16        	beqz	a10, 40149bac <tcp_write+0x308>
+40149a78:	3188      	l32i.n	a8, a1, 12
+40149a7a:	789c      	beqz.n	a8, 40149a95 <tcp_write+0x1f1>
+40149a7c:	02dc      	bnez.n	a2, 40149a90 <tcp_write+0x1ec>
+40149a7e:	20bfd1        	l32r	a13, 40111d7c <FLAC__stream_decoder_get_decode_position+0x1c50> (3f41cd1c <_esp_trace_encoder_array_end+0x1cbfc>)
+40149a81:	20b8c1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+40149a84:	20aca1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149a87:	aea2b2        	movi	a11, 0x2ae
+40149a8a:	1d7381        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149a8d:	0008e0        	callx8	a8
+40149a90:	02a9      	s32i.n	a10, a2, 0
+40149a92:	000046        	j	40149a97 <tcp_write+0x1f3>
+40149a95:	31a9      	s32i.n	a10, a1, 12
+40149a97:	335a      	add.n	a3, a3, a5
+40149a99:	1188      	l32i.n	a8, a1, 4
+40149a9b:	f43030        	extui	a3, a3, 0, 16
+40149a9e:	02b387        	bgeu	a3, a8, 40149aa4 <tcp_write+0x200>
+40149aa1:	ffd346        	j	401499f2 <tcp_write+0x14e>
+40149aa4:	08fd      	mov.n	a15, a8
+40149aa6:	71c8      	l32i.n	a12, a1, 28
+40149aa8:	5188      	l32i.n	a8, a1, 20
+40149aaa:	8198      	l32i.n	a9, a1, 32
+40149aac:	41d8      	l32i.n	a13, a1, 16
+40149aae:	0a4d      	mov.n	a4, a10
+40149ab0:	c03850        	sub	a3, a8, a5
+40149ab3:	5cdc      	bnez.n	a12, 40149acc <tcp_write+0x228>
+40149ab5:	001c86        	j	40149b2b <tcp_write+0x287>
+40149ab8:	f1ef56        	bnez	a15, 401499da <tcp_write+0x136>
+40149abb:	31f9      	s32i.n	a15, a1, 12
+40149abd:	001dc6        	j	40149b38 <tcp_write+0x294>
+40149ac0:	0acd      	mov.n	a12, a10
+40149ac2:	02baf7        	bgeu	a10, a15, 40149ac8 <tcp_write+0x224>
+40149ac5:	ffc446        	j	401499da <tcp_write+0x136>
+40149ac8:	004d86        	j	40149c02 <tcp_write+0x35e>
+40149acb:	195800        	lsi	f0, a8, 100
+40149ace:	a5dc      	bnez.n	a5, 40149aec <tcp_write+0x248>
+40149ad0:	000286        	j	40149ade <tcp_write+0x23a>
+40149ad3:	07cd00        	lsi	f0, a13, 28
+40149ad6:	1168      	l32i.n	a6, a1, 4
+40149ad8:	2178      	l32i.n	a7, a1, 8
+40149ada:	029d      	mov.n	a9, a2
+40149adc:	05fd      	mov.n	a15, a5
+40149ade:	0419a2        	l16ui	a10, a9, 8
+40149ae1:	acaa      	add.n	a10, a12, a10
+40149ae3:	0459a2        	s16i	a10, a9, 8
+40149ae6:	365732        	s16i	a3, a7, 108
+40149ae9:	0012c6        	j	40149b38 <tcp_write+0x294>
+40149aec:	1169      	s32i.n	a6, a1, 4
+40149aee:	2179      	s32i.n	a7, a1, 8
+40149af0:	056d      	mov.n	a6, a5
+40149af2:	092d      	mov.n	a2, a9
+40149af4:	0c7d      	mov.n	a7, a12
+40149af6:	01d9      	s32i.n	a13, a1, 0
+40149af8:	0f5d      	mov.n	a5, a15
+40149afa:	041692        	l16ui	a9, a6, 8
+40149afd:	06a8      	l32i.n	a10, a6, 0
+40149aff:	979a      	add.n	a9, a7, a9
+40149b01:	045692        	s16i	a9, a6, 8
+40149b04:	dadc      	bnez.n	a10, 40149b25 <tcp_write+0x281>
+40149b06:	051692        	l16ui	a9, a6, 10
+40149b09:	16a8      	l32i.n	a10, a6, 4
+40149b0b:	01b8      	l32i.n	a11, a1, 0
+40149b0d:	aa9a      	add.n	a10, a10, a9
+40149b0f:	20c770        	or	a12, a7, a7
+40149b12:	19cf81        	l32r	a8, 40110250 <FLAC__stream_decoder_get_decode_position+0x124> (4000c2c8 <memcpy>)
+40149b15:	0008e0        	callx8	a8
+40149b18:	051692        	l16ui	a9, a6, 10
+40149b1b:	06a8      	l32i.n	a10, a6, 0
+40149b1d:	979a      	add.n	a9, a7, a9
+40149b1f:	055692        	s16i	a9, a6, 10
+40149b22:	faea16        	beqz	a10, 40149ad4 <tcp_write+0x230>
+40149b25:	0a6d      	mov.n	a6, a10
+40149b27:	fff3c6        	j	40149afa <tcp_write+0x256>
+40149b2a:	573200        	lsi	f0, a2, 0x15c
+40149b2d:	69cc36        	entry	a12, 0x34e0
+40149b30:	3188      	l32i.n	a8, a1, 12
+40149b32:	1c6782        	s32i	a8, a7, 112
+40149b35:	0000c6        	j	40149b3c <tcp_write+0x298>
+40149b38:	3188      	l32i.n	a8, a1, 12
+40149b3a:	0989      	s32i.n	a8, a9, 0
+40149b3c:	341792        	l16ui	a9, a7, 104
+40149b3f:	1827a2        	l32i	a10, a7, 96
+40149b42:	c099f0        	sub	a9, a9, a15
+40149b45:	11b600        	slli	a11, a6, 16
+40149b48:	f49090        	extui	a9, a9, 0, 16
+40149b4b:	aafa      	add.n	a10, a10, a15
+40149b4d:	2099b0        	or	a9, a9, a11
+40149b50:	1867a2        	s32i	a10, a7, 96
+40149b53:	1a6792        	s32i	a9, a7, 104
+40149b56:	a69c      	beqz.n	a6, 40149b74 <tcp_write+0x2d0>
+40149b58:	1d2782        	l32i	a8, a7, 116
+40149b5b:	58dc      	bnez.n	a8, 40149b74 <tcp_write+0x2d0>
+40149b5d:	1c2782        	l32i	a8, a7, 112
+40149b60:	08dc      	bnez.n	a8, 40149b74 <tcp_write+0x2d0>
+40149b62:	2087d1        	l32r	a13, 40111d80 <FLAC__stream_decoder_get_decode_position+0x1c54> (3f41cd30 <_esp_trace_encoder_array_end+0x1cc10>)
+40149b65:	207fc1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+40149b68:	2073a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149b6b:	15a3b2        	movi	a11, 0x315
+40149b6e:	1d3a81        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149b71:	0008e0        	callx8	a8
+40149b74:	248c      	beqz.n	a4, 40149b7a <tcp_write+0x2d6>
+40149b76:	3488      	l32i.n	a8, a4, 12
+40149b78:	48cc      	bnez.n	a8, 40149b80 <tcp_write+0x2dc>
+40149b7a:	020c      	movi.n	a2, 0
+40149b7c:	002306        	j	40149c0c <tcp_write+0x368>
+40149b7f:	219200        	srai	a9, a0, 2
+40149b82:	e91706        	j	40143fe2 <sntp_request+0x1e>
+40149b85:	0872f3        	lsi	f15, a2, 32
+40149b88:	920d      	lsi	f0, a2, 8
+40149b8a:	0c08      	l32i.n	a0, a12, 0
+40149b8c:	08a0a2        	movi	a10, 8
+40149b8f:	118780        	slli	a8, a7, 8
+40149b92:	207890        	or	a7, a8, a9
+40149b95:	4217e5        	call8	4018bd14 <lwip_htons>
+40149b98:	032492        	l32i	a9, a4, 12
+40149b9b:	2087a0        	or	a8, a7, a10
+40149b9e:	41a880        	srli	a10, a8, 8
+40149ba1:	0c4982        	s8i	a8, a9, 12
+40149ba4:	0d49a2        	s8i	a10, a9, 13
+40149ba7:	fff3c6        	j	40149b7a <tcp_write+0x2d6>
+40149baa:	820000        	mull	a0, a0, a0
+40149bad:	920f17        	bnone	a15, a1, 40149b43 <tcp_write+0x29f>
+40149bb0:	9080a0        	addx2	a8, a0, a10
+40149bb3:	2088      	l32i.n	a8, a0, 8
+40149bb5:	0f5782        	s16i	a8, a7, 30
+40149bb8:	032182        	l32i	a8, a1, 12
+40149bbb:	005816        	beqz	a8, 40149bc4 <tcp_write+0x320>
+40149bbe:	20a880        	or	a10, a8, a8
+40149bc1:	fcde65        	call8	401469a8 <tcp_segs_free>
+40149bc4:	351782        	l16ui	a8, a7, 106
+40149bc7:	a89c      	beqz.n	a8, 40149be5 <tcp_write+0x341>
+40149bc9:	1d2782        	l32i	a8, a7, 116
+40149bcc:	58dc      	bnez.n	a8, 40149be5 <tcp_write+0x341>
+40149bce:	1c2782        	l32i	a8, a7, 112
+40149bd1:	08dc      	bnez.n	a8, 40149be5 <tcp_write+0x341>
+40149bd3:	206bd1        	l32r	a13, 40111d80 <FLAC__stream_decoder_get_decode_position+0x1c54> (3f41cd30 <_esp_trace_encoder_array_end+0x1cc10>)
+40149bd6:	2063c1        	l32r	a12, 40111d64 <FLAC__stream_decoder_get_decode_position+0x1c38> (3f459358 <__func__$23>)
+40149bd9:	2056a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149bdc:	2aa3b2        	movi	a11, 0x32a
+40149bdf:	1d1e81        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149be2:	0008e0        	callx8	a8
+40149be5:	ffa022        	movi	a2, 255
+40149be8:	000806        	j	40149c0c <tcp_write+0x368>
+40149beb:	a02200        	addx4	a2, a2, a0
+40149bee:	0646f0        	lsi	f15, a6, 24
+40149bf1:	000000        	ill
+40149bf4:	f5a022        	movi	a2, 245
+40149bf7:	000446        	j	40149c0c <tcp_write+0x368>
+40149bfa:	365732        	s16i	a3, a7, 108
+40149bfd:	31a9      	s32i.n	a10, a1, 12
+40149bff:	ffcd46        	j	40149b38 <tcp_write+0x294>
+40149c02:	3149      	s32i.n	a4, a1, 12
+40149c04:	094d      	mov.n	a4, a9
+40149c06:	ec2a56        	bnez	a10, 40149acc <tcp_write+0x228>
+40149c09:	fffb46        	j	40149bfa <tcp_write+0x356>
+40149c0c:	f01d      	retw.n

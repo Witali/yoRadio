@@ -1,0 +1,600 @@
+{
+  "passed": false,
+  "runtime_verified": false,
+  "physical_tested": false,
+  "scope": "Conservative reachable instruction CFG and literal-backed call targets; branch feasibility and dynamic execution are not proved. Only the four pinned undefined tcp_out references are covered; same-object allocator paths remain separate.",
+  "elf": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf",
+    "bytes": 10638336,
+    "sha256": "934cad50af64436739771e7b753ca8356d1cda5da27c4301494c030c6123385c"
+  },
+  "objdump": {
+    "path": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+    "bytes": 906240,
+    "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+  },
+  "verifier": {
+    "bytes": 23211,
+    "sha256": "d4e636beb193d9a52460f587300cc07cae4b93285e3b8b3a04cd7a7337dcd90b"
+  },
+  "source_inputs": {
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure.c": {
+      "bytes": 3843,
+      "sha256": "6bd8a1ed0b87bac323af36cfb77a35465dbbd0104ccbb2fda042e4ce121fa848"
+    },
+    "tests/target/cyd_full_app_openeth_qemu/pbuf_failure_record.h": {
+      "bytes": 3388,
+      "sha256": "abd40e262a573337bd51efe2f364ae3e5bc37eae21c63c31559061fadac68072"
+    }
+  },
+  "source_binding_scope": "Current source byte identities; build-release/dependency binding is independently owned by SDK qualification.",
+  "sdk_provenance": {
+    "profile": "legacy",
+    "cu": {
+      "offset": 2220738,
+      "source": "C:/Work/yoRadio/.idf/v6.0.2/components/lwip/lwip/src/core/tcp_out.c",
+      "directory": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-openeth-20261117\\word-legacy\\b"
+    },
+    "source": {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\lwip\\lwip\\src\\core\\tcp_out.c",
+      "bytes": 81436,
+      "sha256": "f31f0eef0c9aba4402ebff73b6d99a560b1d7ec219b4e0e5791996c41a832308"
+    },
+    "object_scope": "Frozen pre-probe SDK reference objects. Current build-object identity is independently checked by SDK qualification; no live build output is read here.",
+    "tcp_object": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk-baseline\\legacy\\tcp_out.c.obj",
+      "bytes": 124784,
+      "sha256": "29a98e26478c7b71a0e30b2668739718806813690219b3049754e9f491860244"
+    },
+    "pbuf_object": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\sdk-baseline\\legacy\\pbuf.c.obj",
+      "bytes": 136816,
+      "sha256": "956e10c6b180b7ee8b285b759abab18b82de066e9fe6f66e72f3619cb083c862"
+    },
+    "references": [
+      {
+        "section": ".literal.tcp_output_alloc_header_common$constprop$0",
+        "offset": 16,
+        "type": 1
+      },
+      {
+        "section": ".literal.tcp_write",
+        "offset": 76,
+        "type": 1
+      },
+      {
+        "section": ".literal.tcp_split_unsent_seg",
+        "offset": 32,
+        "type": 1
+      },
+      {
+        "section": ".literal.tcp_enqueue_flags",
+        "offset": 40,
+        "type": 1
+      },
+      {
+        "section": ".text.tcp_output_alloc_header_common$constprop$0",
+        "offset": 20,
+        "type": 11
+      },
+      {
+        "section": ".text.tcp_write",
+        "offset": 344,
+        "type": 11
+      },
+      {
+        "section": ".text.tcp_split_unsent_seg",
+        "offset": 116,
+        "type": 11
+      },
+      {
+        "section": ".text.tcp_enqueue_flags",
+        "offset": 72,
+        "type": 11
+      }
+    ]
+  },
+  "tcp_out_sites": [
+    {
+      "function": {
+        "name": "tcp_output_alloc_header_common$constprop$0",
+        "address": 1075095972,
+        "bytes": 186,
+        "binding": "STB_LOCAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075095991,
+        "offset": 19,
+        "instruction": "call8",
+        "target": {
+          "address": 1074747272,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075095991,
+            "encoding": "aadd25"
+          }
+        ],
+        "normalized_return_pc_expected": 1075095991
+      },
+      "reachable_instructions": 66
+    },
+    {
+      "function": {
+        "name": "tcp_write",
+        "address": 1075096420,
+        "bytes": 874,
+        "binding": "STB_GLOBAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075096765,
+        "offset": 345,
+        "instruction": "call8",
+        "target": {
+          "address": 1074747272,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075096765,
+            "encoding": "aaaca5"
+          }
+        ],
+        "normalized_return_pc_expected": 1075096765
+      },
+      "reachable_instructions": 318
+    },
+    {
+      "function": {
+        "name": "tcp_split_unsent_seg",
+        "address": 1075097296,
+        "bytes": 392,
+        "binding": "STB_GLOBAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075097410,
+        "offset": 114,
+        "instruction": "call8",
+        "target": {
+          "address": 1074747272,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075097410,
+            "encoding": "aa8465"
+          }
+        ],
+        "normalized_return_pc_expected": 1075097410
+      },
+      "reachable_instructions": 145
+    },
+    {
+      "function": {
+        "name": "tcp_enqueue_flags",
+        "address": 1075097688,
+        "bytes": 314,
+        "binding": "STB_GLOBAL",
+        "section": ".flash.text"
+      },
+      "call": {
+        "site": 1075097763,
+        "offset": 75,
+        "instruction": "call8",
+        "target": {
+          "address": 1074747272,
+          "names": [
+            "__wrap_pbuf_alloc"
+          ],
+          "kind": "ELF_function"
+        },
+        "provenance": [
+          {
+            "instruction": 1075097763,
+            "encoding": "aa6e65"
+          }
+        ],
+        "normalized_return_pc_expected": 1075097763
+      },
+      "reachable_instructions": 112
+    }
+  ],
+  "wrapper_calls": [
+    {
+      "site": 1074747284,
+      "offset": 12,
+      "instruction": "call8",
+      "target": {
+        "address": 1075080728,
+        "names": [
+          "pbuf_alloc"
+        ],
+        "kind": "ELF_function"
+      },
+      "provenance": [
+        {
+          "instruction": 1074747284,
+          "encoding": "516825"
+        }
+      ],
+      "normalized_return_pc_expected": 1074747284
+    },
+    {
+      "site": 1074747361,
+      "offset": 89,
+      "instruction": "call8",
+      "target": {
+        "address": 1075080728,
+        "names": [
+          "pbuf_alloc"
+        ],
+        "kind": "ELF_function"
+      },
+      "provenance": [
+        {
+          "instruction": 1074747361,
+          "encoding": "516365"
+        }
+      ],
+      "normalized_return_pc_expected": 1074747361
+    },
+    {
+      "site": 1074747568,
+      "offset": 296,
+      "instruction": "call8",
+      "target": {
+        "address": 1074307328,
+        "names": [
+          "vPortExitCritical"
+        ],
+        "kind": "ELF_function"
+      },
+      "provenance": [
+        {
+          "instruction": 1074747568,
+          "encoding": "9484e5"
+        }
+      ],
+      "normalized_return_pc_expected": 1074747568
+    }
+  ],
+  "reason": "Wrapper does not call the original allocator exactly once",
+  "raw_disassembly": [
+    {
+      "file": "000-tcp_output_alloc_header_common_constprop_0.txt",
+      "bytes": 3606,
+      "sha256": "9bdcfc19682079eaeed16f196c8dd2f63665fd4dacfddf0a6fddb48010adece9",
+      "stderr": {
+        "file": "000-tcp_output_alloc_header_common_constprop_0.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014a9a4",
+        "--stop-address=0x4014aa5e",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "001-tcp_write.txt",
+      "bytes": 18600,
+      "sha256": "edafd3d4790bd191829e4197fcae8a86be4eea791aede81319203e68a423fcf9",
+      "stderr": {
+        "file": "001-tcp_write.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ab64",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "002-tcp_write-branch.txt",
+      "bytes": 875,
+      "sha256": "e8f593314c35dbd4e3a2159a1ba3ea00fbb94e36cb51355282cf6a6eba89dda2",
+      "stderr": {
+        "file": "002-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014aeac",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "003-tcp_write-branch.txt",
+      "bytes": 17372,
+      "sha256": "60c48745f1cb7a816018dba9b11831535e9a4189e87e70b6b38f80a8078dbd2c",
+      "stderr": {
+        "file": "003-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014abad",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "004-tcp_write-branch.txt",
+      "bytes": 15160,
+      "sha256": "e887a0e9caa4a9203e2687c94ca1feb0ff517d368862b9e834f334820e6dc5a7",
+      "stderr": {
+        "file": "004-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ac08",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "005-tcp_write-branch.txt",
+      "bytes": 15222,
+      "sha256": "8cb27edaaaaca6b77f8df7715c66ac43db0e87464143e05b4e033ee26d882e73",
+      "stderr": {
+        "file": "005-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ac05",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "006-tcp_write-branch.txt",
+      "bytes": 2868,
+      "sha256": "ac42a807c0f419ef64f6fa40ca38d6558d1a663d9ff0943f649bc9bda016a8bd",
+      "stderr": {
+        "file": "006-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ae40",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "007-tcp_write-branch.txt",
+      "bytes": 2170,
+      "sha256": "026cea3ad39ce499d654630db6c4170cebad7a89dbfc1c3fde000ffdea0020a5",
+      "stderr": {
+        "file": "007-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ae6c",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "008-tcp_write-branch.txt",
+      "bytes": 6435,
+      "sha256": "725c8ccf497d425a9a9da6687cc53aa4be925abeb0177e1d42e69963521cd393",
+      "stderr": {
+        "file": "008-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ad8c",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "009-tcp_write-branch.txt",
+      "bytes": 8683,
+      "sha256": "602ef55d0721dc0efbe0305feea8ad0e3703c1f0bcae215242a433dda52204de",
+      "stderr": {
+        "file": "009-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ad24",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "010-tcp_write-branch.txt",
+      "bytes": 6275,
+      "sha256": "d411c78d9e2449c45c4cac30498889d08ce12d3d2eb995702a1820bbeca022f6",
+      "stderr": {
+        "file": "010-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014ad94",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "011-tcp_write-branch.txt",
+      "bytes": 4724,
+      "sha256": "96dab3e7163e797d93889d35e945bbc2a0fdef9ac20649cb3ce2a7346c679089",
+      "stderr": {
+        "file": "011-tcp_write-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014adeb",
+        "--stop-address=0x4014aece",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "012-tcp_split_unsent_seg.txt",
+      "bytes": 7838,
+      "sha256": "2ba3b83020e0d83146e24db990a39b29c6e9cb685b8f3552e62ffcc9a9f3e589",
+      "stderr": {
+        "file": "012-tcp_split_unsent_seg.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014aed0",
+        "--stop-address=0x4014b058",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "013-tcp_enqueue_flags.txt",
+      "bytes": 7403,
+      "sha256": "b5c1ccdde88f3eef3be7e0d84fa6911a2873320f0e9c96c60de40c16af149ee5",
+      "stderr": {
+        "file": "013-tcp_enqueue_flags.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014b058",
+        "--stop-address=0x4014b192",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "014-tcp_enqueue_flags-branch.txt",
+      "bytes": 5434,
+      "sha256": "ff5d2eeba923fb7a8bb934f540160efaed275704f09cd69b211a00ab01a66be9",
+      "stderr": {
+        "file": "014-tcp_enqueue_flags-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014b0b0",
+        "--stop-address=0x4014b192",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "015-tcp_enqueue_flags-branch.txt",
+      "bytes": 4266,
+      "sha256": "34e1354a01e986a73a6422b6827b33b1e80ad4147156b2d8b95d416557199025",
+      "stderr": {
+        "file": "015-tcp_enqueue_flags-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014b0e4",
+        "--stop-address=0x4014b192",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "016-tcp_enqueue_flags-branch.txt",
+      "bytes": 2564,
+      "sha256": "12191473b8b5a6cb04099a6e8e827b959f75aba37f594f9be55df84c7a5cca9a",
+      "stderr": {
+        "file": "016-tcp_enqueue_flags-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x4014b120",
+        "--stop-address=0x4014b192",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "017-__wrap_pbuf_alloc.txt",
+      "bytes": 5900,
+      "sha256": "5ae726f6ab2a8fae849d49c01eff5708cb8d461deb8847609d2db9ecf339c34b",
+      "stderr": {
+        "file": "017-__wrap_pbuf_alloc.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x400f5788",
+        "--stop-address=0x400f58ba",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    },
+    {
+      "file": "018-__wrap_pbuf_alloc-branch.txt",
+      "bytes": 967,
+      "sha256": "5c93be9d2ba6748d99fd89b7d0c9164018f0b306b1f2a4b453f65e88392d3269",
+      "stderr": {
+        "file": "018-__wrap_pbuf_alloc-branch.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-d",
+        "--start-address=0x400f5890",
+        "--stop-address=0x400f58ba",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cpbuf24\\linked-negative-controls\\duplicate-original-call.elf"
+      ]
+    }
+  ]
+}

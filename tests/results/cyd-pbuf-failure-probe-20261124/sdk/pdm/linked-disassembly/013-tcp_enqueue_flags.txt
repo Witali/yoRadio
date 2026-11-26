@@ -1,0 +1,120 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\pdm\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+40148b40 <tcp_enqueue_flags>:
+40148b40:	006136        	entry	a1, 48
+40148b43:	148030        	extui	a8, a3, 0, 2
+40148b46:	743030        	extui	a3, a3, 0, 8
+40148b49:	08dc      	bnez.n	a8, 40148b5d <tcp_enqueue_flags+0x1d>
+40148b4b:	2353d1        	l32r	a13, 40111898 <FLAC__stream_decoder_get_decode_position+0x2950> (3f41c35c <_esp_trace_encoder_array_end+0x1c23c>)
+40148b4e:	2353c1        	l32r	a12, 4011189c <FLAC__stream_decoder_get_decode_position+0x2954> (3f4596ac <__func__$17>)
+40148b51:	2339a1        	l32r	a10, 40111838 <FLAC__stream_decoder_get_decode_position+0x28f0> (3f41c114 <_esp_trace_encoder_array_end+0x1bff4>)
+40148b54:	13a4b2        	movi	a11, 0x413
+40148b57:	200281        	l32r	a8, 40110b60 <FLAC__stream_decoder_get_decode_position+0x1c18> (400890b4 <__assert_func>)
+40148b5a:	0008e0        	callx8	a8
+40148b5d:	02dc      	bnez.n	a2, 40148b71 <tcp_enqueue_flags+0x31>
+40148b5f:	2350d1        	l32r	a13, 401118a0 <FLAC__stream_decoder_get_decode_position+0x2958> (3f41c3b4 <_esp_trace_encoder_array_end+0x1c294>)
+40148b62:	234ec1        	l32r	a12, 4011189c <FLAC__stream_decoder_get_decode_position+0x2954> (3f4596ac <__func__$17>)
+40148b65:	2334a1        	l32r	a10, 40111838 <FLAC__stream_decoder_get_decode_position+0x28f0> (3f41c114 <_esp_trace_encoder_array_end+0x1bff4>)
+40148b68:	15a4b2        	movi	a11, 0x415
+40148b6b:	1ffd81        	l32r	a8, 40110b60 <FLAC__stream_decoder_get_decode_position+0x1c18> (400890b4 <__assert_func>)
+40148b6e:	0008e0        	callx8	a8
+40148b71:	02a072        	movi	a7, 2
+40148b74:	107370        	and	a7, a3, a7
+40148b77:	04e170        	extui	a14, a7, 1, 1
+40148b7a:	74e0e0        	extui	a14, a14, 0, 8
+40148b7d:	116ee0        	slli	a6, a14, 2
+40148b80:	20b660        	or	a11, a6, a6
+40148b83:	80a2c2        	movi	a12, 0x280
+40148b86:	36a0a2        	movi	a10, 54
+40148b89:	01e9      	s32i.n	a14, a1, 0
+40148b8b:	ab3ba5        	call8	400f3f44 <__wrap_pbuf_alloc>
+40148b8e:	01e8      	l32i.n	a14, a1, 0
+40148b90:	0abd      	mov.n	a11, a10
+40148b92:	2acc      	bnez.n	a10, 40148b98 <tcp_enqueue_flags+0x58>
+40148b94:	0009c6        	j	40148bbf <tcp_enqueue_flags+0x7f>
+40148b97:	1a8200        	sub.s	f8, f2, f0
+40148b9a:	b86705        	call0	4010120c <native_ota_sink_feed+0xa8>
+40148b9d:	41d111        	l32r	a1, 401192e4 <pvmp3_resetDecoder+0x30> (8e0da <UserFrameTotalSize+0x8dfda>)
+40148ba0:	3ec123        	ssip	f2, a1, 248
+40148ba3:	25a123        	lsi	f2, a1, 148
+40148ba6:	a4b223        	lsi	f2, a2, 0x290
+40148ba9:	813d      	lsi	f3, a1, 4
+40148bab:	1fed      	lsi	f14, a15, 60
+40148bad:	0008e0        	callx8	a8
+40148bb0:	1822d2        	l32i	a13, a2, 96
+40148bb3:	20c330        	or	a12, a3, a3
+40148bb6:	20a220        	or	a10, a2, a2
+40148bb9:	ff7f25        	call8	401483ac <tcp_create_segment>
+40148bbc:	00ca56        	bnez	a10, 40148bcc <tcp_enqueue_flags+0x8c>
+40148bbf:	0f1282        	l16ui	a8, a2, 30
+40148bc2:	80a092        	movi	a9, 128
+40148bc5:	208890        	or	a8, a8, a9
+40148bc8:	002906        	j	40148c70 <tcp_enqueue_flags+0x130>
+40148bcb:	3a8800        	lsi	f0, a8, 232
+40148bce:	148080        	extui	a8, a8, 0, 2
+40148bd1:	089c      	beqz.n	a8, 40148be5 <tcp_enqueue_flags+0xa5>
+40148bd3:	2335d1        	l32r	a13, 401118a8 <FLAC__stream_decoder_get_decode_position+0x2960> (3f41c410 <_esp_trace_encoder_array_end+0x1c2f0>)
+40148bd6:	2331c1        	l32r	a12, 4011189c <FLAC__stream_decoder_get_decode_position+0x2954> (3f4596ac <__func__$17>)
+40148bd9:	2317a1        	l32r	a10, 40111838 <FLAC__stream_decoder_get_decode_position+0x28f0> (3f41c114 <_esp_trace_encoder_array_end+0x1bff4>)
+40148bdc:	46a4b2        	movi	a11, 0x446
+40148bdf:	1fe081        	l32r	a8, 40110b60 <FLAC__stream_decoder_get_decode_position+0x1c18> (400890b4 <__assert_func>)
+40148be2:	0008e0        	callx8	a8
+40148be5:	041a82        	l16ui	a8, a10, 8
+40148be8:	089c      	beqz.n	a8, 40148bfc <tcp_enqueue_flags+0xbc>
+40148bea:	2330d1        	l32r	a13, 401118ac <FLAC__stream_decoder_get_decode_position+0x2964> (3f41c428 <_esp_trace_encoder_array_end+0x1c308>)
+40148bed:	232bc1        	l32r	a12, 4011189c <FLAC__stream_decoder_get_decode_position+0x2954> (3f4596ac <__func__$17>)
+40148bf0:	2312a1        	l32r	a10, 40111838 <FLAC__stream_decoder_get_decode_position+0x28f0> (3f41c114 <_esp_trace_encoder_array_end+0x1bff4>)
+40148bf3:	47a4b2        	movi	a11, 0x447
+40148bf6:	1fda81        	l32r	a8, 40110b60 <FLAC__stream_decoder_get_decode_position+0x1c18> (400890b4 <__assert_func>)
+40148bf9:	0008e0        	callx8	a8
+40148bfc:	1c2282        	l32i	a8, a2, 112
+40148bff:	58cc      	bnez.n	a8, 40148c08 <tcp_enqueue_flags+0xc8>
+40148c01:	1c62a2        	s32i	a10, a2, 112
+40148c04:	000246        	j	40148c11 <tcp_enqueue_flags+0xd1>
+40148c07:	089d00        	lsx	f9, a13, a0
+40148c0a:	0888      	l32i.n	a8, a8, 0
+40148c0c:	ff8856        	bnez	a8, 40148c08 <tcp_enqueue_flags+0xc8>
+40148c0f:	09a9      	s32i.n	a10, a9, 0
+40148c11:	080c      	movi.n	a8, 0
+40148c13:	365282        	s16i	a8, a2, 108
+40148c16:	043030        	extui	a3, a3, 0, 1
+40148c19:	b7cc      	bnez.n	a7, 40148c28 <tcp_enqueue_flags+0xe8>
+40148c1b:	e39c      	beqz.n	a3, 40148c3d <tcp_enqueue_flags+0xfd>
+40148c1d:	182282        	l32i	a8, a2, 96
+40148c20:	881b      	addi.n	a8, a8, 1
+40148c22:	186282        	s32i	a8, a2, 96
+40148c25:	000246        	j	40148c32 <tcp_enqueue_flags+0xf2>
+40148c28:	182282        	l32i	a8, a2, 96
+40148c2b:	881b      	addi.n	a8, a8, 1
+40148c2d:	186282        	s32i	a8, a2, 96
+40148c30:	938c      	beqz.n	a3, 40148c3d <tcp_enqueue_flags+0xfd>
+40148c32:	0f1282        	l16ui	a8, a2, 30
+40148c35:	092c      	movi.n	a9, 32
+40148c37:	208890        	or	a8, a8, a9
+40148c3a:	0f5282        	s16i	a8, a2, 30
+40148c3d:	012aa2        	l32i	a10, a10, 4
+40148c40:	4439a5        	call8	4018cfdc <pbuf_clen>
+40148c43:	351282        	l16ui	a8, a2, 106
+40148c46:	80aa80        	add	a10, a10, a8
+40148c49:	f4a0a0        	extui	a10, a10, 0, 16
+40148c4c:	3552a2        	s16i	a10, a2, 106
+40148c4f:	023a16        	beqz	a10, 40148c76 <tcp_enqueue_flags+0x136>
+40148c52:	1d2282        	l32i	a8, a2, 116
+40148c55:	0a0c      	movi.n	a10, 0
+40148c57:	b8dc      	bnez.n	a8, 40148c76 <tcp_enqueue_flags+0x136>
+40148c59:	1c2282        	l32i	a8, a2, 112
+40148c5c:	68dc      	bnez.n	a8, 40148c76 <tcp_enqueue_flags+0x136>
+40148c5e:	2314d1        	l32r	a13, 401118b0 <FLAC__stream_decoder_get_decode_position+0x2968> (3f41c454 <_esp_trace_encoder_array_end+0x1c334>)
+40148c61:	230ec1        	l32r	a12, 4011189c <FLAC__stream_decoder_get_decode_position+0x2954> (3f4596ac <__func__$17>)
+40148c64:	22f5a1        	l32r	a10, 40111838 <FLAC__stream_decoder_get_decode_position+0x28f0> (3f41c114 <_esp_trace_encoder_array_end+0x1bff4>)
+40148c67:	69a4b2        	movi	a11, 0x469
+40148c6a:	1fbd81        	l32r	a8, 40110b60 <FLAC__stream_decoder_get_decode_position+0x1c18> (400890b4 <__assert_func>)
+40148c6d:	0008e0        	callx8	a8
+40148c70:	0f5282        	s16i	a8, a2, 30
+40148c73:	ffa0a2        	movi	a10, 255
+40148c76:	0a2d      	mov.n	a2, a10
+40148c78:	f01d      	retw.n

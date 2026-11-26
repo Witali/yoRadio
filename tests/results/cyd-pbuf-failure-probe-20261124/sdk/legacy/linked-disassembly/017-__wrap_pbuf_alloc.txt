@@ -1,0 +1,125 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\legacy\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+400f5788 <__wrap_pbuf_alloc>:
+400f5788:	006136        	entry	a1, 48
+400f578b:	f43030        	extui	a3, a3, 0, 16
+400f578e:	04cd      	mov.n	a12, a4
+400f5790:	03bd      	mov.n	a11, a3
+400f5792:	02ad      	mov.n	a10, a2
+400f5794:	516825        	call8	40146e18 <pbuf_alloc>
+400f5797:	0a8d      	mov.n	a8, a10
+400f5799:	119a56        	bnez	a10, 400f58b6 <__wrap_pbuf_alloc+0x12e>
+400f579c:	80a292        	movi	a9, 0x280
+400f579f:	0a7d      	mov.n	a7, a10
+400f57a1:	139497        	bne	a4, a9, 400f57b8 <__wrap_pbuf_alloc+0x30>
+400f57a4:	f49020        	extui	a9, a2, 0, 16
+400f57a7:	cb7c      	movi.n	a11, -4
+400f57a9:	993b      	addi.n	a9, a9, 3
+400f57ab:	1099b0        	and	a9, a9, a11
+400f57ae:	a33b      	addi.n	a10, a3, 3
+400f57b0:	10c992        	addi	a9, a9, 16
+400f57b3:	10aab0        	and	a10, a10, a11
+400f57b6:	79aa      	add.n	a7, a9, a10
+400f57b8:	714aa1        	l32r	a10, 400d1ce0 <_stext+0x1cc0> (400f57b8 <__wrap_pbuf_alloc+0x30>)
+400f57bb:	1190e0        	slli	a9, a0, 2
+400f57be:	15bea0        	extui	a11, a10, 30, 2
+400f57c1:	404200        	ssai	2
+400f57c4:	819b90        	src	a9, a11, a9
+400f57c7:	00bad6        	bgez	a10, 400f57d6 <__wrap_pbuf_alloc+0x4e>
+400f57ca:	6adea1        	l32r	a10, 400d0344 <_stext+0x324> (40000000 <_heap_end>)
+400f57cd:	1199e0        	slli	a9, a9, 2
+400f57d0:	419290        	srli	a9, a9, 2
+400f57d3:	2099a0        	or	a9, a9, a10
+400f57d6:	7143a1        	l32r	a10, 400d1ce4 <_stext+0x1cc4> (3ffb1c70 <s_pbuf_failure_lock>)
+400f57d9:	fb7c      	movi.n	a11, -1
+400f57db:	006182        	s32i	a8, a1, 0
+400f57de:	fdc962        	addi	a6, a9, -3
+400f57e1:	949c65        	call8	4008a1a8 <xPortEnterCriticalTimeout>
+400f57e4:	713e91        	l32r	a9, 400d1cdc <_stext+0x1cbc> (3ffb1bf0 <s_pbuf_failures>)
+400f57e7:	0188      	l32i.n	a8, a1, 0
+400f57e9:	1c29a2        	l32i	a10, a9, 112
+400f57ec:	1e0a66        	bnei	a10, -1, 400f580e <__wrap_pbuf_alloc+0x86>
+400f57ef:	1f29a2        	l32i	a10, a9, 124
+400f57f2:	1b0c      	movi.n	a11, 1
+400f57f4:	20aab0        	or	a10, a10, a11
+400f57f7:	1f69a2        	s32i	a10, a9, 124
+400f57fa:	1e29d2        	l32i	a13, a9, 120
+400f57fd:	09ad      	mov.n	a10, a9
+400f57ff:	0c0c      	movi.n	a12, 0
+400f5801:	0dbd      	mov.n	a11, a13
+400f5803:	fdcc      	bnez.n	a13, 400f5816 <__wrap_pbuf_alloc+0x8e>
+400f5805:	1c0c      	movi.n	a12, 1
+400f5807:	09bd      	mov.n	a11, a9
+400f5809:	0dad      	mov.n	a10, a13
+400f580b:	001886        	j	400f5871 <__wrap_pbuf_alloc+0xe9>
+400f580e:	aa1b      	addi.n	a10, a10, 1
+400f5810:	1c69a2        	s32i	a10, a9, 112
+400f5813:	fff8c6        	j	400f57fa <__wrap_pbuf_alloc+0x72>
+400f5816:	0ae8      	l32i.n	a14, a10, 0
+400f5818:	2192e7        	bne	a2, a14, 400f583d <__wrap_pbuf_alloc+0xb5>
+400f581b:	1ae8      	l32i.n	a14, a10, 4
+400f581d:	1c94e7        	bne	a4, a14, 400f583d <__wrap_pbuf_alloc+0xb5>
+400f5820:	2ae8      	l32i.n	a14, a10, 8
+400f5822:	1793e7        	bne	a3, a14, 400f583d <__wrap_pbuf_alloc+0xb5>
+400f5825:	3ae8      	l32i.n	a14, a10, 12
+400f5827:	1297e7        	bne	a7, a14, 400f583d <__wrap_pbuf_alloc+0xb5>
+400f582a:	4ae8      	l32i.n	a14, a10, 16
+400f582c:	0d96e7        	bne	a6, a14, 400f583d <__wrap_pbuf_alloc+0xb5>
+400f582f:	f0ccc0        	subx8	a12, a12, a12
+400f5832:	a0ac90        	addx4	a10, a12, a9
+400f5835:	5ab8      	l32i.n	a11, a10, 20
+400f5837:	210b66        	bnei	a11, -1, 400f585c <__wrap_pbuf_alloc+0xd4>
+400f583a:	000306        	j	400f584a <__wrap_pbuf_alloc+0xc2>
+400f583d:	cc1b      	addi.n	a12, a12, 1
+400f583f:	1ccaa2        	addi	a10, a10, 28
+400f5842:	bb0b      	addi.n	a11, a11, -1
+400f5844:	fceb56        	bnez	a11, 400f5816 <__wrap_pbuf_alloc+0x8e>
+400f5847:	000606        	j	400f5863 <__wrap_pbuf_alloc+0xdb>
+400f584a:	1f29b2        	l32i	a11, a9, 124
+400f584d:	4c0c      	movi.n	a12, 4
+400f584f:	20bbc0        	or	a11, a11, a12
+400f5852:	1c0c      	movi.n	a12, 1
+400f5854:	6ac9      	s32i.n	a12, a10, 24
+400f5856:	1f69b2        	s32i	a11, a9, 124
+400f5859:	001346        	j	400f58aa <__wrap_pbuf_alloc+0x122>
+400f585c:	9b1b      	addi.n	a9, a11, 1
+400f585e:	5a99      	s32i.n	a9, a10, 20
+400f5860:	001186        	j	400f58aa <__wrap_pbuf_alloc+0x122>
+400f5863:	294d26        	beqi	a13, 4, 400f5890 <__wrap_pbuf_alloc+0x108>
+400f5866:	f0bdd0        	subx8	a11, a13, a13
+400f5869:	11add0        	slli	a10, a13, 3
+400f586c:	a0bb90        	addx4	a11, a11, a9
+400f586f:	cd1b      	addi.n	a12, a13, 1
+400f5871:	1e69c2        	s32i	a12, a9, 120
+400f5874:	c0aad0        	sub	a10, a10, a13
+400f5877:	a09a90        	addx4	a9, a10, a9
+400f587a:	0b29      	s32i.n	a2, a11, 0
+400f587c:	1b49      	s32i.n	a4, a11, 4
+400f587e:	1a0c      	movi.n	a10, 1
+400f5880:	59a9      	s32i.n	a10, a9, 20
+400f5882:	0a0c      	movi.n	a10, 0
+400f5884:	2939      	s32i.n	a3, a9, 8
+400f5886:	3979      	s32i.n	a7, a9, 12
+400f5888:	4969      	s32i.n	a6, a9, 16
+400f588a:	69a9      	s32i.n	a10, a9, 24
+400f588c:	000686        	j	400f58aa <__wrap_pbuf_alloc+0x122>
+400f588f:	29a200        	lsi	f0, a2, 164
+400f5892:	661d      	lsi	f1, a6, 24
+400f5894:	0d0a      	add.n	a0, a13, a0
+400f5896:	1f29a2        	l32i	a10, a9, 124
+400f5899:	2b0c      	movi.n	a11, 2
+400f589b:	20aab0        	or	a10, a10, a11
+400f589e:	1f69a2        	s32i	a10, a9, 124
+400f58a1:	000146        	j	400f58aa <__wrap_pbuf_alloc+0x122>
+400f58a4:	01caa2        	addi	a10, a10, 1
+400f58a7:	1d69a2        	s32i	a10, a9, 116
+400f58aa:	710ea1        	l32r	a10, 400d1ce4 <_stext+0x1cc4> (3ffb1c70 <s_pbuf_failure_lock>)
+400f58ad:	006182        	s32i	a8, a1, 0
+400f58b0:	9484e5        	call8	4008a100 <vPortExitCritical>
+400f58b3:	002182        	l32i	a8, a1, 0
+400f58b6:	082d      	mov.n	a2, a8
+400f58b8:	f01d      	retw.n

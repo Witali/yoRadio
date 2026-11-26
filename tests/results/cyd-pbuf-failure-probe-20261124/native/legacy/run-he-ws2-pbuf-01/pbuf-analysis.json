@@ -1,0 +1,59 @@
+{
+  "controller_state": "TERMINAL_NONPASS",
+  "controller_reason": "Remote end closed connection without response",
+  "physical_tested": false,
+  "inputs": {
+    "report": {
+      "bytes": 22137,
+      "sha256": "dd1b247a2585643ead51ba681f94c557dd630187f7352a10947eff0cae627d21"
+    },
+    "uart": {
+      "bytes": 5098,
+      "sha256": "7297b1240d719fcba8d008b1855462b546d10f713030525c587049f278fb1b29"
+    },
+    "elf": {
+      "bytes": 10638336,
+      "sha256": "695ec4e4cd1e7647e3524fea480999ec582c28b81cf70ff5c04b3a4593b7c191"
+    },
+    "addr2line": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    },
+    "objdump": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    },
+    "link_report": {
+      "bytes": 23689,
+      "sha256": "d169968f37afcdeee96b824f7ff9e5551206f8337f067de90a7d48de874e97bb"
+    }
+  },
+  "attribution_available": false,
+  "pbuf_pcm_flush_prefix": null,
+  "health_observations": {
+    "first_active_health": {
+      "uptime_ms": 29895,
+      "minimum_heap": 12908,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      }
+    },
+    "health_during_webui": {
+      "uptime_ms": 42324,
+      "minimum_heap": 1668,
+      "allocation_failures": 1,
+      "last_allocation_failure": {
+        "size": 1512,
+        "caps": 6144
+      }
+    },
+    "eof_health": null,
+    "post_eof_health": null,
+    "last_reachable_health": null
+  },
+  "pcm_sha256": null,
+  "pcm_flushes": [],
+  "interpretation": "The probe is a cumulative PCM-flush prefix. Later EOF/WebUI/peer-close heap counts are independent snapshots, not an atomic common observation. NULL is not automatically a heap failure; retain non-RAM/overflow/saturation, unwrapped paths and unexplained differences. This report never promotes a controller NONPASS."
+}

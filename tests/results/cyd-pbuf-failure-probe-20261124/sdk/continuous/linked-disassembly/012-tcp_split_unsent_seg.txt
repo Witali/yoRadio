@@ -1,0 +1,152 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\continuous\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+40149c10 <tcp_split_unsent_seg>:
+40149c10:	006136        	entry	a1, 48
+40149c13:	f43030        	extui	a3, a3, 0, 16
+40149c16:	02dc      	bnez.n	a2, 40149c2a <tcp_split_unsent_seg+0x1a>
+40149c18:	205bd1        	l32r	a13, 40111d84 <FLAC__stream_decoder_get_decode_position+0x1c58> (3f41cd50 <_esp_trace_encoder_array_end+0x1cc30>)
+40149c1b:	205bc1        	l32r	a12, 40111d88 <FLAC__stream_decoder_get_decode_position+0x1c5c> (3f459304 <__func__$19>)
+40149c1e:	2045a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149c21:	4ea3b2        	movi	a11, 0x34e
+40149c24:	1d0d81        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149c27:	0008e0        	callx8	a8
+40149c2a:	1c2242        	l32i	a4, a2, 112
+40149c2d:	162416        	beqz	a4, 40149d93 <tcp_split_unsent_seg+0x183>
+40149c30:	03dc      	bnez.n	a3, 40149c44 <tcp_split_unsent_seg+0x34>
+40149c32:	2056d1        	l32r	a13, 40111d8c <FLAC__stream_decoder_get_decode_position+0x1c60> (3f41cd74 <_esp_trace_encoder_array_end+0x1cc54>)
+40149c35:	2054c1        	l32r	a12, 40111d88 <FLAC__stream_decoder_get_decode_position+0x1c5c> (3f459304 <__func__$19>)
+40149c38:	203fa1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149c3b:	56a3b2        	movi	a11, 0x356
+40149c3e:	1d0681        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149c41:	0008e0        	callx8	a8
+40149c44:	041472        	l16ui	a7, a4, 8
+40149c47:	023377        	bltu	a3, a7, 40149c4d <tcp_split_unsent_seg+0x3d>
+40149c4a:	004ec6        	j	40149d89 <tcp_split_unsent_seg+0x179>
+40149c4d:	1b1282        	l16ui	a8, a2, 54
+40149c50:	11b837        	bgeu	a8, a3, 40149c65 <tcp_split_unsent_seg+0x55>
+40149c53:	204fd1        	l32r	a13, 40111d90 <FLAC__stream_decoder_get_decode_position+0x1c64> (3f41cd98 <_esp_trace_encoder_array_end+0x1cc78>)
+40149c56:	204cc1        	l32r	a12, 40111d88 <FLAC__stream_decoder_get_decode_position+0x1c5c> (3f459304 <__func__$19>)
+40149c59:	2036a1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149c5c:	5ea3b2        	movi	a11, 0x35e
+40149c5f:	1cfe81        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149c62:	0008e0        	callx8	a8
+40149c65:	0a0482        	l8ui	a8, a4, 10
+40149c68:	c06730        	sub	a6, a7, a3
+40149c6b:	1189      	s32i.n	a8, a1, 4
+40149c6d:	048080        	extui	a8, a8, 0, 1
+40149c70:	1188e0        	slli	a8, a8, 2
+40149c73:	f46060        	extui	a6, a6, 0, 16
+40149c76:	b86a      	add.n	a11, a8, a6
+40149c78:	80a2c2        	movi	a12, 0x280
+40149c7b:	f4b0b0        	extui	a11, a11, 0, 16
+40149c7e:	6a3c      	movi.n	a10, 54
+40149c80:	0189      	s32i.n	a8, a1, 0
+40149c82:	a9f325        	call8	400f3bb4 <__wrap_pbuf_alloc>
+40149c85:	0a5d      	mov.n	a5, a10
+40149c87:	108a16        	beqz	a10, 40149d93 <tcp_split_unsent_seg+0x183>
+40149c8a:	14a8      	l32i.n	a10, a4, 4
+40149c8c:	041492        	l16ui	a9, a4, 8
+40149c8f:	041ad2        	l16ui	a13, a10, 8
+40149c92:	15b8      	l32i.n	a11, a5, 4
+40149c94:	0188      	l32i.n	a8, a1, 0
+40149c96:	c0dd90        	sub	a13, a13, a9
+40149c99:	d3da      	add.n	a13, a3, a13
+40149c9b:	f4d0d0        	extui	a13, a13, 0, 16
+40149c9e:	06cd      	mov.n	a12, a6
+40149ca0:	bb8a      	add.n	a11, a11, a8
+40149ca2:	fc2b25        	call8	40145f54 <pbuf_copy_partial>
+40149ca5:	021a67        	beq	a10, a6, 40149cab <tcp_split_unsent_seg+0x9b>
+40149ca8:	003886        	j	40149d8e <tcp_split_unsent_seg+0x17e>
+40149cab:	3498      	l32i.n	a9, a4, 12
+40149cad:	0d0982        	l8ui	a8, a9, 13
+40149cb0:	0c09a2        	l8ui	a10, a9, 12
+40149cb3:	118880        	slli	a8, a8, 8
+40149cb6:	20a8a0        	or	a10, a8, a10
+40149cb9:	4205a5        	call8	4018bd14 <lwip_htons>
+40149cbc:	08a082        	movi	a8, 8
+40149cbf:	10ca80        	and	a12, a10, a8
+40149cc2:	5460a0        	extui	a6, a10, 0, 6
+40149cc5:	070a87        	bnone	a10, a8, 40149cd0 <tcp_split_unsent_seg+0xc0>
+40149cc8:	783c      	movi.n	a8, 55
+40149cca:	106a80        	and	a6, a10, a8
+40149ccd:	08a0c2        	movi	a12, 8
+40149cd0:	096607        	bbci	a6, 0, 40149cdd <tcp_split_unsent_seg+0xcd>
+40149cd3:	e87c      	movi.n	a8, -2
+40149cd5:	106680        	and	a6, a6, a8
+40149cd8:	180c      	movi.n	a8, 1
+40149cda:	20cc80        	or	a12, a12, a8
+40149cdd:	34a8      	l32i.n	a10, a4, 12
+40149cdf:	01c9      	s32i.n	a12, a1, 0
+40149ce1:	050a92        	l8ui	a9, a10, 5
+40149ce4:	040ab2        	l8ui	a11, a10, 4
+40149ce7:	060a82        	l8ui	a8, a10, 6
+40149cea:	119980        	slli	a9, a9, 8
+40149ced:	070aa2        	l8ui	a10, a10, 7
+40149cf0:	2099b0        	or	a9, a9, a11
+40149cf3:	118800        	slli	a8, a8, 16
+40149cf6:	208890        	or	a8, a8, a9
+40149cf9:	01aa80        	slli	a10, a10, 24
+40149cfc:	20aa80        	or	a10, a10, a8
+40149cff:	4202a5        	call8	4018bd28 <lwip_htonl>
+40149d02:	11e8      	l32i.n	a14, a1, 4
+40149d04:	01c8      	l32i.n	a12, a1, 0
+40149d06:	d3aa      	add.n	a13, a3, a10
+40149d08:	05bd      	mov.n	a11, a5
+40149d0a:	02ad      	mov.n	a10, a2
+40149d0c:	ff8f65        	call8	40149604 <tcp_create_segment>
+40149d0f:	0a5d      	mov.n	a5, a10
+40149d11:	07ea16        	beqz	a10, 40149d93 <tcp_split_unsent_seg+0x183>
+40149d14:	14a8      	l32i.n	a10, a4, 4
+40149d16:	c07370        	sub	a7, a3, a7
+40149d19:	420ce5        	call8	4018bde8 <pbuf_clen>
+40149d1c:	1498      	l32i.n	a9, a4, 4
+40149d1e:	351282        	l16ui	a8, a2, 106
+40149d21:	0419b2        	l16ui	a11, a9, 8
+40149d24:	c088a0        	sub	a8, a8, a10
+40149d27:	b7ba      	add.n	a11, a7, a11
+40149d29:	f4b0b0        	extui	a11, a11, 0, 16
+40149d2c:	09ad      	mov.n	a10, a9
+40149d2e:	355282        	s16i	a8, a2, 106
+40149d31:	fbf765        	call8	40145ca8 <pbuf_realloc>
+40149d34:	041482        	l16ui	a8, a4, 8
+40149d37:	3498      	l32i.n	a9, a4, 12
+40149d39:	778a      	add.n	a7, a7, a8
+40149d3b:	045472        	s16i	a7, a4, 8
+40149d3e:	0d0982        	l8ui	a8, a9, 13
+40149d41:	0c0992        	l8ui	a9, a9, 12
+40149d44:	118880        	slli	a8, a8, 8
+40149d47:	06ad      	mov.n	a10, a6
+40149d49:	207890        	or	a7, a8, a9
+40149d4c:	41fc65        	call8	4018bd14 <lwip_htons>
+40149d4f:	2087a0        	or	a8, a7, a10
+40149d52:	3498      	l32i.n	a9, a4, 12
+40149d54:	41b880        	srli	a11, a8, 8
+40149d57:	0124a2        	l32i	a10, a4, 4
+40149d5a:	0c4982        	s8i	a8, a9, 12
+40149d5d:	0d49b2        	s8i	a11, a9, 13
+40149d60:	420865        	call8	4018bde8 <pbuf_clen>
+40149d63:	351292        	l16ui	a9, a2, 106
+40149d66:	208aa0        	or	a8, a10, a10
+40149d69:	889a      	add.n	a8, a8, a9
+40149d6b:	0125a2        	l32i	a10, a5, 4
+40149d6e:	355282        	s16i	a8, a2, 106
+40149d71:	420765        	call8	4018bde8 <pbuf_clen>
+40149d74:	351292        	l16ui	a9, a2, 106
+40149d77:	0488      	l32i.n	a8, a4, 0
+40149d79:	aa9a      	add.n	a10, a10, a9
+40149d7b:	3552a2        	s16i	a10, a2, 106
+40149d7e:	0589      	s32i.n	a8, a5, 0
+40149d80:	0459      	s32i.n	a5, a4, 0
+40149d82:	0588      	l32i.n	a8, a5, 0
+40149d84:	18cc      	bnez.n	a8, 40149d89 <tcp_split_unsent_seg+0x179>
+40149d86:	365282        	s16i	a8, a2, 108
+40149d89:	020c      	movi.n	a2, 0
+40149d8b:	0001c6        	j	40149d96 <tcp_split_unsent_seg+0x186>
+40149d8e:	05ad      	mov.n	a10, a5
+40149d90:	fbd025        	call8	40145a94 <pbuf_free>
+40149d93:	ffa022        	movi	a2, 255
+40149d96:	f01d      	retw.n

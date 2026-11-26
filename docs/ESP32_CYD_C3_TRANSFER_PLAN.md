@@ -1,9 +1,28 @@
 # План переноса улучшений ESP32 C3 на CYD
 
-Обновлено: 2026-11-24. Ветка: `codex/cyd-espressif-vorbis`.
+Обновлено: 2026-11-26. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 
-Текущая точка: [обычный профиль без RTC](../tests/results/cyd-openeth-no-rtc-20261124/README.md)
+Текущая точка: [реальная трасса pbuf в QEMU](../tests/results/cyd-pbuf-failure-probe-20261124/native/README.md)
+локализовала все 10 наблюдённых отказов continuous DAC в `tcp_write` →
+`tcp_pbuf_prealloc`: PBUF_RAM, запрос 1512 B при MSS 1440. Полный PCM равен
+614400 кадров с прежним SHA, WebUI после EOF и два WS-клиента проходят;
+resource gate остаётся NONPASS. Legacy/PDM в новых observer-прогонах теряют
+ответ WebUI до EOF, поэтому их pbuf-снимка нет: отсутствие данных не равно
+нулю отказов. Все три [SDK/Clang/ELF проверки](../tests/results/cyd-pbuf-failure-probe-20261124/sdk/README.md)
+проходят; наблюдатель занимает 136 B DRAM и 144 B heap-start с выравниванием.
+Прежние TCP/TLS, поля/ёмкость JSON, два клиента и привязки задач сохранены.
+
+Отдельный [эксперимент TCP_OVERSIZE_DISABLE](../tests/results/cyd-pbuf-failure-probe-20261124/oversize-disabled-20261126/README.md)
+отклонён самой сборкой SDK: `LWIP_NETIF_TX_SINGLE_PBUF` требует ненулевого
+`TCP_OVERSIZE`. Образ не слинкован, runtime не заявляется; guard и режим
+драйвера не изменены. Следующая реализация — потоковая выдача полного
+WS-статуса через небольшой staging внутри одного кадра с прежним общим
+тайм-аутом. Экономию DRAM и полный трёхвыходный resource gate ещё предстоит
+измерить. Независимая actual-target проверка WS/WSS по RFC также остаётся
+отдельным offline gate; локальные проверки клиента её не заменяют.
+
+Предыдущая точка: [обычный профиль без RTC](../tests/results/cyd-openeth-no-rtc-20261124/README.md)
 проверен на всех трёх выходах с тем же исправленным OpenETH и QEMU.
 Полный TLS/HE-AAC, 614400 точных PCM-кадров, WebUI после EOF и два WS-клиента
 проходят, но все три resource gates — NONPASS: legacy 171 allocation failures
@@ -23,8 +42,9 @@ Clang проверки проходят без новых предупрежде
 Для следующего gate добавлен отдельный [ограниченный pbuf probe](../tests/results/cyd-pbuf-failure-probe-20261124/README.md):
 таблица 128 B плюс lock, NULL-only запись после реального вызова, вывод после
 PCM EOF. ASan/UBSan проверяют 100000 обновлений таблицы, 2000 параллельных
-wrapper calls и восемь испорченных controls. SDK/ELF и QEMU attribution пока
-не выполнены; allocator origin и RTC-off NONPASS этим не переквалифицированы.
+wrapper calls и восемь испорченных controls. На этой исходной host-точке SDK/ELF
+и runtime attribution ещё не были выполнены; новые результаты выше сохранены
+отдельно и не переквалифицируют исходный RTC-off NONPASS.
 
 Предыдущая точка: [финальный контроль после WebUI и закрытия WS](../tests/results/cyd-openeth-rx-exact-20261124/README.md#final-resource-check-after-webui-and-peer-closure)
 пройден в QEMU на PDM, continuous DAC и legacy DAC. Во всех трёх новых
@@ -984,9 +1004,9 @@ Stream остаётся на core0, decode/output на core1 с прежними
 
 | Фича C3 | Донор | Место подключения CYD и условия |
 | --- | --- | --- |
-| Normalizer/limiter и кэш gains | [native_audio_normalizer.cpp](../idf/esp32c3-oled-native/main/native_audio_normalizer.cpp), [AudioNormalizer.cpp](../yoRadio/src/audioI2S/AudioNormalizer.cpp), [native_audio_output.c](../idf/esp32c3-oled-native/main/native_audio_output.c) | CYD [native_audio_output.c](../idf/esp32-cyd2usb-native/main/native_audio_output.c): сейчас gain вычисляется на каждый sample; обновлять параметры и DSP только через output owner. |
+| Normalizer/limiter и кэш gains | [native_audio_normalizer.cpp](../idf/esp32c3-oled-native/main/native_audio_normalizer.cpp), [AudioNormalizer.cpp](../yoRadio/src/audioI2S/AudioNormalizer.cpp), [native_audio_output.c](../idf/esp32c3-oled-native/main/native_audio_output.c) | Перенесено в CYD [native_audio_output.c](../idf/esp32-cyd2usb-native/main/native_audio_output.c): reader кэширует gains на пакет, все три backend создают reader; параметры и DSP применяет output owner. |
 | PCM flush на EOF, reset на generation и rate change | [native_audio_output.c](../idf/esp32c3-oled-native/main/native_audio_output.c), [native_audio_output.h](../idf/esp32c3-oled-native/main/native_audio_output.h) | CYD PDM имеет накопленный staging tail; отдельная реализация для continuous/legacy DAC. Проверить переходы с одинаковой частотой. |
-| Custom FLAC: bounded input, bit depths, stereo decorrelation, LPC/Rice hot loops | [custom_flac](../idf/esp32c3-oled-native/components/custom_flac), [flac_decoder.cpp](../yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp), [отчёт](ESP32C3_FLAC_HOTLOOPS_20261008.md) | CYD сейчас регистрирует Espressif FLAC. Portable C кандидат; ускорение RISC-V не доказывает ускорение LX6. |
+| Custom FLAC: bounded input, bit depths, stereo decorrelation, LPC/Rice hot loops | [custom_flac](../idf/esp32c3-oled-native/components/custom_flac), [flac_decoder.cpp](../yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp), [отчёт](ESP32C3_FLAC_HOTLOOPS_20261008.md) | В CYD подключены Espressif и custom adapters в [audio_service.c](../idf/esp32-cyd2usb-native/main/audio_service.c), выбор задаёт профиль сборки. Portable C и LX6 gates квалифицированы отдельно; измерения RISC-V не подменяют LX6. |
 | Full-rate AAC, late/resumed SBR, metadata и input framing | [native_aac_decoder.c](../idf/esp32c3-oled-native/main/native_aac_decoder.c), [aac_fill_parser.c](../idf/esp32c3-oled-native/main/aac_fill_parser.c) | Сначала публичный decoder API и ADTS framing; внутренние hooks изолировать до Xtensa аудита. |
 | Compact AAC SBR owner, PC19, scoped low-QMF, smoothing/high history | [aac_compact_owner.c](../idf/esp32c3-oled-native/main/aac_compact_owner.c), [aac_sbr_abi.h](../idf/esp32c3-oled-native/main/aac_sbr_abi.h), [aac_high_history.c](../idf/esp32c3-oled-native/main/aac_high_history.c), [aac_smoothing_history.c](../idf/esp32c3-oled-native/main/aac_smoothing_history.c) | Это private RV32 ABI, не готовый ESP32 компонент. C3 owner 55128 → 32744 B; экономия 22384 B относится к C3, пока не к CYD. |
 | Vorbis/Ogg initialization/teardown, OOM и output repair | [vorbis_repair](../idf/esp32c3-oled-native/main/vorbis_repair), [vorbis_repair_abi.h](../idf/esp32c3-oled-native/main/vorbis_repair_abi.h), [CMake hash guards](../idf/esp32c3-oled-native/main/CMakeLists.txt) | Та же идея fault injection применима, но C3 offsets/hashes не использовать для `lib/esp32`. Сверить обе vendor archives. |

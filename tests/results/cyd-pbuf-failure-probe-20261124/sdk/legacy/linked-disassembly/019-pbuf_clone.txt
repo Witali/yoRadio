@@ -1,0 +1,21 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\legacy\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+40147378 <pbuf_clone>:
+40147378:	004136        	entry	a1, 32
+4014737b:	0414b2        	l16ui	a11, a4, 8
+4014737e:	20a220        	or	a10, a2, a2
+40147381:	03cd      	mov.n	a12, a3
+40147383:	ffa965        	call8	40146e18 <pbuf_alloc>
+40147386:	0a2d      	mov.n	a2, a10
+40147388:	da8c      	beqz.n	a10, 40147399 <pbuf_clone+0x21>
+4014738a:	0414c2        	l16ui	a12, a4, 8
+4014738d:	0d0c      	movi.n	a13, 0
+4014738f:	04bd      	mov.n	a11, a4
+40147391:	ffd7e5        	call8	40147110 <pbuf_copy_partial_pbuf>
+40147394:	1a8c      	beqz.n	a10, 40147399 <pbuf_clone+0x21>
+40147396:	ff8525        	call8	40146be8 <pbuf_clone$part$0>
+40147399:	f01d      	retw.n

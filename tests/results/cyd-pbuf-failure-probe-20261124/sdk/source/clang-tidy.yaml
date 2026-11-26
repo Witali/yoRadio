@@ -1,0 +1,20 @@
+---
+# Correctness, ownership, portability and performance. Keep style-only rules
+# out of the initial baseline so reviews stay focused on firmware behavior.
+Checks: >-
+  -*,
+  clang-analyzer-*,
+  bugprone-*,
+  performance-*,
+  portability-*,
+  cert-err34-c,
+  cert-str34-c,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-reserved-identifier,
+  -bugprone-macro-parentheses,
+  -bugprone-macro-repeated-side-effects,
+  -portability-avoid-pragma-once,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+WarningsAsErrors: ''
+FormatStyle: none
+...

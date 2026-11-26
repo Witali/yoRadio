@@ -1,0 +1,50 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cpbuf24\sdk\continuous\compiled\yoradio_cyd2usb_native.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+40149e60 <tcp_enqueue_flags+0xc8>:
+40149e60:	089d      	mov.n	a9, a8
+40149e62:	0888      	l32i.n	a8, a8, 0
+40149e64:	ff8856        	bnez	a8, 40149e60 <tcp_enqueue_flags+0xc8>
+40149e67:	09a9      	s32i.n	a10, a9, 0
+40149e69:	080c      	movi.n	a8, 0
+40149e6b:	365282        	s16i	a8, a2, 108
+40149e6e:	043030        	extui	a3, a3, 0, 1
+40149e71:	b7cc      	bnez.n	a7, 40149e80 <tcp_enqueue_flags+0xe8>
+40149e73:	e39c      	beqz.n	a3, 40149e95 <tcp_enqueue_flags+0xfd>
+40149e75:	182282        	l32i	a8, a2, 96
+40149e78:	881b      	addi.n	a8, a8, 1
+40149e7a:	186282        	s32i	a8, a2, 96
+40149e7d:	000246        	j	40149e8a <tcp_enqueue_flags+0xf2>
+40149e80:	182282        	l32i	a8, a2, 96
+40149e83:	881b      	addi.n	a8, a8, 1
+40149e85:	186282        	s32i	a8, a2, 96
+40149e88:	938c      	beqz.n	a3, 40149e95 <tcp_enqueue_flags+0xfd>
+40149e8a:	0f1282        	l16ui	a8, a2, 30
+40149e8d:	092c      	movi.n	a9, 32
+40149e8f:	208890        	or	a8, a8, a9
+40149e92:	0f5282        	s16i	a8, a2, 30
+40149e95:	012aa2        	l32i	a10, a10, 4
+40149e98:	41f4e5        	call8	4018bde8 <pbuf_clen>
+40149e9b:	351282        	l16ui	a8, a2, 106
+40149e9e:	80aa80        	add	a10, a10, a8
+40149ea1:	f4a0a0        	extui	a10, a10, 0, 16
+40149ea4:	3552a2        	s16i	a10, a2, 106
+40149ea7:	023a16        	beqz	a10, 40149ece <tcp_enqueue_flags+0x136>
+40149eaa:	1d2282        	l32i	a8, a2, 116
+40149ead:	0a0c      	movi.n	a10, 0
+40149eaf:	b8dc      	bnez.n	a8, 40149ece <tcp_enqueue_flags+0x136>
+40149eb1:	1c2282        	l32i	a8, a2, 112
+40149eb4:	68dc      	bnez.n	a8, 40149ece <tcp_enqueue_flags+0x136>
+40149eb6:	1fbdd1        	l32r	a13, 40111dac <FLAC__stream_decoder_get_decode_position+0x1c80> (3f41cea0 <_esp_trace_encoder_array_end+0x1cd80>)
+40149eb9:	1fb7c1        	l32r	a12, 40111d98 <FLAC__stream_decoder_get_decode_position+0x1c6c> (3f4592e0 <__func__$17>)
+40149ebc:	1f9ea1        	l32r	a10, 40111d34 <FLAC__stream_decoder_get_decode_position+0x1c08> (3f41cb60 <_esp_trace_encoder_array_end+0x1ca40>)
+40149ebf:	69a4b2        	movi	a11, 0x469
+40149ec2:	1c6581        	l32r	a8, 40111058 <FLAC__stream_decoder_get_decode_position+0xf2c> (400891d0 <__assert_func>)
+40149ec5:	0008e0        	callx8	a8
+40149ec8:	0f5282        	s16i	a8, a2, 30
+40149ecb:	ffa0a2        	movi	a10, 255
+40149ece:	0a2d      	mov.n	a2, a10
+40149ed0:	f01d      	retw.n

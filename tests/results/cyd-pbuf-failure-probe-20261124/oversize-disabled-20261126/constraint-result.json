@@ -1,0 +1,85 @@
+{
+  "state": "TERMINAL_NONPASS",
+  "source_commit": "f7dee344fb30ce109f2d30a01f0325d353e3b2eb",
+  "backend": "legacy",
+  "reason": "Pinned SDK rejects TCP_OVERSIZE=0 while TCP and the unchanged LWIP_NETIF_TX_SINGLE_PBUF=1 are enabled; real compile-time compatibility constraint.",
+  "cause": {
+    "source": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\lwip\\lwip\\src\\core\\init.c",
+    "line": 233,
+    "source_identity": {
+      "bytes": 16911,
+      "sha256": "855da32574ea8af6074369186f057971616086b9dd1a10dd6182af378b78f03b"
+    },
+    "condition": "LWIP_TCP && LWIP_NETIF_TX_SINGLE_PBUF && !TCP_OVERSIZE",
+    "diagnostic": "LWIP_NETIF_TX_SINGLE_PBUF needs TCP_OVERSIZE enabled to create single-pbuf TCP packets"
+  },
+  "generated_configuration": {
+    "effective_delta": {
+      "LWIP_TCP_OVERSIZE_DISABLE": {
+        "before": false,
+        "after": true
+      },
+      "LWIP_TCP_OVERSIZE_MSS": {
+        "before": true,
+        "after": false
+      }
+    },
+    "before": {
+      "bytes": 49212,
+      "sha256": "bf6a0b73b9715bbb723b96ea65337ff75d5680fa9681ccdcf973c1dec15e60ad"
+    },
+    "after": {
+      "bytes": 49212,
+      "sha256": "95ec2349447ce176fbbea97390e8d19bce428623596ff9db0d8947c544024717"
+    },
+    "header_before": {
+      "bytes": 40507,
+      "sha256": "d0a2a8770abe9def048f1201372d2d2fce0f58adf2d1392bc2ff02b5c536148a"
+    },
+    "header_after": {
+      "bytes": 40519,
+      "sha256": "7157b9026b0a4d3d08df3c646ebd7b03e1b71d93be48abb527cd7e2fb720cf5d"
+    },
+    "header_comparison": "Exactly the modern selected-choice define and its sdkconfig.rename compatibility alias, after explicit CRLF normalization; raw hashes retained."
+  },
+  "build_execution": {
+    "bytes": 589,
+    "sha256": "19c0014d5e38986c22b9ea279752d5308da7b8412922b2ee33069b27d65bf4af"
+  },
+  "original_reconfigure_guard_failure": {
+    "bytes": 348,
+    "sha256": "2ea200e0da6b6858ffc1fffe03b426f1ba5ba37a45c35dc92d7efb2010315b1c"
+  },
+  "narrow_header_review": {
+    "bytes": 2110,
+    "sha256": "24f5e1196393765f4d9d3a0ef90d408fcca18890233f3771055ffa93501308fa"
+  },
+  "raw_logs": {
+    "gcc-reconfigure.stdout.log": {
+      "bytes": 15215,
+      "sha256": "a1b72a709a006d20b2e84c555f9905f6d4ed3084d33e4152541512ebf295e357"
+    },
+    "gcc-reconfigure.stderr.log": {
+      "bytes": 2496,
+      "sha256": "4fbc55b726dcc4a672148acb3c70497bc56890b9f92642b3d3a311e0e68e0318"
+    },
+    "gcc-build.stdout.log": {
+      "bytes": 49646,
+      "sha256": "7a0372e83b9bbc2ee97f237138ef555410b8257528449d176215b5d22e328bcd"
+    },
+    "gcc-build.stderr.log": {
+      "bytes": 969,
+      "sha256": "94434ce40bfd7ea26b0bfeea127bf9597cdbd122ce6292fd9e43c98a2e74d022"
+    }
+  },
+  "root_source_and_index_changed": false,
+  "pinned_sdk_modified": false,
+  "prior_artifacts_changed": false,
+  "protected_inputs_reverified": 324,
+  "source_pins_reverified": 61,
+  "firmware_linked": false,
+  "clang_qualification_run": false,
+  "qemu_run": false,
+  "production_defaults_changed": false,
+  "conclusion": "The public Kconfig choice exists, but its disabled value is not a legal isolated change for this fixed single-pbuf port configuration. Do not bypass the SDK guard. Quarter-MSS stays on the same unconditional max_length allocation branch and does not remove the observed request. A SINGLE_PBUF policy change would be a distinct driver/SDK experiment with new compatibility obligations, outside this bounded release."
+}
