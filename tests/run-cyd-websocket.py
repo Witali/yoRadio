@@ -183,7 +183,9 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
     fixture = (frozen / 'tests/native/cyd_websocket_test.c').read_text().replace(
         '#include "../../idf/esp32-cyd2usb-native/main/websocket_service.c"',
         '#include "websocket-under-test.c"')
-    (out / 'cyd_websocket_test.c').write_text('#define TEST_NETWORK_STATUS '+str(int(b'network_service_snapshot' in source))+'\n'+fixture)
+    (out / 'cyd_websocket_test.c').write_text(
+        '#define TEST_NETWORK_STATUS '+str(int(b'network_service_snapshot' in source))+'\n'+
+        '#define TEST_EXPECT_GRACEFUL_CLOSE '+str(int(not args.source_ref))+'\n'+fixture)
     build_succeeded = False
     control_ids = {'drop-byte':1, 'reset-deadline':2, 'reuse-partial':3}
     control_flags = ['-DTEST_WIRE_CAPTURE_CONTROL='+str(control_ids[args.capture_control])] if args.capture_control else []

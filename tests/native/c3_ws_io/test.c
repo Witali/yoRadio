@@ -601,6 +601,7 @@ int main(int argc,char **argv) {
     if(!passed) fprintf(stderr,"NEGATIVE_CONTROL_FAIL: %s\n",argv[1]);
     return passed?0:1;
 #else
+    _Static_assert(WS_GRACEFUL_CLOSE == 1, "Current source must retain graceful Close regressions");
     assert(!strcmp(argv[1],"all"));
     {
         reset(); open_session(3,false);
@@ -615,6 +616,14 @@ int main(int argc,char **argv) {
     test_fragmented_commands(); test_fragment_deadline_poll(); test_pre_upgrade_transport();
     test_outbound_utf8_and_close_validation();
     test_tls_transport_delegation();
+#if defined(WS_GRACEFUL_CLOSE) && WS_GRACEFUL_CLOSE
+    reset(); ready_session(3);
+    assert(ws_close_client(ws_session(s_server,3),1009) == ESP_OK);
+    assert(last_shutdown_graceful && close_code_output() == 1009 && sessions[3].context); ++cases;
+    reset(); ready_session(3); send_script[0]=0; send_script_len=1;
+    assert(ws_close_client(ws_session(s_server,3),1002) != ESP_OK);
+    assert(!last_shutdown_graceful); ++cases;
+#endif
     reset(); printf("PASS: %u C3 WebSocket IO/session/framing cases; four historic negative controls required\n",cases);
     printf("WS_LAYOUT={\"client_bytes\":%zu,\"all_clients_bytes\":%zu,\"message_state_bytes\":%zu,\"command_capacity\":256}\n",sizeof(ws_client_t),sizeof(s_clients),sizeof(websocket_message_t)); return 0;
 #endif

@@ -8,6 +8,10 @@
 #include "network_status.h"
 #include "../../idf/esp32-cyd2usb-native/main/websocket_service.c"
 
+#if TEST_EXPECT_GRACEFUL_CLOSE
+_Static_assert(WS_GRACEFUL_CLOSE == 1, "Current source must retain graceful Close regressions");
+#endif
+
 typedef struct { bool live, websocket; unsigned incarnation; void *context; httpd_free_ctx_fn_t free_context; httpd_send_func_t send_override; httpd_recv_func_t recv_override; } socket_t;
 typedef struct { int socket; unsigned incarnation; httpd_ws_type_t type; size_t size; char text[WS_STATUS_BYTES]; } delivery_t;
 typedef struct {
@@ -21,6 +25,7 @@ static socket_t sockets[16];
 static wire_capture_t captures[16];
 static delivery_t deliveries[256];
 static unsigned delivery_count, shutdown_count, queue_calls, capture_calls, command_calls, recv_calls;
+static unsigned graceful_shutdowns, aborted_shutdowns;
 static unsigned http_errors;
 static int failed_socket = -1;
 static bool queue_failure, registration_failure, task_failure, radio_unavailable, setting_failure, slow_send;
@@ -312,7 +317,8 @@ ssize_t native_web_transport_recv(httpd_handle_t server, int socket, void *data,
     return lwip_recv(socket, data, size, flags);
 }
 void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful) {
-    assert(server == s_server); (void)graceful;
+    assert(server == s_server);
+    if (graceful) ++graceful_shutdowns; else ++aborted_shutdowns;
     (void)shutdown(socket, SHUT_RDWR);
 }
 int lwip_select(int highest, fd_set *readable, fd_set *writable, fd_set *exception, struct timeval *wait) {
@@ -482,6 +488,7 @@ static void reset(void) {
     limited_socket=timed_socket=-1; transport_limit=0;
     memset(&radio, 0, sizeof(radio)); memset(&input, 0, sizeof(input));
     delivery_count = shutdown_count = queue_calls = capture_calls = command_calls = recv_calls = http_errors = 0;
+    graceful_shutdowns = aborted_shutdowns = 0;
     queue_failure = registration_failure = task_failure = radio_unavailable = setting_failure = slow_send = change_radio_during_capture = context_failure = send_override_failure = recv_override_failure = false;
     io_length = io_position = select_length = select_position = 0; raw_send_calls = select_calls = transport_yields = 0; io_advance_us = 0;
     radio_aba_phase=0; suspend_task_exit=stop_task_after_delay=false;
@@ -1233,6 +1240,24 @@ int main(void) {
 #endif
 #if defined(WS_STATUS_STREAMING) && WS_STATUS_STREAMING
     streaming_status_regressions();
+#endif
+#if defined(WS_GRACEFUL_CLOSE) && WS_GRACEFUL_CLOSE
+    // A complete policy Close must keep its transport output deliverable.
+    reset(); start(); open_socket(7,true); cycle();
+    assert(close_with_code(find_client(7),1009) == ESP_FAIL);
+    assert(graceful_shutdowns == 1 && !aborted_shutdowns && s_clients[0].message.close_sent);
+    assert(s_clients[0].closing && deliveries[delivery_count-1].type == HTTPD_WS_TYPE_CLOSE);
+    assert((uint8_t)deliveries[delivery_count-1].text[1] == 0xf1);
+
+    // A failed Close write is still an immediate transport abort.
+    reset(); start(); open_socket(7,true); cycle(); failed_socket=7;
+    assert(close_with_code(find_client(7),1002) == ESP_FAIL);
+    assert(!graceful_shutdowns && aborted_shutdowns == 1 && !s_clients[0].message.close_sent);
+
+    // An ordinary write failure must not opt into graceful Close handling.
+    reset(); start(); open_socket(7,true); cycle(); failed_socket=7;
+    assert(send_text(find_client(7),"failed status") != ESP_OK);
+    assert(!graceful_shutdowns && aborted_shutdowns == 1);
 #endif
     printf("PASS CYD WebSocket core: %u fixture groups, two clients, bounded async work, fd reuse, malformed commands, maximum JSON\n", cases);
     reset();

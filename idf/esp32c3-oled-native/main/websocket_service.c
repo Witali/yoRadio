@@ -32,6 +32,7 @@
 #define WS_STATUS_POLL_MS 100
 #define WS_STATUS_HEARTBEAT_MS 2000
 #define WS_FRAME_BUDGET_US 1000000LL
+#define WS_GRACEFUL_CLOSE 1
 #define WS_MESSAGE_BUDGET_US 5000000ULL
 
 #if !CONFIG_HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT
@@ -262,7 +263,7 @@ static esp_err_t ws_close_client(ws_client_t *client, uint16_t code) {
             ws_update_active(client, was_active);
         }
     }
-    ws_fail_client(client);
+    ws_finish_client(client, result == ESP_OK && client->message.close_sent);
     return result;
 }
 

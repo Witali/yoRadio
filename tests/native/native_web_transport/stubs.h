@@ -35,6 +35,10 @@ typedef int nvs_handle_t;
 #define PSA_SUCCESS 0
 #define CONFIG_ESP_TLS_USING_MBEDTLS 1
 #define CONFIG_MBEDTLS_TLS_SERVER 1
+/* Independent acceptance bounds for the close lifecycle fault scenarios. */
+#define TEST_CLOSE_BUDGET_US 200000U
+#define TEST_CLOSE_BYTE_LIMIT 4096U
+#define TEST_CLOSE_SCRATCH_LIMIT 128U
 typedef struct { unsigned unused; } mbedtls_pk_context;
 typedef struct { mbedtls_pk_context pk; } mbedtls_x509_crt;
 typedef struct { unsigned unused; } mbedtls_ssl_context;

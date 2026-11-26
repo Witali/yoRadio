@@ -3,7 +3,7 @@
 #undef free
 #undef fcntl
 typedef struct { void *context;void (*free_context)(void *);httpd_send_func_t send;
-    httpd_recv_func_t recv;httpd_pending_func_t pending;unsigned closed,shutdown; } sock_t;
+    httpd_recv_func_t recv;httpd_pending_func_t pending;unsigned closed,shutdown,half_closed,fully_shutdown; } sock_t;
 static sock_t sockets[32];
 static uint8_t nvs_blob[NATIVE_WEB_TLS_BUNDLE_MAX+1], staged[NATIVE_WEB_TLS_BUNDLE_MAX+1];
 static size_t nvs_size, staged_size;
@@ -16,6 +16,12 @@ static unsigned selects,yields,raw_writes,raw_reads,close_alerts,last_direction,
 static uint64_t now_us;
 static uint64_t init_advance,handshake_advance,read_advance,write_advance;
 static uint8_t wire[1024],sent[2048];static size_t wire_size,wire_at,sent_size;
+static int raw_read_script[64],raw_read_default;
+static size_t raw_read_at,raw_read_count,raw_bytes,raw_max_request;
+static uint64_t raw_read_advance;
+static bool raw_fill;
+static char lifecycle[2048];static size_t lifecycle_size;
+static void event(char value) { assert(lifecycle_size+1<sizeof(lifecycle));lifecycle[lifecycle_size++]=value;lifecycle[lifecycle_size]=0; }
 
 void *tracked_malloc(size_t size) {
     ++alloc_calls;if(fail_alloc && alloc_calls==fail_alloc)return NULL;
@@ -27,17 +33,31 @@ int mock_fcntl(int socket,int command,...) { assert(socket>=0 && socket<32);(voi
 int64_t esp_timer_get_time(void) { return (int64_t)now_us; }
 void vTaskDelay(unsigned ticks) { ++yields;now_us+=ticks*1000U; }
 ssize_t lwip_send(int socket,const void *data,size_t size,int flags) { (void)socket;(void)data;assert(flags&MSG_DONTWAIT);++raw_writes;return (ssize_t)size; }
-ssize_t lwip_recv(int socket,void *data,size_t size,int flags) { (void)socket;assert(flags&MSG_DONTWAIT);++raw_reads;if(size>wire_size-wire_at)size=wire_size-wire_at;memcpy(data,wire+wire_at,size);if(!(flags&MSG_PEEK))wire_at+=size;return (ssize_t)size; }
+ssize_t lwip_recv(int socket,void *data,size_t size,int flags) {
+    (void)socket;assert(flags&MSG_DONTWAIT);++raw_reads;event('R');now_us+=raw_read_advance;
+    if(size>raw_max_request)raw_max_request=size;
+    int result=raw_read_at<raw_read_count?raw_read_script[raw_read_at++]:raw_read_default;
+    if(result<0){errno=-result;return -1;}
+    if((size_t)result<size)size=(size_t)result;
+    if(raw_fill)memset(data,0xa5,size);
+    else { if(size>wire_size-wire_at)size=wire_size-wire_at;memcpy(data,wire+wire_at,size);if(!(flags&MSG_PEEK))wire_at+=size; }
+    raw_bytes+=size;return (ssize_t)size;
+}
 int lwip_select(int count,fd_set *readable,fd_set *writable,fd_set *exception,struct timeval *timeout) {
     assert(count>0 && (readable!=NULL)!=(writable!=NULL) && !exception && timeout);
-    ++selects;last_direction=writable!=NULL;
+    ++selects;last_direction=writable!=NULL;event('S');
     int result=select_at<select_count?select_script[select_at++]:1;
     if(result<0){errno=-result;return -1;}
     if(!result)now_us+=(uint64_t)timeout->tv_sec*1000000U+(uint64_t)timeout->tv_usec;
     return result;
 }
-int lwip_close(int socket) { ++sockets[socket].closed;return 0; }
-int shutdown(int socket,int how) { assert(how==SHUT_RDWR);++sockets[socket].shutdown;return 0; }
+int lwip_close(int socket) { assert(!sockets[socket].closed);++sockets[socket].closed;event('C');return 0; }
+int shutdown(int socket,int how) {
+    assert(how==SHUT_WR || how==SHUT_RDWR);++sockets[socket].shutdown;
+    if(how==SHUT_WR){++sockets[socket].half_closed;event('W');}
+    else {++sockets[socket].fully_shutdown;event('D');}
+    return 0;
+}
 void *httpd_sess_get_transport_ctx(httpd_handle_t server,int socket) { assert(server==(void *)1);return sockets[socket].context; }
 void httpd_sess_set_transport_ctx(httpd_handle_t server,int socket,void *context,void (*cleanup)(void *)) { assert(server==(void *)1);if(context_fail)return;sockets[socket].context=context;sockets[socket].free_context=cleanup; }
 esp_err_t httpd_sess_set_send_override(httpd_handle_t server,int socket,httpd_send_func_t fn) { assert(server==(void *)1);if(override_fail==1)return ESP_FAIL;sockets[socket].send=fn;return ESP_OK; }
@@ -57,7 +77,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *key,const unsigned char *data,size_
 int mbedtls_pk_check_pair(const mbedtls_pk_context *pub,const mbedtls_pk_context *key) { assert(pub && key);return crypto_fail==4?-1:0; }
 void mbedtls_pk_free(mbedtls_pk_context *key) { (void)key; }
 static int action(int *script,size_t count,size_t *at,int default_action) { return *at<count?script[(*at)++]:default_action; }
-int mbedtls_ssl_close_notify(mbedtls_ssl_context *ssl) { assert(ssl);++close_alerts;return action(close_script,close_count,&close_at,0); }
+int mbedtls_ssl_close_notify(mbedtls_ssl_context *ssl) { assert(ssl);++close_alerts;event('A');return action(close_script,close_count,&close_at,0); }
 esp_tls_t *esp_tls_init(void) { esp_tls_t *tls=tracked_calloc(1,sizeof(*tls));if(tls)++tls_live;return tls; }
 esp_err_t esp_tls_server_session_init(esp_tls_cfg_server_t *config,int socket,esp_tls_t *tls) { assert(config->tls_version==ESP_TLS_VER_TLS_1_2 && tls);tls->socket=socket;now_us+=init_advance;return session_init_fail?ESP_FAIL:ESP_OK; }
 int esp_tls_server_session_continue_async(esp_tls_t *tls) { assert(tls);now_us+=handshake_advance;return action(handshake_script,handshake_count,&handshake_at,0); }
@@ -70,7 +90,7 @@ void *esp_tls_get_ssl_context(esp_tls_t *tls) { assert(tls);return &tls->ssl; }
 
 static void close_socket(int socket) {
     if(sockets[socket].context) {
-        httpd_close_tls((void *)1,socket);
+        httpd_close_transport((void *)1,socket);
         sockets[socket].free_context(sockets[socket].context);
         sockets[socket].context=NULL;sockets[socket].free_context=NULL;
     }
@@ -86,6 +106,8 @@ static void reset(void) {
     selects=yields=raw_writes=raw_reads=close_alerts=last_direction=0;now_us=100;
     init_advance=handshake_advance=read_advance=write_advance=0;
     wire_size=wire_at=sent_size=0;
+    raw_read_at=raw_read_count=raw_bytes=raw_max_request=0;raw_read_default=INT_MAX;
+    raw_read_advance=0;raw_fill=false;lifecycle_size=0;lifecycle[0]=0;
 }
 static httpd_config_t config(void) { return (httpd_config_t){.server_port=80,.stack_size=6144,.max_open_sockets=5,.task_priority=5,.core_id=-1}; }
 static void secure_blob(void) {
@@ -95,12 +117,12 @@ static void secure_blob(void) {
 static void ready(void) {
     secure_blob();httpd_config_t cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK && native_web_transport_secure());
     assert(cfg.server_port==443 && cfg.max_open_sockets==3 && cfg.stack_size==10240 && cfg.task_priority==5 && cfg.core_id==-1);
-    assert(cfg.open_fn==httpd_open_tls && cfg.close_fn==httpd_close_tls);
+    assert(cfg.open_fn==httpd_open_tls && cfg.close_fn==httpd_close_transport);
     assert(cfg.open_fn((void *)1,3)==ESP_OK && sockets[3].send && sockets[3].recv && sockets[3].pending);
 }
 static void credentials(void) {
-    reset();httpd_config_t cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK && !native_web_transport_secure());assert(cfg.server_port==80 && cfg.max_open_sockets==5 && !cfg.open_fn);++cases;
-    reset();secure_blob();nvs_blob[6]=0;memset(nvs_blob+8,0,8);nvs_size=16;cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK && !native_web_transport_secure());++cases;
+    reset();httpd_config_t cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK && !native_web_transport_secure());assert(cfg.server_port==80 && cfg.max_open_sockets==5 && !cfg.open_fn && cfg.close_fn==httpd_close_transport);++cases;
+    reset();secure_blob();nvs_blob[6]=0;memset(nvs_blob+8,0,8);nvs_size=16;cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK && !native_web_transport_secure() && cfg.close_fn==httpd_close_transport);++cases;
     for(unsigned mode=0;mode<12;++mode) {
         reset();secure_blob();
         if(mode==0)nvs_blob[0]='X';else if(mode==1)nvs_blob[4]=2;else if(mode==2)nvs_blob[6]=2;else if(mode==3)nvs_blob[7]=1;else if(mode==4)nvs_size=15;
@@ -147,21 +169,21 @@ static void io(void) {
     write_at=0;write_count=1;write_script[0]=ESP_TLS_ERR_SSL_WANT_READ;select_at=0;select_count=1;select_script[0]=0;
     assert(sockets[3].send((void *)1,3,"x",1,0)==HTTPD_SOCK_ERR_TIMEOUT);++cases;
     reset();ready();close_script[0]=ESP_TLS_ERR_SSL_WANT_WRITE;close_script[1]=0;close_count=2;
-    native_web_transport_shutdown((void *)1,3,true);assert(close_alerts==2 && sockets[3].shutdown==1);
+    native_web_transport_shutdown((void *)1,3,true);assert(close_alerts==2 && sockets[3].half_closed==1 && sockets[3].fully_shutdown==1);
     close_socket(3);assert(sockets[3].closed==1 && close_alerts==2 && tls_deleted==1);++cases;
     reset();ready();native_web_transport_shutdown((void *)1,3,false);close_socket(3);assert(!close_alerts && sockets[3].closed==1 && tls_deleted==1);++cases;
     reset();ready();for(unsigned i=0;i<32;++i)close_script[i]=ESP_TLS_ERR_SSL_WANT_READ;close_count=32;select_script[0]=0;select_count=1;
-    native_web_transport_shutdown((void *)1,3,true);assert(now_us<=200100 && sockets[3].shutdown==1);++cases;
+    native_web_transport_shutdown((void *)1,3,true);assert(now_us<=200100 && sockets[3].half_closed==1 && sockets[3].fully_shutdown==1);++cases;
     reset();bool direction;assert(native_web_transport_send((void *)1,3,"plain",5,0,&direction)==5 && raw_writes==1);++cases;
 }
 static void prepare_close_without_socket_cleanup(void) {
     reset();
     native_web_transport_prepare_close((void *)1,3,true);
-    assert(!sockets[3].shutdown && !sockets[3].closed && !close_alerts);++cases;
+    assert(!sockets[3].shutdown && !sockets[3].closed && !close_alerts && !raw_reads && !raw_writes);++cases;
 
     reset();ready();close_script[0]=ESP_TLS_ERR_SSL_WANT_WRITE;close_script[1]=0;close_count=2;
     native_web_transport_prepare_close((void *)1,3,true);
-    assert(!sockets[3].shutdown && !sockets[3].closed);
+    assert(!sockets[3].shutdown && !sockets[3].closed && !raw_reads && !raw_writes);
     assert(close_alerts==2 && tls_live==1 && !tls_deleted);
     unsigned alerts=close_alerts;
     native_web_transport_prepare_close((void *)1,3,true);
@@ -172,12 +194,12 @@ static void prepare_close_without_socket_cleanup(void) {
     close_socket(3);assert(sockets[3].closed==1 && close_alerts==alerts && tls_deleted==1);++cases;
 
     reset();ready();native_web_transport_prepare_close((void *)1,3,false);
-    assert(!sockets[3].shutdown && !sockets[3].closed && !close_alerts && tls_live==1);
+    assert(!sockets[3].shutdown && !sockets[3].closed && !close_alerts && tls_live==1 && !raw_reads && !raw_writes);
     close_socket(3);assert(sockets[3].closed==1 && !close_alerts && tls_deleted==1);++cases;
 
     reset();ready();close_script[0]=ESP_TLS_ERR_SSL_WANT_READ;close_count=1;select_script[0]=0;select_count=1;
     native_web_transport_prepare_close((void *)1,3,true);
-    assert(now_us<=200100 && !sockets[3].shutdown && !sockets[3].closed && tls_live==1);
+    assert(now_us<=200100 && !sockets[3].shutdown && !sockets[3].closed && tls_live==1 && !raw_reads && !raw_writes);
     alerts=close_alerts;close_socket(3);
     assert(sockets[3].closed==1 && close_alerts==alerts && tls_deleted==1);++cases;
 }
@@ -214,6 +236,92 @@ static void boundaries_and_failures(void) {
     reset();secure_blob();cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK);init_advance=3000001;
     assert(cfg.open_fn((void *)1,3)==ESP_ERR_TIMEOUT);close_socket(3);assert(!close_alerts && tls_deleted==1 && !handshake_at);++cases;
     reset();ready();close_socket(3);assert(sockets[3].closed==1 && close_alerts==1 && tls_deleted==1);
+    sockets[3].closed=0; /* HTTPD has accepted a new connection reusing this fd. */
     assert(httpd_open_tls((void *)1,3)==ESP_OK);assert(!session((void *)1,4));++cases;
 }
-int main(void) { credentials();open_failures();io();prepare_close_without_socket_cleanup();boundaries_and_failures();reset();printf("PASS: %u native TLS transport credential/ownership/IO fault groups\n",cases);return 0; }
+static void bounded_close(void) {
+    /* A plaintext close uses the same callback, with no TLS or heap owner. */
+    reset();httpd_config_t cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK);
+    unsigned allocations=alloc_calls;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(!strcmp(lifecycle,"WRD") && raw_reads==1 && !raw_bytes);
+    assert(sockets[3].half_closed==1 && sockets[3].fully_shutdown==1 && !sockets[3].closed && alloc_calls==allocations);++cases;
+
+    reset();cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK);
+    memset(wire,'x',257);wire_size=257;
+    cfg.close_fn((void *)1,3);
+    assert(!strcmp(lifecycle,"WRRRRC") && wire_at==257 && raw_bytes==257 && raw_reads==4);
+    assert(sockets[3].closed==1 && !sockets[3].fully_shutdown && !live_allocs);++cases;
+
+    reset();memcpy(wire,"end",3);wire_size=3;
+    raw_read_script[0]=-EAGAIN;raw_read_script[1]=-EINTR;raw_read_script[2]=3;raw_read_script[3]=0;raw_read_count=4;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(raw_reads==4 && raw_bytes==3 && selects==2 && !last_direction && yields==2);
+    assert(!strcmp(lifecycle,"WRSRSRRD"));++cases;
+
+    reset();raw_read_script[0]=-EAGAIN;raw_read_script[1]=-EWOULDBLOCK;raw_read_script[2]=0;raw_read_count=3;
+    select_script[0]=-EINTR;select_script[1]=1;select_count=2;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(raw_reads==3 && selects==2 && yields==2 && !last_direction && sockets[3].fully_shutdown==1);++cases;
+
+    reset();raw_read_default=-EAGAIN;select_script[0]=0;select_count=1;uint64_t started=now_us;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(now_us-started==TEST_CLOSE_BUDGET_US && raw_reads==1 && selects==1 && !yields && sockets[3].fully_shutdown==1);++cases;
+
+    reset();raw_read_default=-EAGAIN;started=now_us;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(now_us-started>=TEST_CLOSE_BUDGET_US && now_us-started<=TEST_CLOSE_BUDGET_US+1000U);
+    assert(raw_reads>1 && raw_reads==selects && yields==selects && !last_direction && sockets[3].fully_shutdown==1);++cases;
+
+    reset();raw_fill=true;raw_read_advance=50000;started=now_us;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(now_us-started==TEST_CLOSE_BUDGET_US && raw_reads==4 && raw_bytes==512 && !selects);
+    assert(raw_bytes<TEST_CLOSE_BYTE_LIMIT && raw_max_request<=TEST_CLOSE_SCRATCH_LIMIT);++cases;
+
+    reset();raw_fill=true;started=now_us;allocations=alloc_calls;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(raw_bytes==TEST_CLOSE_BYTE_LIMIT && raw_reads==32 && raw_max_request<=TEST_CLOSE_SCRATCH_LIMIT);
+    assert(now_us==started && !selects && alloc_calls==allocations && sockets[3].fully_shutdown==1);++cases;
+
+    reset();raw_read_script[0]=-ECONNRESET;raw_read_count=1;
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(!strcmp(lifecycle,"WRD") && !raw_bytes && !selects && sockets[3].fully_shutdown==1);++cases;
+
+    reset();native_web_transport_shutdown((void *)1,3,false);
+    assert(!strcmp(lifecycle,"D") && !raw_reads && !sockets[3].half_closed && !close_alerts);++cases;
+
+    /* A public graceful request cannot revive a TLS session that already failed. */
+    reset();ready();write_script[0]=-123;write_count=1;bool writable;
+    assert(native_web_transport_send((void *)1,3,"x",1,0,&writable)==-1 && errno==EIO);
+    native_web_transport_shutdown((void *)1,3,true);
+    assert(!strcmp(lifecycle,"D") && !raw_reads && !close_alerts && !sockets[3].half_closed);
+    close_socket(3);assert(!strcmp(lifecycle,"DC") && tls_deleted==1 && sockets[3].closed==1);++cases;
+
+    reset();ready();memcpy(wire,"tail",4);wire_size=4;
+    httpd_close_transport((void *)1,3);
+    assert(!strcmp(lifecycle,"AWRRC") && raw_bytes==4 && sockets[3].closed==1 && tls_live==1 && !tls_deleted);
+    /* HTTPD frees its context after the callback, not inside the callback. */
+    sockets[3].free_context(sockets[3].context);sockets[3].context=NULL;sockets[3].free_context=NULL;
+    assert(tls_deleted==1);++cases;
+
+    reset();ready();close_script[0]=-123;close_count=1;
+    close_socket(3);assert(!strcmp(lifecycle,"AWRC") && close_alerts==1 && raw_reads==1 && sockets[3].closed==1 && tls_deleted==1);++cases;
+
+    reset();nvs_present=true;nvs_get_error=ESP_ERR_NVS_NOT_FOUND;cfg=config();
+    assert(native_web_transport_prepare(&cfg)==ESP_OK && !native_web_transport_secure() && cfg.close_fn==httpd_close_transport);
+    cfg.close_fn((void *)1,3);assert(!strcmp(lifecycle,"WRC") && sockets[3].closed==1 && !live_allocs);++cases;
+
+    reset();ready();native_web_transport_prepare_close((void *)1,3,false);
+    assert(!lifecycle_size && !raw_reads && !sockets[3].shutdown && !sockets[3].closed);
+    close_socket(3);assert(!strcmp(lifecycle,"C") && !close_alerts && !raw_reads && tls_deleted==1);++cases;
+
+    reset();ready();native_web_transport_shutdown((void *)1,3,true);
+    assert(!strcmp(lifecycle,"AWRD") && tls_live==1 && !tls_deleted && !sockets[3].closed);
+    close_socket(3);assert(!strcmp(lifecycle,"AWRDWRC") && close_alerts==1 && sockets[3].closed==1 && tls_deleted==1);++cases;
+}
+int main(void) {
+    credentials();open_failures();io();prepare_close_without_socket_cleanup();boundaries_and_failures();
+    assert(cases==69);printf("BASELINE_GROUPS=%u\n",cases);
+    bounded_close();printf("CLOSE_GROUPS=%u\n",cases-69U);
+    reset();printf("PASS: %u native TLS transport credential/ownership/IO/close fault groups\n",cases);return 0;
+}

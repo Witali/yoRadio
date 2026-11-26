@@ -48,6 +48,7 @@
 #define WS_HEARTBEAT_US 2000000LL
 #define WS_TIMER_SCHEDULER 1
 #define WS_FRAME_BUDGET_US 1000000LL
+#define WS_GRACEFUL_CLOSE 1
 #define WS_MESSAGE_BUDGET_US 5000000ULL
 
 typedef struct {
@@ -189,12 +190,16 @@ static int receive_complete_frame_bytes(httpd_handle_t server, int socket, char 
     return esp_timer_get_time() >= deadline ? HTTPD_SOCK_ERR_TIMEOUT : (int)received;
 }
 
-static void fail_client(ws_client_t *client) {
+static void finish_client(ws_client_t *client, bool graceful) {
     if (!current_client(client)) return;
     client->closing = true;
-    // HTTPD owns close(). Immediate shutdown wakes its receive loop without a
+    // HTTPD owns close(). Transport shutdown wakes its receive loop without a
     // queued fd/session-pointer close that could hit a subsequently reused fd.
-    native_web_transport_shutdown(s_server, client->socket, false);
+    native_web_transport_shutdown(s_server, client->socket, graceful);
+}
+
+static void fail_client(ws_client_t *client) {
+    finish_client(client, false);
 }
 
 static ws_client_t *find_client(int socket) {
@@ -255,7 +260,7 @@ static esp_err_t close_with_code(ws_client_t *client, uint16_t code) {
     uint8_t payload[2] = {(uint8_t)(code >> 8U), (uint8_t)code};
     if (!client->message.close_sent)
         (void)send_control(client, HTTPD_WS_TYPE_CLOSE, payload, sizeof(payload));
-    fail_client(client);
+    finish_client(client, client->message.close_sent);
     return ESP_FAIL;
 }
 

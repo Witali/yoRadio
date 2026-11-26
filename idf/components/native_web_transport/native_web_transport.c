@@ -28,6 +28,8 @@
 #define TLS_IO_US 1000000ULL
 #define TLS_CLOSE_US 200000ULL
 #define TLS_LOOKAHEAD 128U
+#define TCP_CLOSE_DRAIN_US 200000ULL
+#define TCP_CLOSE_DRAIN_BYTES 4096U
 
 typedef struct {
     httpd_handle_t server;
@@ -286,14 +288,41 @@ void native_web_transport_prepare_close(httpd_handle_t server, int socket, bool 
     }
 }
 
+// lwIP resets a connection with unread RX and purges its queued TX. Send
+// FIN first, then discard trailing bytes within both a time and byte bound.
+// No trailing WebSocket command is dispatched. TLS has already sent its
+// close alert; encrypted trailing records are discarded at the TCP layer.
+static void drain_tcp_close(int socket) {
+    (void)shutdown(socket, SHUT_WR);
+    uint64_t started = (uint64_t)esp_timer_get_time();
+    uint8_t discarded[128];
+    size_t drained = 0;
+    while (drained < TCP_CLOSE_DRAIN_BYTES &&
+           (uint64_t)esp_timer_get_time() - started < TCP_CLOSE_DRAIN_US) {
+        size_t remaining = TCP_CLOSE_DRAIN_BYTES - drained;
+        size_t size = remaining < sizeof(discarded) ? remaining : sizeof(discarded);
+        ssize_t count = lwip_recv(socket, discarded, size, MSG_DONTWAIT);
+        if (count > 0) {
+            if ((size_t)count > size) break;
+            drained += (size_t)count;
+            continue;
+        }
+        if (!count || (errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)) break;
+        if (wait_ready(socket, false, started, TCP_CLOSE_DRAIN_US) != ESP_OK) break;
+    }
+}
+
 void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful) {
     native_web_transport_prepare_close(server, socket, graceful);
+    tls_session_t *context = session(server, socket);
+    if (graceful && (!context || !context->aborted)) drain_tcp_close(socket);
     (void)shutdown(socket, SHUT_RDWR);
 }
 
-static void httpd_close_tls(httpd_handle_t server, int socket) {
+static void httpd_close_transport(httpd_handle_t server, int socket) {
     tls_session_t *context = session(server, socket);
     if (context) close_alert(context);
+    if (!context || !context->aborted) drain_tcp_close(socket);
     (void)lwip_close(socket);
 }
 
@@ -385,7 +414,7 @@ static esp_err_t prepare_config(httpd_config_t *config) {
     config->max_open_sockets = TLS_CLIENTS;
     if (config->stack_size < 10240U) config->stack_size = 10240U;
     config->open_fn = httpd_open_tls;
-    config->close_fn = httpd_close_tls;
+    config->close_fn = httpd_close_transport;
     atomic_store(&s_secure, true);
     atomic_store(&s_prepared, true);
     return ESP_OK;
@@ -398,5 +427,6 @@ esp_err_t native_web_transport_prepare(httpd_config_t *config) {
     if (!atomic_compare_exchange_strong(&s_prepared, &expected, true)) return ESP_ERR_INVALID_STATE;
     esp_err_t result = prepare_config(config);
     if (result != ESP_OK) (void)native_web_transport_release();
+    else config->close_fn = httpd_close_transport;
     return result;
 }

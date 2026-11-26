@@ -133,7 +133,7 @@ def main():
             # production SDK/session/receive/control/message code stays intact.
             prefix+='\nstatic esp_err_t handle_command(ws_client_t *,char *);\nstatic esp_err_t send_status(ws_client_t *,bool);\n'
             names=['session_free','current_client','send_complete_frame_bytes','receive_complete_frame_bytes',
-                   'fail_client','find_client','send_text','send_control','close_with_code','receive_and_handle',
+                   'finish_client','fail_client','find_client','send_text','send_control','close_with_code','receive_and_handle',
                    'websocket_handler','websocket_handshake_transport','websocket_service_register']
         (directory/'application.inc').write_text(prefix+selected(app,names),encoding='utf-8')
         # Reuse the documented SHA sample seam, not an independently copied
