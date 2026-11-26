@@ -58,7 +58,7 @@ def main():
             assert code==0,log.decode(errors='replace');print(log.decode().strip())
             count=int(re.search(rb'PASS: (\d+)',log)[1])
             assert int(re.search(rb'BASELINE_GROUPS=(\d+)',log)[1])==69
-            close_groups=int(re.search(rb'CLOSE_GROUPS=(\d+)',log)[1]);assert close_groups==16 and count==69+close_groups
+            close_groups=int(re.search(rb'CLOSE_GROUPS=(\d+)',log)[1]);assert close_groups==17 and count==69+close_groups
             report.update(groups=count,close_groups=close_groups)
         else:
             assert code!=0 and b'Assertion' in log and b'Sanitizer' not in log and b'runtime error:' not in log,(name,code,log)

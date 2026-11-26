@@ -293,6 +293,7 @@ void native_web_transport_prepare_close(httpd_handle_t server, int socket, bool 
 // No trailing WebSocket command is dispatched. TLS has already sent its
 // close alert; encrypted trailing records are discarded at the TCP layer.
 static void drain_tcp_close(int socket) {
+    if (socket < 0) return;
     (void)shutdown(socket, SHUT_WR);
     uint64_t started = (uint64_t)esp_timer_get_time();
     uint8_t discarded[128];
@@ -313,6 +314,7 @@ static void drain_tcp_close(int socket) {
 }
 
 void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful) {
+    if (socket < 0) return;
     native_web_transport_prepare_close(server, socket, graceful);
     tls_session_t *context = session(server, socket);
     if (graceful && (!context || !context->aborted)) drain_tcp_close(socket);
@@ -320,6 +322,7 @@ void native_web_transport_shutdown(httpd_handle_t server, int socket, bool grace
 }
 
 static void httpd_close_transport(httpd_handle_t server, int socket) {
+    if (socket < 0) return;
     tls_session_t *context = session(server, socket);
     if (context) close_alert(context);
     if (!context || !context->aborted) drain_tcp_close(socket);
