@@ -3,7 +3,37 @@
 Обновлено: 2026-11-26. Ветка: `codex/cyd-espressif-vorbis`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
 
-Текущая точка: [полный RTC-off TLS/HE-AAC на трёх выходах](../tests/results/cyd-ws-streaming-20261126/README.md)
+Текущая точка на 26 ноября: [сохранение Close и три строгих RTC-off прогона](../tests/results/cyd-ws-close-20261126/README.md)
+из исходников `95672e8f` проходят на legacy DAC, PDM и continuous DAC.
+Во всех трёх случаях — полный TLS/HE-AAC, 614400 точных PCM-кадров с прежним
+SHA-256, WebUI после EOF, два WS-клиента с кодом Close 1000 и остановленными
+reader threads. Final allocation failures после закрытия клиентов равен нулю;
+независимый pbuf prefix на PCM flush также равен нулю. Minimum heap:
+legacy 3260 B, PDM 4104 B, continuous 3548 B.
+
+Общий transport завершает TCP через SHUT_WR и ограниченный drain (200 мс /
+4096 B, scratch 128 B, без собственных heap allocations), сохраняя ownership HTTPD и немедленный abort
+после TLS failure. Отрицательные fd игнорируются до обращения к сокету/context.
+Границы относятся только к drain; ожидание выделения FIN остаётся политикой lwIP.
+GCC/Clang/ELF gates проходят; статическое потребление памяти относительно
+`799f6787` не изменилось. Конфигурация, модель QEMU, controller,
+core/task/watchdog budgets и TCP/TLS сохранены.
+ASan/UBSan: CYD 82/82, C3 IO 5191, transport 86, TCP 164 на каждой цели.
+Ранний SDK `d260` NONPASS сохранён. Реальные host TLS/WSS на d260 не означают
+полную actual-target RFC-квалификацию финального исходника.
+
+Следующие offline gates — свежая actual-target WS/WSS квалификация на `956`,
+12 production CYD exports и текущая compiler/artifact-регрессия C3. Плата пока
+не подключена; её приёмка остаётся условным отдельным этапом. Deferred
+Vorbis/AAC/FLAC scopes автоматически не возобновляются. Ограничения дат
+аудиосертификата и границы stack/physical timing отражены в новом README.
+
+## История контрольных точек
+
+Ниже сохранены прежние результаты и формулировки следующих шагов на момент
+каждого checkpoint. Актуальный gated статус указан выше и в текущей очереди.
+
+Предыдущая точка 26 ноября (source 799f6787): [полный RTC-off TLS/HE-AAC на трёх выходах](../tests/results/cyd-ws-streaming-20261126/README.md)
 проходит после потоковой выдачи WS-статуса в `799f6787`. Постоянный rendered
 buffer 5120 B заменён staging 1024 B и счётчиком длины 4 B; логическая ёмкость
 5120 B, все поля/экранирование, два клиента и общий deadline кадра сохранены.
@@ -437,6 +467,31 @@ DMA-памяти завершилось ошибкой.
 обязательный стереопункт.
 
 ## Что осталось по переносу
+
+Актуальная очередь на 26 ноября 2026 года, source `95672e8f`.
+Перенос выбранных публичных реализаций выполнен; [три диагностических
+resource gates](../tests/results/cyd-ws-close-20261126/README.md) проходят с полным
+PCM и нулём allocation failures после WebUI/WS close. Это не заменяет
+следующие квалификацию и доставку:
+
+| Осталось | Gate и входы |
+| --- | --- |
+| Actual-target WS/WSS | Полная независимая RFC-матрица на свежем финальном исходнике, с явной областью compiled backend/transport. Host 82/82/5191/86 и TCP 164/цель, а также прежний d260 TLS/WSS, этот gate не закрывают. [Общий transport](../idf/components/native_web_transport/native_web_transport.c), [CYD WS](../idf/esp32-cyd2usb-native/main/websocket_service.c), [C3 WS](../idf/esp32c3-oled-native/main/websocket_service.c). |
+| Production CYD и C3 | Обновить 12 CYD exports: vendor/custom FLAC × PDM/continuous/legacy × обычный/RTC профиль; сверить app/ELF/config/OTA slots и compiler gates. Выполнить текущую C3 compiler dependency closure и artifact refresh после shared JSON/transport/caller правок. Прежние опубликованные образы остаются своими checkpoint, три diagnostic образа не подменяют production exports. [Production workflow](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md). |
+| Плата, когда доступна | Wi-Fi/TLS/аудио/WebUI/OTA/длительная нагрузка, реальные выходы, запас RAM и timing. Плата не подключена; независимую программную работу можно продолжать. |
+| Явно отложено | [Собственный расширенный Vorbis](CYD_VORBIS_EXTENDED_DEFERRED_20261028.md); AAC compact/private ABI/reset/owner-view и late-SBR/PS vendor limitations; [FLAC target OOM/backpressure/semantic controls](CYD_FLAC_TARGET_ERRORS_DEFERRED_20261020.md). Эти scopes не возобновлять автоматически. |
+
+Физический worst-case stack/timing не доказан. TLS audio fixture сохраняет
+прежнюю [политику дат](../tests/results/cyd-pbuf-failure-probe-20261124/native/root-records/tls-date-policy-20261126.json);
+новый WSS gate требует отдельного свежего host-verified сертификата.
+Аппаратно-специфичные дисплеи/выводы C3 не входят в перенос.
+
+## Исторический срез очереди на 24 ноября 2026 года
+
+Историческая запись: формулировки «текущий», «следующий» и «не квалифицирован»
+в сохранённом блоке ниже относятся к тому checkpoint. Они не отменяют новый
+RTC-off PASS выше и не объявляют текущие production/C3 артефакты обновлёнными.
+
 
 Состояние программных проверок на 24 ноября 2026 года. Production-доставка: `d54e61049`;
 START regression/patch: `10f8c46dc`. Ниже отделены перенесённые реализации,

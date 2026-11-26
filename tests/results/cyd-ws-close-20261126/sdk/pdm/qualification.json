@@ -1,0 +1,1128 @@
+{
+  "passed": true,
+  "source_commit": "95672e8f673ec977b6f61b78eeba6958d0d992ac",
+  "backend": "pdm",
+  "physical_tested": false,
+  "native_run": false,
+  "rtc_workspace": false,
+  "rtc_probe_enabled": true,
+  "pbuf_probe_enabled": true,
+  "effective_config_delta": {},
+  "children": [
+    {
+      "phase": "frame-native_web_transport-before",
+      "pid": 15592,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "frame-native_web_transport-after",
+      "pid": 33564,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "frame-websocket_service-before",
+      "pid": 11380,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "frame-websocket_service-after",
+      "pid": 25088,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "clang-reconfigure",
+      "pid": 15228,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "tidy-native_web_transport-before",
+      "pid": 22788,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "tidy-native_web_transport-after",
+      "pid": 17872,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "tidy-websocket_service-before",
+      "pid": 3200,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "tidy-websocket_service-after",
+      "pid": 4816,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "sdk-pbuf.c",
+      "pid": 29184,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "sdk-tcp_out.c",
+      "pid": 35252,
+      "state": "TERMINAL",
+      "exit_status": 0
+    },
+    {
+      "phase": "linked-pbuf",
+      "pid": 25460,
+      "state": "TERMINAL",
+      "exit_status": 0
+    }
+  ],
+  "changed_objects": [
+    {
+      "source": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_web_transport\\native_web_transport.c",
+      "path": ".build/caqt23a/fair-default-pdm/b/esp-idf/native_web_transport/CMakeFiles/__idf_native_web_transport.dir/native_web_transport.c.obj",
+      "before": {
+        "bytes": 124916,
+        "sha256": "c23eed4c6d0ce11022155b932a400c0bb0ae171833ac5591c51f89defb9263cf"
+      },
+      "after": {
+        "bytes": 131492,
+        "sha256": "e3710b8ac44d14c8398ad4c9e4d69d1c5bc4037d3d1f0d4e375b01d4e3e5a909"
+      }
+    },
+    {
+      "source": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+      "path": ".build/caqt23a/fair-default-pdm/b/esp-idf/main/CMakeFiles/__idf_main.dir/websocket_service.c.obj",
+      "before": {
+        "bytes": 259340,
+        "sha256": "a1a8859e11f3f54e224f180c686c344ac72dec1999a22d58b1e95b31b487a096"
+      },
+      "after": {
+        "bytes": 260656,
+        "sha256": "2bde146a44e3c9ddf454ceab8c0c8ea7066c24f789752b46a8c9cedbddf59d77"
+      }
+    }
+  ],
+  "frames": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_web_transport\\native_web_transport.c": {
+      "before": {
+        "decode_bundle": 1552,
+        "session": 48,
+        "wait_ready": 64,
+        "close_alert": 32,
+        "httpd_close_tls": 32,
+        "httpd_pending_tls": 32,
+        "tls_free": 32,
+        "httpd_open_tls": 48,
+        "native_web_transport_provision": 112,
+        "native_web_transport_send": 48,
+        "httpd_send_tls": 64,
+        "native_web_transport_recv": 48,
+        "httpd_recv_tls": 64,
+        "native_web_transport_prepare_close": 48,
+        "native_web_transport_shutdown": 48,
+        "native_web_transport_secure": 32,
+        "native_web_transport_release": 32,
+        "native_web_transport_prepare": 64
+      },
+      "after": {
+        "decode_bundle": 1552,
+        "session": 48,
+        "wait_ready": 64,
+        "close_alert": 32,
+        "httpd_pending_tls": 32,
+        "tls_free": 32,
+        "drain_tcp_close$part$0": 160,
+        "httpd_close_transport": 32,
+        "httpd_open_tls": 48,
+        "native_web_transport_provision": 112,
+        "native_web_transport_send": 48,
+        "httpd_send_tls": 64,
+        "native_web_transport_recv": 48,
+        "httpd_recv_tls": 64,
+        "native_web_transport_prepare_close": 48,
+        "native_web_transport_shutdown": 48,
+        "native_web_transport_secure": 32,
+        "native_web_transport_release": 32,
+        "native_web_transport_prepare": 64
+      }
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c": {
+      "before": {
+        "number": 32,
+        "session_free": 32,
+        "status_event": 48,
+        "capture_status$constprop$0": 1360,
+        "find_client": 48,
+        "websocket_handshake_transport": 32,
+        "status_timer": 48,
+        "send_text": 64,
+        "send_complete_frame_bytes": 96,
+        "write_status_stream": 32,
+        "receive_complete_frame_bytes": 96,
+        "json_sink_string": 48,
+        "payload_string": 32,
+        "payload_number": 80,
+        "send_control": 64,
+        "close_with_code$isra$0": 64,
+        "format_status$constprop$0": 656,
+        "send_status": 96,
+        "prepare_status": 64,
+        "websocket_handler": 464,
+        "status_work": 48,
+        "websocket_service_notify_playlist_changed": 32,
+        "websocket_service_register": 80,
+        "websocket_service_stop": 32,
+        "websocket_service_start": 64,
+        "websocket_service_server_stopped": 32
+      },
+      "after": {
+        "number": 32,
+        "session_free": 32,
+        "status_event": 48,
+        "capture_status$constprop$0": 1360,
+        "find_client": 48,
+        "websocket_handshake_transport": 32,
+        "status_timer": 48,
+        "send_text": 64,
+        "send_complete_frame_bytes": 96,
+        "write_status_stream": 32,
+        "receive_complete_frame_bytes": 96,
+        "json_sink_string": 48,
+        "payload_string": 32,
+        "payload_number": 80,
+        "send_control": 64,
+        "close_with_code$isra$0": 64,
+        "format_status$constprop$0": 656,
+        "send_status": 96,
+        "prepare_status": 64,
+        "websocket_handler": 464,
+        "status_work": 48,
+        "websocket_service_notify_playlist_changed": 32,
+        "websocket_service_register": 80,
+        "websocket_service_stop": 32,
+        "websocket_service_start": 64,
+        "websocket_service_server_stopped": 32
+      }
+    }
+  },
+  "clang": [
+    {
+      "source": "idf/components/native_web_transport/native_web_transport.c",
+      "view": "before",
+      "whole_translation_unit": true,
+      "system_headers": true,
+      "source_pin": {
+        "bytes": 17573,
+        "sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf"
+      },
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_cpu.h",
+          "line": 221,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 164,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 179,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 193,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 565,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 580,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 113,
+          "column": 14,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 123,
+          "column": 15,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 150,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'sbintime_t' (aka 'long long') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 157,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 202,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'int64_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 215,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 236,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 257,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 280,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 298,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 316,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 333,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "idf/components/native_web_transport/native_web_transport.c",
+          "line": 59,
+          "column": 48,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "source": "idf/components/native_web_transport/native_web_transport.c",
+      "view": "after",
+      "whole_translation_unit": true,
+      "system_headers": true,
+      "source_pin": {
+        "bytes": 19139,
+        "sha256": "9629b5aa1cf2e6c21f3fabf56fab004abfbd7935a11f32830806555283403397"
+      },
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_cpu.h",
+          "line": 221,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 164,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 179,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 193,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 565,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 580,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 113,
+          "column": 14,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 123,
+          "column": 15,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 150,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'sbintime_t' (aka 'long long') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 157,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 202,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'int64_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 215,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 236,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 257,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 280,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 298,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 316,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 333,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "idf/components/native_web_transport/native_web_transport.c",
+          "line": 61,
+          "column": 48,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "source": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+      "view": "before",
+      "whole_translation_unit": true,
+      "system_headers": true,
+      "source_pin": {
+        "bytes": 34947,
+        "sha256": "6ff6490ccce6592ad5a986336bb266efab815bf0040945cf3dd6f385bad42a6b"
+      },
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_cpu.h",
+          "line": 221,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 164,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 179,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 193,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 565,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 580,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 113,
+          "column": 14,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 123,
+          "column": 15,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 150,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'sbintime_t' (aka 'long long') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 157,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 202,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'int64_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 215,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 236,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 257,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 280,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 298,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 316,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 333,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+          "line": 285,
+          "column": 39,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ]
+    },
+    {
+      "source": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+      "view": "after",
+      "whole_translation_unit": true,
+      "system_headers": true,
+      "source_pin": {
+        "bytes": 35109,
+        "sha256": "fc2a931c9ae665cdefcd2cb400c5b6d6a2596e1a39b6e69f45511d0d2d7bbf9a"
+      },
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_cpu.h",
+          "line": 221,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 164,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 179,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_hw_support\\include\\esp_memory_utils.h",
+          "line": 193,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 565,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\portable\\xtensa\\include\\freertos\\portmacro.h",
+          "line": 580,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 113,
+          "column": 14,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 123,
+          "column": 15,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 150,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'sbintime_t' (aka 'long long') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 157,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 202,
+          "column": 9,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'int64_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 215,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 236,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 257,
+          "column": 8,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 280,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 298,
+          "column": 17,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 316,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\lib\\clang-runtimes\\xtensa-esp-unknown-elf\\esp32\\include\\sys\\time.h",
+          "line": 333,
+          "column": 16,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+          "line": 290,
+          "column": 39,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ]
+    }
+  ],
+  "sdk_frontends": [
+    {
+      "unit": "pbuf.c",
+      "source": {
+        "bytes": 52859,
+        "sha256": "951b1723eb1f919ca5cb408f19b00fcb9d464948a126631217ec96412dd1cc77"
+      },
+      "command_identical_to_799": true,
+      "exit_status": 0
+    },
+    {
+      "unit": "tcp_out.c",
+      "source": {
+        "bytes": 81436,
+        "sha256": "f31f0eef0c9aba4402ebff73b6d99a560b1d7ec219b4e0e5791996c41a832308"
+      },
+      "command_identical_to_799": true,
+      "exit_status": 0
+    }
+  ],
+  "before_geometry": {
+    "sections": {
+      ".dram0.data": 11922,
+      ".dram0.bss": 19720,
+      ".iram0.text": 60095,
+      ".rtc_slow_reserved": 24
+    },
+    "heap_start": 1073445800,
+    "rtc_used": 104,
+    "owners": {
+      "s_status_stage": {
+        "bytes": 1024,
+        "address": 1073439724,
+        "section": ".dram0.bss"
+      },
+      "s_previous": {
+        "bytes": 508,
+        "address": 1073441264,
+        "section": ".dram0.bss"
+      },
+      "s_current": {
+        "bytes": 508,
+        "address": 1073440756,
+        "section": ".dram0.bss"
+      },
+      "s_clients": {
+        "bytes": 384,
+        "address": 1073441776,
+        "section": ".dram0.bss"
+      },
+      "s_sockets": {
+        "bytes": 40,
+        "address": 1073439680,
+        "section": ".dram0.bss"
+      },
+      "s_status_length": {
+        "bytes": 4,
+        "address": 1073439720,
+        "section": ".dram0.bss"
+      },
+      "s_display": {
+        "bytes": 5168,
+        "address": 1073428272,
+        "section": ".dram0.bss"
+      },
+      "s_pbuf_failures": {
+        "bytes": 128,
+        "address": 1073421280,
+        "section": ".dram0.data"
+      },
+      "s_pbuf_failure_lock": {
+        "bytes": 8,
+        "address": 1073421408,
+        "section": ".dram0.data"
+      }
+    }
+  },
+  "after_geometry": {
+    "sections": {
+      ".dram0.data": 11922,
+      ".dram0.bss": 19720,
+      ".iram0.text": 60095,
+      ".rtc_slow_reserved": 24
+    },
+    "heap_start": 1073445800,
+    "rtc_used": 104,
+    "owners": {
+      "s_status_stage": {
+        "bytes": 1024,
+        "address": 1073439724,
+        "section": ".dram0.bss"
+      },
+      "s_previous": {
+        "bytes": 508,
+        "address": 1073441264,
+        "section": ".dram0.bss"
+      },
+      "s_current": {
+        "bytes": 508,
+        "address": 1073440756,
+        "section": ".dram0.bss"
+      },
+      "s_clients": {
+        "bytes": 384,
+        "address": 1073441776,
+        "section": ".dram0.bss"
+      },
+      "s_sockets": {
+        "bytes": 40,
+        "address": 1073439680,
+        "section": ".dram0.bss"
+      },
+      "s_status_length": {
+        "bytes": 4,
+        "address": 1073439720,
+        "section": ".dram0.bss"
+      },
+      "s_display": {
+        "bytes": 5168,
+        "address": 1073428272,
+        "section": ".dram0.bss"
+      },
+      "s_pbuf_failures": {
+        "bytes": 128,
+        "address": 1073421280,
+        "section": ".dram0.data"
+      },
+      "s_pbuf_failure_lock": {
+        "bytes": 8,
+        "address": 1073421408,
+        "section": ".dram0.data"
+      }
+    }
+  },
+  "actual_memory_delta": {
+    ".dram0.data": 0,
+    ".dram0.bss": 0,
+    ".iram0.text": 0,
+    ".rtc_slow_reserved": 0,
+    "heap_start": 0
+  },
+  "ota_slots": [
+    {
+      "name": "app0",
+      "offset": 65536,
+      "bytes": 1769472
+    },
+    {
+      "name": "app1",
+      "offset": 1835008,
+      "bytes": 1769472
+    }
+  ],
+  "typed_compiler_delta": {
+    "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_NO_MERGE_CONSTANTS": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "COMPILER_RT_LIB_CLANGRT": {
+      "before_present": false,
+      "before": null,
+      "after_present": true,
+      "after": false
+    },
+    "COMPILER_STATIC_ANALYZER": {
+      "before_present": true,
+      "before": false,
+      "after_present": false,
+      "after": null
+    },
+    "IDF_TOOLCHAIN": {
+      "before_present": true,
+      "before": "gcc",
+      "after_present": true,
+      "after": "clang"
+    },
+    "IDF_TOOLCHAIN_CLANG": {
+      "before_present": false,
+      "before": null,
+      "after_present": true,
+      "after": true
+    },
+    "IDF_TOOLCHAIN_GCC": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    },
+    "LIBC_NEWLIB": {
+      "before_present": true,
+      "before": false,
+      "after_present": true,
+      "after": true
+    },
+    "LIBC_NEWLIB_NANO_FORMAT": {
+      "before_present": false,
+      "before": null,
+      "after_present": true,
+      "after": true
+    },
+    "LIBC_PICOLIBC": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    },
+    "LIBC_PICOLIBC_NEWLIB_COMPATIBILITY": {
+      "before_present": true,
+      "before": true,
+      "after_present": false,
+      "after": null
+    }
+  },
+  "image": {
+    "bytes": 1269424,
+    "sha256": "e18bb793645c236572ac9aaa6d3b3c9091995aeb8ffab70c1ba7b6639cc50950"
+  },
+  "elf": {
+    "bytes": 10651268,
+    "sha256": "84b5f45ae14144240a71b7d91ac339d0a7c55993278578a18178fd7e79dcdfc3"
+  },
+  "config": {
+    "bytes": 49212,
+    "sha256": "b316d5cf49efe0818252ace4f27aa064c34213d4848f829cef27e00d809dd352"
+  },
+  "linked_report": {
+    "bytes": 23854,
+    "sha256": "c9354ac346ce907df94bbdca4b6f0646062d845a5552c047c5b84adc144baafe"
+  },
+  "linked_verifier": {
+    "bytes": 23211,
+    "sha256": "d4e636beb193d9a52460f587300cc07cae4b93285e3b8b3a04cd7a7337dcd90b"
+  },
+  "commands_identical_to_799": true,
+  "unchanged_task_channel_budgets": true,
+  "total_stack_depth_verified": false
+}

@@ -1,0 +1,63 @@
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_cpu.h:221:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  221 |     return (void *)((pc & 0x3fffffffU) | 0x40000000U);
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_memory_utils.h:164:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  164 |     return (void *) ( SOC_DIRAM_IRAM_LOW + (SOC_DIRAM_DRAM_HIGH - (intptr_t)p) - 4);
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_memory_utils.h:179:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  179 |     return (void *) ( SOC_RTC_IRAM_LOW + (ptr - SOC_RTC_DRAM_LOW) );
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_memory_utils.h:193:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  193 |     return (void *) ( SOC_DIRAM_DRAM_LOW + (SOC_DIRAM_IRAM_HIGH - (intptr_t)p) - 4);
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:565:5: warning: if with identical then and else branches [bugprone-branch-clone]
+  565 |     if (xPortInIsrContext()) {
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:567:7: note: else branch starts here
+  567 |     } else {
+      |       ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:580:5: warning: if with identical then and else branches [bugprone-branch-clone]
+  580 |     if (xPortInIsrContext()) {
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:582:7: note: else branch starts here
+  582 |     } else {
+      |       ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:113:14: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  113 |         _bt->sec += (_p2 >> 32);
+      |                     ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:123:15: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  123 |                 _bt->sec |= _bt->frac >> (64 - _exp);
+      |                             ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:150:9: warning: narrowing conversion from 'sbintime_t' (aka 'long long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  150 |         return (_sbt >> 32);
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:157:9: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  157 |         return (((sbintime_t)_bt.sec << 32) + (_bt.frac >> 32));
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:202:9: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'int64_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  202 |         return (ns + (1000000000 * (_sbt & 0xffffffffu) >> 32));
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:215:8: warning: narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  215 |         sb += ((_ns * 9223372037ull) + 0x7fffffff) >> 31;
+      |               ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:236:8: warning: narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  236 |         sb += ((_us * 9223372036855ull) + 0x7fffffff) >> 31;
+      |               ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:257:8: warning: narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  257 |         sb += ((_ms * 9223372036854776ull) + 0x7fffffff) >> 31;
+      |               ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:280:17: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  280 |         _ts->tv_nsec = ((uint64_t)1000000000 *
+      |                        ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:298:17: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  298 |         _tv->tv_usec = ((uint64_t)1000000 * (uint32_t)(_bt->frac >> 32)) >> 32;
+      |                        ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:316:16: warning: narrowing conversion from 'int64_t' (aka 'long long') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  316 |         _ts.tv_nsec = sbttons((uint32_t)_sbt);
+      |                       ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:333:16: warning: narrowing conversion from 'int64_t' (aka 'long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  333 |         _tv.tv_usec = sbttous((uint32_t)_sbt);
+      |                       ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\websocket_service.c:290:39: warning: narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined [bugprone-narrowing-conversions]
+  290 |         key->rssi = key->rssi_valid ? network.rssi : 0;
+      |                                       ^

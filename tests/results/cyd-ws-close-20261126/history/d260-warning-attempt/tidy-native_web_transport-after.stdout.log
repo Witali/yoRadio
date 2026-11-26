@@ -1,0 +1,189 @@
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_cpu.h:221:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  221 |     return (void *)((pc & 0x3fffffffU) | 0x40000000U);
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_memory_utils.h:164:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  164 |     return (void *) ( SOC_DIRAM_IRAM_LOW + (SOC_DIRAM_DRAM_HIGH - (intptr_t)p) - 4);
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_memory_utils.h:179:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  179 |     return (void *) ( SOC_RTC_IRAM_LOW + (ptr - SOC_RTC_DRAM_LOW) );
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_hw_support/include/esp_memory_utils.h:193:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  193 |     return (void *) ( SOC_DIRAM_DRAM_LOW + (SOC_DIRAM_IRAM_HIGH - (intptr_t)p) - 4);
+      |            ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:565:5: warning: if with identical then and else branches [bugprone-branch-clone]
+  565 |     if (xPortInIsrContext()) {
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:567:7: note: else branch starts here
+  567 |     } else {
+      |       ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:580:5: warning: if with identical then and else branches [bugprone-branch-clone]
+  580 |     if (xPortInIsrContext()) {
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:582:7: note: else branch starts here
+  582 |     } else {
+      |       ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:113:14: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  113 |         _bt->sec += (_p2 >> 32);
+      |                     ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:123:15: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'time_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  123 |                 _bt->sec |= _bt->frac >> (64 - _exp);
+      |                             ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:150:9: warning: narrowing conversion from 'sbintime_t' (aka 'long long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  150 |         return (_sbt >> 32);
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:157:9: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  157 |         return (((sbintime_t)_bt.sec << 32) + (_bt.frac >> 32));
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:202:9: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'int64_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  202 |         return (ns + (1000000000 * (_sbt & 0xffffffffu) >> 32));
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:215:8: warning: narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  215 |         sb += ((_ns * 9223372037ull) + 0x7fffffff) >> 31;
+      |               ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:236:8: warning: narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  236 |         sb += ((_us * 9223372036855ull) + 0x7fffffff) >> 31;
+      |               ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:257:8: warning: narrowing conversion from 'unsigned long long' to signed type 'sbintime_t' (aka 'long long') is implementation-defined [bugprone-narrowing-conversions]
+  257 |         sb += ((_ms * 9223372036854776ull) + 0x7fffffff) >> 31;
+      |               ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:280:17: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  280 |         _ts->tv_nsec = ((uint64_t)1000000000 *
+      |                        ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:298:17: warning: narrowing conversion from 'uint64_t' (aka 'unsigned long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  298 |         _tv->tv_usec = ((uint64_t)1000000 * (uint32_t)(_bt->frac >> 32)) >> 32;
+      |                        ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:316:16: warning: narrowing conversion from 'int64_t' (aka 'long long') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  316 |         _ts.tv_nsec = sbttons((uint32_t)_sbt);
+      |                       ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/sys/time.h:333:16: warning: narrowing conversion from 'int64_t' (aka 'long long') to signed type 'suseconds_t' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  333 |         _tv.tv_usec = sbttous((uint32_t)_sbt);
+      |                       ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:61:48: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   61 |     if (size < NATIVE_WEB_TLS_BUNDLE_HEADER || memcmp(bundle, "NTLS", 4) ||
+      |                                                ^
+      |                                                                          != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:296:11: warning: The 1st argument to 'shutdown' is < 0 but should be >= 0 [clang-analyzer-unix.StdCLibraryFunctions]
+  296 |     (void)shutdown(socket, SHUT_WR);
+      |           ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:323:30: note: Calling 'session'
+  323 |     tls_session_t *context = session(server, socket);
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:122:9: note: Assuming the condition is false
+  122 |     if (!atomic_load(&s_secure)) return NULL;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:122:5: note: Taking false branch
+  122 |     if (!atomic_load(&s_secure)) return NULL;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:124:5: note: Loop condition is true.  Entering loop body
+  124 |     for (size_t i = 0; i < TLS_CLIENTS; ++i) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:13: note: Assuming 'current' is non-null
+  126 |         if (current && context == current && current->server == server && current->socket == socket)
+      |             ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:13: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:24: note: Assuming 'context' is equal to 'current'
+  126 |         if (current && context == current && current->server == server && current->socket == socket)
+      |                        ^~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:13: note: Left side of '&&' is true
+  126 |         if (current && context == current && current->server == server && current->socket == socket)
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:46: note: Assuming 'server' is equal to field 'server'
+  126 |         if (current && context == current && current->server == server && current->socket == socket)
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:13: note: Left side of '&&' is true
+  126 |         if (current && context == current && current->server == server && current->socket == socket)
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:75: note: Assuming 'socket' is equal to field 'socket'
+  126 |         if (current && context == current && current->server == server && current->socket == socket)
+      |                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:126:9: note: Taking true branch
+  126 |         if (current && context == current && current->server == server && current->socket == socket)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:127:13: note: Returning pointer (loaded from 'current'), which participates in a condition later
+  127 |             return current;
+      |             ^~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:323:30: note: Returning from 'session'
+  323 |     tls_session_t *context = session(server, socket);
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:324:9: note: 'context' is non-null
+  324 |     if (context) close_alert(context);
+      |         ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:324:5: note: Taking true branch
+  324 |     if (context) close_alert(context);
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:324:18: note: Calling 'close_alert'
+  324 |     if (context) close_alert(context);
+      |                  ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:9: note: Assuming field 'tls' is non-null
+  269 |     if (!context->tls || context->aborted || context->close_alert_sent || context->shutdown_requested) return;
+      |         ^~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:9: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:26: note: Assuming field 'aborted' is false
+  269 |     if (!context->tls || context->aborted || context->close_alert_sent || context->shutdown_requested) return;
+      |                          ^~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:9: note: Left side of '||' is false
+  269 |     if (!context->tls || context->aborted || context->close_alert_sent || context->shutdown_requested) return;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:46: note: Assuming field 'close_alert_sent' is false
+  269 |     if (!context->tls || context->aborted || context->close_alert_sent || context->shutdown_requested) return;
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:9: note: Left side of '||' is false
+  269 |     if (!context->tls || context->aborted || context->close_alert_sent || context->shutdown_requested) return;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:75: note: Assuming field 'shutdown_requested' is false
+  269 |     if (!context->tls || context->aborted || context->close_alert_sent || context->shutdown_requested) return;
+      |                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:269:5: note: Taking false branch
+  269 |     if (!context->tls || context->aborted || context->close_alert_sent || context->shutdown_requested) return;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:271:9: note: Assuming 'ssl' is non-null
+  271 |     if (!ssl) return;
+      |         ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:271:5: note: Taking false branch
+  271 |     if (!ssl) return;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:273:12: note: Assuming the condition is true
+  273 |     while ((uint64_t)esp_timer_get_time() - started < TLS_CLOSE_US) {
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:273:5: note: Loop condition is true.  Entering loop body
+  273 |     while ((uint64_t)esp_timer_get_time() - started < TLS_CLOSE_US) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:275:13: note: Assuming 'result' is not equal to 0
+  275 |         if (!result) { context->close_alert_sent = true; return; }
+      |             ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:275:9: note: Taking false branch
+  275 |         if (!result) { context->close_alert_sent = true; return; }
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:276:13: note: Assuming the condition is false
+  276 |         if (result != ESP_TLS_ERR_SSL_WANT_READ && result != ESP_TLS_ERR_SSL_WANT_WRITE) return;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:276:49: note: Left side of '&&' is false
+  276 |         if (result != ESP_TLS_ERR_SSL_WANT_READ && result != ESP_TLS_ERR_SSL_WANT_WRITE) return;
+      |                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:277:9: note: Taking true branch
+  277 |         if (wait_ready(context->socket, result == ESP_TLS_ERR_SSL_WANT_WRITE,
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:324:18: note: Returning from 'close_alert'
+  324 |     if (context) close_alert(context);
+      |                  ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:325:10: note: 'context' is non-null
+  325 |     if (!context || !context->aborted) drain_tcp_close(socket);
+      |          ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:325:9: note: Left side of '||' is false
+  325 |     if (!context || !context->aborted) drain_tcp_close(socket);
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:325:31: note: Field 'aborted' is false
+  325 |     if (!context || !context->aborted) drain_tcp_close(socket);
+      |                               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:325:5: note: Taking true branch
+  325 |     if (!context || !context->aborted) drain_tcp_close(socket);
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:325:56: note: Passing value via 1st parameter 'socket'
+  325 |     if (!context || !context->aborted) drain_tcp_close(socket);
+      |                                                        ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:325:40: note: Calling 'drain_tcp_close'
+  325 |     if (!context || !context->aborted) drain_tcp_close(socket);
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_web_transport\native_web_transport.c:296:11: note: The 1st argument to 'shutdown' is < 0 but should be >= 0
+  296 |     (void)shutdown(socket, SHUT_WR);
+      |           ^        ~~~~~~

@@ -1,0 +1,88 @@
+{
+  "controller_state": "TERMINAL_PASS",
+  "controller_reason": null,
+  "physical_tested": false,
+  "inputs": {
+    "report": {
+      "bytes": 27814,
+      "sha256": "fb810168e2d8765ec20a27038c1f6f55061224992bc8da8c98edef6ad3d4a479"
+    },
+    "uart": {
+      "bytes": 8528,
+      "sha256": "c97c8e58dc4076b9f90d52d6b158f14d7f3f8057f6182e3d132800d2eb41b6d2"
+    },
+    "elf": {
+      "bytes": 10651268,
+      "sha256": "84b5f45ae14144240a71b7d91ac339d0a7c55993278578a18178fd7e79dcdfc3"
+    },
+    "addr2line": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    },
+    "objdump": {
+      "bytes": 906240,
+      "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5"
+    },
+    "link_report": {
+      "bytes": 23854,
+      "sha256": "c9354ac346ce907df94bbdca4b6f0646062d845a5552c047c5b84adc144baafe"
+    }
+  },
+  "attribution_available": true,
+  "pbuf_pcm_flush_prefix": {
+    "total": 0,
+    "overflow": 0,
+    "used": 0,
+    "saturated": 0,
+    "table_bytes": 128,
+    "lock_bytes": 8,
+    "entries": []
+  },
+  "health_observations": {
+    "first_active_health": {
+      "uptime_ms": 32109,
+      "minimum_heap": 18068,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      }
+    },
+    "health_during_webui": {
+      "uptime_ms": 42200,
+      "minimum_heap": 5644,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      }
+    },
+    "eof_health": {
+      "uptime_ms": 109099,
+      "minimum_heap": 4104,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      }
+    },
+    "post_eof_health": {
+      "uptime_ms": 116865,
+      "minimum_heap": 4104,
+      "allocation_failures": 0,
+      "last_allocation_failure": {
+        "size": 0,
+        "caps": 0
+      }
+    },
+    "last_reachable_health": null
+  },
+  "pcm_sha256": "44d9a67ecc2e6a6d382951442fb7bdf687510c784e2e9137036cbe0a38b6f362",
+  "pcm_flushes": [
+    {
+      "frames": 614400,
+      "status": 0
+    }
+  ],
+  "interpretation": "The probe is a cumulative PCM-flush prefix. Later EOF/WebUI/peer-close heap counts are independent snapshots, not an atomic common observation. NULL is not automatically a heap failure; retain non-RAM/overflow/saturation, unwrapped paths and unexplained differences. This report never promotes a controller NONPASS."
+}
